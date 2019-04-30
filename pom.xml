@@ -6,7 +6,7 @@
 
     <name>moon-util</name>
     <description>a java tool library</description>
-    <url>https://github.com/xua744531854/moon-util</url>
+    <url>https://github.com/moon-util/moon-util</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -18,11 +18,15 @@
             <name>xua744531854</name>
             <email>xua744531854@163.com</email>
         </developer>
+        <developer>
+            <name>flying8824301</name>
+            <email>flying8824301@163.com</email>
+        </developer>
     </developers>
     <scm>
-        <connection>scm:git:git@github.com:xua744531854/moon-util.git</connection>
-        <developerConnection>scm:git:git@github.com:xua744531854/moon-util.git</developerConnection>
-        <url>git@github.com:xua744531854/moon-util.git</url>
+        <connection>scm:git:git@github.com:moon-util/moon-util.git</connection>
+        <developerConnection>scm:git:git@github.com:moon-util/moon-util.git</developerConnection>
+        <url>git@github.com:moon-util/moon-util.git</url>
     </scm>
 
     <profiles>
@@ -100,10 +104,10 @@
     </profiles>
 
 
-    <groupId>com.github.xua744531854</groupId>
+    <groupId>com.github.moon-util</groupId>
     <artifactId>moon-util</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.11</version>
+    <version>0.0.12</version>
     <build>
         <plugins>
             <plugin>
