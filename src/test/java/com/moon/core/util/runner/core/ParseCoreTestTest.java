@@ -1,0 +1,305 @@
+package com.moon.core.util.runner.core;
+
+import com.moon.core.io.FileUtil;
+import com.moon.core.lang.StringUtil;
+import com.moon.core.util.Console;
+import com.moon.core.util.MapUtil;
+import com.moon.core.util.require.Requires;
+import com.moon.core.util.runner.RunnerUtil;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * @author benshaoye
+ */
+class ParseCoreTestTest {
+
+    static final Requires REQUIRES = Requires.of();
+
+    int num;
+    String str;
+    Object data;
+    Object res;
+    AsRunner handler, handler1, runner;
+
+    static AsRunner running(String str) {
+        return ParseCore.parse(str, null);
+    }
+
+    @Test
+    void testRunnerThree() {
+        handler = running("true?'name':'age'");
+        REQUIRES.requireTrue(handler instanceof DataStr);
+        REQUIRES.requireEquals(handler.run(), "name");
+        handler = running("false?'name':'age'");
+        REQUIRES.requireTrue(handler instanceof DataStr);
+        REQUIRES.requireEquals(handler.run(), "age");
+        handler = running("1>2?'name':'age'");
+        REQUIRES.requireTrue(handler instanceof DataStr);
+        REQUIRES.requireEquals(handler.run(), "age");
+        handler = running("1<=2?'name':'age'");
+        REQUIRES.requireTrue(handler instanceof DataStr);
+        REQUIRES.requireEquals(handler.run(), "name");
+    }
+
+    @Test
+    void testRunnerThree0() {
+        handler = running("{assertion: true, value1: 20, value2: 30}");
+        data = handler.run();
+        handler = running("assertion?value1:value2");
+        res = handler.run(data);
+        REQUIRES.requireEquals(res, 20);
+        REQUIRES.requireNotInstanceOf(handler, DataConst.class);
+
+        handler = running("@BooleanUtil.toBooleanValue(20)?value1:value2");
+        res = handler.run(data);
+        REQUIRES.requireEquals(res, 20);
+    }
+
+    @Test
+    void testCompare() {
+        handler = running("1>2");
+        REQUIRES.requireEquals(handler.run(), false);
+        handler = running("1+2>2");
+        REQUIRES.requireEquals(handler.run(), true);
+        handler = running("1>=2");
+        REQUIRES.requireEquals(handler.run(), false);
+        handler = running("1+2>=2");
+        REQUIRES.requireEquals(handler.run(), true);
+        handler = running("2>=2");
+        REQUIRES.requireEquals(handler.run(), true);
+        handler = running("1+2>=3");
+        REQUIRES.requireEquals(handler.run(), true);
+    }
+
+    @Test
+    void testRunningCaller() {
+        handler = running("@Objects.hash('123')");
+        REQUIRES.requireEquals(Objects.hash("123"), handler.run());
+        handler = running("@StringUtil.concat(data)");
+        data = new HashMap() {{
+            put("data", new CharSequence[]{"123", "456"});
+        }};
+        REQUIRES.requireEquals(StringUtil.concat("123", "456"), handler.run(data));
+    }
+
+    @Test
+    void testGetTotalFiles() {
+        String path = "D:\\WorkSpaces\\IDEA\\moonsky\\src\\main\\java\\com\\moon";
+        List<File> all = FileUtil.traverseDirectory(path);
+        Console.out.println("==============================================");
+        Console.out.println(all.size());
+    }
+
+    @Test
+    void testName() {
+        handler = running("1 + 2 + @Objects.toString('10')");
+        REQUIRES.requireEquals(handler.run(), "310");
+        handler = running("@Console.out.getLowestLevel().name()");
+        REQUIRES.requireEquals(handler.run(), "PRINT");
+        handler = running("@Console$Level.ASSERT.name()");
+        REQUIRES.requireEquals(handler.run(), "ASSERT");
+    }
+
+    @Test
+    void testGetOpposite() {
+        handler = ParseCore.parse("1+-1*5");
+        REQUIRES.requireEq((Integer) handler.run(), 1 + -1 * 5);
+        handler = ParseCore.parse("(1+-1)*5");
+        REQUIRES.requireEq((Integer) handler.run(), (1 + -1) * 5);
+        handler = ParseCore.parse("-1*5");
+        REQUIRES.requireEq((Integer) handler.run(), -1 * 5);
+
+        data = new HashMap() {{
+            put(true, 20);
+        }};
+        handler = ParseCore.parse("-[true]*5");
+        REQUIRES.requireEq((Integer) handler.run(data), -100);
+    }
+
+    @Test
+    void testParse() {
+        handler = ParseCore.parse("1+1");
+        REQUIRES.requireEq((Integer) handler.run(), 2);
+        handler = ParseCore.parse("(1+1+205)");
+        REQUIRES.requireEq((Integer) handler.run(), 207);
+        handler = ParseCore.parse("2100-21*53+2255");
+        num = 2100 - 21 * 53 + 2255;
+        REQUIRES.requireEq((Integer) handler.run(), num);
+        handler = ParseCore.parse("40 * 48 - (1472 + 328) / 5");
+        num = 40 * 48 - (1472 + 328) / 5;
+        REQUIRES.requireEq((Integer) handler.run(), num);
+
+        str = "aaaaaaaaaaa";
+        data = new HashMap() {{
+            put(true, str);
+            put(false, false);
+            put(str, false);
+            put(20, new HashMap() {{
+                put("name", 53);
+            }});
+        }};
+
+        handler = ParseCore.parse("[true]");
+        REQUIRES.requireEquals(handler.run(data), str);
+    }
+
+    @Test
+    void testInvoker() {
+        data = new HashMap() {{
+            put(20, new HashMap() {{
+                put("name", new ArrayList() {{
+                    add(new Employee());
+                    add(new Employee());
+                }});
+            }});
+            put(true, 16);
+            put("true", 20);
+        }};
+
+        handler = ParseCore.parse("[20].getSheet('name').getSheet(0).age.toString().length()");
+        REQUIRES.requireEquals(handler.run(data), 2);
+
+        handler = ParseCore.parse(
+            "[  20   ]  .name   .  getSheet(0)  .  age  .  doubleValue(). toString(   ) . length   (  ) + [true]");
+        REQUIRES.requireEquals(handler.run(data), 20);
+
+        handler = ParseCore.parse(
+            "[  20   ]  .name   .  getSheet(0)  .  age  .  doubleValue(). toString(   ) . length   (  ) + ['true']");
+        REQUIRES.requireEquals(handler.run(data), 24);
+
+        handler = ParseCore.parse("([20].name.getSheet(0).age.doubleValue().toString().length()+[true]).longValue()");
+        REQUIRES.requireEquals(handler.run(data), 20L);
+
+        handler = ParseCore.parse("([20].name.getSheet(0).age.doubleValue().toString().length()+['true'])");
+        REQUIRES.requireEquals(handler.run(data), 24);
+
+        handler = ParseCore.parse("([20].name.getSheet(0).age.doubleValue().toString().length()+true).toString().length()");
+        REQUIRES.requireEquals(handler.run(data), 5);
+    }
+
+    @Test
+    void testCaller() {
+        data = new HashMap() {{
+            put("array", new Object[]{1, 2, 3, "asdfghj"});
+        }};
+        handler = ParseCore.parse("@System.currentTimeMillis()");
+        res = handler.run();
+        Console.out.println(res);
+        handler1 = ParseCore.parse("@DateUtil.now()");
+        res = handler.run();
+        Console.out.println(res);
+        Console.out.println("===============================");
+        res = handler.run();
+        Console.out.println(res);
+        res = handler1.run();
+        Console.out.println(res);
+        Console.out.println("===============================");
+    }
+
+    @Test
+    void testArrayStringify() {
+        data = new HashMap() {{
+            put("array", new Object[]{1, 2, 3, "asdfghj"});
+        }};
+        handler1 = ParseCore.parse("@ ArraysEnum . OBJECTS . stringify(['array']).toString()");
+        res = handler1.run(data);
+
+        System.out.println(RunnerUtil.run("@now()"));
+
+    }
+
+    @Test
+    void testCalc() {
+        res = ParseCore.parse("15+5/3").run();
+        REQUIRES.requireEquals(res, 15 + 5 / 3);
+    }
+
+    @Test
+    void testLinker() {
+        str = "1111111111111";
+        String str1 = "aaaaaa";
+        data = new HashMap() {{
+            put(20, new HashMap() {{
+                put("name", new ArrayList() {{
+                    add(new Employee());
+                    add(new Employee());
+                }});
+            }});
+            put("fieldName", "age");
+            put(str1, str1);
+            put(true, str);
+            put(false, false);
+            put(str, false);
+        }};
+
+        handler = ParseCore.parse("[true]");
+        REQUIRES.requireEquals(handler.run(data), str);
+        handler = ParseCore.parse("[aaaaaa]");
+        REQUIRES.requireEquals(handler.run(data), str1);
+        handler = ParseCore.parse("!['1111111111111']");
+        REQUIRES.requireTrue((Boolean) handler.run(data));
+
+        MapUtil.putToObject(data, true, "age");
+
+        handler = ParseCore.parse("(!['1111111111111']+([20].name[1][fieldName].doubleValue() + '123')).length()");
+        REQUIRES.requireEquals(handler.run(data), 11);
+        handler = ParseCore.parse("(!['1111111111111']+([20].name[1][fieldName].doubleValue() + '123'))");
+        REQUIRES.requireEquals(handler.run(data), "true20.0123");
+        handler = ParseCore.parse("([20].name).isEmpty()");
+        REQUIRES.requireFalse((Boolean) handler.run(data));
+        handler = ParseCore.parse("({}).isEmpty()");
+        REQUIRES.requireTrue((Boolean) handler.run(data));
+        handler = ParseCore.parse("({:}).isEmpty()");
+        REQUIRES.requireTrue((Boolean) handler.run(data));
+        handler = ParseCore.parse("({}).size()");
+        REQUIRES.requireEquals(handler.run(data), 0);
+        handler = ParseCore.parse("({:}).size()");
+        REQUIRES.requireEquals(handler.run(data), 0);
+    }
+
+    public static class Employee {
+        int age = 20;
+    }
+
+    @Test
+    void testFnRunner() {
+        str = "@map.getSheet({20:25}, 20)";
+        REQUIRES.requireEquals(running(str).run(), 25);
+
+        str = "@map.getSheet(@map(23,24,25,26,68),68)";
+        runner = running(str);
+        REQUIRES.requireEquals(runner.run(), null);
+
+        str = "@list.size(@list(23,24,25,26,68))";
+        runner = running(str);
+        REQUIRES.requireEquals(runner.run(), 5);
+
+        str = "@System.getProperty('os.name')";
+        runner = running(str);
+        data = runner.run();
+        System.out.println(data);
+    }
+
+    @Test
+    void testParseExist() {
+        str = "@System.exit(0)";
+        REQUIRES.requireThrows(() -> running(str));
+    }
+
+    @Test
+    void testInstance() {
+        Object o = null;
+        Console.out.println(Object.class.isInstance(o));
+    }
+
+    @Test
+    void testCalculator() {
+        REQUIRES.requireEq(((Number) ParseCore.parse("349+644+72").run()).intValue(), 349 + 644 + 72);
+    }
+}
