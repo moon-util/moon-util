@@ -6,7 +6,7 @@ package com.moon.core.util.function;
  * @author benshaoye
  */
 @FunctionalInterface
-public interface ThrowsRunnable {
+public interface ThrowingRunnable {
     /**
      * 运行
      *

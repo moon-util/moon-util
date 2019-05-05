@@ -1,10 +1,7 @@
 package com.moon.core.lang;
 
-import com.moon.core.io.IOUtil;
 import com.moon.core.util.OptionalUtil;
 import com.moon.core.util.function.*;
-
-import java.io.Closeable;
 
 import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -22,7 +19,7 @@ public final class LangUtil {
      *
      * @param run
      */
-    public static void run(ThrowsRunnable run) {
+    public static void run(ThrowingRunnable run) {
         try {
             run.run();
         } catch (Throwable t) {
@@ -37,7 +34,7 @@ public final class LangUtil {
      * @param <T>
      * @return
      */
-    public static <T> T get(ThrowsSupplier<T> supplier) {
+    public static <T> T get(ThrowingSupplier<T> supplier) {
         try {
             return supplier.get();
         } catch (Throwable t) {
@@ -45,7 +42,7 @@ public final class LangUtil {
         }
     }
 
-    public static <T> T getOrDefault(ThrowsSupplier<T> supplier, T defaultValue) {
+    public static <T> T getOrDefault(ThrowingSupplier<T> supplier, T defaultValue) {
         try {
             return OptionalUtil.getOrDefault(supplier.get(), defaultValue);
         } catch (Throwable t) {
@@ -53,7 +50,7 @@ public final class LangUtil {
         }
     }
 
-    public static <T> T defaultWhenThrow(ThrowsSupplier<T> supplier, T defaultValue) {
+    public static <T> T defaultWhenThrow(ThrowingSupplier<T> supplier, T defaultValue) {
         try {
             return supplier.get();
         } catch (Throwable t) {
@@ -68,7 +65,7 @@ public final class LangUtil {
      * @param consumer
      * @param <T>
      */
-    public static <T> void accept(T value, ThrowsConsumer<? super T> consumer) {
+    public static <T> void accept(T value, ThrowingConsumer<? super T> consumer) {
         try {
             consumer.accept(value);
         } catch (Throwable t) {
@@ -85,7 +82,7 @@ public final class LangUtil {
      * @param <R>
      * @return
      */
-    public static <T, R> R apply(T value, ThrowsFunction<? super T, R> function) {
+    public static <T, R> R apply(T value, ThrowingFunction<? super T, R> function) {
         try {
             return function.apply(value);
         } catch (Throwable t) {
@@ -102,7 +99,7 @@ public final class LangUtil {
      * @param <T>
      * @param <O>
      */
-    public static <T, O> void acceptBi(T v1, O v2, ThrowsBiConsumer<? super T, ? super O> consumer) {
+    public static <T, O> void acceptBi(T v1, O v2, ThrowingBiConsumer<? super T, ? super O> consumer) {
         try {
             consumer.accept(v1, v2);
         } catch (Throwable t) {
@@ -121,7 +118,7 @@ public final class LangUtil {
      * @param <R>
      * @return
      */
-    public static <T, O, R> R applyBi(T v1, O v2, ThrowsBiFunction<? super T, ? super O, R> function) {
+    public static <T, O, R> R applyBi(T v1, O v2, ThrowingBiFunction<? super T, ? super O, R> function) {
         try {
             return function.apply(v1, v2);
         } catch (Throwable t) {

@@ -6,7 +6,7 @@ import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.IteratorUtil;
-import com.moon.core.util.function.ThrowsConsumer;
+import com.moon.core.util.function.ThrowingConsumer;
 
 import java.io.*;
 import java.util.Collection;
@@ -222,7 +222,7 @@ public final class FileUtil {
      * -----------------------------------------------------------------------
      */
 
-    private static ThrowsConsumer<Object> newLineWriter(Writer writer) {
+    private static ThrowingConsumer<Object> newLineWriter(Writer writer) {
         BufferedWriter bw = IOUtil.getBufferedWriter(writer);
         return line -> {
             bw.newLine();
@@ -231,17 +231,17 @@ public final class FileUtil {
     }
 
     public static void writeLinesToWriter(Writer writer, Iterator<? extends Object> lines) {
-        ThrowsConsumer<Object> consumer = newLineWriter(writer);
+        ThrowingConsumer<Object> consumer = newLineWriter(writer);
         IteratorUtil.forEach(lines, line -> LangUtil.accept(line, consumer));
     }
 
     public static void writeLinesToWriter(Writer writer, Collection<? extends Object> lines) {
-        ThrowsConsumer<Object> consumer = newLineWriter(writer);
+        ThrowingConsumer<Object> consumer = newLineWriter(writer);
         IteratorUtil.forEach(lines, line -> LangUtil.accept(line, consumer));
     }
 
     public static void writeLinesToWriter(Writer writer, Object... lines) {
-        ThrowsConsumer<Object> consumer = newLineWriter(writer);
+        ThrowingConsumer<Object> consumer = newLineWriter(writer);
         IteratorUtil.forEach(lines, line -> LangUtil.accept(line, consumer));
     }
 

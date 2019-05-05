@@ -5,7 +5,7 @@ package com.moon.core.util.function;
  * @see java.util.function.Function
  */
 @FunctionalInterface
-public interface ThrowsBiFunction<T, O, R> {
+public interface ThrowingBiFunction<T, O, R> {
     /**
      * 应用并返回
      *

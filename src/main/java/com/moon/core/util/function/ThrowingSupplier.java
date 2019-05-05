@@ -5,7 +5,7 @@ package com.moon.core.util.function;
  * @see java.util.function.Supplier
  */
 @FunctionalInterface
-public interface ThrowsSupplier<T> {
+public interface ThrowingSupplier<T> {
     /**
      * 运行并获取值
      *

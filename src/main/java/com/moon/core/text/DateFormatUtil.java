@@ -116,14 +116,10 @@ public enum DateFormatUtil implements EnumDescriptor {
      */
     DEFAULT("") {
         @Override
-        public String getTextWithChinese() {
-            return This.DFT.getTextWithChinese();
-        }
+        public String getTextWithChinese() { return This.DFT.getTextWithChinese(); }
 
         @Override
-        public String getTextWithEnglish() {
-            return This.DFT.getTextWithEnglish();
-        }
+        public String getTextWithEnglish() { return This.DFT.getTextWithEnglish(); }
     },
     ;
 
@@ -139,9 +135,7 @@ public enum DateFormatUtil implements EnumDescriptor {
             return get(str).format(date).equals(zone.with(str).format(date));
         }
 
-        static DateFormat get(String pattern) {
-            return new SimpleDateFormat(pattern);
-        }
+        static DateFormat get(String pattern) { return new SimpleDateFormat(pattern); }
     }
 
     DateFormatUtil(String text) {
@@ -151,9 +145,7 @@ public enum DateFormatUtil implements EnumDescriptor {
         }
     }
 
-    public final DateFormat of(String pattern) {
-        return with(pattern);
-    }
+    public final DateFormat of(String pattern) { return with(pattern); }
 
     public final DateFormat with(String pattern) {
         DateFormat format = getLocal(pattern);
@@ -163,22 +155,14 @@ public enum DateFormatUtil implements EnumDescriptor {
         return format;
     }
 
-    public final static DateFormat getLocal(String pattern) {
-        return This.get(pattern);
-    }
+    public final static DateFormat getLocal(String pattern) { return This.get(pattern); }
 
-    public TimeZone getTimeZone() {
-        return TimeZone.getTimeZone(getTextWithEnglish());
-    }
+    public TimeZone getTimeZone() { return TimeZone.getTimeZone(getTextWithEnglish()); }
 
     @Override
-    public final String getText() {
-        return This.isChinese ? getTextWithChinese() : getTextWithEnglish();
-    }
+    public final String getText() { return This.isChinese ? getTextWithChinese() : getTextWithEnglish(); }
 
-    public String getTextWithChinese() {
-        return textOfChinese;
-    }
+    public String getTextWithChinese() { return textOfChinese; }
 
     public String getTextWithEnglish() {
         char[] chars = name().toCharArray();

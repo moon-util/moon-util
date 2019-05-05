@@ -2,15 +2,16 @@ package com.moon.core.util.function;
 
 /**
  * @author benshaoye
- * @see java.util.function.Supplier
+ * @see java.util.function.Function
  */
 @FunctionalInterface
-public interface ThrowsConsumer<T> {
+public interface ThrowingFunction<T, R> {
     /**
-     * 消费
+     * 应用并返回
      *
      * @param value
+     * @return
      * @throws Throwable
      */
-    void accept(T value) throws Throwable;
+    R apply(T value) throws Throwable;
 }

@@ -4,7 +4,7 @@ import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.LongAccessor;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ResourceUtil;
-import com.moon.core.util.function.ThrowsConsumer;
+import com.moon.core.util.function.ThrowingConsumer;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -414,27 +414,27 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public static void autoCloseAccept(Reader reader, ThrowsConsumer<? super Reader> consumer) {
+    public static void autoCloseAccept(Reader reader, ThrowingConsumer<? super Reader> consumer) {
         autoCloseHandle(reader, consumer);
     }
 
-    public static void autoCloseAccept(Writer writer, ThrowsConsumer<? super Writer> consumer) {
+    public static void autoCloseAccept(Writer writer, ThrowingConsumer<? super Writer> consumer) {
         autoCloseHandle(writer, consumer);
     }
 
-    public static void autoCloseAccept(InputStream is, ThrowsConsumer<? super InputStream> consumer) {
+    public static void autoCloseAccept(InputStream is, ThrowingConsumer<? super InputStream> consumer) {
         autoCloseHandle(is, consumer);
     }
 
-    public static void autoCloseAccept(OutputStream os, ThrowsConsumer<? super OutputStream> consumer) {
+    public static void autoCloseAccept(OutputStream os, ThrowingConsumer<? super OutputStream> consumer) {
         autoCloseHandle(os, consumer);
     }
 
-    public static void autoCloseAcceptAny(AutoCloseable closeable, ThrowsConsumer<? super AutoCloseable> consumer) {
+    public static void autoCloseAcceptAny(AutoCloseable closeable, ThrowingConsumer<? super AutoCloseable> consumer) {
         autoCloseHandle(closeable, consumer);
     }
 
-    private static void autoCloseHandle(AutoCloseable closeable, ThrowsConsumer consumer) {
+    private static void autoCloseHandle(AutoCloseable closeable, ThrowingConsumer consumer) {
         try {
             consumer.accept(closeable);
         } catch (Throwable throwable) {

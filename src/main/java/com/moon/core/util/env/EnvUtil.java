@@ -1,7 +1,7 @@
 package com.moon.core.util.env;
 
-import com.moon.core.util.function.ThrowsRunnable;
-import com.moon.core.util.function.ThrowsSupplier;
+import com.moon.core.util.function.ThrowingRunnable;
+import com.moon.core.util.function.ThrowingSupplier;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.env.EnvEnum.DEVELOPMENT;
@@ -38,11 +38,11 @@ public final class EnvUtil {
         return DEVELOPMENT.isTrue();
     }
 
-    public final static void ifProd(ThrowsRunnable executor) {
+    public final static void ifProd(ThrowingRunnable executor) {
         PRODUCTION.run(executor);
     }
 
-    public final static void ifDev(ThrowsRunnable executor) {
+    public final static void ifDev(ThrowingRunnable executor) {
         DEVELOPMENT.run(executor);
     }
 
@@ -54,19 +54,19 @@ public final class EnvUtil {
         return isDevelopment() ? dev : other;
     }
 
-    public final static <T> T ifProdOrDefault(ThrowsSupplier<T> supplier, T defaultValue) {
+    public final static <T> T ifProdOrDefault(ThrowingSupplier<T> supplier, T defaultValue) {
         return PRODUCTION.getOrDefault(supplier, defaultValue);
     }
 
-    public final static <T> T ifDevOrDefault(ThrowsSupplier<T> supplier, T defaultValue) {
+    public final static <T> T ifDevOrDefault(ThrowingSupplier<T> supplier, T defaultValue) {
         return DEVELOPMENT.getOrDefault(supplier, defaultValue);
     }
 
-    public final static <T> T ifProdOrElse(ThrowsSupplier<T> supplier, ThrowsSupplier<T> defaultSupplier) {
+    public final static <T> T ifProdOrElse(ThrowingSupplier<T> supplier, ThrowingSupplier<T> defaultSupplier) {
         return PRODUCTION.getOrElse(supplier, defaultSupplier);
     }
 
-    public final static <T> T ifDevOrElse(ThrowsSupplier<T> supplier, ThrowsSupplier<T> defaultSupplier) {
+    public final static <T> T ifDevOrElse(ThrowingSupplier<T> supplier, ThrowingSupplier<T> defaultSupplier) {
         return DEVELOPMENT.getOrElse(supplier, defaultSupplier);
     }
 }

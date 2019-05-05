@@ -1,7 +1,7 @@
 package com.moon.core.util.env;
 
-import com.moon.core.util.function.ThrowsRunnable;
-import com.moon.core.util.function.ThrowsSupplier;
+import com.moon.core.util.function.ThrowingRunnable;
+import com.moon.core.util.function.ThrowingSupplier;
 
 /**
  * @author benshaoye
@@ -12,7 +12,7 @@ public interface Environmental {
      *
      * @param executor
      */
-    void run(ThrowsRunnable executor);
+    void run(ThrowingRunnable executor);
 
     /**
      * 得到一个值，null 值或异常时返回 defaultVal
@@ -22,7 +22,7 @@ public interface Environmental {
      * @param <T>
      * @return
      */
-    <T> T getOrDefault(ThrowsSupplier<T> supplier, T defaultValue);
+    <T> T getOrDefault(ThrowingSupplier<T> supplier, T defaultValue);
 
     /**
      * 得到一个值，null 值或异常时返回 defaultSupplier 的值
@@ -32,7 +32,7 @@ public interface Environmental {
      * @param <T>
      * @return
      */
-    <T> T getOrElse(ThrowsSupplier<T> supplier, ThrowsSupplier<T> defaultSupplier);
+    <T> T getOrElse(ThrowingSupplier<T> supplier, ThrowingSupplier<T> defaultSupplier);
 
     /**
      * 得到一个值，null 值或异常时返回 null
@@ -41,5 +41,5 @@ public interface Environmental {
      * @param <T>
      * @return
      */
-    <T> T getOrNull(ThrowsSupplier<T> supplier);
+    <T> T getOrNull(ThrowingSupplier<T> supplier);
 }

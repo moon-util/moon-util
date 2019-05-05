@@ -1,9 +1,9 @@
 package com.moon.core.lang;
 
 import com.moon.core.exception.DefaultException;
-import com.moon.core.util.function.ThrowsConsumer;
-import com.moon.core.util.function.ThrowsFunction;
-import com.moon.core.util.function.ThrowsRunnable;
+import com.moon.core.util.function.ThrowingConsumer;
+import com.moon.core.util.function.ThrowingFunction;
+import com.moon.core.util.function.ThrowingRunnable;
 
 import java.util.function.Consumer;
 
@@ -137,7 +137,7 @@ public final class ThrowUtil {
      *
      * @param runner
      */
-    public static void ignoreThrowsRun(ThrowsRunnable runner) {
+    public static void ignoreThrowsRun(ThrowingRunnable runner) {
         ignoreThrowsRun(runner, false);
     }
 
@@ -147,11 +147,11 @@ public final class ThrowUtil {
      * @param runner
      * @param println
      */
-    public static void ignoreThrowsRun(ThrowsRunnable runner, boolean println) {
+    public static void ignoreThrowsRun(ThrowingRunnable runner, boolean println) {
         optionalThrowsRun(runner, println ? Throwable::printStackTrace : t -> {});
     }
 
-    public static void optionalThrowsRun(ThrowsRunnable runner, Consumer<Throwable> consumer) {
+    public static void optionalThrowsRun(ThrowingRunnable runner, Consumer<Throwable> consumer) {
         try {
             runner.run();
         } catch (Throwable t) {
@@ -159,15 +159,15 @@ public final class ThrowUtil {
         }
     }
 
-    public static <T> void ignoreThrowsAccept(T value, ThrowsConsumer<T> consumer) {
+    public static <T> void ignoreThrowsAccept(T value, ThrowingConsumer<T> consumer) {
         ignoreThrowsAccept(value, consumer, false);
     }
 
-    public static <T> void ignoreThrowsAccept(T value, ThrowsConsumer<T> consumer, boolean println) {
+    public static <T> void ignoreThrowsAccept(T value, ThrowingConsumer<T> consumer, boolean println) {
         optionalThrowsAccept(value, consumer, println ? Throwable::printStackTrace : t -> {});
     }
 
-    public static <T> void optionalThrowsAccept(T value, ThrowsConsumer<T> consumer, Consumer<Throwable> throwableConsumer) {
+    public static <T> void optionalThrowsAccept(T value, ThrowingConsumer<T> consumer, Consumer<Throwable> throwableConsumer) {
         try {
             consumer.accept(value);
         } catch (Throwable t) {
@@ -175,15 +175,15 @@ public final class ThrowUtil {
         }
     }
 
-    public static <T, R> R ignoreThrowsApply(T value, ThrowsFunction<T, R> function) {
+    public static <T, R> R ignoreThrowsApply(T value, ThrowingFunction<T, R> function) {
         return ignoreThrowsApply(value, function, false);
     }
 
-    public static <T, R> R ignoreThrowsApply(T value, ThrowsFunction<T, R> function, boolean println) {
+    public static <T, R> R ignoreThrowsApply(T value, ThrowingFunction<T, R> function, boolean println) {
         return optionalThrowsApply(value, function, println ? Throwable::printStackTrace : t -> {});
     }
 
-    public static <T, R> R optionalThrowsApply(T value, ThrowsFunction<T, R> function, Consumer<Throwable> consumer) {
+    public static <T, R> R optionalThrowsApply(T value, ThrowingFunction<T, R> function, Consumer<Throwable> consumer) {
         try {
             return function.apply(value);
         } catch (Throwable t) {
@@ -228,4 +228,8 @@ public final class ThrowUtil {
     public final static <T> T rejectAccessError(String message) {
         throw new IllegalAccessError(message);
     }
+
+    public static <T> T unsupported(String message) { throw new UnsupportedOperationException(message); }
+
+    public static <T> T unsupported(Object message) { return unsupported(String.valueOf(message)); }
 }

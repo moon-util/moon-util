@@ -7,17 +7,13 @@ public class DefaultException extends RuntimeException {
 
     private int code = 0;
 
-    public DefaultException() {
-        super();
-    }
+    public DefaultException() { super(); }
 
     /*
      * reason constructor
      */
 
-    public DefaultException(String message) {
-        super(message);
-    }
+    public DefaultException(String message) { super(message); }
 
     public DefaultException(Object reason) {
         this(reason instanceof Throwable ? ((Throwable) reason).getMessage() : toStr(reason));
@@ -44,13 +40,9 @@ public class DefaultException extends RuntimeException {
      * reason and throwable constructor
      */
 
-    public DefaultException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public DefaultException(String message, Throwable cause) { super(message, cause); }
 
-    public DefaultException(Object reason, Throwable cause) {
-        this(toStr(reason), cause);
-    }
+    public DefaultException(Object reason, Throwable cause) { this(toStr(reason), cause); }
 
     /*
      * code, reason and throwable constructor
@@ -70,9 +62,7 @@ public class DefaultException extends RuntimeException {
      * throwable constructor
      */
 
-    public DefaultException(Throwable cause) {
-        this(cause.getMessage(), cause);
-    }
+    public DefaultException(Throwable cause) { this(cause.getMessage(), cause); }
 
     public DefaultException(int code, Throwable cause) {
         this(cause.getMessage(), cause);
@@ -96,29 +86,21 @@ public class DefaultException extends RuntimeException {
         return this;
     }
 
-    public int getCode() {
-        return code;
-    }
+    public int getCode() { return code; }
 
     /*
      * tools
      */
 
-    private final static String toStr(Object reason) {
-        return reason == null ? null : reason.toString();
-    }
+    private final static String toStr(Object reason) { return reason == null ? null : reason.toString(); }
 
     /*
      * static caller
      */
 
-    public static final DefaultException with(Object reason) {
-        return new DefaultException(reason);
-    }
+    public static final DefaultException with(Object reason) { return new DefaultException(reason); }
 
-    public static final DefaultException with(int code, Object reason) {
-        return new DefaultException(code, reason);
-    }
+    public static final DefaultException with(int code, Object reason) { return new DefaultException(code, reason); }
 
     public static final DefaultException with(int code, Object reason, Throwable throwable) {
         return new DefaultException(code, reason, throwable);

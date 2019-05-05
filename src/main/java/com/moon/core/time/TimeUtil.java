@@ -21,21 +21,13 @@ public final class TimeUtil {
         noInstanceError();
     }
 
-    public final static long now() {
-        return System.currentTimeMillis();
-    }
+    public final static long now() { return System.currentTimeMillis(); }
 
-    public final static LocalDate nowDate() {
-        return LocalDate.now();
-    }
+    public final static LocalDate nowDate() { return LocalDate.now(); }
 
-    public final static LocalTime nowTime() {
-        return LocalTime.now();
-    }
+    public final static LocalTime nowTime() { return LocalTime.now(); }
 
-    public final static LocalDateTime nowDateTime() {
-        return LocalDateTime.now();
-    }
+    public final static LocalDateTime nowDateTime() { return LocalDateTime.now(); }
 
     /*
      * ----------------------------------------------------------------------------------
@@ -76,29 +68,17 @@ public final class TimeUtil {
         return toDateTime(calendar);
     }
 
-    public final static LocalDate toDate(CharSequence date) {
-        return LocalDate.parse(date);
-    }
+    public final static LocalDate toDate(CharSequence date) { return LocalDate.parse(date); }
 
-    public final static LocalTime toTime(CharSequence date) {
-        return LocalTime.parse(date);
-    }
+    public final static LocalTime toTime(CharSequence date) { return LocalTime.parse(date); }
 
-    public final static LocalDateTime toDateTime(CharSequence date) {
-        return LocalDateTime.parse(date);
-    }
+    public final static LocalDateTime toDateTime(CharSequence date) { return LocalDateTime.parse(date); }
 
-    public final static LocalDate toDate(long milliseconds) {
-        return toDate(new Date(milliseconds));
-    }
+    public final static LocalDate toDate(long milliseconds) { return toDate(new Date(milliseconds)); }
 
-    public final static LocalTime toTime(long milliseconds) {
-        return toTime(new Date(milliseconds));
-    }
+    public final static LocalTime toTime(long milliseconds) { return toTime(new Date(milliseconds)); }
 
-    public final static LocalDateTime toDateTime(long milliseconds) {
-        return toDateTime(new Date(milliseconds));
-    }
+    public final static LocalDateTime toDateTime(long milliseconds) { return toDateTime(new Date(milliseconds)); }
 
     public final static LocalDate toDate(int... values) {
         int i = 0, len = values.length, max = 2;

@@ -3,8 +3,8 @@ package com.moon.core.util.env;
 import com.moon.core.enums.MoonProps;
 import com.moon.core.lang.LangUtil;
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.util.function.ThrowsRunnable;
-import com.moon.core.util.function.ThrowsSupplier;
+import com.moon.core.util.function.ThrowingRunnable;
+import com.moon.core.util.function.ThrowingSupplier;
 
 import static java.lang.Boolean.TRUE;
 
@@ -28,7 +28,7 @@ enum EnvEnum implements Environmental {
     abstract boolean isTrue();
 
     @Override
-    public void run(ThrowsRunnable executor) {
+    public void run(ThrowingRunnable executor) {
         if (isTrue()) {
             try {
                 executor.run();
@@ -39,7 +39,7 @@ enum EnvEnum implements Environmental {
     }
 
     @Override
-    public <T> T getOrDefault(ThrowsSupplier<T> supplier, T defaultValue) {
+    public <T> T getOrDefault(ThrowingSupplier<T> supplier, T defaultValue) {
         try {
             return isTrue() ? supplier.get() : defaultValue;
         } catch (Throwable e) {
@@ -48,7 +48,7 @@ enum EnvEnum implements Environmental {
     }
 
     @Override
-    public <T> T getOrElse(ThrowsSupplier<T> supplier, ThrowsSupplier<T> defaultSupplier) {
+    public <T> T getOrElse(ThrowingSupplier<T> supplier, ThrowingSupplier<T> defaultSupplier) {
         try {
             return (isTrue() ? supplier : defaultSupplier).get();
         } catch (Throwable e) {
@@ -57,7 +57,7 @@ enum EnvEnum implements Environmental {
     }
 
     @Override
-    public <T> T getOrNull(ThrowsSupplier<T> supplier) {
+    public <T> T getOrNull(ThrowingSupplier<T> supplier) {
         return getOrDefault(supplier, null);
     }
 
