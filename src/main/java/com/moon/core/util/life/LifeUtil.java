@@ -14,14 +14,14 @@ public final class LifeUtil {
 
     final static LifeCycle EMPTY = EmptyLifeCycle.VALUE;
 
-    public final static <T> T before(T value, LifeCycle<T> before) {
+    final static <T> T before(T value, LifeCycle<T> before) {
         value = before.computeWhenCutIn(value);
         before.before(value);
         before.around(value, CutPoint.BEFORE);
         return value;
     }
 
-    public final static <T> void after(T value, LifeCycle<T> after) {
+    final static <T> void after(T value, LifeCycle<T> after) {
         after.around(value, CutPoint.AFTER);
         after.after(value);
     }
@@ -30,14 +30,14 @@ public final class LifeUtil {
      * 执行
      *
      * @param value
-     * @param consumer
+     * @param runner
      * @param cycle
      * @param <T>
      */
-    public final static <T> void runAccept(T value, Consumer<T> consumer, LifeCycle<T> cycle) {
-        cycle = cycle == null ? EmptyLifeCycle.VALUE : cycle;
+    public final static <T> void runAccept(T value, Consumer<T> runner, LifeCycle<T> cycle) {
+        cycle = cycle == null ? EMPTY : cycle;
         value = before(value, cycle);
-        consumer.accept(value);
+        runner.accept(value);
         after(value, cycle);
     }
 
@@ -45,16 +45,16 @@ public final class LifeUtil {
      * 执行
      *
      * @param value
-     * @param function
+     * @param runner
      * @param cycle
      * @param <T>
      * @param <R>
      * @return
      */
-    public final static <T, R> R runApply(T value, Function<T, R> function, LifeCycle<T> cycle) {
+    public final static <T, R> R runApply(T value, Function<T, R> runner, LifeCycle<T> cycle) {
         cycle = cycle == null ? EMPTY : cycle;
         value = before(value, cycle);
-        R ret = function.apply(value);
+        R ret = runner.apply(value);
         after(value, cycle);
         return ret;
     }
