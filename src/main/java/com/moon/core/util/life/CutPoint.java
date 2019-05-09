@@ -15,9 +15,7 @@ public enum CutPoint {
 
     private final boolean before;
 
-    CutPoint(boolean before) {
-        this.before = before;
-    }
+    CutPoint(boolean before) { this.before = before; }
 
     public final boolean isBefore() { return before; }
 

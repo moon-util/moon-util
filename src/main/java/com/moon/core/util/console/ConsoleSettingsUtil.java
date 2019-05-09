@@ -19,7 +19,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.annotation.AnnotatedUtil.get;
 import static com.moon.core.util.FilterUtil.nullableLast;
 import static com.moon.core.util.OptionalUtil.computeOrDefault;
-import static com.moon.core.util.OptionalUtil.elseGetIfNull;
+import static com.moon.core.util.OptionalUtil.getOrElse;
 
 /**
  * @author benshaoye
@@ -127,11 +127,11 @@ final class ConsoleSettingsUtil {
     }
 
     private static final ConsoleSettings parseConsoleControl(ConsoleControl control) {
-        return elseGetIfNull(parseByClassOrJSON(control), () -> new ConsoleSettings(control));
+        return getOrElse(parseByClassOrJSON(control), () -> new ConsoleSettings(control));
     }
 
     private static final ConsoleSettings parseByClassOrJSON(ConsoleControl consoleControl) {
-        return elseGetIfNull(parseByClass(consoleControl),
+        return getOrElse(parseByClass(consoleControl),
             () -> parseByJSON(consoleControl));
     }
 

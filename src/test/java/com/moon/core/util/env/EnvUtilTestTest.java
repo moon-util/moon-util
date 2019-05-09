@@ -1,13 +1,11 @@
 package com.moon.core.util.env;
 
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author benshaoye
  */
 class EnvUtilTestTest {
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testIsProduction() {

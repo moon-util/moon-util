@@ -21,6 +21,9 @@ public final class ThrowUtil {
         throw new IllegalArgumentException();
     }
 
+    public static <T> T doThrow(String reason) {
+        throw new IllegalArgumentException(reason);
+    }
     public static <T> T doThrow(Object reason) {
         if (reason == null) {
             throw new NullPointerException();
@@ -29,7 +32,7 @@ public final class ThrowUtil {
         } else if (reason instanceof Error) {
             throw (Error) reason;
         } else {
-            throw DefaultException.with(reason);
+            return doThrow(String.valueOf(reason));
         }
     }
 

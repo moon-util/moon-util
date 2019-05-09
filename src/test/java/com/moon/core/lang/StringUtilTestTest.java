@@ -2,7 +2,6 @@ package com.moon.core.lang;
 
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.RandomStringUtil;
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -14,8 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @date 2018/9/12
  */
 class StringUtilTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testFormat() {
@@ -328,18 +325,18 @@ class StringUtilTestTest {
     void testDeleteWhitespaces() {
         final String str = " 1 2 3 4 5 6 ";
         String deleted = StringUtil.deleteWhitespaces(str);
-        REQUIRES.requireEquals(deleted, "123456");
+        assertEquals(deleted, "123456");
 
 
         final CharSequence cs1 = new StringBuilder(str);
         CharSequence deleted1 = StringUtil.deleteWhitespaces(cs1);
-        REQUIRES.requireInstanceOf(deleted1, StringBuilder.class);
-        REQUIRES.requireEquals(deleted1.toString(), "123456");
+        assertTrue(deleted1 instanceof StringBuilder);
+        assertEquals(deleted1.toString(), "123456");
 
         final CharSequence cs2 = new StringBuffer(str);
         CharSequence deleted2 = StringUtil.deleteWhitespaces(cs2);
-        REQUIRES.requireInstanceOf(deleted2, StringBuffer.class);
-        REQUIRES.requireEquals(deleted2.toString(), "123456");
+        assertTrue(deleted2 instanceof StringBuffer);
+        assertEquals(deleted2.toString(), "123456");
     }
 
 

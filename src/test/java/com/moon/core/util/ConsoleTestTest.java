@@ -1,6 +1,5 @@
 package com.moon.core.util;
 
-import com.moon.core.util.require.Requires;
 import com.moon.core.util.console.ConsoleControl;
 import org.junit.jupiter.api.Test;
 
@@ -11,8 +10,6 @@ import java.io.File;
  */
 @ConsoleControl(lowestLevel = Console.Level.WARN)
 class ConsoleTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testOf() {

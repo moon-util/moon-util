@@ -2,12 +2,15 @@ package com.moon.core.lang.reflect;
 
 import com.moon.core.util.Console;
 import com.moon.core.util.IteratorUtil;
-import com.moon.core.util.require.Requires;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author benshaoye
@@ -33,8 +36,6 @@ class MethodUtilTestTest {
         }
     }
 
-    static final Requires REQUIRES = Requires.of();
-
     String name;
     Class type;
     Method method, m;
@@ -46,27 +47,27 @@ class MethodUtilTestTest {
         type = User.class;
         name = "hashCode";
         m = MethodUtil.getPublicMethod(type, name);
-        REQUIRES.requireNotNull(m);
-        REQUIRES.requireEquals(m.getName(), name);
-        REQUIRES.requireEquals(m.getDeclaringClass(), type);
+        assertNotNull(m);
+        assertEquals(m.getName(), name);
+        assertEquals(m.getDeclaringClass(), type);
 
         name = "toString";
         m = MethodUtil.getPublicMethod(type, name);
-        REQUIRES.requireNotNull(m);
-        REQUIRES.requireEquals(m.getName(), name);
-        REQUIRES.requireEquals(m.getDeclaringClass(), Object.class);
+        assertNotNull(m);
+        assertEquals(m.getName(), name);
+        assertEquals(m.getDeclaringClass(), Object.class);
 
         name = "apply";
         m = MethodUtil.getPublicMethod(type, name);
-        REQUIRES.requireNotNull(m);
-        REQUIRES.requireEquals(m.getName(), name);
-        REQUIRES.requireEquals(m.getDeclaringClass(), Top.class);
+        assertNotNull(m);
+        assertEquals(m.getName(), name);
+        assertEquals(m.getDeclaringClass(), Top.class);
 
         name = "reset";
         m = MethodUtil.getPublicMethod(type, name);
-        REQUIRES.requireNotNull(m);
-        REQUIRES.requireEquals(m.getName(), name);
-        REQUIRES.requireEquals(m.getDeclaringClass(), type);
+        assertNotNull(m);
+        assertEquals(m.getName(), name);
+        assertEquals(m.getDeclaringClass(), type);
     }
 
     @Test

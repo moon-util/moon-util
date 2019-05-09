@@ -198,8 +198,24 @@ public final class FileUtil {
         return traveller().traverse(dirPath);
     }
 
+    public static List<File> traverse(String dirPath) {
+        return traveller().traverse(dirPath);
+    }
+
+    public static List<File> traverse(File dir) {
+        return traveller().traverse(dir);
+    }
+
     public static List<File> traverseAll(File... dirs) {
         FileTraveller traveller = traveller();
+        for (int i = 0; i < dirs.length; i++) {
+            traveller.traverse(dirs[i]);
+        }
+        return traveller;
+    }
+
+    public static List<File> traverseAll(String... dirs) {
+        Traveller<File> traveller = traveller();
         for (int i = 0; i < dirs.length; i++) {
             traveller.traverse(dirs[i]);
         }

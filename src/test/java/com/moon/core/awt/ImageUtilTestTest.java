@@ -15,11 +15,8 @@ class ImageUtilTestTest {
 
     @Test
     void testToBase64() {
-        path = "E:/Pictures/000/cover-{}.jpg";
-        String[] paths = {};
-        for (int i = 0; i < paths.length; i++) {
-            String out = StringUtil.format(path, StringUtil.padStart(i + 1, 3, '0'));
-            ImageUtil.joiner().verticalJoin(out, paths[i]);
-        }
+        int[] i = {};
+        Object arr = i;
+        System.out.println(arr instanceof Object[]);
     }
 }

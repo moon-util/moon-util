@@ -352,4 +352,20 @@ public final class ListUtil extends CollectUtil {
         }
         return repeated;
     }
+
+    /**
+     * 增加 ArrayList 容量，避免频繁扩容
+     *
+     * @param list
+     * @param needSize
+     * @param <E>
+     * @param <L>
+     * @return
+     */
+    public static final <E, L extends List<E>> L increaseCapacity(L list, int needSize) {
+        if (list instanceof ArrayList && needSize > 0) {
+            ((ArrayList) list).ensureCapacity(size(list) + needSize);
+        }
+        return list;
+    }
 }

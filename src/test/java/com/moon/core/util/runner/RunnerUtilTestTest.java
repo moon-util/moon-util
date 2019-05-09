@@ -8,7 +8,6 @@ import com.moon.core.util.Console;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
 
 import javax.script.ScriptEngine;
@@ -16,13 +15,12 @@ import javax.script.ScriptException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.moon.core.util.require.Requires.of;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author benshaoye
  */
 class RunnerUtilTestTest {
-    static final Requires REQUIRES = of();
     Object data, res;
     Runner runner, runner1;
 
@@ -60,7 +58,7 @@ class RunnerUtilTestTest {
     @Test
     void testFunction() {
         runner = RunnerUtil.parse("@str.indexOf('123', '2')");
-        REQUIRES.requireEquals(runner.run(), "123".indexOf("2"));
+        assertEquals(runner.run(), Integer.valueOf("123".indexOf("2")));
         for (int i = 0; i < 10000; i++) {
             runner.run();
             "123".indexOf("2");
@@ -86,48 +84,48 @@ class RunnerUtilTestTest {
     @Test
     void testMapAndList() {
         res = RunnerUtil.run("{:}.getSheet(true)");
-        REQUIRES.requireEquals(res, null);
+        assertEquals(res, null);
         res = RunnerUtil.run("{}.isEmpty()");
-        REQUIRES.requireEquals(res, true);
+        assertEquals(res, true);
         res = RunnerUtil.run("{:}.isEmpty()");
-        REQUIRES.requireEquals(res, true);
+        assertEquals(res, true);
 
         res = RunnerUtil.run("{a:10}.isEmpty()");
-        REQUIRES.requireEquals(res, false);
+        assertEquals(res, false);
 
-        REQUIRES.requireThrows(() -> RunnerUtil.run("{a:}.isEmpty()"));
-        REQUIRES.requireThrows(() -> RunnerUtil.run("{a:,}.isEmpty()"));
-        REQUIRES.requireThrows(() -> RunnerUtil.run("{a}.isEmpty()"));
+        assertThrows(Throwable.class, () -> RunnerUtil.run("{a:}.isEmpty()"));
+        assertThrows(Throwable.class, () -> RunnerUtil.run("{a:,}.isEmpty()"));
+        assertThrows(Throwable.class, () -> RunnerUtil.run("{a}.isEmpty()"));
 
         res = RunnerUtil.run("{a:10}.isEmpty() + false");
-        REQUIRES.requireEquals(res, "falsefalse");
+        assertEquals(res, "falsefalse");
 
         res = RunnerUtil.run("!{:}.isEmpty()");
-        REQUIRES.requireEquals(res, false);
+        assertEquals(res, false);
 
         res = RunnerUtil.run("!{}.isEmpty()");
-        REQUIRES.requireEquals(res, false);
+        assertEquals(res, false);
 
         res = RunnerUtil.run("!({:}.isEmpty())");
-        REQUIRES.requireEquals(res, false);
+        assertEquals(res, false);
 
         res = RunnerUtil.run("!({}.isEmpty())");
-        REQUIRES.requireEquals(res, false);
+        assertEquals(res, false);
 
         res = RunnerUtil.run("!({:}).isEmpty()");
-        REQUIRES.requireEquals(res, false);
+        assertEquals(res, false);
 
         res = RunnerUtil.run("!({}).isEmpty()");
-        REQUIRES.requireEquals(res, false);
+        assertEquals(res, false);
 
         res = RunnerUtil.run("-20.doubleValue()");
-        REQUIRES.requireEquals(res, -20D);
+        assertEquals(res, -20D);
 
         res = RunnerUtil.run("-20.doubleValue().intValue()");
-        REQUIRES.requireEquals(res, -20);
+        assertEquals(res, -20);
 
         res = RunnerUtil.run("-@DateUtil.now().intValue()");
-        REQUIRES.requireInstanceOf(res, Integer.class);
+        assertTrue(res instanceof Integer);
     }
 
     @Test
@@ -139,43 +137,43 @@ class RunnerUtilTestTest {
     @Test
     void testRun() {
         res = RunnerUtil.run("1+1.doubleValue()");
-        REQUIRES.requireEquals(res, 2D);
+        assertEquals(res, 2D);
         res = RunnerUtil.run("''.length()");
-        REQUIRES.requireEquals(res, 0);
+        assertEquals(res, 0);
         res = RunnerUtil.run("1+1.doubleValue()");
-        REQUIRES.requireEquals(res, 2D);
+        assertEquals(res, 2D);
         res = RunnerUtil.run("'a'.length()");
-        REQUIRES.requireEquals(res, 1);
+        assertEquals(res, 1);
         res = RunnerUtil.run("@DateUtil.yyyy_MM+20");
-        REQUIRES.requireEquals(res, "yyyy-MM20");
+        assertEquals(res, "yyyy-MM20");
         res = RunnerUtil.run("@   DateUtil.yyyy_MM+20");
-        REQUIRES.requireEquals(res, "yyyy-MM20");
+        assertEquals(res, "yyyy-MM20");
     }
 
 
     @Test
     void testCalc() {
-        REQUIRES.requireEquals(RunnerUtil.run("1^1"), 1 ^ 1);
-        REQUIRES.requireEquals(RunnerUtil.run("2^1+5"), 2 ^ 1 + 5);
+        assertEquals(RunnerUtil.run("1^1"), 1 ^ 1);
+        assertEquals(RunnerUtil.run("2^1+5"), 2 ^ 1 + 5);
     }
 
     @Test
     void testParseRun() {
-        REQUIRES.requireEquals(RunnerUtil.parseRun("{{1+2}}"), 3);
-        REQUIRES.requireEquals(RunnerUtil.parseRun("{{'中华人民共和国'}}"), "中华人民共和国");
+        assertEquals(RunnerUtil.parseRun("{{1+2}}"), 3);
+        assertEquals(RunnerUtil.parseRun("{{'中华人民共和国'}}"), "中华人民共和国");
 
         data = new HashMap() {{
             put("name", 456);
         }};
 
         str = "本草纲目{{'好的'}}  {{   123   }}  电脑 {{1+2+3+5+6}} {{name}}";
-        REQUIRES.requireEquals(
+        assertEquals(
             RunnerUtil.parseRun(str, data),
             "本草纲目好的  123  电脑 17 456"
         );
 
         str = "本草纲目{{'好的'}}  {{123}}  ";
-        REQUIRES.requireEquals(
+        assertEquals(
             RunnerUtil.parseRun(str, data),
             "本草纲目好的  123  "
         );
@@ -192,7 +190,7 @@ class RunnerUtilTestTest {
 
         runner = RunnerUtil.parse("name");
         data = runner.runMulti(m1, m2);
-        REQUIRES.requireSame(data, 2);
+        assertEquals(data, 2);
     }
 
     @Test
@@ -216,13 +214,13 @@ class RunnerUtilTestTest {
         }};
 
         str = "本草纲目${'好的'}}  ${123}}  电脑 ${1+2+3+5+6}} ${name}}";
-        REQUIRES.requireEquals(
+        assertEquals(
             RunnerUtil.parseRun(str, delimiters, data),
             "本草纲目好的  123  电脑 17 456"
         );
 
         str = "本草纲目${'好的'}}  ${123}}  ";
-        REQUIRES.requireEquals(
+        assertEquals(
             RunnerUtil.parseRun(str, delimiters, data),
             "本草纲目好的  123  "
         );
@@ -232,18 +230,18 @@ class RunnerUtilTestTest {
     void testParseRun2() {
         res = RunnerUtil.run("@Long.  parseLong(   @Objects.toString(   @DateUtil.now(   )   )  )");
         res = RunnerUtil.run("-(-@Long.parseLong(   @   Objects  . toString( @    DateUtil .  now(   ))  )   ).longValue()");
-        REQUIRES.requireInstanceOf(res, Long.class);
+        assertTrue(res instanceof Long);
         res = RunnerUtil.run("@MapUtil.sizeByObject({key: null, null: true})");
-        REQUIRES.requireInstanceOf(res, Integer.class);
-        REQUIRES.requireEquals(res, 2);
+        assertTrue(res instanceof Integer);
+        assertEquals(res, 2);
         res = RunnerUtil.run("{key: null, null: true, 25.3: 25}");
-        REQUIRES.requireInstanceOf(res, HashMap.class);
-        REQUIRES.requireEquals(MapUtil.sizeByObject(res), 3);
-        REQUIRES.requireEquals(MapUtil.getByObject(res, "key"), null);
-        REQUIRES.requireEquals(MapUtil.getByObject(res, null), true);
-        REQUIRES.requireEquals(MapUtil.getByObject(res, null), true);
-        REQUIRES.requireEquals(MapUtil.getByObject(res, "null"), null);
-        REQUIRES.requireEquals(MapUtil.getByObject(res, 25.3), 25);
+        assertTrue(res instanceof HashMap);
+        assertEquals(MapUtil.sizeByObject(res), 3);
+        assertEquals(MapUtil.getByObject(res, "key"), null);
+        assertEquals(MapUtil.getByObject(res, null), true);
+        assertEquals(MapUtil.getByObject(res, null), true);
+        assertEquals(MapUtil.getByObject(res, "null"), null);
+        assertEquals(MapUtil.getByObject(res, 25.3), 25);
     }
 
     @Test
@@ -258,7 +256,7 @@ class RunnerUtilTestTest {
         res = MethodUtil.getPublicStaticMethods(DoubleUtil.class, "requireGt", (Class[]) res);
         //res = RunnerUtil.apply("@DateUtil.parse('2018-05-09 12:35:26', 'yyyy-MM-dd HH:mm:ss')");
 
-        REQUIRES.requireSame(String.class.getPackage(), Class.class.getPackage());
+        assertTrue(String.class.getPackage() == Class.class.getPackage());
         data = new HashMap() {{
             put("arr", new Object[]{1, 2, 3});
         }};
@@ -342,14 +340,14 @@ class RunnerUtilTestTest {
             .addCaller("Objects", InnerObjects.class);
 
         Runner runner = RunnerUtil.parse("@call.getSheet()", settings);
-        REQUIRES.requireEquals(runner.run(), "123456789");
+        assertEquals(runner.run(), "123456789");
         runner = RunnerUtil.parse("@Objects.toString('123123')", settings);
-        REQUIRES.requireEquals(runner.run(), "--11--");
+        assertEquals(runner.run(), "--11--");
         runner = RunnerUtil.parse("@Objects.toString('123123')");
-        REQUIRES.requireEquals(runner.run(), "123123");
+        assertEquals(runner.run(), "123123");
         runner = RunnerUtil.parse("{'已有人数','需要人数','已提交','已付款','已完成'}", settings);
-        REQUIRES.requireInstanceOf(runner.run(), LinkedList.class);
-        REQUIRES.requireEquals(ListUtil.sizeByObject(runner.run()), 5);
+        assertTrue(runner.run() instanceof LinkedList);
+        assertEquals(ListUtil.sizeByObject(runner.run()), 5);
     }
 
     @Test
@@ -364,28 +362,28 @@ class RunnerUtilTestTest {
 
         Runner runner = RunnerUtil.parse(str);
         res = runner.run(data);
-        REQUIRES.requireEquals(res, ((a + b) * (c + b)) / (c + a) / b);
+        assertEquals(res, ((a + b) * (c + b)) / (c + a) / b);
 
         str = "43*(2 + 1.4)+2*32/(3-2.1)";
-        REQUIRES.requireEquals(RunnerUtil.run(str), 43 * (2 + 1.4) + 2 * 32 / (3 - 2.1));
+        assertEquals(RunnerUtil.run(str), 43 * (2 + 1.4) + 2 * 32 / (3 - 2.1));
 
         str = "1 >> 1";
         runner = RunnerUtil.parse(str);
         res = runner.run(data);
-        REQUIRES.requireEquals(res, 1 >> 1);
-        REQUIRES.requireEquals(RunnerUtil.run("1<<1"), 1 << 1);
-        REQUIRES.requireEquals(RunnerUtil.run("1>>1"), 1 >> 1);
-        REQUIRES.requireEquals(RunnerUtil.run("1>>>1"), 1 >>> 1);
-        REQUIRES.requireEquals(RunnerUtil.run("2>>>2"), 2 >>> 2);
-        REQUIRES.requireEquals(RunnerUtil.run("3>>>5"), 3 >>> 5);
-        REQUIRES.requireEquals(RunnerUtil.run("8>>>2"), 8 >>> 2);
-        REQUIRES.requireEquals(RunnerUtil.run("1==1"), 1 == 1);
-        REQUIRES.requireEquals(RunnerUtil.run("1!=1"), 1 != 1);
-        REQUIRES.requireEquals(RunnerUtil.run("1|1"), 1 | 1);
-        REQUIRES.requireEquals(RunnerUtil.run("1&1"), 1 & 1);
-        REQUIRES.requireEquals(RunnerUtil.run("1^1"), 1 ^ 1);
-        REQUIRES.requireEquals(RunnerUtil.run("3>4?1:2"), 3 > 4 ? 1 : 2);
-        REQUIRES.requireEquals(RunnerUtil.run("9+44*(8-2/1)"), 9 + 44 * (8 - 2 / 1));
+        assertEquals(res, 1 >> 1);
+        assertEquals(RunnerUtil.run("1<<1"), 1 << 1);
+        assertEquals(RunnerUtil.run("1>>1"), 1 >> 1);
+        assertEquals(RunnerUtil.run("1>>>1"), 1 >>> 1);
+        assertEquals(RunnerUtil.run("2>>>2"), 2 >>> 2);
+        assertEquals(RunnerUtil.run("3>>>5"), 3 >>> 5);
+        assertEquals(RunnerUtil.run("8>>>2"), 8 >>> 2);
+        assertEquals(RunnerUtil.run("1==1"), 1 == 1);
+        assertEquals(RunnerUtil.run("1!=1"), 1 != 1);
+        assertEquals(RunnerUtil.run("1|1"), 1 | 1);
+        assertEquals(RunnerUtil.run("1&1"), 1 & 1);
+        assertEquals(RunnerUtil.run("1^1"), 1 ^ 1);
+        assertEquals(RunnerUtil.run("3>4?1:2"), 3 > 4 ? 1 : 2);
+        assertEquals(RunnerUtil.run("9+44*(8-2/1)"), 9 + 44 * (8 - 2 / 1));
 
         data = new HashMap() {{
             put("money", 2640);
@@ -395,7 +393,7 @@ class RunnerUtilTestTest {
         }};
         runner = RunnerUtil.parse("((money+count)*people/100)+50-88+cat*10");
         int money = 2640, count = 50, people = 25, cat = 1, x = 2;
-        REQUIRES.requireEquals(runner.run(data), ((money + count) * people / 100) + 50 - 88 + cat * 10);
+        assertEquals(runner.run(data), (Object)(((money + count) * people / 100) + 50 - 88 + cat * 10));
 
         data = new HashMap() {{
             put("value", 7);
@@ -407,23 +405,23 @@ class RunnerUtilTestTest {
         String st = "test", state = "正常";
         boolean flag = true;
         runner = RunnerUtil.parse("value > 5 && st == \"test\" && state == \"正常\" && flag == true");
-        REQUIRES.requireEquals(runner.run(data), value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
+        assertEquals(runner.run(data), value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
         runner = RunnerUtil.parse("value > 5 && st =='test' && state == '正常' && flag == true");
-        REQUIRES.requireEquals(runner.run(data), value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
+        assertEquals(runner.run(data), value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
         runner = RunnerUtil.parse("1 + 2 * (4 - 3) / 2");
-        REQUIRES.requireEquals(runner.run(), 1 + 2 * (4 - 3) / 2);
+        assertEquals(runner.run(), (Object)(1 + 2 * (4 - 3) / 2));
         runner = RunnerUtil.parse("(10 + 20) * 3 / 5 - 6");
-        REQUIRES.requireEquals(runner.run(), (10 + 20) * 3 / 5 - 6);
+        assertEquals(runner.run(), (Object)((10 + 20) * 3 / 5 - 6));
         runner = RunnerUtil.parse("110 + 2 * (40 - 3) / 2");
-        REQUIRES.requireEquals(runner.run(), 110 + 2 * (40 - 3) / 2);
+        assertEquals(runner.run(), (Object)(110 + 2 * (40 - 3) / 2));
         runner = RunnerUtil.parse("3+(2-5)*6/3 ");
-        REQUIRES.requireEquals(runner.run(), 3 + (2 - 5) * 6 / 3);
+        assertEquals(runner.run(), (Object)(3 + (2 - 5) * 6 / 3));
         runner = RunnerUtil.parse("5 * ( 4.1 + 2 -6 /(8-2))");
-        REQUIRES.requireEquals(runner.run(), 5 * (4.1 + 2 - 6 / (8 - 2)));
+        assertEquals(runner.run(), 5 * (4.1 + 2 - 6 / (8 - 2)));
         runner = RunnerUtil.parse("5 * ( 4.1 + 2.9 )");
-        REQUIRES.requireEquals(runner.run(), 5 * (4.1 + 2.9));
+        assertEquals(runner.run(), 5 * (4.1 + 2.9));
         runner = RunnerUtil.parse("14/3*2");
-        REQUIRES.requireEquals(runner.run(), 14 / 3 * 2);
+        assertEquals(runner.run(), (Object)(14 / 3 * 2));
 
     }
 
@@ -433,7 +431,7 @@ class RunnerUtilTestTest {
         res = 1000 + 100.0 * 99 - (600 - 3 * 15) / (((68 - 9) - 3) * 2 - 100) + 10000 % 7 * 71;
 
         runner = RunnerUtil.parse(str);
-        REQUIRES.requireEquals(runner.run(), res);
+        assertEquals(runner.run(), res);
 
         runner = RunnerUtil.parse(str);
         int count = 10000000;
@@ -457,12 +455,12 @@ class RunnerUtilTestTest {
         runner = RunnerUtil.parse(str);
 
         res = 6.7 - 100 > 39.6 ? 5 == 5 ? 4 + 5 : 6 - 1 : !(100 % 3 - 39.0 < 27) ? 8 * 2 - 199 : 100 % 3;
-        REQUIRES.requireEquals(runner.run(), res);
+        assertEquals(runner.run(), res);
 
         str = "6.7 - 100 > 39.6 ? (5 == 5 ? 4 + 5 : 6 - 1) : (!(100 % 3 - 39.0 < 27) ? (8 * 2 - 199) : 100 % 3)";
         runner = RunnerUtil.parse(str);
         res = 6.7 - 100 > 39.6 ? (5 == 5 ? 4 + 5 : 6 - 1) : (!(100 % 3 - 39.0 < 27) ? (8 * 2 - 199) : 100 % 3);
-        REQUIRES.requireEquals(runner.run(), res);
+        assertEquals(runner.run(), res);
 
         final Runner er = runner;
         int count = 10000000;
@@ -504,7 +502,7 @@ class RunnerUtilTestTest {
         int i = 100, b = 4;
         double d = -3.9;
         res = i * Math.PI + (d * b - 199) / (1 - d * Math.PI) - (2 + 100 - i / Math.PI) % 99 == i * Math.PI + (d * b - 199) / (1 - d * Math.PI) - (2 + 100 - i / Math.PI) % 99;
-        REQUIRES.requireEquals(res, runner.run(data));
+        assertEquals(res, runner.run(data));
 
         final Runner er = runner;
         int count = 1000;

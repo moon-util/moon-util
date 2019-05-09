@@ -1,6 +1,5 @@
 package com.moon.core.util.runner.core;
 
-import com.moon.core.util.require.Requires;
 import com.moon.core.util.runner.Runner;
 import org.junit.jupiter.api.Test;
 
@@ -9,13 +8,13 @@ import java.time.LocalTime;
 import java.util.HashMap;
 
 import static com.moon.core.util.runner.core.ParseUtil.parse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author benshaoye
  */
 class IGetFunTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     String str, str1;
     Runner runner, runner1;
@@ -36,40 +35,41 @@ class IGetFunTestTest {
     @Test
     void testFunctionsName() {
         toValue("@ str . indexOf (12,1)");
-        REQUIRES.requireSame(runner.getClass(), DataNum.class);
-        REQUIRES.requireEquals(res, 0);
+        assertSame(DataNum.class, runner.getClass());
+        assertSame(DataNum.class, runner.getClass());
+        assertEquals(res, 0);
 
         data = new HashMap() {{
             put("str", 12);
         }};
         toValue("@ str . indexOf (str,1)", data);
-        REQUIRES.requireEquals(res, 0);
+        assertEquals(res, 0);
 
         toValue("@now()");
-        REQUIRES.requireInstanceOf(res, Long.class);
+        assertSame(Long.class, res.getClass());
 
         toValue("@now.year()");
-        REQUIRES.requireInstanceOf(res, Integer.class);
-        REQUIRES.requireEquals(res, LocalDate.now().getYear());
+        assertSame(Integer.class, res.getClass());
+        assertEquals(res,  LocalDate.now().getYear());
 
         toValue("@now.month()");
-        REQUIRES.requireInstanceOf(res, Integer.class);
-        REQUIRES.requireEquals(res, LocalDate.now().getMonthValue());
+        assertSame(Integer.class, res.getClass());
+        assertEquals(res,  LocalDate.now().getMonthValue());
 
         toValue("@now.day()");
-        REQUIRES.requireInstanceOf(res, Integer.class);
-        REQUIRES.requireEquals(res, LocalDate.now().getDayOfMonth());
+        assertSame(Integer.class, res.getClass());
+        assertEquals(res,  LocalDate.now().getDayOfMonth());
 
         toValue("@now.hour()");
-        REQUIRES.requireInstanceOf(res, Integer.class);
-        REQUIRES.requireEquals(res, LocalTime.now().getHour());
+        assertSame(Integer.class, res.getClass());
+        assertEquals(res,  LocalTime.now().getHour());
 
         toValue("@now.minute()");
-        REQUIRES.requireInstanceOf(res, Integer.class);
-        REQUIRES.requireEquals(res, LocalTime.now().getMinute());
+        assertSame(Integer.class, res.getClass());
+        assertEquals(res,  LocalTime.now().getMinute());
 
         toValue("@now.second()");
-        REQUIRES.requireInstanceOf(res, Integer.class);
-        REQUIRES.requireEquals(res, LocalTime.now().getSecond());
+        assertSame(Integer.class, res.getClass());
+        assertEquals(res,  LocalTime.now().getSecond());
     }
 }

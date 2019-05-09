@@ -1,7 +1,6 @@
 package com.moon.core.util;
 
 import com.alibaba.fastjson.JSON;
-import com.moon.core.util.require.Requires;
 import com.moon.core.util.validator.IDCard18Validator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,7 +21,6 @@ import java.util.List;
  */
 class IDCard18ValidatorTestTest {
     String value;
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testAgeOfDuration() {

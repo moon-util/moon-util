@@ -1,15 +1,14 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.require.Requires;
 import com.moon.core.util.validator.Validator;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author benshaoye
  */
 class ValidatorTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testOf() {
@@ -19,7 +18,7 @@ class ValidatorTestTest {
             .require(item -> item.contains("b"), "必须包含字母‘b’")
             .require(item -> item.contains("a"), "必须包含字母‘a’");
 
-        REQUIRES.requireThrows(IllegalArgumentException.class,
+        assertThrows(IllegalArgumentException.class,
             () -> validator.get(str -> new IllegalArgumentException(str)));
 
         Validator<Employee> employeeValidator = Validator.of(new Employee());

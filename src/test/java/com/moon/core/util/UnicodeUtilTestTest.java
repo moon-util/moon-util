@@ -1,7 +1,8 @@
 package com.moon.core.util;
 
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
+
+import static junit.framework.Assert.assertFalse;
 
 /**
  * @author benshaoye
@@ -10,12 +11,10 @@ class UnicodeUtilTestTest {
 
     String str, str0, str1, str2, u, u0, u1, u2, u3;
 
-    static final Requires REQUIRES = Requires.of();
-
     @Test
     void testIsUnicode() {
         str = "123";
-        REQUIRES.requireFalse(UnicodeUtil.isUnicode(str));
+        assertFalse(UnicodeUtil.isUnicode(str));
         u = UnicodeUtil.toSimpleUnicode(str);
         u0 = UnicodeUtil.toFullUnicode(str);
 

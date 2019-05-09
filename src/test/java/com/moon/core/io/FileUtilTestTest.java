@@ -2,7 +2,7 @@ package com.moon.core.io;
 
 import com.moon.core.util.Console;
 import com.moon.core.util.IteratorUtil;
-import com.moon.core.util.require.Requires;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -13,8 +13,6 @@ import java.util.List;
  * @author benshaoye
  */
 class FileUtilTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     String path;
     File file, dir;
@@ -27,7 +25,7 @@ class FileUtilTestTest {
             Console.out.println((file.getFreeSpace() >> 10) + "kb");
             Console.out.println((file.getFreeSpace() >> 10 >> 10) + "mb");
             Console.out.println((file.getFreeSpace() >> 10 >> 10 >> 10) + "gb");
-            REQUIRES.requireTrue(FileUtil.exists(local));
+            Assertions.assertTrue(FileUtil.exists(local));
             Console.out.println(FileUtil.length(local));
         } catch (Throwable t) {
 

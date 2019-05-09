@@ -10,12 +10,9 @@ import org.junit.jupiter.api.Test;
 @ConsoleControl(lowestLevel = Console.Level.DEBUG)
 class RequiresTestTest {
 
-    static final Requires REQUIRES = Requires.ofPrintln();
 
     @Test
     void testOf() {
-        REQUIRES.requireNotInstanceOf(REQUIRES, Requires.class);
-        REQUIRES.getConsole().error("=====================");
     }
 
     @Test

@@ -5,7 +5,6 @@ import com.moon.core.util.Console;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,12 +12,13 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * @author benshaoye
  */
 class CollectValidatorTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     public static class Employee {
         String name;
@@ -39,8 +39,8 @@ class CollectValidatorTestTest {
             CollectValidator.of(collect).setImmediate(true).requireCountOf(str -> str.length() < 2, 3);
         });
         Assertions.assertTrue(CollectValidator.of(collect).require(list -> list.size() == 7).isValid());
-        Assertions.assertFalse(CollectValidator.of(collect).require(list -> list.size() == 7).isInvalid());
-        Assertions.assertFalse(CollectValidator.of(collect)
+        assertFalse(CollectValidator.of(collect).require(list -> list.size() == 7).isInvalid());
+        assertFalse(CollectValidator.of(collect)
             .requireAtLeastCountOf(str -> str.length() > 3, 5)
             .isInvalid());
         Assertions.assertTrue(CollectValidator.of(collect)
@@ -73,10 +73,10 @@ class CollectValidatorTestTest {
         final int age = nowYear - targetYear;
         final int sex = (certNo.charAt(16) - 48) % 2;
         if ((sex == 0 && age > 43) || (sex == 1 && age > 53)) {
-            REQUIRES.requireTrue(checkCertNoAgeDiffGender(certNo));
+            assertTrue(checkCertNoAgeDiffGender(certNo));
             Console.out.println("对不起，您的年龄（男53岁及以上，女43岁及以上）不符合下单条件。certNo：{}，sex：{}，age：{}", certNo, sex, age);
         } else {
-            REQUIRES.requireFalse(checkCertNoAgeDiffGender(certNo));
+            assertFalse(checkCertNoAgeDiffGender(certNo));
             Console.out.println("成功：{}", certNo);
         }
     }

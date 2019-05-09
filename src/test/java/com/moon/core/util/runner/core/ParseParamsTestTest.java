@@ -1,15 +1,15 @@
 package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.core.util.require.Requires;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author benshaoye
  */
 class ParseParamsTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     AsRunner[] res;
 
@@ -24,44 +24,44 @@ class ParseParamsTestTest {
     @Test
     void testParse() {
         res = parse("()");
-        REQUIRES.requireEq(res.length, 0);
+        assertEquals(res.length, 0);
         res = parse("(,)");
-        REQUIRES.requireEq(res.length, 1);
+        assertEquals(res.length, 1);
         res = parse("(null,)");
-        REQUIRES.requireEq(res.length, 1);
+        assertEquals(res.length, 1);
         res = parse("(null,null)");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("('null',12)");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("(12.3,12)");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("(12.3,12,)");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("(    )");
-        REQUIRES.requireEq(res.length, 0);
+        assertEquals(res.length, 0);
         res = parse("(   , )  ");
-        REQUIRES.requireEq(res.length, 1);
+        assertEquals(res.length, 1);
         res = parse("  (   null ,    )");
-        REQUIRES.requireEq(res.length, 1);
+        assertEquals(res.length, 1);
         res = parse("(null  ,   null)");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("  (  ' null'   ,12)");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("  (12.3  ,   12   )");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("( 12.3  ,  12,   )");
-        REQUIRES.requireEq(res.length, 2);
+        assertEquals(res.length, 2);
         res = parse("( 12.3  ,  12,   true)");
-        REQUIRES.requireEq(res.length, 3);
+        assertEquals(res.length, 3);
         res = parse("( 12.3  ,  12, name,  true)");
-        REQUIRES.requireEq(res.length, 4);
+        assertEquals(res.length, 4);
         res = parse("( 12.3  ,  12, name,  ,'',   true)");
-        REQUIRES.requireEq(res.length, 5);
+        assertEquals(res.length, 5);
         res = parse("( 12.3  ,  12, name, , ,'',   true)");
-        REQUIRES.requireEq(res.length, 6);
+        assertEquals(res.length, 6);
         res = parse("( 12.3  ,  12, name, null , ,'',   true)");
-        REQUIRES.requireEq(res.length, 6);
+        assertEquals(res.length, 6);
         res = parse("( 12.3  ,  12, name, null,  , ,'',   true)");
-        REQUIRES.requireEq(res.length, 7);
+        assertEquals(res.length, 7);
     }
 }

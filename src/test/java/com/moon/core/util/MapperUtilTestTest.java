@@ -1,18 +1,21 @@
 package com.moon.core.util;
 
 import com.moon.core.lang.reflect.FieldUtil;
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author benshaoye
  */
 class MapperUtilTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     Object data;
 
@@ -41,7 +44,7 @@ class MapperUtilTestTest {
 
         IteratorUtil.forEach(maps, (item, i) -> item.forEach((key, value) -> {
             Employee one = employees.get(i);
-            REQUIRES.requireEquals(value, FieldUtil.getValue(key, one));
+            assertEquals(value, FieldUtil.getValue(key, one));
         }));
     }
 
@@ -51,7 +54,7 @@ class MapperUtilTestTest {
         List<Map<String, Object>> maps = MapperUtil.forEachToMap(employees);
 
         List<Employee> newList = MapperUtil.forEachToInstance(maps, Employee.class);
-        IteratorUtil.forEach((newList), (item, i) -> REQUIRES.requireTrue(item.equals(employees.get(i))));
+        IteratorUtil.forEach((newList), (item, i) -> assertTrue(item.equals(employees.get(i))));
     }
 
     Object res = 0x4e00;
@@ -138,22 +141,22 @@ class MapperUtilTestTest {
     void testToMap() {
         Employee employee1 = new Employee("张三", 24);
         Map<String, Object> map = MapperUtil.toMap(employee1);
-        REQUIRES.requireTrue(map.containsKey("name"));
-        REQUIRES.requireEquals(map.get("name"), "张三");
-        REQUIRES.requireTrue(map.containsKey("age"));
-        REQUIRES.requireEquals(map.get("age"), 24);
+        assertTrue(map.containsKey("name"));
+        assertEquals(map.get("name"), "张三");
+        assertTrue(map.containsKey("age"));
+        assertEquals(map.get("age"), 24);
 
         Employee e1 = MapperUtil.override(map, new Employee());
-        REQUIRES.requireNotSame(employee1, e1);
-        REQUIRES.requireEquals(employee1, e1);
+        assertTrue(employee1 != e1);
+        assertEquals(employee1, e1);
 
         Console.out.println(System.identityHashCode(employee1));
         Console.out.println(System.identityHashCode(e1));
 
         Employee e2 = MapperUtil.toInstance(map, Employee.class);
-        REQUIRES.requireNotSame(employee1, e2);
-        REQUIRES.requireEquals(employee1, e1);
-        REQUIRES.requireEquals(e2, e1);
+        assertTrue(employee1 != e2);
+        assertEquals(employee1, e1);
+        assertEquals(e2, e1);
 
         Console.out.println(System.identityHashCode(employee1));
         Console.out.println(System.identityHashCode(e1));

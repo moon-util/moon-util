@@ -1,18 +1,18 @@
 package com.moon.core.time;
 
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author benshaoye
  */
 class TimeUtilTestTest {
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testForEachYears() {
@@ -22,8 +22,8 @@ class TimeUtilTestTest {
         LocalDate date = LocalDate.of(yearValue, monthValue, dayValue);
         IntAccessor interDate = IntAccessor.of();
         TimeUtil.forEachYears(date, date.plusYears(3), (year, localDate) -> {
-            REQUIRES.requireEq(year, interDate.get() + yearValue);
-            REQUIRES.requireEquals(localDate, LocalDate.of(yearValue + interDate.getAndIncrement(), monthValue, dayValue));
+            assertEquals(year, interDate.get() + yearValue);
+            assertEquals(localDate, LocalDate.of(yearValue + interDate.getAndIncrement(), monthValue, dayValue));
             return true;
         });
         LocalTime time = LocalTime.now();

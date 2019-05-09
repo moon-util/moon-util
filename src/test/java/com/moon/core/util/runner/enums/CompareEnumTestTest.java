@@ -1,6 +1,5 @@
 package com.moon.core.util.runner.enums;
 
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.Test;
  */
 class CompareEnumTestTest {
 
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testEQ() {

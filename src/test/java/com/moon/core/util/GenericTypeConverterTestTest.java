@@ -1,17 +1,17 @@
 package com.moon.core.util;
 
-import com.moon.core.util.require.Requires;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author benshaoye
  */
 class GenericTypeConverterTestTest {
-
-    static final Requires REQUIRES = Requires.of();
 
     @Test
     void testRegister() {
@@ -141,9 +141,9 @@ class GenericTypeConverterTestTest {
     void testToArray() {
         type = Array.class;
         res = TypeUtil.cast().toArray(0, type);
-        REQUIRES.requireTrue(res instanceof Object[]);
-        REQUIRES.requireTrue(res.getClass().isArray());
-        REQUIRES.requireTrue(res.getClass().getComponentType() == Object.class);
+        assertTrue(res instanceof Object[]);
+        assertTrue(res.getClass().isArray());
+        assertTrue(res.getClass().getComponentType() == Object.class);
     }
 
     @Test
@@ -159,25 +159,25 @@ class GenericTypeConverterTestTest {
 
         type = ArrayList.class;
         res = TypeUtil.cast().toCollection(0, type);
-        REQUIRES.requireInstanceOf(res, type);
-        REQUIRES.requireEq(CollectUtil.sizeByObject(res), 1);
-        REQUIRES.requireTrue(SetUtil.contains((ArrayList) res, 0));
-        REQUIRES.requireEquals(ListUtil.getByObject(res, 0), 0);
+        assertTrue(type.isInstance(res));
+        assertEquals(CollectUtil.sizeByObject(res), 1);
+        assertTrue(SetUtil.contains((ArrayList) res, 0));
+        assertEquals(ListUtil.getByObject(res, 0), (Object) 0);
 
         type = LinkedList.class;
         res = TypeUtil.cast().toCollection(0, type);
-        REQUIRES.requireInstanceOf(res, type);
-        REQUIRES.requireEq(CollectUtil.sizeByObject(res), 1);
-        REQUIRES.requireTrue(SetUtil.contains((LinkedList) res, 0));
-        REQUIRES.requireEquals(ListUtil.getByObject(res, 0), 0);
+        assertTrue(type.isInstance(res));
+        assertEquals(CollectUtil.sizeByObject(res), 1);
+        assertTrue(SetUtil.contains((LinkedList) res, 0));
+        assertEquals(ListUtil.getByObject(res, 0), (Object) 0);
 
         type = List.class;
         res = TypeUtil.cast().toCollection(0, type);
-        REQUIRES.requireInstanceOf(res, type);
-        REQUIRES.requireInstanceOf(res, ArrayList.class);
-        REQUIRES.requireEq(CollectUtil.sizeByObject(res), 1);
-        REQUIRES.requireTrue(SetUtil.contains((ArrayList) res, 0));
-        REQUIRES.requireEquals(ListUtil.getByObject(res, 0), 0);
+        assertTrue(type.isInstance(res));
+        assertTrue(res instanceof ArrayList);
+        assertEquals(CollectUtil.sizeByObject(res), 1);
+        assertTrue(SetUtil.contains((ArrayList) res, 0));
+        assertEquals(ListUtil.getByObject(res, 0), (Object) 0);
     }
 
     Object res, data;
@@ -187,14 +187,14 @@ class GenericTypeConverterTestTest {
     void testToCollection() {
         type = Collection.class;
         res = TypeUtil.cast().toCollection(0, type);
-        REQUIRES.requireInstanceOf(res, ArrayList.class);
-        REQUIRES.requireEq(CollectUtil.sizeByObject(res), 1);
-        REQUIRES.requireTrue(SetUtil.contains((ArrayList) res, 0));
+        assertTrue(ArrayList.class.isInstance(res));
+        assertTrue(CollectUtil.sizeByObject(res) == 1);
+        assertTrue(SetUtil.contains((ArrayList) res, 0));
 
         type = HashSet.class;
         res = TypeUtil.cast().toCollection(0, type);
-        REQUIRES.requireInstanceOf(res, type);
-        REQUIRES.requireEq(CollectUtil.sizeByObject(res), 1);
-        REQUIRES.requireTrue(SetUtil.contains((HashSet) res, 0));
+        assertTrue(type.isInstance(res));
+        assertEquals(CollectUtil.sizeByObject(res), 1);
+        assertTrue(SetUtil.contains((HashSet) res, 0));
     }
 }

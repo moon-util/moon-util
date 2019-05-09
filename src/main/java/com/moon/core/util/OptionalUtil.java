@@ -115,7 +115,7 @@ public final class OptionalUtil {
         return value == null ? defaultVal : value;
     }
 
-    public static <T> T elseGetIfNull(T value, Supplier<T> defaultSupplier) {
+    public static <T> T getOrElse(T value, Supplier<T> defaultSupplier) {
         return value == null ? defaultSupplier.get() : value;
     }
 }

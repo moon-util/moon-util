@@ -1,12 +1,11 @@
 package com.moon.office.excel;
 
 import com.moon.core.io.FileUtil;
-import com.moon.office.excel.core.*;
-import com.moon.office.excel.core.TableStyle;
-import com.moon.office.excel.enums.ValueType;
 import com.moon.core.util.Console;
 import com.moon.core.util.DateUtil;
-import com.moon.core.util.require.Requires;
+import com.moon.office.excel.core.TableStyle;
+import com.moon.office.excel.core.*;
+import com.moon.office.excel.enums.ValueType;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.junit.jupiter.api.Test;
@@ -14,20 +13,18 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.HashMap;
 
-import static com.moon.core.util.require.Requires.of;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author benshaoye
  */
 class ExcelUtilTestTest {
 
-    static final Requires REQUIRES = of();
-
     Workbook result;
 
     @Test
     void testRender() {
-        REQUIRES.requireThrows(() -> ExcelUtil.render());
+        assertThrows(Throwable.class, () -> ExcelUtil.render());
     }
 
     Object data = new HashMap() {{
@@ -151,15 +148,15 @@ class ExcelUtilTestTest {
         String path = "E:/test/test-" + DateUtil.now() + ".xls";
         result = ExcelUtil.render();// 生成 Workbook 文档
 
-        REQUIRES.requireInstanceOf(result, HSSFWorkbook.class);
+        assertTrue(result instanceof HSSFWorkbook);
         int number = result.getNumberOfSheets();
-        REQUIRES.requireEq(number, 1);
+        assertEquals(number, 1);
         Sheet sheet = result.getSheetAt(0);
-        REQUIRES.requireEq(sheet.getLastRowNum(), 100);
+        assertEquals(sheet.getLastRowNum(), 100);
         Row row = sheet.getRow(100);
-        REQUIRES.requireNotNull(row);
+        assertNotNull(row);
         Cell cell = row.getCell(1);
-        REQUIRES.requireEquals(cell.getStringCellValue(), "张三");
+        assertEquals(cell.getStringCellValue(), "张三");
     }
 
     @TableExcel(styles = {
