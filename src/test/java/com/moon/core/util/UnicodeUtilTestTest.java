@@ -3,6 +3,7 @@ package com.moon.core.util;
 import org.junit.jupiter.api.Test;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author benshaoye
@@ -14,7 +15,7 @@ class UnicodeUtilTestTest {
     @Test
     void testIsUnicode() {
         str = "123";
-        assertFalse(UnicodeUtil.isUnicode(str));
+        assertTrue(UnicodeUtil.isUnicode(str));
         u = UnicodeUtil.toSimpleUnicode(str);
         u0 = UnicodeUtil.toFullUnicode(str);
 

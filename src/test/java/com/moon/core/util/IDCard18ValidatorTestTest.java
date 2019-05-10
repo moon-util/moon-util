@@ -91,7 +91,7 @@ class IDCard18ValidatorTestTest {
             File file = new File(path);
             workbook = new XSSFWorkbook(file);
         } catch (Exception e) {
-            Console.out.println(e);
+            System.out.println(e);
             return;
         }
         Sheet sheet = workbook.getSheetAt(0);
@@ -106,6 +106,6 @@ class IDCard18ValidatorTestTest {
             companies.add(new Company(username, password, companyNameCell.getStringCellValue()));
         });
         String json = JSON.toJSONString(companies);
-        Console.out.println(json);
+        System.out.println(json);
     }
 }

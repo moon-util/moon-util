@@ -1,5 +1,6 @@
 package com.moon.core.util;
 
+import com.moon.core.lang.ThrowUtil;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -9,8 +10,10 @@ class JSONUtilTestTest {
 
     @Test
     void testReadJsonString() {
-        String filename = "d:/invoice.json";
-        String json = JSONUtil.readJsonString(filename);
-        System.out.println(json);
+        ThrowUtil.ignoreThrowsRun(() -> {
+            String filename = "d:/invoice.json";
+            String json = JSONUtil.readJsonString(filename);
+            System.out.println(json);
+        }, true);
     }
 }

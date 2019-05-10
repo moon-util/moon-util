@@ -19,6 +19,7 @@ class ZipWriterTestTest {
         ZipWriter builder = new ZipWriter(FileUtil.getOutputStream(name));
         builder.addFileEntry(new File("E:/Documents/WeChat Files/xua744531854/FileStorage/File/2019-05/aaaaa"));
         builder.closeWriter();
+        FileUtil.deleteAllFiles(path);
     }
 
     @Test

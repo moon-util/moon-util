@@ -12,7 +12,7 @@ class OptionalUtilTestTest {
 
     @Test
     void testApplyOrNull() {
-        int count = 1000000;
+        int count = 100;
         StringBuilder sb = new StringBuilder(count + 1);
         sb.append(1);
         for (int i = 0; i < count; i++) {

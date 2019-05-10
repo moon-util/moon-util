@@ -11,7 +11,7 @@ class EnvEnumTestTest {
     @Test
     void testGetModeOrNull() {
         String str = EnvUtil.current().toString();
-        Console.out.println(str);
+        System.out.println(str);
     }
 
     @Test

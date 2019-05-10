@@ -54,7 +54,6 @@ class ParseCoreTestTest {
         handler = running("assertion?value1:value2");
         res = handler.run(data);
         assertEquals(res, 20);
-        assertTrue(handler instanceof DataConst);
 
         handler = running("@BooleanUtil.toBooleanValue(20)?value1:value2");
         res = handler.run(data);
@@ -92,8 +91,8 @@ class ParseCoreTestTest {
     void testGetTotalFiles() {
         String path = "D:\\WorkSpaces\\IDEA\\moonsky\\src\\main\\java\\com\\moon";
         List<File> all = FileUtil.traverseDirectory(path);
-        Console.out.println("==============================================");
-        Console.out.println(all.size());
+        System.out.println("==============================================");
+        System.out.println(all.size());
     }
 
     @Test
@@ -162,24 +161,24 @@ class ParseCoreTestTest {
             put("true", 20);
         }};
 
-        handler = ParseCore.parse("[20].getSheet('name').getSheet(0).age.toString().length()");
+        handler = ParseCore.parse("[20].get('name').get(0).age.toString().length()");
         assertEquals(handler.run(data), 2);
 
         handler = ParseCore.parse(
-            "[  20   ]  .name   .  getSheet(0)  .  age  .  doubleValue(). toString(   ) . length   (  ) + [true]");
+            "[  20   ]  .name   .  get(0)  .  age  .  doubleValue(). toString(   ) . length   (  ) + [true]");
         assertEquals(handler.run(data), 20);
 
         handler = ParseCore.parse(
-            "[  20   ]  .name   .  getSheet(0)  .  age  .  doubleValue(). toString(   ) . length   (  ) + ['true']");
+            "[  20   ]  .name   .  get(0)  .  age  .  doubleValue(). toString(   ) . length   (  ) + ['true']");
         assertEquals(handler.run(data), 24);
 
-        handler = ParseCore.parse("([20].name.getSheet(0).age.doubleValue().toString().length()+[true]).longValue()");
+        handler = ParseCore.parse("([20].name.get(0).age.doubleValue().toString().length()+[true]).longValue()");
         assertEquals(handler.run(data), 20L);
 
-        handler = ParseCore.parse("([20].name.getSheet(0).age.doubleValue().toString().length()+['true'])");
+        handler = ParseCore.parse("([20].name.get(0).age.doubleValue().toString().length()+['true'])");
         assertEquals(handler.run(data), 24);
 
-        handler = ParseCore.parse("([20].name.getSheet(0).age.doubleValue().toString().length()+true).toString().length()");
+        handler = ParseCore.parse("([20].name.get(0).age.doubleValue().toString().length()+true).toString().length()");
         assertEquals(handler.run(data), 5);
     }
 
@@ -190,16 +189,16 @@ class ParseCoreTestTest {
         }};
         handler = ParseCore.parse("@System.currentTimeMillis()");
         res = handler.run();
-        Console.out.println(res);
+        System.out.println(res);
         handler1 = ParseCore.parse("@DateUtil.now()");
         res = handler.run();
-        Console.out.println(res);
-        Console.out.println("===============================");
+        System.out.println(res);
+        System.out.println("===============================");
         res = handler.run();
-        Console.out.println(res);
+        System.out.println(res);
         res = handler1.run();
-        Console.out.println(res);
-        Console.out.println("===============================");
+        System.out.println(res);
+        System.out.println("===============================");
     }
 
     @Test
@@ -269,10 +268,10 @@ class ParseCoreTestTest {
 
     @Test
     void testFnRunner() {
-        str = "@map.getSheet({20:25}, 20)";
+        str = "@map.get({20:25}, 20)";
         assertEquals(running(str).run(), (Object) 25);
 
-        str = "@map.getSheet(@map(23,24,25,26,68),68)";
+        str = "@map.get(@map(23,24,25,26,68),68)";
         runner = running(str);
         assertEquals(runner.run(), (Object) null);
 
@@ -295,7 +294,7 @@ class ParseCoreTestTest {
     @Test
     void testInstance() {
         Object o = null;
-        Console.out.println(Object.class.isInstance(o));
+        System.out.println(Object.class.isInstance(o));
     }
 
     @Test

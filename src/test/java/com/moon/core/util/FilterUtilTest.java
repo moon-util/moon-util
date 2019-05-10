@@ -23,9 +23,9 @@ public class FilterUtilTest {
         assertEquals("aaaa", FilterUtil.requireFirst(strings, str -> str.length() > 3));
         assertEquals("aaaaaa", FilterUtil.requireLast(strings, str -> str.length() > 3));
         
-        assertThrows(NoSuchItemException.class, () ->
+        assertThrows(Exception.class, () ->
             FilterUtil.requireFirst(strings, String::isEmpty));
-        assertThrows(NoSuchItemException.class, () ->
+        assertThrows(Exception.class, () ->
             FilterUtil.requireLast(strings, String::isEmpty));
         
         assertNull(FilterUtil.nullableFirst(strings, String::isEmpty));

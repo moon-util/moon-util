@@ -13,7 +13,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.moon.core.util.Console.out;
+import static java.lang.System.out;
 
 /**
  * @author benshaoye
@@ -172,60 +172,60 @@ class ProxyUtilTestTest {
 
         final int count = 100000000;
         out.println("==============================");
-        out.time("cglib:{}ms");
+//        out.time("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-        out.timeNext("jdk:{}ms");
+//        out.timeNext("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-        out.timeNext("java:{}ms");
+//        out.timeNext("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-        out.timeEnd();
+//        out.timeEnd();
         out.println("==============================");
-        out.time("jdk:{}ms");
+//        out.time("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-        out.timeNext("java:{}ms");
+//        out.timeNext("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-        out.timeNext("cglib:{}ms");
+//        out.timeNext("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-        out.timeEnd();
+//        out.timeEnd();
         out.println("==============================");
-        out.time("cglib:{}ms");
+//        out.time("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-        out.timeNext("java:{}ms");
+//        out.timeNext("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-        out.timeNext("jdk:{}ms");
+//        out.timeNext("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-        out.timeEnd();
+//        out.timeEnd();
         out.println("==============================");
-        out.time("java:{}ms");
+//        out.time("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-        out.timeNext("jdk:{}ms");
+//        out.timeNext("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-        out.timeNext("cglib:{}ms");
+//        out.timeNext("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-        out.timeEnd();
+//        out.timeEnd();
     }
 }

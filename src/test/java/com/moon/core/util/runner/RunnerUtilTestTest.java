@@ -38,21 +38,21 @@ class RunnerUtilTestTest {
             System.currentTimeMillis();
         }
         final int count = 20000;// 2000000000;
-        Console.out.time();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             runner.run();
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             runner1.run();
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             System.currentTimeMillis();
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
     }
 
     @Test
@@ -64,26 +64,26 @@ class RunnerUtilTestTest {
             "123".indexOf("2");
         }
         final int count = 2000000000;
-        Console.out.time();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             runner.run();
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             "123".indexOf("2");
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             "123".indexOf("2");
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
     }
 
     @Test
     void testMapAndList() {
-        res = RunnerUtil.run("{:}.getSheet(true)");
+        res = RunnerUtil.run("{:}.get(true)");
         assertEquals(res, null);
         res = RunnerUtil.run("{}.isEmpty()");
         assertEquals(res, true);
@@ -201,7 +201,7 @@ class RunnerUtilTestTest {
             RunnerUtil.parseRun("{{1+2}}");
         }
         long end = DateUtil.now();
-        Console.out.println(end - begin);
+        // Console.out.println(end - begin);
     }
 
     String str, result;
@@ -247,7 +247,7 @@ class RunnerUtilTestTest {
     @Test
     void testGetMethod() {
         res = MethodUtil.getPublicStaticMethods(Objects.class, "hash");
-        Console.out.println((Object) ListUtil.getByObject(res, 0));
+        // Console.out.println((Object) ListUtil.getByObject(res, 0));
     }
 
     @Test
@@ -272,23 +272,23 @@ class RunnerUtilTestTest {
         Runner runner = RunnerUtil.parse("1+1");
 
         int count = 10000;
-        Console.out.time();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             res = engine.eval("1+1");
         }
-        Console.out.timeNext();
+        // Console.out.timeNext();
         for (int i = 0; i < count; i++) {
             res = RunnerUtil.run("1+1");
         }
-        Console.out.timeNext();
+        // Console.out.timeNext();
         for (int i = 0; i < count; i++) {
             res = runner.run();
         }
-        Console.out.timeNext();
+        // Console.out.timeNext();
         for (int i = 0; i < count; i++) {
             res = 1 + 1;
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
     }
 
     @Test
@@ -308,16 +308,16 @@ class RunnerUtilTestTest {
         System.out.println(createList());
         System.out.println("===============================");
         final int count = 1000;
-        Console.out.time();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             createList();
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             runner.run();
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
     }
 
     List<String> createList() {
@@ -339,7 +339,7 @@ class RunnerUtilTestTest {
             .addCaller("call", Caller.class)
             .addCaller("Objects", InnerObjects.class);
 
-        Runner runner = RunnerUtil.parse("@call.getSheet()", settings);
+        Runner runner = RunnerUtil.parse("@call.get()", settings);
         assertEquals(runner.run(), "123456789");
         runner = RunnerUtil.parse("@Objects.toString('123123')", settings);
         assertEquals(runner.run(), "--11--");
@@ -435,16 +435,16 @@ class RunnerUtilTestTest {
 
         runner = RunnerUtil.parse(str);
         int count = 10000000;
-        Console.out.time();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             res = runner.run();
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             res = 1000 + 100.0 * 99 - (600 - 3 * 15) / (((68 - 9) - 3) * 2 - 100) + 10000 % 7 * 71;
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
 
         // ---------------------------------------------------------------------------------------
     }
@@ -464,16 +464,16 @@ class RunnerUtilTestTest {
 
         final Runner er = runner;
         int count = 10000000;
-        Console.out.time();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             res = 6.7 - 100 > 39.6 ? 5 == 5 ? 4 + 5 : 6 - 1 : !(100 % 3 - 39.0 < 27) ? 8 * 2 - 199 : 100 % 3;
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int i = 0; i < count; i++) {
             res = er.run();
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
     }
 
     @Test
@@ -506,16 +506,16 @@ class RunnerUtilTestTest {
 
         final Runner er = runner;
         int count = 1000;
-        Console.out.time();
+        // Console.out.time();
         for (int j = 0; j < count; j++) {
             res = 6.7 - 100 > 39.6 ? 5 == 5 ? 4 + 5 : 6 - 1 : !(100 % 3 - 39.0 < 27) ? 8 * 2 - 199 : 100 % 3;
         }
-        Console.out.timeEnd();
-        Console.out.time();
+        // Console.out.timeEnd();
+        // Console.out.time();
         for (int j = 0; j < count; j++) {
             res = er.run(data);
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
     }
 
     @Test
@@ -528,11 +528,11 @@ class RunnerUtilTestTest {
         System.out.println(res);
 
         int count = 100000;
-        Console.out.time();
+        // Console.out.time();
         for (int c = 0; c < count; c++) {
             runner.run(vars);
         }
-        Console.out.timeEnd();
+        // Console.out.timeEnd();
     }
 
     @Test

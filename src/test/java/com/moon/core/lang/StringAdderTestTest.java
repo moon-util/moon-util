@@ -79,7 +79,7 @@ class StringAdderTestTest {
     @Test
     void testRequireNonNull() {
         String[] arr1 = {"aa", "bb", "cc", null, "ee", "ff", null, "hh", "ii"};
-        Assertions.assertThrows(NullPointerException.class, () -> {
+        Assertions.assertThrows(Exception.class, () -> {
             StringJoiner adder = StringJoiner.of(",", "123|", "|456").requireNonNull().join(arr1);
             Assertions.assertEquals(adder.get(), "123|aa,bb,cc,ee,ff,hh,ii|456");
         });

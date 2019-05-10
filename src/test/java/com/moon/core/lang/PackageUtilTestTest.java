@@ -22,18 +22,18 @@ class PackageUtilTestTest {
     void testGetClassNames() {
         List<String> names = getClassName("java.util");
         IteratorUtil.forEach(names, name -> {
-            Console.out.println(name);
+            System.out.println(name);
         });
 
         Package pack = getClass().getPackage();
-        Console.out.println("=======================================");
-        Console.out.println(pack.getImplementationTitle());
-        Console.out.println(pack.getImplementationVendor());
-        Console.out.println(pack.getImplementationVersion());
-        Console.out.println(pack.getSpecificationTitle());
-        Console.out.println(pack.getSpecificationVendor());
-        Console.out.println(pack.getSpecificationVersion());
-        Console.out.println(pack.getName());
+        System.out.println("=======================================");
+        System.out.println(pack.getImplementationTitle());
+        System.out.println(pack.getImplementationVendor());
+        System.out.println(pack.getImplementationVersion());
+        System.out.println(pack.getSpecificationTitle());
+        System.out.println(pack.getSpecificationVendor());
+        System.out.println(pack.getSpecificationVersion());
+        System.out.println(pack.getName());
     }
 
     /**
@@ -142,7 +142,7 @@ class PackageUtilTestTest {
             }
         } catch (Exception e) {
             // e.printStackTrace();
-            Console.out.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
         return myClassName;
     }

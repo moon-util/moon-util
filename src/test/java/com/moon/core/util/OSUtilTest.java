@@ -16,8 +16,13 @@ public class OSUtilTest {
         try {
             List<Method> methodList = MethodUtil.getPublicStaticMethods(OSUtil.class);
             String[] tests = new String[methodList.size()];
-            IteratorUtil.forEach(methodList, (method, index) ->
-                tests[index] = MethodUtil.invokeStatic(method) + "\t" + method.getName());
+            IteratorUtil.forEach(methodList, (method, index) -> {
+                if (method.getParameterCount() == 0){
+                    tests[index] = MethodUtil.invokeStatic(method) + "\t" + method.getName();
+                } else {
+                    tests[index] = method.getName();
+                }
+            });
             Arrays.sort(tests);
             IteratorUtil.forEach(tests, System.out::println);
         } catch (Throwable t) {

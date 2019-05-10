@@ -18,29 +18,28 @@ class ConsoleTestTest {
 
     @Test
     void testPrintStackTrace() {
-        Console.out.printStackTrace();
 
     }
 
     @Test
     void testName() {
-        Console.out.println("aaaaaaaaaaaaaaaa");
-        Console.out.println("bbbbbbbbbbbbbbbbbbb");
-        Console.out.println("ccccccccccccccccccccccc");
+        System.out.println("aaaaaaaaaaaaaaaa");
+        System.out.println("bbbbbbbbbbbbbbbbbbb");
+        System.out.println("ccccccccccccccccccccccc");
 
-        Console.out.println(new File("/d:/invoice/").exists());
-        Console.out.println(System.getProperty("consoleBasePath"));
+        System.out.println(new File("/d:/invoice/").exists());
+        System.out.println(System.getProperty("consoleBasePath"));
 
         File file = new File("/d:/invoice/name/temp");
-        Console.out.println(file.exists());
+        System.out.println(file.exists());
         File parent = file;
-        Console.out.println((parent = parent.getParentFile()).exists());
-        Console.out.println((parent = parent.getParentFile()).exists());
-        Console.out.println((parent = parent.getParentFile()).exists());
-        Console.out.println(parent);
-        Console.out.println(parent.getParentFile());
-        Console.out.println(file.mkdirs());
-        Console.out.println(getClass().getSimpleName());
+        System.out.println((parent = parent.getParentFile()).exists());
+        System.out.println((parent = parent.getParentFile()).exists());
+        System.out.println((parent = parent.getParentFile()).exists());
+        System.out.println(parent);
+        System.out.println(parent.getParentFile());
+        System.out.println(file.mkdirs());
+        System.out.println(getClass().getSimpleName());
     }
 
 }

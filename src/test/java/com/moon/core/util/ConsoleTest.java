@@ -8,7 +8,5 @@ import org.junit.jupiter.api.Test;
 public class ConsoleTest {
     @Test
     void testOf() {
-        Console.out.time();
-        Console.out.timeEnd();
     }
 }

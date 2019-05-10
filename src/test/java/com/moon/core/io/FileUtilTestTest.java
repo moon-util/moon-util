@@ -1,6 +1,5 @@
 package com.moon.core.io;
 
-import com.moon.core.util.Console;
 import com.moon.core.util.IteratorUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,12 +20,12 @@ class FileUtilTestTest {
     void outFreeSpace(String local) {
         try {
             file = new File(local);
-            Console.out.println(file.getFreeSpace() + "b");
-            Console.out.println((file.getFreeSpace() >> 10) + "kb");
-            Console.out.println((file.getFreeSpace() >> 10 >> 10) + "mb");
-            Console.out.println((file.getFreeSpace() >> 10 >> 10 >> 10) + "gb");
+            System.out.println(file.getFreeSpace() + "b");
+            System.out.println((file.getFreeSpace() >> 10) + "kb");
+            System.out.println((file.getFreeSpace() >> 10 >> 10) + "mb");
+            System.out.println((file.getFreeSpace() >> 10 >> 10 >> 10) + "gb");
             Assertions.assertTrue(FileUtil.exists(local));
-            Console.out.println(FileUtil.length(local));
+            System.out.println(FileUtil.length(local));
         } catch (Throwable t) {
 
         }
@@ -107,21 +106,6 @@ class FileUtilTestTest {
     void testLengthToBit() {
         String dirPath = "E:\\Downloads\\BaiduNetdiskDownload\\套图合集\\";
         String newDirPath = "E:\\Downloads\\BaiduNetdiskDownload\\套图合集\\[YouMi]尤蜜荟\\001-050\\001-010";
-
-        String traverse = dirPath;
-        List<File> files = FileUtil.traveller().traverse(traverse);
-
-        String targetDir = "A:\\DriverA\\Downloaded\\scattered\\";
-        files.forEach(file -> {
-            String absolutePath = file.getAbsolutePath();
-            if (absolutePath.endsWith(".rar")) {
-                String replaced = targetDir + absolutePath.replace(traverse, "");
-                System.out.println(replaced);
-
-                File replacedFile = new File(replaced);
-                FileUtil.copyToFile(file, replacedFile);
-            }
-        });
     }
 
     @Test

@@ -16,6 +16,8 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
 
     private static final long serialVersionUID = 362498820763181266L;
 
+    final String DEFAULT_KEY = RandomStringUtil.next(64);
+
     private final PropertiesGroup top;
     private final PropertiesGroup parent;
 
@@ -44,11 +46,25 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
      */
 
     @Override
+    public Object get(Object key) {
+        Object value = super.get(key);
+        if (value == null) { return null; }
+        if (value instanceof PropertiesGroup){
+            PropertiesGroup group = (PropertiesGroup) value;
+            Object result = group.get(DEFAULT_KEY);
+            return result == null ? group : result;
+        }
+        return value;
+    }
+
+    private Object simplePut(String key, Object value){ return super.put(key, value); }
+
+    @Override
     public Object put(String key, Object value) {
         int index = key.indexOf('.');
-        return index < 0 ? super.put(key, value)
+        return index < 0 ? this.simplePut(key, value)
             : getChildOrEmpty(key.substring(0, index))
-            .put(key.substring(index + 1), value);
+            .simplePut(key.substring(index + 1), value);
     }
 
     @Override
@@ -64,7 +80,19 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
         return group;
     }
 
-    private PropertiesGroup getChildOnly(String key) { return (PropertiesGroup) get(key); }
+    private PropertiesGroup getChildOnly(String key) {
+        Object present = super.get(key);
+        if (present == null) {
+            return null;
+        }
+        if (present instanceof PropertiesGroup) {
+            return (PropertiesGroup) present;
+        }
+        PropertiesGroup group = new PropertiesGroup(this.top, this);
+        group.simplePut(DEFAULT_KEY, present);
+        simplePut(key, group);
+        return group;
+    }
 
     /*
      * ----------------------------------------------------------------------------

@@ -20,7 +20,8 @@ class PropertiesGroupTestTest {
 
         PropertiesGroup group = new PropertiesGroup(ret);
 
-        Console.out.println(group.get("conn"));
-        Console.out.println(ret);
+        System.out.println(group.get("conn"));
+        System.out.println(ret);
+        System.out.println(group);
     }
 }

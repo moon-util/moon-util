@@ -150,16 +150,16 @@ class MapperUtilTestTest {
         assertTrue(employee1 != e1);
         assertEquals(employee1, e1);
 
-        Console.out.println(System.identityHashCode(employee1));
-        Console.out.println(System.identityHashCode(e1));
+        System.out.println(System.identityHashCode(employee1));
+        System.out.println(System.identityHashCode(e1));
 
         Employee e2 = MapperUtil.toInstance(map, Employee.class);
         assertTrue(employee1 != e2);
         assertEquals(employee1, e1);
         assertEquals(e2, e1);
 
-        Console.out.println(System.identityHashCode(employee1));
-        Console.out.println(System.identityHashCode(e1));
-        Console.out.println(System.identityHashCode(e2));
+        System.out.println(System.identityHashCode(employee1));
+        System.out.println(System.identityHashCode(e1));
+        System.out.println(System.identityHashCode(e2));
     }
 }

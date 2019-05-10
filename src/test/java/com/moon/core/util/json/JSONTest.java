@@ -35,6 +35,6 @@ public class JSONTest {
             put("desc", null);
             put("address", "用户猜测");
         }};
-        Console.out.println(JSON.stringify(data));
+        System.out.println(JSON.stringify(data));
     }
 }

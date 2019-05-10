@@ -95,7 +95,7 @@ class ParseCurlyTestTest {
         assertEquals(MapUtil.getByObject(res, "key"), "value");
         assertEquals(MapUtil.getByObject(res, null), 110);
         assertTrue(MapUtil.getByObject(data, true) instanceof Double);
-        Console.out.println(((Number) MapUtil.getByObject(data, true)).longValue());
+        System.out.println(((Number) MapUtil.getByObject(data, true)).longValue());
     }
 
     void doMap() {

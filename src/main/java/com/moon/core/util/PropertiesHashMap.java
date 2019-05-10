@@ -22,9 +22,7 @@ public class PropertiesHashMap extends StringKeyHashMap<String> {
     public PropertiesHashMap(Map<? extends String, ? extends String>... maps) { super(maps); }
 
     public final static PropertiesHashMap fromObjectMap(Map map) {
-        if (map == null) {
-            return new PropertiesHashMap();
-        }
+        if (map == null) { return new PropertiesHashMap(); }
         PropertiesHashMap props = new PropertiesHashMap(map.size());
         map.forEach((key, value) -> props.put(stringifyOrNull(key), stringifyOrNull(value)));
         return props;
