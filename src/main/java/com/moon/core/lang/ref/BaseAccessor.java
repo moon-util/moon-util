@@ -10,7 +10,7 @@ import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 /**
  * @author benshaoye
  */
-abstract class BaseAccessor<T, A extends BaseAccessor> {
+abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
     /**
      * 缓存取值过程
      */
@@ -133,14 +133,11 @@ abstract class BaseAccessor<T, A extends BaseAccessor> {
      */
 
     private final T reload() {
-        T t = get();
-        if (t == null) {
-            t = supplier.get();
-            if (notAllowNullValue) {
-                Objects.requireNonNull(t, "不允许 null 值");
-            }
-            cache(reference(t));
+        T t = supplier.get();
+        if (notAllowNullValue) {
+            Objects.requireNonNull(t, "不允许 null 值");
         }
+        cache(reference(t));
         return t;
     }
 

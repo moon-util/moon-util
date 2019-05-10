@@ -1,7 +1,10 @@
 package com.moon.core.util;
 
 import com.moon.core.beans.BeanInfoUtil;
+import com.moon.core.enums.ArrayOperator;
+import com.moon.core.enums.ArraysEnum;
 import com.moon.core.enums.Converters;
+import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakAccessor;
 import com.moon.core.lang.reflect.ConstructorUtil;
@@ -12,8 +15,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
+
+import static com.moon.core.enums.Converters.*;
+import static com.moon.core.util.CollectUtil.addAll;
 
 /**
  * @author benshaoye
@@ -24,13 +34,11 @@ public class GenericTypeConverter implements TypeConverter {
     protected final WeakAccessor<MapBuilder> mapAccessor = WeakAccessor.of(MapBuilder::new);
     protected final WeakAccessor<ListBuilder> listAccessor = WeakAccessor.of(ListBuilder::new);
     protected final WeakAccessor<ArrayBuilder> arrayAccessor = WeakAccessor.of(ArrayBuilder::new);
-    protected final WeakAccessor<CollectionBuilder> collectionAccessor = WeakAccessor.of(CollectionBuilder::new);
+    protected final WeakAccessor<CollectBuilder> collectAccessor = WeakAccessor.of(CollectBuilder::new);
 
     protected final Map<Class, BiFunction<Object, Class, Object>> converters = new HashMap<>();
 
-    public GenericTypeConverter() {
-        registerDefaultConverter();
-    }
+    public GenericTypeConverter() { registerDefaultConverter(); }
 
     /**
      * 注册默认转换器
@@ -40,13 +48,12 @@ public class GenericTypeConverter implements TypeConverter {
             BiFunction converter = value;
             add(value.TYPE, converter);
         }
+        add(Optional.class, (value, tyType) -> value instanceof Optional ? (Optional) value : Optional.ofNullable(value));
         // Collection convert
         add(Collection.class, (value, toType) -> {
-            if (value == null || toType == null) {
-                return null;
-            }
+            if (value == null || toType == null) { return null; }
             Class cls;
-            CollectionBuilder builder = collectionAccessor.get();
+            CollectBuilder builder = collectAccessor.get();
             if (value instanceof List) {
                 return builder.toCollection((List) value, toType);
             } else if (value instanceof Collection) {
@@ -77,9 +84,7 @@ public class GenericTypeConverter implements TypeConverter {
         });
         // List convert
         add(List.class, (value, toType) -> {
-            if (value == null || toType == null) {
-                return null;
-            }
+            if (value == null || toType == null) { return null; }
             ListBuilder builder = listAccessor.get();
             if (value instanceof List) {
                 return builder.toList((List) value, toType);
@@ -122,9 +127,7 @@ public class GenericTypeConverter implements TypeConverter {
      */
     private <C> BiFunction<Object, Class<C>, C> converterOfMap() {
         return (value, toType) -> {
-            if (value == null || toType == null) {
-                return null;
-            }
+            if (value == null || toType == null) { return null; }
             Class cls;
             MapBuilder builder = mapAccessor.get();
             if (value instanceof Collection) {
@@ -164,9 +167,10 @@ public class GenericTypeConverter implements TypeConverter {
      * @param <C>
      * @return
      */
-    private <C> void add(Class<C> toType, BiFunction<Object, Class<C>, C> func) {
+    private <C> TypeConverter add(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         BiFunction converter = func;
         converters.put(toType, converter);
+        return this;
     }
 
     /**
@@ -178,9 +182,8 @@ public class GenericTypeConverter implements TypeConverter {
      * @return
      */
     @Override
-    public <C> TypeConverter register(Class<C> toType, BiFunction<Object, Class<C>, C> func) {
-        add(toType, func);
-        return this;
+    public <C> TypeConverter register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+        return add(toType, func);
     }
 
     /**
@@ -192,7 +195,7 @@ public class GenericTypeConverter implements TypeConverter {
      * @return
      */
     @Override
-    public <C> TypeConverter registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, C> func) {
+    public <C> TypeConverter registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         BiFunction converter = func;
         converters.putIfAbsent(toType, converter);
         return this;
@@ -208,9 +211,7 @@ public class GenericTypeConverter implements TypeConverter {
      */
     @Override
     public <T> T toType(Object value, Class<T> type) {
-        if (value == null || type == null) {
-            return null;
-        }
+        if (type == null) { return null; }
 
         BiFunction<Object, Class, Object> func = converters.get(type);
         if (func != null) {
@@ -227,148 +228,110 @@ public class GenericTypeConverter implements TypeConverter {
             return (T) converters.get(Map.class).apply(value, type);
         } else if (value instanceof Map) {
             return toBean((Map) value, type);
+        } else if (type.isInstance(value)) {
+            return (T) value;
         }
 
-        return (T) value;
+        throw new ClassCastException(StringUtil.format("Can not cast: {} to type of: {}", value, type));
     }
 
     private <T, S> T convert(Object value, Class<T> type, Class<S> superType) {
         return (T) converters.get(superType).apply(value, type);
     }
 
-    private <E> E convert(Object value, Class<E> type) {
-        return convert(value, type, type);
-    }
+    private <E> E convert(Object value, Converters converter, Class type) { return (E) converter.apply(value, type); }
+
+    private <E> E convert(Object value, Converters converter) { return convert(value, converter, converter.TYPE); }
 
     @Override
-    public boolean toBooleanValue(Object value) {
-        return convert(value, boolean.class);
-    }
+    public boolean toBooleanValue(Object value) { return convert(value, toBooleanValue); }
 
     @Override
-    public Boolean toBoolean(Object value) {
-        return convert(value, Boolean.class);
-    }
+    public Boolean toBoolean(Object value) { return convert(value, toBoolean); }
 
     @Override
-    public char toCharValue(Object value) {
-        return convert(value, char.class);
-    }
+    public char toCharValue(Object value) { return convert(value, toCharValue); }
 
     @Override
-    public Character toCharacter(Object value) {
-        return convert(value, Character.class);
-    }
+    public Character toCharacter(Object value) { return convert(value, toCharacter); }
 
     @Override
-    public byte toByteValue(Object value) {
-        return convert(value, byte.class);
-    }
+    public byte toByteValue(Object value) { return convert(value, toByteValue); }
 
     @Override
-    public Byte toByte(Object value) {
-        return convert(value, Byte.class);
-    }
+    public Byte toByte(Object value) { return convert(value, toByte); }
 
     @Override
-    public short toShortValue(Object value) {
-        return convert(value, short.class);
-    }
+    public short toShortValue(Object value) { return convert(value, toShortValue); }
 
     @Override
-    public Short toShort(Object value) {
-        return convert(value, Short.class);
-    }
+    public Short toShort(Object value) { return convert(value, toShort); }
 
     @Override
-    public int toIntValue(Object value) {
-        return convert(value, int.class);
-    }
+    public int toIntValue(Object value) { return convert(value, toIntValue); }
 
     @Override
-    public Integer toInteger(Object value) {
-        return convert(value, Integer.class);
-    }
+    public Integer toInteger(Object value) { return convert(value, toInteger); }
 
     @Override
-    public long toLongValue(Object value) {
-        return convert(value, long.class);
-    }
+    public long toLongValue(Object value) { return convert(value, toLongValue); }
 
     @Override
-    public Long toLong(Object value) {
-        return convert(value, Long.class);
-    }
+    public Long toLong(Object value) { return convert(value, toLong); }
 
     @Override
-    public float toFloatValue(Object value) {
-        return convert(value, float.class);
-    }
+    public float toFloatValue(Object value) { return convert(value, toFloatValue); }
 
     @Override
-    public Float toFloat(Object value) {
-        return convert(value, Float.class);
-    }
+    public Float toFloat(Object value) { return convert(value, toFloat); }
 
     @Override
-    public double toDoubleValue(Object value) {
-        return convert(value, double.class);
-    }
+    public double toDoubleValue(Object value) { return convert(value, toDoubleValue); }
 
     @Override
-    public Double toDouble(Object value) {
-        return convert(value, Double.class);
-    }
+    public Double toDouble(Object value) { return convert(value, toDouble); }
 
     @Override
-    public BigInteger toBigInteger(Object value) {
-        return convert(value, BigInteger.class);
-    }
+    public BigInteger toBigInteger(Object value) { return convert(value, toBigInteger); }
 
     @Override
-    public BigDecimal toBigDecimal(Object value) {
-        return convert(value, BigDecimal.class);
-    }
+    public BigDecimal toBigDecimal(Object value) { return convert(value, toBigDecimal); }
 
     @Override
-    public Date toDate(Object value) {
-        return convert(value, Date.class);
-    }
+    public Date toDate(Object value) { return convert(value, toDate); }
 
     @Override
-    public java.sql.Date toSqlDate(Object value) {
-        return convert(value, java.sql.Date.class);
-    }
+    public java.sql.Date toSqlDate(Object value) { return convert(value, toSqlDate); }
 
     @Override
-    public Timestamp toTimestamp(Object value) {
-        return convert(value, Timestamp.class);
-    }
+    public Timestamp toTimestamp(Object value) { return convert(value, toTimestamp); }
 
     @Override
-    public Time toTime(Object value) {
-        return convert(value, Time.class);
-    }
+    public Time toSqlTime(Object value) { return convert(value, toSqlTime); }
 
     @Override
-    public Calendar toCalendar(Object value) {
-        return convert(value, Calendar.class);
-    }
+    public Calendar toCalendar(Object value) { return convert(value, toCalendar); }
 
     @Override
-    public String toString(Object value) {
-        return convert(value, String.class);
-    }
+    public LocalDate toLocalDate(Object value) { return convert(value, toLocalDate); }
 
     @Override
-    public StringBuilder toStringBuilder(Object value) {
-        return convert(value, StringBuilder.class);
-    }
+    public LocalTime toLocalTime(Object value) { return convert(value, toLocalTime); }
 
     @Override
-    public StringBuffer toStringBuffer(Object value) {
-        return convert(value, StringBuffer.class);
-    }
+    public LocalDateTime toLocalDateTime(Object value) { return convert(value, toLocalDateTime); }
+
+    @Override
+    public String toString(Object value) { return convert(value, toString); }
+
+    @Override
+    public StringBuilder toStringBuilder(Object value) { return convert(value, toStringBuilder); }
+
+    @Override
+    public StringBuffer toStringBuffer(Object value) { return convert(value, toStringBuffer); }
+
+    @Override
+    public <T extends java.util.Optional> T toOptional(Object value) { return convert(value, toOptional); }
 
     /**
      * if data is null or clazz is null will back null
@@ -379,9 +342,7 @@ public class GenericTypeConverter implements TypeConverter {
      * @return
      */
     @Override
-    public <T extends Enum<T>> T toEnum(Object value, Class<T> clazz) {
-        return convert(value, clazz, Enum.class);
-    }
+    public <T extends Enum<T>> T toEnum(Object value, Class<T> clazz) { return convert(value, toEnum, clazz); }
 
     /**
      * if data is null or clazz is null will back null.
@@ -452,41 +413,24 @@ public class GenericTypeConverter implements TypeConverter {
         } else if (value instanceof Map) {
             return builder.toArray((Map) value, componentType);
         } else if ((cls = value.getClass()).isArray()) {
-            if (cls == int[].class) {
-                return builder.toArray((int[]) value, componentType);
-            } else if (cls == long[].class) {
-                return builder.toArray((long[]) value, componentType);
-            } else if (cls == double[].class) {
-                return builder.toArray((double[]) value, componentType);
-            } else if (cls == byte[].class) {
-                return builder.toArray((byte[]) value, componentType);
-            } else if (cls == char[].class) {
-                return builder.toArray((char[]) value, componentType);
-            } else if (cls == short[].class) {
-                return builder.toArray((short[]) value, componentType);
-            } else if (cls == boolean[].class) {
-                return builder.toArray((boolean[]) value, componentType);
-            } else if (cls == float[].class) {
-                return builder.toArray((float[]) value, componentType);
-            }
-            return builder.toArray((Object[]) value, componentType);
+            ArrayOperator operator = ArraysEnum.getOrObjects(cls);
+            T[] array = createArray(componentType, operator.length(value));
+            operator.forEach(value, (item, index) ->
+                array[index] = toType(item, componentType));
+            return array;
         }
         return builder.toArray(value, componentType);
     }
 
     @Override
-    public <T extends Map> T toMap(Object value, Class<T> mapClass) {
-        return convert(value, mapClass, Map.class);
-    }
+    public <T extends Map> T toMap(Object value, Class<T> mapClass) { return convert(value, mapClass, Map.class); }
 
     @Override
-    public <T extends List> T toList(Object value, Class<T> listType) {
-        return convert(value, listType, List.class);
-    }
+    public <T extends List> T toList(Object value, Class<T> listType) { return convert(value, listType, List.class); }
 
     @Override
-    public <T extends Collection> T toCollection(Object value, Class<T> collectionType) {
-        return convert(value, collectionType, Collection.class);
+    public <T extends Collection> T toCollection(Object value, Class<T> collectType) {
+        return convert(value, collectType, Collection.class);
     }
 
     // **********************************************************************************************
@@ -494,225 +438,141 @@ public class GenericTypeConverter implements TypeConverter {
     // 凡是进入 builder 的指定类型（type）和 data 均不为 null，故不做 null 值判断
     // **********************************************************************************************
 
-    private static class CollectionBuilder {
+    private static class CollectBuilder {
         Collection toCollection(Map value, Class listImplType) {
-            return createCollect(listImplType, isAbstract(listImplType), value.values());
+            return addAll(createCollect(listImplType, isAbstract(listImplType)), value.values());
         }
 
         Collection toCollection(Collection value, Class listImplType) {
-            if (listImplType.isInstance(value)) {
-                return value;
-            }
-            return createCollect(listImplType, isAbstract(listImplType), value);
+            return listImplType.isInstance(value) ? value
+                : createCollect(listImplType, isAbstract(listImplType), value);
         }
 
         Collection toCollection(Object[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(int[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(long[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(double[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(char[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(byte[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(short[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(float[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(boolean[] array, Class listImplType) {
-            boolean isDefault;
-            if (isDefault = isAbstract(listImplType)) {
-                return ListUtil.toList(array);
-            } else {
-                return createCollect(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createCollect(listImplType, false, array);
         }
 
         Collection toCollection(Object value, Class listImplType) {
-            Collection ret = createCollect(listImplType, isAbstract(listImplType));
-            ret.add(value);
-            return ret;
+            return CollectUtil.add(createCollect(listImplType, isAbstract(listImplType)), value);
         }
 
-        <T extends Collection> Collection createCollect(Class<T> listImplType, boolean isDefault, Collection c) {
-            Collection list = createCollect(listImplType, isDefault);
-            list.addAll(c);
-            return list;
+        <T extends Collection, E> Collection createCollect(Class<T> listImplType, boolean isDefault, E... values) {
+            return addAll(createCollect(listImplType, isDefault), values);
         }
 
         <T extends Collection> Collection createCollect(Class<T> listImplType, boolean isDefault) {
             return newInstance(isDefault, listImplType,
                 isDefault && Set.class.isAssignableFrom(listImplType)
-                    ? HashSet.class : ArrayList.class);
+                    ? HashSet::new : ArrayList::new);
         }
     }
 
     private static class ListBuilder {
         List toList(Map value, Class listImplType) {
-            return createList(listImplType, isAbstract(listImplType), value.values());
+            return addAll(createList(listImplType, isAbstract(listImplType)), value.values());
         }
 
         List toList(Collection value, Class listImplType) {
-            if (listImplType.isInstance(value)) {
-                return (List) value;
-            }
-            return createList(listImplType, isAbstract(listImplType), value);
+            return listImplType.isInstance(value) ? (List) value
+                : createList(listImplType, isAbstract(listImplType), value);
         }
 
         List toList(Object[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(int[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(long[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(double[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(short[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(char[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(byte[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(float[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(boolean[] array, Class listImplType) {
-            boolean isDefault = isAbstract(listImplType);
-            if (isDefault) {
-                return ListUtil.toList(array);
-            } else {
-                return createList(listImplType, isDefault, ListUtil.toList(array));
-            }
+            return isAbstract(listImplType) ? ListUtil.toList(array)
+                : createList(listImplType, false, array);
         }
 
         List toList(Object value, Class listImplType) {
-            List list = createList(listImplType, isAbstract(listImplType));
-            list.add(value);
-            return list;
+            return CollectUtil.add(createList(listImplType, isAbstract(listImplType)), value);
         }
 
-        <T extends List> List createList(Class<T> listImplType, boolean isDefault, Collection c) {
-            List list = createList(listImplType, isDefault);
-            list.addAll(c);
-            return list;
+        <T extends List, E> List createList(Class<T> listImplType, boolean isDefault, E... values) {
+            return addAll(createList(listImplType, isDefault), values);
         }
 
         <T extends List> List createList(Class<T> listImplType, boolean isDefault) {
-            return newInstance(isDefault, listImplType, ArrayList.class);
+            return newInstance(isDefault, listImplType, ArrayList::new);
         }
     }
 
@@ -725,99 +585,12 @@ public class GenericTypeConverter implements TypeConverter {
             return (T[]) value.toArray(createArray(componentType, value.size()));
         }
 
-        <T> T[] toArray(Map value, Class<T> componentType) {
-            return toArray(value.values(), componentType);
-        }
-
-        <T> T[] toArray(Object[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(int[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(long[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(double[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(byte[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(char[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(short[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(float[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
-
-        <T> T[] toArray(boolean[] value, Class<T> componentType) {
-            int length = value.length;
-            T[] array = createArray(componentType, length);
-            for (int i = 0; i < length; i++) {
-                Array.set(array, i, TypeUtil.cast().toType(value[i], componentType));
-            }
-            return array;
-        }
+        <T> T[] toArray(Map value, Class<T> componentType) { return toArray(value.values(), componentType); }
 
         <T> T[] toArray(Object value, Class<T> componentType) {
             T[] array = createArray(componentType, 1);
             Array.set(array, 0, value);
             return array;
-        }
-
-        <T> T[] createArray(Class<T> componentType, int length) {
-            return (T[]) Array.newInstance(componentType, length);
         }
     }
 
@@ -993,24 +766,25 @@ public class GenericTypeConverter implements TypeConverter {
         }
 
         <T> T createMap(Class mapImplClass) {
-            return newInstance(isAbstract(mapImplClass), mapImplClass, HashMap.class);
+            return newInstance(isAbstract(mapImplClass), mapImplClass, HashMap::new);
         }
     }
 
+    private final static <T> T[] createArray(Class<T> componentType, int length) {
+        return (T[]) Array.newInstance(componentType, length);
+    }
 
-    private static boolean isAbstract(Class type) {
-        if (type == null) {
-            return true;
-        }
+    private final static boolean isAbstract(Class type) {
+        if (type == null) { return true; }
         int modifier = type.getModifiers();
         return Modifier.isInterface(modifier) || Modifier.isAbstract(modifier);
     }
 
-    private static <T> T newInstance(boolean isDefault, Class type, Class defaultType) {
+    private final static <T> T newInstance(boolean isDefault, Class type, Supplier supplier) {
         try {
-            return (T) ConstructorUtil.newInstance((isDefault ? defaultType : type));
+            return (T) (isDefault ? supplier.get() : ConstructorUtil.newInstance(type));
         } catch (Exception e) {
-            return (T) ConstructorUtil.newInstance(defaultType);
+            return (T) supplier.get();
         }
     }
 }

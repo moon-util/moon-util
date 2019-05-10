@@ -6,6 +6,7 @@ import com.moon.core.util.function.ThrowingFunction;
 import com.moon.core.util.function.ThrowingRunnable;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author benshaoye
@@ -24,6 +25,7 @@ public final class ThrowUtil {
     public static <T> T doThrow(String reason) {
         throw new IllegalArgumentException(reason);
     }
+
     public static <T> T doThrow(Object reason) {
         if (reason == null) {
             throw new NullPointerException();
@@ -31,6 +33,8 @@ public final class ThrowUtil {
             throw (RuntimeException) reason;
         } else if (reason instanceof Error) {
             throw (Error) reason;
+        } else if (reason instanceof Supplier) {
+            return doThrow(((Supplier) reason).get());
         } else {
             return doThrow(String.valueOf(reason));
         }

@@ -13,10 +13,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static java.util.Objects.requireNonNull;
@@ -144,6 +141,10 @@ public enum Converters implements EnumDescriptor,
     toSqlDate(java.sql.Date.class) {
         @Override
         public Object apply(Object o, Class aClass) { return DateUtil.toSqlDate(o); }
+    },
+    toOptional(Optional.class) {
+        @Override
+        public Object apply(Object o, Class type) { return o instanceof Optional ? o : Optional.ofNullable(o); }
     },
     toEnum(Enum.class) {
         @Override

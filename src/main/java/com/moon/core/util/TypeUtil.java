@@ -4,6 +4,7 @@ import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakAccessor;
 
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 /**
  * 通用类型转换器
@@ -15,9 +16,7 @@ public final class TypeUtil {
     /**
      * can not getSheet a instance of TypeUtil.class
      */
-    private TypeUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private TypeUtil() { ThrowUtil.noInstanceError(); }
 
     /**
      * default converter CACHE or create new one
@@ -25,22 +24,26 @@ public final class TypeUtil {
     private final static WeakAccessor<TypeConverter> accessor = WeakAccessor.of(UnmodifiableTypeConverter::new);
 
     /**
-     * return a flipToUnmodify type converter
+     * return a default type converter
      *
      * @return
      */
-    public final static TypeConverter cast() {
-        return accessor.get();
-    }
+    public final static TypeConverter cast() { return accessor.get(); }
 
     /**
-     * getSheet a default type converter
+     * get a default type converter
      *
      * @return
      */
-    public final static TypeConverter of() {
-        return new GenericTypeConverter();
-    }
+    public final static TypeConverter of() { return of(GenericTypeConverter::new); }
+
+    /**
+     * get a default type converter
+     *
+     * @param supplier
+     * @return
+     */
+    public final static TypeConverter of(Supplier<TypeConverter> supplier) { return supplier.get(); }
 
     /**
      * o is instance of clazz
@@ -49,27 +52,25 @@ public final class TypeUtil {
      * @param clazz
      * @return
      */
-    public final static boolean instanceOf(Object o, Class clazz) {
-        return clazz.isInstance(o);
-    }
+    public final static boolean instanceOf(Object o, Class clazz) { return clazz.isInstance(o); }
 
     /**
      * can not modify converter or increment new converter
      */
     private final static class UnmodifiableTypeConverter extends GenericTypeConverter {
 
-        UnmodifiableTypeConverter() {
-            super();
+        final static String ERROR = "Can't add new converter or modify on default converter";
+
+        UnmodifiableTypeConverter() { super(); }
+
+        @Override
+        public <C> TypeConverter register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+            throw new UnsupportedOperationException(ERROR);
         }
 
         @Override
-        public <C> TypeConverter register(Class<C> toType, BiFunction<Object, Class<C>, C> func) {
-            throw new UnsupportedOperationException("can not add new converter or modify on default converter");
-        }
-
-        @Override
-        public <C> TypeConverter registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, C> func) {
-            throw new UnsupportedOperationException("can not add new converter or modify on default converter");
+        public <C> TypeConverter registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+            throw new UnsupportedOperationException(ERROR);
         }
     }
 }

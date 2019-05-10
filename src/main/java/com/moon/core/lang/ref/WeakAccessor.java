@@ -31,24 +31,14 @@ import java.util.function.Supplier;
  */
 public class WeakAccessor<T> extends BaseAccessor<T, WeakAccessor<T>> {
 
-    public WeakAccessor(Supplier<T> supplier) {
-        this(supplier, false);
-    }
+    public WeakAccessor(Supplier<T> supplier) { this(supplier, false); }
 
-    public WeakAccessor(Supplier<T> supplier, boolean allowNullValue) {
-        super(supplier, allowNullValue);
-    }
+    public WeakAccessor(Supplier<T> supplier, boolean allowNullValue) { super(supplier, allowNullValue); }
 
     @Override
-    protected Reference<T> reference(T value) {
-        return ReferenceUtil.weak(value);
-    }
+    protected Reference<T> reference(T value) { return ReferenceUtil.weak(value); }
 
-    public static <T> WeakAccessor<T> of(Supplier<T> supplier) {
-        return new WeakAccessor<>(supplier);
-    }
+    public static <T> WeakAccessor<T> of(Supplier<T> supplier) { return new WeakAccessor<>(supplier); }
 
-    public static <T> WeakAccessor<T> ofNullable(Supplier<T> supplier) {
-        return new WeakAccessor<>(supplier, true);
-    }
+    public static <T> WeakAccessor<T> ofNullable(Supplier<T> supplier) { return new WeakAccessor<>(supplier, true); }
 }
