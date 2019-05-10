@@ -13,9 +13,7 @@ import static com.moon.core.util.runner.core.Constants.*;
  * @author benshaoye
  */
 final class ParseOpposite {
-    private ParseOpposite() {
-        noInstanceError();
-    }
+    private ParseOpposite() { noInstanceError(); }
 
     final static AsRunner parse(char[] chars, IntAccessor indexer, int len, RunnerSettings settings) {
         AsRunner handler, linked;

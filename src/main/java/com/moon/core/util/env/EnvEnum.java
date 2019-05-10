@@ -14,15 +14,11 @@ import static java.lang.Boolean.TRUE;
 enum EnvEnum implements Environmental {
     DEVELOPMENT {
         @Override
-        boolean isTrue() {
-            return isDevelopment();
-        }
+        boolean isTrue() { return isDevelopment(); }
     },
     PRODUCTION {
         @Override
-        boolean isTrue() {
-            return isProduction();
-        }
+        boolean isTrue() { return isProduction(); }
     };
 
     abstract boolean isTrue();
@@ -57,21 +53,13 @@ enum EnvEnum implements Environmental {
     }
 
     @Override
-    public <T> T getOrNull(ThrowingSupplier<T> supplier) {
-        return getOrDefault(supplier, null);
-    }
+    public <T> T getOrNull(ThrowingSupplier<T> supplier) { return getOrDefault(supplier, null); }
 
-    public final static boolean isProduction() {
-        return production;
-    }
+    public final static boolean isProduction() { return production; }
 
-    public final static boolean isDevelopment() {
-        return !production;
-    }
+    public final static boolean isDevelopment() { return !production; }
 
-    public final static Environmental current() {
-        return production ? PRODUCTION : DEVELOPMENT;
-    }
+    public final static Environmental current() { return production ? PRODUCTION : DEVELOPMENT; }
 
     private static final boolean production;
 

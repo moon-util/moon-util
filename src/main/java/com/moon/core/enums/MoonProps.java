@@ -39,9 +39,10 @@ public enum MoonProps implements PropsSupplier {
      * 则参数值就是配置文件地址
      * <p>
      * 如果系统参数定义了 moon.configure 参数，但参数值不是 properties 文件，
-     * 则默认配置文件为 moon-configuration.properties
+     * 则默认配置文件为 {@link #MOON_CONFIGURE_PATH} moon-configure.properties
      * <p>
-     * 否则，系统检测是否存在 moon-configuration.properties 文件，存在则为配置文件
+     * 否则，系统检测是否存在 {@link #MOON_CONFIGURE_PATH}
+     * moon-configure.properties 文件，存在则为配置文件
      * <p>
      * 其他情况都默认采用系统参数设置{@link System#getProperty(String)}
      */
@@ -51,7 +52,7 @@ public enum MoonProps implements PropsSupplier {
 
         static {
             String suffix = ".properties";
-            String path = DEFAULT_PROPERTIES_PATH;
+            String path = MOON_CONFIGURE_PATH;
             String cfgVal = systemProp(moon_configure.key());
             if (isNotBlank(cfgVal)) {
                 isProperties = true;
@@ -64,7 +65,7 @@ public enum MoonProps implements PropsSupplier {
         }
     }
 
-    public final static String DEFAULT_PROPERTIES_PATH = "moon-configure.properties";
+    public final static String MOON_CONFIGURE_PATH = "moon-configure.properties";
 
     static String systemProp(String key) { return System.getProperty(key); }
 

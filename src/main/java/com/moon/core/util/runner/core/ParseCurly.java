@@ -15,9 +15,7 @@ import static com.moon.core.util.runner.core.Constants.*;
  * @author benshaoye
  */
 final class ParseCurly {
-    private ParseCurly() {
-        noInstanceError();
-    }
+    private ParseCurly() { noInstanceError(); }
 
     /**
      * 花括号检测，可能是：
@@ -83,14 +81,10 @@ final class ParseCurly {
 
         final AsRunner valuer;
 
-        private ListAdder(AsRunner valuer) {
-            this.valuer = valuer == null ? DataConst.NULL : valuer;
-        }
+        private ListAdder(AsRunner valuer) { this.valuer = valuer == null ? DataConst.NULL : valuer; }
 
         @Override
-        public void accept(List list, Object data) {
-            list.add(valuer.run(data));
-        }
+        public void accept(List list, Object data) { list.add(valuer.run(data)); }
     }
 
     private final static AsRunner parseMap(
@@ -154,9 +148,7 @@ final class ParseCurly {
         }
 
         @Override
-        public void accept(Map map, Object data) {
-            map.put(key.run(), valuer.run(data));
-        }
+        public void accept(Map map, Object data) { map.put(key.run(), valuer.run(data)); }
     }
 
     private static AsGetter createAsGetter(
@@ -228,19 +220,13 @@ final class ParseCurly {
             }
 
             @Override
-            public Object get() {
-                return new HashMap<>();
-            }
+            public Object get() { return new HashMap<>(); }
 
             @Override
-            public boolean test(Object o) {
-                return true;
-            }
+            public boolean test(Object o) { return true; }
 
             @Override
-            public Object run(Object data) {
-                return get();
-            }
+            public Object run(Object data) { return get(); }
         },
         LIST {
             @Override
@@ -249,19 +235,13 @@ final class ParseCurly {
             }
 
             @Override
-            public Object get() {
-                return new ArrayList<>();
-            }
+            public Object get() { return new ArrayList<>(); }
 
             @Override
-            public boolean test(Object o) {
-                return true;
-            }
+            public boolean test(Object o) { return true; }
 
             @Override
-            public Object run(Object data) {
-                return get();
-            }
+            public Object run(Object data) { return get(); }
         }
     }
 }

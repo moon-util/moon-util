@@ -12,20 +12,13 @@ public class DoubleAccessor {
 
     private double value;
 
-    public DoubleAccessor() {
-    }
+    public DoubleAccessor() { }
 
-    public DoubleAccessor(double value) {
-        this.set(value);
-    }
+    public DoubleAccessor(double value) { this.set(value); }
 
-    public static DoubleAccessor of() {
-        return new DoubleAccessor();
-    }
+    public static DoubleAccessor of() { return new DoubleAccessor(); }
 
-    public static DoubleAccessor of(double value) {
-        return new DoubleAccessor(value);
-    }
+    public static DoubleAccessor of(double value) { return new DoubleAccessor(value); }
 
     public DoubleAccessor set(double value) {
         this.value = value;
@@ -43,18 +36,14 @@ public class DoubleAccessor {
         return this;
     }
 
-    public DoubleAccessor increment() {
-        return increment(1);
-    }
+    public DoubleAccessor increment() { return increment(1); }
 
     public DoubleAccessor decrement(double value) {
         this.value -= value;
         return this;
     }
 
-    public DoubleAccessor decrement() {
-        return decrement(1);
-    }
+    public DoubleAccessor decrement() { return decrement(1); }
 
     /*
      * ------------------------------------------------------------
@@ -62,21 +51,13 @@ public class DoubleAccessor {
      * ------------------------------------------------------------
      */
 
-    public double get() {
-        return value;
-    }
+    public double get() { return value; }
 
-    public double getAndIncrement() {
-        return value++;
-    }
+    public double getAndIncrement() { return value++; }
 
-    public double incrementAndGet() {
-        return ++value;
-    }
+    public double incrementAndGet() { return ++value; }
 
-    public double getAndIncrement(double value) {
-        return this.value += value;
-    }
+    public double getAndIncrement(double value) { return this.value += value; }
 
     public double incrementAndGet(double value) {
         double now = this.value;
@@ -84,17 +65,11 @@ public class DoubleAccessor {
         return now;
     }
 
-    public double getAndDecrement() {
-        return value--;
-    }
+    public double getAndDecrement() { return value--; }
 
-    public double decrementAndGet() {
-        return --value;
-    }
+    public double decrementAndGet() { return --value; }
 
-    public double decrementAndGet(double value) {
-        return this.value -= value;
-    }
+    public double decrementAndGet(double value) { return this.value -= value; }
 
     public double getAndDecrement(double value) {
         double num = get();
@@ -108,25 +83,15 @@ public class DoubleAccessor {
      * ------------------------------------------------------------
      */
 
-    public boolean isEq(double value) {
-        return this.value == value;
-    }
+    public boolean isEq(double value) { return this.value == value; }
 
-    public boolean isGt(double value) {
-        return this.value > value;
-    }
+    public boolean isGt(double value) { return this.value > value; }
 
-    public boolean isLt(double value) {
-        return this.value < value;
-    }
+    public boolean isLt(double value) { return this.value < value; }
 
-    public boolean isGtOrEq(double value) {
-        return this.value >= value;
-    }
+    public boolean isGtOrEq(double value) { return this.value >= value; }
 
-    public boolean isLtOrEq(double value) {
-        return this.value <= value;
-    }
+    public boolean isLtOrEq(double value) { return this.value <= value; }
 
     /*
      * ------------------------------------------------------------
@@ -180,16 +145,10 @@ public class DoubleAccessor {
         return this;
     }
 
-    public DoubleAccessor compute(ToDoubleFunction<Double> computer) {
-        return set(computer.applyAsDouble(value));
-    }
+    public DoubleAccessor compute(ToDoubleFunction<Double> computer) { return set(computer.applyAsDouble(value)); }
 
-    public <T> T transform(DoubleFunction<T> transformer) {
-        return transformer.apply(value);
-    }
+    public <T> T transform(DoubleFunction<T> transformer) { return transformer.apply(value); }
 
     @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
+    public String toString() { return String.valueOf(value); }
 }

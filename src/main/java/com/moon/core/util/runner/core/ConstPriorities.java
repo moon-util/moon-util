@@ -6,9 +6,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 class ConstPriorities {
-    private ConstPriorities() {
-        noInstanceError();
-    }
+    private ConstPriorities() { noInstanceError(); }
 
     final static int BIT_AND = 4;
     final static int BIT_OR = 4;

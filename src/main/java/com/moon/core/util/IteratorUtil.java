@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.function.*;
 
@@ -41,9 +42,7 @@ import static com.moon.core.util.iterator.EmtpyIterator.EMPTY;
  */
 public final class IteratorUtil {
 
-    private IteratorUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private IteratorUtil() { ThrowUtil.noInstanceError(); }
 
     /*
      * ----------------------------------------------------------------------------
@@ -66,63 +65,49 @@ public final class IteratorUtil {
      *
      * @param values
      */
-    public static Iterator<Byte> of(byte... values) {
-        return values == null ? EMPTY : new BytesIterator(values);
-    }
+    public static Iterator<Byte> of(byte... values) { return values == null ? EMPTY : new BytesIterator(values); }
 
     /**
      * 获取 short[] 类型数组的迭代器
      *
      * @param values
      */
-    public static Iterator<Short> of(short... values) {
-        return values == null ? EMPTY : new ShortsIterator(values);
-    }
+    public static Iterator<Short> of(short... values) { return values == null ? EMPTY : new ShortsIterator(values); }
 
     /**
      * 获取 char[] 类型数组的迭代器
      *
      * @param values
      */
-    public static Iterator<Character> of(char... values) {
-        return values == null ? EMPTY : new CharsIterator(values);
-    }
+    public static Iterator<Character> of(char... values) { return values == null ? EMPTY : new CharsIterator(values); }
 
     /**
      * 获取 int[] 类型数组的迭代器
      *
      * @param values
      */
-    public static Iterator<Integer> of(int... values) {
-        return values == null ? EMPTY : new IntsIterator(values);
-    }
+    public static Iterator<Integer> of(int... values) { return values == null ? EMPTY : new IntsIterator(values); }
 
     /**
      * 获取 long[] 类型数组的迭代器
      *
      * @param values
      */
-    public static Iterator<Long> of(long... values) {
-        return values == null ? EMPTY : new LongsIterator(values);
-    }
+    public static Iterator<Long> of(long... values) { return values == null ? EMPTY : new LongsIterator(values); }
 
     /**
      * 获取 float[] 类型数组的迭代器
      *
      * @param values
      */
-    public static Iterator<Float> of(float... values) {
-        return values == null ? EMPTY : new FloatsIterator(values);
-    }
+    public static Iterator<Float> of(float... values) { return values == null ? EMPTY : new FloatsIterator(values); }
 
     /**
      * 获取 double[] 类型数组的迭代器
      *
      * @param values
      */
-    public static Iterator<Double> of(double... values) {
-        return values == null ? EMPTY : new DoublesIterator(values);
-    }
+    public static Iterator<Double> of(double... values) { return values == null ? EMPTY : new DoublesIterator(values); }
 
     /**
      * 获取 boolean[] 类型数组的迭代器
@@ -159,9 +144,7 @@ public final class IteratorUtil {
      *
      * @param path
      */
-    public static Iterator<String> ofLines(CharSequence path) {
-        return path == null ? EMPTY : new LinesIterator(path);
-    }
+    public static Iterator<String> ofLines(CharSequence path) { return path == null ? EMPTY : new LinesIterator(path); }
 
     /**
      * 从 Reader 中每次读取一行文本
@@ -169,9 +152,7 @@ public final class IteratorUtil {
      * @param reader
      * @return
      */
-    public static Iterator<String> ofLines(Reader reader) {
-        return reader == null ? EMPTY : new LinesIterator(reader);
-    }
+    public static Iterator<String> ofLines(Reader reader) { return reader == null ? EMPTY : new LinesIterator(reader); }
 
     /**
      * 从 InputStream 中按默认字符编码（UTF-8）格式每次读取一行文本
@@ -179,9 +160,7 @@ public final class IteratorUtil {
      * @param is
      * @return
      */
-    public static Iterator<String> ofLines(InputStream is) {
-        return is == null ? EMPTY : new LinesIterator(is);
-    }
+    public static Iterator<String> ofLines(InputStream is) { return is == null ? EMPTY : new LinesIterator(is); }
 
     /**
      * 从 InputStream 中按 charset 格式每次读取一行文本
@@ -211,9 +190,7 @@ public final class IteratorUtil {
      *
      * @param file
      */
-    public static Iterator<String> ofLines(File file) {
-        return file == null ? EMPTY : new LinesIterator(file);
-    }
+    public static Iterator<String> ofLines(File file) { return file == null ? EMPTY : new LinesIterator(file); }
 
     /*
      * ----------------------------------------------------------------------------
@@ -276,9 +253,7 @@ public final class IteratorUtil {
      * ----------------------------------------------------------------------------
      */
 
-    public static <T> Iterator<T> of(Iterator<T> iterator) {
-        return iterator == null ? EMPTY : iterator;
-    }
+    public static <T> Iterator<T> of(Iterator<T> iterator) { return iterator == null ? EMPTY : iterator; }
 
     /**
      * 返回 List 集合的迭代器
@@ -286,9 +261,7 @@ public final class IteratorUtil {
      * @param list
      * @param <T>
      */
-    public static <T> Iterator<T> of(List<T> list) {
-        return list == null ? EMPTY : list.iterator();
-    }
+    public static <T> Iterator<T> of(List<T> list) { return list == null ? EMPTY : list.iterator(); }
 
     /**
      * 返回 Collection 集合的迭代器
@@ -296,9 +269,7 @@ public final class IteratorUtil {
      * @param c
      * @param <T>
      */
-    public static <T> Iterator<T> of(Collection<T> c) {
-        return c == null ? EMPTY : c.iterator();
-    }
+    public static <T> Iterator<T> of(Collection<T> c) { return c == null ? EMPTY : c.iterator(); }
 
     /**
      * 返回 Iterable 集合的迭代器
@@ -331,6 +302,16 @@ public final class IteratorUtil {
         return enumeration == null ? EMPTY : new EnumerationIterator<>(enumeration);
     }
 
+    /**
+     * 返回 ResultSet 迭代器
+     *
+     * @param resultSet
+     * @param <T>
+     */
+    public static <T> Iterator<ResultSet> of(ResultSet resultSet) {
+        return resultSet == null ? EMPTY : new ResultSetIterator(resultSet);
+    }
+
     /*
      * ----------------------------------------------------------------------------
      * enum iterator: 枚举迭代器
@@ -345,7 +326,7 @@ public final class IteratorUtil {
      * @param <T>
      */
     public static <T extends Enum<T>> Iterator<T> of(Class<T> clazz) {
-        return clazz != null && clazz.isEnum() ? new ObjectsIterator(clazz.getEnumConstants()) : EMPTY;
+        return clazz != null && clazz.isEnum() ? of(clazz.getEnumConstants()) : EMPTY;
     }
 
     public static Iterator ofAny(Object value) {
@@ -365,8 +346,9 @@ public final class IteratorUtil {
             if (value instanceof short[]) { return of((short[]) value); }
             if (value instanceof boolean[]) { return of((boolean[]) value); }
         }
-        if (value instanceof CharSequence) { return of((CharSequence) value); }
+        if (value instanceof CharSequence) { return ofChars((CharSequence) value); }
         if (value instanceof Enumeration) { return of((Enumeration) value); }
+        if (value instanceof ResultSet) { return of((ResultSet) value); }
         if (value instanceof File) { return ofLines((File) value); }
         return ofFields(value);
     }
@@ -386,12 +368,15 @@ public final class IteratorUtil {
             forEach((Iterator) data, consumer);
         } else if (data == null) {
             return;
-        }
-        Class type = data.getClass();
-        if (type.isArray()) {
-            ArraysEnum.getOrObjects(data).forEach(data, consumer);
+        } else if (data instanceof ResultSet) {
+            forEach((ResultSet) data, consumer);
         } else {
-            forEachFields(data, consumer);
+            Class type = data.getClass();
+            if (type.isArray()) {
+                ArraysEnum.getOrObjects(data).forEach(data, consumer);
+            } else {
+                forEachFields(data, consumer);
+            }
         }
     }
 
@@ -648,9 +633,7 @@ public final class IteratorUtil {
      * @return
      */
     public static <T> void forEach(List<T> list, Consumer<? super T> consumer) {
-        if (list != null) {
-            list.forEach(consumer);
-        }
+        if (list != null) { list.forEach(consumer); }
     }
 
     /**
@@ -662,9 +645,7 @@ public final class IteratorUtil {
      * @return
      */
     public static <T> void forEach(Collection<T> c, Consumer<? super T> consumer) {
-        if (c != null) {
-            c.forEach(consumer);
-        }
+        if (c != null) { c.forEach(consumer); }
     }
 
     /**
@@ -676,9 +657,7 @@ public final class IteratorUtil {
      * @return
      */
     public static <T> void forEach(Iterable<T> c, Consumer<? super T> consumer) {
-        if (c != null) {
-            c.forEach(consumer);
-        }
+        if (c != null) { c.forEach(consumer); }
     }
 
     /**
@@ -729,9 +708,7 @@ public final class IteratorUtil {
      * @return
      */
     public static <K, V> void forEach(Map<K, V> map, Consumer<Map.Entry<K, V>> consumer) {
-        if (map != null) {
-            map.entrySet().forEach(consumer);
-        }
+        if (map != null) { map.entrySet().forEach(consumer); }
     }
 
     /**
@@ -744,9 +721,7 @@ public final class IteratorUtil {
      * @return
      */
     public static <K, V> void forEach(Map<K, V> map, BiConsumer<? super K, ? super V> consumer) {
-        if (map != null) {
-            map.forEach(consumer);
-        }
+        if (map != null) { map.forEach(consumer); }
     }
 
     /**
@@ -758,13 +733,28 @@ public final class IteratorUtil {
      * @return
      */
     public static <T> void forEach(Enumeration<T> e, Consumer<? super T> consumer) {
-        if (e != null) {
-            while (e.hasMoreElements()) {
-                consumer.accept(e.nextElement());
-            }
-        }
+        if (e != null) { while (e.hasMoreElements()) { consumer.accept(e.nextElement()); } }
     }
 
+    /**
+     * 遍历 ResultSet
+     *
+     * @param resultSet
+     * @param consumer
+     */
+    public static void forEach(ResultSet resultSet, Consumer<? super ResultSet> consumer) {
+        if (resultSet != null) { forEach(of(resultSet), consumer); }
+    }
+
+    /**
+     * 遍历 ResultSet
+     *
+     * @param resultSet
+     * @param consumer
+     */
+    public static void forEach(ResultSet resultSet, IntBiConsumer<? super ResultSet> consumer) {
+        if (resultSet != null) { forEach(of(resultSet), consumer); }
+    }
 
     /*
      * ----------------------------------------------------------------------------
@@ -841,9 +831,7 @@ public final class IteratorUtil {
             int limit;
             do {
                 limit = inputStream.read(buffer, 0, length);
-                if (whiling = (limit >= 0)) {
-                    consumer.accept(limit);
-                }
+                if (whiling = (limit >= 0)) { consumer.accept(limit); }
             } while (whiling);
         } catch (Exception e) {
             doThrow(e);

@@ -39,9 +39,7 @@ class GetOrdinary implements AsGetter {
     }
 
     @Override
-    public boolean isGetterOrdinary() {
-        return true;
-    }
+    public boolean isGetterOrdinary() { return true; }
 
     public AsGetter getGetter(Object data) {
         AsGetter getter = this.getter;
@@ -60,14 +58,10 @@ class GetOrdinary implements AsGetter {
         }
     }
 
-    public Object getKey() {
-        return key;
-    }
+    public Object getKey() { return key; }
 
     @Override
-    public String toString() {
-        return String.valueOf(key);
-    }
+    public String toString() { return String.valueOf(key); }
 
     private final static String ARR_LENGTH = "length";
 
@@ -120,9 +114,7 @@ class GetOrdinary implements AsGetter {
     private static class ResultIndexGetter implements AsGetter {
         private final int index;
 
-        private ResultIndexGetter(int index) {
-            this.index = index;
-        }
+        private ResultIndexGetter(int index) { this.index = index; }
 
         @Override
         public Object run(Object data) {
@@ -134,9 +126,7 @@ class GetOrdinary implements AsGetter {
         }
 
         @Override
-        public boolean test(Object o) {
-            return o instanceof ResultSet;
-        }
+        public boolean test(Object o) { return o instanceof ResultSet; }
     }
 
     private static class ResultLabelGetter implements AsGetter {
@@ -157,17 +147,13 @@ class GetOrdinary implements AsGetter {
         }
 
         @Override
-        public boolean test(Object o) {
-            return o instanceof ResultSet;
-        }
+        public boolean test(Object o) { return o instanceof ResultSet; }
     }
 
     private static class MapGetter implements AsGetter {
         final Object key;
 
-        MapGetter(Object key) {
-            this.key = key;
-        }
+        MapGetter(Object key) { this.key = key; }
 
         /**
          * 使用外部数据
@@ -176,9 +162,7 @@ class GetOrdinary implements AsGetter {
          * @return
          */
         @Override
-        public Object run(Object data) {
-            return MapUtil.getByObject(data, key);
-        }
+        public Object run(Object data) { return MapUtil.getByObject(data, key); }
 
         /**
          * Evaluates this predicate on the given argument.
@@ -188,17 +172,13 @@ class GetOrdinary implements AsGetter {
          * otherwise {@code false}
          */
         @Override
-        public boolean test(Object o) {
-            return o instanceof Map;
-        }
+        public boolean test(Object o) { return o instanceof Map; }
     }
 
     private static class ListGetter implements AsGetter {
         final int index;
 
-        ListGetter(int index) {
-            this.index = index;
-        }
+        ListGetter(int index) { this.index = index; }
 
         /**
          * 使用外部数据
@@ -207,9 +187,7 @@ class GetOrdinary implements AsGetter {
          * @return
          */
         @Override
-        public Object run(Object data) {
-            return ListUtil.getByObject(data, index);
-        }
+        public Object run(Object data) { return ListUtil.getByObject(data, index); }
 
         /**
          * Evaluates this predicate on the given argument.
@@ -219,18 +197,14 @@ class GetOrdinary implements AsGetter {
          * otherwise {@code false}
          */
         @Override
-        public boolean test(Object o) {
-            return o instanceof List;
-        }
+        public boolean test(Object o) { return o instanceof List; }
     }
 
     private enum ArrayLenGetter implements AsGetter {
         LENGTH;
 
         @Override
-        public Object run(Object data) {
-            return ArraysEnum.getOrObjects(data).length(data);
-        }
+        public Object run(Object data) { return ArraysEnum.getOrObjects(data).length(data); }
     }
 
     private static class ArrayGetter implements AsGetter {
@@ -258,9 +232,7 @@ class GetOrdinary implements AsGetter {
             return getter.get(data, index);
         }
 
-        private ArrayOperator reset(Object data) {
-            return getter = ArraysEnum.getOrObjects(data.getClass());
-        }
+        private ArrayOperator reset(Object data) { return getter = ArraysEnum.getOrObjects(data.getClass()); }
 
         /**
          * Evaluates this predicate on the given argument.
@@ -282,9 +254,7 @@ class GetOrdinary implements AsGetter {
         final String field;
         FieldDescriptor getter;
 
-        FieldGetter(Object field) {
-            this.field = field.toString();
-        }
+        FieldGetter(Object field) { this.field = field.toString(); }
 
         /**
          * 使用外部数据

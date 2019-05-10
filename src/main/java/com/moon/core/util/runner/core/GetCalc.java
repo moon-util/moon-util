@@ -11,9 +11,7 @@ import java.util.List;
 class GetCalc implements AsGetter {
     final AsRunner[] runners;
 
-    private GetCalc(AsRunner[] runners) {
-        this.runners = runners;
-    }
+    private GetCalc(AsRunner[] runners) { this.runners = runners; }
 
     final static AsRunner valueOf(List<AsRunner> runners) {
         int size = runners.size();
@@ -26,9 +24,7 @@ class GetCalc implements AsGetter {
         return preRun(toArr(runners));
     }
 
-    private static AsRunner[] toArr(List<AsRunner> runners) {
-        return runners.toArray(new AsRunner[runners.size()]);
-    }
+    private static AsRunner[] toArr(List<AsRunner> runners) { return runners.toArray(new AsRunner[runners.size()]); }
 
     private static AsRunner preRun(AsRunner[] runnerArr) {
         LinkedList<AsRunner> result = new LinkedList();
@@ -59,9 +55,7 @@ class GetCalc implements AsGetter {
     }
 
     @Override
-    public Object run(Object data) {
-        return use1(data);
-    }
+    public Object run(Object data) { return use1(data); }
 
     private Object use1(Object data) {
         Deque<AsRunner> result = new LinkedList();
@@ -123,12 +117,8 @@ class GetCalc implements AsGetter {
      * otherwise {@code false}
      */
     @Override
-    public boolean test(Object o) {
-        return false;
-    }
+    public boolean test(Object o) { return false; }
 
     @Override
-    public String toString() {
-        return Arrays.toString(runners);
-    }
+    public String toString() { return Arrays.toString(runners); }
 }

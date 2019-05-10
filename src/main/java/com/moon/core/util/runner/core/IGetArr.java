@@ -9,9 +9,7 @@ import com.moon.core.enums.ArraysEnum;
 class IGetArr implements IGetter {
     ArrayOperator getter;
 
-    public boolean sourceTest(Object data) {
-        return data.getClass().isArray();
-    }
+    public boolean sourceTest(Object data) { return data.getClass().isArray(); }
 
     /**
      * Applies this function to the given arguments.
@@ -40,7 +38,5 @@ class IGetArr implements IGetter {
      * otherwise {@code false}
      */
     @Override
-    public boolean test(Object o) {
-        return getter == null ? sourceTest(o) : getter.test(o) || sourceTest(o);
-    }
+    public boolean test(Object o) { return getter == null ? sourceTest(o) : getter.test(o) || sourceTest(o); }
 }

@@ -20,9 +20,7 @@ public final class RunnerSettings {
 
     private final Map<String, Object> callers = new HashMap<>();
 
-    public RunnerSettings() {
-        this(ArrayList::new, HashMap::new);
-    }
+    public RunnerSettings() { this(ArrayList::new, HashMap::new); }
 
     public RunnerSettings(Supplier<List> arrCreator, Supplier<Map> objCreator) {
         this.arrCreator = arrCreator;
@@ -35,17 +33,11 @@ public final class RunnerSettings {
      * @param name
      * @return
      */
-    public final Object getCaller(String name) {
-        return this.callers.get(name);
-    }
+    public final Object getCaller(String name) { return this.callers.get(name); }
 
-    public final Supplier<List> getArrCreator() {
-        return arrCreator;
-    }
+    public final Supplier<List> getArrCreator() { return arrCreator; }
 
-    public final Supplier<Map> getObjCreator() {
-        return objCreator;
-    }
+    public final Supplier<Map> getObjCreator() { return objCreator; }
 
     public RunnerSettings setArrCreator(Supplier<List> arrCreator) {
         this.arrCreator = arrCreator;
@@ -77,9 +69,7 @@ public final class RunnerSettings {
         return this;
     }
 
-    public RunnerSettings addCaller(Class clazz) {
-        return addCaller(clazz.getSimpleName(), clazz);
-    }
+    public RunnerSettings addCaller(Class clazz) { return addCaller(clazz.getSimpleName(), clazz); }
 
     public RunnerSettings addCallers(Class... classes) {
         for (Class type : classes) {
@@ -110,13 +100,9 @@ public final class RunnerSettings {
         return this;
     }
 
-    public final static RunnerSettings of() {
-        return new RunnerSettings();
-    }
+    public final static RunnerSettings of() { return new RunnerSettings(); }
 
-    static String toNsName(String ns, String name) {
-        return checkName(ns) + '.' + checkName(name);
-    }
+    static String toNsName(String ns, String name) { return checkName(ns) + '.' + checkName(name); }
 
     static String checkName(String name) {
         char curr = name.charAt(0);

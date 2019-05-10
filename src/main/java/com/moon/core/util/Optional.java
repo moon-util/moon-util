@@ -8,19 +8,22 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.moon.core.lang.ThrowUtil.doThrow;
-import static com.moon.core.util.OptionalImpl.EMPTY;
 
 /**
  * @author benshaoye
  */
 public interface Optional<T> extends Optionally {
+    /**
+     * null 对象
+     */
+    Optional empty = OptionalImpl.EMPTY;
 
     /**
      * null 对象
      *
      * @return
      */
-    static Optional empty() { return EMPTY; }
+    static Optional empty() { return empty; }
 
     /**
      * 新对象，value 不可为 null
@@ -38,7 +41,7 @@ public interface Optional<T> extends Optionally {
      * @param <E>
      * @return
      */
-    static <E> Optional<E> ofNullable(E value) { return value == null ? EMPTY : of(value); }
+    static <E> Optional<E> ofNullable(E value) { return value == null ? empty : of(value); }
 
     /**
      * 构造对象
@@ -140,7 +143,7 @@ public interface Optional<T> extends Optionally {
      * @return
      */
     default Optional<T> filter(Predicate<? super T> predicate) {
-        return isAbsent() ? this : (predicate.test(getOrNull()) ? this : EMPTY);
+        return isAbsent() ? this : (predicate.test(getOrNull()) ? this : empty);
     }
 
     /**

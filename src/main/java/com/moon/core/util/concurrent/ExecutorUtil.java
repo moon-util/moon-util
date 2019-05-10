@@ -16,21 +16,15 @@ public final class ExecutorUtil {
 
     private final static long TIMEOUT = 10 * 1000;
 
-    private ExecutorUtil() {
-        noInstanceError();
-    }
+    private ExecutorUtil() { noInstanceError(); }
 
     /*
      * inner runner
      */
 
-    public final static ThreadPoolExecutor defaultExecutor() {
-        return ThreadPoolSupport.singleton();
-    }
+    public final static ThreadPoolExecutor defaultExecutor() { return ThreadPoolSupport.singleton(); }
 
-    public final static void setExecutor(ThreadPoolExecutor runner) {
-        ThreadPoolSupport.set(runner);
-    }
+    public final static void setExecutor(ThreadPoolExecutor runner) { ThreadPoolSupport.set(runner); }
 
 
     /*
@@ -79,25 +73,17 @@ public final class ExecutorUtil {
         });
     }
 
-    public final static void execute(Runnable runnable) {
-        defaultExecutor().execute(runnable);
-    }
+    public final static void execute(Runnable runnable) { defaultExecutor().execute(runnable); }
 
-    public final static Future<?> submit(Runnable runnable) {
-        return defaultExecutor().submit(runnable);
-    }
+    public final static Future<?> submit(Runnable runnable) { return defaultExecutor().submit(runnable); }
 
-    public final static <T> Future<T> submit(Callable<T> callable) {
-        return defaultExecutor().submit(callable);
-    }
+    public final static <T> Future<T> submit(Callable<T> callable) { return defaultExecutor().submit(callable); }
 
     /*
      * 最大线程数为处理器可用核心数 2 倍
      */
 
-    public static final ThreadPoolExecutor auto() {
-        return auto(TIMEOUT);
-    }
+    public static final ThreadPoolExecutor auto() { return auto(TIMEOUT); }
 
     public static final ThreadPoolExecutor auto(long timeout) {
         return new ThreadPoolExecutor(1, maxCount(),
@@ -105,9 +91,7 @@ public final class ExecutorUtil {
             new LinkedBlockingQueue<>());
     }
 
-    public static final ThreadPoolExecutor auto(RejectedExecutionHandler rejected) {
-        return auto(TIMEOUT, rejected);
-    }
+    public static final ThreadPoolExecutor auto(RejectedExecutionHandler rejected) { return auto(TIMEOUT, rejected); }
 
     public static final ThreadPoolExecutor auto(long timeout, RejectedExecutionHandler rejected) {
         return new ThreadPoolExecutor(1, maxCount(),
@@ -115,9 +99,7 @@ public final class ExecutorUtil {
             new LinkedBlockingQueue<>(), rejected);
     }
 
-    public static final ThreadPoolExecutor auto(ThreadFactory factory) {
-        return auto(TIMEOUT, factory);
-    }
+    public static final ThreadPoolExecutor auto(ThreadFactory factory) { return auto(TIMEOUT, factory); }
 
     public static final ThreadPoolExecutor auto(long timeout, ThreadFactory factory) {
         return new ThreadPoolExecutor(1, maxCount(),
@@ -136,9 +118,7 @@ public final class ExecutorUtil {
      * threshold，指定最大任务数，最大线程数为 CPU 线程数 2 倍
      */
 
-    public static final ThreadPoolExecutor threshold(int thresholdTasks) {
-        return threshold(thresholdTasks, TIMEOUT);
-    }
+    public static final ThreadPoolExecutor threshold(int thresholdTasks) { return threshold(thresholdTasks, TIMEOUT); }
 
     public static final ThreadPoolExecutor threshold(int thresholdTasks, long timeout) {
         return new ThreadPoolExecutor(1, maxCount(),
@@ -181,7 +161,5 @@ public final class ExecutorUtil {
             new ArrayBlockingQueue<>(thresholdTasks), factory, rejected);
     }
 
-    private static int maxCount() {
-        return max(getCoreCount() * 2, 1);
-    }
+    private static int maxCount() { return max(getCoreCount() * 2, 1); }
 }

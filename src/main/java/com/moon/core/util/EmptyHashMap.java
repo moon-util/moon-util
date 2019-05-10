@@ -36,39 +36,37 @@ public final class EmptyHashMap
         }
     }
 
-    public final static Map getInstance() {return EMPTY_MAP;}
+    public final static Map getInstance() { return EMPTY_MAP; }
 
     @Override
-    public int size() {return 0;}
+    public int size() { return 0; }
 
     @Override
-    public boolean isEmpty() {return true;}
+    public boolean isEmpty() { return true; }
 
     @Override
-    public boolean containsKey(Object key) {return false;}
+    public boolean containsKey(Object key) { return false; }
 
     @Override
-    public boolean containsValue(Object value) {return false;}
+    public boolean containsValue(Object value) { return false; }
 
     @Override
-    public String get(Object key) {return null;}
+    public String get(Object key) { return null; }
 
     @Override
-    public Set<String> keySet() {return emptySet();}
+    public Set<String> keySet() { return emptySet(); }
 
     @Override
-    public Collection<String> values() {return emptySet();}
+    public Collection<String> values() { return emptySet(); }
 
     @Override
-    public Set<Map.Entry<String, String>> entrySet() {return emptySet();}
+    public Set<Map.Entry<String, String>> entrySet() { return emptySet(); }
 
     @Override
-    public boolean equals(Object o) {
-        return (o instanceof Map) && ((Map<?, ?>) o).isEmpty();
-    }
+    public boolean equals(Object o) { return (o instanceof Map) && ((Map<?, ?>) o).isEmpty(); }
 
     @Override
-    public int hashCode() {return 0;}
+    public int hashCode() { return 0; }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -84,19 +82,13 @@ public final class EmptyHashMap
     public String putIfAbsent(String key, String value) { return null; }
 
     @Override
-    public boolean remove(Object key, Object value) {
-        return false;
-    }
+    public boolean remove(Object key, Object value) { return false; }
 
     @Override
-    public boolean replace(String key, String old, String now) {
-        return false;
-    }
+    public boolean replace(String key, String old, String now) { return false; }
 
     @Override
-    public String replace(String key, String value) {
-        return null;
-    }
+    public String replace(String key, String value) { return null; }
 
     @Override
     public String computeIfAbsent(String key, Function<? super String, ? extends String> mappingFunction) { return null; }

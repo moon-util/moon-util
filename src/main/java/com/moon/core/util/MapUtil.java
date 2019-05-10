@@ -62,21 +62,13 @@ public final class MapUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static boolean isEmpty(Map map) {
-        return map == null || map.isEmpty();
-    }
+    public static boolean isEmpty(Map map) { return map == null || map.isEmpty(); }
 
-    public static boolean isNotEmpty(Map map) {
-        return !isEmpty(map);
-    }
+    public static boolean isNotEmpty(Map map) { return !isEmpty(map); }
 
-    public static int size(Map map) {
-        return map == null ? 0 : map.size();
-    }
+    public static int size(Map map) { return map == null ? 0 : map.size(); }
 
-    public static int sizeByObject(Object map) {
-        return map == null ? 0 : ((Map) map).size();
-    }
+    public static int sizeByObject(Object map) { return map == null ? 0 : ((Map) map).size(); }
 
     public static int sizeOfAll(Map... maps) {
         int size = 0, i = 0;
@@ -98,17 +90,13 @@ public final class MapUtil {
      * @param <T>
      * @param <E>
      */
-    public static <T, E> E get(Map<T, E> map, T key) {
-        return map == null ? null : map.get(key);
-    }
+    public static <T, E> E get(Map<T, E> map, T key) { return map == null ? null : map.get(key); }
 
     /**
      * @param map
      * @param key
      */
-    public static Object getByObject(Object map, Object key) {
-        return map == null ? null : ((Map) map).get(key);
-    }
+    public static Object getByObject(Object map, Object key) { return map == null ? null : ((Map) map).get(key); }
 
     /**
      * 忽略类型兼容，数据一定能放进 map 里面；
@@ -161,9 +149,7 @@ public final class MapUtil {
         return map;
     }
 
-    public static Object[] toArray(Map map) {
-        return map == null ? null : map.values().toArray();
-    }
+    public static Object[] toArray(Map map) { return map == null ? null : map.values().toArray(); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -171,21 +157,13 @@ public final class MapUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <K, V> Iterator<Map.Entry<K, V>> iterator(Map<K, V> map) {
-        return IteratorUtil.of(map);
-    }
+    public static <K, V> Iterator<Map.Entry<K, V>> iterator(Map<K, V> map) { return IteratorUtil.of(map); }
 
-    public static <K, V> Set<K> keys(Map<K, V> map) {
-        return map == null ? null : map.keySet();
-    }
+    public static <K, V> Set<K> keys(Map<K, V> map) { return map == null ? null : map.keySet(); }
 
-    public static <K, V> Collection<V> values(Map<K, V> map) {
-        return map == null ? null : map.values();
-    }
+    public static <K, V> Collection<V> values(Map<K, V> map) { return map == null ? null : map.values(); }
 
-    public static <K, V> Set<Map.Entry<K, V>> entries(Map<K, V> map) {
-        return map == null ? null : map.entrySet();
-    }
+    public static <K, V> Set<Map.Entry<K, V>> entries(Map<K, V> map) { return map == null ? null : map.entrySet(); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -237,17 +215,13 @@ public final class MapUtil {
         return map == null ? 0 : cast().toDoubleValue(map.get(key));
     }
 
-    public static <K> Float getFloat(Map<K, ?> map, K key) {
-        return map == null ? null : cast().toFloat(map.get(key));
-    }
+    public static <K> Float getFloat(Map<K, ?> map, K key) { return map == null ? null : cast().toFloat(map.get(key)); }
 
     public static <K> float getFloatValue(Map<K, ?> map, K key) {
         return map == null ? 0 : cast().toFloatValue(map.get(key));
     }
 
-    public static <K> Long getLong(Map<K, ?> map, K key) {
-        return map == null ? null : cast().toLong(map.get(key));
-    }
+    public static <K> Long getLong(Map<K, ?> map, K key) { return map == null ? null : cast().toLong(map.get(key)); }
 
     public static <K> long getLongValue(Map<K, ?> map, K key) {
         return map == null ? 0 : cast().toLongValue(map.get(key));
@@ -261,17 +235,13 @@ public final class MapUtil {
         return map == null ? 0 : cast().toIntValue(map.get(key));
     }
 
-    public static <K> Short getShort(Map<K, ?> map, K key) {
-        return map == null ? null : cast().toShort(map.get(key));
-    }
+    public static <K> Short getShort(Map<K, ?> map, K key) { return map == null ? null : cast().toShort(map.get(key)); }
 
     public static <K> short getShortValue(Map<K, ?> map, K key) {
         return map == null ? 0 : cast().toShortValue(map.get(key));
     }
 
-    public static <K> Byte getByte(Map<K, ?> map, K key) {
-        return map == null ? null : cast().toByte(map.get(key));
-    }
+    public static <K> Byte getByte(Map<K, ?> map, K key) { return map == null ? null : cast().toByte(map.get(key)); }
 
     public static <K> byte getByteValue(Map<K, ?> map, K key) {
         return map == null ? 0 : cast().toByteValue(map.get(key));
@@ -371,9 +341,7 @@ public final class MapUtil {
      * @param key
      * @return
      */
-    public static <K> boolean getOrTrue(Map<K, ?> map, K key) {
-        return getOrDefault(map, key, true);
-    }
+    public static <K> boolean getOrTrue(Map<K, ?> map, K key) { return getOrDefault(map, key, true); }
 
     /**
      * Object value = map.getSheet(key);
@@ -383,9 +351,7 @@ public final class MapUtil {
      * @param key
      * @return
      */
-    public static <K> boolean getOrFalse(Map<K, ?> map, K key) {
-        return getOrDefault(map, key, false);
-    }
+    public static <K> boolean getOrFalse(Map<K, ?> map, K key) { return getOrDefault(map, key, false); }
 
     public static <K> String getOrDefault(Map<K, ?> map, K key, String defaultVal) {
         Object value;

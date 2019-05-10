@@ -16,7 +16,7 @@ import java.util.List;
 import static com.moon.core.lang.ClassUtil.forName;
 import static com.moon.core.lang.ClassUtil.requireExtendsOf;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
-import static com.moon.core.lang.annotation.AnnotatedUtil.get;
+import static com.moon.core.lang.annotation.AnnotationUtil.get;
 import static com.moon.core.util.FilterUtil.nullableLast;
 import static com.moon.core.util.OptionalUtil.computeOrDefault;
 import static com.moon.core.util.OptionalUtil.getOrElse;

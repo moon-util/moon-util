@@ -19,9 +19,7 @@ abstract class InvokeBase implements AsInvoker {
         this.methodName = methodName;
     }
 
-    public String getMethodName() {
-        return methodName;
-    }
+    public String getMethodName() { return methodName; }
 
     protected Method getMethod(Object data) {
         Method m = this.method;

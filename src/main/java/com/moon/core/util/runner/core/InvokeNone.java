@@ -7,12 +7,8 @@ import com.moon.core.lang.reflect.MethodUtil;
  */
 class InvokeNone extends InvokeBase {
 
-    InvokeNone(String methodName) {
-        super(methodName);
-    }
+    InvokeNone(String methodName) { super(methodName); }
 
     @Override
-    public Object run(Object data) {
-        return MethodUtil.invoke(true, getMethod(data), data);
-    }
+    public Object run(Object data) { return MethodUtil.invoke(true, getMethod(data), data); }
 }

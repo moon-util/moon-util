@@ -27,9 +27,7 @@ public class GetThree implements AsGetter {
         private AsRunner trueRunner;
         private AsRunner falseRunner;
 
-        public Builder(AsRunner assertRunner) {
-            this.assertRunner = Objects.requireNonNull(assertRunner);
-        }
+        public Builder(AsRunner assertRunner) { this.assertRunner = Objects.requireNonNull(assertRunner); }
 
         public Builder setTrueRunner(AsRunner trueRunner) {
             this.trueRunner = Objects.requireNonNull(trueRunner);

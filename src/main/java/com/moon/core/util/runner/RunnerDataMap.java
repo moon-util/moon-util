@@ -26,9 +26,7 @@ public class RunnerDataMap extends HashMap {
     private final int lastIndex;
     private final int length;
 
-    public RunnerDataMap() {
-        this(ArraysEnum.OBJECTS.empty());
-    }
+    public RunnerDataMap() { this(ArraysEnum.OBJECTS.empty()); }
 
     public RunnerDataMap(Object... dataArr) {
         dataArr = ArraysEnum.OBJECTS.emptyIfNull(dataArr);
@@ -115,9 +113,7 @@ public class RunnerDataMap extends HashMap {
     }
 
     @Override
-    public boolean containsKey(Object key) {
-        return super.containsKey(key) || getOtherKeys().contains(key);
-    }
+    public boolean containsKey(Object key) { return super.containsKey(key) || getOtherKeys().contains(key); }
 
     @Override
     public boolean containsValue(Object value) {
@@ -125,14 +121,10 @@ public class RunnerDataMap extends HashMap {
     }
 
     @Override
-    public int size() {
-        return super.size() + getOtherEntries().size();
-    }
+    public int size() { return super.size() + getOtherEntries().size(); }
 
     @Override
-    public boolean isEmpty() {
-        return size() == 0;
-    }
+    public boolean isEmpty() { return size() == 0; }
 
     @Override
     public void forEach(BiConsumer action) {
@@ -171,68 +163,112 @@ public class RunnerDataMap extends HashMap {
     }
 
     interface DefaultMap<KEY, VALUE> extends Map<KEY, VALUE> {
-
+        /**
+         * 容器
+         *
+         * @return
+         */
         Map<KEY, VALUE> getRes();
 
+        /**
+         * 大小
+         *
+         * @return
+         */
         @Override
-        default int size() {
-            return getRes().size();
-        }
+        default int size() { return getRes().size(); }
 
+        /**
+         * 是否为空
+         *
+         * @return
+         */
         @Override
-        default boolean isEmpty() {
-            return getRes().isEmpty();
-        }
+        default boolean isEmpty() { return getRes().isEmpty(); }
 
+        /**
+         * 检测是否包含键
+         *
+         * @param key
+         * @return
+         */
         @Override
-        default boolean containsKey(Object key) {
-            return getRes().containsKey(key);
-        }
+        default boolean containsKey(Object key) { return getRes().containsKey(key); }
 
+        /**
+         * 检测是否包含值
+         *
+         * @param value
+         * @return
+         */
         @Override
-        default boolean containsValue(Object value) {
-            return getRes().containsValue(value);
-        }
+        default boolean containsValue(Object value) { return getRes().containsValue(value); }
 
+        /**
+         * 获取
+         *
+         * @param key
+         * @return
+         */
         @Override
-        default VALUE get(Object key) {
-            return getRes().get(key);
-        }
+        default VALUE get(Object key) { return getRes().get(key); }
 
+        /**
+         * 放进
+         *
+         * @param key
+         * @param value
+         * @return
+         */
         @Override
-        default VALUE put(KEY key, VALUE value) {
-            return getRes().put(key, value);
-        }
+        default VALUE put(KEY key, VALUE value) { return getRes().put(key, value); }
 
+        /**
+         * 删除
+         *
+         * @param key
+         * @return
+         */
         @Override
-        default VALUE remove(Object key) {
-            return getRes().remove(key);
-        }
+        default VALUE remove(Object key) { return getRes().remove(key); }
 
+        /**
+         * 设置
+         *
+         * @param m
+         */
         @Override
-        default void putAll(Map m) {
-            getRes().putAll(m);
-        }
+        default void putAll(Map m) { getRes().putAll(m); }
 
+        /**
+         * 清空
+         */
         @Override
-        default void clear() {
-            getRes().clear();
-        }
+        default void clear() { getRes().clear(); }
 
+        /**
+         * 键结果集
+         *
+         * @return
+         */
         @Override
-        default Set keySet() {
-            return getRes().keySet();
-        }
+        default Set keySet() { return getRes().keySet(); }
 
+        /**
+         * 值结果集
+         *
+         * @return
+         */
         @Override
-        default Collection values() {
-            return getRes().values();
-        }
+        default Collection values() { return getRes().values(); }
 
+        /**
+         * 映射节点集合
+         *
+         * @return
+         */
         @Override
-        default Set<Entry<KEY, VALUE>> entrySet() {
-            return getRes().entrySet();
-        }
+        default Set<Entry<KEY, VALUE>> entrySet() { return getRes().entrySet(); }
     }
 
     private final static DefaultMap NULL = () -> new HashMap<>(1);
@@ -250,9 +286,7 @@ public class RunnerDataMap extends HashMap {
             return res;
         }
 
-        public ListGetter(Object data) {
-            this.data = (List) data;
-        }
+        public ListGetter(Object data) { this.data = (List) data; }
     }
 
     protected static class ArrayGetter implements DefaultMap {

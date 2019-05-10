@@ -6,34 +6,22 @@ package com.moon.core.util.runner.core;
 enum DataBool implements AsConst, AsFlip {
     TRUE {
         @Override
-        public Object run(Object data) {
-            return Boolean.TRUE;
-        }
+        public Object run(Object data) { return Boolean.TRUE; }
 
         @Override
-        public DataBool flip() {
-            return FALSE;
-        }
+        public DataBool flip() { return FALSE; }
     },
     FALSE {
         @Override
-        public Object run(Object data) {
-            return Boolean.FALSE;
-        }
+        public Object run(Object data) { return Boolean.FALSE; }
 
         @Override
-        public DataBool flip() {
-            return TRUE;
-        }
+        public DataBool flip() { return TRUE; }
     };
 
     @Override
-    public boolean isBoolean() {
-        return true;
-    }
+    public boolean isBoolean() { return true; }
 
     @Override
-    public String toString() {
-        return name().toLowerCase();
-    }
+    public String toString() { return name().toLowerCase(); }
 }

@@ -164,9 +164,7 @@ public final class RunnerUtil extends ParseUtil {
     /**
      * @throws AssertionError 不可实例化
      */
-    private RunnerUtil() {
-        super();
-    }
+    private RunnerUtil() { super(); }
 
     /**
      * 运行简单表达式，形如： 1 + 2 或 'a' + 'b' 等不含有参数的表达式。
@@ -181,9 +179,7 @@ public final class RunnerUtil extends ParseUtil {
      * @return
      * @throws Throwable 如果字符串表达式中包含变量
      */
-    public final static Object run(String expression) {
-        return parse(expression).run();
-    }
+    public final static Object run(String expression) { return parse(expression).run(); }
 
     /**
      * 计算带有变量复杂表达式，可接受一个参数，形如：
@@ -201,9 +197,7 @@ public final class RunnerUtil extends ParseUtil {
      * @return
      * @throws NullPointerException 如果字符串表达式中包含 data 中没有的变量
      */
-    public final static Object run(String expression, Object data) {
-        return parse(expression).run(data);
-    }
+    public final static Object run(String expression, Object data) { return parse(expression).run(data); }
 
     /**
      * 计算带有变量复杂表达式，可接受多个参数，主要与{@link #run(String, Object)}的区别；
@@ -218,9 +212,7 @@ public final class RunnerUtil extends ParseUtil {
      * @param data
      * @return
      */
-    public final static Object runMulti(String expression, Object... data) {
-        return parse(expression).runMulti(data);
-    }
+    public final static Object runMulti(String expression, Object... data) { return parse(expression).runMulti(data); }
 
     /**
      * 运行字符串中的表达式，如：
@@ -257,9 +249,7 @@ public final class RunnerUtil extends ParseUtil {
      * @return
      * @throws Throwable 如果字符串表达式中包含变量
      */
-    public final static Object parseRun(String expression) {
-        return parse(expression, DELIMITERS).run();
-    }
+    public final static Object parseRun(String expression) { return parse(expression, DELIMITERS).run(); }
 
     /**
      * 运行字符串中的带变量的表达式，如：

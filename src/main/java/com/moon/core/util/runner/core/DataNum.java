@@ -4,14 +4,10 @@ package com.moon.core.util.runner.core;
  * @author benshaoye
  */
 class DataNum extends DataConst {
-    private DataNum(Number value) {
-        super(value);
-    }
+    private DataNum(Number value) { super(value); }
 
     @Override
-    public boolean isNumber() {
-        return true;
-    }
+    public boolean isNumber() { return true; }
 
     final static AsConst valueOf(Number str) {
         AsConst CONST = getValue(str);
@@ -21,7 +17,5 @@ class DataNum extends DataConst {
         return CONST;
     }
 
-    final static AsConst tempNum(Number str) {
-        return new DataNum(str);
-    }
+    final static AsConst tempNum(Number str) { return new DataNum(str); }
 }

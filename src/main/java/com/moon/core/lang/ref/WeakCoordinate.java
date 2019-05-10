@@ -22,9 +22,7 @@ public final class WeakCoordinate<X, Y, Z> extends FinalCoordinate<X, Y, Z> {
      * @param <Z>
      * @return
      */
-    public static <X, Y, Z> WeakCoordinate<X, Y, Z> manageOne() {
-        return new WeakCoordinate(DEFAULT_CAPACITY, TRUE);
-    }
+    public static <X, Y, Z> WeakCoordinate<X, Y, Z> manageOne() { return new WeakCoordinate(DEFAULT_CAPACITY, TRUE); }
 
     /**
      * 获得一个普通缓存坐标对象
@@ -34,13 +32,9 @@ public final class WeakCoordinate<X, Y, Z> extends FinalCoordinate<X, Y, Z> {
      * @param <Z>
      * @return
      */
-    public static <X, Y, Z> WeakCoordinate<X, Y, Z> one() {
-        return new WeakCoordinate();
-    }
+    public static <X, Y, Z> WeakCoordinate<X, Y, Z> one() { return new WeakCoordinate(); }
 
-    protected WeakCoordinate() {
-        this(DEFAULT_CAPACITY, IS_MANAGE);
-    }
+    protected WeakCoordinate() { this(DEFAULT_CAPACITY, IS_MANAGE); }
 
     private WeakCoordinate(int capacity, boolean isManage) {
         super(capacity,isManage);

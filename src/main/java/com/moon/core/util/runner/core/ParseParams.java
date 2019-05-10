@@ -15,9 +15,7 @@ import static com.moon.core.util.runner.core.Constants.*;
  * @author benshaoye
  */
 final class ParseParams {
-    private ParseParams() {
-        noInstanceError();
-    }
+    private ParseParams() { noInstanceError(); }
 
     /**
      * 从左括号的下一个字符开始解析，右括号为止

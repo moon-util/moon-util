@@ -12,11 +12,12 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MapperProperty {
-    Class fromType();
 
-    String propertyName();
+    boolean serialize() default true;
 
-    boolean useToReverse() default false;
+    boolean deserialize() default true;
+
+    String propertyName() default "";
 
     String pattern() default "";
 }

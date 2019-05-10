@@ -6,7 +6,7 @@ import com.moon.core.enums.Chars;
 import com.moon.core.io.IOUtil;
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.lang.annotation.AnnotatedUtil;
+import com.moon.core.lang.annotation.AnnotationUtil;
 import com.moon.core.lang.ref.ReferenceUtil;
 import com.moon.core.lang.reflect.FieldUtil;
 import com.moon.core.lang.reflect.ModifierUtil;
@@ -31,9 +31,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 class IGetLoad {
-    private IGetLoad() {
-        noInstanceError();
-    }
+    private IGetLoad() { noInstanceError(); }
 
     private final static String[] packages;
 
@@ -45,7 +43,7 @@ class IGetLoad {
             System.class, Method.class, List.class,
             ImageUtil.class, BeanInfoUtil.class, Chars.class,
             IOUtil.class, StringUtil.class, ListUtil.class,
-            ReferenceUtil.class, FieldUtil.class, AnnotatedUtil.class,
+            ReferenceUtil.class, FieldUtil.class, AnnotationUtil.class,
             EmailUtil.class, BigDecimalUtil.class, HttpUtil.class,
             TimeUtil.class, ScriptUtil.class, EncryptUtil.class,
             ResultSetUtil.class, ExecutorUtil.class, EnvUtil.class,

@@ -1,7 +1,7 @@
 package com.moon.office.excel.core;
 
 import com.moon.core.lang.ClassUtil;
-import com.moon.core.lang.annotation.AnnotatedUtil;
+import com.moon.core.lang.annotation.AnnotationUtil;
 import com.moon.core.lang.reflect.MethodUtil;
 import com.moon.office.excel.ExcelUtil;
 import com.moon.office.excel.Renderer;
@@ -52,7 +52,7 @@ public class RendererUtil {
                 List<Method> methods = MethodUtil.getAllMethods(ClassUtil.forName(className), methodName);
                 if (CollectUtil.isNotEmpty(methods)) {
                     Method method = methods.get(0);
-                    TableExcel excel = AnnotatedUtil.get(method, TableExcel.class);
+                    TableExcel excel = AnnotationUtil.get(method, TableExcel.class);
                     if (excel == null) {
                         throw new NotExistTableExcelException(foundName + '.' + methodName);
                     }

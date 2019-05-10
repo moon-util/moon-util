@@ -23,14 +23,10 @@ class GetComplex implements AsGetter {
      * otherwise {@code false}
      */
     @Override
-    public boolean test(Object o) {
-        return true;
-    }
+    public boolean test(Object o) { return true; }
 
     @Override
-    public boolean isGetterComplex() {
-        return true;
-    }
+    public boolean isGetterComplex() { return true; }
 
     @Override
     public Object run(Object data) {
@@ -44,7 +40,5 @@ class GetComplex implements AsGetter {
     }
 
     @Override
-    public String toString() {
-        return beforeItem.toString() + " " + afterItem.toString();
-    }
+    public String toString() { return beforeItem.toString() + " " + afterItem.toString(); }
 }

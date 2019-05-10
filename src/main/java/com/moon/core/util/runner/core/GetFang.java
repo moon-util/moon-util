@@ -10,13 +10,9 @@ class GetFang implements AsGetter {
     final AsValuer valuer;
     IGetter getter;
 
-    GetFang(AsValuer valuer) {
-        this.valuer = valuer;
-    }
+    GetFang(AsValuer valuer) { this.valuer = valuer; }
 
-    AsRunner toComplex(AsRunner beforeValuer) {
-        return new GetComplex((AsValuer) beforeValuer, this.valuer);
-    }
+    AsRunner toComplex(AsRunner beforeValuer) { return new GetComplex((AsValuer) beforeValuer, this.valuer); }
 
     public IGetter getGetter(Object data, Object innerData) {
         IGetter getter = this.getter;
@@ -42,12 +38,8 @@ class GetFang implements AsGetter {
      * otherwise {@code false}
      */
     @Override
-    public boolean test(Object o) {
-        return false;
-    }
+    public boolean test(Object o) { return false; }
 
     @Override
-    public String toString() {
-        return "[" + valuer.toString() + "]";
-    }
+    public String toString() { return "[" + valuer.toString() + "]"; }
 }

@@ -31,24 +31,14 @@ import java.util.function.Supplier;
  */
 public class SoftAccessor<T> extends BaseAccessor<T, SoftAccessor<T>> {
 
-    public SoftAccessor(Supplier<T> supplier) {
-        this(supplier, false);
-    }
+    public SoftAccessor(Supplier<T> supplier) { this(supplier, false); }
 
-    public SoftAccessor(Supplier<T> supplier, boolean allowNullValue) {
-        super(supplier, allowNullValue);
-    }
+    public SoftAccessor(Supplier<T> supplier, boolean allowNullValue) { super(supplier, allowNullValue); }
 
     @Override
-    protected Reference<T> reference(T value) {
-        return ReferenceUtil.weak(value);
-    }
+    protected Reference<T> reference(T value) { return ReferenceUtil.weak(value); }
 
-    public static <T> SoftAccessor<T> of(Supplier<T> supplier) {
-        return new SoftAccessor<>(supplier);
-    }
+    public static <T> SoftAccessor<T> of(Supplier<T> supplier) { return new SoftAccessor<>(supplier); }
 
-    public static <T> SoftAccessor<T> ofNullable(Supplier<T> supplier) {
-        return new SoftAccessor<>(supplier, true);
-    }
+    public static <T> SoftAccessor<T> ofNullable(Supplier<T> supplier) { return new SoftAccessor<>(supplier, true); }
 }

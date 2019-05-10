@@ -14,9 +14,7 @@ interface AsRunner extends Runner {
      * @return
      */
     @Override
-    default Object run(Object data) {
-        throw new UnsupportedOperationException();
-    }
+    default Object run(Object data) { throw new UnsupportedOperationException(); }
 
     /**
      * 计算
@@ -25,9 +23,7 @@ interface AsRunner extends Runner {
      * @param right
      * @return
      */
-    default Object exe(Object right, Object left) {
-        throw new UnsupportedOperationException();
-    }
+    default Object exe(Object right, Object left) { throw new UnsupportedOperationException(); }
 
     /**
      * 计算
@@ -44,9 +40,7 @@ interface AsRunner extends Runner {
      *
      * @return
      */
-    default int getPriority() {
-        return 99;
-    }
+    default int getPriority() { return 99; }
 
     /*
      * --------------------------------------
@@ -59,52 +53,40 @@ interface AsRunner extends Runner {
      *
      * @return
      */
-    default boolean isHandler() {
-        return false;
-    }
+    default boolean isHandler() { return false; }
 
     /**
      * 取值器
      *
      * @return
      */
-    default boolean isValuer() {
-        return isConst() || isGetter();
-    }
+    default boolean isValuer() { return isConst() || isGetter(); }
 
     /**
      * 普通常量
      *
      * @return
      */
-    default boolean isConst() {
-        return false;
-    }
+    default boolean isConst() { return false; }
 
     /**
      * 是否使用外部数据
      *
      * @return
      */
-    default boolean isGetter() {
-        return false;
-    }
+    default boolean isGetter() { return false; }
 
     /**
      * 是否是赋值器
      *
      * @return
      */
-    default boolean isSetter() {
-        return false;
-    }
+    default boolean isSetter() { return false; }
 
     /**
      * 是否是一个方法执行
      *
      * @return
      */
-    default boolean isInvoker() {
-        return false;
-    }
+    default boolean isInvoker() { return false; }
 }

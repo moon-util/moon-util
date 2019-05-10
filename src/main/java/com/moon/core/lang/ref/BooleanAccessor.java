@@ -17,13 +17,9 @@ public class BooleanAccessor {
 
     private boolean value;
 
-    public BooleanAccessor() {
-        this(false);
-    }
+    public BooleanAccessor() { this(false); }
 
-    public BooleanAccessor(boolean value) {
-        this.set(value);
-    }
+    public BooleanAccessor(boolean value) { this.set(value); }
 
     /*
      * ----------------------------------------------------------------------------
@@ -31,21 +27,13 @@ public class BooleanAccessor {
      * ----------------------------------------------------------------------------
      */
 
-    public static BooleanAccessor ofFalse() {
-        return of(false);
-    }
+    public static BooleanAccessor ofFalse() { return of(false); }
 
-    public static BooleanAccessor ofTrue() {
-        return of(true);
-    }
+    public static BooleanAccessor ofTrue() { return of(true); }
 
-    public static BooleanAccessor of(boolean value) {
-        return new BooleanAccessor(value);
-    }
+    public static BooleanAccessor of(boolean value) { return new BooleanAccessor(value); }
 
-    public static BooleanAccessor of() {
-        return new BooleanAccessor();
-    }
+    public static BooleanAccessor of() { return ofFalse(); }
 
     /*
      * ----------------------------------------------------------------------------
@@ -53,30 +41,20 @@ public class BooleanAccessor {
      * ----------------------------------------------------------------------------
      */
 
-    public boolean get() {
-        return value;
-    }
+    public boolean get() { return value; }
 
     public BooleanAccessor set(boolean value) {
         this.value = value;
         return this;
     }
 
-    public BooleanAccessor set(BooleanSupplier supplier) {
-        return set(supplier.getAsBoolean());
-    }
+    public BooleanAccessor set(BooleanSupplier supplier) { return set(supplier.getAsBoolean()); }
 
-    public BooleanAccessor setTrue() {
-        return set(true);
-    }
+    public BooleanAccessor setTrue() { return set(true); }
 
-    public BooleanAccessor setFalse() {
-        return set(false);
-    }
+    public BooleanAccessor setFalse() { return set(false); }
 
-    public BooleanAccessor flip() {
-        return set(!value);
-    }
+    public BooleanAccessor flip() { return set(!value); }
 
     /*
      * ----------------------------------------------------------------------------
@@ -84,13 +62,9 @@ public class BooleanAccessor {
      * ----------------------------------------------------------------------------
      */
 
-    public boolean isTrue() {
-        return value;
-    }
+    public boolean isTrue() { return value; }
 
-    public boolean isFalse() {
-        return !value;
-    }
+    public boolean isFalse() { return !value; }
 
     /*
      * ----------------------------------------------------------------------------
@@ -137,28 +111,16 @@ public class BooleanAccessor {
      * ----------------------------------------------------------------------------
      */
 
-    public <T> T ifTrueOrNull(Supplier<T> supplier) {
-        return isTrue() ? supplier.get() : null;
-    }
+    public <T> T ifTrueOrNull(Supplier<T> supplier) { return isTrue() ? supplier.get() : null; }
 
-    public <T> T ifFalseOrNull(Supplier<T> supplier) {
-        return isFalse() ? supplier.get() : null;
-    }
+    public <T> T ifFalseOrNull(Supplier<T> supplier) { return isFalse() ? supplier.get() : null; }
 
-    public <T> T ifTrueOrThrow(Supplier<T> supplier) {
-        return isTrue() ? supplier.get() : doThrow(toString());
-    }
+    public <T> T ifTrueOrThrow(Supplier<T> supplier) { return isTrue() ? supplier.get() : doThrow(toString()); }
 
-    public <T> T ifFalseOrThrow(Supplier<T> supplier) {
-        return isFalse() ? supplier.get() : doThrow(toString());
-    }
+    public <T> T ifFalseOrThrow(Supplier<T> supplier) { return isFalse() ? supplier.get() : doThrow(toString()); }
 
-    public <R> R apply(BooleanFunction<R> function) {
-        return function.apply(value);
-    }
+    public <R> R apply(BooleanFunction<R> function) { return function.apply(value); }
 
     @Override
-    public String toString() {
-        return Boolean.toString(value);
-    }
+    public String toString() { return Boolean.toString(value); }
 }

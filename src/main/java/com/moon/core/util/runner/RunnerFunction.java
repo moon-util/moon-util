@@ -30,18 +30,14 @@ public interface RunnerFunction {
      *
      * @return
      */
-    default boolean isChangeless() {
-        return true;
-    }
+    default boolean isChangeless() { return true; }
 
     /**
      * 执行无参方法
      *
      * @return
      */
-    default Object apply() {
-        throw new UnsupportedOperationException();
-    }
+    default Object apply() { throw new UnsupportedOperationException(); }
 
     /**
      * 执行含有一个参数的方法
@@ -49,9 +45,7 @@ public interface RunnerFunction {
      * @param value
      * @return
      */
-    default Object apply(Object value) {
-        throw new UnsupportedOperationException();
-    }
+    default Object apply(Object value) { throw new UnsupportedOperationException(); }
 
     /**
      * 执行含有两个参数的方法
@@ -60,9 +54,7 @@ public interface RunnerFunction {
      * @param value2
      * @return
      */
-    default Object apply(Object value1, Object value2) {
-        throw new UnsupportedOperationException();
-    }
+    default Object apply(Object value1, Object value2) { throw new UnsupportedOperationException(); }
 
     /**
      * 执行含有三个参数的方法
@@ -72,9 +64,7 @@ public interface RunnerFunction {
      * @param value3
      * @return
      */
-    default Object apply(Object value1, Object value2, Object value3) {
-        throw new UnsupportedOperationException();
-    }
+    default Object apply(Object value1, Object value2, Object value3) { throw new UnsupportedOperationException(); }
 
     /**
      * 执行无参或含有多个参数的方法
@@ -82,7 +72,5 @@ public interface RunnerFunction {
      * @param values
      * @return
      */
-    default Object apply(Object... values) {
-        throw new UnsupportedOperationException();
-    }
+    default Object apply(Object... values) { throw new UnsupportedOperationException(); }
 }

@@ -31,22 +31,14 @@ import java.util.function.Supplier;
  */
 public class PhantomAccessor<T> extends BaseAccessor<T, PhantomAccessor<T>> {
 
-    public PhantomAccessor(Supplier<T> supplier) {
-        this(supplier, false);
-    }
+    public PhantomAccessor(Supplier<T> supplier) { this(supplier, false); }
 
-    public PhantomAccessor(Supplier<T> supplier, boolean allowNullValue) {
-        super(supplier, allowNullValue);
-    }
+    public PhantomAccessor(Supplier<T> supplier, boolean allowNullValue) { super(supplier, allowNullValue); }
 
     @Override
-    protected Reference<T> reference(T value) {
-        return ReferenceUtil.weak(value);
-    }
+    protected Reference<T> reference(T value) { return ReferenceUtil.weak(value); }
 
-    public static <T> PhantomAccessor<T> of(Supplier<T> supplier) {
-        return new PhantomAccessor<>(supplier);
-    }
+    public static <T> PhantomAccessor<T> of(Supplier<T> supplier) { return new PhantomAccessor<>(supplier); }
 
     public static <T> PhantomAccessor<T> ofNullable(Supplier<T> supplier) {
         return new PhantomAccessor<>(supplier, true);

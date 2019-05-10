@@ -8,13 +8,9 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 final class PackageUtil {
 
-    private PackageUtil() {
-        noInstanceError();
-    }
+    private PackageUtil() { noInstanceError(); }
 
-    public static PackageScanner scanner() {
-        return new PackageScanner();
-    }
+    public static PackageScanner scanner() { return new PackageScanner(); }
 
     public static String[] scan(String packageName) {
         return PackageScanner.scanOf(packageName).toArray(STRINGS.empty());

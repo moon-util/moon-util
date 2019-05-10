@@ -13,27 +13,21 @@ interface AsGetter extends AsValuer, Predicate {
      * @return
      */
     @Override
-    default boolean isGetter() {
-        return true;
-    }
+    default boolean isGetter() { return true; }
 
     /**
      * 是一个简单获取器
      *
      * @return
      */
-    default boolean isGetterOrdinary() {
-        return false;
-    }
+    default boolean isGetterOrdinary() { return false; }
 
     /**
      * 是一个复杂获取器
      *
      * @return
      */
-    default boolean isGetterComplex() {
-        return false;
-    }
+    default boolean isGetterComplex() { return false; }
 
     /**
      * Evaluates this predicate on the given argument.
@@ -42,7 +36,5 @@ interface AsGetter extends AsValuer, Predicate {
      * @return
      */
     @Override
-    default boolean test(Object o) {
-        return false;
-    }
+    default boolean test(Object o) { return false; }
 }

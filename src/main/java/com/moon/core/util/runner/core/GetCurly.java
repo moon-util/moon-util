@@ -28,7 +28,5 @@ class GetCurly implements AsGetter {
     }
 
     @Override
-    public String toString() {
-        return Arrays.toString(consumers);
-    }
+    public String toString() { return Arrays.toString(consumers); }
 }

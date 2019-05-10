@@ -14,9 +14,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 final class ParseDelimiters {
-    private ParseDelimiters() {
-        noInstanceError();
-    }
+    private ParseDelimiters() { noInstanceError(); }
 
     private final static Map<String, AsRunner> CACHE = ReferenceUtil.manageMap();
 
@@ -82,9 +80,7 @@ final class ParseDelimiters {
     private static class InRunner implements AsGetter {
         final AsRunner[] gets;
 
-        private InRunner(AsRunner[] gets) {
-            this.gets = gets;
-        }
+        private InRunner(AsRunner[] gets) { this.gets = gets; }
 
         @Override
         public Object run(Object data) {

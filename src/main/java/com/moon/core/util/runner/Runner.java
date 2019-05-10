@@ -23,9 +23,7 @@ public interface Runner {
      * @param <T>
      * @return
      */
-    default <T> T run() {
-        return run(null);
-    }
+    default <T> T run() { return run(null); }
 
     /**
      * 如果需要使用多个参数，用指定的多参数列表运行解析的表达式
@@ -50,7 +48,5 @@ public interface Runner {
      * @param <T>
      * @return
      */
-    default <T> T runMulti(Object... data) {
-        return run(new RunnerDataMap(data));
-    }
+    default <T> T runMulti(Object... data) { return run(new RunnerDataMap(data)); }
 }

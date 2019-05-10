@@ -56,9 +56,7 @@ class IGetFun {
             }
 
             @Override
-            public Object apply() {
-                return DateUtil.format();
-            }
+            public Object apply() { return DateUtil.format(); }
 
             @Override
             public Object apply(Object value) {
@@ -76,66 +74,42 @@ class IGetFun {
         },
         date_now {
             @Override
-            public Object apply() {
-                return System.currentTimeMillis();
-            }
+            public Object apply() { return System.currentTimeMillis(); }
 
             @Override
-            public Object apply(Object value) {
-                return apply();
-            }
+            public Object apply(Object value) { return apply(); }
 
             @Override
-            public Object apply(Object value1, Object value2) {
-                return apply();
-            }
+            public Object apply(Object value1, Object value2) { return apply(); }
 
             @Override
-            public Object apply(Object value1, Object value2, Object value3) {
-                return apply();
-            }
+            public Object apply(Object value1, Object value2, Object value3) { return apply(); }
 
             @Override
-            public Object apply(Object... values) {
-                return apply();
-            }
+            public Object apply(Object... values) { return apply(); }
         },
         date {
             @Override
-            public boolean isChangeless() {
-                return false;
-            }
+            public boolean isChangeless() { return false; }
 
             @Override
-            public Object apply() {
-                return new Date();
-            }
+            public Object apply() { return new Date(); }
 
             @Override
-            public Object apply(Object o) {
-                return DateUtil.toDate(o);
-            }
+            public Object apply(Object o) { return DateUtil.toDate(o); }
 
             @Override
-            public Object apply(Object o, Object o1) {
-                return apply();
-            }
+            public Object apply(Object o, Object o1) { return apply(); }
 
             @Override
-            public Object apply(Object o, Object o1, Object o2) {
-                return apply();
-            }
+            public Object apply(Object o, Object o1, Object o2) { return apply(); }
 
             @Override
-            public Object apply(Object... values) {
-                return apply();
-            }
+            public Object apply(Object... values) { return apply(); }
         };
 
         @Override
-        public String functionName() {
-            return this.name().replace('_', '.');
-        }
+        public String functionName() { return this.name().replace('_', '.'); }
     }
 
     private enum StrFunctions implements RunnerFunction {
@@ -144,9 +118,7 @@ class IGetFun {
          */
         str_substring {
             @Override
-            public String apply(Object str, Object from) {
-                return ((String) str).substring(toInt(from));
-            }
+            public String apply(Object str, Object from) { return ((String) str).substring(toInt(from)); }
 
             @Override
             public String apply(Object str, Object from, Object to) {
@@ -187,20 +159,14 @@ class IGetFun {
         },
         str_length {
             @Override
-            public Integer apply(Object value) {
-                return value == null ? 0 : ((CharSequence) value).length();
-            }
+            public Integer apply(Object value) { return value == null ? 0 : ((CharSequence) value).length(); }
         },
         str_random {
             @Override
-            public Object apply() {
-                return RandomStringUtil.next();
-            }
+            public Object apply() { return RandomStringUtil.next(); }
 
             @Override
-            public Object apply(Object value) {
-                return RandomStringUtil.next(toInt(value));
-            }
+            public Object apply(Object value) { return RandomStringUtil.next(toInt(value)); }
 
             @Override
             public Object apply(Object value1, Object value2) {
@@ -209,91 +175,61 @@ class IGetFun {
         },
         str {
             @Override
-            public String apply(Object value) {
-                return String.valueOf(value);
-            }
+            public String apply(Object value) { return String.valueOf(value); }
         },
         ;
 
         @Override
-        public String functionName() {
-            return this.name().replace('_', '.');
-        }
+        public String functionName() { return this.name().replace('_', '.'); }
     }
 
     private enum NowFunctions implements RunnerFunction {
         now_year {
             @Override
-            public Object apply() {
-                return LocalDate.now().getYear();
-            }
+            public Object apply() { return LocalDate.now().getYear(); }
         },
         now_month {
             @Override
-            public Object apply() {
-                return LocalDate.now().getMonthValue();
-            }
+            public Object apply() { return LocalDate.now().getMonthValue(); }
         },
         now_day {
             @Override
-            public Object apply() {
-                return LocalDate.now().getDayOfMonth();
-            }
+            public Object apply() { return LocalDate.now().getDayOfMonth(); }
         },
         now_hour {
             @Override
-            public Object apply() {
-                return LocalTime.now().getHour();
-            }
+            public Object apply() { return LocalTime.now().getHour(); }
         },
         now_minute {
             @Override
-            public Object apply() {
-                return LocalTime.now().getMinute();
-            }
+            public Object apply() { return LocalTime.now().getMinute(); }
         },
         now_second {
             @Override
-            public Object apply() {
-                return LocalTime.now().getSecond();
-            }
+            public Object apply() { return LocalTime.now().getSecond(); }
         },
         now {
             @Override
-            public Object apply() {
-                return System.currentTimeMillis();
-            }
+            public Object apply() { return System.currentTimeMillis(); }
 
             @Override
-            public Object apply(Object o) {
-                return TimeUtil.toDateTime(o);
-            }
+            public Object apply(Object o) { return TimeUtil.toDateTime(o); }
 
             @Override
-            public Object apply(Object o, Object o1) {
-                return this.apply();
-            }
+            public Object apply(Object o, Object o1) { return this.apply(); }
 
             @Override
-            public Object apply(Object o, Object o1, Object o2) {
-                return this.apply();
-            }
+            public Object apply(Object o, Object o1, Object o2) { return this.apply(); }
 
             @Override
-            public Object apply(Object... values) {
-                return this.apply();
-            }
+            public Object apply(Object... values) { return this.apply(); }
         };
 
         @Override
-        public String functionName() {
-            return this.name().replace('_', '.');
-        }
+        public String functionName() { return this.name().replace('_', '.'); }
 
         @Override
-        public boolean isChangeless() {
-            return false;
-        }
+        public boolean isChangeless() { return false; }
     }
 
     private interface ChangeableRunnerFunction extends RunnerFunction {
@@ -303,9 +239,7 @@ class IGetFun {
          * @return
          */
         @Override
-        default boolean isChangeless() {
-            return false;
-        }
+        default boolean isChangeless() { return false; }
     }
 
     private enum MapFunctions implements ChangeableRunnerFunction {
@@ -323,27 +257,19 @@ class IGetFun {
         },
         map_isEmpty {
             @Override
-            public Object apply(Object value) {
-                return MapUtil.sizeByObject(value) == 0;
-            }
+            public Object apply(Object value) { return MapUtil.sizeByObject(value) == 0; }
         },
         map_get {
             @Override
-            public Object apply(Object value1, Object value2) {
-                return MapUtil.getByObject(value1, value2);
-            }
+            public Object apply(Object value1, Object value2) { return MapUtil.getByObject(value1, value2); }
         },
         map_size {
             @Override
-            public Object apply(Object value) {
-                return MapUtil.sizeByObject(value);
-            }
+            public Object apply(Object value) { return MapUtil.sizeByObject(value); }
         },
         map {
             @Override
-            public Object apply() {
-                return new HashMap<>();
-            }
+            public Object apply() { return new HashMap<>(); }
 
             @Override
             public Map apply(Object key) {
@@ -385,9 +311,7 @@ class IGetFun {
         };
 
         @Override
-        public String functionName() {
-            return this.name().replace('_', '.');
-        }
+        public String functionName() { return this.name().replace('_', '.'); }
     }
 
     private enum ListFunctions implements ChangeableRunnerFunction {
@@ -406,37 +330,25 @@ class IGetFun {
         },
         list_isEmpty {
             @Override
-            public Boolean apply(Object value) {
-                return ListUtil.isEmpty((List) value);
-            }
+            public Boolean apply(Object value) { return ListUtil.isEmpty((List) value); }
         },
         list_get {
             @Override
-            public Object apply(Object value1, Object value2) {
-                return ListUtil.getByObject(value1, toInt(value2));
-            }
+            public Object apply(Object value1, Object value2) { return ListUtil.getByObject(value1, toInt(value2)); }
         },
         list_size {
             @Override
-            public Integer apply(Object value) {
-                return ListUtil.sizeByObject(value);
-            }
+            public Integer apply(Object value) { return ListUtil.sizeByObject(value); }
         },
         list {
             @Override
-            public boolean isChangeless() {
-                return true;
-            }
+            public boolean isChangeless() { return true; }
 
             @Override
-            public List apply(Object value) {
-                return ListUtil.ofArrayList(value);
-            }
+            public List apply(Object value) { return ListUtil.ofArrayList(value); }
 
             @Override
-            public List apply(Object value1, Object value2) {
-                return ListUtil.ofArrayList(value1, value2);
-            }
+            public List apply(Object value1, Object value2) { return ListUtil.ofArrayList(value1, value2); }
 
             @Override
             public List apply(Object value1, Object value2, Object value3) {
@@ -444,144 +356,96 @@ class IGetFun {
             }
 
             @Override
-            public List apply(Object... values) {
-                return ListUtil.ofArrayList(values);
-            }
+            public List apply(Object... values) { return ListUtil.ofArrayList(values); }
         };
 
         @Override
-        public String functionName() {
-            return this.name().replace('_', '.');
-        }
+        public String functionName() { return this.name().replace('_', '.'); }
     }
 
     private enum MathFunctions implements RunnerFunction {
         math_double {
             @Override
-            public Double apply(Object value) {
-                return DoubleUtil.toDoubleValue(value);
-            }
+            public Double apply(Object value) { return DoubleUtil.toDoubleValue(value); }
         },
         math_int {
             @Override
-            public Integer apply(Object value) {
-                return IntUtil.toIntValue(value);
-            }
+            public Integer apply(Object value) { return IntUtil.toIntValue(value); }
         },
         math_ceil {
             @Override
-            public Double apply(Object value) {
-                return Math.ceil(toDb(value));
-            }
+            public Double apply(Object value) { return Math.ceil(toDb(value)); }
         },
         math_floor {
             @Override
-            public Double apply(Object value) {
-                return Math.floor(toDb(value));
-            }
+            public Double apply(Object value) { return Math.floor(toDb(value)); }
         },
         math_cos {
             @Override
-            public Double apply(Object value) {
-                return Math.cos(toDb(value));
-            }
+            public Double apply(Object value) { return Math.cos(toDb(value)); }
         },
         math_sin {
             @Override
-            public Double apply(Object value) {
-                return Math.sin(toDb(value));
-            }
+            public Double apply(Object value) { return Math.sin(toDb(value)); }
         },
         math_tan {
             @Override
-            public Double apply(Object value) {
-                return Math.tan(toDb(value));
-            }
+            public Double apply(Object value) { return Math.tan(toDb(value)); }
         },
         math_abs {
             @Override
-            public Double apply(Object value) {
-                return Math.abs(toDb(value));
-            }
+            public Double apply(Object value) { return Math.abs(toDb(value)); }
         },
         math_round {
             @Override
-            public Long apply(Object value) {
-                return Math.round(toDb(value));
-            }
+            public Long apply(Object value) { return Math.round(toDb(value)); }
         },
         math_pow {
             @Override
-            public Double apply(Object value1, Object value2) {
-                return Math.pow(toDb(value1), toDb(value2));
-            }
+            public Double apply(Object value1, Object value2) { return Math.pow(toDb(value1), toDb(value2)); }
         },
         math_cbrt {
             @Override
-            public Double apply(Object value) {
-                return Math.cbrt(toDb(value));
-            }
+            public Double apply(Object value) { return Math.cbrt(toDb(value)); }
         },
         math_sqrt {
             @Override
-            public Double apply(Object value) {
-                return Math.sqrt(toDb(value));
-            }
+            public Double apply(Object value) { return Math.sqrt(toDb(value)); }
         },
         math_log {
             @Override
-            public Double apply(Object value) {
-                return Math.log(toDb(value));
-            }
+            public Double apply(Object value) { return Math.log(toDb(value)); }
         },
         math_log10 {
             @Override
-            public Double apply(Object value) {
-                return Math.log10(toDb(value));
-            }
+            public Double apply(Object value) { return Math.log10(toDb(value)); }
         },
         math_random {
             private final ThreadLocalRandom random = ThreadLocalRandom.current();
 
             @Override
-            public boolean isChangeless() {
-                return false;
-            }
+            public boolean isChangeless() { return false; }
 
             @Override
-            public Double apply() {
-                return random.nextDouble();
-            }
+            public Double apply() { return random.nextDouble(); }
 
             @Override
-            public Integer apply(Object value) {
-                return random.nextInt(toInt(value));
-            }
+            public Integer apply(Object value) { return random.nextInt(toInt(value)); }
 
             @Override
-            public Integer apply(Object value1, Object value2) {
-                return random.nextInt(toInt(value1), toInt(value2));
-            }
+            public Integer apply(Object value1, Object value2) { return random.nextInt(toInt(value1), toInt(value2)); }
 
             @Override
-            public Double apply(Object... values) {
-                return random.nextDouble();
-            }
+            public Double apply(Object... values) { return random.nextDouble(); }
         };
 
         @Override
-        public String functionName() {
-            return this.name().replace('_', '.');
-        }
+        public String functionName() { return this.name().replace('_', '.'); }
     }
 
-    private final static int toInt(Object value) {
-        return value == null ? 0 : ((Number) value).intValue();
-    }
+    private final static int toInt(Object value) { return value == null ? 0 : ((Number) value).intValue(); }
 
-    private final static double toDb(Object value) {
-        return value == null ? 0 : ((Number) value).doubleValue();
-    }
+    private final static double toDb(Object value) { return value == null ? 0 : ((Number) value).doubleValue(); }
 
     private final static Object formatToKey(Object key) {
         boolean test = key == null || key instanceof Boolean
@@ -612,7 +476,5 @@ class IGetFun {
         return ns + (name == null || name.isEmpty() ? name : '.' + name);
     }
 
-    final static RunnerFunction tryLoad(String name) {
-        return CACHE.get(name);
-    }
+    final static RunnerFunction tryLoad(String name) { return CACHE.get(name); }
 }

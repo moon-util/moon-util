@@ -17,6 +17,5 @@ class IteratorUtilTestTest {
         IteratorUtil.forEach(arr, System.out::println);
         IteratorUtil.forEach(arr, (str, index) ->
             System.out.println(String.format("index: %d, value: %s", index, str)));
-
     }
 }

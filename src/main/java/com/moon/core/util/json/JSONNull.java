@@ -11,67 +11,41 @@ public enum JSONNull implements JSON<Object>, Comparable<JSONNull> {
     NULL;
 
     @Override
-    public Map<String, Object> getMap(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public Map<String, Object> getMap(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public List<Object> getList(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public List<Object> getList(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public <T> T get() {
-        return null;
-    }
+    public <T> T get() { return null; }
 
     @Override
-    public JSONObject getJSONObject(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public JSONObject getJSONObject(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public JSONArray getJSONArray(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public JSONArray getJSONArray(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public int getIntValue(Object key) {
-        return 0;
-    }
+    public int getIntValue(Object key) { return 0; }
 
     @Override
-    public Integer getInteger(Object key) {
-        return null;
-    }
+    public Integer getInteger(Object key) { return null; }
 
     @Override
-    public long getLongValue(Object key) {
-        return 0;
-    }
+    public long getLongValue(Object key) { return 0; }
 
     @Override
-    public Long getLong(Object key) {
-        return null;
-    }
+    public Long getLong(Object key) { return null; }
 
     @Override
-    public double getDoubleValue(Object key) {
-        return 0;
-    }
+    public double getDoubleValue(Object key) { return 0; }
 
     @Override
-    public Double getDouble(Object key) {
-        return null;
-    }
+    public Double getDouble(Object key) { return null; }
 
     @Override
-    public String getString(Object key) {
-        return null;
-    }
+    public String getString(Object key) { return null; }
 
     @Override
-    public String toString() {
-        return "null";
-    }
+    public String toString() { return "null"; }
 }

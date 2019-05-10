@@ -7,14 +7,10 @@ class GetNot implements AsGetter {
 
     final AsRunner valuer;
 
-    GetNot(AsRunner valuer) {
-        this.valuer = valuer;
-    }
+    GetNot(AsRunner valuer) { this.valuer = valuer; }
 
     @Override
-    public Object run(Object data) {
-        return !((Boolean) valuer.run(data)).booleanValue();
-    }
+    public Object run(Object data) { return !((Boolean) valuer.run(data)).booleanValue(); }
 
     /**
      * 这个方法在这儿不能保证数据强正确性
@@ -24,12 +20,8 @@ class GetNot implements AsGetter {
      * otherwise {@code false}
      */
     @Override
-    public boolean test(Object o) {
-        return true;
-    }
+    public boolean test(Object o) { return true; }
 
     @Override
-    public String toString() {
-        return "!" + valuer.toString();
-    }
+    public String toString() { return "!" + valuer.toString(); }
 }

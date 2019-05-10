@@ -17,9 +17,7 @@ class GetLink implements AsGetter {
     }
 
     @Override
-    public Object run(Object data) {
-        return valuer.run(prevGetter.run(data));
-    }
+    public Object run(Object data) { return valuer.run(prevGetter.run(data)); }
 
     /**
      * Evaluates this predicate on the given argument.
@@ -29,12 +27,8 @@ class GetLink implements AsGetter {
      * otherwise {@code false}
      */
     @Override
-    public boolean test(Object o) {
-        return false;
-    }
+    public boolean test(Object o) { return false; }
 
     @Override
-    public String toString() {
-        return prevGetter.toString() + " " + valuer.toString();
-    }
+    public String toString() { return prevGetter.toString() + " " + valuer.toString(); }
 }

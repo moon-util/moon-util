@@ -22,46 +22,6 @@ public final class FilterUtil {
         noInstanceError();
     }
 
-    public final static <T> Filter<T> of(Predicate<T> tester) {
-        return new Filter<>(tester);
-    }
-
-    public final static class Filter<T> {
-        final Predicate<T> tester;
-
-        private Filter(Predicate<T> tester) {
-            this.tester = tester;
-        }
-
-        public <E extends T> List<E> filter(List<E> collect) {
-            return FilterUtil.filter(collect, tester);
-        }
-
-        public <E extends T> Set<E> filter(Set<E> collect) {
-            return FilterUtil.filter(collect, tester);
-        }
-
-        public <E extends T> E requireFirst(Iterable<E> collect) {
-            return FilterUtil.requireFirst(collect, tester);
-        }
-
-        public <E extends T> E requireFirst(E... es) {
-            return FilterUtil.requireFirst(es, tester);
-        }
-
-        public <E extends T> E nullableFirst(E... es) {
-            return FilterUtil.requireFirst(es, tester);
-        }
-
-        public <E extends T> E requireLast(E... es) {
-            return FilterUtil.requireFirst(es, tester);
-        }
-
-        public <E extends T> E nullableLast(E... es) {
-            return FilterUtil.requireFirst(es, tester);
-        }
-    }
-
     /*
      * --------------------------------------------------------------
      * find one

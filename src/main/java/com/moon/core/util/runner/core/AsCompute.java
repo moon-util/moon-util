@@ -10,9 +10,7 @@ interface AsCompute extends AsRunner {
      * @return
      */
     @Override
-    default boolean isHandler() {
-        return true;
-    }
+    default boolean isHandler() { return true; }
 
     /**
      * 计算
@@ -23,7 +21,5 @@ interface AsCompute extends AsRunner {
      * @return
      */
     @Override
-    default Object exe(AsRunner right, AsRunner left, Object data) {
-        return exe(right.run(data), left.run(data));
-    }
+    default Object exe(AsRunner right, AsRunner left, Object data) { return exe(right.run(data), left.run(data)); }
 }

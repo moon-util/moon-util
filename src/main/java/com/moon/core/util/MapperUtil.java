@@ -4,10 +4,7 @@ import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.moon.core.beans.BeanInfoUtil.getFieldDescriptorsMap;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -29,9 +26,7 @@ public final class MapperUtil {
      * ---------------------------------------------------------------------------
      */
 
-    public final static Map<String, Object> toMap(Object bean) {
-        return toMap(bean, new HashMap(16));
-    }
+    public final static Map<String, Object> toMap(Object bean) { return toMap(bean, new HashMap(16)); }
 
     public final static Map<String, Object> toMap(Object bean, Map container) {
         if (bean != null) {
@@ -68,8 +63,8 @@ public final class MapperUtil {
      * ---------------------------------------------------------------------------
      */
 
-    public final static <T> List<Map<String, Object>> forEachToMap(List<T> beanList) {
-        List<Map<String, Object>> result = new ArrayList<>();
+    public final static <T> List<Map<String, Object>> forEachToMap(Collection<T> beanList) {
+        List<Map<String, Object>> result = new ArrayList<>(CollectUtil.size(beanList));
         IteratorUtil.forEach(beanList, item -> result.add(toMap(item)));
         return result;
     }
@@ -82,14 +77,14 @@ public final class MapperUtil {
      * @param <T>
      * @return
      */
-    public final static <T> List<T> forEachToInstance(List<Map<String, Object>> dataList, Class<T> type) {
-        List<T> result = new ArrayList<>();
+    public final static <T> List<T> forEachToInstance(Collection<Map<String, Object>> dataList, Class<T> type) {
+        List<T> result = new ArrayList<>(CollectUtil.size(dataList));
         IteratorUtil.forEach(dataList, itemMap -> result.add(toInstance(itemMap, type)));
         return result;
     }
 
-    public final static <T, E> List<T> forEachToOther(List<E> dataList, Class<T> type) {
-        List<T> result = new ArrayList<>();
+    public final static <T, E> List<T> forEachToOther(Collection<E> dataList, Class<T> type) {
+        List<T> result = new ArrayList<>(CollectUtil.size(dataList));
         IteratorUtil.forEach(dataList, item -> result.add(toInstance(item, type)));
         return result;
     }

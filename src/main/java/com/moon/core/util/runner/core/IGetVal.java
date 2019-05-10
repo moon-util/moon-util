@@ -13,25 +13,17 @@ import java.util.Map;
 enum IGetVal implements IGetter {
     MAP {
         @Override
-        public boolean test(Object o) {
-            return o instanceof Map;
-        }
+        public boolean test(Object o) { return o instanceof Map; }
 
         @Override
-        public Object apply(Object o, Object o2) {
-            return MapUtil.getByObject(o, o2);
-        }
+        public Object apply(Object o, Object o2) { return MapUtil.getByObject(o, o2); }
     },
     LIST {
         @Override
-        public boolean test(Object o) {
-            return o instanceof List;
-        }
+        public boolean test(Object o) { return o instanceof List; }
 
         @Override
-        public Object apply(Object o, Object o2) {
-            return ListUtil.getByObject(o, ((Number) o2).intValue());
-        }
+        public Object apply(Object o, Object o2) { return ListUtil.getByObject(o, ((Number) o2).intValue()); }
     },
     BEAN {
         @Override
@@ -40,8 +32,6 @@ enum IGetVal implements IGetter {
         }
 
         @Override
-        public Object apply(Object o, Object o2) {
-            return FieldUtil.getValue(o2.toString(), o, true);
-        }
+        public Object apply(Object o, Object o2) { return FieldUtil.getValue(o2.toString(), o, true); }
     }
 }

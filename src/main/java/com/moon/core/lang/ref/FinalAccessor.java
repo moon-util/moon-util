@@ -13,20 +13,13 @@ public class FinalAccessor<T> {
 
     private T value;
 
-    public FinalAccessor() {
-    }
+    public FinalAccessor() { }
 
-    public FinalAccessor(T value) {
-        this.set(value);
-    }
+    public FinalAccessor(T value) { this.set(value); }
 
-    public static <T> FinalAccessor<T> of() {
-        return new FinalAccessor<>();
-    }
+    public static <T> FinalAccessor<T> of() { return new FinalAccessor<>(); }
 
-    public static <T> FinalAccessor<T> of(T value) {
-        return new FinalAccessor<>(value);
-    }
+    public static <T> FinalAccessor<T> of(T value) { return new FinalAccessor<>(value); }
 
     /*
      * ------------------------------------------------------------
@@ -49,13 +42,9 @@ public class FinalAccessor<T> {
         return this;
     }
 
-    public FinalAccessor<T> setIfAbsent(T value) {
-        return isPresent() ? this : set(value);
-    }
+    public FinalAccessor<T> setIfAbsent(T value) { return isPresent() ? this : set(value); }
 
-    public FinalAccessor<T> setIfAbsent(Supplier<T> supplier) {
-        return isPresent() ? this : set(supplier.get());
-    }
+    public FinalAccessor<T> setIfAbsent(Supplier<T> supplier) { return isPresent() ? this : set(supplier.get()); }
 
     /*
      * ------------------------------------------------------------
@@ -63,25 +52,15 @@ public class FinalAccessor<T> {
      * ------------------------------------------------------------
      */
 
-    public T get() {
-        return value;
-    }
+    public T get() { return value; }
 
-    public T getOrDefault(T defaultValue) {
-        return isPresent() ? value : defaultValue;
-    }
+    public T getOrDefault(T defaultValue) { return isPresent() ? value : defaultValue; }
 
-    public T getOrDefault(Supplier<T> supplier) {
-        return isPresent() ? value : supplier.get();
-    }
+    public T getOrDefault(Supplier<T> supplier) { return isPresent() ? value : supplier.get(); }
 
-    public T getOrThrow() {
-        return Objects.requireNonNull(value);
-    }
+    public T getOrThrow() { return Objects.requireNonNull(value); }
 
-    public T getOrThrow(String exceptionMessage) {
-        return Objects.requireNonNull(value, exceptionMessage);
-    }
+    public T getOrThrow(String exceptionMessage) { return Objects.requireNonNull(value, exceptionMessage); }
 
     public <EX extends Throwable> T getOrThrow(EX ex) {
         if (isAbsent()) {
@@ -103,17 +82,11 @@ public class FinalAccessor<T> {
      * ------------------------------------------------------------
      */
 
-    public boolean isPresent() {
-        return value != null;
-    }
+    public boolean isPresent() { return value != null; }
 
-    public boolean isAbsent() {
-        return value == null;
-    }
+    public boolean isAbsent() { return value == null; }
 
-    public boolean isEquals(Object value) {
-        return Objects.equals(value, this.value);
-    }
+    public boolean isEquals(Object value) { return Objects.equals(value, this.value); }
 
     /*
      * ------------------------------------------------------------
@@ -172,12 +145,8 @@ public class FinalAccessor<T> {
      * ------------------------------------------------------------
      */
 
-    public <O> FinalAccessor<O> transform(Function<T, O> function) {
-        return of(function.apply(value));
-    }
+    public <O> FinalAccessor<O> transform(Function<T, O> function) { return of(function.apply(value)); }
 
     @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
+    public String toString() { return String.valueOf(value); }
 }

@@ -22,9 +22,7 @@ public class ParseUtil {
     /**
      * @throws AssertionError 不可实例化
      */
-    protected ParseUtil() {
-        noInstanceError();
-    }
+    protected ParseUtil() { noInstanceError(); }
 
     /*
      * -----------------------------------------------
@@ -32,9 +30,7 @@ public class ParseUtil {
      * -----------------------------------------------
      */
 
-    final static boolean isNum(int value) {
-        return value > 47 && value < 58;
-    }
+    final static boolean isNum(int value) { return value > 47 && value < 58; }
 
     final static boolean isVar(int value) {
         return CharUtil.isLetter(value)
@@ -42,9 +38,7 @@ public class ParseUtil {
             || CharUtil.isChinese(value);
     }
 
-    final static boolean isStr(int value) {
-        return value == SINGLE || value == DOUBLE;
-    }
+    final static boolean isStr(int value) { return value == SINGLE || value == DOUBLE; }
 
     /**
      * 运行之前 indexer 指向起始索引
@@ -66,9 +60,7 @@ public class ParseUtil {
      * -------------------------------------------------------
      */
 
-    final static <T> T throwErr(char[] chars, IntAccessor indexer) {
-        return SupportUtil.throwErr(chars, indexer);
-    }
+    final static <T> T throwErr(char[] chars, IntAccessor indexer) { return SupportUtil.throwErr(chars, indexer); }
 
     final static void assertTrue(boolean value, char[] chars, IntAccessor indexer) {
         if (value) {
@@ -89,9 +81,7 @@ public class ParseUtil {
      * -----------------------------------------------
      */
 
-    public final static Runner parse(String expression) {
-        return ParseCore.parse(expression);
-    }
+    public final static Runner parse(String expression) { return ParseCore.parse(expression); }
 
     public final static Runner parse(String expression, String[] delimiters) {
         return ParseDelimiters.parse(expression, delimiters);

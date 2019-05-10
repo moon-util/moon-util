@@ -21,9 +21,7 @@ import static java.util.Objects.requireNonNull;
  * @author benshaoye
  */
 final class ParseInvoker {
-    private ParseInvoker() {
-        noInstanceError();
-    }
+    private ParseInvoker() { noInstanceError(); }
 
     private final static Predicate<Method> NONE_PARAM = m -> m.getParameterCount() == 0;
 

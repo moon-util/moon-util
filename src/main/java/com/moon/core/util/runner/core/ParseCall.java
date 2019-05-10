@@ -16,9 +16,7 @@ import static com.moon.core.util.runner.core.ParseUtil.*;
  * @author benshaoye
  */
 class ParseCall {
-    private ParseCall() {
-        noInstanceError();
-    }
+    private ParseCall() { noInstanceError(); }
 
     /**
      * 静态方法调用或者函数调用
@@ -152,9 +150,7 @@ class ParseCall {
         }
 
         @Override
-        public Object run(Object data) {
-            return fn.apply(runner.run(data), runner0.run(), runner1.run());
-        }
+        public Object run(Object data) { return fn.apply(runner.run(data), runner0.run(), runner1.run()); }
     }
 
     final static AsRunner valueOf(RunnerFunction fn, AsRunner runner, AsRunner runner0) {
@@ -173,9 +169,7 @@ class ParseCall {
         }
 
         @Override
-        public Object run(Object data) {
-            return fn.apply(runner.run(data), runner0.run());
-        }
+        public Object run(Object data) { return fn.apply(runner.run(data), runner0.run()); }
     }
 
     final static AsRunner valueOf(RunnerFunction fn, AsRunner runner) {
@@ -195,9 +189,7 @@ class ParseCall {
         }
 
         @Override
-        public Object run(Object data) {
-            return fn.apply(runner.run(data));
-        }
+        public Object run(Object data) { return fn.apply(runner.run(data)); }
     }
 
     final static AsRunner valueOf(RunnerFunction fn) {
@@ -207,14 +199,10 @@ class ParseCall {
     private static class FunctionNone implements AsInvoker {
         protected final RunnerFunction fn;
 
-        FunctionNone(RunnerFunction fn) {
-            this.fn = fn;
-        }
+        FunctionNone(RunnerFunction fn) { this.fn = fn; }
 
         @Override
-        public Object run(Object data) {
-            return fn.apply();
-        }
+        public Object run(Object data) { return fn.apply(); }
     }
 
     /**

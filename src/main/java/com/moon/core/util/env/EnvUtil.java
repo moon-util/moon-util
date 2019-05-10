@@ -22,37 +22,21 @@ import static com.moon.core.util.env.EnvEnum.PRODUCTION;
  */
 public final class EnvUtil {
 
-    private EnvUtil() {
-        noInstanceError();
-    }
+    private EnvUtil() { noInstanceError(); }
 
-    public final static Environmental current() {
-        return EnvEnum.current();
-    }
+    public final static Environmental current() { return EnvEnum.current(); }
 
-    public final static boolean isProduction() {
-        return PRODUCTION.isTrue();
-    }
+    public final static boolean isProduction() { return PRODUCTION.isTrue(); }
 
-    public final static boolean isDevelopment() {
-        return DEVELOPMENT.isTrue();
-    }
+    public final static boolean isDevelopment() { return DEVELOPMENT.isTrue(); }
 
-    public final static void ifProd(ThrowingRunnable executor) {
-        PRODUCTION.run(executor);
-    }
+    public final static void ifProd(ThrowingRunnable executor) { PRODUCTION.run(executor); }
 
-    public final static void ifDev(ThrowingRunnable executor) {
-        DEVELOPMENT.run(executor);
-    }
+    public final static void ifDev(ThrowingRunnable executor) { DEVELOPMENT.run(executor); }
 
-    public final static <T> T ifProdOrOther(T prod, T other) {
-        return isProduction() ? prod : other;
-    }
+    public final static <T> T ifProdOrOther(T prod, T other) { return isProduction() ? prod : other; }
 
-    public final static <T> T ifDevOrOther(T dev, T other) {
-        return isDevelopment() ? dev : other;
-    }
+    public final static <T> T ifDevOrOther(T dev, T other) { return isDevelopment() ? dev : other; }
 
     public final static <T> T ifProdOrDefault(ThrowingSupplier<T> supplier, T defaultValue) {
         return PRODUCTION.getOrDefault(supplier, defaultValue);

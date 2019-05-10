@@ -18,9 +18,7 @@ import static com.moon.core.util.runner.core.Constants.*;
  * @author benshaoye
  */
 class ParseCore {
-    private ParseCore() {
-        noInstanceError();
-    }
+    private ParseCore() { noInstanceError(); }
 
     private final static Map<String, AsRunner> CACHE = ReferenceUtil.manageMap();
 
@@ -331,7 +329,5 @@ class ParseCore {
         return computer == null || computer == Computes.YUAN_LEFT;
     }
 
-    private final static boolean isNotBoundary(AsRunner computer) {
-        return !isBoundary(computer);
-    }
+    private final static boolean isNotBoundary(AsRunner computer) { return !isBoundary(computer); }
 }

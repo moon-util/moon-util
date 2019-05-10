@@ -9,9 +9,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 class ParseConst {
-    private ParseConst() {
-        noInstanceError();
-    }
+    private ParseConst() { noInstanceError(); }
 
     final static AsValuer parseStr(char[] chars, IntAccessor indexer, int endChar) {
         return DataConst.get(SupportUtil.parseStr(chars, indexer, endChar));

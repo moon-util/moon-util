@@ -20,8 +20,7 @@ public class PackageScanner extends HashSet<String> {
 
     private final static String DOT_CLASS = ".class";
 
-    PackageScanner() {
-    }
+    PackageScanner() { }
 
     public PackageScanner scan(String packageName) {
         this.addAll(scanOf(packageName));

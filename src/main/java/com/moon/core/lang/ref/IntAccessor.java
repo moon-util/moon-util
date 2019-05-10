@@ -12,20 +12,13 @@ public class IntAccessor {
 
     private int value;
 
-    public IntAccessor() {
-    }
+    public IntAccessor() { }
 
-    public IntAccessor(int value) {
-        this.set(value);
-    }
+    public IntAccessor(int value) { this.set(value); }
 
-    public static IntAccessor of() {
-        return new IntAccessor();
-    }
+    public static IntAccessor of() { return new IntAccessor(); }
 
-    public static IntAccessor of(int value) {
-        return new IntAccessor(value);
-    }
+    public static IntAccessor of(int value) { return new IntAccessor(value); }
 
     public IntAccessor set(int value) {
         this.value = value;
@@ -43,18 +36,14 @@ public class IntAccessor {
         return this;
     }
 
-    public IntAccessor increment() {
-        return increment(1);
-    }
+    public IntAccessor increment() { return increment(1); }
 
     public IntAccessor decrement(int value) {
         this.value -= value;
         return this;
     }
 
-    public IntAccessor decrement() {
-        return decrement(1);
-    }
+    public IntAccessor decrement() { return decrement(1); }
 
     /*
      * ------------------------------------------------------------
@@ -62,21 +51,13 @@ public class IntAccessor {
      * ------------------------------------------------------------
      */
 
-    public int get() {
-        return value;
-    }
+    public int get() { return value; }
 
-    public int getAndIncrement() {
-        return value++;
-    }
+    public int getAndIncrement() { return value++; }
 
-    public int incrementAndGet() {
-        return ++value;
-    }
+    public int incrementAndGet() { return ++value; }
 
-    public int getAndIncrement(int value) {
-        return this.value += value;
-    }
+    public int getAndIncrement(int value) { return this.value += value; }
 
     public int incrementAndGet(int value) {
         int now = this.value;
@@ -84,17 +65,11 @@ public class IntAccessor {
         return now;
     }
 
-    public int getAndDecrement() {
-        return value--;
-    }
+    public int getAndDecrement() { return value--; }
 
-    public int decrementAndGet() {
-        return --value;
-    }
+    public int decrementAndGet() { return --value; }
 
-    public int decrementAndGet(int value) {
-        return this.value -= value;
-    }
+    public int decrementAndGet(int value) { return this.value -= value; }
 
     public int getAndDecrement(int value) {
         int num = get();
@@ -108,25 +83,15 @@ public class IntAccessor {
      * ------------------------------------------------------------
      */
 
-    public boolean isEq(int value) {
-        return this.value == value;
-    }
+    public boolean isEq(int value) { return this.value == value; }
 
-    public boolean isGt(int value) {
-        return this.value > value;
-    }
+    public boolean isGt(int value) { return this.value > value; }
 
-    public boolean isLt(int value) {
-        return this.value < value;
-    }
+    public boolean isLt(int value) { return this.value < value; }
 
-    public boolean isGtOrEq(int value) {
-        return this.value >= value;
-    }
+    public boolean isGtOrEq(int value) { return this.value >= value; }
 
-    public boolean isLtOrEq(int value) {
-        return this.value <= value;
-    }
+    public boolean isLtOrEq(int value) { return this.value <= value; }
 
     /*
      * ------------------------------------------------------------
@@ -180,16 +145,10 @@ public class IntAccessor {
         return this;
     }
 
-    public IntAccessor compute(ToIntFunction<Integer> computer) {
-        return set(computer.applyAsInt(value));
-    }
+    public IntAccessor compute(ToIntFunction<Integer> computer) { return set(computer.applyAsInt(value)); }
 
-    public <T> T transform(IntFunction<T> transformer) {
-        return transformer.apply(value);
-    }
+    public <T> T transform(IntFunction<T> transformer) { return transformer.apply(value); }
 
     @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
+    public String toString() { return String.valueOf(value); }
 }

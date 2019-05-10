@@ -10,7 +10,5 @@ interface AsInvoker extends AsValuer {
      * @return
      */
     @Override
-    default boolean isInvoker() {
-        return true;
-    }
+    default boolean isInvoker() { return true; }
 }

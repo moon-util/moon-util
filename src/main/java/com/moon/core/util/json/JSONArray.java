@@ -16,74 +16,44 @@ public class JSONArray extends ArrayList<Object>
 
     private static final long serialVersionUID = 1L;
 
-    public JSONArray() {
-        super();
-    }
+    public JSONArray() { super(); }
 
-    public JSONArray(int capacity) {
-        super(capacity);
-    }
+    public JSONArray(int capacity) { super(capacity); }
 
-    public JSONArray(List<Object> list) {
-        super(list);
-    }
+    public JSONArray(List<Object> list) { super(list); }
 
-    Object get(Object key) {
-        return this.get((int) key);
-    }
+    Object get(Object key) { return this.get((int) key); }
 
     @Override
-    public <T> T get() {
-        return (T) this;
-    }
+    public <T> T get() { return (T) this; }
 
     @Override
-    public JSONObject getJSONObject(Integer key) {
-        return cast().toType(get(key), JSONObject.class);
-    }
+    public JSONObject getJSONObject(Integer key) { return cast().toType(get(key), JSONObject.class); }
 
     @Override
-    public JSONArray getJSONArray(Integer key) {
-        return cast().toType(get(key), JSONArray.class);
-    }
+    public JSONArray getJSONArray(Integer key) { return cast().toType(get(key), JSONArray.class); }
 
     @Override
-    public int getIntValue(Integer key) {
-        return cast().toIntValue(get(key));
-    }
+    public int getIntValue(Integer key) { return cast().toIntValue(get(key)); }
 
     @Override
-    public Integer getInteger(Integer key) {
-        return cast().toInteger(get(key));
-    }
+    public Integer getInteger(Integer key) { return cast().toInteger(get(key)); }
 
     @Override
-    public long getLongValue(Integer key) {
-        return cast().toLongValue(get(key));
-    }
+    public long getLongValue(Integer key) { return cast().toLongValue(get(key)); }
 
     @Override
-    public Long getLong(Integer key) {
-        return cast().toLong(get(key));
-    }
+    public Long getLong(Integer key) { return cast().toLong(get(key)); }
 
     @Override
-    public double getDoubleValue(Integer key) {
-        return cast().toDoubleValue(get(key));
-    }
+    public double getDoubleValue(Integer key) { return cast().toDoubleValue(get(key)); }
 
     @Override
-    public Double getDouble(Integer key) {
-        return cast().toDouble(get(key));
-    }
+    public Double getDouble(Integer key) { return cast().toDouble(get(key)); }
 
     @Override
-    public String getString(Integer key) {
-        return cast().toString(get(key));
-    }
+    public String getString(Integer key) { return cast().toString(get(key)); }
 
     @Override
-    public String toString() {
-        return JSONCfg.WEAK.get().stringify(this);
-    }
+    public String toString() { return JSONCfg.WEAK.get().stringify(this); }
 }

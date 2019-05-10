@@ -12,9 +12,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 final class ParseGetter {
-    private ParseGetter() {
-        noInstanceError();
-    }
+    private ParseGetter() { noInstanceError(); }
 
     private final static Map<Class, Set<String>> EXCLUDE_METHODS = new HashMap<>();
 

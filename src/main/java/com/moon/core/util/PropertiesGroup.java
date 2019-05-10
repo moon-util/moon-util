@@ -16,7 +16,7 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
 
     private static final long serialVersionUID = 362498820763181266L;
 
-    final String DEFAULT_KEY = RandomStringUtil.next(64);
+    final String DEFAULT_KEY = RandomStringUtil.next(32);
 
     private final PropertiesGroup top;
     private final PropertiesGroup parent;
@@ -49,15 +49,15 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
     public Object get(Object key) {
         Object value = super.get(key);
         if (value == null) { return null; }
-        if (value instanceof PropertiesGroup){
+        if (value instanceof PropertiesGroup) {
             PropertiesGroup group = (PropertiesGroup) value;
             Object result = group.get(DEFAULT_KEY);
-            return result == null ? group : result;
+            return result == null && !group.containsKey(DEFAULT_KEY) ? group : result;
         }
         return value;
     }
 
-    private Object simplePut(String key, Object value){ return super.put(key, value); }
+    private Object simplePut(String key, Object value) { return super.put(key, value); }
 
     @Override
     public Object put(String key, Object value) {
@@ -82,12 +82,8 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
 
     private PropertiesGroup getChildOnly(String key) {
         Object present = super.get(key);
-        if (present == null) {
-            return null;
-        }
-        if (present instanceof PropertiesGroup) {
-            return (PropertiesGroup) present;
-        }
+        if (present == null) { return null; }
+        if (present instanceof PropertiesGroup) { return (PropertiesGroup) present; }
         PropertiesGroup group = new PropertiesGroup(this.top, this);
         group.simplePut(DEFAULT_KEY, present);
         simplePut(key, group);
@@ -109,9 +105,7 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
     public Set<PropertiesGroup> getChildrenGroups() {
         Set groups = new HashSet();
         forEach((key, value) -> {
-            if (value instanceof PropertiesGroup) {
-                groups.add(value);
-            }
+            if (value instanceof PropertiesGroup) { groups.add(value); }
         });
         return groups;
     }
@@ -138,6 +132,13 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
                 }
             }
             value = group.get(keys[endIndex]);
+//            if (value instanceof PropertiesGroup) {
+//                group = (PropertiesGroup) value;
+//                Object curr = group.get(DEFAULT_KEY);
+//                if (curr == null && !group.containsKey(DEFAULT_KEY)) {
+//
+//                }
+//            }
             return value == null ? null : value.toString();
         }
         return null;

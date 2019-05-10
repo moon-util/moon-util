@@ -8,22 +8,14 @@ enum DataNull implements AsConst {
 
 
     @Override
-    public boolean isNull() {
-        return true;
-    }
+    public boolean isNull() { return true; }
 
     @Override
-    public boolean isObject() {
-        return false;
-    }
+    public boolean isObject() { return false; }
 
     @Override
-    public String toString() {
-        return "null";
-    }
+    public String toString() { return "null"; }
 
     @Override
-    public Object run(Object data) {
-        return null;
-    }
+    public Object run(Object data) { return null; }
 }

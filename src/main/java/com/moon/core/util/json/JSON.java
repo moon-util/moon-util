@@ -45,9 +45,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param jsonFile
      * @return
      */
-    static JSON parse(File jsonFile) {
-        return new JSONParser(readJsonString(jsonFile)).toJSON();
-    }
+    static JSON parse(File jsonFile) { return new JSONParser(readJsonString(jsonFile)).toJSON(); }
 
     /**
      * 从 io 流中解析 JSON 对象
@@ -55,30 +53,58 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param jsonIO
      * @return
      */
-    static JSON parse(InputStream jsonIO) {
-        return new JSONParser(readJsonString(jsonIO)).toJSON();
-    }
+    static JSON parse(InputStream jsonIO) { return new JSONParser(readJsonString(jsonIO)).toJSON(); }
 
-    static JSON parse(Reader jsonReader) {
-        return new JSONParser(readJsonString(ofLines(jsonReader))).toJSON();
-    }
+    /**
+     * 解析
+     *
+     * @param jsonReader
+     * @return
+     */
+    static JSON parse(Reader jsonReader) { return new JSONParser(readJsonString(ofLines(jsonReader))).toJSON(); }
 
-    static JSON parse(URL url) {
-        return new JSONParser(readJsonString(url)).toJSON();
-    }
+    /**
+     * 解析
+     *
+     * @param url
+     * @return
+     */
+    static JSON parse(URL url) { return new JSONParser(readJsonString(url)).toJSON(); }
 
-    static JSONArray parseArray(String jsonText) {
-        return (JSONArray) parse(jsonText);
-    }
+    /**
+     * 解析
+     *
+     * @param jsonText
+     * @return
+     */
+    static JSONArray parseArray(String jsonText) { return (JSONArray) parse(jsonText); }
 
-    static JSONObject parseObject(String jsonText) {
-        return (JSONObject) parse(jsonText);
-    }
+    /**
+     * 解析
+     *
+     * @param jsonText
+     * @return
+     */
+    static JSONObject parseObject(String jsonText) { return (JSONObject) parse(jsonText); }
 
-    static <T> T parseToType(String jsonText, Class<T> clazz) {
-        return cast().toType(parse(jsonText), clazz);
-    }
+    /**
+     * 解析为指定类
+     *
+     * @param jsonText
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    static <T> T parseToType(String jsonText, Class<T> clazz) { return cast().toType(parse(jsonText), clazz); }
 
+    /**
+     * 解析为指定类 List
+     *
+     * @param jsonText
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     static <T> List<T> parseToList(String jsonText, Class<T> clazz) {
         JSONArray array = parseArray(jsonText);
         List<T> result = new ArrayList<>(array.size());
@@ -98,9 +124,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param url
      * @return
      */
-    static String toJSONString(URL url) {
-        return readJsonString(url);
-    }
+    static String toJSONString(URL url) { return readJsonString(url); }
 
     /**
      * 将 Object 字符串化
@@ -108,9 +132,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param obj
      * @return
      */
-    static String toJSONString(Object obj) {
-        return JSONCfg.WEAK.get().stringify(obj);
-    }
+    static String toJSONString(Object obj) { return JSONCfg.WEAK.get().stringify(obj); }
 
     /**
      * 将 Object 字符串化
@@ -118,9 +140,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param obj
      * @return
      */
-    static String stringify(Object obj) {
-        return toJSONString(obj);
-    }
+    static String stringify(Object obj) { return toJSONString(obj); }
 
     /*
      * ------------------------------------------------------
@@ -214,9 +234,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param key
      * @return
      */
-    default Map<String, Object> getMap(KEY key) {
-        return this.getJSONObject(key);
-    }
+    default Map<String, Object> getMap(KEY key) { return this.getJSONObject(key); }
 
     /**
      * 获取 Integer
@@ -224,9 +242,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param key
      * @return
      */
-    default List<Object> getList(KEY key) {
-        return this.getJSONArray(key);
-    }
+    default List<Object> getList(KEY key) { return this.getJSONArray(key); }
 
     /**
      * 将当前 JSON 转化为指定类型对象
@@ -234,7 +250,5 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @param type
      * @return
      */
-    default <T> T convertTo(Class<T> type) {
-        return cast().toType(this, type);
-    }
+    default <T> T convertTo(Class<T> type) { return cast().toType(this, type); }
 }

@@ -4,14 +4,10 @@ package com.moon.core.util.runner.core;
  * @author benshaoye
  */
 class DataObj extends DataConst {
-    private DataObj(Object value) {
-        super(value);
-    }
+    private DataObj(Object value) { super(value); }
 
     @Override
-    public boolean isObject() {
-        return true;
-    }
+    public boolean isObject() { return true; }
 
     final static AsConst valueOf(Object str) {
         AsConst CONST = getValue(str);
@@ -21,7 +17,5 @@ class DataObj extends DataConst {
         return CONST;
     }
 
-    final static AsConst tempObj(Object str) {
-        return new DataObj(str);
-    }
+    final static AsConst tempObj(Object str) { return new DataObj(str); }
 }

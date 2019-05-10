@@ -26,7 +26,5 @@ class GetOpposite implements AsGetter {
     }
 
     @Override
-    public String toString() {
-        return "-" + handler.toString();
-    }
+    public String toString() { return "-" + handler.toString(); }
 }

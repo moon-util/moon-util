@@ -10,7 +10,8 @@ import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 /**
  * @author benshaoye
  */
-abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
+abstract class BaseAccessor<T, A extends BaseAccessor<T, A>>
+    implements Accessor<T, A> {
     /**
      * 缓存取值过程
      */
@@ -42,16 +43,6 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
 
     /*
      * ------------------------------------------------------------
-     * current
-     * ------------------------------------------------------------
-     */
-
-    private final A current() {
-        return (A) this;
-    }
-
-    /*
-     * ------------------------------------------------------------
      * gets
      * ------------------------------------------------------------
      */
@@ -62,9 +53,7 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
      * @return
      */
 
-    public final T getOrDefault(T obj) {
-        return defaultIfNull(get(), obj);
-    }
+    public final T getOrDefault(T obj) { return defaultIfNull(get(), obj); }
 
     public final T getOrElse(Supplier<T> supplier) {
         T curr = get();
@@ -79,9 +68,7 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
         return curr;
     }
 
-    private final T getValue() {
-        return reference == null ? null : reference.get();
-    }
+    private final T getValue() { return reference == null ? null : reference.get(); }
 
     /*
      * ------------------------------------------------------------
@@ -89,17 +76,19 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
      * ------------------------------------------------------------
      */
 
-    public final boolean isPresent() {
-        return get() != null;
+    @Override
+    public final boolean isPresent() { return get() != null; }
+
+    @Override
+    public final boolean isAbsent() { return get() == null; }
+
+    @Override
+    public A clear() {
+        this.reference = null;
+        return current();
     }
 
-    public final boolean isAbsent() {
-        return get() == null;
-    }
-
-    public final boolean isEquals(Object obj) {
-        return Objects.equals(obj, get());
-    }
+    public final boolean isEquals(Object obj) { return Objects.equals(obj, get()); }
 
     /*
      * ------------------------------------------------------------
@@ -115,9 +104,7 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
         return current();
     }
 
-    public final A ifPresentOrThrow(Consumer<T> consumer) {
-        return ifPresentOrThrow(consumer, "");
-    }
+    public final A ifPresentOrThrow(Consumer<T> consumer) { return ifPresentOrThrow(consumer, ""); }
 
     public final A ifPresentOrThrow(Consumer<T> consumer, String message) {
         T curr = get();
@@ -141,7 +128,5 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> {
         return t;
     }
 
-    private final synchronized void cache(Reference<T> ref) {
-        reference = ref;
-    }
+    private final synchronized void cache(Reference<T> ref) { reference = ref; }
 }

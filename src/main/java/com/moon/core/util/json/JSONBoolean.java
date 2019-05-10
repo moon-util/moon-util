@@ -15,72 +15,44 @@ public enum JSONBoolean implements JSON<Object>,
 
     final Boolean value;
 
-    JSONBoolean(boolean value) {
-        this.value = value;
-    }
+    JSONBoolean(boolean value) { this.value = value; }
 
     @Override
-    public Map<String, Object> getMap(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public Map<String, Object> getMap(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public List<Object> getList(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public List<Object> getList(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public <T> T get() {
-        return (T) value;
-    }
+    public <T> T get() { return (T) value; }
 
     @Override
-    public JSONObject getJSONObject(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public JSONObject getJSONObject(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public JSONArray getJSONArray(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public JSONArray getJSONArray(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public int getIntValue(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public int getIntValue(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public Integer getInteger(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public Integer getInteger(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public long getLongValue(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public long getLongValue(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public Long getLong(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public Long getLong(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public double getDoubleValue(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public double getDoubleValue(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public Double getDouble(Object key) {
-        throw new UnsupportedOperationException();
-    }
+    public Double getDouble(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public String getString(Object key) {
-        return toString();
-    }
+    public String getString(Object key) { return toString(); }
 
     @Override
-    public String toString() {
-        return Boolean.toString(value);
-    }
+    public String toString() { return Boolean.toString(value); }
 }

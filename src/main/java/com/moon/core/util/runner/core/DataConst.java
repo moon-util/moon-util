@@ -18,9 +18,7 @@ abstract class DataConst<T> implements AsConst {
     private final static Map<Object, AsConst> CACHE = ReferenceUtil.manageMap();
     private final static ReentrantLock LOCK = new ReentrantLock();
 
-    protected final static AsConst getValue(Object key) {
-        return CACHE.get(key);
-    }
+    protected final static AsConst getValue(Object key) { return CACHE.get(key); }
 
     protected final static AsConst putValue(Object key, AsConst value) {
         try {
@@ -34,33 +32,21 @@ abstract class DataConst<T> implements AsConst {
 
     final T value;
 
-    protected DataConst(T value) {
-        this.value = value;
-    }
+    protected DataConst(T value) { this.value = value; }
 
     @Override
-    public Object run(Object data) {
-        return value;
-    }
+    public Object run(Object data) { return value; }
 
-    public T getValue() {
-        return value;
-    }
+    public T getValue() { return value; }
 
     @Override
-    public boolean isNumber() {
-        return value instanceof Number;
-    }
+    public boolean isNumber() { return value instanceof Number; }
 
     @Override
-    public boolean isString() {
-        return value instanceof CharSequence;
-    }
+    public boolean isString() { return value instanceof CharSequence; }
 
     @Override
-    public final String toString() {
-        return String.valueOf(value);
-    }
+    public final String toString() { return String.valueOf(value); }
 
     public static final AsConst get(Object data) {
         if (data == null) {

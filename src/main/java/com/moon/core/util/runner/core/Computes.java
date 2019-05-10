@@ -13,39 +13,27 @@ enum Computes implements AsCompute {
 
     BIT_LEFT(ConstPriorities.BIT_LEFT) {
         @Override
-        public Object exe(Object o2, Object o1) {
-            return ((Number) o1).intValue() << ((Number) o2).intValue();
-        }
+        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() << ((Number) o2).intValue(); }
     },
     UN_BIT_RIGHT(ConstPriorities.UN_BIT_RIGHT) {
         @Override
-        public Object exe(Object o2, Object o1) {
-            return ((Number) o1).intValue() >>> ((Number) o2).intValue();
-        }
+        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() >>> ((Number) o2).intValue(); }
     },
     BIT_RIGHT(ConstPriorities.BIT_RIGHT) {
         @Override
-        public Object exe(Object o2, Object o1) {
-            return ((Number) o1).intValue() >> ((Number) o2).intValue();
-        }
+        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() >> ((Number) o2).intValue(); }
     },
     BIT_AND(ConstPriorities.BIT_AND) {
         @Override
-        public Object exe(Object o2, Object o1) {
-            return ((Number) o1).intValue() & ((Number) o2).intValue();
-        }
+        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() & ((Number) o2).intValue(); }
     },
     BIT_OR(ConstPriorities.BIT_OR) {
         @Override
-        public Object exe(Object o2, Object o1) {
-            return ((Number) o1).intValue() | ((Number) o2).intValue();
-        }
+        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() | ((Number) o2).intValue(); }
     },
     NOT_OR(ConstPriorities.NOT_OR) {
         @Override
-        public Object exe(Object o2, Object o1) {
-            return ((Number) o1).intValue() ^ ((Number) o2).intValue();
-        }
+        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() ^ ((Number) o2).intValue(); }
     },
 
     PLUS(ConstPriorities.PLUS) {
@@ -241,12 +229,8 @@ enum Computes implements AsCompute {
 
     private final int priority;
 
-    Computes(int priority) {
-        this.priority = priority;
-    }
+    Computes(int priority) { this.priority = priority; }
 
     @Override
-    public int getPriority() {
-        return priority;
-    }
+    public int getPriority() { return priority; }
 }

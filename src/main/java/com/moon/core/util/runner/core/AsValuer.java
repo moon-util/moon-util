@@ -10,19 +10,16 @@ interface AsValuer extends AsRunner {
      * @return
      */
     @Override
-    default boolean isValuer() {
-        return true;
-    }
+    default boolean isValuer() { return true; }
 
     /**
      * 计算
      *
      * @param left
      * @param right
+     * @param data
      * @return
      */
     @Override
-    default Object exe(AsRunner left, AsRunner right, Object data) {
-        throw new UnsupportedOperationException();
-    }
+    default Object exe(AsRunner left, AsRunner right, Object data) { throw new UnsupportedOperationException(); }
 }
