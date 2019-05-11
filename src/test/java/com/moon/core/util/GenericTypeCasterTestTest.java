@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author benshaoye
  */
-class GenericTypeConverterTestTest {
+class GenericTypeCasterTestTest {
 
     @Test
     void testRegister() {

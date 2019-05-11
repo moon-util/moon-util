@@ -1,7 +1,7 @@
 package com.moon.core.beans;
 
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.lang.ref.WeakCoordinate;
+import com.moon.core.lang.ref.WeakLocation;
 import com.moon.core.lang.reflect.FieldUtil;
 import com.moon.core.util.IteratorUtil;
 
@@ -28,12 +28,10 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class BeanInfoUtil {
 
-    private BeanInfoUtil(){
-        noInstanceError();
-    }
+    private BeanInfoUtil(){ noInstanceError(); }
 
-    private final static WeakCoordinate<Object, Object, Object>
-            WEAK = WeakCoordinate.manageOne();
+    private final static WeakLocation<Object, Object, Object>
+            WEAK = WeakLocation.ofManaged();
 
     /**
      * 获取标准 setter 方法
@@ -42,7 +40,7 @@ public final class BeanInfoUtil {
      * @return
      */
     public static Method getSetterMethod(Field field) {
-        return (Method) WEAK.get(field, TypeEnum.SETTER, () ->
+        return (Method) WEAK.getOrWithElse(field, TypeEnum.SETTER, () ->
                 getSetterMethod(field.getDeclaringClass(), field.getName()));
     }
 
@@ -53,7 +51,7 @@ public final class BeanInfoUtil {
      * @return
      */
     public static Method getGetterMethod(Field field) {
-        return (Method) WEAK.get(field, TypeEnum.GETTER, () ->
+        return (Method) WEAK.getOrWithElse(field, TypeEnum.GETTER, () ->
                 getGetterMethod(field.getDeclaringClass(), field.getName()));
     }
 
@@ -98,7 +96,7 @@ public final class BeanInfoUtil {
      * @return
      */
     public static FieldExecutor getGetterExecutor(Field field) {
-        return (FieldExecutor) WEAK.get(field, TypeEnum.GET_EXECUTOR, () ->
+        return (FieldExecutor) WEAK.getOrWithElse(field, TypeEnum.GET_EXECUTOR, () ->
                 getGetterExecutor(field.getDeclaringClass(), field.getName()));
     }
 
@@ -112,7 +110,7 @@ public final class BeanInfoUtil {
      * @throws IllegalArgumentException 当 field 被 final 修饰，且没有对应的 setter 方法就会抛出异常
      */
     public static FieldExecutor getSetterExecutor(Field field) {
-        return (FieldExecutor) WEAK.get(field, TypeEnum.SET_EXECUTOR, () ->
+        return (FieldExecutor) WEAK.getOrWithElse(field, TypeEnum.SET_EXECUTOR, () ->
                 getSetterExecutor(field.getDeclaringClass(), field.getName()));
     }
 
@@ -167,7 +165,7 @@ public final class BeanInfoUtil {
      * @return
      */
     public static Map<String, PropertyDescriptor> getPropertyDescriptorsMap(Class clazz) {
-        return (Map<String, PropertyDescriptor>) WEAK.get(clazz, TypeEnum.ALL_DESC_MAP, () -> {
+        return (Map<String, PropertyDescriptor>) WEAK.getOrWithElse(clazz, TypeEnum.ALL_DESC_MAP, () -> {
             Map<String, PropertyDescriptor> ret = new HashMap<>();
             IteratorUtil.forEach(getPropertyDescriptors(clazz), desc ->
                     ret.put(desc.getName(), desc));
@@ -184,7 +182,7 @@ public final class BeanInfoUtil {
      */
     public static Map<String, FieldDescriptor> getFieldDescriptorsMap(Class clazz) {
         return (Map<String, FieldDescriptor>)
-                WEAK.get(Objects.requireNonNull(clazz), TypeEnum.ALL_FIELD_MAP, () -> {
+                WEAK.getOrWithElse(Objects.requireNonNull(clazz), TypeEnum.ALL_FIELD_MAP, () -> {
                     Map<String, FieldDescriptor> ret = new HashMap<>();
                     IteratorUtil.forEach(getPropertyDescriptors(clazz), desc -> {
                         String name = desc.getName();
@@ -203,7 +201,7 @@ public final class BeanInfoUtil {
      * @return
      */
     public static PropertyDescriptor[] getPropertyDescriptors(Class clazz) {
-        return (PropertyDescriptor[]) WEAK.get(clazz, TypeEnum.ALL_DESC, () -> {
+        return (PropertyDescriptor[]) WEAK.getOrWithElse(clazz, TypeEnum.ALL_DESC, () -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
                 return beanInfo.getPropertyDescriptors();
@@ -233,7 +231,7 @@ public final class BeanInfoUtil {
      * @return
      */
     public static FieldDescriptor getFieldDescriptor(Field field) {
-        return (FieldDescriptor) WEAK.get(field, TypeEnum.DESCRIPTOR, () ->
+        return (FieldDescriptor) WEAK.getOrWithElse(field, TypeEnum.DESCRIPTOR, () ->
                 getFieldDescriptor(field.getDeclaringClass(), field.getName()));
     }
 
@@ -249,7 +247,7 @@ public final class BeanInfoUtil {
      */
     public static FieldDescriptor getFieldDescriptor(Class clazz, String propertyName) {
         String name = Objects.requireNonNull(propertyName);
-        return (FieldDescriptor) WEAK.get(clazz, name, () -> {
+        return (FieldDescriptor) WEAK.getOrWithElse(clazz, name, () -> {
             Map<String, FieldDescriptor> descriptorMap = getFieldDescriptorsMap(clazz);
             FieldDescriptor descriptor = descriptorMap.get(name);
             if (descriptor == null) {

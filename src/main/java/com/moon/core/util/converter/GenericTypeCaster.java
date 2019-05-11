@@ -1,13 +1,16 @@
-package com.moon.core.util;
+package com.moon.core.util.converter;
 
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.enums.ArrayOperator;
 import com.moon.core.enums.ArraysEnum;
-import com.moon.core.enums.Converters;
+import com.moon.core.enums.Caster;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakAccessor;
 import com.moon.core.lang.reflect.ConstructorUtil;
+import com.moon.core.util.CollectUtil;
+import com.moon.core.util.IteratorUtil;
+import com.moon.core.util.ListUtil;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
@@ -22,14 +25,14 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import static com.moon.core.enums.Converters.*;
+import static com.moon.core.enums.Caster.*;
 import static com.moon.core.util.CollectUtil.addAll;
 
 /**
  * @author benshaoye
  * @date 2018/9/11
  */
-public class GenericTypeConverter implements TypeConverter {
+public class GenericTypeCaster implements TypeCaster {
 
     protected final WeakAccessor<MapBuilder> mapAccessor = WeakAccessor.of(MapBuilder::new);
     protected final WeakAccessor<ListBuilder> listAccessor = WeakAccessor.of(ListBuilder::new);
@@ -38,17 +41,17 @@ public class GenericTypeConverter implements TypeConverter {
 
     protected final Map<Class, BiFunction<Object, Class, Object>> converters = new HashMap<>();
 
-    public GenericTypeConverter() { registerDefaultConverter(); }
+    public GenericTypeCaster() { registerDefaultConverter(); }
 
     /**
      * 注册默认转换器
      */
     private void registerDefaultConverter() {
-        for (Converters value : Converters.values()) {
+        for (Caster value : Caster.values()) {
             BiFunction converter = value;
             add(value.TYPE, converter);
         }
-        add(Optional.class, (value, tyType) -> value instanceof Optional ? (Optional) value : Optional.ofNullable(value));
+        add(com.moon.core.util.Optional.class, (value, tyType) -> value instanceof com.moon.core.util.Optional ? (com.moon.core.util.Optional) value : com.moon.core.util.Optional.ofNullable(value));
         // Collection convert
         add(Collection.class, (value, toType) -> {
             if (value == null || toType == null) { return null; }
@@ -167,7 +170,7 @@ public class GenericTypeConverter implements TypeConverter {
      * @param <C>
      * @return
      */
-    private <C> TypeConverter add(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+    private <C> TypeCaster add(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         BiFunction converter = func;
         converters.put(toType, converter);
         return this;
@@ -182,7 +185,7 @@ public class GenericTypeConverter implements TypeConverter {
      * @return
      */
     @Override
-    public <C> TypeConverter register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+    public <C> TypeCaster register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         return add(toType, func);
     }
 
@@ -195,7 +198,7 @@ public class GenericTypeConverter implements TypeConverter {
      * @return
      */
     @Override
-    public <C> TypeConverter registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+    public <C> TypeCaster registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         BiFunction converter = func;
         converters.putIfAbsent(toType, converter);
         return this;
@@ -239,9 +242,9 @@ public class GenericTypeConverter implements TypeConverter {
         return (T) converters.get(superType).apply(value, type);
     }
 
-    private <E> E convert(Object value, Converters converter, Class type) { return (E) converter.apply(value, type); }
+    private <E> E convert(Object value, Caster converter, Class type) { return (E) converter.apply(value, type); }
 
-    private <E> E convert(Object value, Converters converter) { return convert(value, converter, converter.TYPE); }
+    private <E> E convert(Object value, Caster converter) { return convert(value, converter, converter.TYPE); }
 
     @Override
     public boolean toBooleanValue(Object value) { return convert(value, toBooleanValue); }

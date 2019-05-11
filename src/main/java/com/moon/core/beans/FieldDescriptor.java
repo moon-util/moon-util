@@ -3,7 +3,7 @@ package com.moon.core.beans;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.FieldUtil;
-import com.moon.core.util.TypeConverter;
+import com.moon.core.util.converter.TypeCaster;
 import com.moon.core.util.TypeUtil;
 
 import java.beans.PropertyDescriptor;
@@ -403,7 +403,7 @@ public final class FieldDescriptor {
      * @param converter
      * @return
      */
-    public Object setValue(Object obj, Object value, boolean accessible, TypeConverter converter) {
+    public Object setValue(Object obj, Object value, boolean accessible, TypeCaster converter) {
         try {
             return getSetterExecutor().execute(obj, converter.toType(value, getPropertyType()), accessible);
         } catch (Exception e) {

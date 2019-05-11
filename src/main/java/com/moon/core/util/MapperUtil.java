@@ -3,6 +3,7 @@ package com.moon.core.util;
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
+import com.moon.core.util.converter.TypeCaster;
 
 import java.util.*;
 
@@ -93,7 +94,7 @@ public final class MapperUtil {
         return ThrowUtil.rejectAccessError();
     }
 
-    private final static Object mapper(Class type, TypeConverter converter) {
+    private final static Object mapper(Class type, TypeCaster converter) {
         return ThrowUtil.rejectAccessError();
     }
 

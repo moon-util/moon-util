@@ -2,7 +2,7 @@ package com.moon.core.lang.reflect;
 
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.lang.ref.WeakCoordinate;
+import com.moon.core.lang.ref.WeakLocation;
 import com.moon.core.util.IteratorUtil;
 
 import java.lang.reflect.Field;
@@ -40,8 +40,9 @@ public final class FieldUtil {
         ThrowUtil.noInstanceError();
     }
 
-    private final static WeakCoordinate<Class, TypeEnum, List<Field>> WEAK = WeakCoordinate.manageOne();
-    private final static WeakCoordinate<Class, String, Field> WEAK_APPOINT_FIELD = WeakCoordinate.manageOne();
+    private final static WeakLocation<Class, TypeEnum, List<Field>> WEAK = WeakLocation.ofManaged();
+
+    private final static WeakLocation<Class, String, Field> WEAK_APPOINT_FIELD = WeakLocation.ofManaged();
 
     /**
      * 获取标准 setter 方法
@@ -93,7 +94,7 @@ public final class FieldUtil {
      * @return
      */
     public static Field getPublicField(Class clazz, String name) {
-        return WEAK_APPOINT_FIELD.get(clazz, name, () -> {
+        return WEAK_APPOINT_FIELD.getOrWithElse(clazz, name, () -> {
             try {
                 return clazz.getField(name);
             } catch (NoSuchFieldException e) {
@@ -109,7 +110,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getPublicFields(Class clazz) {
-        return WEAK.get(Objects.requireNonNull(clazz), TypeEnum.PUBLIC,
+        return WEAK.getOrWithElse(Objects.requireNonNull(clazz), TypeEnum.PUBLIC,
             () -> UnmodifiableArrayList.unmodifiable(clazz.getFields()));
     }
 
@@ -120,7 +121,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getPublicMemberFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.PUBLIC_MEMBER, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.PUBLIC_MEMBER, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isMember);
             return fields.flipToUnmodify();
@@ -134,7 +135,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getPublicStaticFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.PUBLIC_STATIC, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.PUBLIC_STATIC, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isStatic);
             return fields.flipToUnmodify();
@@ -149,7 +150,7 @@ public final class FieldUtil {
      * @return
      */
     public static Field getDeclaredField(Class clazz, String name) {
-        return WEAK_APPOINT_FIELD.get(clazz, name, () -> {
+        return WEAK_APPOINT_FIELD.getOrWithElse(clazz, name, () -> {
             try {
                 return clazz.getDeclaredField(name);
             } catch (NoSuchFieldException e) {
@@ -165,7 +166,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getDeclaredFields(Class clazz) {
-        return WEAK.get(Objects.requireNonNull(clazz), TypeEnum.DECLARED,
+        return WEAK.getOrWithElse(Objects.requireNonNull(clazz), TypeEnum.DECLARED,
             () -> UnmodifiableArrayList.unmodifiable(clazz.getDeclaredFields()));
     }
 
@@ -176,7 +177,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getDeclaredMemberFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.DECLARED_MEMBER, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.DECLARED_MEMBER, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isMember);
             return fields.flipToUnmodify();
@@ -190,7 +191,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getDeclaredStaticFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.DECLARED_STATIC, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.DECLARED_STATIC, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isStatic);
             return fields.flipToUnmodify();
@@ -238,7 +239,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getSuperDeclaredFields(Class clazz) {
-        return WEAK.get(Objects.requireNonNull(clazz), TypeEnum.SUPER, () -> {
+        return WEAK.getOrWithElse(Objects.requireNonNull(clazz), TypeEnum.SUPER, () -> {
             Map<String, Field> superFields = new HashMap<>();
             Class currCls = clazz;
             while (true) {
@@ -260,7 +261,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getSuperDeclaredMemberFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.SUPER_MEMBER, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.SUPER_MEMBER, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isMember);
             return fields.flipToUnmodify();
@@ -274,7 +275,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getSuperDeclaredStaticFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.SUPER_STATIC, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.SUPER_STATIC, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isStatic);
             return fields.flipToUnmodify();
@@ -288,7 +289,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getAllDeclaredFields(Class clazz) {
-        return WEAK.get(Objects.requireNonNull(clazz), TypeEnum.ALL, () -> {
+        return WEAK.getOrWithElse(Objects.requireNonNull(clazz), TypeEnum.ALL, () -> {
             Map<String, Field> cacheFields = new HashMap<>();
             Class currCls = clazz;
             while (true) {
@@ -311,7 +312,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getAllMemberFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.ALL_MEMBER, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.ALL_MEMBER, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isMember);
             return fields.flipToUnmodify();
@@ -325,7 +326,7 @@ public final class FieldUtil {
      * @return
      */
     public static List<Field> getAllStaticFields(Class clazz) {
-        return WEAK.get(clazz, TypeEnum.ALL_STATIC, () -> {
+        return WEAK.getOrWithElse(clazz, TypeEnum.ALL_STATIC, () -> {
             UnmodifiableArrayList<Field> fields = new UnmodifiableArrayList<>();
             ReflectionSupport.filter(getDeclaredFields(clazz), fields, AssertModifier.isStatic);
             return fields.flipToUnmodify();

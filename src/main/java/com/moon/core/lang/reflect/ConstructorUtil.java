@@ -2,7 +2,7 @@ package com.moon.core.lang.reflect;
 
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.FinalAccessor;
-import com.moon.core.lang.ref.WeakCoordinate;
+import com.moon.core.lang.ref.WeakLocation;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 
 import static com.moon.core.lang.ClassUtil.getClasses;
 import static com.moon.core.lang.ThrowUtil.doThrow;
-import static com.moon.core.lang.ref.WeakCoordinate.manageOne;
 import static com.moon.core.lang.reflect.ReflectionSupport.castAsPossibly;
 import static com.moon.core.lang.reflect.ReflectionSupport.findByParameterTypes;
 import static com.moon.core.lang.reflect.UnmodifiableArrayList.unmodifiable;
@@ -30,10 +29,10 @@ public final class ConstructorUtil {
 
     final static int ONE = 1;
     final static int ZERO = 0;
-    final static WeakCoordinate<Class, Integer, Object> WEAK
-        = manageOne();
-    final static WeakCoordinate<Class, Integer, Supplier<Constructor>> WEAK_ITEM
-        = manageOne();
+    final static WeakLocation<Class, Integer, Object> WEAK
+        = WeakLocation.ofManaged();
+    final static WeakLocation<Class, Integer, Supplier<Constructor>> WEAK_ITEM
+        = WeakLocation.ofManaged();
 
     /**
      * 获取指定了类的所有公共构造器
@@ -43,7 +42,7 @@ public final class ConstructorUtil {
      * @return
      */
     public static <T> List getConstructors(Class<T> type) {
-        return (List) WEAK.get(type, ONE, () -> unmodifiable(type.getConstructors()));
+        return (List) WEAK.getOrWithElse(type, ONE, () -> unmodifiable(type.getConstructors()));
     }
 
     /**
@@ -54,7 +53,7 @@ public final class ConstructorUtil {
      * @return
      */
     public static <T> List getDeclaredConstructors(Class<T> type) {
-        return (List) WEAK.get(type, ZERO, () -> unmodifiable(type.getDeclaredConstructors()));
+        return (List) WEAK.getOrWithElse(type, ZERO, () -> unmodifiable(type.getDeclaredConstructors()));
     }
 
     /**
@@ -65,7 +64,7 @@ public final class ConstructorUtil {
      * @return
      */
     public static <T> Constructor getEmptyConstructor(Class type) {
-        return WEAK_ITEM.get(type, ONE, () -> {
+        return WEAK_ITEM.getOrWithElse(type, ONE, () -> {
             Exception exception = null;
             FinalAccessor<Constructor<T>> accessor = new FinalAccessor<>();
             try {
@@ -86,11 +85,11 @@ public final class ConstructorUtil {
      * @return
      */
     public static <T> Constructor<T> getEmptyDeclaredConstructor(Class type) {
-        return WEAK_ITEM.get(type, ONE, () -> {
+        return WEAK_ITEM.getOrWithCompute(type, ONE, (clazz, val) -> {
+            FinalAccessor<Constructor<T>> accessor = FinalAccessor.of();
             Exception exception = null;
-            FinalAccessor<Constructor<T>> accessor = new FinalAccessor<>();
             try {
-                accessor.set(type.getDeclaredConstructor());
+                accessor.set(clazz.getDeclaredConstructor());
             } catch (NoSuchMethodException e) {
                 exception = e;
             }
@@ -128,7 +127,7 @@ public final class ConstructorUtil {
      * @return
      */
     public static <T> List<Constructor<T>> getMatchConstructors(Class type, Class... parameterTypes) {
-        return (List) WEAK.get(type, Arrays.hashCode(parameterTypes), () -> {
+        return (List) WEAK.getOrWithElse(type, Arrays.hashCode(parameterTypes), () -> {
             List<Constructor<T>> list = getDeclaredConstructors(type);
             return findByParameterTypes(list, list.size(), parameterTypes);
         });
@@ -143,7 +142,7 @@ public final class ConstructorUtil {
      * @return
      */
     public static <T> Constructor<T> getMatchConstructor(Class<T> type, Class... parameterTypes) {
-        return WEAK_ITEM.get(type, Arrays.hashCode(parameterTypes), () -> {
+        return WEAK_ITEM.getOrWithElse(type, Arrays.hashCode(parameterTypes), () -> {
             String message = null;
             FinalAccessor<Constructor<T>> accessor = new FinalAccessor<>();
             List<Constructor<T>> list = getMatchConstructors(type, parameterTypes);

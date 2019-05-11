@@ -1,4 +1,4 @@
-package com.moon.core.util;
+package com.moon.core.util.converter;
 
 import java.util.function.Function;
 
@@ -6,14 +6,14 @@ import java.util.function.Function;
  * @author benshaoye
  */
 @FunctionalInterface
-public interface TypeCaster<R> extends Function<Object, R> {
+public interface Converter<T, R> extends Function<T, R> {
     /**
      * Alias for apply
      *
      * @param o
      * @return
      */
-    R cast(Object o);
+    R cast(T o);
 
     /**
      * Applies this function to the given argument.
@@ -22,7 +22,5 @@ public interface TypeCaster<R> extends Function<Object, R> {
      * @return the function result
      */
     @Override
-    default R apply(Object o) {
-        return cast(o);
-    }
+    default R apply(T o) { return cast(o); }
 }

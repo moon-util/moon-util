@@ -1,4 +1,4 @@
-package com.moon.core.util;
+package com.moon.core.util.converter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -18,7 +18,7 @@ import java.util.function.BiFunction;
  * @date 2018/9/11
  */
 @FunctionalInterface
-public interface TypeConverter {
+public interface TypeCaster {
     /**
      * register type converter
      *
@@ -27,7 +27,7 @@ public interface TypeConverter {
      * @param <C>
      * @return
      */
-    default <C> TypeConverter register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+    default <C> TypeCaster register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         throw new UnsupportedOperationException();
     }
 
@@ -39,7 +39,7 @@ public interface TypeConverter {
      * @param <C>
      * @return
      */
-    default <C> TypeConverter registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+    default <C> TypeCaster registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         throw new UnsupportedOperationException();
     }
 

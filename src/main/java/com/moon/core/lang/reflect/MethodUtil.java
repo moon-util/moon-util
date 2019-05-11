@@ -3,7 +3,7 @@ package com.moon.core.lang.reflect;
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.lang.ref.WeakCoordinate;
+import com.moon.core.lang.ref.WeakLocation;
 import com.moon.core.util.FilterUtil;
 
 import java.lang.reflect.Method;
@@ -30,31 +30,31 @@ public final class MethodUtil {
 
     // 没有方法名，返回所有 public 方法
 
-    private final static WeakCoordinate<Class, Object, List<Method>>
-        WEAK = WeakCoordinate.manageOne();
+    private final static WeakLocation<Class, Object, List<Method>>
+        WEAK = WeakLocation.ofManaged();
 
-    private final static WeakCoordinate<Class, Object, List<Method>>
-        WEAK_PARAMS = WeakCoordinate.manageOne();
+    private final static WeakLocation<Class, Object, List<Method>>
+        WEAK_PARAMS = WeakLocation.ofManaged();
 
     public final static List<Method> getPublicMethods(Class type) {
-        return WEAK.get(type, TypeEnum.PUBLIC, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.PUBLIC, (clazz, n) ->
             get(clazz.getMethods()).flipToUnmodify());
     }
 
     public final static List<Method> getPublicStaticMethods(Class type) {
-        return WEAK.get(type, TypeEnum.PUBLIC_STATIC, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.PUBLIC_STATIC, (clazz, n) ->
             FilterUtil.filter(getPublicMethods(clazz), Asserts.isStatic, get()).flipToUnmodify());
     }
 
     public final static List<Method> getPublicMemberMethods(Class type) {
-        return WEAK.get(type, TypeEnum.PUBLIC_STATIC, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.PUBLIC_STATIC, (clazz, n) ->
             FilterUtil.filter(getPublicMethods(clazz), Asserts.isMember, get()).flipToUnmodify());
     }
 
     // 返回所有符合名字的 public 方法
 
     public final static List<Method> getPublicMethods(Class type, String methodName) {
-        return WEAK.get(type, methodName, (clazz, name) ->
+        return WEAK.getOrWithCompute(type, methodName, (clazz, name) ->
             FilterUtil.filter(getPublicMethods(clazz), nameTester(name), get()).flipToUnmodify());
     }
 
@@ -78,7 +78,7 @@ public final class MethodUtil {
     // 返回所有符合名字和参数类型列表的 public 方法
 
     public final static List<Method> getPublicMethods(Class type, String methodName, Class... parameterTypes) {
-        return FilterUtil.filter(WEAK.get(type, Arrays.hashCode(parameterTypes),
+        return FilterUtil.filter(WEAK.getOrWithElse(type, Arrays.hashCode(parameterTypes),
             () -> matching(getPublicMethods(type, methodName), parameterTypes).flipToUnmodify()),
             nameTester(methodName), get()).flipToUnmodify();
     }
@@ -109,24 +109,24 @@ public final class MethodUtil {
     // 没有方法名，返回所有 declared 方法
 
     public final static List<Method> getDeclaredMethods(Class type) {
-        return WEAK.get(type, TypeEnum.DECLARED, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.DECLARED, (clazz, n) ->
             get(clazz.getDeclaredMethods()));
     }
 
     public final static List<Method> getDeclaredStaticMethods(Class type) {
-        return WEAK.get(type, TypeEnum.DECLARED_STATIC, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.DECLARED_STATIC, (clazz, n) ->
             FilterUtil.filter(getDeclaredMethods(clazz), Asserts.isStatic, get()).flipToUnmodify());
     }
 
     public final static List<Method> getDeclaredMemberMethods(Class type) {
-        return WEAK.get(type, TypeEnum.DECLARED_STATIC, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.DECLARED_STATIC, (clazz, n) ->
             FilterUtil.filter(getDeclaredMethods(clazz), Asserts.isMember, get()).flipToUnmodify());
     }
 
     // 返回所有符合名字的 declared 方法
 
     public final static List<Method> getDeclaredMethods(Class type, String methodName) {
-        return WEAK.get(type, methodName, (clazz, name) ->
+        return WEAK.getOrWithCompute(type, methodName, (clazz, name) ->
             FilterUtil.filter(getDeclaredMethods(clazz), nameTester(name), get()).flipToUnmodify());
     }
 
@@ -149,7 +149,7 @@ public final class MethodUtil {
     // 返回所有符合名字和参数类型列表的 declared 方法
 
     public final static List<Method> getDeclaredMethods(Class type, String methodName, Class... parameterTypes) {
-        return FilterUtil.filter(WEAK.get(type, Arrays.hashCode(parameterTypes),
+        return FilterUtil.filter(WEAK.getOrWithElse(type, Arrays.hashCode(parameterTypes),
             () -> matching(getDeclaredMethods(type, methodName), parameterTypes).flipToUnmodify()),
             nameTester(methodName), get()).flipToUnmodify();
     }
@@ -177,24 +177,24 @@ public final class MethodUtil {
      */
 
     public final static List<Method> getAllMethods(Class type) {
-        return WEAK.get(type, TypeEnum.ALL, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.ALL, (clazz, n) ->
             unmodify(getPublicMethods(type), getDeclaredMethods(type), type).flipToUnmodify());
     }
 
     public final static List<Method> getAllStaticMethods(Class type) {
-        return WEAK.get(type, TypeEnum.ALL_STATIC, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.ALL_STATIC, (clazz, n) ->
             FilterUtil.filter(getAllMethods(clazz), Asserts.isStatic, get()).flipToUnmodify());
     }
 
     public final static List<Method> getAllMemberMethods(Class type) {
-        return WEAK.get(type, TypeEnum.ALL_STATIC, (clazz, n) ->
+        return WEAK.getOrWithCompute(type, TypeEnum.ALL_STATIC, (clazz, n) ->
             FilterUtil.filter(getAllMethods(clazz), Asserts.isMember, get()).flipToUnmodify());
     }
 
     // 返回所有符合名字的所有方法
 
     public final static List<Method> getAllMethods(Class type, String methodName) {
-        return WEAK.get(type, methodName, (clazz, name) ->
+        return WEAK.getOrWithCompute(type, methodName, (clazz, name) ->
             FilterUtil.filter(getAllMethods(clazz), nameTester(name), get()).flipToUnmodify());
     }
 
@@ -217,7 +217,7 @@ public final class MethodUtil {
     // 返回所有符合名字和参数类型列表的所有方法
 
     public final static List<Method> getAllMethods(Class type, String methodName, Class... parameterTypes) {
-        return FilterUtil.filter(WEAK.get(type, Arrays.hashCode(parameterTypes),
+        return FilterUtil.filter(WEAK.getOrWithElse(type, Arrays.hashCode(parameterTypes),
             () -> matching(getAllMethods(type, methodName), parameterTypes).flipToUnmodify()),
             nameTester(methodName), get()).flipToUnmodify();
     }

@@ -2,6 +2,8 @@ package com.moon.core.util;
 
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakAccessor;
+import com.moon.core.util.converter.GenericTypeCaster;
+import com.moon.core.util.converter.TypeCaster;
 
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -21,21 +23,21 @@ public final class TypeUtil {
     /**
      * default converter CACHE or create new one
      */
-    private final static WeakAccessor<TypeConverter> accessor = WeakAccessor.of(UnmodifiableTypeConverter::new);
+    private final static WeakAccessor<TypeCaster> accessor = WeakAccessor.of(UnmodifiableTypeCaster::new);
 
     /**
      * return a default type converter
      *
      * @return
      */
-    public final static TypeConverter cast() { return accessor.get(); }
+    public final static TypeCaster cast() { return accessor.get(); }
 
     /**
      * get a default type converter
      *
      * @return
      */
-    public final static TypeConverter of() { return of(GenericTypeConverter::new); }
+    public final static TypeCaster of() { return of(GenericTypeCaster::new); }
 
     /**
      * get a default type converter
@@ -43,7 +45,7 @@ public final class TypeUtil {
      * @param supplier
      * @return
      */
-    public final static TypeConverter of(Supplier<TypeConverter> supplier) { return supplier.get(); }
+    public final static TypeCaster of(Supplier<TypeCaster> supplier) { return supplier.get(); }
 
     /**
      * o is instance of clazz
@@ -57,19 +59,19 @@ public final class TypeUtil {
     /**
      * can not modify converter or increment new converter
      */
-    private final static class UnmodifiableTypeConverter extends GenericTypeConverter {
+    private final static class UnmodifiableTypeCaster extends GenericTypeCaster {
 
         final static String ERROR = "Can't add new converter or modify on default converter";
 
-        UnmodifiableTypeConverter() { super(); }
+        UnmodifiableTypeCaster() { super(); }
 
         @Override
-        public <C> TypeConverter register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+        public <C> TypeCaster register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
             throw new UnsupportedOperationException(ERROR);
         }
 
         @Override
-        public <C> TypeConverter registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
+        public <C> TypeCaster registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
             throw new UnsupportedOperationException(ERROR);
         }
     }

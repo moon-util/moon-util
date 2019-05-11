@@ -2,12 +2,12 @@ package com.moon.core.lang.reflect;
 
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.beans.FieldExecutor;
-import com.moon.core.lang.ref.WeakCoordinate;
-import com.moon.core.util.TypeUtil;
+import com.moon.core.lang.ref.WeakLocation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import static com.moon.core.enums.Caster.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -16,9 +16,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class PropertyUtil {
 
-    private PropertyUtil() {
-        noInstanceError();
-    }
+    private PropertyUtil() { noInstanceError(); }
 
     /**
      * 获取标准 setter 方法
@@ -26,9 +24,7 @@ public final class PropertyUtil {
      * @param field
      * @return
      */
-    public static Method getSetterMethod(Field field) {
-        return BeanInfoUtil.getSetterMethod(field);
-    }
+    public static Method getSetterMethod(Field field) { return BeanInfoUtil.getSetterMethod(field); }
 
     /**
      * 获取标准 getter 方法
@@ -36,9 +32,7 @@ public final class PropertyUtil {
      * @param field
      * @return
      */
-    public static Method getGetterMethod(Field field) {
-        return BeanInfoUtil.getGetterMethod(field);
-    }
+    public static Method getGetterMethod(Field field) { return BeanInfoUtil.getGetterMethod(field); }
 
     /**
      * 获取标准 getter 方法
@@ -47,9 +41,7 @@ public final class PropertyUtil {
      * @param name
      * @return
      */
-    public static Method getGetterMethod(Class clazz, String name) {
-        return BeanInfoUtil.getGetterMethod(clazz, name);
-    }
+    public static Method getGetterMethod(Class clazz, String name) { return BeanInfoUtil.getGetterMethod(clazz, name); }
 
     /**
      * 获取标准 getter 方法
@@ -58,9 +50,7 @@ public final class PropertyUtil {
      * @param name
      * @return
      */
-    public static Method getSetterMethod(Class clazz, String name) {
-        return BeanInfoUtil.getSetterMethod(clazz, name);
-    }
+    public static Method getSetterMethod(Class clazz, String name) { return BeanInfoUtil.getSetterMethod(clazz, name); }
 
     /**
      * 优先通过 setter 方法为对象 source 赋值；
@@ -70,9 +60,7 @@ public final class PropertyUtil {
      * @param source
      * @param value
      */
-    public static void setValue(Field field, Object source, Object value) {
-        setValue(field, source, value, false);
-    }
+    public static void setValue(Field field, Object source, Object value) { setValue(field, source, value, false); }
 
     /**
      * 设置值
@@ -117,9 +105,7 @@ public final class PropertyUtil {
      * @param source
      * @return
      */
-    public static Object getValue(Field field, Object source) {
-        return getValue(field, source, false);
-    }
+    public static Object getValue(Field field, Object source) { return getValue(field, source, false); }
 
     /**
      * 获取字段值
@@ -140,9 +126,7 @@ public final class PropertyUtil {
      * @param source
      * @return
      */
-    public static Object getValue(String fieldName, Object source) {
-        return getValue(fieldName, source, false);
-    }
+    public static Object getValue(String fieldName, Object source) { return getValue(fieldName, source, false); }
 
     /**
      * 获取字段值
@@ -156,109 +140,85 @@ public final class PropertyUtil {
         return readValue(source.getClass(), fieldName, source, accessAble);
     }
 
-    public static String getString(Field field, Object source) {
-        return getString(field, source, false);
-    }
+    public static String getString(Field field, Object source) { return getString(field, source, false); }
 
     public static String getString(Field field, Object source, boolean accessible) {
-        return TypeUtil.cast().toString(getValue(field, source, accessible));
+        return toString.convert(getValue(field, source, accessible));
     }
 
-    public static String getString(String fieldName, Object source) {
-        return getString(fieldName, source, false);
-    }
+    public static String getString(String fieldName, Object source) { return getString(fieldName, source, false); }
 
     public static String getString(String fieldName, Object source, boolean accessible) {
-        return TypeUtil.cast().toString(getValue(fieldName, source, accessible));
+        return toString.convert(getValue(fieldName, source, accessible));
     }
 
-    public static int getInt(Field field, Object source) {
-        return getInt(field, source, false);
-    }
+    public static int getInt(Field field, Object source) { return getInt(field, source, false); }
 
     public static int getInt(Field field, Object source, boolean accessible) {
-        return TypeUtil.cast().toIntValue(getValue(field, source, accessible));
+        return toIntValue.convert(getValue(field, source, accessible));
     }
 
-    public static int getInt(String fieldName, Object source) {
-        return getInt(fieldName, source, false);
-    }
+    public static int getInt(String fieldName, Object source) { return getInt(fieldName, source, false); }
 
     public static int getInt(String fieldName, Object source, boolean accessible) {
-        return TypeUtil.cast().toIntValue(getValue(fieldName, source, accessible));
+        return toIntValue.convert(getValue(fieldName, source, accessible));
     }
 
-    public static long getLong(Field field, Object source) {
-        return getLong(field, source, false);
-    }
+    public static long getLong(Field field, Object source) { return getLong(field, source, false); }
 
     public static long getLong(Field field, Object source, boolean accessible) {
-        return TypeUtil.cast().toLongValue(getValue(field, source, accessible));
+        return toLongValue.convert(getValue(field, source, accessible));
     }
 
-    public static long getLong(String fieldName, Object source) {
-        return getLong(fieldName, source, false);
-    }
+    public static long getLong(String fieldName, Object source) { return getLong(fieldName, source, false); }
 
     public static long getLong(String fieldName, Object source, boolean accessible) {
-        return TypeUtil.cast().toLongValue(getValue(fieldName, source, accessible));
+        return toLongValue.convert(getValue(fieldName, source, accessible));
     }
 
-    public static double getDouble(Field field, Object source) {
-        return getInt(field, source, false);
-    }
+    public static double getDouble(Field field, Object source) { return getInt(field, source, false); }
 
     public static double getDouble(Field field, Object source, boolean accessible) {
-        return TypeUtil.cast().toDoubleValue(getValue(field, source, accessible));
+        return toDoubleValue.convert(getValue(field, source, accessible));
     }
 
-    public static double getDouble(String fieldName, Object source) {
-        return getDouble(fieldName, source, false);
-    }
+    public static double getDouble(String fieldName, Object source) { return getDouble(fieldName, source, false); }
 
     public static double getDouble(String fieldName, Object source, boolean accessible) {
-        return TypeUtil.cast().toDoubleValue(getValue(fieldName, source, accessible));
+        return toDoubleValue.convert(getValue(fieldName, source, accessible));
     }
 
-    public static boolean getBoolean(Field field, Object source) {
-        return getBoolean(field, source, false);
-    }
+    public static boolean getBoolean(Field field, Object source) { return getBoolean(field, source, false); }
 
     public static boolean getBoolean(Field field, Object source, boolean accessible) {
-        return TypeUtil.cast().toBooleanValue(getValue(field, source, accessible));
+        return toBooleanValue.convert(getValue(field, source, accessible));
     }
 
-    public static boolean getBoolean(String fieldName, Object source) {
-        return getBoolean(fieldName, source, false);
-    }
+    public static boolean getBoolean(String fieldName, Object source) { return getBoolean(fieldName, source, false); }
 
     public static boolean getBoolean(String fieldName, Object source, boolean accessible) {
-        return TypeUtil.cast().toBooleanValue(getValue(fieldName, source, accessible));
+        return toBooleanValue.convert(getValue(fieldName, source, accessible));
     }
 
-    public static char getChar(Field field, Object source) {
-        return getChar(field, source, false);
-    }
+    public static char getChar(Field field, Object source) { return getChar(field, source, false); }
 
     public static char getChar(Field field, Object source, boolean accessible) {
-        return TypeUtil.cast().toCharValue(getValue(field, source, accessible));
+        return toCharValue.convert(getValue(field, source, accessible));
     }
 
-    public static char getChar(String fieldName, Object source) {
-        return getChar(fieldName, source, false);
-    }
+    public static char getChar(String fieldName, Object source) { return getChar(fieldName, source, false); }
 
     public static char getChar(String fieldName, Object source, boolean accessible) {
-        return TypeUtil.cast().toCharValue(getValue(fieldName, source, accessible));
+        return toCharValue.convert(getValue(fieldName, source, accessible));
     }
 
     /**
      * 缓存字段读取和设置的执行器
      */
-    private final static WeakCoordinate<Class, String, FieldExecutor>
-        SETTER_EXECUTOR = WeakCoordinate.manageOne();
-    private final static WeakCoordinate<Class, String, FieldExecutor>
-        GETTER_EXECUTOR = WeakCoordinate.manageOne();
+    private final static WeakLocation<Class, String, FieldExecutor>
+        SETTER_EXECUTOR = WeakLocation.ofManaged();
+    private final static WeakLocation<Class, String, FieldExecutor>
+        GETTER_EXECUTOR = WeakLocation.ofManaged();
 
     /**
      * 读取值
@@ -269,8 +229,9 @@ public final class PropertyUtil {
      * @param accessible   可见状态
      * @return 返回字段值
      */
-    private static Object readValue(Class targetType, String propertyName,
-                                    Object source, boolean accessible) {
+    private static Object readValue(
+        Class targetType, String propertyName, Object source, boolean accessible
+    ) {
         try {
             return reader(targetType, propertyName).execute(source, null, accessible);
         } catch (Exception e) {
@@ -288,8 +249,9 @@ public final class PropertyUtil {
      * @param accessible   可见状态
      * @return 返回作用对象 source
      */
-    private static Object writeValue(Class targetType, String propertyName,
-                                     Object source, Object value, boolean accessible) {
+    private static Object writeValue(
+        Class targetType, String propertyName, Object source, Object value, boolean accessible
+    ) {
         try {
             return writer(targetType, propertyName).execute(source, value, accessible);
         } catch (Exception e) {
@@ -298,10 +260,10 @@ public final class PropertyUtil {
     }
 
     private static FieldExecutor reader(Class clazz, String name) {
-        return GETTER_EXECUTOR.get(clazz, name, () -> BeanInfoUtil.getGetterExecutor(clazz, name));
+        return GETTER_EXECUTOR.getOrWithElse(clazz, name, () -> BeanInfoUtil.getGetterExecutor(clazz, name));
     }
 
     private static FieldExecutor writer(Class clazz, String name) {
-        return SETTER_EXECUTOR.get(clazz, name, () -> BeanInfoUtil.getSetterExecutor(clazz, name));
+        return SETTER_EXECUTOR.getOrWithElse(clazz, name, () -> BeanInfoUtil.getSetterExecutor(clazz, name));
     }
 }
