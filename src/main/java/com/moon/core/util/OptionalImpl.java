@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 final class OptionalImpl<T> implements Optional<T> {
 
-    enum Empty implements Optional {INSTANCE}
+    private enum Empty implements Optional {INSTANCE}
 
     final static Optional EMPTY = Empty.INSTANCE;
 

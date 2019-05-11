@@ -51,9 +51,7 @@ public interface Optional<T> extends Optionally {
      * @param <E>
      * @return
      */
-    static <E> Optional<E> of(E value, Function<? super E, ? extends Optional<E>> mapper) {
-        return mapper.apply(value);
-    }
+    static <E, OI extends Optional<E>> OI of(E value, Function<? super E, OI> mapper) { return mapper.apply(value); }
 
     /**
      * 设置值，可为 null
@@ -114,6 +112,7 @@ public interface Optional<T> extends Optionally {
      * @param supplier
      * @param <EX>
      * @return
+     * @throws EX
      */
     default <EX extends Throwable> T getOrThrow(Supplier<EX> supplier) throws EX {
         if (isPresent()) { return getOrNull(); }

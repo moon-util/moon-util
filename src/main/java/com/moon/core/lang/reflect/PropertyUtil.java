@@ -143,73 +143,73 @@ public final class PropertyUtil {
     public static String getString(Field field, Object source) { return getString(field, source, false); }
 
     public static String getString(Field field, Object source, boolean accessible) {
-        return toString.convert(getValue(field, source, accessible));
+        return toString.cast(getValue(field, source, accessible));
     }
 
     public static String getString(String fieldName, Object source) { return getString(fieldName, source, false); }
 
     public static String getString(String fieldName, Object source, boolean accessible) {
-        return toString.convert(getValue(fieldName, source, accessible));
+        return toString.cast(getValue(fieldName, source, accessible));
     }
 
     public static int getInt(Field field, Object source) { return getInt(field, source, false); }
 
     public static int getInt(Field field, Object source, boolean accessible) {
-        return toIntValue.convert(getValue(field, source, accessible));
+        return toIntValue.cast(getValue(field, source, accessible));
     }
 
     public static int getInt(String fieldName, Object source) { return getInt(fieldName, source, false); }
 
     public static int getInt(String fieldName, Object source, boolean accessible) {
-        return toIntValue.convert(getValue(fieldName, source, accessible));
+        return toIntValue.cast(getValue(fieldName, source, accessible));
     }
 
     public static long getLong(Field field, Object source) { return getLong(field, source, false); }
 
     public static long getLong(Field field, Object source, boolean accessible) {
-        return toLongValue.convert(getValue(field, source, accessible));
+        return toLongValue.cast(getValue(field, source, accessible));
     }
 
     public static long getLong(String fieldName, Object source) { return getLong(fieldName, source, false); }
 
     public static long getLong(String fieldName, Object source, boolean accessible) {
-        return toLongValue.convert(getValue(fieldName, source, accessible));
+        return toLongValue.cast(getValue(fieldName, source, accessible));
     }
 
     public static double getDouble(Field field, Object source) { return getInt(field, source, false); }
 
     public static double getDouble(Field field, Object source, boolean accessible) {
-        return toDoubleValue.convert(getValue(field, source, accessible));
+        return toDoubleValue.cast(getValue(field, source, accessible));
     }
 
     public static double getDouble(String fieldName, Object source) { return getDouble(fieldName, source, false); }
 
     public static double getDouble(String fieldName, Object source, boolean accessible) {
-        return toDoubleValue.convert(getValue(fieldName, source, accessible));
+        return toDoubleValue.cast(getValue(fieldName, source, accessible));
     }
 
     public static boolean getBoolean(Field field, Object source) { return getBoolean(field, source, false); }
 
     public static boolean getBoolean(Field field, Object source, boolean accessible) {
-        return toBooleanValue.convert(getValue(field, source, accessible));
+        return toBooleanValue.cast(getValue(field, source, accessible));
     }
 
     public static boolean getBoolean(String fieldName, Object source) { return getBoolean(fieldName, source, false); }
 
     public static boolean getBoolean(String fieldName, Object source, boolean accessible) {
-        return toBooleanValue.convert(getValue(fieldName, source, accessible));
+        return toBooleanValue.cast(getValue(fieldName, source, accessible));
     }
 
     public static char getChar(Field field, Object source) { return getChar(field, source, false); }
 
     public static char getChar(Field field, Object source, boolean accessible) {
-        return toCharValue.convert(getValue(field, source, accessible));
+        return toCharValue.cast(getValue(field, source, accessible));
     }
 
     public static char getChar(String fieldName, Object source) { return getChar(fieldName, source, false); }
 
     public static char getChar(String fieldName, Object source, boolean accessible) {
-        return toCharValue.convert(getValue(fieldName, source, accessible));
+        return toCharValue.cast(getValue(fieldName, source, accessible));
     }
 
     /**

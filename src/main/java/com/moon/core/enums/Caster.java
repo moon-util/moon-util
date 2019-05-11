@@ -47,133 +47,132 @@ public enum Caster implements EnumDescriptor,
 
     toBooleanValue(boolean.class) {
         @Override
-        public Object convert(Object o) { return toBooleanValue(o); }
+        public Object cast(Object o) { return toBooleanValue(o); }
     },
     toBoolean(Boolean.class) {
         @Override
-        public Object convert(Object o) { return toBoolean(o); }
+        public Object cast(Object o) { return toBoolean(o); }
     },
     toCharValue(char.class) {
         @Override
-        public Object convert(Object o) { return toCharValue(o); }
+        public Object cast(Object o) { return toCharValue(o); }
     },
     toCharacter(Character.class) {
         @Override
-        public Object convert(Object o) { return toCharacter(o); }
+        public Object cast(Object o) { return toCharacter(o); }
     },
     toByteValue(byte.class) {
         @Override
-        public Object convert(Object o) { return toByteValue(o); }
+        public Object cast(Object o) { return toByteValue(o); }
     },
     toByte(Byte.class) {
         @Override
-        public Object convert(Object o) { return toByte(o); }
+        public Object cast(Object o) { return toByte(o); }
     },
     toShortValue(short.class) {
         @Override
-        public Object convert(Object o) { return toShortValue(o); }
+        public Object cast(Object o) { return toShortValue(o); }
     },
     toShort(Short.class) {
         @Override
-        public Object convert(Object o) { return toShort(o); }
+        public Object cast(Object o) { return toShort(o); }
     },
     toIntValue(int.class) {
         @Override
-        public Object convert(Object o) { return toIntValue(o); }
+        public Object cast(Object o) { return toIntValue(o); }
     },
     toInteger(Integer.class) {
         @Override
-        public Object convert(Object o) { return toInteger(o); }
+        public Object cast(Object o) { return toInteger(o); }
     },
     toLongValue(long.class) {
         @Override
-        public Object convert(Object o) { return toLongValue(o); }
+        public Object cast(Object o) { return toLongValue(o); }
     },
     toLong(Long.class) {
         @Override
-        public Object convert(Object o) { return toLong(o); }
+        public Object cast(Object o) { return toLong(o); }
     },
     toFloatValue(float.class) {
         @Override
-        public Object convert(Object o) { return toFloatValue(o); }
+        public Object cast(Object o) { return toFloatValue(o); }
     },
     toFloat(Float.class) {
         @Override
-        public Object convert(Object o) { return toFloat(o); }
+        public Object cast(Object o) { return toFloat(o); }
     },
     toDoubleValue(double.class) {
         @Override
-        public Object convert(Object o) { return toDoubleValue(o); }
+        public Object cast(Object o) { return toDoubleValue(o); }
     },
     toDouble(Double.class) {
         @Override
-        public Object convert(Object o) { return toDouble(o); }
+        public Object cast(Object o) { return toDouble(o); }
     },
     toBigInteger(BigInteger.class) {
         @Override
-        public Object convert(Object o) { return toBigInteger(o); }
+        public Object cast(Object o) { return toBigInteger(o); }
     },
     toBigDecimal(BigDecimal.class) {
         @Override
-        public Object convert(Object o) { return toBigDecimal(o); }
+        public Object cast(Object o) { return toBigDecimal(o); }
     },
 
     toString(String.class) {
         @Override
-        public Object convert(Object o) { return String.valueOf(o); }
+        public Object cast(Object o) { return String.valueOf(o); }
     },
     toStringBuffer(StringBuffer.class) {
         @Override
-        public Object convert(Object o) { return new StringBuffer(String.valueOf(o)); }
+        public Object cast(Object o) { return new StringBuffer(String.valueOf(o)); }
     },
     toStringBuilder(StringBuilder.class) {
         @Override
-        public Object convert(Object o) { return new StringBuilder(String.valueOf(o)); }
+        public Object cast(Object o) { return new StringBuilder(String.valueOf(o)); }
     },
     toDate(Date.class) {
         @Override
-        public Object convert(Object o) { return toDate(o); }
+        public Object cast(Object o) { return toDate(o); }
     },
     toSqlTime(Time.class) {
         @Override
-        public Object convert(Object o) { return toSqlTime(o); }
+        public Object cast(Object o) { return toSqlTime(o); }
     },
     toCalendar(Calendar.class) {
         @Override
-        public Object convert(Object o) { return toCalendar(o); }
+        public Object cast(Object o) { return toCalendar(o); }
     },
     toLocalDate(LocalDate.class) {
         @Override
-        public Object convert(Object o) { return TimeUtil.toDate(o); }
+        public Object cast(Object o) { return TimeUtil.toDate(o); }
     },
     toLocalTime(LocalTime.class) {
         @Override
-        public Object convert(Object o) { return toTime(o); }
+        public Object cast(Object o) { return toTime(o); }
     },
     toLocalDateTime(LocalDateTime.class) {
         @Override
-        public Object convert(Object o) { return toDateTime(o); }
+        public Object cast(Object o) { return toDateTime(o); }
     },
     toTimestamp(Timestamp.class) {
         @Override
-        public Object convert(Object o) { return toTimestamp(o); }
+        public Object cast(Object o) { return toTimestamp(o); }
     },
     toSqlDate(java.sql.Date.class) {
         @Override
-        public Object convert(Object o) { return toSqlDate(o); }
+        public Object cast(Object o) { return toSqlDate(o); }
     },
     toOptional(Optional.class) {
         @Override
-        public Object convert(Object o) { return o instanceof Optional ? o : ofNullable(o); }
+        public Object cast(Object o) { return o instanceof Optional ? o : ofNullable(o); }
     },
     toEnum(Enum.class) {
         @Override
-        public Object convert(Object o) { return doThrow("Unsupported."); }
+        public Object cast(Object o) { return doThrow("Unsupported."); }
 
         @Override
         public Object apply(Object o, Class type) { return toEnum(o, type); }
-    },
-    ;
+    };
 
     public final Class TYPE;
 
@@ -181,10 +180,10 @@ public enum Caster implements EnumDescriptor,
 
     Caster(Class type) { Cached.CACHE.put(this.TYPE = type, this); }
 
-    public abstract <T> T convert(Object o);
+    public abstract <T> T cast(Object o);
 
     @Override
-    public Object apply(Object o, Class aClass) { return convert(o); }
+    public Object apply(Object o, Class aClass) { return cast(o); }
 
     @Override
     public String getText() { return TYPE.getName(); }

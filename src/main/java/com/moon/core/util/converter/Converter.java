@@ -13,7 +13,7 @@ public interface Converter<T, R> extends Function<T, R> {
      * @param o
      * @return
      */
-    R cast(T o);
+    R convert(T o);
 
     /**
      * Applies this function to the given argument.
@@ -22,5 +22,5 @@ public interface Converter<T, R> extends Function<T, R> {
      * @return the function result
      */
     @Override
-    default R apply(T o) { return cast(o); }
+    default R apply(T o) { return convert(o); }
 }
