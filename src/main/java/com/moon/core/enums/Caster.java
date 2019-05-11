@@ -1,10 +1,6 @@
 package com.moon.core.enums;
 
-import com.moon.core.lang.*;
-import com.moon.core.math.BigDecimalUtil;
-import com.moon.core.math.BigIntegerUtil;
 import com.moon.core.time.TimeUtil;
-import com.moon.core.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -16,7 +12,31 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import static com.moon.core.lang.BooleanUtil.toBoolean;
+import static com.moon.core.lang.BooleanUtil.toBooleanValue;
+import static com.moon.core.lang.ByteUtil.toByte;
+import static com.moon.core.lang.ByteUtil.toByteValue;
+import static com.moon.core.lang.CharUtil.toCharValue;
+import static com.moon.core.lang.CharacterUtil.toCharacter;
+import static com.moon.core.lang.DoubleUtil.toDouble;
+import static com.moon.core.lang.DoubleUtil.toDoubleValue;
+import static com.moon.core.lang.EnumUtil.toEnum;
+import static com.moon.core.lang.FloatUtil.toFloat;
+import static com.moon.core.lang.FloatUtil.toFloatValue;
+import static com.moon.core.lang.IntUtil.toIntValue;
+import static com.moon.core.lang.IntegerUtil.toInteger;
+import static com.moon.core.lang.LongUtil.toLong;
+import static com.moon.core.lang.LongUtil.toLongValue;
+import static com.moon.core.lang.ShortUtil.toShort;
+import static com.moon.core.lang.ShortUtil.toShortValue;
+import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.math.BigDecimalUtil.toBigDecimal;
+import static com.moon.core.math.BigIntegerUtil.toBigInteger;
+import static com.moon.core.time.TimeUtil.toDateTime;
+import static com.moon.core.time.TimeUtil.toTime;
+import static com.moon.core.util.DateUtil.*;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 /**
  * @author benshaoye
@@ -27,75 +47,75 @@ public enum Caster implements EnumDescriptor,
 
     toBooleanValue(boolean.class) {
         @Override
-        public Object convert(Object o) { return BooleanUtil.toBooleanValue(o); }
+        public Object convert(Object o) { return toBooleanValue(o); }
     },
     toBoolean(Boolean.class) {
         @Override
-        public Object convert(Object o) { return BooleanUtil.toBoolean(o); }
+        public Object convert(Object o) { return toBoolean(o); }
     },
     toCharValue(char.class) {
         @Override
-        public Object convert(Object o) { return CharUtil.toCharValue(o); }
+        public Object convert(Object o) { return toCharValue(o); }
     },
     toCharacter(Character.class) {
         @Override
-        public Object convert(Object o) { return CharacterUtil.toCharacter(o); }
+        public Object convert(Object o) { return toCharacter(o); }
     },
     toByteValue(byte.class) {
         @Override
-        public Object convert(Object o) { return ByteUtil.toByteValue(o); }
+        public Object convert(Object o) { return toByteValue(o); }
     },
     toByte(Byte.class) {
         @Override
-        public Object convert(Object o) { return ByteUtil.toByte(o); }
+        public Object convert(Object o) { return toByte(o); }
     },
     toShortValue(short.class) {
         @Override
-        public Object convert(Object o) { return ShortUtil.toShortValue(o); }
+        public Object convert(Object o) { return toShortValue(o); }
     },
     toShort(Short.class) {
         @Override
-        public Object convert(Object o) { return ShortUtil.toShort(o); }
+        public Object convert(Object o) { return toShort(o); }
     },
     toIntValue(int.class) {
         @Override
-        public Object convert(Object o) { return IntUtil.toIntValue(o); }
+        public Object convert(Object o) { return toIntValue(o); }
     },
     toInteger(Integer.class) {
         @Override
-        public Object convert(Object o) { return IntegerUtil.toInteger(o); }
+        public Object convert(Object o) { return toInteger(o); }
     },
     toLongValue(long.class) {
         @Override
-        public Object convert(Object o) { return LongUtil.toLongValue(o); }
+        public Object convert(Object o) { return toLongValue(o); }
     },
     toLong(Long.class) {
         @Override
-        public Object convert(Object o) { return LongUtil.toLong(o); }
+        public Object convert(Object o) { return toLong(o); }
     },
     toFloatValue(float.class) {
         @Override
-        public Object convert(Object o) { return FloatUtil.toFloatValue(o); }
+        public Object convert(Object o) { return toFloatValue(o); }
     },
     toFloat(Float.class) {
         @Override
-        public Object convert(Object o) { return FloatUtil.toFloat(o); }
+        public Object convert(Object o) { return toFloat(o); }
     },
     toDoubleValue(double.class) {
         @Override
-        public Object convert(Object o) { return DoubleUtil.toDoubleValue(o); }
+        public Object convert(Object o) { return toDoubleValue(o); }
     },
     toDouble(Double.class) {
         @Override
-        public Object convert(Object o) { return DoubleUtil.toDouble(o); }
+        public Object convert(Object o) { return toDouble(o); }
     },
     toBigInteger(BigInteger.class) {
         @Override
-        public Object convert(Object o) { return BigIntegerUtil.toBigInteger(o); }
+        public Object convert(Object o) { return toBigInteger(o); }
     },
     toBigDecimal(BigDecimal.class) {
         @Override
-        public Object convert(Object o) { return BigDecimalUtil.toBigDecimal(o); }
+        public Object convert(Object o) { return toBigDecimal(o); }
     },
 
     toString(String.class) {
@@ -112,15 +132,15 @@ public enum Caster implements EnumDescriptor,
     },
     toDate(Date.class) {
         @Override
-        public Object convert(Object o) { return DateUtil.toDate(o); }
+        public Object convert(Object o) { return toDate(o); }
     },
     toSqlTime(Time.class) {
         @Override
-        public Object convert(Object o) { return DateUtil.toSqlTime(o); }
+        public Object convert(Object o) { return toSqlTime(o); }
     },
     toCalendar(Calendar.class) {
         @Override
-        public Object convert(Object o) { return DateUtil.toCalendar(o); }
+        public Object convert(Object o) { return toCalendar(o); }
     },
     toLocalDate(LocalDate.class) {
         @Override
@@ -128,30 +148,30 @@ public enum Caster implements EnumDescriptor,
     },
     toLocalTime(LocalTime.class) {
         @Override
-        public Object convert(Object o) { return TimeUtil.toTime(o); }
+        public Object convert(Object o) { return toTime(o); }
     },
     toLocalDateTime(LocalDateTime.class) {
         @Override
-        public Object convert(Object o) { return TimeUtil.toDateTime(o); }
+        public Object convert(Object o) { return toDateTime(o); }
     },
     toTimestamp(Timestamp.class) {
         @Override
-        public Object convert(Object o) { return DateUtil.toTimestamp(o); }
+        public Object convert(Object o) { return toTimestamp(o); }
     },
     toSqlDate(java.sql.Date.class) {
         @Override
-        public Object convert(Object o) { return DateUtil.toSqlDate(o); }
+        public Object convert(Object o) { return toSqlDate(o); }
     },
     toOptional(Optional.class) {
         @Override
-        public Object convert(Object o) { return o instanceof Optional ? o : Optional.ofNullable(o); }
+        public Object convert(Object o) { return o instanceof Optional ? o : ofNullable(o); }
     },
     toEnum(Enum.class) {
         @Override
-        public Object convert(Object o) { return ThrowUtil.doThrow("Unsupported."); }
+        public Object convert(Object o) { return doThrow("Unsupported."); }
 
         @Override
-        public Object apply(Object o, Class type) { return EnumUtil.toEnum(o, type); }
+        public Object apply(Object o, Class type) { return toEnum(o, type); }
     },
     ;
 
