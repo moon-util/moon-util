@@ -1,4 +1,4 @@
-package com.moon.core.util.able;
+package com.moon.core.util.interfaces;
 
 /**
  * @author benshaoye

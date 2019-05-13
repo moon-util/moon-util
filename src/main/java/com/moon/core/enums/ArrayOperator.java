@@ -2,8 +2,8 @@ package com.moon.core.enums;
 
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
-import com.moon.core.util.able.IteratorAble;
-import com.moon.core.util.able.Stringify;
+import com.moon.core.util.interfaces.IteratorAble;
+import com.moon.core.util.interfaces.Stringify;
 import com.moon.core.util.function.IntBiConsumer;
 
 import java.lang.reflect.Array;

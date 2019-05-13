@@ -27,10 +27,10 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>>
      */
     private volatile Reference<T> reference;
 
-    protected BaseAccessor(Supplier<T> supplier, boolean allowNullValue) {
+    protected BaseAccessor(Supplier<T> supplier, boolean allowNullValue, boolean initLoaded) {
         this.supplier = Objects.requireNonNull(supplier);
         this.notAllowNullValue = !allowNullValue;
-        reload();
+        if (initLoaded) { reload(); }
     }
 
     /**

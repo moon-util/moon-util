@@ -1,7 +1,7 @@
 package com.moon.core.util.json;
 
 import com.moon.core.beans.BeanInfoUtil;
-import com.moon.core.util.able.Stringify;
+import com.moon.core.util.interfaces.Stringify;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

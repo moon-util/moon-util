@@ -1,22 +1,19 @@
 package com.moon.core.util.logger;
 
+import com.moon.core.AbstractTest;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author benshaoye
  */
-class LoggerUtilTestTest {
+class LoggerUtilTestTest extends AbstractTest {
 
     @Test
     void testSetDefaultOnlyOnce() {
-        assertDoesNotThrow(() -> {
-            LoggerUtil.setDefaultOnlyOnce(LoggerUtil.LoggerType.LOG4J);
-        });
-        assertThrows(Throwable.class, () -> {
-            LoggerUtil.setDefaultOnlyOnce(LoggerUtil.LoggerType.SLF4J);
-        });
+        LoggerUtil.setDefaultOnlyOnce(LoggerUtil.LoggerType.SLF4J);
+        assertThrow(() -> LoggerUtil.setDefaultOnlyOnce(LoggerUtil.LoggerType.SLF4J));
+        assertThrow(() -> LoggerUtil.getSlf4j());
+        assertThrow(() -> LoggerUtil.getLog4j());
+        assertThrow(() -> LoggerUtil.getLog4j2());
     }
 }

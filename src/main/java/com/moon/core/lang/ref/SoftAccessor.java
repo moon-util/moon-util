@@ -33,7 +33,11 @@ public class SoftAccessor<T> extends BaseAccessor<T, SoftAccessor<T>> {
 
     public SoftAccessor(Supplier<T> supplier) { this(supplier, false); }
 
-    public SoftAccessor(Supplier<T> supplier, boolean allowNullValue) { super(supplier, allowNullValue); }
+    public SoftAccessor(Supplier<T> supplier, boolean allowNullValue) { this(supplier, allowNullValue, false); }
+
+    public SoftAccessor(Supplier<T> supplier, boolean allowNullValue, boolean initValue) {
+        super(supplier, allowNullValue, initValue);
+    }
 
     @Override
     protected Reference<T> reference(T value) { return ReferenceUtil.weak(value); }

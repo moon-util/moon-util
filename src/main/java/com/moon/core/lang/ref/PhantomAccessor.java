@@ -33,7 +33,11 @@ public class PhantomAccessor<T> extends BaseAccessor<T, PhantomAccessor<T>> {
 
     public PhantomAccessor(Supplier<T> supplier) { this(supplier, false); }
 
-    public PhantomAccessor(Supplier<T> supplier, boolean allowNullValue) { super(supplier, allowNullValue); }
+    public PhantomAccessor(Supplier<T> supplier, boolean allowNullValue) { this(supplier, allowNullValue, false); }
+
+    public PhantomAccessor(Supplier<T> supplier, boolean allowNullValue, boolean initValue) {
+        super(supplier, allowNullValue, initValue);
+    }
 
     @Override
     protected Reference<T> reference(T value) { return ReferenceUtil.weak(value); }
