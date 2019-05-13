@@ -14,6 +14,10 @@ public final class StackTraceUtil {
         ThrowUtil.noInstanceError();
     }
 
+    public final static String toString(StackTraceElement elem) {
+        return String.format("%s#%s(%d)", elem.getClassName(), elem.getMethodName(), elem.getLineNumber());
+    }
+
     // ============================= methods =============================================================
 
     /**

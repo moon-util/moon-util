@@ -2,6 +2,7 @@ package com.moon.core.util.logger;
 
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.EnumUtil;
+import com.moon.core.lang.StackTraceUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakAccessor;
 import com.moon.core.util.FilterUtil;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.lang.StackTraceUtil.getPrevCallerTrace;
 import static com.moon.core.lang.reflect.MethodUtil.getPublicStaticMethods;
 
 /**
@@ -30,6 +32,7 @@ final class LoggerUtil {
     public final static <T> T getDefault() { return Creator.DEFAULT.create(caller()); }
 
     public final static void setDefaultOnlyOnce(LoggerType type) {
+        Creator.setCreator(type.getCreator(), StackTraceUtil.toString(getPrevCallerTrace()));
     }
 
     public enum LoggerType {
@@ -45,44 +48,46 @@ final class LoggerUtil {
         LOG4J("org.apache.log4j.Logger", "getLogger"),
         LOG4J2("org.apache.logging.log4j.LogManager", "getLogger"),
         DEFAULT(null, null) {
-            private Creator creator;
-            private String settingMessage;
-
-            synchronized Creator setCreator(Creator creator, String settingMessage) {
-                if (this.settingMessage == null) {
-                    this.creator = Objects.requireNonNull(creator);
-                    this.settingMessage = settingMessage;
-                } else if (settingMessage != null) {
-                    ThrowUtil.doThrow(this.settingMessage);
-                }
-                return creator;
-            }
-
             @Override
             ThrowingFunction getCreator() {
-                if (creator != null) {
-                    return creator.getCreator();
-                } else {
-                    Class<Creator> type = (Class<Creator>) getClass();
-                    Creator[] creators = EnumUtil.values(type);
-                    for (Creator constant : creators) {
-                        if (constant != this) {
-                            try {
-                                constant.create(type);
-                                return setCreator(constant, null).getCreator();
-                            } catch (Throwable t) {
-                                // ignore
+                return name -> {
+                    if (Creator.creator != null) {
+                        return Creator.creator.getCreator();
+                    } else {
+                        Class<Creator> type = Creator.class;
+                        Creator[] creators = EnumUtil.values(type);
+                        for (Creator constant : creators) {
+                            if (constant != this) {
+                                try {
+                                    constant.create(type);
+                                    return Creator.setCreator(constant, null).getCreator();
+                                } catch (Throwable t) {
+                                    // ignore
+                                }
                             }
                         }
                     }
-                }
-                return ThrowUtil.doThrow();
+                    return ThrowUtil.doThrow();
+                };
             }
         };
 
         private final WeakAccessor<ThrowingFunction> accessor;
         private final String methodName;
         private final String className;
+
+        private static volatile Creator creator;
+        private static volatile String settingMessage;
+
+        private static synchronized Creator setCreator(Creator creator, String settingMessage) {
+            if (Creator.settingMessage == null && Creator.creator != creator) {
+                Creator.creator = Objects.requireNonNull(creator);
+                Creator.settingMessage = settingMessage;
+            } else if (settingMessage != null) {
+                ThrowUtil.doThrow(Creator.settingMessage);
+            }
+            return creator;
+        }
 
         Creator(String className, String methodName) {
             this.accessor = WeakAccessor.of(() -> getCreator());
@@ -91,10 +96,12 @@ final class LoggerUtil {
         }
 
         ThrowingFunction getCreator() {
-            Class targetClass = ClassUtil.forName(className);
-            List<Method> ms = getPublicStaticMethods(targetClass, methodName, String.class);
-            Method creator = FilterUtil.requireFirst(ms, m -> m != null);
-            return name -> creator.invoke(null, name);
+            return name -> {
+                Class targetClass = ClassUtil.forName(className);
+                List<Method> ms = getPublicStaticMethods(targetClass, methodName, String.class);
+                Method creator = FilterUtil.requireFirst(ms, m -> m != null);
+                return creator.invoke(null, name);
+            };
         }
 
         public <T> T create(Class clazz) { return create(clazz.getName()); }

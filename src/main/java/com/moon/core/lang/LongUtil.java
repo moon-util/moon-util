@@ -129,13 +129,9 @@ public final class LongUtil {
         return value;
     }
 
-    public static long oneIfInvalid(CharSequence cs) {
-        return defaultIfInvalid(cs, 1);
-    }
+    public static long oneIfInvalid(CharSequence cs) { return defaultIfInvalid(cs, 1); }
 
-    public static long zeroIfInvalid(CharSequence cs) {
-        return defaultIfInvalid(cs, 0);
-    }
+    public static long zeroIfInvalid(CharSequence cs) { return defaultIfInvalid(cs, 0); }
 
     /**
      * convert a CharSequence to int, if is an invalid CharSequence will return defaultVal
@@ -152,45 +148,25 @@ public final class LongUtil {
         }
     }
 
-    public static boolean isLong(Object o) {
-        return o != null && o.getClass() == Long.class;
-    }
+    public static boolean isLong(Object o) { return o != null && o.getClass() == Long.class; }
 
-    public static boolean matchLong(Object o) {
-        return DetectUtil.isNumber(String.valueOf(o));
-    }
+    public static boolean matchLong(Object o) { return DetectUtil.isNumber(String.valueOf(o)); }
 
-    public static Long toLong(Boolean bool) {
-        return bool == null ? null : Long.valueOf((bool ? 1 : 0));
-    }
+    public static Long toLong(Boolean bool) { return bool == null ? null : Long.valueOf((bool ? 1 : 0)); }
 
-    public static Long toLong(Character value) {
-        return value == null ? null : Long.valueOf(value);
-    }
+    public static Long toLong(Character value) { return value == null ? null : Long.valueOf(value); }
 
-    public static Long toLong(Byte value) {
-        return value == null ? null : value.longValue();
-    }
+    public static Long toLong(Byte value) { return value == null ? null : value.longValue(); }
 
-    public static Long toLong(Short value) {
-        return value == null ? null : value.longValue();
-    }
+    public static Long toLong(Short value) { return value == null ? null : value.longValue(); }
 
-    public static Long toLong(Long value) {
-        return value == null ? null : value.longValue();
-    }
+    public static Long toLong(Long value) { return value == null ? null : value.longValue(); }
 
-    public static Long toLong(Float value) {
-        return value == null ? null : value.longValue();
-    }
+    public static Long toLong(Float value) { return value == null ? null : value.longValue(); }
 
-    public static Long toLong(Double value) {
-        return value == null ? null : value.longValue();
-    }
+    public static Long toLong(Double value) { return value == null ? null : value.longValue(); }
 
-    public static Long toLong(CharSequence cs) {
-        return cs == null ? null : Long.parseLong(cs.toString());
-    }
+    public static Long toLong(CharSequence cs) { return cs == null ? null : Long.parseLong(cs.toString()); }
 
     /**
      * 目前基本数据 Util 内类似的方法均使用了<strong>极大的容忍度</strong>
