@@ -42,7 +42,7 @@ import static java.util.Optional.ofNullable;
  * @author benshaoye
  * @date 2018/9/11
  */
-public enum Caster implements EnumDescriptor,
+public enum Casters implements EnumDescriptor,
     BiFunction<Object, Class, Object> {
 
     toBooleanValue(boolean.class) {
@@ -176,9 +176,9 @@ public enum Caster implements EnumDescriptor,
 
     public final Class TYPE;
 
-    private static class Cached { final static Map<Class, Caster> CACHE = new HashMap();}
+    private static class Cached { final static Map<Class, Casters> CACHE = new HashMap();}
 
-    Caster(Class type) { Cached.CACHE.put(this.TYPE = type, this); }
+    Casters(Class type) { Cached.CACHE.put(this.TYPE = type, this); }
 
     public abstract <T> T cast(Object o);
 

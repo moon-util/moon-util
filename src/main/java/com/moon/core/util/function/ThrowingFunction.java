@@ -17,7 +17,13 @@ public interface ThrowingFunction<T, R> {
      */
     R apply(T value) throws Throwable;
 
-    default R applyWithUnchecked(T value) {
+    /**
+     * 应用并返回，如果异常，将包装成非检查异常抛出
+     *
+     * @param value
+     * @return
+     */
+    default R orWithUnchecked(T value) {
         try {
             return apply(value);
         } catch (Throwable t) {

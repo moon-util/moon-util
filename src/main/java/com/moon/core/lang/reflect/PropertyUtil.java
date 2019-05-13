@@ -7,7 +7,7 @@ import com.moon.core.lang.ref.WeakLocation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import static com.moon.core.enums.Caster.*;
+import static com.moon.core.enums.Casters.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**

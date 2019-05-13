@@ -3,7 +3,7 @@ package com.moon.core.util.converter;
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.enums.ArrayOperator;
 import com.moon.core.enums.ArraysEnum;
-import com.moon.core.enums.Caster;
+import com.moon.core.enums.Casters;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakAccessor;
@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import static com.moon.core.enums.Caster.*;
+import static com.moon.core.enums.Casters.*;
 import static com.moon.core.util.CollectUtil.addAll;
 
 /**
@@ -47,7 +47,7 @@ public class GenericTypeCaster implements TypeCaster {
      * 注册默认转换器
      */
     private void registerDefaultConverter() {
-        for (Caster value : Caster.values()) {
+        for (Casters value : Casters.values()) {
             BiFunction converter = value;
             add(value.TYPE, converter);
         }
@@ -242,9 +242,9 @@ public class GenericTypeCaster implements TypeCaster {
         return (T) converters.get(superType).apply(value, type);
     }
 
-    private <E> E convert(Object value, Caster converter, Class type) { return (E) converter.apply(value, type); }
+    private <E> E convert(Object value, Casters converter, Class type) { return (E) converter.apply(value, type); }
 
-    private <E> E convert(Object value, Caster converter) { return convert(value, converter, converter.TYPE); }
+    private <E> E convert(Object value, Casters converter) { return convert(value, converter, converter.TYPE); }
 
     @Override
     public boolean toBooleanValue(Object value) { return convert(value, toBooleanValue); }

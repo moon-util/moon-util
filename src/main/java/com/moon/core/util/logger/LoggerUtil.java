@@ -1,12 +1,15 @@
 package com.moon.core.util.logger;
 
 import com.moon.core.lang.ClassUtil;
+import com.moon.core.lang.EnumUtil;
+import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakAccessor;
 import com.moon.core.util.FilterUtil;
 import com.moon.core.util.function.ThrowingFunction;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.reflect.MethodUtil.getPublicStaticMethods;
@@ -18,34 +21,71 @@ final class LoggerUtil {
 
     private LoggerUtil() { noInstanceError(); }
 
-    public final static <T> T slf4j() {
-        return null;
+    public final static <T> T getSlf4j() { return Creator.SLF4J.create(caller()); }
+
+    public final static <T> T getLog4j() { return Creator.LOG4J.create(caller()); }
+
+    public final static <T> T getLog4j2() { return Creator.LOG4J2.create(caller()); }
+
+    public final static <T> T getDefault() { return Creator.DEFAULT.create(caller()); }
+
+    public final static void setDefaultOnlyOnce(LoggerType type) {
     }
 
-    public final static <T> T log4j() {
-        return null;
+    public enum LoggerType {
+        SLF4J, LOG4J, LOG4J2;
+
+        Creator getCreator() { return Creator.valueOf(name()); }
     }
 
-    public final static <T> T log4j2() {
-        return null;
-    }
+    private static final String caller() { return null; }
 
-    @FunctionalInterface
-    private interface LoggerCreator {
-        <T> T create(String name);
-    }
-
-    private enum Creator implements LoggerCreator {
+    private enum Creator {
         SLF4J("org.slf4j.LoggerFactory", "getLogger"),
-        LOG4J("", ""),
-        LOG4J2("", "");
+        LOG4J("org.apache.log4j.Logger", "getLogger"),
+        LOG4J2("org.apache.logging.log4j.LogManager", "getLogger"),
+        DEFAULT(null, null) {
+            private Creator creator;
+            private String settingMessage;
 
-        final WeakAccessor<ThrowingFunction> ACCESSOR;
+            synchronized Creator setCreator(Creator creator, String settingMessage) {
+                if (this.settingMessage == null) {
+                    this.creator = Objects.requireNonNull(creator);
+                    this.settingMessage = settingMessage;
+                } else if (settingMessage != null) {
+                    ThrowUtil.doThrow(this.settingMessage);
+                }
+                return creator;
+            }
+
+            @Override
+            ThrowingFunction getCreator() {
+                if (creator != null) {
+                    return creator.getCreator();
+                } else {
+                    Class<Creator> type = (Class<Creator>) getClass();
+                    Creator[] creators = EnumUtil.values(type);
+                    for (Creator constant : creators) {
+                        if (constant != this) {
+                            try {
+                                constant.create(type);
+                                return setCreator(constant, null).getCreator();
+                            } catch (Throwable t) {
+                                // ignore
+                            }
+                        }
+                    }
+                }
+                return ThrowUtil.doThrow();
+            }
+        };
+
+        private final WeakAccessor<ThrowingFunction> accessor;
         private final String methodName;
         private final String className;
 
         Creator(String className, String methodName) {
-            this.ACCESSOR = WeakAccessor.of(() -> getCreator());
+            this.accessor = WeakAccessor.of(() -> getCreator());
             this.methodName = methodName;
             this.className = className;
         }
@@ -57,7 +97,8 @@ final class LoggerUtil {
             return name -> creator.invoke(null, name);
         }
 
-        @Override
-        public <T> T create(String name) { return (T) ACCESSOR.get().applyWithUnchecked(name); }
+        public <T> T create(Class clazz) { return create(clazz.getName()); }
+
+        public <T> T create(String name) { return (T) accessor.get().orWithUnchecked(name); }
     }
 }

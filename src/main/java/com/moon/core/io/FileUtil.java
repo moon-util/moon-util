@@ -256,7 +256,7 @@ public final class FileUtil {
         IteratorUtil.forEach(lines, line -> LangUtil.accept(line, consumer));
     }
 
-    public static void writeLinesToWriter(Writer writer, Object... lines) {
+    public static void writeLinesToWriter(Writer writer, CharSequence... lines) {
         ThrowingConsumer<Object> consumer = newLineWriter(writer);
         IteratorUtil.forEach(lines, line -> LangUtil.accept(line, consumer));
     }

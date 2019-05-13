@@ -105,4 +105,10 @@ public class DefaultException extends RuntimeException {
     public static final DefaultException with(int code, Object reason, Throwable throwable) {
         return new DefaultException(code, reason, throwable);
     }
+
+    public static final <T> T doThrow(Object reason) { throw with(reason); }
+
+    public static final <T> T doThrow(int code, Object reason) { throw with(code, reason); }
+
+    public static final <T> T doThrow(int code, Object reason, Throwable throwable) { throw with(code, reason, throwable); }
 }
