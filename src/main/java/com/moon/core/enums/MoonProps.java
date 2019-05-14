@@ -2,6 +2,7 @@ package com.moon.core.enums;
 
 import com.moon.core.util.PropertiesUtil;
 import com.moon.core.util.ResourceUtil;
+import com.moon.core.util.logger.LoggerUtil;
 
 import static com.moon.core.lang.StringUtil.isNotBlank;
 import static com.moon.core.util.PropertiesUtil.getString;
@@ -32,6 +33,12 @@ public enum MoonProps implements PropsSupplier {
      * @see com.moon.core.util.env.Environmental
      */
     moon_env_development,
+    /**
+     * 默认日志类型
+     *
+     * @see LoggerUtil#get()
+     */
+    moon_logger_type,
     ;
 
     /**
@@ -56,7 +63,7 @@ public enum MoonProps implements PropsSupplier {
             String cfgVal = systemProp(moon_configure.key());
             if (isNotBlank(cfgVal)) {
                 isProperties = true;
-                propsPath = cfgVal.endsWith(suffix) ? cfgVal : path;
+                propsPath = cfgVal.endsWith(suffix) ? cfgVal : cfgVal + suffix;
             } else {
                 isProperties = ResourceUtil.resourceExists(path)
                     && !PropertiesUtil.get(path).isEmpty();

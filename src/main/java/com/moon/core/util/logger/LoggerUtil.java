@@ -46,9 +46,7 @@ public final class LoggerUtil {
         private volatile static Creator creator;
         private volatile static String settingMessage;
 
-        private final static synchronized Creator set(Creator c) {
-            return creator = Objects.requireNonNull(c);
-        }
+        private final static synchronized Creator set(Creator c) { return creator = Objects.requireNonNull(c); }
 
         private final static synchronized Creator setCreator(LoggerType c) {
             if (creator == null || settingMessage == null) {
@@ -56,7 +54,7 @@ public final class LoggerUtil {
                 trace = String.format("Created by: %s", trace);
                 creator = c.getCreator();
                 settingMessage = trace;
-            } else {
+            } else if (c.getCreator() != creator) {
                 ThrowUtil.doThrow(settingMessage);
             }
             return creator;

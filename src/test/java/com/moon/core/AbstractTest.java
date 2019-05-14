@@ -8,6 +8,10 @@ import org.junit.jupiter.api.function.Executable;
  */
 public class AbstractTest {
 
+    public static void assertNotThrow(Executable executable) {
+        Assertions.assertDoesNotThrow(executable);
+    }
+
     public static void assertThrow(Executable executable) {
         Assertions.assertThrows(Throwable.class, executable);
     }
