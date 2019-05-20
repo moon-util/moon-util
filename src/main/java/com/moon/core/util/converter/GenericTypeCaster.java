@@ -220,7 +220,7 @@ public class GenericTypeCaster implements TypeCaster {
         if (func != null) {
             return (T) func.apply(value, type);
         } else if (type.isEnum()) {
-            return (T) converters.get(Enum.class).apply(value, type);
+            return (T) toEnum.apply(value, type);
         } else if (type.isArray() || type == Array.class) {
             return toArray(value, type);
         } else if (List.class.isAssignableFrom(type)) {

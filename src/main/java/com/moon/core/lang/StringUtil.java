@@ -9,9 +9,12 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
 
+import static com.moon.core.enums.Const.NULL_STR;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.support.StringSupport.concatHandler;
+import static java.lang.Character.*;
 
 /**
  * @author benshaoye
@@ -22,7 +25,6 @@ public final class StringUtil {
         noInstanceError();
     }
 
-    private static final String NULL_STRING = Const.NULL_STR;
     public final static String EMPTY = "";
     private final static char[] EMPTY_CHARS = ArraysEnum.CHARS.empty();
     private static final String NULL = null;
@@ -71,19 +73,19 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static int indexOn(String str, boolean bool) { return str == null ? NO : str.indexOf(String.valueOf(bool)); }
+    public static int indexOf(String str, boolean bool) { return str == null ? NO : str.indexOf(String.valueOf(bool)); }
 
-    public static int indexOn(String str, double num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
+    public static int indexOf(String str, double num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
 
-    public static int indexOn(String str, float num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
+    public static int indexOf(String str, float num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
 
-    public static int indexOn(String str, int num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
+    public static int indexOf(String str, int num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
 
-    public static int indexOn(String str, long num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
+    public static int indexOf(String str, long num) { return str == null ? NO : str.indexOf(String.valueOf(num)); }
 
-    public static int indexOn(String str, char c) { return str == null ? NO : str.indexOf(c); }
+    public static int indexOf(String str, char c) { return str == null ? NO : str.indexOf(c); }
 
-    public static int indexOn(String str, String test) { return str == null ? NO : str.indexOf(test); }
+    public static int indexOf(String str, String test) { return str == null ? NO : str.indexOf(test); }
 
     /*
      * -------------------------------------------------------------------
@@ -97,24 +99,16 @@ public final class StringUtil {
      * @param css
      * @return
      */
-    public static String concat(CharSequence... css) {
-        return concatHandler(Predicates.TRUE, css);
-    }
+    public static String concat(CharSequence... css) { return concatHandler(Predicates.TRUE, css); }
 
-    public static String concatSkipNulls(CharSequence... css) {
-        return concatHandler(Predicates.isNotNull, css);
-    }
+    public static String concatSkipNulls(CharSequence... css) { return concatHandler(Predicates.isNotNull, css); }
 
-    public static String concatSkipBlanks(CharSequence... css) {
-        return concatHandler(cs -> isNotBlank(cs), css);
-    }
+    public static String concatSkipBlanks(CharSequence... css) { return concatHandler(cs -> isNotBlank(cs), css); }
 
-    public static String concatSkipEmpties(CharSequence... css) {
-        return concatHandler(cs -> isNotEmpty(cs), css);
-    }
+    public static String concatSkipEmpties(CharSequence... css) { return concatHandler(cs -> isNotEmpty(cs), css); }
 
     public static String concatUseForNulls(CharSequence nullVal, CharSequence... css) {
-        return map(str -> (str == null ? nullVal : str), css);
+        return concatWithTransformer(str -> (str == null ? nullVal : str), css);
     }
 
     /*
@@ -128,9 +122,7 @@ public final class StringUtil {
      * @return
      * @see #isEmpty(CharSequence)
      */
-    public static boolean isNotEmpty(CharSequence string) {
-        return !isEmpty(string);
-    }
+    public static boolean isNotEmpty(CharSequence string) { return !isEmpty(string); }
 
     /**
      * string is null、""(EMPTY string)
@@ -148,32 +140,14 @@ public final class StringUtil {
      * @param string
      * @return
      */
-    public static boolean isEmpty(CharSequence string) {
-        return string == null || string.length() == 0;
-    }
-
-    public static <C extends CharSequence> C requireEmpty(C c) {
-        if (isEmpty(c)) {
-            return c;
-        }
-        throw new IllegalArgumentException("Require an EMPTY String, but got: " + c);
-    }
-
-    public static <C extends CharSequence> C requireNotEmpty(C c) {
-        if (isEmpty(c)) {
-            throw new IllegalArgumentException("Require not EMPTY String, but got: " + c);
-        }
-        return c;
-    }
+    public static boolean isEmpty(CharSequence string) { return string == null || string.length() == 0; }
 
     /**
      * @param string
      * @return
      * @see #isBlank(CharSequence)
      */
-    public static boolean isNotBlank(CharSequence string) {
-        return !isBlank(string);
-    }
+    public static boolean isNotBlank(CharSequence string) { return !isBlank(string); }
 
     /**
      * string is null、""(EMPTY string) or " "(all char is whitespace)
@@ -200,20 +174,6 @@ public final class StringUtil {
             }
         }
         return true;
-    }
-
-    public static <C extends CharSequence> C requireBlank(C c) {
-        if (isBlank(c)) {
-            return c;
-        }
-        throw new IllegalArgumentException("Require an blank String, but got: " + c);
-    }
-
-    public static <C extends CharSequence> C requireNotBlank(C c) {
-        if (isBlank(c)) {
-            throw new IllegalArgumentException("Require not blank String, but got: " + c);
-        }
-        return c;
     }
 
     /**
@@ -293,6 +253,76 @@ public final class StringUtil {
         }
     }
 
+    public final static boolean isAllLetter(CharSequence cs) { return isAllMatched(cs, curr -> isLetter(curr)); }
+
+    public final static boolean isAllUpperCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isUpperCase(curr)); }
+
+    public final static boolean isAllLowerCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isLowerCase(curr)); }
+
+    public final static boolean isAllMatched(CharSequence cs, IntPredicate tester) {
+        final int length = length(cs);
+        if (length == 0) { return false; }
+        String source = cs.toString();
+        for (int i = 0; i < length; i++) {
+            if (!tester.test(source.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public final static boolean isAnyLetter(CharSequence cs) { return isAllMatched(cs, curr -> isLetter(curr)); }
+
+    public final static boolean isAnyUpperCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isUpperCase(curr)); }
+
+    public final static boolean isAnyLowerCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isLowerCase(curr)); }
+
+    public final static boolean isAnyMatched(CharSequence cs, IntPredicate tester) {
+        final int length = length(cs);
+        if (length == 0) { return false; }
+        String source = cs.toString();
+        for (int i = 0; i < length; i++) {
+            if (!tester.test(source.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+     * -------------------------------------------------------------------
+     * requires
+     * -------------------------------------------------------------------
+     */
+
+    public static <C extends CharSequence> C requireEmpty(C c) {
+        if (isEmpty(c)) { return c; }
+        String error = "Require an empty String, but got: ";
+        throw new IllegalArgumentException(error + c);
+    }
+
+    public static <C extends CharSequence> C requireNotEmpty(C c) {
+        if (isEmpty(c)) {
+            String error = "Require a not empty String, but got: ";
+            throw new IllegalArgumentException(error + c);
+        }
+        return c;
+    }
+
+    public static <C extends CharSequence> C requireBlank(C c) {
+        if (isBlank(c)) { return c; }
+        String error = "Require a blank String, but got: ";
+        throw new IllegalArgumentException(error + c);
+    }
+
+    public static <C extends CharSequence> C requireNotBlank(C c) {
+        if (isBlank(c)) {
+            String error = "Require a not blank String, but got: ";
+            throw new IllegalArgumentException(error + c);
+        }
+        return c;
+    }
+
     /*
      * -------------------------------------------------------------------
      * default
@@ -307,9 +337,7 @@ public final class StringUtil {
 
     public static <T extends CharSequence> T nullIfEmpty(T cs) { return isEmpty(cs) ? null : cs; }
 
-    public static <T> T defaultIfNull(T cs, T defaultValue) {
-        return cs == null ? defaultValue : cs;
-    }
+    public static <T> T defaultIfNull(T cs, T defaultValue) { return cs == null ? defaultValue : cs; }
 
     public static <T extends CharSequence> T defaultIfEmpty(T cs, T defaultValue) {
         return isEmpty(cs) ? defaultValue : cs;
@@ -404,13 +432,11 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static <T, S extends CharSequence> String map(Function<T, S> function, T... objects) {
-        final int length = objects.length;
+    public static <T, S extends CharSequence> String concatWithTransformer(Function<T, S> transformer, T... objects) {
+        final int length = objects == null ? 0 : objects.length;
         if (length > 0) {
             StringBuilder builder = new StringBuilder(length * Const.DEFAULT_LENGTH);
-            for (int i = 0; i < length; i++) {
-                builder.append(function.apply(objects[i]));
-            }
+            for (int i = 0; i < length; i++) { builder.append(transformer.apply(objects[i])); }
             return builder.toString();
         }
         return EMPTY;
@@ -422,34 +448,29 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static String toString(CharSequence cs) { return cs == null ? NULL_STRING : cs.toString(); }
+    public static String toString(Object value) { return stringifyOrDefault(value, NULL_STR); }
 
     public static final String toString(char[] chars) {
-        return chars == null ? NULL_STRING : new String(chars, 0, chars.length);
+        return chars == null ? NULL_STR : new String(chars, 0, chars.length);
     }
 
     public static final String toString(char[] chars, int from, int end) {
-        return chars == null ? NULL_STRING : new String(chars, from, end);
+        return chars == null ? NULL_STR : new String(chars, from, end);
     }
 
     public static final StringBuilder toBuilder(char[] chars, int from, int to) {
         StringSupport.checkIndexesBetween(from, to, chars.length);
-        int l = to - from;
-        StringBuilder builder = new StringBuilder(l);
+        StringBuilder builder = new StringBuilder(to - from);
         builder.append(chars, from, to);
         return builder;
     }
 
     public static final StringBuffer toBuffer(char[] chars, int from, int to) {
         StringSupport.checkIndexesBetween(from, to, chars.length);
-        int l = to - from;
-        StringBuffer builder = new StringBuffer(l);
+        StringBuffer builder = new StringBuffer(to - from);
         builder.append(chars, from, to);
         return builder;
     }
-
-
-    public static String toString(Object value) { return stringifyOrDefault(value, NULL_STRING); }
 
     public static String stringifyOrNull(Object value) { return stringifyOrDefault(value, null); }
 
@@ -560,6 +581,12 @@ public final class StringUtil {
         return null;
     }
 
+    /**
+     * 连续空白只保留一个
+     *
+     * @param str
+     * @return
+     */
     public final static String onlyWhitespace(String str) {
         char[] chars = toCharArray(str), value = ArraysEnum.CHARS.empty();
         boolean isNotWhitespace = true;
@@ -587,7 +614,7 @@ public final class StringUtil {
     /**
      * 去掉字符串中重复字符
      * <p>
-     * 返回字符串中字符顺序为源字符串中出现顺序
+     * 返回字符串中字符顺序为源字符串中首次出现顺序
      *
      * @param sourceString
      */
@@ -604,7 +631,7 @@ public final class StringUtil {
             for (; i < len; i++) {
                 char ch = sourceString.charAt(i);
                 if (chars == null) {
-                    chars = SupportUtil.setChar(chars, index++, ch);
+                    chars = SupportUtil.setChar(null, index++, ch);
                 } else {
                     for (j = 0; j < index; j++) {
                         if (chars[j] == ch) {
@@ -651,32 +678,6 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static final char[] toCharArray(StringBuffer builder) { return toCharArray(builder, false); }
-
-    public static final char[] toCharArray(StringBuffer buffer, boolean emptyIfNull) {
-        if (buffer != null) {
-            int len = buffer.length();
-            char[] template = new char[len];
-            buffer.getChars(0, len, template, 0);
-            return template;
-        } else {
-            return emptyIfNull ? EMPTY_CHARS : null;
-        }
-    }
-
-    public static final char[] toCharArray(StringBuilder builder) { return toCharArray(builder, false); }
-
-    public static final char[] toCharArray(StringBuilder builder, boolean emptyIfNull) {
-        if (builder == null) {
-            return emptyIfNull ? EMPTY_CHARS : null;
-        } else {
-            int len = builder.length();
-            char[] template = new char[len];
-            builder.getChars(0, len, template, 0);
-            return template;
-        }
-    }
-
     public static final char[] toCharArray(CharSequence cs) { return toCharArray(cs, false); }
 
     public static final char[] toCharArray(CharSequence cs, boolean emptyIfNull) {
@@ -691,6 +692,7 @@ public final class StringUtil {
 
     /**
      * 首字母大写
+     * <p>
      * "className"    ==>      "ClassName"
      * "ClassName"    ==>      "ClassName"
      * null           ==>      null
@@ -702,9 +704,7 @@ public final class StringUtil {
      */
     public static final String capitalize(String str) {
         int len = str == null ? 0 : str.length();
-        if (len == 0) {
-            return str;
-        }
+        if (len == 0) { return str; }
         char ch = str.charAt(0);
         if (CharUtil.isLowerCase(ch)) {
             char[] chars = new char[len];
@@ -715,23 +715,59 @@ public final class StringUtil {
         return str;
     }
 
-    final static String camelcase(String str) {
+    /**
+     * 首字母小写
+     *
+     * @param str
+     * @return
+     */
+    public static final String uncapitalize(String str) {
+        int len = length(str);
+        if (len == 0) { return str; }
+        char ch = str.charAt(0);
+        if (CharUtil.isUpperCase(ch)) {
+            char[] chars = new char[len];
+            chars[0] = (char) (ch + 32);
+            str.getChars(1, len, chars, 1);
+            return new String(chars);
+        }
+        return str;
+    }
+
+    /**
+     * 连字符号转驼峰
+     *
+     * @param str
+     * @return
+     */
+    public final static String camelcase(String str) { return camelcase(str, false); }
+
+    /**
+     * 连字符号转驼峰
+     *
+     * @param str
+     * @param firstToUpper 第一个字母是否大写
+     * @return
+     */
+    public final static String camelcase(String str, boolean firstToUpper) {
         final int len = str == null ? 0 : str.length();
-        if (len == 0) {
-            return str;
-        }
+        if (len == 0) { return str; }
         char curr;
-        boolean isCamel = false;
-        char[] nowChars = new char[len];
-        for (int strIndex = 0, nowIndex = 0; strIndex < len; strIndex++) {
-            curr = str.charAt(strIndex);
-            if (strIndex == 0) {
+        int index = 0, count = 0;
+        char[] chars = new char[len];
+        boolean isCamel = false, isLetter;
+        for (; index < len; index++) {
+            if (isLetter = isLetterOrDigit(curr = str.charAt(index))) {
+                curr = (firstToUpper && count == 0) || isCamel
+                    ? toUpperCase(curr) : toLowerCase(curr);
+                chars[count++] = curr;
+            } else if (index == 0) {
+                isCamel = count != 0;
+                continue;
             }
-            if (Character.isLetterOrDigit(curr)) {
-                nowChars[nowIndex++] = curr;
-            }
+            isCamel = !isLetter;
         }
-        return null;
+        return new String(chars, 0, count);
     }
 
     /**
@@ -744,9 +780,11 @@ public final class StringUtil {
      * @param str
      * @return
      */
-    public final static String underscore(String str) { return hyphenWith(str, '_'); }
+    public final static String underscore(String str) { return camelcaseToHyphen(str, '_'); }
 
     /**
+     * 驼峰转连字符号，可自定义连字符号和是否拆分连接连续大写字母
+     * <p>
      * "oneOnlyWhitespace"      ===>    "one-only-whitespace"
      * "StringUtilTestTest"     ===>    "string-util-test-test"
      * null                     ===>    null
@@ -756,25 +794,59 @@ public final class StringUtil {
      * @param str
      * @return
      */
-    public final static String camelcaseToHyphen(String str) { return hyphenWith(str, '-'); }
+    public final static String camelcaseToHyphen(String str) { return camelcaseToHyphen(str, '-'); }
 
-    private static String hyphenWith(String str, char hyphen) {
-        int len = str == null ? 0 : str.length();
-        if (len == 0) {
-            return str;
-        }
+    /**
+     * 驼峰转连字符
+     *
+     * @param str
+     * @param hyphen 自定义连字符号
+     * @return
+     */
+    public final static String camelcaseToHyphen(String str, char hyphen) { return camelcaseToHyphen(str, hyphen, true); }
+
+    /**
+     * 驼峰转连字符
+     * <p>
+     * camelcaseToHyphen(null, ',')                             ===>   null
+     * camelcaseToHyphen("", ',')                               ===>   ""
+     * camelcaseToHyphen("   ", ',')                            ===>   ""
+     * camelcaseToHyphen("oneOnlyWhitespace", ',')              ===>   "one,only,whitespace"
+     * camelcaseToHyphen("StringUtilTestTest", ',')             ===>   "string,util,test,test"
+     * camelcaseToHyphen("SSStringUtilTestTest", ',', false)    ===>   "ss,string,util,test,test"
+     * camelcaseToHyphen("SSStringUtilTestTest", ',', true)     ===>   "s,s,string,util,test,test"
+     *
+     * @param str
+     * @param hyphen          自定义连字符号
+     * @param continuousSplit 自定义连续大写字母是否拆分连接
+     * @return
+     */
+    public final static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {
+        final int len = length(str);
+        if (len == 0) { return str; }
+        boolean prevIsUpper = false, currIsUpper;
         char ch;
         StringBuilder res = new StringBuilder(len + 5);
         for (int i = 0; i < len; i++) {
-            if (Character.isUpperCase(ch = str.charAt(i))) {
+            if (currIsUpper = Character.isUpperCase(ch = str.charAt(i))) {
+                ch = Character.toLowerCase(ch);
                 if (i == 0) {
-                    res.append(Character.toLowerCase(ch));
+                    res.append(ch);
+                } else if (prevIsUpper) {
+                    if (continuousSplit) {
+                        res.append(hyphen).append(ch);
+                    } else if (Character.isLowerCase(str.charAt(i + 1))) {
+                        res.append(hyphen).append(ch);
+                    } else {
+                        res.append(ch);
+                    }
                 } else {
-                    res.append(hyphen).append(Character.toLowerCase(ch));
+                    res.append(hyphen).append(ch);
                 }
             } else if (!Character.isWhitespace(ch)) {
                 res.append(ch);
             }
+            prevIsUpper = currIsUpper;
         }
         return res.toString();
     }

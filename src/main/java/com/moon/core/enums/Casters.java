@@ -176,7 +176,9 @@ public enum Casters implements EnumDescriptor,
 
     public final Class TYPE;
 
-    private static class Cached { final static Map<Class, Casters> CACHE = new HashMap();}
+    private static class Cached {
+        final static Map<Class, Casters> CACHE = new HashMap();
+    }
 
     Casters(Class type) { Cached.CACHE.put(this.TYPE = type, this); }
 
@@ -186,7 +188,7 @@ public enum Casters implements EnumDescriptor,
     public Object apply(Object o, Class aClass) { return cast(o); }
 
     @Override
-    public String getText() { return TYPE.getName(); }
+    public final String getText() { return TYPE.getName(); }
 
-    public static <T> T to(Object o, Class type) { return (T) requireNonNull(Cached.CACHE.get(type)).apply(o, type); }
+    public final static <T> T to(Object o, Class type) { return (T) requireNonNull(Cached.CACHE.get(type)).apply(o, type); }
 }

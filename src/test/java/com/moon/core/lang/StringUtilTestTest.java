@@ -420,7 +420,9 @@ class StringUtilTestTest {
         str = "StringUtilTestTest";
         now = StringUtil.underscore(str);
         assertEquals(now, "string_util_test_test");
-
+        str = "CYStringUtilTestTest";
+        now = StringUtil.underscore(str);
+        assertEquals(now, "c_y_string_util_test_test");
     }
 
     @Test
@@ -431,6 +433,15 @@ class StringUtilTestTest {
         str = "StringUtilTestTest";
         now = StringUtil.camelcaseToHyphen(str);
         assertEquals(now, "string-util-test-test");
+        str = "CYStringUtilTestTest";
+        now = StringUtil.camelcaseToHyphen(str);
+        assertEquals(now, "c-y-string-util-test-test");
+        str = "CYStringUtilTestTest";
+        now = StringUtil.camelcaseToHyphen(str, '|');
+        assertEquals(now, "c|y|string|util|test|test");
+        str = "CYStringUtilTestTest";
+        now = StringUtil.camelcaseToHyphen(str, '-', false);
+        assertEquals(now, "cy-string-util-test-test");
     }
 
     /**
@@ -518,5 +529,43 @@ class StringUtilTestTest {
         System.out.println("=======================");
         System.out.println(flag);
         System.out.println(num);
+    }
+
+    @Test
+    void testEqualsIgnoreCase() {
+    }
+
+    @Test
+    void testConcatWithTransformer() {
+        assertEquals(StringUtil.concatWithTransformer(str -> str.toString()), "");
+        assertEquals(StringUtil.concatWithTransformer(str -> str.toString(), 1, 2, 3), "123");
+    }
+
+    @Test
+    void testStringifyOrNull() {
+    }
+
+    @Test
+    void testStringifyOrEmpty() {
+    }
+
+    @Test
+    void testStringifyOrDefault() {
+    }
+
+    @Test
+    void testCamelcase() {
+        String string = "cy-string-util-test-test";
+        assertEquals("cyStringUtilTestTest", StringUtil.camelcase(string, false));
+        assertEquals("cyStringUtilTestTest", StringUtil.camelcase(string));
+        assertEquals("CyStringUtilTestTest", StringUtil.camelcase(string, true));
+        string = "-cy-string-util-test-test";
+        assertEquals("cyStringUtilTestTest", StringUtil.camelcase(string, false));
+        assertEquals("cyStringUtilTestTest", StringUtil.camelcase(string));
+        assertEquals("CyStringUtilTestTest", StringUtil.camelcase(string, true));
+    }
+
+    @Test
+    void testReplaceFirst() {
     }
 }

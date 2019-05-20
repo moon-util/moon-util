@@ -7,9 +7,7 @@ import com.moon.core.lang.ThrowUtil;
  * @date 2018/9/11
  */
 public final class DetectUtil {
-    private DetectUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private DetectUtil() { ThrowUtil.noInstanceError(); }
 
     public static boolean isChinese(String str) {
         final int length = str == null ? 0 : str.length();
@@ -37,9 +35,7 @@ public final class DetectUtil {
         return true;
     }
 
-    private static boolean isOver(int value, int min, int max) {
-        return value < min || value > max;
-    }
+    private static boolean isOver(int value, int min, int max) { return value < min || value > max; }
 
     /**
      * 是否是一个全是数字的字符串（即正整数）
@@ -60,6 +56,12 @@ public final class DetectUtil {
         return false;
     }
 
+    private final static int CODE_ZERO = 48;
+    private final static int CODE_PREV_ZERO = 47;
+    private final static int CODE_NINE = 57;
+    private final static int CODE_NEXT_NINE = 58;
+    private final static int CODE_MINUS = 45;
+
     /**
      * 是否是一个整数（包括正整数和负整数，只支持十进制数）
      *
@@ -71,15 +73,15 @@ public final class DetectUtil {
             int i = 0;
 
             char ch = string.charAt(i++);
-            if (ch > 57 || ch < 48) {
-                if (ch != 45 || len == i) {
+            if (ch > CODE_NINE || ch < CODE_ZERO) {
+                if (ch != CODE_MINUS || len == i) {
                     return false;
                 }
             }
 
             while (i < len) {
                 ch = string.charAt(i++);
-                if (ch > 57 || ch < 48) {
+                if (ch > CODE_NINE || ch < CODE_ZERO) {
                     return false;
                 }
             }

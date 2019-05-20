@@ -40,7 +40,7 @@ public final class TypeUtil {
     public final static TypeCaster of() { return of(GenericTypeCaster::new); }
 
     /**
-     * get a default type converter
+     * get a default type converter：自定义实现
      *
      * @param supplier
      * @return
@@ -63,7 +63,7 @@ public final class TypeUtil {
 
         final static String ERROR = "Can't add new converter or modify on default converter";
 
-        UnmodifiableTypeCaster() { super(); }
+        UnmodifiableTypeCaster() { }
 
         @Override
         public <C> TypeCaster register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
