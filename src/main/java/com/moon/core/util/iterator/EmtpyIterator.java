@@ -19,12 +19,8 @@ public enum EmtpyIterator implements Iterator {
     public static final EmtpyIterator EMPTY = empty;
 
     @Override
-    public final boolean hasNext() {
-        return false;
-    }
+    public final boolean hasNext() { return false; }
 
     @Override
-    public final Object next() {
-        throw new UnsupportedOperationException();
-    }
+    public final Object next() { throw new UnsupportedOperationException(); }
 }

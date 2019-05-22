@@ -18,12 +18,8 @@ public class FloatsIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Float next() {
-        return this.array[index++];
-    }
+    public Float next() { return this.array[index++]; }
 }

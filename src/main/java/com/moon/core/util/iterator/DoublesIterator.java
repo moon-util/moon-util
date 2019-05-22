@@ -18,12 +18,8 @@ public class DoublesIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Double next() {
-        return this.array[index++];
-    }
+    public Double next() { return this.array[index++]; }
 }

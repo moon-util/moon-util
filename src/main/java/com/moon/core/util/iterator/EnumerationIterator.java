@@ -17,14 +17,10 @@ public class EnumerationIterator<T> implements Iterator<T> {
         VALUE;
 
         @Override
-        public boolean hasMoreElements() {
-            return false;
-        }
+        public boolean hasMoreElements() { return false; }
 
         @Override
-        public Object nextElement() {
-            throw new UnsupportedOperationException();
-        }
+        public Object nextElement() { throw new UnsupportedOperationException(); }
     }
 
     public EnumerationIterator(Enumeration<T> enumeration) {
@@ -32,12 +28,8 @@ public class EnumerationIterator<T> implements Iterator<T> {
     }
 
     @Override
-    public boolean hasNext() {
-        return enumeration.hasMoreElements();
-    }
+    public boolean hasNext() { return enumeration.hasMoreElements(); }
 
     @Override
-    public T next() {
-        return enumeration.nextElement();
-    }
+    public T next() { return enumeration.nextElement(); }
 }

@@ -18,12 +18,8 @@ public class IntsIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Integer next() {
-        return this.array[index++];
-    }
+    public Integer next() { return this.array[index++]; }
 }

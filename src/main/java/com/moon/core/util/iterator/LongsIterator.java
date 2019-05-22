@@ -18,12 +18,8 @@ public class LongsIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Long next() {
-        return this.array[index++];
-    }
+    public Long next() { return this.array[index++]; }
 }

@@ -6,7 +6,7 @@ package com.moon.core.util.iterator;
  */
 abstract class BaseArrayIterator {
 
-    protected int index;
+    protected int index = 0;
     protected final int length;
 
     protected BaseArrayIterator(int length) {

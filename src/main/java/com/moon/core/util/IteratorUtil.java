@@ -56,9 +56,7 @@ public final class IteratorUtil {
      * @param values
      * @param <T>
      */
-    public static <T> Iterator<T> of(T... values) {
-        return values == null ? EMPTY : new ObjectsIterator<>(values);
-    }
+    public static <T> Iterator<T> of(T... values) { return values == null ? EMPTY : new ObjectsIterator<>(values); }
 
     /**
      * 获取 byte[] 类型数组的迭代器
@@ -277,9 +275,7 @@ public final class IteratorUtil {
      * @param iterable
      * @param <T>
      */
-    public static <T> Iterator<T> of(Iterable<T> iterable) {
-        return iterable == null ? EMPTY : iterable.iterator();
-    }
+    public static <T> Iterator<T> of(Iterable<T> iterable) { return iterable == null ? EMPTY : iterable.iterator(); }
 
     /**
      * 返回 Map 集合迭代器

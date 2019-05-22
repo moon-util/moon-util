@@ -261,11 +261,11 @@ public final class FileUtil {
         IteratorUtil.forEach(lines, line -> LangUtil.accept(line, consumer));
     }
 
-    public static void writeLinesToOutput(OutputStream os, Iterator<CharSequence> lines) {
+    public static void writeLinesToOutput(OutputStream os, Iterator<? extends CharSequence> lines) {
         IOUtil.autoCloseAccept(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
     }
 
-    public static void writeLinesToOutput(OutputStream os, Collection<CharSequence> lines) {
+    public static void writeLinesToOutput(OutputStream os, Collection<? extends CharSequence> lines) {
         IOUtil.autoCloseAccept(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
     }
 
@@ -273,11 +273,11 @@ public final class FileUtil {
         IOUtil.autoCloseAccept(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
     }
 
-    public static void appendLinesToFile(File existFile, Iterator<CharSequence> lines) {
+    public static void appendLinesToFile(File existFile, Iterator<? extends CharSequence> lines) {
         writeLinesToOutput(getOutputStream(existFile, true), lines);
     }
 
-    public static void appendLinesToFile(File existFile, Collection<CharSequence> lines) {
+    public static void appendLinesToFile(File existFile, Collection<? extends CharSequence> lines) {
         writeLinesToOutput(getOutputStream(existFile, true), lines);
     }
 
@@ -285,11 +285,11 @@ public final class FileUtil {
         writeLinesToOutput(getOutputStream(existFile, true), lines);
     }
 
-    public static void appendLinesToFile(String existFilePath, Iterator<CharSequence> lines) {
+    public static void appendLinesToFile(String existFilePath, Iterator<? extends CharSequence> lines) {
         appendLinesToFile(new File(existFilePath), lines);
     }
 
-    public static void appendLinesToFile(String existFilePath, Collection<CharSequence> lines) {
+    public static void appendLinesToFile(String existFilePath, Collection<? extends CharSequence> lines) {
         appendLinesToFile(new File(existFilePath), lines);
     }
 
@@ -309,9 +309,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToBit(File file) {
-        return lengthToB(file) << 3;
-    }
+    public static long lengthToBit(File file) { return lengthToB(file) << 3; }
 
     /**
      * 返回文件大小(单位 B)
@@ -319,9 +317,7 @@ public final class FileUtil {
      * @param filepath
      * @return
      */
-    public static long length(String filepath) {
-        return lengthToB(new File(filepath));
-    }
+    public static long length(String filepath) { return lengthToB(new File(filepath)); }
 
     /**
      * 返回文件大小(单位 B)
@@ -329,9 +325,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToB(File file) {
-        return file.length();
-    }
+    public static long lengthToB(File file) { return file.length(); }
 
     /**
      * 返回文件大小(单位 KB)
@@ -339,9 +333,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToKB(File file) {
-        return lengthToB(file) >> 10;
-    }
+    public static long lengthToKB(File file) { return lengthToB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 MB)
@@ -349,9 +341,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToMB(File file) {
-        return lengthToKB(file) >> 10;
-    }
+    public static long lengthToMB(File file) { return lengthToKB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 GB)
@@ -359,9 +349,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToGB(File file) {
-        return lengthToMB(file) >> 10;
-    }
+    public static long lengthToGB(File file) { return lengthToMB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 TB)
@@ -369,9 +357,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToTB(File file) {
-        return lengthToGB(file) >> 10;
-    }
+    public static long lengthToTB(File file) { return lengthToGB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 PB)
@@ -379,9 +365,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToPB(File file) {
-        return lengthToTB(file) >> 10;
-    }
+    public static long lengthToPB(File file) { return lengthToTB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 EB)
@@ -389,9 +373,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToEB(File file) {
-        return lengthToPB(file) >> 10;
-    }
+    public static long lengthToEB(File file) { return lengthToPB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 ZB)
@@ -399,9 +381,7 @@ public final class FileUtil {
      * @param file
      * @return
      */
-    public static long lengthToZB(File file) {
-        return lengthToEB(file) >> 10;
-    }
+    public static long lengthToZB(File file) { return lengthToEB(file) >> 10; }
 
     /*
      * -----------------------------------------------------------------------
@@ -415,9 +395,7 @@ public final class FileUtil {
      * @param dir
      * @return
      */
-    public static boolean deleteAllFiles(String dir) {
-        return deleteAllFiles(new File(dir));
-    }
+    public static boolean deleteAllFiles(String dir) { return deleteAllFiles(new File(dir)); }
 
     /**
      * 深度删除所有文件
@@ -479,11 +457,7 @@ public final class FileUtil {
         return null;
     }
 
-    public static boolean exists(File file) {
-        return file != null && file.exists();
-    }
+    public static boolean exists(File file) { return file != null && file.exists(); }
 
-    public static boolean exists(String filePath) {
-        return filePath != null && new File(filePath).exists();
-    }
+    public static boolean exists(String filePath) { return filePath != null && new File(filePath).exists(); }
 }

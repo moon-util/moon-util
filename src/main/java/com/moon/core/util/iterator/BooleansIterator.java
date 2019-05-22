@@ -18,12 +18,8 @@ public class BooleansIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Boolean next() {
-        return this.array[index++];
-    }
+    public Boolean next() { return this.array[index++]; }
 }

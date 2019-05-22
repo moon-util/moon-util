@@ -18,13 +18,9 @@ public class ObjectsIterator<T>
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
 
     @Override
-    public T next() {
-        return this.array[index++];
-    }
+    public T next() { return this.array[index++]; }
 }

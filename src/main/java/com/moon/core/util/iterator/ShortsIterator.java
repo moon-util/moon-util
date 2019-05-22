@@ -18,12 +18,8 @@ public class ShortsIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Short next() {
-        return this.array[index++];
-    }
+    public Short next() { return this.array[index++]; }
 }

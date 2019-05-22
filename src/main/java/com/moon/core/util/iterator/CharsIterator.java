@@ -14,9 +14,7 @@ public class CharsIterator
 
     private final char[] array;
 
-    public CharsIterator(CharSequence string) {
-        this(StringUtil.toCharArray(string));
-    }
+    public CharsIterator(CharSequence string) { this(StringUtil.toCharArray(string)); }
 
     public CharsIterator(char[] array) {
         super(array == null ? 0 : array.length);
@@ -24,12 +22,8 @@ public class CharsIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Character next() {
-        return this.array[index++];
-    }
+    public Character next() { return this.array[index++]; }
 }

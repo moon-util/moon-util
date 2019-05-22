@@ -18,12 +18,8 @@ public class BytesIterator
     }
 
     @Override
-    public boolean hasNext() {
-        return this.index < this.length;
-    }
+    public boolean hasNext() { return this.index < this.length; }
 
     @Override
-    public Byte next() {
-        return this.array[index++];
-    }
+    public Byte next() { return this.array[index++]; }
 }

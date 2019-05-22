@@ -71,13 +71,9 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      */
     private int length = 0;
 
-    public CollectSplitter(T t) {
-        this(t, DEFAULT_SPLIT_COUNT);
-    }
+    public CollectSplitter(T t) { this(t, DEFAULT_SPLIT_COUNT); }
 
-    public CollectSplitter(T t, int count) {
-        this.split(t, count);
-    }
+    public CollectSplitter(T t, int count) { this.split(t, count); }
 
     /**
      * 拆分
@@ -210,9 +206,7 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      * @return {@code true} if the iteration has more cells
      */
     @Override
-    public boolean hasNext() {
-        return index < length;
-    }
+    public boolean hasNext() { return index < length; }
 
     /**
      * Returns the next element in the iteration.
@@ -221,9 +215,7 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      * @throws NoSuchElementException if the iteration has no more cells
      */
     @Override
-    public T next() {
-        return (T) this.container[index++];
-    }
+    public T next() { return (T) this.container[index++]; }
 
     /**
      * 工具，返回集合 size
@@ -231,7 +223,5 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      * @param c collection
      * @return size of collection
      */
-    private int size(Collection c) {
-        return c == null ? 0 : c.size();
-    }
+    private int size(Collection c) { return c == null ? 0 : c.size(); }
 }
