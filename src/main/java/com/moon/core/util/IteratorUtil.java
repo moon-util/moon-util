@@ -148,6 +148,7 @@ public final class IteratorUtil {
      * 从 Reader 中每次读取一行文本
      *
      * @param reader
+     *
      * @return
      */
     public static Iterator<String> ofLines(Reader reader) { return reader == null ? EMPTY : new LinesIterator(reader); }
@@ -156,6 +157,7 @@ public final class IteratorUtil {
      * 从 InputStream 中按默认字符编码（UTF-8）格式每次读取一行文本
      *
      * @param is
+     *
      * @return
      */
     public static Iterator<String> ofLines(InputStream is) { return is == null ? EMPTY : new LinesIterator(is); }
@@ -165,6 +167,7 @@ public final class IteratorUtil {
      *
      * @param is
      * @param charset
+     *
      * @return
      */
     public static Iterator<String> ofLines(InputStream is, String charset) {
@@ -176,6 +179,7 @@ public final class IteratorUtil {
      *
      * @param is
      * @param charset
+     *
      * @return
      */
     public static Iterator<String> ofLines(InputStream is, Charset charset) {
@@ -183,8 +187,7 @@ public final class IteratorUtil {
     }
 
     /**
-     * 获取一个文本文件读取迭代器，可用于常用的txt、json、xml等文本文件读取；
-     * 迭代器每次返回一行数据，直到文本结尾，对象会自动关闭文件流
+     * 获取一个文本文件读取迭代器，可用于常用的txt、json、xml等文本文件读取； 迭代器每次返回一行数据，直到文本结尾，对象会自动关闭文件流
      *
      * @param file
      */
@@ -197,8 +200,7 @@ public final class IteratorUtil {
      */
 
     /**
-     * 文件流迭代读取器
-     * 每次将读取的字节放入数组 buffer 中，并返回读取到的长度
+     * 文件流迭代读取器 每次将读取的字节放入数组 buffer 中，并返回读取到的长度
      *
      * @param filepath
      * @param buffer
@@ -208,8 +210,7 @@ public final class IteratorUtil {
     }
 
     /**
-     * 文件流迭代读取器
-     * 每次将读取的字节放入数组 buffer 中，并返回读取到的长度
+     * 文件流迭代读取器 每次将读取的字节放入数组 buffer 中，并返回读取到的长度
      *
      * @param file
      * @param buffer
@@ -219,8 +220,7 @@ public final class IteratorUtil {
     }
 
     /**
-     * 文件流迭代读取器
-     * 每次将读取的字节放入数组 buffer 中，并返回读取到的长度
+     * 文件流迭代读取器 每次将读取的字节放入数组 buffer 中，并返回读取到的长度
      *
      * @param is
      * @param buffer
@@ -239,6 +239,7 @@ public final class IteratorUtil {
      * 将 JavaBean 中每个属性认为是一个字段进行迭代
      *
      * @param object
+     *
      * @return
      */
     public static Iterator<Map.Entry<String, FieldDescriptor>> ofFields(Object object) {
@@ -315,8 +316,7 @@ public final class IteratorUtil {
      */
 
     /**
-     * 返回类字段信息描述迭代器;
-     * 迭代器每次返回一个枚举；
+     * 返回类字段信息描述迭代器; 迭代器每次返回一个枚举；
      *
      * @param clazz
      * @param <T>
@@ -385,8 +385,8 @@ public final class IteratorUtil {
     public final static void forEachFields(Object bean, IntBiConsumer consumer) {
         if (bean != null) {
             IntAccessor indexer = IntAccessor.of();
-            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass()).forEach((name, desc) ->
-                consumer.accept(desc.getValueIfPresent(bean, true), indexer.getAndIncrement()));
+            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass())
+                .forEach((name, desc) -> consumer.accept(desc.getValueIfPresent(bean, true), indexer.getAndIncrement()));
         }
     }
 
@@ -401,13 +401,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(boolean[] array, BooleanConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (boolean value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -415,13 +413,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(double[] array, DoubleConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (double value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -429,13 +425,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(float[] array, FloatConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (float value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -443,13 +437,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(long[] array, LongConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (long value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -457,13 +449,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(int[] array, IntConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (int value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -471,13 +461,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(char[] array, CharConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (char value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -485,13 +473,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(short[] array, ShortConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (short value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -499,13 +485,11 @@ public final class IteratorUtil {
      *
      * @param consumer 处理对象
      * @param array
+     *
      * @return
      */
     public static void forEach(byte[] array, ByteConsumer consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (byte value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -516,10 +500,7 @@ public final class IteratorUtil {
      * @param <T>
      */
     public static <T> void forEach(T[] array, Consumer<? super T> consumer) {
-        int length = array == null ? 0 : array.length;
-        for (int i = 0; i < length; i++) {
-            consumer.accept(array[i]);
-        }
+        if (array != null) { for (T value : array) { consumer.accept(value); } }
     }
 
     /**
@@ -530,7 +511,7 @@ public final class IteratorUtil {
      * @param <T>
      */
     public static <T extends Enum<T>> void forEach(Class<T> enumType, Consumer<? super T> consumer) {
-        forEach(EnumUtil.values(enumType), consumer);
+        if (enumType != null) { forEach(EnumUtil.values(enumType), consumer); }
     }
 
     /*
@@ -540,9 +521,7 @@ public final class IteratorUtil {
      */
 
     public static void forEach(final int count, IntConsumer consumer) {
-        for (int i = 0; i < count; i++) {
-            consumer.accept(i);
-        }
+        for (int i = 0; i < count; i++) { consumer.accept(i); }
     }
 
     /*
@@ -556,6 +535,7 @@ public final class IteratorUtil {
      *
      * @param array
      * @param consumer 处理对象
+     *
      * @return
      */
     public static void forEach(int[] array, IntIntConsumer consumer) {
@@ -569,6 +549,7 @@ public final class IteratorUtil {
      *
      * @param array
      * @param consumer 处理对象
+     *
      * @return
      */
     public static void forEach(long[] array, IntLongConsumer consumer) {
@@ -582,6 +563,7 @@ public final class IteratorUtil {
      *
      * @param array
      * @param consumer 处理对象
+     *
      * @return
      */
     public static void forEach(double[] array, IntDoubleConsumer consumer) {
@@ -595,6 +577,7 @@ public final class IteratorUtil {
      *
      * @param array
      * @param consumer 处理对象
+     *
      * @return
      */
     public static <T> void forEach(T[] array, IntBiConsumer<? super T> consumer) {
@@ -611,7 +594,7 @@ public final class IteratorUtil {
      * @param <T>
      */
     public static <T extends Enum<T>> void forEach(Class<T> enumType, IntBiConsumer<? super T> consumer) {
-        forEach(EnumUtil.values(enumType), consumer);
+        if (enumType != null) { forEach(EnumUtil.values(enumType), consumer); }
     }
 
     /*
@@ -626,6 +609,7 @@ public final class IteratorUtil {
      * @param consumer 处理对象
      * @param list
      * @param <T>
+     *
      * @return
      */
     public static <T> void forEach(List<T> list, Consumer<? super T> consumer) {
@@ -638,6 +622,7 @@ public final class IteratorUtil {
      * @param consumer 处理对象
      * @param c
      * @param <T>
+     *
      * @return
      */
     public static <T> void forEach(Collection<T> c, Consumer<? super T> consumer) {
@@ -650,6 +635,7 @@ public final class IteratorUtil {
      * @param consumer 处理对象
      * @param c
      * @param <T>
+     *
      * @return
      */
     public static <T> void forEach(Iterable<T> c, Consumer<? super T> consumer) {
@@ -681,9 +667,7 @@ public final class IteratorUtil {
      * @param <T>
      */
     public static <T> void forEach(Iterator<T> iterator, Consumer<? super T> consumer) {
-        if (iterator != null) {
-            iterator.forEachRemaining(consumer);
-        }
+        if (iterator != null) { iterator.forEachRemaining(consumer); }
     }
 
     public static <T> void forEach(Iterator<T> iterator, IntBiConsumer<? super T> consumer) {
@@ -701,6 +685,7 @@ public final class IteratorUtil {
      * @param map
      * @param <K>
      * @param <V>
+     *
      * @return
      */
     public static <K, V> void forEach(Map<K, V> map, Consumer<Map.Entry<K, V>> consumer) {
@@ -714,6 +699,7 @@ public final class IteratorUtil {
      * @param map
      * @param <K>
      * @param <V>
+     *
      * @return
      */
     public static <K, V> void forEach(Map<K, V> map, BiConsumer<? super K, ? super V> consumer) {
@@ -726,6 +712,7 @@ public final class IteratorUtil {
      * @param consumer 处理对象
      * @param e
      * @param <T>
+     *
      * @return
      */
     public static <T> void forEach(Enumeration<T> e, Consumer<? super T> consumer) {
@@ -764,9 +751,7 @@ public final class IteratorUtil {
      * @param consumer 处理对象
      * @param file
      */
-    public static void forEachLines(File file, Consumer<String> consumer) {
-        ofLines(file).forEachRemaining(consumer);
-    }
+    public static void forEachLines(File file, Consumer<String> consumer) { ofLines(file).forEachRemaining(consumer); }
 
     public static void forEachLines(String filename, Consumer<String> consumer) {
         ofLines(filename).forEachRemaining(consumer);
@@ -828,7 +813,8 @@ public final class IteratorUtil {
             do {
                 limit = inputStream.read(buffer, 0, length);
                 if (whiling = (limit >= 0)) { consumer.accept(limit); }
-            } while (whiling);
+            }
+            while (whiling);
         } catch (Exception e) {
             doThrow(e);
         }
@@ -848,6 +834,7 @@ public final class IteratorUtil {
      * @param c
      * @param <E>
      * @param <C>
+     *
      * @return
      */
     public static <E, C extends Collection<E>> Iterator<C> split(C c) {
@@ -867,6 +854,7 @@ public final class IteratorUtil {
      * @param size 指定拆分大小
      * @param <E>
      * @param <C>
+     *
      * @return
      */
     public static <E, C extends Collection<E>> Iterator<C> split(C c, int size) {
@@ -912,6 +900,7 @@ public final class IteratorUtil {
      * @param <K>      键类型
      * @param <E>      集合单项类型
      * @param <L>      List 类型
+     *
      * @return
      */
     public static <K, E, L extends List<E>> Map<K, List<E>> groupBy(L list, Function<? super E, ? extends K> function) {
@@ -922,7 +911,8 @@ public final class IteratorUtil {
         return GroupUtil.groupAsSet(set, function);
     }
 
-    public static <K, E, C extends Collection<E>> Map<K, Collection<E>> groupBy(C collect, Function<? super E, ? extends K> function) {
+    public static <K, E, C extends Collection<E>> Map<K, Collection<E>> groupBy(
+        C collect, Function<? super E, ? extends K> function) {
         return GroupUtil.groupBy(collect, function);
     }
 
@@ -943,6 +933,7 @@ public final class IteratorUtil {
      * @param tester
      * @param <E>
      * @param <L>
+     *
      * @return
      */
     public static <E, L extends List<E>> List<E> filter(L list, Predicate<? super E> tester) {
@@ -960,6 +951,7 @@ public final class IteratorUtil {
      * @param <E>
      * @param <C>
      * @param <CR>
+     *
      * @return
      */
     public static <E, C extends Collection<E>, CR extends Collection<E>>
@@ -975,6 +967,7 @@ public final class IteratorUtil {
      * @param <E>
      * @param <C>
      * @param <CR>
+     *
      * @return 返回提供的容器 toResultContainer
      */
     public static <E, C extends Collection<E>, CR extends Collection<E>>
