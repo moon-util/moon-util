@@ -22,6 +22,7 @@ import java.util.function.*;
 
 import static com.moon.core.io.FileUtil.getInputStream;
 import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.util.iterator.CollectSplitter.DEFAULT_SPLIT_COUNT;
 import static com.moon.core.util.iterator.EmtpyIterator.EMPTY;
 
 /**
@@ -303,9 +304,8 @@ public final class IteratorUtil {
      * 返回 ResultSet 迭代器
      *
      * @param resultSet
-     * @param <T>
      */
-    public static <T> Iterator<ResultSet> of(ResultSet resultSet) {
+    public static Iterator<ResultSet> of(ResultSet resultSet) {
         return resultSet == null ? EMPTY : new ResultSetIterator(resultSet);
     }
 
@@ -385,8 +385,8 @@ public final class IteratorUtil {
     public final static void forEachFields(Object bean, IntBiConsumer consumer) {
         if (bean != null) {
             IntAccessor indexer = IntAccessor.of();
-            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass())
-                .forEach((name, desc) -> consumer.accept(desc.getValueIfPresent(bean, true), indexer.getAndIncrement()));
+            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass()).forEach(
+                (name, desc) -> consumer.accept(desc.getValueIfPresent(bean, true), indexer.getAndIncrement()));
         }
     }
 
@@ -671,11 +671,7 @@ public final class IteratorUtil {
     }
 
     public static <T> void forEach(Iterator<T> iterator, IntBiConsumer<? super T> consumer) {
-        if (iterator != null) {
-            for (int i = 0; iterator.hasNext(); i++) {
-                consumer.accept(iterator.next(), i);
-            }
-        }
+        if (iterator != null) { for (int i = 0; iterator.hasNext(); i++) { consumer.accept(iterator.next(), i); } }
     }
 
     /**
@@ -786,12 +782,14 @@ public final class IteratorUtil {
     public static void forEach(Reader reader, char[] buffer, Consumer<Integer> consumer) {
         if (reader != null) {
             try {
-                int length = buffer.length;
-                int limit = reader.read(buffer, 0, length);
-                while (limit >= 0) {
-                    consumer.accept(limit);
+                int length = buffer.length, limit;
+                boolean hasValue;
+                do {
                     limit = reader.read(buffer, 0, length);
-                }
+                    if (hasValue = limit >= 0) {
+                        consumer.accept(limit);
+                    }
+                } while (hasValue);
             } catch (IOException e) {
                 doThrow(e);
             }
@@ -802,21 +800,24 @@ public final class IteratorUtil {
      * 流读取和处理
      *
      * @param consumer    处理对象
-     * @param inputStream
+     * @param input
      * @param buffer
      */
-    public static void forEach(InputStream inputStream, byte[] buffer, IntConsumer consumer) {
-        try {
-            final int length = buffer.length;
-            boolean whiling;
-            int limit;
-            do {
-                limit = inputStream.read(buffer, 0, length);
-                if (whiling = (limit >= 0)) { consumer.accept(limit); }
+    public static void forEach(InputStream input, byte[] buffer, IntConsumer consumer) {
+        if (input != null) {
+            try {
+                final int length = buffer.length;
+                boolean whiling;
+                int limit;
+                do {
+                    limit = input.read(buffer, 0, length);
+                    if (whiling = (limit >= 0)) {
+                        consumer.accept(limit);
+                    }
+                } while (whiling);
+            } catch (IOException e) {
+                doThrow(e);
             }
-            while (whiling);
-        } catch (Exception e) {
-            doThrow(e);
         }
     }
 
@@ -837,9 +838,7 @@ public final class IteratorUtil {
      *
      * @return
      */
-    public static <E, C extends Collection<E>> Iterator<C> split(C c) {
-        return split(c, CollectSplitter.DEFAULT_SPLIT_COUNT);
-    }
+    public static <E, C extends Collection<E>> Iterator<C> split(C c) { return split(c, DEFAULT_SPLIT_COUNT); }
 
     /**
      * 集合拆分器
@@ -870,7 +869,7 @@ public final class IteratorUtil {
      * @param <E>
      * @param <C>
      */
-    public static <E, C extends Collection<E>> void splitter(C c, int size, Consumer<? super Collection<E>> consumer) {
+    public static <E, C extends Collection<E>> void splitter(C c, int size, Consumer<? super C> consumer) {
         split(c, size).forEachRemaining(consumer);
     }
 
@@ -882,7 +881,7 @@ public final class IteratorUtil {
      * @param <E>
      * @param <C>
      */
-    public static <E, C extends Collection<E>> void splitter(C c, Consumer<? super Collection<E>> consumer) {
+    public static <E, C extends Collection<E>> void splitter(C c, Consumer<? super C> consumer) {
         split(c).forEachRemaining(consumer);
     }
 
@@ -912,7 +911,8 @@ public final class IteratorUtil {
     }
 
     public static <K, E, C extends Collection<E>> Map<K, Collection<E>> groupBy(
-        C collect, Function<? super E, ? extends K> function) {
+        C collect, Function<? super E, ? extends K> function
+    ) {
         return GroupUtil.groupBy(collect, function);
     }
 
@@ -1007,9 +1007,7 @@ public final class IteratorUtil {
 
     CR mapTo(C collect, Function<? super E, T> function, CR container) {
         if (collect != null) {
-            for (E item : collect) {
-                container.add(function.apply(item));
-            }
+            for (E item : collect) { container.add(function.apply(item)); }
         }
         return container;
     }
