@@ -14,6 +14,7 @@ import static com.moon.core.util.runner.core.Constants.SINGLE;
  * @author benshaoye
  */
 public class ParseUtil {
+
     /**
      * 默认字符串表达式分隔符：DELIMITERS = {"{{", "}}"}
      */
@@ -33,9 +34,7 @@ public class ParseUtil {
     final static boolean isNum(int value) { return value > 47 && value < 58; }
 
     final static boolean isVar(int value) {
-        return CharUtil.isLetter(value)
-            || value == '$' || value == '_'
-            || CharUtil.isChinese(value);
+        return CharUtil.isLetter(value) || value == '$' || value == '_' || CharUtil.isChinese(value);
     }
 
     final static boolean isStr(int value) { return value == SINGLE || value == DOUBLE; }
@@ -48,6 +47,7 @@ public class ParseUtil {
      * @param chars
      * @param indexer
      * @param len
+     *
      * @return
      */
     final static int nextVal(char[] chars, IntAccessor indexer, final int len) {

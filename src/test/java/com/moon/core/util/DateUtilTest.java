@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author benshaoye
  */
-class DateUtilTestTest {
-
+class DateUtilTest {
 
 }

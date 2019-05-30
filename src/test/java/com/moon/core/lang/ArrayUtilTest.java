@@ -2,6 +2,8 @@ package com.moon.core.lang;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -27,5 +29,15 @@ public class ArrayUtilTest {
         assertEquals(JoinerUtil.join(objects, ","), "1,2,3,4,5");
         Object[] newObjects = ArrayUtil.splice(objects, 1, 4, 11, 11, 11, 11);
         assertEquals(JoinerUtil.join(newObjects, ","), "1,11,11,11,11");
+    }
+
+    @Test
+    void testReverse() {
+        Integer[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        ArrayUtil.reverse(values);
+        assertEquals(JoinerUtil.join(values, ","), "9,8,7,6,5,4,3,2,1");
+        values = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8};
+        ArrayUtil.reverse(values);
+        assertEquals(JoinerUtil.join(values, ","), "8,7,6,5,4,3,2,1");
     }
 }

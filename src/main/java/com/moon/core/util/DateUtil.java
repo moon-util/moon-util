@@ -16,19 +16,44 @@ import static java.util.Calendar.*;
  */
 public final class DateUtil extends CalendarUtil {
 
-    public final static String yyyy_MM_dd_HH_mm_ss_SSS = "yyyy-MM-dd HH:mm:ss SSS";
-    public final static String yyyy_MM_dd_hh_mm_ss_SSS = "yyyy-MM-dd hh:mm:ss SSS";
-    public final static String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
-    public final static String yyyy_MM_dd_hh_mm_ss = "yyyy-MM-dd hh:mm:ss";
-    public final static String yyyy_MM_dd_HH_mm = "yyyy-MM-dd HH:mm";
-    public final static String yyyy_MM_dd_hh_mm = "yyyy-MM-dd hh:mm";
-    public final static String yyyy_MM_dd_HH = "yyyy-MM-dd HH";
-    public final static String yyyy_MM_dd_hh = "yyyy-MM-dd hh";
-    public final static String yyyy_MM_dd = "yyyy-MM-dd";
-    public final static String yyyy_MM = "yyyy-MM";
-    public final static String yyyy = "yyyy";
-
     private DateUtil() { super(); }
+
+    /*
+     * -------------------------------------------------------------------------
+     * is
+     * -------------------------------------------------------------------------
+     */
+
+    public final static boolean isToday(Date value) { return value != null && isSameDay(value, nowDate()); }
+
+    public final static boolean isSameDay(Date value, Date other) {
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other);
+    }
+
+    public final static boolean isSameTime(Date value, Date other) {
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getSecond(value) == getSecond(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other) &&
+            getHour(value) == getHour(other) &&
+            getMinute(value) == getMinute(other);
+    }
+
+    public final static boolean isBefore(Date value, Date other) {
+        return value == null ? false : value.getTime() < other.getTime();
+    }
+
+    public final static boolean isAfter(Date value, Date other) {
+        return value == null ? false : value.getTime() > other.getTime();
+    }
+
+    public final static boolean isBeforeNow(Date value) { return isBefore(value, nowDate()); }
+
+    public final static boolean isAfterNow(Date value) { return isAfter(value, nowDate()); }
 
     /*
      * -------------------------------------------------------------------------
@@ -61,45 +86,47 @@ public final class DateUtil extends CalendarUtil {
 
     public final static Date clearMilliseconds(Date value) { return setMillisecond(toCalendar(value), 0).getTime(); }
 
-    public final static Date setYear(Date value, int amount) { return set(toCalendar(value), YEAR, amount).getTime(); }
+    /*
+     * -------------------------------------------------------------------------
+     * get and set
+     * -------------------------------------------------------------------------
+     */
 
-    public final static Date setMonth(Date value, int amount) {
-        return set(toCalendar(value), MONTH, amount).getTime();
-    }
+    public final static Date setYear(Date value, int amount) { return setYear(toCalendar(value), amount).getTime(); }
+
+    public final static Date setMonth(Date value, int amount) { return setMonth(toCalendar(value), amount).getTime(); }
 
     public final static Date setDayOfMonth(Date value, int amount) {
-        return set(toCalendar(value), DAY_OF_MONTH, amount).getTime();
+        return setDayOfMonth(toCalendar(value), amount).getTime();
     }
 
-    public final static Date setHour(Date value, int amount) {
-        return set(toCalendar(value), HOUR_OF_DAY, amount).getTime();
-    }
+    public final static Date setHour(Date value, int amount) { return setHour(toCalendar(value), amount).getTime(); }
 
     public final static Date setMinute(Date value, int amount) {
-        return set(toCalendar(value), MINUTE, amount).getTime();
+        return setMinute(toCalendar(value), amount).getTime();
     }
 
     public final static Date setSecond(Date value, int amount) {
-        return set(toCalendar(value), SECOND, amount).getTime();
+        return setSecond(toCalendar(value), amount).getTime();
     }
 
     public final static Date setMillisecond(Date value, int amount) {
-        return set(toCalendar(toCalendar(value)), MILLISECOND, amount).getTime();
+        return setMillisecond(toCalendar(value), amount).getTime();
     }
 
-    public final static int getYear(Date value) { return get(toCalendar(value), YEAR); }
+    public final static int getYear(Date value) { return getYear(toCalendar(value)); }
 
-    public final static int getMonth(Date value) { return get(toCalendar(value), MONTH); }
+    public final static int getMonth(Date value) { return getMonth(toCalendar(value)); }
 
-    public final static int getDayOfMonth(Date value) { return get(toCalendar(value), DAY_OF_MONTH); }
+    public final static int getDayOfMonth(Date value) { return getDayOfMonth(toCalendar(value)); }
 
-    public final static int getHour(Date value) { return get(toCalendar(value), HOUR_OF_DAY); }
+    public final static int getHour(Date value) { return getHour(toCalendar(value)); }
 
-    public final static int getMinute(Date value) { return get(toCalendar(value), MINUTE); }
+    public final static int getMinute(Date value) { return getMinute(toCalendar(value)); }
 
-    public final static int getSecond(Date value) { return get(toCalendar(value), SECOND); }
+    public final static int getSecond(Date value) { return getSecond(toCalendar(value)); }
 
-    public final static int getMillisecond(Date value) { return get(toCalendar(value), MILLISECOND); }
+    public final static int getMillisecond(Date value) { return getMillisecond(toCalendar(value)); }
 
     /*
      * -------------------------------------------------------------------------
@@ -116,7 +143,9 @@ public final class DateUtil extends CalendarUtil {
      */
 
 
-    public static Date parse(String dateString, String patten) { return parse(dateString, new SimpleDateFormat(patten)); }
+    public static Date parse(String dateString, String patten) {
+        return parse(dateString, new SimpleDateFormat(patten));
+    }
 
     public static Date parse(String dateString, DateFormat patten) {
         try {
@@ -133,12 +162,8 @@ public final class DateUtil extends CalendarUtil {
      */
 
     public static Time toSqlTime(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Time) {
-            return (Time) value;
-        }
+        if (value == null) { return null; }
+        if (value instanceof Time) { return (Time) value; }
         try {
             return new Time(toCalendar(value).getTimeInMillis());
         } catch (Throwable t) {
@@ -147,12 +172,8 @@ public final class DateUtil extends CalendarUtil {
     }
 
     public static Timestamp toTimestamp(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Timestamp) {
-            return (Timestamp) value;
-        }
+        if (value == null) { return null; }
+        if (value instanceof Timestamp) { return (Timestamp) value; }
         try {
             return new Timestamp(toCalendar(value).getTimeInMillis());
         } catch (Throwable t) {
@@ -161,12 +182,8 @@ public final class DateUtil extends CalendarUtil {
     }
 
     public static java.sql.Date toSqlDate(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof java.sql.Date) {
-            return (java.sql.Date) value;
-        }
+        if (value == null) { return null; }
+        if (value instanceof java.sql.Date) { return (java.sql.Date) value; }
         try {
             return new java.sql.Date(toCalendar(value).getTimeInMillis());
         } catch (Throwable t) {
@@ -179,12 +196,8 @@ public final class DateUtil extends CalendarUtil {
      */
 
     public static Date toDate(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Date) {
-            return (Date) value;
-        }
+        if (value == null) { return null; }
+        if (value instanceof Date) { return (Date) value; }
         try {
             return toCalendar(value).getTime();
         } catch (Throwable t) {
@@ -203,6 +216,7 @@ public final class DateUtil extends CalendarUtil {
      * java.util.Calendar to java.util.Date
      *
      * @param value
+     *
      * @return
      */
     public final static Date toDate(Calendar value) { return value == null ? null : value.getTime(); }

@@ -17,9 +17,8 @@ import static com.moon.core.util.IteratorUtil.forEach;
 /**
  * @author benshaoye
  */
-public class StringJoiner implements Supplier<String>,
-    ValueSupplier<String>, Appendable,
-    CharSequence, Cloneable, Serializable {
+public class StringJoiner
+    implements Supplier<String>, ValueSupplier<String>, Appendable, CharSequence, Cloneable, Serializable {
 
     private static final long serialVersionUID = 6428348081105594320L;
 
@@ -56,12 +55,17 @@ public class StringJoiner implements Supplier<String>,
     }
 
     private StringJoiner(
-        Function<Object, String> stringifier, CharSequence prefix, CharSequence delimiter,
-        CharSequence suffix, CharSequence useForNull, boolean requireNonNull, CharSequence value
+        Function<Object, String> stringifier,
+        CharSequence prefix,
+        CharSequence delimiter,
+        CharSequence suffix,
+        CharSequence useForNull,
+        boolean requireNonNull,
+        CharSequence value
     ) {
         this.useForNull = useForNull == null ? null : useForNull.toString();
-        this.setStringifier(stringifier).setPrefix(prefix).setDelimiter(delimiter)
-            .setSuffix(suffix).requireNonNull(requireNonNull).clear(value);
+        this.setStringifier(stringifier).setPrefix(prefix).setDelimiter(delimiter).setSuffix(suffix)
+            .requireNonNull(requireNonNull).clear(value);
     }
 
     public final static StringJoiner of(CharSequence delimiter) {return new StringJoiner(delimiter);}
@@ -214,7 +218,9 @@ public class StringJoiner implements Supplier<String>,
 
     public StringJoiner join(Iterator iterator) { return ifChecked(iterator, values -> forEach(values, this::add)); }
 
-    public StringJoiner join(Enumeration enumeration) { return ifChecked(enumeration, values -> forEach(values, this::add)); }
+    public StringJoiner join(Enumeration enumeration) {
+        return ifChecked(enumeration, values -> forEach(values, this::add));
+    }
 
     public <K, V> StringJoiner join(Map<K, V> map, BiFunction<? super K, ? super V, CharSequence> merger) {
         return ifChecked(map, values -> values.forEach((key, value) -> add(merger.apply(key, value))));
@@ -333,8 +339,7 @@ public class StringJoiner implements Supplier<String>,
      */
 
     private StringJoiner clear(CharSequence defaultValue) {
-        this.container = defaultValue == null
-            ? new StringBuilder() : new StringBuilder(defaultValue);
+        this.container = defaultValue == null ? new StringBuilder() : new StringBuilder(defaultValue);
         this.itemCount = 0;
         return this;
     }
@@ -354,7 +359,9 @@ public class StringJoiner implements Supplier<String>,
     public int length() { return container.length() + suffix.length(); }
 
     @Override
-    public StringJoiner clone() { return new StringJoiner(stringifier, prefix, delimiter, suffix, useForNull, requireNonNull, container); }
+    public StringJoiner clone() {
+        return new StringJoiner(stringifier, prefix, delimiter, suffix, useForNull, requireNonNull, container);
+    }
 
     @Override
     public char charAt(int index) {

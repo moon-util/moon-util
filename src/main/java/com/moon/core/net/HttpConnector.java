@@ -26,7 +26,7 @@ public abstract class HttpConnector {
     }
 
     public HttpConnector(String url, RequestMethod method) {
-        this(URLUtil.withHttps(url), method);
+        this(URLUtil.ofHttps(url), method);
     }
 
     public HttpConnector(URL url) {

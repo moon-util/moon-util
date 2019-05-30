@@ -4,8 +4,8 @@ import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.DoubleUtil;
 import com.moon.core.lang.reflect.MethodUtil;
 import com.moon.core.script.ScriptUtil;
-import com.moon.core.util.Console;
 import com.moon.core.util.DateUtil;
+import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
 import org.junit.jupiter.api.Test;
@@ -21,12 +21,93 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author benshaoye
  */
 class RunnerUtilTestTest {
+
     Object data, res;
     Runner runner, runner1;
 
     @Test
+    void testFunc1() {
+        data = RunnerUtil.run("false||false");
+        assertEquals(data, false || false);
+        data = RunnerUtil.run("false|false");
+        assertEquals(data, false | false);
+        data = RunnerUtil.run("true||true");
+        assertEquals(data, true || true);
+        data = RunnerUtil.run("true|true");
+        assertEquals(data, true | true);
+
+        data = RunnerUtil.run("true||false");
+        assertEquals(data, true || false);
+
+        data = RunnerUtil.run("true|false");
+        assertEquals(data, true | false);
+
+        data = RunnerUtil.run("false||true");
+        assertEquals(data, false || true);
+
+        data = RunnerUtil.run("false|true");
+        assertEquals(data, false | true);
+
+        data = RunnerUtil.run("false&&false");
+        assertEquals(data, false && false);
+
+        data = RunnerUtil.run("false&false");
+        assertEquals(data, false & false);
+
+        data = RunnerUtil.run("true&&true");
+        assertEquals(data, true && true);
+
+        data = RunnerUtil.run("true&true");
+        assertEquals(data, true & true);
+
+        data = RunnerUtil.run("true&&false");
+        assertEquals(data, true && false);
+
+        data = RunnerUtil.run("true&false");
+        assertEquals(data, true & false);
+
+        data = RunnerUtil.run("false&&true");
+        assertEquals(data, false && true);
+
+        data = RunnerUtil.run("false&true");
+        assertEquals(data, false & true);
+
+        data = RunnerUtil.run("false^false");
+        assertEquals(data, false ^ false);
+
+        data = RunnerUtil.run("true^true");
+        assertEquals(data, true ^ true);
+
+        data = RunnerUtil.run("true^false");
+        assertEquals(data, true ^ false);
+
+        data = RunnerUtil.run("false^true");
+        assertEquals(data, false ^ true);
+    }
+
+    @Test
+    void testFunc0() {
+        data = RunnerUtil.run("@list(1,2,null,3,4,5,)");
+        res = RunnerUtil.run("{1,2,null,3,4,5,}");
+        final List list0 = (List) res;
+        IteratorUtil.forEachAny(data, (value, i) -> assertEquals(value, list0.get(i)));
+        data = RunnerUtil.run("@map(1,2,null,3,4,5,6,)");
+        res = RunnerUtil.run("{1:2,null:3,4:5,6:null}");
+
+        assertEquals(2, MapUtil.getByObject(data, 1));
+        assertEquals(3, MapUtil.getByObject(data, null));
+        assertEquals(5, MapUtil.getByObject(data, 4));
+        assertEquals(null, MapUtil.getByObject(data, 6));
+
+        assertEquals(2, MapUtil.getByObject(res, 1));
+        assertEquals(3, MapUtil.getByObject(res, null));
+        assertEquals(5, MapUtil.getByObject(res, 4));
+        assertEquals(null, MapUtil.getByObject(data, 6));
+    }
+
+    @Test
     void testFunc() {
-        runner = RunnerUtil.parse("@now()");
+        runner = RunnerUtil.parse("@time()");
         runner1 = RunnerUtil.parse("@System.currentTimeMillis()");
 
         System.out.println(data = runner.run());
@@ -167,16 +248,10 @@ class RunnerUtilTestTest {
         }};
 
         str = "本草纲目{{'好的'}}  {{   123   }}  电脑 {{1+2+3+5+6}} {{name}}";
-        assertEquals(
-            RunnerUtil.parseRun(str, data),
-            "本草纲目好的  123  电脑 17 456"
-        );
+        assertEquals(RunnerUtil.parseRun(str, data), "本草纲目好的  123  电脑 17 456");
 
         str = "本草纲目{{'好的'}}  {{123}}  ";
-        assertEquals(
-            RunnerUtil.parseRun(str, data),
-            "本草纲目好的  123  "
-        );
+        assertEquals(RunnerUtil.parseRun(str, data), "本草纲目好的  123  ");
     }
 
     @Test
@@ -214,22 +289,17 @@ class RunnerUtilTestTest {
         }};
 
         str = "本草纲目${'好的'}}  ${123}}  电脑 ${1+2+3+5+6}} ${name}}";
-        assertEquals(
-            RunnerUtil.parseRun(str, delimiters, data),
-            "本草纲目好的  123  电脑 17 456"
-        );
+        assertEquals(RunnerUtil.parseRun(str, delimiters, data), "本草纲目好的  123  电脑 17 456");
 
         str = "本草纲目${'好的'}}  ${123}}  ";
-        assertEquals(
-            RunnerUtil.parseRun(str, delimiters, data),
-            "本草纲目好的  123  "
-        );
+        assertEquals(RunnerUtil.parseRun(str, delimiters, data), "本草纲目好的  123  ");
     }
 
     @Test
     void testParseRun2() {
         res = RunnerUtil.run("@Long.  parseLong(   @Objects.toString(   @DateUtil.now(   )   )  )");
-        res = RunnerUtil.run("-(-@Long.parseLong(   @   Objects  . toString( @    DateUtil .  now(   ))  )   ).longValue()");
+        res = RunnerUtil
+            .run("-(-@Long.parseLong(   @   Objects  . toString( @    DateUtil .  now(   ))  )   ).longValue()");
         assertTrue(res instanceof Long);
         res = RunnerUtil.run("@MapUtil.sizeByObject({key: null, null: true})");
         assertTrue(res instanceof Integer);
@@ -333,11 +403,8 @@ class RunnerUtilTestTest {
 
     @Test
     void testCustomCaller() {
-        RunnerSettings settings = RunnerSettings.of()
-            .setObjCreator(LinkedHashMap::new)
-            .setArrCreator(LinkedList::new)
-            .addCaller("call", Caller.class)
-            .addCaller("Objects", InnerObjects.class);
+        RunnerSettings settings = RunnerSettings.of().setObjCreator(LinkedHashMap::new).setArrCreator(LinkedList::new)
+            .addCaller("call", Caller.class).addCaller("Objects", InnerObjects.class);
 
         Runner runner = RunnerUtil.parse("@call.get()", settings);
         assertEquals(runner.run(), "123456789");
@@ -393,7 +460,7 @@ class RunnerUtilTestTest {
         }};
         runner = RunnerUtil.parse("((money+count)*people/100)+50-88+cat*10");
         int money = 2640, count = 50, people = 25, cat = 1, x = 2;
-        assertEquals(runner.run(data), (Object)(((money + count) * people / 100) + 50 - 88 + cat * 10));
+        assertEquals(runner.run(data), (Object) (((money + count) * people / 100) + 50 - 88 + cat * 10));
 
         data = new HashMap() {{
             put("value", 7);
@@ -405,23 +472,25 @@ class RunnerUtilTestTest {
         String st = "test", state = "正常";
         boolean flag = true;
         runner = RunnerUtil.parse("value > 5 && st == \"test\" && state == \"正常\" && flag == true");
-        assertEquals(runner.run(data), value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
+        assertEquals(runner.run(data),
+            value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
         runner = RunnerUtil.parse("value > 5 && st =='test' && state == '正常' && flag == true");
-        assertEquals(runner.run(data), value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
+        assertEquals(runner.run(data),
+            value > 5 && Objects.equals("test", st) && Objects.equals("正常", state) && flag == true);
         runner = RunnerUtil.parse("1 + 2 * (4 - 3) / 2");
-        assertEquals(runner.run(), (Object)(1 + 2 * (4 - 3) / 2));
+        assertEquals(runner.run(), (Object) (1 + 2 * (4 - 3) / 2));
         runner = RunnerUtil.parse("(10 + 20) * 3 / 5 - 6");
-        assertEquals(runner.run(), (Object)((10 + 20) * 3 / 5 - 6));
+        assertEquals(runner.run(), (Object) ((10 + 20) * 3 / 5 - 6));
         runner = RunnerUtil.parse("110 + 2 * (40 - 3) / 2");
-        assertEquals(runner.run(), (Object)(110 + 2 * (40 - 3) / 2));
+        assertEquals(runner.run(), (Object) (110 + 2 * (40 - 3) / 2));
         runner = RunnerUtil.parse("3+(2-5)*6/3 ");
-        assertEquals(runner.run(), (Object)(3 + (2 - 5) * 6 / 3));
+        assertEquals(runner.run(), (Object) (3 + (2 - 5) * 6 / 3));
         runner = RunnerUtil.parse("5 * ( 4.1 + 2 -6 /(8-2))");
         assertEquals(runner.run(), 5 * (4.1 + 2 - 6 / (8 - 2)));
         runner = RunnerUtil.parse("5 * ( 4.1 + 2.9 )");
         assertEquals(runner.run(), 5 * (4.1 + 2.9));
         runner = RunnerUtil.parse("14/3*2");
-        assertEquals(runner.run(), (Object)(14 / 3 * 2));
+        assertEquals(runner.run(), (Object) (14 / 3 * 2));
 
     }
 
@@ -496,12 +565,14 @@ class RunnerUtilTestTest {
     @Test
     void testPerformance2() {
         data = vars;
-        str = "i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99 ==i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99";
+        str
+            = "i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99 ==i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99";
         runner = RunnerUtil.parse(str);
 
         int i = 100, b = 4;
         double d = -3.9;
-        res = i * Math.PI + (d * b - 199) / (1 - d * Math.PI) - (2 + 100 - i / Math.PI) % 99 == i * Math.PI + (d * b - 199) / (1 - d * Math.PI) - (2 + 100 - i / Math.PI) % 99;
+        res = i * Math.PI + (d * b - 199) / (1 - d * Math.PI) - (2 + 100 - i / Math.PI) % 99 ==
+            i * Math.PI + (d * b - 199) / (1 - d * Math.PI) - (2 + 100 - i / Math.PI) % 99;
         assertEquals(res, runner.run(data));
 
         final Runner er = runner;
@@ -521,7 +592,8 @@ class RunnerUtilTestTest {
     @Test
     void testPerformance6() {
 
-        str = "i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99 ==i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99";
+        str
+            = "i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99 ==i * @Math.PI + (d * b - 199) / (1 - d * @Math.PI) - (2 + 100 - i / @Math.PI) % 99";
         runner = RunnerUtil.parse(str);
         res = runner.run(vars);
 
@@ -543,12 +615,14 @@ class RunnerUtilTestTest {
     }
 
     public static class Caller {
+
         public static final String get() {
             return "123456789";
         }
     }
 
     public static class InnerObjects {
+
         public static final String toString(Object o) {
             return "--11--";
         }

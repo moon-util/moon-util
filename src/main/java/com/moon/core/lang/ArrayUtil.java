@@ -23,7 +23,7 @@ public final class ArrayUtil {
 
     public static String stringify(Object arr) {
         if (arr == null) { return null; }
-        if (arr instanceof Object[]) {return Arrays.toString((Object[]) arr);}
+        if (arr instanceof Object[]) {return Arrays.deepToString((Object[]) arr);}
         if (arr instanceof int[]) {return Arrays.toString((int[]) arr);}
         if (arr instanceof long[]) {return Arrays.toString((long[]) arr);}
         if (arr instanceof double[]) {return Arrays.toString((double[]) arr);}
@@ -91,6 +91,22 @@ public final class ArrayUtil {
         return values;
     }
 
+    /*
+     * ----------------------------------------------------------------
+     * reverse
+     * ----------------------------------------------------------------
+     */
+
+    public static <T> T[] reverse(T... values) {
+        return ifNonNull(values, items -> {
+            T cache;
+            for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
+                cache = items[len - i];
+                items[len - i] = items[i];
+                items[i] = cache;
+            }
+        });
+    }
 
     /*
      * ----------------------------------------------------------------
@@ -98,7 +114,9 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
-    public final static Class getArrayType(Class componentType) { return Array.newInstance(componentType, 0).getClass(); }
+    public final static Class getArrayType(Class componentType) {
+        return Array.newInstance(componentType, 0).getClass();
+    }
 
     /*
      * ----------------------------------------------------------------
@@ -156,21 +174,37 @@ public final class ArrayUtil {
 
     public static <T> T[] fillFrom(T[] arr, int fromIndex, T value) { return fill(arr, fromIndex, length(arr), value); }
 
-    public static boolean[] fillFrom(boolean[] arr, int fromIndex, boolean value) { return fill(arr, fromIndex, length(arr), value); }
+    public static boolean[] fillFrom(boolean[] arr, int fromIndex, boolean value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
-    public static double[] fillFrom(double[] arr, int fromIndex, double value) { return fill(arr, fromIndex, length(arr), value); }
+    public static double[] fillFrom(double[] arr, int fromIndex, double value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
-    public static float[] fillFrom(float[] arr, int fromIndex, float value) { return fill(arr, fromIndex, length(arr), value); }
+    public static float[] fillFrom(float[] arr, int fromIndex, float value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
-    public static long[] fillFrom(long[] arr, int fromIndex, long value) { return fill(arr, fromIndex, length(arr), value); }
+    public static long[] fillFrom(long[] arr, int fromIndex, long value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
-    public static int[] fillFrom(int[] arr, int fromIndex, int value) { return fill(arr, fromIndex, length(arr), value); }
+    public static int[] fillFrom(int[] arr, int fromIndex, int value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
-    public static short[] fillFrom(short[] arr, int fromIndex, short value) { return fill(arr, fromIndex, length(arr), value); }
+    public static short[] fillFrom(short[] arr, int fromIndex, short value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
-    public static byte[] fillFrom(byte[] arr, int fromIndex, byte value) { return fill(arr, fromIndex, length(arr), value); }
+    public static byte[] fillFrom(byte[] arr, int fromIndex, byte value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
-    public static char[] fillFrom(char[] arr, int fromIndex, char value) { return fill(arr, fromIndex, length(arr), value); }
+    public static char[] fillFrom(char[] arr, int fromIndex, char value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
 
     /*
      * ----------------------------------------------------------------

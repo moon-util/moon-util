@@ -25,38 +25,38 @@ public final class URLUtil {
      * @param url
      * @return
      */
-    public static URL withOnly(String url) {
+    public static URL ofOrigin(String url) {
         return LangUtil.apply(url, URL::new);
     }
 
-    public static URL withHttp(String url) {
-        return with(url, HTTP);
+    public static URL ofHttp(String url) {
+        return of(url, HTTP);
     }
 
-    public static URL withHttps(String url) {
-        return with(url, HTTPS);
+    public static URL ofHttps(String url) {
+        return of(url, HTTPS);
     }
 
-    public static URL with(String url, Protocol protocol) {
-        return with(url, protocol.getText());
+    public static URL of(String url, Protocol protocol) {
+        return of(url, protocol.getText());
     }
 
-    public static URL with(String url, String protocol) {
+    public static URL of(String url, String protocol) {
         url = url.trim();
         String root = "//";
         int endIndex = 6;
         int index = url.indexOf(root);
         if (Protocol.matchProtocolWith(url)) {
             if (index >= 0 && index < endIndex) {
-                return withOnly(url);
+                return ofOrigin(url);
             } else {
                 return ThrowUtil.doThrow("no protocol: " + url);
             }
         } else {
             if (index == 0) {
-                return withOnly(protocol + url);
+                return ofOrigin(protocol + url);
             } else if (index < 0) {
-                return withOnly(StringUtil.concat(protocol, root, url));
+                return ofOrigin(StringUtil.concat(protocol, root, url));
             }
             return ThrowUtil.doThrow("no protocol: " + url);
         }

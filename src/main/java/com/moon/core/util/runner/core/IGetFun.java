@@ -25,7 +25,7 @@ class IGetFun {
 
     static {
         Class[] classes = {
-            NowFunctions.class,
+            TimeFunctions.class,
             StrFunctions.class,
             MapFunctions.class,
             ListFunctions.class,
@@ -183,32 +183,32 @@ class IGetFun {
         public String functionName() { return this.name().replace('_', '.'); }
     }
 
-    private enum NowFunctions implements RunnerFunction {
-        now_year {
+    private enum TimeFunctions implements RunnerFunction {
+        time_year {
             @Override
             public Object apply() { return LocalDate.now().getYear(); }
         },
-        now_month {
+        time_month {
             @Override
             public Object apply() { return LocalDate.now().getMonthValue(); }
         },
-        now_day {
+        time_day {
             @Override
             public Object apply() { return LocalDate.now().getDayOfMonth(); }
         },
-        now_hour {
+        time_hour {
             @Override
             public Object apply() { return LocalTime.now().getHour(); }
         },
-        now_minute {
+        time_minute {
             @Override
             public Object apply() { return LocalTime.now().getMinute(); }
         },
-        now_second {
+        time_second {
             @Override
             public Object apply() { return LocalTime.now().getSecond(); }
         },
-        now {
+        time {
             @Override
             public Object apply() { return System.currentTimeMillis(); }
 

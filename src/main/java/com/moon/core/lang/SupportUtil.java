@@ -21,9 +21,7 @@ public final class SupportUtil {
 
     private final static char DOT = '.';
 
-    private SupportUtil() {
-        noInstanceError("这个类不推荐任何形式调用");
-    }
+    private SupportUtil() { noInstanceError("这个类不推荐任何形式调用"); }
 
     public static int addTrueValue(char[] data, int posBegin) {
         data[posBegin++] = 't';
@@ -78,28 +76,44 @@ public final class SupportUtil {
         return toStr(value, index);
     }
 
+    /**
+     * 解析字符串中的数字
+     * 数字间为了方便阅读，可用下划线分割，允许数字间有一个或多个下划线
+     * 表示一个数字的字符串所有字符必须连续
+     *
+     * @param chars   源字符数组
+     * @param indexer 指向数字的第二个字符，如：1234  则索引值为 1，指向字符串中的字符 2，
+     * @param len     源数组长度
+     * @param current 当前数字字符，如：1234，则为 1
+     *
+     * @return
+     */
     public final static Number parseNum(char[] chars, IntAccessor indexer, int len, int current) {
         char curr = (char) current;
         char[] value = {curr};
         int index = value.length, i = indexer.get();
         final Number number;
-        for (; i < len && isNum(curr = chars[i]); i++) {
-            value = setChar(value, index++, curr);
+        for (; i < len && (isNum(curr = chars[i]) || isUnderscore(curr)); i++) {
+            if (isNum(curr)) {
+                value = setChar(value, index++, curr);
+            }
         }
         if (curr == DOT) {
             final int cacheIndex = index, cacheI = i + 1;
             value = setChar(value, index++, curr);
-            for (++i; i < len && isNum(curr = chars[i]); i++) {
-                value = setChar(value, index++, curr);
+            for (++i; i < len && (isNum(curr = chars[i]) || isUnderscore(curr)); i++) {
+                if (isNum(curr)) {
+                    value = setChar(value, index++, curr);
+                }
             }
             if (cacheI == i && isVar(curr)) {
                 i--;
-                number = Integer.parseInt(toStr(value, cacheIndex));
+                number = Integer.valueOf(toStr(value, cacheIndex));
             } else {
                 number = Double.parseDouble(toStr(value, index));
             }
         } else {
-            number = Integer.parseInt(toStr(value, index));
+            number = Integer.valueOf(toStr(value, index));
         }
         setIndexer(indexer, i, len);
         return number;
@@ -123,37 +137,48 @@ public final class SupportUtil {
         indexer.set(index < len ? index : len);
     }
 
-    public final static String toStr(char[] chars, int len) {
-        return new String(chars, 0, len);
-    }
+    public final static String toStr(char[] chars, int len) { return new String(chars, 0, len); }
 
-    public final static boolean isNum(int value) {
-        return value > 47 && value < 58;
-    }
+    public final static boolean isNum(int value) { return value > 47 && value < 58; }
+
+    public final static boolean isUnderscore(int value) { return value == '_'; }
 
     public final static boolean isVar(int value) {
-        return CharUtil.isLetter(value) || value == '$'
-            || value == '_' || CharUtil.isChinese(value);
+        return CharUtil.isLetter(value) || value == '$' || isUnderscore(value) || CharUtil.isChinese(value);
     }
 
+    /**
+     * 跳过空字符
+     *
+     * @param chars
+     * @param indexer
+     * @param len
+     *
+     * @return
+     */
     public final static int skipWhitespaces(char[] chars, IntAccessor indexer, final int len) {
         int index = indexer.get(), ch = 0;
-        while (index < len && isWhitespace(ch = chars[index++])) {
-        }
+        while (index < len && isWhitespace(ch = chars[index++])) { }
         indexer.set(index);
         return ch;
     }
 
+    /**
+     * 抛出指定位置异常，异常信息为 indexer 指向的前后 amount 个字符，超出首尾自动以首尾为止
+     *
+     * @param chars
+     * @param indexer
+     * @param <T>
+     *
+     * @return
+     */
     public final static <T> T throwErr(char[] chars, IntAccessor indexer) {
         int amount = 12, len = chars.length, index = indexer.get();
         int end = index + amount < len ? index + amount : len;
         int start = index < amount ? 0 : index - amount;
         throw new IllegalArgumentException(
-            new StringBuilder((amount + 5) * 2)
-                .append(">>>>>")
-                .append(chars, start, end - start)
-                .append("<<<<<").toString()
-        );
+            new StringBuilder((amount + 5) * 2).append(">>>>>").append(chars, start, end - start).append("<<<<<")
+                .toString());
     }
 
     /**
@@ -161,36 +186,25 @@ public final class SupportUtil {
      * 其他自定义对象或集合均抛出异常
      *
      * @param o
+     *
      * @return
      */
     public static Object onlyOneItemOrSize(Object o) {
-        if (o == null) {
-            return null;
-        }
+        if (o == null) { return null; }
         int size;
-        if (o.getClass().isArray()) {
-            return ((size = Array.getLength(o)) == 1) ? Array.get(o, 0) : size;
-        }
+        if (o.getClass().isArray()) { return ((size = Array.getLength(o)) == 1) ? Array.get(o, 0) : size; }
         if (o instanceof Collection) {
             return (size = ((Collection) o).size()) == 1 ? ((Collection) o).iterator().next() : size;
         }
         if (o instanceof Map) {
             return (size = ((Map) o).size()) == 1 ? ((Map) o).values().iterator().next() : size;
         }
-        if (o instanceof Iterable) {
-            return ((Iterable) o).iterator().next();
-        }
+        if (o instanceof Iterable) { return ((Iterable) o).iterator().next(); }
         throw new IllegalArgumentException();
     }
 
     public static <T> T matchOne(Collection<T> collection, Predicate<? super T> test) {
-        if (collection != null) {
-            for (T t : collection) {
-                if (test.test(t)) {
-                    return t;
-                }
-            }
-        }
+        if (collection != null) { for (T t : collection) { if (test.test(t)) { return t; } } }
         return null;
     }
 
@@ -233,9 +247,7 @@ public final class SupportUtil {
     }
 
     public static char[] ensureToLength(char[] chars, int newLength, int presentLength) {
-        if (chars == null) {
-            return new char[newLength];
-        }
+        if (chars == null) { return new char[newLength]; }
         if (chars.length < newLength) {
             char[] newArr = new char[newLength];
             System.arraycopy(chars, 0, newArr, 0, presentLength);
@@ -244,7 +256,9 @@ public final class SupportUtil {
         return chars;
     }
 
-    public static char[] defaultChars(char[] chars) {
-        return chars == null ? new char[8] : chars;
+    public static char[] defaultChars(char[] chars) { return defaultChars(chars, 8); }
+
+    public static char[] defaultChars(char[] chars, int length) {
+        return chars == null ? new char[length] : chars;
     }
 }

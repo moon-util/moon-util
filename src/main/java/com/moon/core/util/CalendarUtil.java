@@ -21,15 +21,69 @@ import static java.util.Calendar.*;
  * @author benshaoye
  */
 public class CalendarUtil {
+
     protected CalendarUtil() { noInstanceError(); }
 
-    private final static String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
+    public final static String yyyy_MM_dd_HH_mm_ss_SSS = "yyyy-MM-dd HH:mm:ss SSS";
+    public final static String yyyy_MM_dd_hh_mm_ss_SSS = "yyyy-MM-dd hh:mm:ss SSS";
+    public final static String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
+    public final static String yyyy_MM_dd_hh_mm_ss = "yyyy-MM-dd hh:mm:ss";
+    public final static String yyyy_MM_dd_HH_mm = "yyyy-MM-dd HH:mm";
+    public final static String yyyy_MM_dd_hh_mm = "yyyy-MM-dd hh:mm";
+    public final static String yyyy_MM_dd_HH = "yyyy-MM-dd HH";
+    public final static String yyyy_MM_dd_hh = "yyyy-MM-dd hh";
+    public final static String yyyy_MM_dd = "yyyy-MM-dd";
+    public final static String yyyy_MM = "yyyy-MM";
+    public final static String yyyy = "yyyy";
+
+    private final static String PATTERN = yyyy_MM_dd_HH_mm_ss;
+
+    private final static String[] PATTERNS = {
+        yyyy, yyyy_MM, yyyy_MM_dd, yyyy_MM_dd_HH, yyyy_MM_dd_HH_mm, yyyy_MM_dd_HH_mm_ss, yyyy_MM_dd_HH_mm_ss_SSS,
+    };
 
     private final static int[] PARSE_FIELD_OF_CALENDAR = {
-        YEAR, MONTH, DAY_OF_MONTH, HOUR_OF_DAY,
-        MINUTE, SECOND, MILLISECOND};
+        YEAR, MONTH, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE, SECOND, MILLISECOND
+    };
 
-    protected final static Calendar current() { return getInstance(); }
+    final static Calendar current() { return getInstance(); }
+
+    /*
+     * -------------------------------------------------------------------------
+     * is
+     * -------------------------------------------------------------------------
+     */
+
+    public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, current()); }
+
+    public final static boolean isSameDay(Calendar value, Calendar other) {
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other);
+    }
+
+    public final static boolean isSameTime(Calendar value, Calendar other) {
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other) &&
+            getHour(value) == getHour(other) &&
+            getMinute(value) == getMinute(other) &&
+            getSecond(value) == getSecond(other);
+    }
+
+    public final static boolean isBefore(Calendar value, Calendar other) {
+        return value == null ? false : value.getTimeInMillis() < other.getTimeInMillis();
+    }
+
+    public final static boolean isAfter(Calendar value, Calendar other) {
+        return value == null ? false : value.getTimeInMillis() > other.getTimeInMillis();
+    }
+
+    public final static boolean isBeforeNow(Calendar value) { return isBefore(value, current()); }
+
+    public final static boolean isAfterNow(Calendar value) { return isAfter(value, current()); }
 
     /*
      * -------------------------------------------------------------------------
@@ -211,12 +265,14 @@ public class CalendarUtil {
     public final static int getMillisecond(Calendar value) { return get(value, MILLISECOND); }
 
     public final static Calendar set(Calendar value, int field, int amount) {
-        Calendar current = copy(value);
-        current.set(field, field == MONTH ? amount - 1 : amount);
-        return current;
+        Calendar copied = copy(value);
+        copied.set(field, field == MONTH ? amount - 1 : amount);
+        return copied;
     }
 
-    public final static int get(Calendar cal, int field) { return field == MONTH ? cal.get(field) + 1 : cal.get(field); }
+    public final static int get(Calendar cal, int field) {
+        return field == MONTH ? cal.get(field) + 1 : cal.get(field);
+    }
 
     /*
      * -------------------------------------------------------------------------
@@ -224,21 +280,59 @@ public class CalendarUtil {
      * -------------------------------------------------------------------------
      */
 
-    public final static String format() { return format(yyyy_MM_dd_HH_mm_ss); }
+    public final static DateFormat toFormat(String pattern) {
+        return new SimpleDateFormat(pattern);
+    }
 
-    public final static String format(String pattern) { return format(new Date(), pattern); }
+    public final static String format(DateFormat pattern, int... values) {
+        return format(toCalendar(values), pattern);
+    }
 
-    public final static String format(Date date, String pattern) { return format(date, new SimpleDateFormat(pattern)); }
+    public final static String format(String pattern, int... values) {
+        return format(toFormat(pattern), values);
+    }
 
-    public final static String format(Date date, DateFormat formatter) { return formatter.format(date); }
+    public final static String format(int... values) {
+        return format(PATTERNS[values.length - 1], values);
+    }
 
-    public final static String format(Date date) { return format(date, yyyy_MM_dd_HH_mm_ss); }
+    public final static String format(DateFormat pattern, String... values) {
+        return format(toCalendar(values), pattern);
+    }
 
-    public final static String format(Calendar date) { return format(date.getTime()); }
+    public final static String format(String... values) {
+        return format(toFormat(PATTERNS[values.length - 1]), values);
+    }
 
-    public final static String format(Calendar date, String pattern) { return format(date.getTime(), pattern); }
+    public final static String format() { return format(PATTERN); }
 
-    public final static String format(Calendar date, DateFormat formatter) { return format(date.getTime(), formatter); }
+    public final static String format(String pattern) {
+        return pattern == null ? null : format(new Date(), pattern);
+    }
+
+    public final static String format(Date date, String pattern) {
+        return date == null ? null : format(date, toFormat(pattern));
+    }
+
+    public final static String format(Date date, DateFormat formatter) {
+        return date == null ? null : formatter.format(date);
+    }
+
+    public final static String format(Date date) {
+        return date == null ? null : format(date, PATTERN);
+    }
+
+    public final static String format(Calendar date) {
+        return date == null ? null : format(date.getTime());
+    }
+
+    public final static String format(Calendar date, String pattern) {
+        return date == null ? null : format(date.getTime(), pattern);
+    }
+
+    public final static String format(Calendar date, DateFormat formatter) {
+        return date == null ? null : format(date.getTime(), formatter);
+    }
 
     /*
      * -------------------------------------------------------------------------
@@ -311,10 +405,11 @@ public class CalendarUtil {
     /**
      * 解析成 Calendar 日期
      *
-     * @param arguments 用 String 表示的年、月、日、时、分、秒、毫秒等一个或多个字段按顺序传入
+     * @param values 用 String 表示的年、月、日、时、分、秒、毫秒等一个或多个字段按顺序传入
      */
-    public final static Calendar toCalendar(String... arguments) {
-        int size = arguments.length;
+    public final static Calendar toCalendar(String... values) {
+        if (values == null) { return null; }
+        int size = values.length;
         int length = PARSE_FIELD_OF_CALENDAR.length;
         size = size > length ? length : size;
         Calendar calendar = getInstance();
@@ -323,9 +418,9 @@ public class CalendarUtil {
         for (; i < size; i++) {
             int currField = PARSE_FIELD_OF_CALENDAR[i];
             if (currField == MONTH) {
-                calendar.set(currField, parseInt(arguments[i]) - 1);
+                calendar.set(currField, parseInt(values[i]) - 1);
             } else {
-                calendar.set(currField, parseInt(arguments[i]));
+                calendar.set(currField, parseInt(values[i]));
             }
         }
         for (; i < length; i++) {
@@ -335,7 +430,7 @@ public class CalendarUtil {
         return calendar;
     }
 
-    public final static Calendar toCalendar(Number value) { return toCalendar(value.longValue()); }
+    public final static Calendar toCalendar(Number num) { return num == null ? null : toCalendar(num.longValue()); }
 
     public final static Calendar toCalendar(long timeMillis) {
         Calendar calendar = getInstance();
@@ -343,25 +438,30 @@ public class CalendarUtil {
         return calendar;
     }
 
-    public final static Calendar toCalendar(Date date) { return toCalendar(date.getTime()); }
+    public final static Calendar toCalendar(Date date) { return date == null ? null : toCalendar(date.getTime()); }
 
     public final static Calendar toCalendar(LocalDate date, LocalTime time) {
-        return toCalendar(date.getYear(), date.getDayOfMonth(), date.getDayOfMonth(),
-            time.getHour(), time.getMinute(), time.getSecond());
+        return toCalendar(date.getYear(), date.getDayOfMonth(), date.getDayOfMonth(), time.getHour(), time.getMinute(),
+            time.getSecond());
     }
 
-    public final static Calendar toCalendar(LocalTime time) { return toCalendar(LocalDate.now(), time); }
+    public final static Calendar toCalendar(LocalTime time) {
+        return time == null ? null : toCalendar(LocalDate.now(), time);
+    }
 
     public final static Calendar toCalendar(LocalDate date) {
-        return toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0);
+        return date == null ? null : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0);
     }
 
     public final static Calendar toCalendar(LocalDateTime date) {
-        return toCalendar(date.getYear(), date.getMonthValue(),
-            date.getDayOfMonth(), date.getHour(), date.getMinute(), date.getSecond());
+        return date == null
+               ? null
+               : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), date.getHour(),
+                   date.getMinute(), date.getSecond());
     }
 
     public final static Calendar toCalendar(int... values) {
+        if (values == null) { return null; }
         final int len = values.length, max = 6;
         int i = 0;
         Calendar calendar = current();
@@ -398,13 +498,9 @@ public class CalendarUtil {
     }
 
     public final static Calendar toCalendar(CharSequence value) {
+        if (value == null) { return null; }
         String temp = value.toString();
-        if (DetectUtil.isNumeric(temp)) {
-            Calendar calendar = current();
-            calendar.setTimeInMillis(LongUtil.toLong(temp));
-            return calendar;
-        }
-        return parseToCalendar(value.toString());
+        return DetectUtil.isNumeric(temp) ? toCalendar(LongUtil.toLong(temp)) : parseToCalendar(temp);
     }
 
     public final static Calendar toCalendar(Object value) {

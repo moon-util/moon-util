@@ -236,6 +236,8 @@ public final class ThrowUtil {
         throw new IllegalAccessError(message);
     }
 
+    public static <T> T unsupported() { throw new UnsupportedOperationException(); }
+
     public static <T> T unsupported(String message) { throw new UnsupportedOperationException(message); }
 
     public static <T> T unsupported(Object message) { return unsupported(String.valueOf(message)); }

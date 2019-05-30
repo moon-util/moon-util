@@ -18,6 +18,7 @@ import static com.moon.core.util.runner.core.Constants.*;
  * @author benshaoye
  */
 class ParseCore {
+
     private ParseCore() { noInstanceError(); }
 
     private final static Map<String, AsRunner> CACHE = ReferenceUtil.manageMap();
@@ -37,8 +38,7 @@ class ParseCore {
 
     final static AsRunner parse(String expression) {
         AsRunner runner = CACHE.get(expression);
-        return runner == null ? (expression == null
-            ? DataConst.NULL : parse(expression, null)) : runner;
+        return runner == null ? (expression == null ? DataConst.NULL : parse(expression, null)) : runner;
     }
 
     final static AsRunner parse(
@@ -56,61 +56,67 @@ class ParseCore {
      */
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer,
-        int len, RunnerSettings settings
+        char[] chars, IntAccessor indexer, int len, RunnerSettings settings
     ) {
         return parse(chars, indexer, len, settings, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len,
-        RunnerSettings settings, int end
+        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end
     ) {
         return parse(chars, indexer, len, settings, end, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len,
-        RunnerSettings settings, int end0, int end1
+        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end0, int end1
     ) {
         return parse(chars, indexer, len, settings, end0, end1, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len,
-        RunnerSettings settings, int end0, int end1, int end2
+        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end0, int end1, int end2
     ) {
         return parse(chars, indexer, len, settings, end0, end1, end2, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len,
-        RunnerSettings settings, int end0, int end1, int end2, int end3
+        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end0, int end1, int end2, int end3
     ) {
-        return parse(chars, indexer, len, settings,
-            end0, end1, end2, end3, -1);
+        return parse(chars, indexer, len, settings, end0, end1, end2, end3, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len,
-        RunnerSettings settings, int end0, int end1, int end2, int end3, int end4
+        char[] chars,
+        IntAccessor indexer,
+        int len,
+        RunnerSettings settings,
+        int end0,
+        int end1,
+        int end2,
+        int end3,
+        int end4
     ) {
-        return parse(chars, indexer, len, settings,
-            end0, end1, end2, end3, end4, v -> false);
+        return parse(chars, indexer, len, settings, end0, end1, end2, end3, end4, v -> false);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings,
-        int end0, int end1, int end2, int end3, int end4, IntPredicate tester
+        char[] chars,
+        IntAccessor indexer,
+        int len,
+        RunnerSettings settings,
+        int end0,
+        int end1,
+        int end2,
+        int end3,
+        int end4,
+        IntPredicate tester
     ) {
         AsRunner runner = null;
         GetThree.Builder builder;
         LinkedList<AsRunner> values = new LinkedList<>(), methods = new LinkedList();
         for (int curr; indexer.get() < len; ) {
             curr = ParseUtil.nextVal(chars, indexer, len);
-            if (curr == end0 || curr == end1 ||
-                curr == end2 || curr == end3 ||
-                curr == end4 || tester.test(curr)) {
+            if (curr == end0 || curr == end1 || curr == end2 || curr == end3 || curr == end4 || tester.test(curr)) {
                 if (curr == YUAN_R) {
                     cleanTo(values, methods, Computes.YUAN_LEFT);
                 }
@@ -119,12 +125,10 @@ class ParseCore {
                 // ?
                 builder = new GetThree.Builder(toRunner(values, methods));
                 builder.setTrueRunner(parse(chars, indexer, len, settings, COLON));
-                builder.setFalseRunner(parse(chars, indexer, len, settings,
-                    COLON, YUAN_R, HUA_R, FANG_R, COMMA));
+                builder.setFalseRunner(parse(chars, indexer, len, settings, COLON, YUAN_R, HUA_R, FANG_R, COMMA));
                 return builder.build();
             } else {
-                runner = core(chars, indexer, len, settings,
-                    curr, values, methods, runner);
+                runner = core(chars, indexer, len, settings, curr, values, methods, runner);
             }
         }
         return toRunner(values, methods);
@@ -153,11 +157,18 @@ class ParseCore {
      * @param values
      * @param methods
      * @param prevHandler
+     *
      * @return
      */
     private final static AsRunner core(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int curr,
-        LinkedList<AsRunner> values, LinkedList<AsRunner> methods, AsRunner prevHandler
+        char[] chars,
+        IntAccessor indexer,
+        int len,
+        RunnerSettings settings,
+        int curr,
+        LinkedList<AsRunner> values,
+        LinkedList<AsRunner> methods,
+        AsRunner prevHandler
     ) {
         AsRunner run;
         if (ParseUtil.isStr(curr)) {
@@ -211,8 +222,7 @@ class ParseCore {
                             run = casSymbol(values, methods, Computes.BIT_RIGHT);
                         }
                     } else {
-                        run = toGtLtAndOr(chars, indexer, values, methods,
-                            EQ, Computes.GT_OR_EQ, Computes.GT);
+                        run = toGtLtAndOr(chars, indexer, values, methods, EQ, Computes.GT_OR_EQ, Computes.GT);
                     }
                     break;
                 case LT:
@@ -221,19 +231,16 @@ class ParseCore {
                         indexer.increment();
                         run = casSymbol(values, methods, Computes.BIT_LEFT);
                     } else {
-                        run = toGtLtAndOr(chars, indexer, values, methods,
-                            EQ, Computes.LT_OR_EQ, Computes.LT);
+                        run = toGtLtAndOr(chars, indexer, values, methods, EQ, Computes.LT_OR_EQ, Computes.LT);
                     }
                     break;
                 case AND:
                     // && 、&
-                    run = toGtLtAndOr(chars, indexer, values, methods,
-                        AND, Computes.AND, Computes.BIT_AND);
+                    run = toGtLtAndOr(chars, indexer, values, methods, AND, Computes.AND, Computes.BIT_AND);
                     break;
                 case OR:
                     // || 、|
-                    run = toGtLtAndOr(chars, indexer, values, methods,
-                        OR, Computes.OR, Computes.BIT_OR);
+                    run = toGtLtAndOr(chars, indexer, values, methods, OR, Computes.OR, Computes.BIT_OR);
                     break;
                 case NOT:
                     // !
@@ -280,9 +287,13 @@ class ParseCore {
     }
 
     private final static AsCompute toGtLtAndOr(
-        char[] chars, IntAccessor indexer,
-        LinkedList<AsRunner> values, LinkedList<AsRunner> methods,
-        int testTarget, Computes matchType, Computes defaultType
+        char[] chars,
+        IntAccessor indexer,
+        LinkedList<AsRunner> values,
+        LinkedList<AsRunner> methods,
+        int testTarget,
+        Computes matchType,
+        Computes defaultType
     ) {
         Computes type;
         if (chars[indexer.get()] == testTarget) {
@@ -302,8 +313,7 @@ class ParseCore {
         if (isBoundary(prev) || currPriority > prev.getPriority()) {
             methods.offerFirst(computer);
         } else {
-            while (isNotBoundary(prev = methods.pollFirst())
-                && prev.getPriority() >= currPriority) {
+            while (isNotBoundary(prev = methods.pollFirst()) && prev.getPriority() >= currPriority) {
                 values.add(prev);
             }
             if (prev != null) {

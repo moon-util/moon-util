@@ -32,6 +32,10 @@ import java.util.Date;
  * 如果一个方法调用的返回值是其他类型数字且没有继续参与运算，
  * 则可以返回其他类似数字，包括 char
  * <p>
+ * RunnerUtil 中的数字间可以有一个或多个下划线作为方便阅读用的区分，如：
+ * <p>
+ * 123_456 == 123456、3_456.789_123 == 3456.789123
+ * <p>
  * <strong>【 五 】</strong>、字符串：'string'、"string"
  * <p>
  * <strong>【 六 】</strong>、Map：解析成 HashMap，
@@ -105,14 +109,14 @@ import java.util.Date;
  * - @list.hasIndex(List)：<p>
  * - @list.hasValue(List)：<p>
  * <p>
- * - @now()：返回当前时间毫秒数{@link System#currentTimeMillis()}；<p>
- * - @now(Object)：将对象转换成{@link java.time.LocalDateTime}}<p>
- * - @now.year()：当前年份<p>
- * - @now.month()：当前月份<p>
- * - @now.day()：当前月份第几天<p>
- * - @now.hour()：当前小时数<p>
- * - @now.minute()：当前分钟数<p>
- * - @now.second()：当前秒数<p>
+ * - @time()：返回当前时间毫秒数{@link System#currentTimeMillis()}；<p>
+ * - @time(Object)：将对象转换成{@link java.time.LocalDateTime}<p>
+ * - @time.year()：当前年份<p>
+ * - @time.month()：当前月份<p>
+ * - @time.day()：当前月份第几天<p>
+ * - @time.hour()：当前小时数<p>
+ * - @time.minute()：当前分钟数<p>
+ * - @time.second()：当前秒数<p>
  * <p>
  * - @str(Object)：将对象转换成 String {@link Object#toString()}<p>
  * - @str.substring(String,index[,index])：{@link String#substring(int, int)}}<p>
@@ -176,7 +180,9 @@ public final class RunnerUtil extends ParseUtil {
      * 只解析执行一次，并缓存，以后的运行返回第一次缓存的结果
      *
      * @param expression 字符串表达式
+     *
      * @return
+     *
      * @throws Throwable 如果字符串表达式中包含变量
      */
     public final static Object run(String expression) { return parse(expression).run(); }
@@ -194,7 +200,9 @@ public final class RunnerUtil extends ParseUtil {
      *
      * @param expression 字符串表达式
      * @param data       表达式运行时变量所引用的数据
+     *
      * @return
+     *
      * @throws NullPointerException 如果字符串表达式中包含 data 中没有的变量
      */
     public final static Object run(String expression, Object data) { return parse(expression).run(data); }
@@ -210,6 +218,7 @@ public final class RunnerUtil extends ParseUtil {
      *
      * @param expression
      * @param data
+     *
      * @return
      */
     public final static Object runMulti(String expression, Object... data) { return parse(expression).runMulti(data); }
@@ -246,7 +255,9 @@ public final class RunnerUtil extends ParseUtil {
      * 或： $[{'name'}] ==> 自定义分隔符；
      *
      * @param expression 包含插值语法的字符串表达式
+     *
      * @return
+     *
      * @throws Throwable 如果字符串表达式中包含变量
      */
     public final static Object parseRun(String expression) { return parse(expression, DELIMITERS).run(); }
@@ -272,7 +283,9 @@ public final class RunnerUtil extends ParseUtil {
      *
      * @param expression 包含插值语法的字符串表达式
      * @param data       表达式运行时变量所引用的数据
+     *
      * @return
+     *
      * @throws NullPointerException 如果字符串表达式中包含 data 中没有的变量
      * @see #parseRun(String)
      */
@@ -306,7 +319,9 @@ public final class RunnerUtil extends ParseUtil {
      *
      * @param expression 包含插值语法的字符串表达式
      * @param delimiters 必须是一个长度不小于 2 包含始末标记的非空字符串，长度大于 2 后面的内容会被忽略
+     *
      * @return
+     *
      * @throws Throwable 如果字符串表达式中包含变量
      * @see #parseRun(String, String[], Object)
      */
@@ -337,7 +352,9 @@ public final class RunnerUtil extends ParseUtil {
      * @param expression 包含插值语法的字符串表达式
      * @param delimiters 必须是一个长度不小于 2 包含始末标记的非空字符串，长度大于 2 后面的内容会被忽略
      * @param data       表达式运行时变量所引用的数据
+     *
      * @return
+     *
      * @throws NullPointerException 如果字符串表达式中包含 data 中没有的变量
      * @see #parseRun(String)
      */

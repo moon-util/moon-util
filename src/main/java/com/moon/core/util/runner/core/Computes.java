@@ -25,15 +25,30 @@ enum Computes implements AsCompute {
     },
     BIT_AND(ConstPriorities.BIT_AND) {
         @Override
-        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() & ((Number) o2).intValue(); }
+        public Object exe(Object o2, Object o1) {
+            if (o1 instanceof Number || o2 instanceof Number) {
+                return ((Number) o1).intValue() & ((Number) o2).intValue();
+            }
+            return ((Boolean) o1).booleanValue() & ((Boolean) o2).booleanValue();
+        }
     },
     BIT_OR(ConstPriorities.BIT_OR) {
         @Override
-        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() | ((Number) o2).intValue(); }
+        public Object exe(Object o2, Object o1) {
+            if (o1 instanceof Number || o2 instanceof Number) {
+                return ((Number) o1).intValue() | ((Number) o2).intValue();
+            }
+            return ((Boolean) o1).booleanValue() | ((Boolean) o2).booleanValue();
+        }
     },
     NOT_OR(ConstPriorities.NOT_OR) {
         @Override
-        public Object exe(Object o2, Object o1) { return ((Number) o1).intValue() ^ ((Number) o2).intValue(); }
+        public Object exe(Object o2, Object o1) {
+            if (o1 instanceof Number || o2 instanceof Number) {
+                return ((Number) o1).intValue() ^ ((Number) o2).intValue();
+            }
+            return ((Boolean) o1).booleanValue() ^ ((Boolean) o2).booleanValue();
+        }
     },
 
     PLUS(ConstPriorities.PLUS) {
@@ -45,16 +60,13 @@ enum Computes implements AsCompute {
                 }
                 return ((Number) o1).doubleValue() + ((Number) o2).doubleValue();
             }
-            return String.valueOf(o1) + String.valueOf(o2);
+            return String.valueOf(o1) + o2;
         }
     },
     MINUS(ConstPriorities.MINUS) {
         @Override
         public Object exe(Object o2, Object o1) {
-            if (o1 instanceof Double
-                || o2 instanceof Double
-                || o1 instanceof Float
-                || o2 instanceof Float) {
+            if (o1 instanceof Double || o2 instanceof Double || o1 instanceof Float || o2 instanceof Float) {
                 return ((Number) o1).doubleValue() - ((Number) o2).doubleValue();
             }
             return ((Number) o1).intValue() - ((Number) o2).intValue();
@@ -63,10 +75,7 @@ enum Computes implements AsCompute {
     MULTI(ConstPriorities.MULTI) {
         @Override
         public Object exe(Object o2, Object o1) {
-            if (o1 instanceof Double
-                || o2 instanceof Double
-                || o1 instanceof Float
-                || o2 instanceof Float) {
+            if (o1 instanceof Double || o2 instanceof Double || o1 instanceof Float || o2 instanceof Float) {
                 return ((Number) o1).doubleValue() * ((Number) o2).doubleValue();
             }
             return ((Number) o1).intValue() * ((Number) o2).intValue();
@@ -75,10 +84,7 @@ enum Computes implements AsCompute {
     DIVIDE(ConstPriorities.DIVIDE) {
         @Override
         public Object exe(Object o2, Object o1) {
-            if (o1 instanceof Double
-                || o2 instanceof Double
-                || o1 instanceof Float
-                || o2 instanceof Float) {
+            if (o1 instanceof Double || o2 instanceof Double || o1 instanceof Float || o2 instanceof Float) {
                 return ((Number) o1).doubleValue() / ((Number) o2).doubleValue();
             }
             return ((Number) o1).intValue() / ((Number) o2).intValue();
@@ -87,10 +93,7 @@ enum Computes implements AsCompute {
     MOD(ConstPriorities.MOD) {
         @Override
         public Object exe(Object o2, Object o1) {
-            if (o1 instanceof Double
-                || o2 instanceof Double
-                || o1 instanceof Float
-                || o2 instanceof Float) {
+            if (o1 instanceof Double || o2 instanceof Double || o1 instanceof Float || o2 instanceof Float) {
                 return ((Number) o1).doubleValue() % ((Number) o2).doubleValue();
             }
             return ((Number) o1).intValue() % ((Number) o2).intValue();
@@ -131,7 +134,10 @@ enum Computes implements AsCompute {
                 return false;
             }
             if (right instanceof Number && left instanceof Number) {
-                if (right instanceof Double || right instanceof Float || left instanceof Double || left instanceof Float) {
+                if (right instanceof Double ||
+                    right instanceof Float ||
+                    left instanceof Double ||
+                    left instanceof Float) {
                     return ((Number) right).doubleValue() == ((Number) left).doubleValue();
                 }
                 return ((Number) right).intValue() == ((Number) left).intValue();
@@ -194,10 +200,10 @@ enum Computes implements AsCompute {
         @Override
         public Object exe(Object o2, Object o1) {
             if (o1 == o2 || o2 == null) {
-                return Boolean.TRUE;
+                return true;
             }
             if (o1 == null) {
-                return Boolean.FALSE;
+                return false;
             }
             if (o1 instanceof Number && o2 instanceof Number) {
                 if (o1 instanceof Double || o1 instanceof Float || o2 instanceof Double || o2 instanceof Float) {
@@ -212,10 +218,10 @@ enum Computes implements AsCompute {
         @Override
         public Object exe(Object o2, Object o1) {
             if (o1 == o2 || o1 == null) {
-                return Boolean.TRUE;
+                return true;
             }
             if (o2 == null) {
-                return Boolean.FALSE;
+                return false;
             }
             if (o1 instanceof Number && o2 instanceof Number) {
                 if (o1 instanceof Double || o1 instanceof Float || o2 instanceof Double || o2 instanceof Float) {
@@ -232,5 +238,4 @@ enum Computes implements AsCompute {
     Computes(int priority) { this.priority = priority; }
 
     @Override
-    public int getPriority() { return priority; }
-}
+    public int getPriority() { return priority; }}

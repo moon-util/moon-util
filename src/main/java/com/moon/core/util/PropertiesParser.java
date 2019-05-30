@@ -1,15 +1,14 @@
 package com.moon.core.util;
 
+import com.moon.core.enums.ArraysEnum;
 import com.moon.core.enums.Const;
 import com.moon.core.io.FileUtil;
+import com.moon.core.lang.ArrayUtil;
 import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.interfaces.Parser;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import static com.moon.core.lang.StringUtil.*;
 
@@ -89,31 +88,38 @@ import static com.moon.core.lang.StringUtil.*;
  *
  * @author benshaoye
  */
-public class PropertiesParser implements Parser<PropertiesHashMap> {
+public class PropertiesParser implements Parser<PropertiesHashMap, String> {
 
     private final static PropertiesHashMap EMPTY_MAP = EmptyHashMap.DEFAULT;
+    private final static String[] EMPTY_STRINGS = ArraysEnum.STRINGS.empty();
+    private final static String[] DEFAULT_NAMES = {"import", "active"};
+
+    private final static boolean DEFAULT_BUBBLE_DELIMITERS = false;
 
     private final static String DEFAULT_NAMESPACE = "moon";
     private final static String NAME = "name:";
     private final static String PATH = "path:";
     private final static String COLON = ":";
-    private final static int TWO = 2;
+    private final static String DOT = ".";
 
+    private final static String DELIMITERS_NAME = "delimiters";
     private final static String SUFFIX = ".properties";
 
     private final String currentNamespace;
-    private final String currentImportName;
-    private final String currentActiveName;
     private final String currentDelimitersName;
     /**
      * delimiters 是否可以从当前文件向 import、active 引用文件传递
      * 默认不可传递
      */
-    private final boolean bubbleDelimiters;
+    private boolean bubbleDelimiters;
     /**
-     * 包括：{@link #currentImportName}、{@link #currentActiveName}、{@link #currentDelimitersName}
+     * 默认 KEY
      */
-    private final Set<String> excludeKeys;
+    private final Set<String> includes;
+    /**
+     * 包括：{@link #includes}、{@link #currentDelimitersName}
+     */
+    private final Set<String> excludesKey;
     /**
      * 防止循环引用
      */
@@ -125,28 +131,43 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
      * ----------------------------------------------------------------------------
      */
 
-    protected PropertiesParser() { this(DEFAULT_NAMESPACE); }
+    public PropertiesParser() { this(DEFAULT_NAMESPACE); }
 
-    protected PropertiesParser(String namespace) { this(namespace, false); }
+    public PropertiesParser(String namespace) { this(namespace, DEFAULT_BUBBLE_DELIMITERS); }
 
-    protected PropertiesParser(String namespace, boolean bubbleDelimiters) { this(namespace, bubbleDelimiters, new HashMap<>()); }
+    public PropertiesParser(String namespace, String[] names) {
+        this(namespace, names, DEFAULT_BUBBLE_DELIMITERS, new HashMap<>());
+    }
 
-    protected PropertiesParser(
-        String namespace, boolean bubbleDelimiters,
-        Map<String, PropertiesHashMap> parsedSources
+    public PropertiesParser(String namespace, boolean bubbleDelimiters) {
+        this(namespace, EMPTY_STRINGS, bubbleDelimiters, new HashMap<>());
+    }
+
+    public PropertiesParser(String namespace, String[] names, boolean bubbleDelimiters) {
+        this(namespace, names, bubbleDelimiters, new HashMap<>());
+    }
+
+    PropertiesParser(String namespace, boolean bubbleDelimiters, Map<String, PropertiesHashMap> parsedSources) {
+        this(namespace, EMPTY_STRINGS, bubbleDelimiters, parsedSources);
+    }
+
+    private PropertiesParser(
+        String namespace, String[] names, boolean bubbleDelimiters, Map<String, PropertiesHashMap> parsedSources
     ) {
-        this.currentNamespace = namespace = requireNotEmpty(trimToNull(namespace));
-        this.currentDelimitersName = namespace + ".delimiters";
-        this.currentImportName = namespace + ".import";
-        this.currentActiveName = namespace + ".active";
+        this(namespace, namesToIncludesSet(namespace, names), bubbleDelimiters, parsedSources);
+    }
+
+    private PropertiesParser(
+        String namespace, Set<String> includes, boolean bubbleDelimiters, Map<String, PropertiesHashMap> parsedSources
+    ) {
+        String ns = this.currentNamespace = requireNotEmpty(trimToNull(namespace));
+        this.currentDelimitersName = ns + DOT + DELIMITERS_NAME;
         this.bubbleDelimiters = bubbleDelimiters;
         this.parsedSources = parsedSources;
-        excludeKeys = SetUtil.ofHashSet(
-            currentDelimitersName,
-            currentImportName,
-            currentActiveName
-        );
+        this.includes = includes;
+        excludesKey = SetUtil.add(new HashSet<>(includes), currentDelimitersName);
     }
+
 
     /**
      * 实现
@@ -154,20 +175,21 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
      * @param namespace
      * @param bubbleDelimiters
      * @param parsedSources
+     *
      * @return
      */
     protected PropertiesParser getParser(
-        String namespace, boolean bubbleDelimiters,
-        Map<String, PropertiesHashMap> parsedSources
+        String namespace, boolean bubbleDelimiters, Map<String, PropertiesHashMap> parsedSources
     ) { return new PropertiesParser(namespace, bubbleDelimiters, parsedSources); }
 
     /**
      * 解析
      *
      * @param sourcePath
+     *
      * @return
      */
-    protected PropertiesHashMap getProps(String sourcePath) {
+    protected PropertiesHashMap getResources(String sourcePath) {
         return new PropertiesHashMap(PropertiesUtil.get(sourcePath));
     }
 
@@ -177,7 +199,9 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
      * ----------------------------------------------------------------------------
      */
 
-    public Properties resolveProperties(String propertiesSource) { return MapUtil.putAll(new Properties(), parse(propertiesSource)); }
+    public Properties resolveProperties(String propertiesSource) {
+        return MapUtil.putAll(new Properties(), parse(propertiesSource));
+    }
 
     @Override
     public PropertiesHashMap parse(final String propertiesSource) { return parse(propertiesSource, DELIMITERS); }
@@ -200,13 +224,12 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
         final String activeName = activeName(sourcePath);
         final String activePath = activePath(sourcePath);
 
-        PropertiesHashMap currentProps = getProps(sourcePath);
-        IDelimiters delimiters = parseDelimiters(currentProps,
-            bubbleDelimiters ? defaultDelimiters : DELIMITERS);
-        PropertiesHashMap importProps = parseImport(currentProps, activePath, activeName, delimiters);
-        PropertiesHashMap activeProps = parseActive(currentProps, activePath, activeName, delimiters);
+        PropertiesHashMap currentProps = getResources(sourcePath);
+        IDelimiters delimiters = parseDelimiters(currentProps, bubbleDelimiters ? defaultDelimiters : DELIMITERS);
+        Set<PropertiesHashMap> imports = parseIncludes(currentProps, activePath, activeName, delimiters);
 
-        PropertiesHashMap properties = computeProps(currentProps, importProps, activeProps, delimiters);
+        PropertiesHashMap[] parameters = imports.toArray(new PropertiesHashMap[imports.size()]);
+        PropertiesHashMap properties = computeProps(delimiters, currentProps, parameters);
 
         parsedSources.put(propertiesSource, properties);
         return properties;
@@ -218,30 +241,36 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
      * -------------------------------------------------------------------------
      */
 
-    final PropertiesHashMap computeProps(
-        PropertiesHashMap props, PropertiesHashMap imports,
-        PropertiesHashMap actives, IDelimiters delimiters
+    private final PropertiesHashMap computeProps(
+        IDelimiters delimiters, PropertiesHashMap currentProps, PropertiesHashMap... includesProps
     ) {
-        PropertiesHashMap computed = new PropertiesHashMap(props.size());
+        PropertiesHashMap computed = new PropertiesHashMap(currentProps.size());
         PropertiesHashMap presents = new PropertiesHashMap(8);
-        for (Map.Entry<String, String> entry : props.entrySet()) {
+        PropertiesHashMap[] params = formatParams(computed, currentProps, includesProps);
+        for (Map.Entry<String, String> entry : currentProps.entrySet()) {
             String key = entry.getKey(), value = entry.getValue();
-            if (!excludeKeys.contains(key)) {
-                value = recursiveGetValue(key, value, delimiters,
-                    presents, computed, props, imports, actives);
+            if (!excludesKey.contains(key)) {
+                value = recursiveGetValue(key, value, delimiters, presents, params);
                 presents.clear();
             }
             computed.put(key, value);
         }
+        return new PropertiesHashMap(ArrayUtil.reverse(params));
+    }
 
-        return new PropertiesHashMap(imports, actives, computed);
+    private PropertiesHashMap[] formatParams(
+        PropertiesHashMap computed, PropertiesHashMap currentProps, PropertiesHashMap... includesProps
+    ) {
+        int length = includesProps.length, index = 0;
+        PropertiesHashMap[] params = new PropertiesHashMap[length + 2];
+        params[index++] = computed;
+        params[index++] = currentProps;
+        for (int i = 0; i < length; i++) { params[i + index] = includesProps[i]; }
+        return params;
     }
 
     private final static String recursiveGetValue(
-        String key, String value, IDelimiters delimiters,
-        PropertiesHashMap presents, PropertiesHashMap computed,
-        PropertiesHashMap props, PropertiesHashMap imports,
-        PropertiesHashMap actives
+        String key, String value, IDelimiters delimiters, PropertiesHashMap presents, PropertiesHashMap... propMaps
     ) {
         if (presents.containsKey(key)) {
             throw new StackOverflowError("The stack overflow of key: " + key);
@@ -251,21 +280,17 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
         String start = delimiters.getStart(), end = delimiters.getEnd();
         if ((value = trimToNull(value)) != null && value.startsWith(start) && value.endsWith(end)) {
             String importKey = trimToNull(value.substring(start.length(), value.indexOf(end)));
-            String importValue = getValue(importKey, computed, props, imports, actives);
-            return recursiveGetValue(importKey, importValue, delimiters,
-                presents, computed, props, imports, actives);
+            String importValue = getValue(importKey, propMaps);
+            return recursiveGetValue(importKey, importValue, delimiters, presents, propMaps);
         }
         return value;
     }
 
-    private final static String getValue(
-        String key, PropertiesHashMap computed,
-        PropertiesHashMap props, PropertiesHashMap imports,
-        PropertiesHashMap actives) {
-        String value = getValue(computed, key);
-        value = value == null ? getValue(props, key) : value;
-        value = value == null ? getValue(imports, key) : value;
-        value = value == null ? getValue(actives, key) : value;
+    private final static String getValue(String key, PropertiesHashMap... propMaps) {
+        String value = null;
+        for (PropertiesHashMap props : propMaps) {
+            value = value == null ? getValue(props, key) : value;
+        }
         return value;
     }
 
@@ -287,8 +312,8 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
                 String[] delimiters = delimitersValue.split(",");
                 return new Delimiters(delimiters[0], delimiters[1]);
             } catch (Throwable e) {
-                throw new IllegalArgumentException("无效分隔符（delimiters）" +
-                    "，必须是用英文逗号（,）分割的两个非空字符串，但是配置的是：" + delimitersValue);
+                throw new IllegalArgumentException(
+                    "无效分隔符（delimiters）" + "，必须是用英文逗号（,）分割的两个非空字符串，但是配置的是：" + delimitersValue);
             }
         }
         return defaultDelimiters;
@@ -300,43 +325,41 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
      * -------------------------------------------------------------------------
      */
 
-    private final PropertiesHashMap parseActive(
-        PropertiesHashMap props, String activePath,
-        String activeName, IDelimiters delimiters) {
-        return parseInclude(props, currentActiveName, activePath, activeName, delimiters);
-    }
-
-    private final PropertiesHashMap parseImport(
-        PropertiesHashMap props, String activePath,
-        String activeName, IDelimiters delimiters) {
-        return parseInclude(props, currentImportName, activePath, activeName, delimiters);
+    private final Set<PropertiesHashMap> parseIncludes(
+        PropertiesHashMap props, String activePath, String activeName, IDelimiters delimiters
+    ) {
+        Set<PropertiesHashMap> maps = new LinkedHashSet<>(includes.size());
+        for (String include : includes) {
+            maps.add(parseInclude(props, include, activePath, activeName, delimiters));
+        }
+        return maps;
     }
 
     private PropertiesHashMap parseInclude(
-        PropertiesHashMap props, String includeTargetName,
-        String activePath, String activeName, IDelimiters delimiters) {
+        PropertiesHashMap props, String includeTargetName, String activePath, String activeName, IDelimiters delimiters
+    ) {
         PropertiesHashMap includeProps = EMPTY_MAP;
         String includeName = StringUtil.trimToNull(props.get(includeTargetName));
         if (StringUtil.isNotEmpty(includeName)) {
-            includeProps = parseIncludeProps(
-                includeName, activePath, activeName, delimiters);
+            includeProps = parseIncludeProps(includeName, activePath, activeName, delimiters);
         }
         return includeProps;
     }
 
     private PropertiesHashMap parseIncludeProps(
-        String inputName, String activePath, String activeName, IDelimiters delimiters) {
+        String inputName, String activePath, String activeName, IDelimiters delimiters
+    ) {
         String[] inputs = inputName.split(",");
         PropertiesHashMap properties = new PropertiesHashMap(16 * inputs.length);
         for (int i = 0; i < inputs.length; i++) {
-            properties.putAll(parseInputName(inputs[i],
-                activePath, activeName, delimiters));
+            properties.putAll(parseInputName(inputs[i], activePath, activeName, delimiters));
         }
         return properties;
     }
 
     private final PropertiesHashMap parseInputName(
-        String inputName, String activePath, String activeName, IDelimiters delimiters) {
+        String inputName, String activePath, String activeName, IDelimiters delimiters
+    ) {
         PropertiesHashMap props = EMPTY_MAP;
         String formatted, simpleName = trimToEmpty(inputName);
         if (simpleName.startsWith(NAME)) {
@@ -368,18 +391,17 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
      * @param ns
      * @param formatted
      * @param delimiters
+     *
      * @return
      */
-    private PropertiesHashMap parseNSMap(
-        String ns, String formatted, IDelimiters delimiters) {
-        return ns == null || StringUtil.equals(ns, currentNamespace) ? parse(formatted, delimiters)
-            : getParser(ns, bubbleDelimiters, this.parsedSources).parse(formatted, delimiters);
+    private PropertiesHashMap parseNSMap(String ns, String formatted, IDelimiters delimiters) {
+        return ns == null || StringUtil.equals(ns, currentNamespace) ? parse(formatted, delimiters) : getParser(ns,
+            bubbleDelimiters, this.parsedSources).parse(formatted, delimiters);
     }
 
-    private PropertiesHashMap parseNSMap(
-        String formatted, String[] strings, IDelimiters delimiters) {
-        return strings.length > TWO ? parseNSMap(trimToNull(strings[2]),
-            formatted, delimiters) : parse(formatted, delimiters);
+    private PropertiesHashMap parseNSMap(String formatted, String[] strings, IDelimiters delimiters) {
+        return strings.length > 2 ? parseNSMap(trimToNull(strings[2]), formatted, delimiters) : parse(formatted,
+            delimiters);
     }
 
     /*
@@ -403,16 +425,25 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
         return sourceName.substring(0, minimumWithZero(sourceName.indexOf(sourceBaseName)));
     }
 
-    private static int incrementIfPositive(int value) {
-        return value > 0 ? value + 1 : value;
+    private static int incrementIfPositive(int value) { return value > 0 ? value + 1 : value; }
+
+    private static int minimumWithZero(int value) { return Math.max(value, 0); }
+
+    private static String toPropertiesName(String name) { return name.endsWith(SUFFIX) ? name : name + SUFFIX; }
+
+    private static String requireNonDelimitersName(String ns, String name) {
+        if (DELIMITERS_NAME.equals(name)) { throw new IllegalArgumentException(name); }
+        return ns + DOT + name;
     }
 
-    private static int minimumWithZero(int value) {
-        return Math.max(value, 0);
-    }
-
-    private static String toPropertiesName(String name) {
-        return name.endsWith(SUFFIX) ? name : name + SUFFIX;
+    private static Set<String> namesToIncludesSet(String namespace, String... names) {
+        final String ns = requireNotEmpty(trimToNull(namespace));
+        names = ArraysEnum.STRINGS.defaultIfEmpty(names, DEFAULT_NAMES);
+        Set<String> ret = new LinkedHashSet<>();
+        for (String name : names) {
+            ret.add(requireNonDelimitersName(ns, name));
+        }
+        return ret;
     }
 
     /*
@@ -424,12 +455,14 @@ public class PropertiesParser implements Parser<PropertiesHashMap> {
     private final static IDelimiters DELIMITERS = new IDelimiters();
 
     private static class IDelimiters {
+
         String getStart() { return "${"; }
 
-        String getEnd() {return "}";}
+        String getEnd() { return "}"; }
     }
 
     private final static class Delimiters extends IDelimiters {
+
         private final String start;
         private final String end;
 

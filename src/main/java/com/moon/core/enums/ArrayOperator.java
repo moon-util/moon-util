@@ -2,9 +2,9 @@ package com.moon.core.enums;
 
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
+import com.moon.core.util.function.IntBiConsumer;
 import com.moon.core.util.interfaces.IteratorAble;
 import com.moon.core.util.interfaces.Stringify;
-import com.moon.core.util.function.IntBiConsumer;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -21,6 +21,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      * Applies this function to the given argument.
      *
      * @param value the function argument
+     *
      * @return the function result
      */
     @Override
@@ -30,6 +31,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      * 获取空数组对象
      *
      * @param <T>
+     *
      * @return
      */
     default <T> T empty() { return null; }
@@ -39,6 +41,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      *
      * @param length
      * @param <T>
+     *
      * @return
      */
     default <T> T create(int length) {return (T) apply(length);}
@@ -47,6 +50,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      * 字符串化对象
      *
      * @param o
+     *
      * @return
      */
     @Override
@@ -56,6 +60,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      * Evaluates this predicate on the given argument.
      *
      * @param o the input argument
+     *
      * @return {@code true} if the input argument matches the predicate,
      * otherwise {@code false}
      */
@@ -66,6 +71,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      * 获取一个迭代器
      *
      * @param o
+     *
      * @return
      */
     @Override
@@ -76,6 +82,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      *
      * @param arr
      * @param <T>
+     *
      * @return
      */
     default <T> T toPrimitives(Object arr) { return (T) arr; }
@@ -85,6 +92,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      *
      * @param arr
      * @param <T>
+     *
      * @return
      */
     default <T> T toObjects(Object arr) { return (T) arr; }
@@ -94,15 +102,39 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      *
      * @param arr
      * @param <T>
+     *
      * @return
      */
-    default <T> T emptyIfNull(Object arr) { return arr == null ? empty() : (T) arr; }
+    default <T> T emptyIfNull(Object arr) { return defaultIfNull(arr, empty()); }
+
+    /**
+     * 指定默认值
+     *
+     * @param arr
+     * @param empty
+     * @param <T>
+     *
+     * @return
+     */
+    default <T> T defaultIfNull(Object arr, T empty) { return arr == null ? empty : (T) arr; }
+
+    /**
+     * 指定默认值
+     *
+     * @param arr
+     * @param empty
+     * @param <T>
+     *
+     * @return
+     */
+    default <T> T defaultIfEmpty(Object arr, T empty) { return isEmpty(arr) ? empty : (T) arr; }
 
     /**
      * 或者数组指定索引项
      *
      * @param arr
      * @param index
+     *
      * @return
      */
     default <T> T get(Object arr, int index) { return (T) Array.get(arr, index); }
@@ -113,6 +145,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      * @param arr
      * @param index
      * @param value
+     *
      * @return
      */
     default Object set(Object arr, int index, Object value) {
@@ -125,6 +158,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      * 求数组长度
      *
      * @param arr
+     *
      * @return
      */
     default int length(Object arr) { return arr == null ? 0 : Array.getLength(arr); }
@@ -146,6 +180,7 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
      *
      * @param arr
      * @param item
+     *
      * @return
      */
     default boolean contains(Object arr, Object item) {
@@ -170,4 +205,13 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
         }
         return false;
     }
+
+    /**
+     * 数组是否为空
+     *
+     * @param arr
+     *
+     * @return
+     */
+    default boolean isEmpty(Object arr) { return length(arr) == 0; }
 }

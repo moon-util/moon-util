@@ -45,30 +45,30 @@ class IGetFunTestTest {
         toValue("@ str . indexOf (str,1)", data);
         assertEquals(res, 0);
 
-        toValue("@now()");
+        toValue("@time()");
         assertSame(Long.class, res.getClass());
 
-        toValue("@now.year()");
+        toValue("@time.year()");
         assertSame(Integer.class, res.getClass());
         assertEquals(res,  LocalDate.now().getYear());
 
-        toValue("@now.month()");
+        toValue("@time.month()");
         assertSame(Integer.class, res.getClass());
         assertEquals(res,  LocalDate.now().getMonthValue());
 
-        toValue("@now.day()");
+        toValue("@time.day()");
         assertSame(Integer.class, res.getClass());
         assertEquals(res,  LocalDate.now().getDayOfMonth());
 
-        toValue("@now.hour()");
+        toValue("@time.hour()");
         assertSame(Integer.class, res.getClass());
         assertEquals(res,  LocalTime.now().getHour());
 
-        toValue("@now.minute()");
+        toValue("@time.minute()");
         assertSame(Integer.class, res.getClass());
         assertEquals(res,  LocalTime.now().getMinute());
 
-        toValue("@now.second()");
+        toValue("@time.second()");
         assertSame(Integer.class, res.getClass());
         assertEquals(res,  LocalTime.now().getSecond());
     }

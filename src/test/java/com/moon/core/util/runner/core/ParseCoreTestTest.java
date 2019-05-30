@@ -209,7 +209,7 @@ class ParseCoreTestTest {
         handler1 = ParseCore.parse("@ ArraysEnum . OBJECTS . stringify(['array']).toString()");
         res = handler1.run(data);
 
-        System.out.println(RunnerUtil.run("@now()"));
+        System.out.println(RunnerUtil.run("@time()"));
 
     }
 

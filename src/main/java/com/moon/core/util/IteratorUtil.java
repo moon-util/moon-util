@@ -45,6 +45,24 @@ public final class IteratorUtil {
 
     private IteratorUtil() { ThrowUtil.noInstanceError(); }
 
+    /**
+     * 空迭代器
+     *
+     * @return
+     */
+    private static Iterator ofEmpty() { return EMPTY; }
+
+    /**
+     * 集合反序迭代器
+     *
+     * @param collect
+     * @param <T>
+     *
+     * @return
+     */
+    public static <T> Iterator<T> ofReverse(Collection<? extends T> collect) { return ReverseIterator.of(collect); }
+
+
     /*
      * ----------------------------------------------------------------------------
      * array iterator: 数组迭代器
@@ -253,6 +271,14 @@ public final class IteratorUtil {
      * ----------------------------------------------------------------------------
      */
 
+    /**
+     * 默认迭代器
+     *
+     * @param iterator
+     * @param <T>
+     *
+     * @return
+     */
     public static <T> Iterator<T> of(Iterator<T> iterator) { return iterator == null ? EMPTY : iterator; }
 
     /**
@@ -260,6 +286,8 @@ public final class IteratorUtil {
      *
      * @param list
      * @param <T>
+     *
+     * @return
      */
     public static <T> Iterator<T> of(List<T> list) { return list == null ? EMPTY : list.iterator(); }
 
@@ -268,6 +296,8 @@ public final class IteratorUtil {
      *
      * @param c
      * @param <T>
+     *
+     * @return
      */
     public static <T> Iterator<T> of(Collection<T> c) { return c == null ? EMPTY : c.iterator(); }
 
@@ -347,6 +377,17 @@ public final class IteratorUtil {
         if (value instanceof ResultSet) { return of((ResultSet) value); }
         if (value instanceof File) { return ofLines((File) value); }
         return ofFields(value);
+    }
+
+    /**
+     * 反序遍历
+     *
+     * @param collect
+     * @param consumer
+     * @param <E>
+     */
+    public final static <E> void forEachReverse(Collection<? extends E> collect, Consumer<? super E> consumer) {
+        forEach(ofReverse(collect), consumer);
     }
 
     /*
@@ -684,7 +725,7 @@ public final class IteratorUtil {
      *
      * @return
      */
-    public static <K, V> void forEach(Map<K, V> map, Consumer<Map.Entry<K, V>> consumer) {
+    public static <K, V> void forEach(Map<K, V> map, Consumer<? super Map.Entry<K, V>> consumer) {
         if (map != null) { map.entrySet().forEach(consumer); }
     }
 
@@ -799,7 +840,7 @@ public final class IteratorUtil {
     /**
      * 流读取和处理
      *
-     * @param consumer    处理对象
+     * @param consumer 处理对象
      * @param input
      * @param buffer
      */

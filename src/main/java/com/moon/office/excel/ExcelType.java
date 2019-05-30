@@ -1,4 +1,4 @@
-package com.moon.office.excel.enums;
+package com.moon.office.excel;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -14,31 +14,24 @@ import java.util.function.Supplier;
 public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
     XLS(".xls") {
         @Override
-        public Workbook get() {
-            return new HSSFWorkbook();
-        }
+        public Workbook get() { return new HSSFWorkbook(); }
     },
     XLSX(".xlsx") {
         @Override
-        public Workbook get() {
-            return new XSSFWorkbook();
-        }
+        public Workbook get() { return new XSSFWorkbook(); }
     },
     SUPER(".xlsx") {
         @Override
-        public Workbook get() {
-            return new SXSSFWorkbook();
-        }
+        public Workbook get() { return new SXSSFWorkbook(); }
     };
 
     @Override
-    public boolean test(String name) {
-        return name == null ? false : name.toLowerCase().endsWith(suffix);
+    public boolean test(String name) { return name == null ? false : name.toLowerCase().endsWith(suffix); }
+
+    public String formatFileName(String originName) {
+        return originName.toLowerCase().endsWith(suffix) ? originName : originName + suffix;
     }
 
     private final String suffix;
 
-    ExcelType(String suffix) {
-        this.suffix = suffix;
-    }
-}
+    ExcelType(String suffix) { this.suffix = suffix; }}

@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-class PropertiesYamlParser extends PropertiesParser implements Parser<PropertiesHashMap> {
+class PropertiesYamlParser extends PropertiesParser implements Parser<PropertiesHashMap, String> {
 
     public PropertiesYamlParser() { }
 
@@ -25,5 +25,5 @@ class PropertiesYamlParser extends PropertiesParser implements Parser<Properties
     ) { return new PropertiesParser(namespace, bubbleDelimiters, parsedSources); }
 
     @Override
-    protected PropertiesHashMap getProps(String sourcePath) { throw new UnsupportedOperationException(); }
+    protected PropertiesHashMap getResources(String sourcePath) { throw new UnsupportedOperationException(); }
 }
