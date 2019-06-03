@@ -16,6 +16,8 @@ public final class ArrayUtil {
 
     private ArrayUtil() { noInstanceError(); }
 
+    public final static <T> T[] toArray(T... values) { return values; }
+
     private final static <T> T ifNonNull(T value, Consumer<T> consumer) {
         if (value != null) { consumer.accept(value); }
         return value;
