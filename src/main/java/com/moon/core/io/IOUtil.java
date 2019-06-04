@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static com.moon.core.enums.Charsets.UTF_8;
 import static com.moon.core.io.FileUtil.getInputStream;
@@ -28,6 +29,7 @@ import static com.moon.core.util.IteratorUtil.forEachLines;
  * @date 2018/9/11
  */
 public final class IOUtil {
+
     private IOUtil() { ThrowUtil.noInstanceError(); }
 
     /*
@@ -45,9 +47,7 @@ public final class IOUtil {
     }
 
     public static BufferedOutputStream getBufferedOutputStream(OutputStream os) {
-        return os instanceof BufferedOutputStream
-            ? (BufferedOutputStream) os
-            : new BufferedOutputStream(os);
+        return os instanceof BufferedOutputStream ? (BufferedOutputStream) os : new BufferedOutputStream(os);
     }
 
     public static BufferedInputStream getBufferedInputStream(File file) {
@@ -55,9 +55,7 @@ public final class IOUtil {
     }
 
     public static BufferedInputStream getBufferedInputStream(InputStream is) {
-        return is instanceof BufferedInputStream
-            ? (BufferedInputStream) is
-            : new BufferedInputStream(is);
+        return is instanceof BufferedInputStream ? (BufferedInputStream) is : new BufferedInputStream(is);
     }
 
     /*
@@ -74,7 +72,9 @@ public final class IOUtil {
         return getBufferedWriter(os, Charset.forName(charset));
     }
 
-    public final static BufferedWriter getBufferedWriter(OutputStream os) { return getBufferedWriter(os, UTF_8.charset()); }
+    public final static BufferedWriter getBufferedWriter(OutputStream os) {
+        return getBufferedWriter(os, UTF_8.charset());
+    }
 
     public final static BufferedWriter getBufferedWriter(Writer writer) {
         if (writer instanceof BufferedWriter) {
@@ -96,7 +96,9 @@ public final class IOUtil {
         return getBufferedWriter(new OutputStreamWriter(os, charset));
     }
 
-    public final static Writer getWriter(OutputStream os, String charset) { return getWriter(os, Charset.forName(charset)); }
+    public final static Writer getWriter(OutputStream os, String charset) {
+        return getWriter(os, Charset.forName(charset));
+    }
 
     public final static Writer getWriter(OutputStream os) { return getWriter(os, UTF_8.charset()); }
 
@@ -144,7 +146,9 @@ public final class IOUtil {
 
     public final static Reader getReader(InputStream is, Charset charset) { return new InputStreamReader(is, charset); }
 
-    public final static Reader getReader(InputStream is, String charset) { return getReader(is, Charset.forName(charset)); }
+    public final static Reader getReader(InputStream is, String charset) {
+        return getReader(is, Charset.forName(charset));
+    }
 
     public final static Reader getReader(InputStream is) { return getReader(is, UTF_8.charset()); }
 
@@ -183,9 +187,13 @@ public final class IOUtil {
         }
     }
 
-    public final static String toString(InputStream in, Charset charset) { return toString(getBufferedReader(in, charset)); }
+    public final static String toString(InputStream in, Charset charset) {
+        return toString(getBufferedReader(in, charset));
+    }
 
-    public final static String toString(InputStream in, String charset) { return toString(getBufferedReader(in, charset)); }
+    public final static String toString(InputStream in, String charset) {
+        return toString(getBufferedReader(in, charset));
+    }
 
     public final static String toString(InputStream in) { return toString(in, UTF_8.charset()); }
 
@@ -286,6 +294,7 @@ public final class IOUtil {
      *
      * @param cs
      * @param writer
+     *
      * @return
      */
     public final static int copy(CharSequence cs, Writer writer) {
@@ -304,6 +313,7 @@ public final class IOUtil {
      *
      * @param cs
      * @param os
+     *
      * @return
      */
     public final static int copy(CharSequence cs, OutputStream os) {
@@ -320,6 +330,7 @@ public final class IOUtil {
      * @param cs
      * @param os
      * @param charset
+     *
      * @return
      */
     public final static int copy(CharSequence cs, OutputStream os, String charset) {
@@ -340,6 +351,7 @@ public final class IOUtil {
      * @param cs
      * @param os
      * @param charset
+     *
      * @return
      */
     public final static int copy(CharSequence cs, OutputStream os, Charset charset) {
@@ -452,6 +464,8 @@ public final class IOUtil {
 
     public static Closer close() { return Closer.VALUE; }
 
+    public static Closer close(Stream stream) { return closeCloseable(stream); }
+
     public static Closer close(Reader reader) { return closeCloseable(reader); }
 
     public static Closer close(Writer writer) { return closeCloseable(writer); }
@@ -480,11 +494,13 @@ public final class IOUtil {
 
     public static Closer close(OutputStream os, InputStream is) { return close(os).close(is); }
 
-    public static Closer close(ResultSet set, Statement stmt, Connection connect) { return close(set).close(stmt).close(connect); }
+    public static Closer close(ResultSet set, Statement stmt, Connection connect) {
+        return close(set).close(stmt).close(connect);
+    }
 
-    public static void close(Closeable... closes) { IteratorUtil.forEach(closes, Closer.VALUE::close); }
+    public static void close(Closeable... closes) { IteratorUtil.forEach(closes, IOUtil::closeCloseable); }
 
-    public static void closeAll(AutoCloseable... closes) { IteratorUtil.forEach(closes, Closer.VALUE::close); }
+    public static void closeAll(AutoCloseable... closes) { IteratorUtil.forEach(closes, IOUtil::closeCloseable); }
 
     /*
      * -----------------------------------------------------------------------
@@ -494,21 +510,21 @@ public final class IOUtil {
 
     public static Flusher flush() { return Flusher.VALUE; }
 
-    public static Flusher flush(Flushable flushable) { return flush().flush(flushable); }
+    public static Flusher flush(Flushable flushable) {
+        ThrowUtil.ignoreThrowsAccept(flushable, Flushable::flush);
+        return flush();
+    }
 
-    public static Flusher flushCloseable(AutoCloseable closeable) { return flush().flushCloseable(closeable); }
+    public static Flusher flushCloseable(AutoCloseable closeable) {
+        return (closeable instanceof Flushable) ? flush((Flushable) closeable) : flush();
+    }
 
     public enum Flusher {
         VALUE;
 
-        public Flusher flush(Flushable flushable) {
-            ThrowUtil.ignoreThrowsAccept(flushable, Flushable::flush);
-            return this;
-        }
+        public Flusher flush(Flushable flushable) { return IOUtil.flush(flushable); }
 
-        public Flusher flushCloseable(AutoCloseable close) {
-            return close instanceof Flushable ? flush((Flushable) close) : this;
-        }
+        public Flusher flushCloseable(AutoCloseable close) { return IOUtil.flushCloseable(close); }
     }
 
     /*
@@ -517,17 +533,17 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public static Closer closeCloseable(AutoCloseable close) { return close().close(close); }
+    public static Closer closeCloseable(AutoCloseable close) {
+        ThrowUtil.ignoreThrowsAccept(close, c -> {
+            flushCloseable(c);
+            c.close();
+        });
+        return Closer.VALUE;
+    }
 
     public enum Closer {
         VALUE;
 
-        public Closer close(AutoCloseable close) {
-            ThrowUtil.ignoreThrowsAccept(close, c -> {
-                flushCloseable(c);
-                c.close();
-            });
-            return this;
-        }
+        public Closer close(AutoCloseable close) { return closeCloseable(close); }
     }
 }
