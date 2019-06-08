@@ -1,29 +1,14 @@
 package com.moon.core.util.runner.core;
 
-import com.moon.core.awt.ImageUtil;
-import com.moon.core.beans.BeanInfoUtil;
-import com.moon.core.enums.Chars;
-import com.moon.core.io.IOUtil;
-import com.moon.core.lang.ClassUtil;
-import com.moon.core.lang.StringUtil;
-import com.moon.core.lang.annotation.AnnotationUtil;
+import com.moon.core.lang.PackageScanner;
+import com.moon.core.lang.PackageUtil;
 import com.moon.core.lang.ref.ReferenceUtil;
-import com.moon.core.lang.reflect.FieldUtil;
 import com.moon.core.lang.reflect.ModifierUtil;
-import com.moon.core.mail.EmailUtil;
-import com.moon.core.math.BigDecimalUtil;
-import com.moon.core.net.HttpUtil;
-import com.moon.core.script.ScriptUtil;
-import com.moon.core.security.EncryptUtil;
-import com.moon.core.sql.ResultSetUtil;
-import com.moon.core.time.TimeUtil;
-import com.moon.core.util.ListUtil;
-import com.moon.core.util.concurrent.ExecutorUtil;
-import com.moon.core.util.env.EnvUtil;
 
-import java.lang.reflect.Method;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -31,45 +16,51 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 class IGetLoad {
+
     private IGetLoad() { noInstanceError(); }
 
     private final static String[] packages;
+    private final static Map<String, Class> NAMED_CACHE = new HashMap<>();
 
     static {
-        /**
-         * 每个包下列举一个类，得到包名，支持这个包下的所有类静态方法调用
-         */
-        Class[] classes = {
-            System.class, Method.class, List.class,
-            ImageUtil.class, BeanInfoUtil.class, Chars.class,
-            IOUtil.class, StringUtil.class, ListUtil.class,
-            ReferenceUtil.class, FieldUtil.class, AnnotationUtil.class,
-            EmailUtil.class, BigDecimalUtil.class, HttpUtil.class,
-            TimeUtil.class, ScriptUtil.class, EncryptUtil.class,
-            ResultSetUtil.class, ExecutorUtil.class, EnvUtil.class,
-        };
-        String[] names = packages = new String[classes.length];
-        for (int i = 0; i < classes.length; i++) {
-            names[i] = classes[i].getPackage().getName() + ".";
+        Map<String, Object> packagesName = new LinkedHashMap<>();
+        PackageScanner scanner = PackageUtil.scanner();
+        scanner.scan("com.moon.core");
+        packagesName.putIfAbsent("java.util.", null);
+        packagesName.putIfAbsent("java.lang.", null);
+        scanner.forEach(className -> {
+            Class loaded = loadClass(className);
+            if (loaded != null) {
+                packagesName.putIfAbsent(loaded.getPackage().getName() + '.', null);
+                NAMED_CACHE.putIfAbsent(loaded.getCanonicalName(), loaded);
+            }
+        });
+        Set<String> names = packagesName.keySet();
+        packages = names.toArray(new String[names.size()]);
+    }
+
+    private final static Class loadClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (Throwable e) {
+            return null;
         }
     }
 
     private final static Map<String, Class> CACHE = ReferenceUtil.weakMap();
 
     public final static Class tryLoad(String name) {
-        Class type = CACHE.get(name);
-        if (type == null) {
+        Map<String, Class> cache = NAMED_CACHE;
+        Class type = cache.get(name);
+        if (type == null && (type = (cache = CACHE).get(name)) == null) {
             for (String packageName : packages) {
-                try {
-                    type = ClassUtil.forName(packageName + name);
-                    if (ModifierUtil.isPublic(type)) {
-                        synchronized (CACHE) {
-                            CACHE.put(name, type);
+                if (ModifierUtil.isPublic(type = loadClass(packageName + name))) {
+                    if (cache.get(name) == null) {
+                        synchronized (cache) {
+                            cache.put(name, type);
                         }
-                        return type;
                     }
-                } catch (Throwable t) {
-                    // ignore
+                    return type;
                 }
             }
         }

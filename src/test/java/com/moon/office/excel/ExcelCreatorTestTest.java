@@ -8,6 +8,9 @@ import com.moon.office.excel.creator.ExcelCreator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author benshaoye
@@ -51,6 +54,21 @@ class ExcelCreatorTestTest {
 
     @Test
     void testStringLength() {
+        String regex = "^\\s*(\\w[\\w\\d]{0,255})\\s*(\\((.*)?\\))?.*";
+        String str = "  selectAll(   sdafsdfasdfasdfc )asdfegsdfgvbdfgvbsdfgv";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+
+
+        System.out.println(matcher.matches());
+
+        MatchResult result = matcher.toMatchResult();
+        int count = result.groupCount();
+        for (int i = 0; i < count; i++) {
+            System.out.println(">>>" + result.group(i) + "<<<");
+        }
+        System.out.println(matcher.toMatchResult().groupCount());
     }
 
 

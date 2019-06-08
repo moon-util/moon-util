@@ -176,9 +176,11 @@ public final class SupportUtil {
         int amount = 12, len = chars.length, index = indexer.get();
         int end = index + amount < len ? index + amount : len;
         int start = index < amount ? 0 : index - amount;
+        int maxLen = end - start, preLen = index - start, postLen = end - index - 1;
         throw new IllegalArgumentException(
-            new StringBuilder((amount + 5) * 2).append(">>>>>").append(chars, start, end - start).append("<<<<<")
-                .toString());
+            new StringBuilder((amount + 5) * 2).append(">>>>>").append(chars, start, maxLen).append("<<<<<")
+                .append("\n>>>>>").append(chars, start, preLen).append('ˇ').append(chars[index]).append('ˇ')
+                .append(chars, index + 1, postLen).append("<<<<<").toString());
     }
 
     /**
@@ -206,6 +208,16 @@ public final class SupportUtil {
     public static <T> T matchOne(Collection<T> collection, Predicate<? super T> test) {
         if (collection != null) { for (T t : collection) { if (test.test(t)) { return t; } } }
         return null;
+    }
+
+    public static <T> T requireOne(Collection<T> collection, Predicate<? super T> test) {
+        if (collection != null) { for (T t : collection) { if (test.test(t)) { return t; } } }
+        throw new NullPointerException();
+    }
+
+    public static <T> T requireOne(Collection<T> collection, Predicate<? super T> test, String message) {
+        if (collection != null) { for (T t : collection) { if (test.test(t)) { return t; } } }
+        throw new IllegalArgumentException(message);
     }
 
     public static char[] setChar(char[] chars, int index, char ch) {

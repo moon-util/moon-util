@@ -23,7 +23,7 @@ enum ConsoleGlobalControl implements ConsoleEnabled {
     /**
      * 全局最低输出级别
      */
-    private Level GLOBAL_LEVEL = Console.LOWEST;
+    private Level GLOBAL_LEVEL;
     /**
      * 全局输出文件路径
      */
@@ -32,6 +32,7 @@ enum ConsoleGlobalControl implements ConsoleEnabled {
     ConsoleGlobalControl() {
         // 留着初始化 base path
         setBasePath(MoonProps.moon_console_base_path.getOrNull());
+        GLOBAL_LEVEL = Console.LOWEST;
     }
 
     @Override

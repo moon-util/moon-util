@@ -14,6 +14,9 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static java.lang.System.getProperties;
+import static java.lang.System.getProperty;
+
 /**
  * 内置自定义函数
  *
@@ -31,12 +34,31 @@ class IGetFun {
             ListFunctions.class,
             MathFunctions.class,
             DateFunctions.class,
+            SystemFunctions.class,
         };
         for (Class<RunnerFunction> runner : classes) {
             for (RunnerFunction fun : runner.getEnumConstants()) {
                 CACHE.put(fun.functionName(), fun);
             }
         }
+    }
+
+    private enum SystemFunctions implements RunnerFunction {
+        system_property {
+            @Override
+            public Object apply(Object value) {
+                return getProperty(String.valueOf(value));
+            }
+        },
+        system_properties {
+            @Override
+            public Object apply() {
+                return getProperties();
+            }
+        };
+
+        @Override
+        public String functionName() { return formatName(name()); }
     }
 
     private enum DateFunctions implements RunnerFunction {
@@ -109,7 +131,7 @@ class IGetFun {
         };
 
         @Override
-        public String functionName() { return this.name().replace('_', '.'); }
+        public String functionName() { return formatName(name()); }
     }
 
     private enum StrFunctions implements RunnerFunction {
@@ -180,7 +202,7 @@ class IGetFun {
         ;
 
         @Override
-        public String functionName() { return this.name().replace('_', '.'); }
+        public String functionName() { return formatName(name()); }
     }
 
     private enum TimeFunctions implements RunnerFunction {
@@ -226,13 +248,14 @@ class IGetFun {
         };
 
         @Override
-        public String functionName() { return this.name().replace('_', '.'); }
+        public String functionName() { return formatName(name()); }
 
         @Override
         public boolean isChangeless() { return false; }
     }
 
     private interface ChangeableRunnerFunction extends RunnerFunction {
+
         /**
          * 这个函数执行相同参数的返回值是否相同
          *
@@ -311,7 +334,7 @@ class IGetFun {
         };
 
         @Override
-        public String functionName() { return this.name().replace('_', '.'); }
+        public String functionName() { return formatName(name()); }
     }
 
     private enum ListFunctions implements ChangeableRunnerFunction {
@@ -360,7 +383,7 @@ class IGetFun {
         };
 
         @Override
-        public String functionName() { return this.name().replace('_', '.'); }
+        public String functionName() { return formatName(name()); }
     }
 
     private enum MathFunctions implements RunnerFunction {
@@ -440,21 +463,20 @@ class IGetFun {
         };
 
         @Override
-        public String functionName() { return this.name().replace('_', '.'); }
+        public String functionName() { return formatName(name()); }
     }
+
+    private static String formatName(String name) { return name.replace('_', '.'); }
 
     private final static int toInt(Object value) { return value == null ? 0 : ((Number) value).intValue(); }
 
     private final static double toDb(Object value) { return value == null ? 0 : ((Number) value).doubleValue(); }
 
     private final static Object formatToKey(Object key) {
-        boolean test = key == null || key instanceof Boolean
-            || key instanceof Integer || key instanceof Double;
+        boolean test = key == null || key instanceof Boolean || key instanceof Integer || key instanceof Double;
         if (!test) {
             if (key instanceof Number) {
-                key = key instanceof Float
-                    ? ((Float) key).doubleValue()
-                    : ((Number) key).intValue();
+                key = key instanceof Float ? ((Float) key).doubleValue() : ((Number) key).intValue();
             } else {
                 key = String.valueOf(key);
             }

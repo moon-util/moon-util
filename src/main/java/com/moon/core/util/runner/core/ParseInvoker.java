@@ -1,5 +1,6 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.lang.SupportUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.reflect.FieldUtil;
 import com.moon.core.util.runner.RunnerSettings;
@@ -23,7 +24,7 @@ import static java.util.Objects.requireNonNull;
 final class ParseInvoker {
     private ParseInvoker() { noInstanceError(); }
 
-    private final static Predicate<Method> NONE_PARAM = m -> m.getParameterCount() == 0;
+    final static Predicate<Method> NONE_PARAM = m -> m.getParameterCount() == 0;
 
     final static AsRunner tryParseInvoker(
         char[] chars, IntAccessor indexer, int len,
@@ -34,7 +35,7 @@ final class ParseInvoker {
         if (nextVal(chars, indexer, len) == YUAN_L) {
             if (nextVal(chars, indexer, len) == YUAN_R) {
                 // 无参方法调用
-                return parseNoneParams(prevValuer, name, isStatic);
+                return parseNonParams(prevValuer, name, isStatic);
             } else {
                 // 带有参数的方法调用
                 return parseHasParams(chars, indexer.decrement(),
@@ -98,13 +99,13 @@ final class ParseInvoker {
     /**
      * 无参方法调用
      */
-    private final static AsRunner parseNoneParams(
+    private final static AsRunner parseNonParams(
         AsValuer prev, String name, boolean isStatic
     ) {
         if (isStatic) {
             // 静态方法
             return new InvokeNoneEnsure(
-                matchOne(getPublicStaticMethods(
+                SupportUtil.requireOne(getPublicStaticMethods(
                     ((DataLoader) prev).getValue(), name), NONE_PARAM));
         } else {
             // 成员方法

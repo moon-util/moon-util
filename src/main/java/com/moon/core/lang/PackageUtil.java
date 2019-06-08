@@ -6,7 +6,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author benshaoye
  */
-final class PackageUtil {
+public final class PackageUtil {
 
     private PackageUtil() { noInstanceError(); }
 

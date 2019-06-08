@@ -22,7 +22,7 @@ public interface Console extends Printable, Timing {
     /**
      * 最低级别
      */
-    Level LOWEST = last(Level.class);
+    Level LOWEST = Level.PRINT;
     /**
      * 全局默认输出
      */
