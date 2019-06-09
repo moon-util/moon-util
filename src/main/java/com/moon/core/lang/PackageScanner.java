@@ -1,7 +1,6 @@
 package com.moon.core.lang;
 
 import com.moon.core.util.FilterUtil;
-import com.moon.core.util.IteratorUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,6 +18,7 @@ import java.util.*;
 public class PackageScanner extends HashSet<String> {
 
     private final static String DOT_CLASS = ".class";
+    private final static Class TYPE = PackageScanner.class;
 
     PackageScanner() { }
 
@@ -27,13 +27,15 @@ public class PackageScanner extends HashSet<String> {
         return this;
     }
 
-    static List<String> scanOf(String packageName) {
+    private List<String> scanOf(String packageName) {
         final String currentName = packageName.replaceAll("\\.", "/");
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = getClass().getClassLoader();
         try {
             Enumeration<URL> urls = cl.getResources(currentName);
             ArrayList<String> result = new ArrayList<>();
-            IteratorUtil.forEach(urls, url -> result.addAll(scanFromUrl(url, currentName)));
+            while (urls.hasMoreElements()) {
+                result.addAll(scanFromUrl(urls.nextElement(), currentName));
+            }
             return result;
         } catch (IOException e) {
             return ThrowUtil.doThrow(e);
@@ -64,7 +66,9 @@ public class PackageScanner extends HashSet<String> {
             int end = url.getPath().lastIndexOf(packageName);
             String basePath = url.getPath().substring(1, end);
             try {
-                return walkFileTree(Paths.get(url.getPath().replaceFirst("/", "")), Paths.get(basePath));
+                final String target = url.getPath();
+                Path path = LangUtil.getOrElse(() -> Paths.get(target.replaceFirst("/", "")), () -> Paths.get(target));
+                return walkFileTree(Paths.get(target), Paths.get(basePath));
             } catch (Exception e) {
                 ThrowUtil.doThrow(e);
             }
@@ -74,34 +78,42 @@ public class PackageScanner extends HashSet<String> {
 
     private static List<String> walkFileTree(Path path, Path basePath) throws Exception {
         final List<String> result = new ArrayList<>();
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-
-            private String packageName = StringUtil.stringifyOrEmpty(basePath);
-
-            @Override
-            public FileVisitResult visitFile(Path arg, BasicFileAttributes attrs) {
-                if (arg.toString().endsWith(DOT_CLASS)) {
-                    String path = arg.toString();
-                    path = path.replace(packageName, "");
-                    path = path.substring(1);
-                    path = path.replace('\\', '/');
-                    path = path.replace(DOT_CLASS, "");
-                    path = path.replace('/', '.');
-                    result.add(path);
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult preVisitDirectory(Path arg0, BasicFileAttributes arg1) {
-                return FileVisitResult.CONTINUE;
-            }
-        });
+        Files.walkFileTree(path, new DefaultFileVisitor(result,basePath));
         return result;
     }
 
+    static class DefaultFileVisitor extends SimpleFileVisitor<Path> {
+
+        private final List<String> result;
+        private final String packageName;
+
+        DefaultFileVisitor(List<String> result, Path basePath) {
+            this.result = result;
+            this.packageName = StringUtil.stringifyOrEmpty(basePath);
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)   {
+            if (file.toString().endsWith(DOT_CLASS)) {
+                String path = file.toString();
+                path = path.replace(packageName, "");
+                path = path.substring(1);
+                path = path.replace('\\', '/');
+                path = path.replace(DOT_CLASS, "");
+                path = path.replace('/', '.');
+                result.add(path);
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+            return FileVisitResult.CONTINUE;
+        }
+    }
+
     private static FileSystemProvider getZipFSProvider() {
-        return FilterUtil.nullableFirst(FileSystemProvider.installedProviders(),
-            provider -> "jar".equals(provider.getScheme()));
+        return FilterUtil
+            .nullableFirst(FileSystemProvider.installedProviders(), provider -> "jar".equals(provider.getScheme()));
     }
 }

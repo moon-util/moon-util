@@ -1,6 +1,8 @@
 package com.moon.core.lang;
 
 
+import org.junit.jupiter.api.Assertions;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,12 @@ public class ClassUtilTest {
 
     @org.junit.Test
     public void testGetAllSuperclasses() {
+        ClassUtil.WRAPPER_TO_PRIMITIVE_MAP.forEach((key,value)->{
+            System.out.println(key);
+            System.out.println(value);
+            Assertions.assertFalse(key.isAssignableFrom(value));
+            Assertions.assertFalse(value.isAssignableFrom(key));
+        });
     }
 
     @org.junit.Test

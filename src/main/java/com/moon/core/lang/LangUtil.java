@@ -3,6 +3,8 @@ package com.moon.core.lang;
 import com.moon.core.util.OptionalUtil;
 import com.moon.core.util.function.*;
 
+import java.util.function.Supplier;
+
 import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -10,6 +12,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 public final class LangUtil {
+
     private LangUtil() {
         noInstanceError();
     }
@@ -32,6 +35,7 @@ public final class LangUtil {
      *
      * @param supplier
      * @param <T>
+     *
      * @return
      */
     public static <T> T get(ThrowingSupplier<T> supplier) {
@@ -39,6 +43,14 @@ public final class LangUtil {
             return supplier.get();
         } catch (Throwable t) {
             return doThrow(t);
+        }
+    }
+
+    public static <T> T getOrElse(ThrowingSupplier<T> supplier, Supplier<T> defaultSupplier) {
+        try {
+            return supplier.get();
+        } catch (Throwable t) {
+            return defaultSupplier.get();
         }
     }
 
@@ -80,6 +92,7 @@ public final class LangUtil {
      * @param function
      * @param <T>
      * @param <R>
+     *
      * @return
      */
     public static <T, R> R apply(T value, ThrowingFunction<? super T, R> function) {
@@ -116,6 +129,7 @@ public final class LangUtil {
      * @param <T>
      * @param <O>
      * @param <R>
+     *
      * @return
      */
     public static <T, O, R> R applyBi(T v1, O v2, ThrowingBiFunction<? super T, ? super O, R> function) {

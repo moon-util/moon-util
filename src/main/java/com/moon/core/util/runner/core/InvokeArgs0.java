@@ -1,7 +1,6 @@
 package com.moon.core.util.runner.core;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Objects;
 
 import static com.moon.core.lang.reflect.MethodUtil.*;
@@ -9,7 +8,7 @@ import static com.moon.core.lang.reflect.MethodUtil.*;
 /**
  * @author benshaoye
  */
-final class InvokeArgs0 extends InvokeArgs {
+final class InvokeArgs0 extends InvokeAbstract {
 
     static class BaseInvoker implements AsInvoker {
 
@@ -32,7 +31,7 @@ final class InvokeArgs0 extends InvokeArgs {
         }
 
         @Override
-        public String toString() { return methodName; }
+        public String toString() { return method == null ? methodName : stringify(method); }
     }
 
     static class NonMember extends BaseInvoker {
@@ -63,19 +62,9 @@ final class InvokeArgs0 extends InvokeArgs {
                 return null;
             }
         }
-    }
-
-    static class NonStatic implements AsInvoker {
-
-        final Method method;
-
-        NonStatic(Method method) {this.method = method;}
 
         @Override
-        public Object run(Object data) { return invoke(true, method, null); }
-
-        @Override
-        public String toString() { return method.getName(); }
+        public String toString() { return stringify(method); }
     }
 
     static AsInvoker memberArgs0(String name) {
@@ -83,21 +72,10 @@ final class InvokeArgs0 extends InvokeArgs {
         return invoker == null ? new NonMember(name) : invoker;
     }
 
-    static Method memberArgs0(Class source, String name) {
-        List<Method> ms = getPublicMemberMethods(source, name);
-        return filterEmptyArgs(ms, source, name);
-    }
-
-    static Method staticArgs0(Class source, String name) {
-        List<Method> ms = getPublicStaticMethods(source, name);
-        return filterEmptyArgs(ms, source, name);
-    }
-
-
     final static AsRunner parse(AsValuer prev, String name, boolean isStatic) {
         if (isStatic) {
             Class srcType = ((DataLoader) prev).getValue();
-            return new NonStatic(staticArgs0(srcType, name));
+            return onlyStatic(staticArgs0(srcType, name));
         } else {
             // 成员方法
             return new GetLink(prev, memberArgs0(name));

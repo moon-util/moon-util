@@ -13,6 +13,6 @@ public final class PackageUtil {
     public static PackageScanner scanner() { return new PackageScanner(); }
 
     public static String[] scan(String packageName) {
-        return PackageScanner.scanOf(packageName).toArray(STRINGS.empty());
+        return scanner().scan(packageName).toArray(STRINGS.empty());
     }
 }

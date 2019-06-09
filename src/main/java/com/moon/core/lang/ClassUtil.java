@@ -20,8 +20,8 @@ public final class ClassUtil {
         noInstanceError();
     }
 
-    private static final Map<Class, Class> PRIMITIVE_TO_WRAPPER_MAP;
-    private static final Map<Class, Class> WRAPPER_TO_PRIMITIVE_MAP;
+    static final Map<Class, Class> PRIMITIVE_TO_WRAPPER_MAP;
+    static final Map<Class, Class> WRAPPER_TO_PRIMITIVE_MAP;
 
     static {
         final Class[] PRIMITIVE_CLASSES = {

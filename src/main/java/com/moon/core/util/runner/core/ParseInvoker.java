@@ -55,8 +55,12 @@ final class ParseInvoker {
         boolean isStatic
     ) {
         AsRunner[] params = ParseParams.parse(chars, indexer, len, settings);
-        return params.length > 1 ? parseMultiParamCaller(params, prev, name, isStatic) : parseOnlyParamCaller(params,
-            prev, name, isStatic);
+        if (params.length > 1) {
+            return parseMultiParamCaller(params, prev, name, isStatic);
+        } else {
+            // return InvokeArgs1.parse(prev, name, isStatic, params[0]);
+            return parseOnlyParamCaller(params,prev,name,isStatic);
+        }
     }
 
     /**

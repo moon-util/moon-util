@@ -28,13 +28,13 @@ class IGetLoad {
         scanner.scan("com.moon.core");
         packagesName.putIfAbsent("java.util.", null);
         packagesName.putIfAbsent("java.lang.", null);
-        scanner.forEach(className -> {
+        for (String className : scanner) {
             Class loaded = loadClass(className);
             if (loaded != null) {
                 packagesName.putIfAbsent(loaded.getPackage().getName() + '.', null);
                 NAMED_CACHE.putIfAbsent(loaded.getCanonicalName(), loaded);
             }
-        });
+        }
         Set<String> names = packagesName.keySet();
         packages = names.toArray(new String[names.size()]);
     }
