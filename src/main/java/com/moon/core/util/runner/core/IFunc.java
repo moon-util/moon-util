@@ -14,7 +14,7 @@ final class IFunc {
         Non(RunnerFunction fn) { this.fn = fn; }
 
         @Override
-        public Object run() { return fn.apply(); }
+        public Object run(Object data) { return fn.apply(); }
     }
 
     static class One extends Non {

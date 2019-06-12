@@ -1,5 +1,7 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.util.runner.core.InvokeEnsure.Args1;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -7,9 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.moon.core.lang.ClassUtil.toPrimitiveClass;
-import static com.moon.core.lang.StringUtil.concat;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
-import static com.moon.core.lang.reflect.MethodUtil.getPublicStaticMethods;
 import static com.moon.core.lang.reflect.MethodUtil.invoke;
 import static java.util.stream.Collectors.toList;
 
@@ -144,7 +144,7 @@ final class InvokeArgs1 extends InvokeAbstract {
                 method = withNumber(dataType, currType);
             }
             if (method == null) {
-                doThrow(toString());
+                ParseUtil.doThrow(toString());
             }
             return currentMethod = method;
         }
@@ -168,29 +168,43 @@ final class InvokeArgs1 extends InvokeAbstract {
     }
 
     static AsRunner staticArgs1(Class type, String name, AsRunner paramValuer) {
-        List<Method> ms = getPublicStaticMethods(type, name);
+        List<Method> ms = staticMethods(type, name);
         ms = ms.stream().filter(m -> m.getParameterCount() == 1).collect(toList());
         switch (ms.size()) {
             case 0:
-                return doThrow(concat("Can not find method of:", type.getName(), "#", name, "()"));
+                return ParseUtil.doThrow(type, name);
             case 1:
-                return onlyStatic(ms.get(0), paramValuer);
+                return ensure(ms.get(0), paramValuer);
             default:
                 return new OneStaticDynamic(paramValuer, ms);
         }
     }
 
+    static AsRunner memberArgs1Runner(Class type, String name, AsValuer src, AsRunner no1) {
+        List<Method> ms = memberMethods(type, name);
+        switch (ms.size()) {
+            case 0:
+                return doThrowNull();
+            case 1:
+                return new Args1(ms.get(0), src, no1);
+            default:
+                return new InvokeOne(src, no1, name);
+        }
+    }
+
     final static AsRunner parse(
-        AsValuer prev, String name, boolean isStatic, AsRunner firstParam
+        AsValuer prev, String name, boolean isStatic, AsRunner no1
     ) {
         if (isStatic) {
             // 静态方法
-            Class sourceType = ((DataLoader) prev).getValue();
-            return staticArgs1(sourceType, name, firstParam);
-            // return InvokeOneEnsure.of(firstParam, sourceType, name);
+            Class sourceType = ((DataClass) prev).getValue();
+            return staticArgs1(sourceType, name, no1);
+        } else if (prev.isConst()) {
+            Class target = prev.run().getClass();
+            return memberArgs1Runner(target, name, prev, no1);
         } else {
             // 成员方法
-            return new InvokeOne(prev, firstParam, name);
+            return new InvokeOne(prev, no1, name);
         }
     }
 }

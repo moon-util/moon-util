@@ -6,6 +6,8 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.runner.Runner;
 import com.moon.core.util.runner.RunnerSettings;
 
+import java.lang.reflect.Method;
+
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.runner.core.Constants.DOUBLE;
 import static com.moon.core.util.runner.core.Constants.SINGLE;
@@ -61,6 +63,14 @@ public class ParseUtil {
      */
 
     final static <T> T throwErr(char[] chars, IntAccessor indexer) { return SupportUtil.throwErr(chars, indexer); }
+
+    static AsRunner doThrow(String msg) { throw new IllegalArgumentException(msg); }
+
+    static AsRunner doThrow(Method m) { return doThrow(m.getDeclaringClass(), m.getName()); }
+
+    static AsRunner doThrow(Class source, String name) {
+        return doThrow("Can not find method of: " + source + "#" + name + "(...)");
+    }
 
     final static void assertTrue(boolean value, char[] chars, IntAccessor indexer) {
         if (value) {

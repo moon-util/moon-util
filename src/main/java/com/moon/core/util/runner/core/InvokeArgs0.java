@@ -1,6 +1,7 @@
 package com.moon.core.util.runner.core;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Objects;
 
 import static com.moon.core.lang.reflect.MethodUtil.*;
@@ -10,7 +11,7 @@ import static com.moon.core.lang.reflect.MethodUtil.*;
  */
 final class InvokeArgs0 extends InvokeAbstract {
 
-    static class BaseInvoker implements AsInvoker {
+    static abstract class BaseInvoker implements AsInvoker {
 
         final String methodName;
 
@@ -43,9 +44,12 @@ final class InvokeArgs0 extends InvokeAbstract {
     }
 
     enum NonDefault implements AsInvoker {
+        wait,
         clone,
+        notify,
         toString,
         hashCode,
+        notifyAll,
         getClass;
 
         private final Method method;
@@ -72,12 +76,27 @@ final class InvokeArgs0 extends InvokeAbstract {
         return invoker == null ? new NonMember(name) : invoker;
     }
 
+    static AsRunner memberArgs0Runner(Class type, String name, AsValuer src) {
+        List<Method> ms = memberMethods(type, name);
+        switch (ms.size()) {
+            case 0:
+                return doThrowNull();
+            case 1:
+                return new InvokeEnsure.Args0(ms.get(0), src);
+            default:
+                return new GetLink(src, memberArgs0(name));
+        }
+    }
+
     final static AsRunner parse(AsValuer prev, String name, boolean isStatic) {
         if (isStatic) {
-            Class srcType = ((DataLoader) prev).getValue();
-            return onlyStatic(staticArgs0(srcType, name));
-        } else {
+            Class srcType = ((DataClass) prev).getValue();
+            return ensure(staticArgs0(srcType, name));
+        } else if (prev.isConst()) {
             // 成员方法
+            Class target = prev.run().getClass();
+            return memberArgs0Runner(target, name, prev);
+        } else {
             return new GetLink(prev, memberArgs0(name));
         }
     }

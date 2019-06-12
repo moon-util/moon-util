@@ -1,6 +1,7 @@
 package com.moon.core.lang;
 
 import com.moon.core.util.FilterUtil;
+import com.moon.core.util.OSUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -67,8 +68,8 @@ public class PackageScanner extends HashSet<String> {
             String basePath = url.getPath().substring(1, end);
             try {
                 final String target = url.getPath();
-                Path path = LangUtil.getOrElse(() -> Paths.get(target.replaceFirst("/", "")), () -> Paths.get(target));
-                return walkFileTree(Paths.get(target), Paths.get(basePath));
+                Path path = Paths.get(OSUtil.isWindows() ? target.replaceFirst("/", "") : target);
+                return walkFileTree(path, Paths.get(basePath));
             } catch (Exception e) {
                 ThrowUtil.doThrow(e);
             }
@@ -78,7 +79,7 @@ public class PackageScanner extends HashSet<String> {
 
     private static List<String> walkFileTree(Path path, Path basePath) throws Exception {
         final List<String> result = new ArrayList<>();
-        Files.walkFileTree(path, new DefaultFileVisitor(result,basePath));
+        Files.walkFileTree(path, new DefaultFileVisitor(result, basePath));
         return result;
     }
 
@@ -93,7 +94,7 @@ public class PackageScanner extends HashSet<String> {
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)   {
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
             if (file.toString().endsWith(DOT_CLASS)) {
                 String path = file.toString();
                 path = path.replace(packageName, "");

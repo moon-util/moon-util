@@ -1,5 +1,6 @@
 package com.moon.core.util.runner;
 
+import com.moon.core.AbstractTest;
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.DoubleUtil;
 import com.moon.core.lang.reflect.MethodUtil;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author benshaoye
  */
-class RunnerUtilTestTest {
+class RunnerUtilTestTest extends AbstractTest {
 
     Object data, res;
     Runner runner, runner1;
@@ -69,23 +70,6 @@ class RunnerUtilTestTest {
 
         running(max, "runnable: ", runnable, "origin  : ", origin);
         running(max, "origin  : ", origin, "runnable: ", runnable);
-    }
-
-    void running(int count, String name0, Runnable runnable0, String name1, Runnable runnable1) {
-        final long time0 = System.currentTimeMillis();
-        running(count, runnable0);
-        final long time1 = System.currentTimeMillis();
-        System.out.println(name0 + (time1 - time0));
-        final long time2 = System.currentTimeMillis();
-        running(count, runnable1);
-        final long time3 = System.currentTimeMillis();
-        System.out.println(name1 + (time3 - time2));
-    }
-
-    void running(int count, Runnable runnable) {
-        for (int i = 0; i < count; i++) {
-            runnable.run();
-        }
     }
 
     @Test

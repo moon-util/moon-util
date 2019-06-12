@@ -1,10 +1,13 @@
 package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.ref.FinalAccessor;
+import com.moon.core.util.runner.Runner;
+import com.moon.core.util.runner.RunnerUtil;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +21,28 @@ class InvokeArgs0TestTest {
     Method method, m, m1, m0, method0, method1;
     String name, name0, name1, name2, methodName, methodName0;
 
+    @Test
+    void testArraysCopyOfRange() {
+        int[] arr = {1, 1, 1, 1, 2, 2, 2, 2};
+        System.out.println(Arrays.toString(Arrays.copyOfRange(arr, 0, 3)));
+        System.out.println(Arrays.toString(Arrays.copyOfRange(arr, 3, arr.length)));
+    }
+
+    @Test
+    void testOnlyMethod() {
+        String str = "@Objects.hash(12,12)";
+        Runner runner = RunnerUtil.parse(str);
+
+        Object ret = runner.run();
+        Object res = Objects.hash(12, 12);
+        assertEquals(ret, res);
+
+        str = "@Objects.hash(12,12,1, 1, 1, 1, 2, 2, 2, 2)";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        res = Objects.hash(12, 12, 1, 1, 1, 1, 2, 2, 2, 2);
+        assertEquals(ret, res);
+    }
 
     @Test
     void testGetStaticEmptyParam() {

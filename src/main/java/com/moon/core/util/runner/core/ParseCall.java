@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.runner.core.Constants.DOT;
-import static com.moon.core.util.runner.core.Constants.YUAN_L;
 import static com.moon.core.util.runner.core.ParseGetter.parseVar;
 import static com.moon.core.util.runner.core.ParseUtil.*;
 
@@ -164,7 +163,7 @@ class ParseCall {
         } else if (caller instanceof RunnerFunction) {
             return caller;
         } else if (caller instanceof Class) {
-            return new DataLoader((Class) caller);
+            return new DataClass((Class) caller);
         }
         return throwErr(chars, indexer);
     }
@@ -183,7 +182,7 @@ class ParseCall {
         }
         caller = IGetLoad.tryLoad(runnerName);
         if (caller != null) {
-            return new DataLoader((Class) caller);
+            return new DataClass((Class) caller);
         }
         return null;
     }

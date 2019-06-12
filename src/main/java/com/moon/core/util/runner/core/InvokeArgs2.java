@@ -1,24 +1,39 @@
 package com.moon.core.util.runner.core;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author benshaoye
  */
-public class InvokeArgs2 extends InvokeAbstract {
+final class InvokeArgs2 extends InvokeAbstract {
 
     private InvokeArgs2() { noInstanceError(); }
 
+    static AsRunner staticCall2(Class source, String name, AsRunner no1, AsRunner no2) {
+        List<Method> ms = staticMethods(source, name);
+        switch (ms.size()) {
+            case 0:
+                return ParseUtil.doThrow(source, name);
+            case 1:
+                return ensure(ms.get(0), no1, no2);
+            default:
+                return doThrowNull();
+        }
+    }
+
     final static AsRunner parse(
-        AsValuer prev, String name, boolean isStatic, AsRunner firstParam, AsRunner secondParam
+        AsValuer prev, String name, boolean isStatic, AsRunner no1, AsRunner no2
     ) {
         if (isStatic) {
             // 静态方法
-            Class sourceType = ((DataLoader) prev).getValue();
-            return InvokeOneEnsure.of(firstParam, sourceType, name);
+            Class sourceType = ((DataClass) prev).getValue();
+            return staticCall2(sourceType, name, no1, no2);
         } else {
             // 成员方法
-            return new InvokeOne(prev, firstParam, name);
+            return doThrowNull();
         }
     }
 }

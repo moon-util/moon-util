@@ -5,8 +5,6 @@ import com.moon.core.lang.reflect.FieldUtil;
 import com.moon.core.util.runner.RunnerSettings;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.function.Predicate;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.reflect.FieldUtil.getAccessibleField;
@@ -26,7 +24,7 @@ final class ParseInvoker {
         char[] chars, IntAccessor indexer, int len, RunnerSettings settings, String methodName, AsValuer prevValuer
     ) {
         final int cache = indexer.get();
-        final boolean isStatic = prevValuer instanceof DataLoader;
+        final boolean isStatic = prevValuer instanceof DataClass;
         if (nextVal(chars, indexer, len) == YUAN_L) {
             if (nextVal(chars, indexer, len) == YUAN_R) {
                 // 无参方法调用
@@ -55,48 +53,17 @@ final class ParseInvoker {
         boolean isStatic
     ) {
         AsRunner[] params = ParseParams.parse(chars, indexer, len, settings);
-        if (params.length > 1) {
-            return parseMultiParamCaller(params, prev, name, isStatic);
-        } else {
-            // return InvokeArgs1.parse(prev, name, isStatic, params[0]);
-            return parseOnlyParamCaller(params,prev,name,isStatic);
-        }
-    }
-
-    /**
-     * 多参数调用的方法（未实现）
-     *
-     * @param params   参数
-     * @param prev     静态方法的 class 或实例方法的{@link AsGetter}
-     * @param name     方法名{@link Method#getName()}
-     * @param isStatic 是否是静态方法
-     *
-     * @return
-     */
-    private final static AsRunner parseMultiParamCaller(
-        AsRunner[] params, AsValuer prev, String name, boolean isStatic
-    ) {
-        if (isStatic) {
-
-        } else {
-
-        }
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * 带有一个参数的方法
-     */
-    private final static AsRunner parseOnlyParamCaller(
-        AsRunner[] valuers, AsValuer prev, String name, boolean isStatic
-    ) {
-        if (isStatic) {
-            // 静态方法
-            Class sourceType = ((DataLoader) prev).getValue();
-            return InvokeOneEnsure.of(valuers[0], sourceType, name);
-        } else {
-            // 成员方法
-            return new InvokeOne(prev, valuers[0], name);
+        switch (params.length) {
+            case 0:
+                return InvokeArgs0.parse(prev, name, isStatic);
+            case 1:
+                return InvokeArgs1.parse(prev, name, isStatic, params[0]);
+            case 2:
+                return InvokeArgs2.parse(prev, name, isStatic, params[0], params[1]);
+            case 3:
+                return InvokeArgs3.parse(prev, name, isStatic, params[0], params[1], params[2]);
+            default:
+                return InvokeArgsN.parse(prev, name, isStatic, params);
         }
     }
 
@@ -108,7 +75,7 @@ final class ParseInvoker {
     ) {
         if (isStatic) {
             // 静态字段
-            Class sourceType = ((DataLoader) prevValuer).getValue();
+            Class sourceType = ((DataClass) prevValuer).getValue();
             Field field = requireNonNull(getAccessibleField(sourceType, name));
             return DataConst.get(FieldUtil.getValue(field, sourceType));
         }

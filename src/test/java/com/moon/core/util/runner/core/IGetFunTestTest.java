@@ -33,6 +33,10 @@ class IGetFunTestTest {
     }
 
     @Test
+    void testStringLength() {
+    }
+
+    @Test
     void testFunctionsName() {
         toValue("@ str . indexOf (12,1)");
         assertSame(DataNum.class, runner.getClass());
