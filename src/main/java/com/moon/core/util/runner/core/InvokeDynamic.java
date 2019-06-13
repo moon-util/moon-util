@@ -1,8 +1,12 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.enums.ArraysEnum;
 import com.moon.core.lang.ThrowUtil;
 
 import java.lang.reflect.Method;
+
+import static com.moon.core.lang.reflect.MethodUtil.invoke;
+import static com.moon.core.util.runner.core.DataNull.NULL;
 
 /**
  * @author benshaoye
@@ -10,6 +14,8 @@ import java.lang.reflect.Method;
 class InvokeDynamic {
 
     private InvokeDynamic() { ThrowUtil.noInstanceError(); }
+
+    protected final static Object[] EMPTY_OBJECTS = ArraysEnum.OBJECTS.empty();
 
     static abstract class BaseDynamic implements AsInvoker {
 
@@ -19,8 +25,24 @@ class InvokeDynamic {
         Method method;
 
         protected BaseDynamic(Method[] ms, AsValuer src) {
-            this.src = src;
+            this.src = src == null ? NULL : src;
             this.ms = ms;
+        }
+
+        Object[] getParams(Object data) { return EMPTY_OBJECTS; }
+
+        public Method getMethod(Object data) { return method == null ? null : method; }
+
+        @Override
+        public final boolean isStaticInvoker() { return src == NULL; }
+
+        @Override
+        public final boolean isMemberInvoker() { return src != NULL; }
+
+        @Override
+        public final Object run(Object data) {
+            Object[] params = getParams(data);
+            return invoke(true, getMethod(data), src.run(data), params);
         }
     }
 }

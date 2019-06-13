@@ -10,7 +10,6 @@ import java.util.Objects;
 
 import static com.moon.core.lang.reflect.MethodUtil.getPublicMemberMethods;
 import static com.moon.core.lang.reflect.MethodUtil.getPublicStaticMethods;
-import static com.moon.core.util.runner.core.DataNull.NULL;
 import static java.util.Arrays.copyOfRange;
 
 /**
@@ -127,7 +126,7 @@ abstract class InvokeAbstract {
         if (m.isVarArgs()) {
             switch (m.getParameterCount()) {
                 case 1:
-                    return new EnsureVars1(m, NULL, no1);
+                    return EnsureVars1.static1(m, no1);
                 default:
                     return ParseUtil.doThrow(m);
             }
@@ -139,9 +138,9 @@ abstract class InvokeAbstract {
         if (m.isVarArgs()) {
             switch (m.getParameterCount()) {
                 case 1:
-                    return new EnsureVars1(m, NULL, no1, no2);
+                    return EnsureVars1.static1(m, no1, no2);
                 case 2:
-                    return new EnsureVars2(m, NULL, no1, no2);
+                    return EnsureVars2.static2(m, no1, no2);
                 default:
                     return ParseUtil.doThrow(m);
             }
@@ -153,11 +152,11 @@ abstract class InvokeAbstract {
         if (m.isVarArgs()) {
             switch (m.getParameterCount()) {
                 case 1:
-                    return new EnsureVars1(m, NULL, no1, no2, no3);
+                    return EnsureVars1.static1(m, no1, no2, no3);
                 case 2:
-                    return new EnsureVars2(m, NULL, no1, no2, no3);
+                    return EnsureVars2.static2(m, no1, no2, no3);
                 case 3:
-                    return new EnsureVars3(m, NULL, no1, no2, no3);
+                    return EnsureVars3.static3(m, no1, no2, no3);
                 default:
                     return ParseUtil.doThrow(m);
             }
@@ -169,18 +168,18 @@ abstract class InvokeAbstract {
         if (m.isVarArgs()) {
             switch (m.getParameterCount()) {
                 case 1: {
-                    return new EnsureVars1(m, NULL, params);
+                    return EnsureVars1.static1(m, params);
                 }
                 case 2: {
                     AsRunner[] lasts = copyOfRange(params, 1, params.length);
-                    return new EnsureVars2(m, NULL, params[0], lasts);
+                    return EnsureVars2.static2(m, params[0], lasts);
                 }
                 case 3: {
                     AsRunner[] lasts = copyOfRange(params, 2, params.length);
-                    return new EnsureVars3(m, NULL, params[0], params[1], lasts);
+                    return EnsureVars3.static3(m, params[0], params[1], lasts);
                 }
                 default: {
-                    return new EnsureVarsN(m, NULL, params);
+                    return EnsureVarsN.staticN(m, params);
                 }
             }
         }

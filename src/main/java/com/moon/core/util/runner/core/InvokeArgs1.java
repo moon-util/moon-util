@@ -1,6 +1,6 @@
 package com.moon.core.util.runner.core;
 
-import com.moon.core.util.runner.core.InvokeEnsure.Args1;
+import com.moon.core.util.runner.core.InvokeEnsure.EnsureArgs1;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -149,9 +149,7 @@ final class InvokeArgs1 extends InvokeAbstract {
             return currentMethod = method;
         }
 
-        Method getMethod(Object data) {
-            return currentMethod == null ? reloadMethod(data) : currentMethod;
-        }
+        Method getMethod(Object data) { return currentMethod == null ? reloadMethod(data) : currentMethod; }
 
         @Override
         public Object run(Object data) {
@@ -186,7 +184,7 @@ final class InvokeArgs1 extends InvokeAbstract {
             case 0:
                 return doThrowNull();
             case 1:
-                return new Args1(ms.get(0), src, no1);
+                return new EnsureArgs1(ms.get(0), src, no1);
             default:
                 return new InvokeOne(src, no1, name);
         }
@@ -197,8 +195,8 @@ final class InvokeArgs1 extends InvokeAbstract {
     ) {
         if (isStatic) {
             // 静态方法
-            Class sourceType = ((DataClass) prev).getValue();
-            return staticArgs1(sourceType, name, no1);
+            Class type = ((DataClass) prev).getValue();
+            return staticArgs1(type, name, no1);
         } else if (prev.isConst()) {
             Class target = prev.run().getClass();
             return memberArgs1Runner(target, name, prev, no1);

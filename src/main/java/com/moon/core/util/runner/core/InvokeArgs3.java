@@ -30,8 +30,10 @@ class InvokeArgs3 extends InvokeAbstract {
     ) {
         if (isStatic) {
             // 静态方法
-            Class sourceType = ((DataClass) prev).getValue();
-            return staticCall3(sourceType, name, no1, no2, no3);
+            Class type = ((DataClass) prev).getValue();
+            return staticCall3(type, name, no1, no2, no3);
+        } else if (prev.isConst()) {
+            return doThrowNull();
         } else {
             // 成员方法
             return new InvokeOne(prev, no1, name);

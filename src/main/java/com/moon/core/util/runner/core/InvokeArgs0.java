@@ -82,7 +82,7 @@ final class InvokeArgs0 extends InvokeAbstract {
             case 0:
                 return doThrowNull();
             case 1:
-                return new InvokeEnsure.Args0(ms.get(0), src);
+                return new InvokeEnsure.EnsureArgs0(ms.get(0), src);
             default:
                 return new GetLink(src, memberArgs0(name));
         }
@@ -90,8 +90,8 @@ final class InvokeArgs0 extends InvokeAbstract {
 
     final static AsRunner parse(AsValuer prev, String name, boolean isStatic) {
         if (isStatic) {
-            Class srcType = ((DataClass) prev).getValue();
-            return ensure(staticArgs0(srcType, name));
+            Class type = ((DataClass) prev).getValue();
+            return ensure(staticArgs0(type, name));
         } else if (prev.isConst()) {
             // 成员方法
             Class target = prev.run().getClass();

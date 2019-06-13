@@ -3,6 +3,7 @@ package com.moon.core.util.runner.core;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.runner.RunnerSettings;
+import com.moon.core.util.runner.core.InvokeEnsure.EnsureArgs0;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -84,8 +85,8 @@ final class ParseGetter {
     final static AsRunner assertNotExistInvoker(
         char[] chars, IntAccessor indexer, int len, AsRunner invoker
     ) {
-        if (invoker.isInvoker() && invoker instanceof InvokeEnsure.Args0) {
-            Method m = ((InvokeEnsure.Args0) invoker).method;
+        if (invoker.isInvoker() && invoker instanceof EnsureArgs0) {
+            Method m = ((EnsureArgs0) invoker).method;
             Asserts.disableIllegalCallers(chars, indexer,
                 len, m.getDeclaringClass(), m.getName());
         }

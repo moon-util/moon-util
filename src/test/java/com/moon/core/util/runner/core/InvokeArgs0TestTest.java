@@ -1,5 +1,6 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.AbstractTest;
 import com.moon.core.lang.ref.FinalAccessor;
 import com.moon.core.util.runner.Runner;
 import com.moon.core.util.runner.RunnerUtil;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author benshaoye
  */
-class InvokeArgs0TestTest {
+class InvokeArgs0TestTest extends AbstractTest {
 
     Class type, defaultType;
     Method method, m, m1, m0, method0, method1;
@@ -42,6 +43,22 @@ class InvokeArgs0TestTest {
         ret = runner.run();
         res = Objects.hash(12, 12, 1, 1, 1, 1, 2, 2, 2, 2);
         assertEquals(ret, res);
+    }
+
+    @Test
+    void testOnlyMethod0() {
+        String str;
+        Object data = null;
+        Runner runner;
+
+        str = "'123' . endsWith (  '23'   )";
+        runner = RunnerUtil.parse(str);
+
+        assertEquals(runner.getClass(), InvokeEnsure.EnsureArgs1.class);
+        assertEquals(runner.run(), "123".endsWith("23"));
+
+        runningTime(100000, () -> runner.run());
+        runningTime(100000, () -> "123".endsWith("23"));
     }
 
     @Test

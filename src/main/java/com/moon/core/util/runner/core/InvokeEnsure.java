@@ -1,5 +1,6 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.enums.ArraysEnum;
 import com.moon.core.enums.Casters;
 import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
@@ -18,7 +19,7 @@ import static com.moon.core.util.runner.core.DataNull.NULL;
  */
 class InvokeEnsure {
 
-    protected final static Object[] EMPTY_OBJECTS = new Object[0];
+    protected final static Object[] EMPTY_OBJECTS = ArraysEnum.OBJECTS.empty();
 
     static abstract class BaseEnsure implements AsInvoker {
 
@@ -61,7 +62,7 @@ class InvokeEnsure {
 
         EnsureArgs0(Method method, AsRunner src) { super(method, src); }
 
-        final static AsRunner static0(Method method) { return new EnsureArgs0(method, NULL); }
+        final static AsRunner static0(Method method) { return new EnsureArgs0(method, null); }
     }
 
     static class EnsureArgs1 extends EnsureArgs0 {
@@ -73,7 +74,7 @@ class InvokeEnsure {
             this.no1 = no1;
         }
 
-        final static AsRunner static1(Method method, AsRunner no1) { return new EnsureArgs1(method, NULL, no1); }
+        final static AsRunner static1(Method method, AsRunner no1) { return new EnsureArgs1(method, null, no1); }
 
         @Override
         public Object[] getParams(Object data) { return toParams(no1.run(data)); }
@@ -90,7 +91,7 @@ class InvokeEnsure {
         }
 
         final static AsRunner static2(Method method, AsRunner no1, AsRunner no2) {
-            return new EnsureArgs2(method, NULL, no1, no2);
+            return new EnsureArgs2(method, null, no1, no2);
         }
 
         @Override
@@ -107,7 +108,7 @@ class InvokeEnsure {
         }
 
         final static AsRunner static3(Method method, AsRunner no1, AsRunner no2, AsRunner no3) {
-            return new EnsureArgs3(method, NULL, no1, no2, no3);
+            return new EnsureArgs3(method, null, no1, no2, no3);
         }
 
         @Override
@@ -124,7 +125,7 @@ class InvokeEnsure {
         }
 
         final static AsRunner staticN(Method method, AsRunner... params) {
-            return new EnsureArgsN(method, NULL, params);
+            return new EnsureArgsN(method, null, params);
         }
 
         @Override
@@ -160,6 +161,10 @@ class InvokeEnsure {
             this.lasts = lasts;
         }
 
+        static EnsureVars1 static1(Method method, AsRunner... lasts) {
+            return new EnsureVars1(method, null, lasts);
+        }
+
         Object getVarArg(Object data, AsRunner[] lasts) {
             int length = lasts.length;
             Object param1 = creator.apply(length), arg;
@@ -185,6 +190,10 @@ class InvokeEnsure {
             this.no1 = no1;
         }
 
+        static EnsureVars1 static2(Method method, AsRunner no1, AsRunner... lasts) {
+            return new EnsureVars2(method, null, no1, lasts);
+        }
+
         @Override
         public Object[] getParams(Object data) { return toParams(no1.run(data), getThisVarArg(data)); }
     }
@@ -196,6 +205,10 @@ class InvokeEnsure {
         EnsureVars3(Method method, AsRunner src, AsRunner no1, AsRunner no2, AsRunner... lasts) {
             super(method, src, no1, lasts);
             this.no2 = no2;
+        }
+
+        static EnsureVars1 static3(Method method, AsRunner no1, AsRunner no2, AsRunner... lasts) {
+            return new EnsureVars3(method, null, no1, no2, lasts);
         }
 
         @Override
@@ -230,6 +243,10 @@ class InvokeEnsure {
                 subs = Arrays.copyOfRange(params, prevN, paramsLen);
             }
             this.paramsLen = prevN + 1;
+        }
+
+        static EnsureVars1 staticN(Method method, AsRunner... params) {
+            return new EnsureVarsN(method, null, params);
         }
 
         @Override

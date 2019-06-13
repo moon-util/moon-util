@@ -25,8 +25,10 @@ final class InvokeArgsN extends InvokeAbstract {
     ) {
         if (isStatic) {
             // 静态方法
-            Class sourceType = ((DataClass) prev).getValue();
-            return staticCallN(sourceType, name, params);
+            Class type = ((DataClass) prev).getValue();
+            return staticCallN(type, name, params);
+        } else if (prev.isConst()) {
+            return doThrowNull();
         } else {
             // 成员方法
             return doThrowNull();
