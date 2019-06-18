@@ -165,7 +165,7 @@ final class InvokeArgs1 extends InvokeAbstract {
         public String toString() { return stringify(srcMethod); }
     }
 
-    static AsRunner staticArgs1(Class type, String name, AsRunner paramValuer) {
+    static AsRunner staticCall1(Class type, String name, AsRunner paramValuer) {
         List<Method> ms = staticMethods(type, name);
         ms = ms.stream().filter(m -> m.getParameterCount() == 1).collect(toList());
         switch (ms.size()) {
@@ -178,7 +178,7 @@ final class InvokeArgs1 extends InvokeAbstract {
         }
     }
 
-    static AsRunner memberArgs1Runner(Class type, String name, AsValuer src, AsRunner no1) {
+    static AsRunner memberCall1(Class type, String name, AsValuer src, AsRunner no1) {
         List<Method> ms = memberMethods(type, name);
         switch (ms.size()) {
             case 0:
@@ -196,10 +196,10 @@ final class InvokeArgs1 extends InvokeAbstract {
         if (isStatic) {
             // 静态方法
             Class type = ((DataClass) prev).getValue();
-            return staticArgs1(type, name, no1);
+            return staticCall1(type, name, no1);
         } else if (prev.isConst()) {
             Class target = prev.run().getClass();
-            return memberArgs1Runner(target, name, prev, no1);
+            return memberCall1(target, name, prev, no1);
         } else {
             // 成员方法
             return new InvokeOne(prev, no1, name);

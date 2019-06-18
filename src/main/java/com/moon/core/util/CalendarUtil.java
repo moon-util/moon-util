@@ -280,21 +280,13 @@ public class CalendarUtil {
      * -------------------------------------------------------------------------
      */
 
-    public final static DateFormat toFormat(String pattern) {
-        return new SimpleDateFormat(pattern);
-    }
+    public final static DateFormat toFormat(String pattern) { return new SimpleDateFormat(pattern); }
 
-    public final static String format(DateFormat pattern, int... values) {
-        return format(toCalendar(values), pattern);
-    }
+    public final static String format(DateFormat pattern, int... values) { return format(toCalendar(values), pattern); }
 
-    public final static String format(String pattern, int... values) {
-        return format(toFormat(pattern), values);
-    }
+    public final static String format(String pattern, int... values) { return format(toFormat(pattern), values); }
 
-    public final static String format(int... values) {
-        return format(PATTERNS[values.length - 1], values);
-    }
+    public final static String format(int... values) { return format(PATTERNS[values.length - 1], values); }
 
     public final static String format(DateFormat pattern, String... values) {
         return format(toCalendar(values), pattern);
@@ -306,9 +298,7 @@ public class CalendarUtil {
 
     public final static String format() { return format(PATTERN); }
 
-    public final static String format(String pattern) {
-        return pattern == null ? null : format(new Date(), pattern);
-    }
+    public final static String format(String pattern) { return pattern == null ? null : format(new Date(), pattern); }
 
     public final static String format(Date date, String pattern) {
         return date == null ? null : format(date, toFormat(pattern));
@@ -318,13 +308,9 @@ public class CalendarUtil {
         return date == null ? null : formatter.format(date);
     }
 
-    public final static String format(Date date) {
-        return date == null ? null : format(date, PATTERN);
-    }
+    public final static String format(Date date) { return date == null ? null : format(date, PATTERN); }
 
-    public final static String format(Calendar date) {
-        return date == null ? null : format(date.getTime());
-    }
+    public final static String format(Calendar date) { return date == null ? null : format(date.getTime()); }
 
     public final static String format(Calendar date, String pattern) {
         return date == null ? null : format(date.getTime(), pattern);
@@ -333,6 +319,10 @@ public class CalendarUtil {
     public final static String format(Calendar date, DateFormat formatter) {
         return date == null ? null : format(date.getTime(), formatter);
     }
+
+    public final static String toYyyyMM(Date date) { return format(date, yyyy_MM); }
+
+    public final static String toYyyyMMDd(Date date) { return format(date, yyyy_MM_dd); }
 
     /*
      * -------------------------------------------------------------------------
@@ -454,10 +444,8 @@ public class CalendarUtil {
     }
 
     public final static Calendar toCalendar(LocalDateTime date) {
-        return date == null
-               ? null
-               : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), date.getHour(),
-                   date.getMinute(), date.getSecond());
+        return date == null ? null : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+            date.getHour(), date.getMinute(), date.getSecond());
     }
 
     public final static Calendar toCalendar(int... values) {

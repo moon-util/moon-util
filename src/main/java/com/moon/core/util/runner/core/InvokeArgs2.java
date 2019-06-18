@@ -1,5 +1,7 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.util.runner.core.InvokeEnsure.EnsureArgs2;
+
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -20,7 +22,19 @@ final class InvokeArgs2 extends InvokeAbstract {
             case 1:
                 return ensure(ms.get(0), no1, no2);
             default:
-                return doThrowNull();
+                return ParseUtil.doThrow("暂未支持");
+        }
+    }
+
+    static AsRunner memberCall2(AsValuer prev, Class source, String name, AsRunner no1, AsRunner no2) {
+        List<Method> ms = memberMethods(source, name);
+        switch (ms.size()) {
+            case 0:
+                return ParseUtil.doThrow(source, name);
+            case 1:
+                return new EnsureArgs2(ms.get(0), prev, no1, no2);
+            default:
+                return ParseUtil.doThrow("暂未支持");
         }
     }
 
@@ -32,10 +46,11 @@ final class InvokeArgs2 extends InvokeAbstract {
             Class type = ((DataClass) prev).getValue();
             return staticCall2(type, name, no1, no2);
         } else if (prev.isConst()) {
-            return doThrowNull();
+            Class type = prev.run().getClass();
+            return memberCall2(prev, type, name, no1, no2);
         } else {
             // 成员方法
-            return doThrowNull();
+            return ParseUtil.doThrow("暂未支持");
         }
     }
 }

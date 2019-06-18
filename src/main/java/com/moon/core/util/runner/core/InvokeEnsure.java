@@ -13,8 +13,11 @@ import java.util.function.IntFunction;
 
 import static com.moon.core.lang.reflect.MethodUtil.invoke;
 import static com.moon.core.util.runner.core.DataNull.NULL;
+import static com.moon.core.util.runner.core.ParseUtil.isAllConst;
 
 /**
+ * 在解析的时候就能确定具体执行方法
+ *
  * @author benshaoye
  */
 class InvokeEnsure {
@@ -43,6 +46,21 @@ class InvokeEnsure {
 
         Method getMethod(Object srcData) { return method; }
 
+        /**
+         * 数据源是否全是常量
+         *
+         * @return
+         */
+        abstract boolean isAllConstants();
+
+        /**
+         * 尝试转化为一个常量表达式执行
+         *
+         * @return
+         */
+        @Override
+        public AsRunner tryToConst() { return isAllConstants() ? DataConst.get(run()) : this; }
+
         @Override
         public final Object run(Object data) {
             Object srcData = src.run(data);
@@ -63,6 +81,9 @@ class InvokeEnsure {
         EnsureArgs0(Method method, AsRunner src) { super(method, src); }
 
         final static AsRunner static0(Method method) { return new EnsureArgs0(method, null); }
+
+        @Override
+        boolean isAllConstants() { return isAllConst(src); }
     }
 
     static class EnsureArgs1 extends EnsureArgs0 {
@@ -75,6 +96,9 @@ class InvokeEnsure {
         }
 
         final static AsRunner static1(Method method, AsRunner no1) { return new EnsureArgs1(method, null, no1); }
+
+        @Override
+        boolean isAllConstants() { return super.isAllConstants() && isAllConst(no1); }
 
         @Override
         public Object[] getParams(Object data) { return toParams(no1.run(data)); }
@@ -95,6 +119,9 @@ class InvokeEnsure {
         }
 
         @Override
+        boolean isAllConstants() { return super.isAllConstants() && isAllConst(no2); }
+
+        @Override
         public Object[] getParams(Object data) { return toParams(no1.run(data), no2.run(data)); }
     }
 
@@ -112,6 +139,9 @@ class InvokeEnsure {
         }
 
         @Override
+        boolean isAllConstants() { return super.isAllConstants() && isAllConst(no3); }
+
+        @Override
         public Object[] getParams(Object data) { return toParams(no1.run(data), no2.run(data), no3.run(data)); }
     }
 
@@ -127,6 +157,9 @@ class InvokeEnsure {
         final static AsRunner staticN(Method method, AsRunner... params) {
             return new EnsureArgsN(method, null, params);
         }
+
+        @Override
+        boolean isAllConstants() { return isAllConst(src, params); }
 
         @Override
         public Object[] getParams(Object data) {
@@ -165,6 +198,9 @@ class InvokeEnsure {
             return new EnsureVars1(method, null, lasts);
         }
 
+        @Override
+        boolean isAllConstants() { return isAllConst(src, lasts); }
+
         Object getVarArg(Object data, AsRunner[] lasts) {
             int length = lasts.length;
             Object param1 = creator.apply(length), arg;
@@ -195,6 +231,9 @@ class InvokeEnsure {
         }
 
         @Override
+        boolean isAllConstants() { return super.isAllConstants() && isAllConst(no1); }
+
+        @Override
         public Object[] getParams(Object data) { return toParams(no1.run(data), getThisVarArg(data)); }
     }
 
@@ -210,6 +249,9 @@ class InvokeEnsure {
         static EnsureVars1 static3(Method method, AsRunner no1, AsRunner no2, AsRunner... lasts) {
             return new EnsureVars3(method, null, no1, no2, lasts);
         }
+
+        @Override
+        boolean isAllConstants() { return super.isAllConstants() && isAllConst(no2); }
 
         @Override
         public Object[] getParams(Object data) { return toParams(no1.run(data), no2.run(data), getThisVarArg(data)); }
@@ -245,9 +287,10 @@ class InvokeEnsure {
             this.paramsLen = prevN + 1;
         }
 
-        static EnsureVars1 staticN(Method method, AsRunner... params) {
-            return new EnsureVarsN(method, null, params);
-        }
+        static EnsureVars1 staticN(Method method, AsRunner... params) { return new EnsureVarsN(method, null, params); }
+
+        @Override
+        boolean isAllConstants() { return isAllConst(src, pres) && isAllConst(NULL, subs); }
 
         @Override
         Object getThisVarArg(Object data) { return emptySubs == null ? getVarArg(data, subs) : emptySubs; }

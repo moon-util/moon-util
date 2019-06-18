@@ -41,6 +41,16 @@ public class ParseUtil {
 
     final static boolean isStr(int value) { return value == SINGLE || value == DOUBLE; }
 
+    static boolean isAllConst(AsRunner one, AsRunner... others) {
+        if (others == null) { return one.isConst(); }
+        if (one.isConst()) {
+            for (AsRunner other : others) {
+                if (!other.isConst()) { return false; }
+            }
+        }
+        return true;
+    }
+
     /**
      * 运行之前 indexer 指向起始索引
      * 运行完成之后 indexer 指向下一个非空白字符索引或字符串长度

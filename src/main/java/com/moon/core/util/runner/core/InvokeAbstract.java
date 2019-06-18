@@ -51,20 +51,6 @@ abstract class InvokeAbstract {
 
     static AsRunner doThrowNull() { throw new NullPointerException(); }
 
-    static boolean isAllConst(AsRunner one, AsRunner... others) {
-        if (others == null) {
-            return one.isConst();
-        }
-        if (one.isConst()) {
-            for (AsRunner other : others) {
-                if (!other.isConst()) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     /**
      * 解析没有参数调用的静态方法
      *

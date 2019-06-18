@@ -23,21 +23,23 @@ final class ParseInvoker {
     final static AsRunner tryParseInvoker(
         char[] chars, IntAccessor indexer, int len, RunnerSettings settings, String methodName, AsValuer prevValuer
     ) {
+        final AsRunner runner;
         final int cache = indexer.get();
         final boolean isStatic = prevValuer instanceof DataClass;
         if (nextVal(chars, indexer, len) == YUAN_L) {
             if (nextVal(chars, indexer, len) == YUAN_R) {
                 // 无参方法调用
-                return InvokeArgs0.parse(prevValuer, methodName, isStatic);
+                runner = InvokeArgs0.parse(prevValuer, methodName, isStatic);
             } else {
                 // 带有参数的方法调用
-                return parseHasParams(chars, indexer.decrement(), len, settings, prevValuer, methodName, isStatic);
+                runner = parseHasParams(chars, indexer.decrement(), len, settings, prevValuer, methodName, isStatic);
             }
         } else {
             // 静态字段检测
             indexer.set(cache);
-            return tryParseStaticField(prevValuer, methodName, isStatic);
+            runner = tryParseStaticField(prevValuer, methodName, isStatic);
         }
+        return (runner instanceof AsInvoker) ? ((AsInvoker) runner).tryToConst() : runner;
     }
 
     /**

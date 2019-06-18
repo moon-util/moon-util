@@ -20,9 +20,12 @@ class IGetFunTestTest {
     Runner runner, runner1;
     Object data, data1, res, res1;
 
+    Runner toRunner(String expression) {
+        return parse(str = expression);
+    }
+
     Object toValue(String expression, Object data) {
         this.data = data;
-        str = expression;
         runner = parse(expression);
         res = runner.run(data);
         return res;
@@ -34,6 +37,11 @@ class IGetFunTestTest {
 
     @Test
     void testStringLength() {
+        str = "@ System.  getProperty(     'os.name'     )";
+
+        runner = toRunner(str);
+
+        assertEquals(runner.run(), System.getProperty("os.name"));
     }
 
     @Test
@@ -54,26 +62,26 @@ class IGetFunTestTest {
 
         toValue("@time.year()");
         assertSame(Integer.class, res.getClass());
-        assertEquals(res,  LocalDate.now().getYear());
+        assertEquals(res, LocalDate.now().getYear());
 
         toValue("@time.month()");
         assertSame(Integer.class, res.getClass());
-        assertEquals(res,  LocalDate.now().getMonthValue());
+        assertEquals(res, LocalDate.now().getMonthValue());
 
         toValue("@time.day()");
         assertSame(Integer.class, res.getClass());
-        assertEquals(res,  LocalDate.now().getDayOfMonth());
+        assertEquals(res, LocalDate.now().getDayOfMonth());
 
         toValue("@time.hour()");
         assertSame(Integer.class, res.getClass());
-        assertEquals(res,  LocalTime.now().getHour());
+        assertEquals(res, LocalTime.now().getHour());
 
         toValue("@time.minute()");
         assertSame(Integer.class, res.getClass());
-        assertEquals(res,  LocalTime.now().getMinute());
+        assertEquals(res, LocalTime.now().getMinute());
 
         toValue("@time.second()");
         assertSame(Integer.class, res.getClass());
-        assertEquals(res,  LocalTime.now().getSecond());
+        assertEquals(res, LocalTime.now().getSecond());
     }
 }

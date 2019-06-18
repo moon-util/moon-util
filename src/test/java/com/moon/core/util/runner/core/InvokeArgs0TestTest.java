@@ -1,6 +1,7 @@
 package com.moon.core.util.runner.core;
 
 import com.moon.core.AbstractTest;
+import com.moon.core.lang.StringJoiner;
 import com.moon.core.lang.ref.FinalAccessor;
 import com.moon.core.util.runner.Runner;
 import com.moon.core.util.runner.RunnerUtil;
@@ -31,14 +32,14 @@ class InvokeArgs0TestTest extends AbstractTest {
 
     @Test
     void testOnlyMethod() {
-        String str = "@Objects.hash(12,12)";
+        String str = "@Objects.hash(12, 12)";
         Runner runner = RunnerUtil.parse(str);
 
         Object ret = runner.run();
         Object res = Objects.hash(12, 12);
         assertEquals(ret, res);
 
-        str = "@Objects.hash(12,12,1, 1, 1, 1, 2, 2, 2, 2)";
+        str = "@Objects.hash(12, 12, 1, 1, 1, 1, 2, 2, 2, 2)";
         runner = RunnerUtil.parse(str);
         ret = runner.run();
         res = Objects.hash(12, 12, 1, 1, 1, 1, 2, 2, 2, 2);
@@ -54,11 +55,12 @@ class InvokeArgs0TestTest extends AbstractTest {
         str = "'123' . endsWith (  '23'   )";
         runner = RunnerUtil.parse(str);
 
-        assertEquals(runner.getClass(), InvokeEnsure.EnsureArgs1.class);
         assertEquals(runner.run(), "123".endsWith("23"));
 
-        runningTime(100000, () -> runner.run());
-        runningTime(100000, () -> "123".endsWith("23"));
+        int count = Integer.MAX_VALUE;
+
+        runningTime(count, () -> runner.run());
+        runningTime(count, () -> "123".endsWith("23"));
     }
 
     @Test

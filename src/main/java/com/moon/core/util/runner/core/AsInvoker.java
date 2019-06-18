@@ -26,4 +26,11 @@ interface AsInvoker extends AsValuer {
      * @return
      */
     default boolean isMemberInvoker() { return false; }
+
+    /**
+     * 尝试转换为常量，以提高性能
+     *
+     * @return
+     */
+    default AsRunner tryToConst() { return this; }
 }

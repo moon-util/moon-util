@@ -1,5 +1,7 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.util.runner.core.InvokeEnsure.EnsureArgs0;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
@@ -82,7 +84,7 @@ final class InvokeArgs0 extends InvokeAbstract {
             case 0:
                 return doThrowNull();
             case 1:
-                return new InvokeEnsure.EnsureArgs0(ms.get(0), src);
+                return new EnsureArgs0(ms.get(0), src);
             default:
                 return new GetLink(src, memberArgs0(name));
         }
