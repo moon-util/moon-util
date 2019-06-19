@@ -11,7 +11,6 @@ import java.util.Set;
 import static com.moon.core.lang.ClassUtil.toPrimitiveClass;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.reflect.MethodUtil.invoke;
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author benshaoye
@@ -166,8 +165,7 @@ final class InvokeArgs1 extends InvokeAbstract {
     }
 
     static AsRunner staticCall1(Class type, String name, AsRunner paramValuer) {
-        List<Method> ms = staticMethods(type, name);
-        ms = ms.stream().filter(m -> m.getParameterCount() == 1).collect(toList());
+        List<Method> ms = filterByParamCount(staticMethods(type, name), 1);
         switch (ms.size()) {
             case 0:
                 return ParseUtil.doThrow(type, name);
