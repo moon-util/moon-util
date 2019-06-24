@@ -9,7 +9,8 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author benshaoye
  */
-public final class WriteUtil {
+final class WriteUtil {
+
     private WriteUtil() {
         noInstanceError();
     }

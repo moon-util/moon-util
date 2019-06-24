@@ -6,14 +6,20 @@ import com.moon.core.lang.StringUtil;
 
 import java.util.function.Function;
 
+import static com.moon.core.lang.IntUtil.defaultIfInvalid;
+import static com.moon.core.lang.StringUtil.emptyIfNullString;
+import static com.moon.core.lang.StringUtil.trimToNull;
+
 /**
  * @author benshaoye
  */
 public interface PropertiesSupplier<V> {
+
     /**
      * override for {@link java.util.Map#get(Object)}
      *
      * @param key
+     *
      * @return
      */
     V get(Object key);
@@ -22,6 +28,7 @@ public interface PropertiesSupplier<V> {
      * get a string value
      *
      * @param key
+     *
      * @return
      */
     default String getString(String key) {
@@ -33,22 +40,25 @@ public interface PropertiesSupplier<V> {
      * Get a string value or an empty string
      *
      * @param key
+     *
      * @return
      */
-    default String getOrEmpty(String key) { return StringUtil.emptyIfNullString(getString(key)); }
+    default String getOrEmpty(String key) { return emptyIfNullString(getString(key)); }
 
     /**
      * 返回一个字符串或 null
      *
      * @param key
+     *
      * @return
      */
-    default String getOrNull(String key) { return StringUtil.trimToNull(getString(key)); }
+    default String getOrNull(String key) { return trimToNull(getString(key)); }
 
     /**
      * 返回 int 数据
      *
      * @param key
+     *
      * @return
      */
     default int getInt(String key) { return Integer.parseInt(getString(key)); }
@@ -57,6 +67,7 @@ public interface PropertiesSupplier<V> {
      * 返回 int 数据，转换失败返回 0
      *
      * @param key
+     *
      * @return
      */
     default int getOrZero(String key) { return getOrDefaultAsInt(key, 0); }
@@ -65,6 +76,7 @@ public interface PropertiesSupplier<V> {
      * 返回 int 数据，转换失败返回 1
      *
      * @param key
+     *
      * @return
      */
     default int getOrOne(String key) { return getOrDefaultAsInt(key, 1); }
@@ -74,16 +86,18 @@ public interface PropertiesSupplier<V> {
      *
      * @param key
      * @param defaultValue
+     *
      * @return
      */
     default int getOrDefaultAsInt(String key, int defaultValue) {
-        return IntUtil.defaultIfInvalid(getString(key), defaultValue);
+        return defaultIfInvalid(getString(key), defaultValue);
     }
 
     /**
      * 返回 long 数据
      *
      * @param key
+     *
      * @return
      */
     default long getLong(String key) { return Long.parseLong(getString(key)); }
@@ -93,6 +107,7 @@ public interface PropertiesSupplier<V> {
      *
      * @param key
      * @param defaultValue
+     *
      * @return
      */
     default long getOrDefaultAsLong(String key, long defaultValue) {
@@ -103,6 +118,7 @@ public interface PropertiesSupplier<V> {
      * 返回 boolean 数据
      *
      * @param key
+     *
      * @return
      */
     default boolean getBoolean(String key) { return Boolean.valueOf(getString(key)); }
@@ -111,6 +127,7 @@ public interface PropertiesSupplier<V> {
      * 返回 int 数据，转换失败返回 true
      *
      * @param key
+     *
      * @return
      */
     default boolean getOrTrue(String key) { return getOrDefaultAsBoolean(key, true); }
@@ -119,6 +136,7 @@ public interface PropertiesSupplier<V> {
      * 返回 int 数据，转换失败返回 false
      *
      * @param key
+     *
      * @return
      */
     default boolean getOrFalse(String key) { return getBoolean(key); }
@@ -128,6 +146,7 @@ public interface PropertiesSupplier<V> {
      *
      * @param key
      * @param defaultVal
+     *
      * @return
      */
     default boolean getOrDefaultAsBoolean(String key, boolean defaultVal) {
@@ -147,7 +166,10 @@ public interface PropertiesSupplier<V> {
      * @param key
      * @param transformer
      * @param <T>
+     *
      * @return
      */
-    default <T> T getAndTransform(String key, Function<String, T> transformer) { return transformer.apply(getString(key)); }
+    default <T> T getAndTransform(String key, Function<String, T> transformer) {
+        return transformer.apply(getString(key));
+    }
 }

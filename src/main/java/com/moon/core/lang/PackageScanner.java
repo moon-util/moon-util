@@ -28,9 +28,9 @@ public class PackageScanner extends HashSet<String> {
         return this;
     }
 
-    private List<String> scanOf(String packageName) {
+    public static List<String> scanOf(String packageName) {
         final String currentName = packageName.replaceAll("\\.", "/");
-        ClassLoader cl = getClass().getClassLoader();
+        ClassLoader cl = TYPE.getClassLoader();
         try {
             Enumeration<URL> urls = cl.getResources(currentName);
             ArrayList<String> result = new ArrayList<>();
@@ -67,14 +67,18 @@ public class PackageScanner extends HashSet<String> {
             int end = url.getPath().lastIndexOf(packageName);
             String basePath = url.getPath().substring(1, end);
             try {
-                final String target = url.getPath();
-                Path path = Paths.get(OSUtil.isWindows() ? target.replaceFirst("/", "") : target);
+                Path path = targetUrlToPath(url);
                 return walkFileTree(path, Paths.get(basePath));
             } catch (Exception e) {
                 ThrowUtil.doThrow(e);
             }
         }
         return Collections.EMPTY_LIST;
+    }
+
+    private static Path targetUrlToPath(URL url){
+        final String target = url.getPath();
+        return Paths.get(OSUtil.isWindows() ? target.replaceFirst("/", "") : target);
     }
 
     private static List<String> walkFileTree(Path path, Path basePath) throws Exception {
