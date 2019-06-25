@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author benshaoye
  */
-class RunnerSettingsTestTest {
+class RunnerSettingTestTest {
 
 
     String str, name;
@@ -16,23 +16,23 @@ class RunnerSettingsTestTest {
     @Test
     void testCheckName() {
         name = "aaa";
-        assertEquals(RunnerSettings.checkName(name), name);
+        assertEquals(RunnerSetting.checkName(name), name);
 
         name = " aaa";
-        assertThrows(Throwable.class, () -> RunnerSettings.checkName(name));
+        assertThrows(Throwable.class, () -> RunnerSetting.checkName(name));
         name = "$_aaa";
-        assertEquals(RunnerSettings.checkName(name), name);
+        assertEquals(RunnerSetting.checkName(name), name);
     }
 
     @Test
     void testName1() {
         name = "a aa";
-        assertThrows(Throwable.class, () -> RunnerSettings.checkName(name));
+        assertThrows(Throwable.class, () -> RunnerSetting.checkName(name));
     }
 
     @Test
     void testToNsName() {
-        name = RunnerSettings.toNsName("str", "indexOf");
+        name = RunnerSetting.toNsName("str", "indexOf");
 
         assertEquals("str.indexOf", name);
     }

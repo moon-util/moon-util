@@ -450,7 +450,7 @@ class RunnerUtilTestTest extends AbstractTest {
 
     @Test
     void testCustomCaller() {
-        RunnerSettings settings = RunnerSettings.of().setObjCreator(LinkedHashMap::new).setArrCreator(LinkedList::new)
+        RunnerSetting settings = RunnerSetting.of().setObjCreator(LinkedHashMap::new).setArrCreator(LinkedList::new)
             .addCaller("call", Caller.class).addCaller("Objects", InnerObjects.class);
 
         Runner runner = RunnerUtil.parse("@call.get()", settings);

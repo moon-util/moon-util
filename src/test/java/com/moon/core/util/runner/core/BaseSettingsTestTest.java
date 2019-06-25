@@ -1,6 +1,6 @@
 package com.moon.core.util.runner.core;
 
-import com.moon.core.util.runner.RunnerSettings;
+import com.moon.core.util.runner.RunnerSetting;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -10,6 +10,6 @@ class BaseSettingsTestTest {
 
     @Test
     void testGetCaller() {
-        RunnerSettings.of();
+        RunnerSetting.of();
     }
 }

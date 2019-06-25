@@ -173,14 +173,23 @@ public final class SupportUtil {
      * @return
      */
     public final static <T> T throwErr(char[] chars, IntAccessor indexer) {
-        int amount = 12, len = chars.length, index = indexer.get();
+        return throwErr(null, chars, indexer);
+    }
+
+    public final static <T> T throwErr(String message, char[] chars, IntAccessor indexer) {
+        message = message == null ? "" : message;
+        int amount = 12, len = chars.length, index = indexer.get(), msgLen = message.length();
         int end = index + amount < len ? index + amount : len;
         int start = index < amount ? 0 : index - amount;
         int maxLen = end - start, preLen = index - start, postLen = end - index - 1;
-        throw new IllegalArgumentException(
-            new StringBuilder((amount + 5) * 2).append(">>>>>").append(chars, start, maxLen).append("<<<<<")
-                .append("\n>>>>>").append(chars, start, preLen).append('ˇ').append(chars[index]).append('ˇ')
-                .append(chars, index + 1, postLen).append("<<<<<").toString());
+        StringBuilder msg = new StringBuilder((amount + 5) * 2 + msgLen + 30);
+        if (msgLen > 0) {
+            msg.append("\n Message : ").append(message);
+        }
+        msg.append("\n Context : ").append(">>>>>").append(chars, start, maxLen).append("<<<<<");
+        msg.append("\n Location: >>>>>").append(chars, start, preLen).append('ˇ').append(chars[index]).append('ˇ')
+            .append(chars, index + 1, postLen).append("<<<<<");
+        throw new IllegalArgumentException(msg.toString());
     }
 
     /**

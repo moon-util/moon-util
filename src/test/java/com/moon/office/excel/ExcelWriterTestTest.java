@@ -4,7 +4,7 @@ import com.moon.core.io.FileUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomUtil;
-import com.moon.office.excel.creator.ExcelCreator;
+import com.moon.office.excel.creator.ExcelWriter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * @author benshaoye
  */
-class ExcelCreatorTestTest {
+class ExcelWriterTestTest {
 
     public static class User {
 
@@ -31,25 +31,17 @@ class ExcelCreatorTestTest {
         String path = "D:/now-test-excel.xlsx";
         FileUtil.deleteAllFiles(path);
         List<User> users = ListUtil.ofArrayList(new User(), new User(), new User(), new User(), new User());
-        ExcelCreator.ofXlsx().createSheet(sheet -> {
-            sheet.createRow(row -> row.cell().set("").merge(2, 5));
-            sheet.createRow(row -> {
-                row.createCell("序号");
-                row.createCell("姓名");
-                row.createCell("年龄");
-                row.createCell("性别");
-                row.createCell("地址");
-                row.createCell("电话");
+
+        ExcelWriter.ofXlsx().createSheet(sheetWriter -> {
+            sheetWriter.createRow(0, rowWriter -> {
+
             });
-            IteratorUtil.forEach(users, user -> sheet.createRow(row -> {
-                row.createCell(row.getCurrentRowIndex());
-                row.createCell(user.name);
-                row.createCell(user.age);
-                row.createCell(user.gender);
-                row.createCell(user.address);
-                row.createCell(user.phone);
-            }));
-        }).write(FileUtil.getOutputStream(path));
+            IteratorUtil.forEach(users, (user, index) -> {
+                sheetWriter.createRow(index, rowWriter -> {
+
+                });
+            });
+        });
     }
 
     @Test

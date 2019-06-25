@@ -1,10 +1,12 @@
 package com.moon.core.util.runner.core;
 
 import com.moon.core.io.FileUtil;
+import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.Console;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.runner.RunnerUtil;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -95,10 +97,11 @@ class ParseCoreTestTest {
         System.out.println(all.size());
     }
 
-    @Test
     void testName() {
         handler = running("1 + 2 + @Objects.toString('10')");
         assertEquals(handler.run(), "310");
+        ClassUtil.forName("com.moon.core.util.Appender");
+        ClassUtil.forName("com.moon.core.util.Console");
         handler = running("@Console.out.getLowestLevel().name()");
         assertEquals(handler.run(), "PRINT");
         handler = running("@Console$Level.ASSERT.name()");

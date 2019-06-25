@@ -59,7 +59,10 @@ class InvokeEnsure {
          * @return
          */
         @Override
-        public AsRunner tryToConst() { return isAllConstants() ? DataConst.get(run()) : this; }
+        public AsRunner tryToConst() {
+            return this;
+            // return isAllConstants() ? DataConst.get(run()) : this;
+        }
 
         @Override
         public final Object run(Object data) {
@@ -184,14 +187,19 @@ class InvokeEnsure {
         final TypeConverter converter;
         final IntFunction creator;
         final AsRunner[] lasts;
+        final Class paramType;
+        final Object ifEmptyArr;
 
         EnsureVars1(Method method, AsRunner src, AsRunner... lasts) {
             super(method, src);
-            Class target = varArgsComponentType(method);
+            Class[] types = method.getParameterTypes();
+            Class paramType = this.paramType = types[types.length - 1];
+            Class target = paramType.getComponentType();
             final Casters caster = Casters.getOrNull(target);
             converter = to(caster, target);
             creator = toArr(caster, target);
             this.lasts = lasts;
+            ifEmptyArr = lasts.length == 0 ? creator.apply(0) : null;
         }
 
         static EnsureVars1 static1(Method method, AsRunner... lasts) {
@@ -203,12 +211,21 @@ class InvokeEnsure {
 
         Object getVarArg(Object data, AsRunner[] lasts) {
             int length = lasts.length;
-            Object param1 = creator.apply(length), arg;
-            for (int i = 0; i < length; i++) {
-                arg = lasts[i].run(data);
-                Array.set(param1, i, converter.convert(arg));
+            switch (length) {
+                case 0:
+                    return ifEmptyArr;
+                default:
+                    Object param, arg = lasts[0].run(data);
+                    if (length == 1 && paramType.isInstance(arg)) {
+                        return arg;
+                    }
+                    Array.set(param = creator.apply(length), 0, converter.convert(arg));
+                    for (int i = 1; i < length; i++) {
+                        arg = lasts[i].run(data);
+                        Array.set(param, i, converter.convert(arg));
+                    }
+                    return param;
             }
-            return param1;
         }
 
         Object getThisVarArg(Object data) { return getVarArg(data, this.lasts); }
@@ -322,7 +339,7 @@ class InvokeEnsure {
     }
 
     private static TypeConverter to(Casters caster, Class type) {
-        return caster == null ? (o -> CASTER.toType(o, type)) : caster;
+        return caster == null ? Casters.getOrDefault(type, o -> CASTER.toType(o, type)) : caster;
     }
 
     private static IntFunction toArr(Casters caster, Class type) {

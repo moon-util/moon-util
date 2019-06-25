@@ -2,7 +2,7 @@ package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.reflect.FieldUtil;
-import com.moon.core.util.runner.RunnerSettings;
+import com.moon.core.util.runner.RunnerSetting;
 
 import java.lang.reflect.Field;
 
@@ -21,7 +21,7 @@ final class ParseInvoker {
     private ParseInvoker() { noInstanceError(); }
 
     final static AsRunner tryParseInvoker(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, String methodName, AsValuer prevValuer
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, String methodName, AsValuer prevValuer
     ) {
         final AsRunner runner;
         final int cache = indexer.get();
@@ -49,7 +49,7 @@ final class ParseInvoker {
         char[] chars,
         IntAccessor indexer,
         int len,
-        RunnerSettings settings,
+        RunnerSetting settings,
         AsValuer prev,
         String name,
         boolean isStatic
