@@ -2,6 +2,7 @@ package com.moon.core.util.runner;
 
 import com.moon.core.lang.reflect.MethodUtil;
 import com.moon.core.util.IteratorUtil;
+import com.moon.core.util.ListUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -22,6 +23,62 @@ class RunnerDataMapTestTest {
         dataMap.put("name", 1);
         hashMap.put("name", 1);
         assertEquals(dataMap.get("name"), hashMap.get("name"));
+    }
+
+    @Test
+    void testListSize() {
+        String str = "{}.size()";
+        Runner runner = RunnerUtil.parse(str);
+        Object ret = runner.run();
+        System.out.println(ret);
+    }
+
+    @Test
+    void textMapSize() {
+        String str = "{:}.size()";
+        Runner runner = RunnerUtil.parse(str);
+        Object ret = runner.run();
+        System.out.println(ret);
+
+        str = "{}.size()";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
+
+        str = "{11,234,2342456,'asdfasdf',,}.size()";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
+
+        str = "{:}.isEmpty()";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
+
+        str = "{}.isEmpty()";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
+
+        str = "{11,234,2342456,'asdfasdf',,}.isEmpty()";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
+
+        str = "@ListUtil.isEmpty({})";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
+
+        str = "@MapUtil.isEmpty({:})";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
+
+        str = "@ListUtil.get({123456,}, 0)";
+        runner = RunnerUtil.parse(str);
+        ret = runner.run();
+        System.out.println(ret);
     }
 
     @Test

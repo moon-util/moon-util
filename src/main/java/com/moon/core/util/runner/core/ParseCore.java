@@ -2,7 +2,7 @@ package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.ReferenceUtil;
-import com.moon.core.util.runner.RunnerSettings;
+import com.moon.core.util.runner.RunnerSetting;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -42,7 +42,7 @@ class ParseCore {
     }
 
     final static AsRunner parse(
-        String expression, RunnerSettings settings
+        String expression, RunnerSetting settings
     ) {
         char[] chars = expression.trim().toCharArray();
         AsRunner runner = parse(chars, IntAccessor.of(), chars.length, settings);
@@ -56,31 +56,31 @@ class ParseCore {
      */
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings
     ) {
         return parse(chars, indexer, len, settings, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, int end
     ) {
         return parse(chars, indexer, len, settings, end, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end0, int end1
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, int end0, int end1
     ) {
         return parse(chars, indexer, len, settings, end0, end1, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end0, int end1, int end2
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, int end0, int end1, int end2
     ) {
         return parse(chars, indexer, len, settings, end0, end1, end2, -1);
     }
 
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, int end0, int end1, int end2, int end3
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, int end0, int end1, int end2, int end3
     ) {
         return parse(chars, indexer, len, settings, end0, end1, end2, end3, -1);
     }
@@ -89,7 +89,7 @@ class ParseCore {
         char[] chars,
         IntAccessor indexer,
         int len,
-        RunnerSettings settings,
+        RunnerSetting settings,
         int end0,
         int end1,
         int end2,
@@ -103,7 +103,7 @@ class ParseCore {
         char[] chars,
         IntAccessor indexer,
         int len,
-        RunnerSettings settings,
+        RunnerSetting settings,
         int end0,
         int end1,
         int end2,
@@ -164,7 +164,7 @@ class ParseCore {
         char[] chars,
         IntAccessor indexer,
         int len,
-        RunnerSettings settings,
+        RunnerSetting settings,
         int curr,
         LinkedList<AsRunner> values,
         LinkedList<AsRunner> methods,

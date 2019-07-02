@@ -6,7 +6,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
-import static com.moon.core.lang.reflect.MethodUtil.*;
+import static com.moon.core.lang.reflect.MethodUtil.getDeclaredMethods;
+import static com.moon.core.lang.reflect.MethodUtil.invoke;
 
 /**
  * @author benshaoye
@@ -56,7 +57,7 @@ final class InvokeArgs0 extends InvokeAbstract {
 
         private final Method method;
 
-        NonDefault() { method = memberArgs0(Object.class, name()); }
+        NonDefault() { method = filterArgs0(getDeclaredMethods(Object.class, name()), Object.class, name()); }
 
         @Override
         public Object run(Object data) { return invoke(true, method, data); }

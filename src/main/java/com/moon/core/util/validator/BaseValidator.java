@@ -202,7 +202,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * @return
      */
     public final T nullIfInvalid() {
-        return elseIfInvalid((T) null);
+        return defaultIfInvalid(null);
     }
 
     /**
@@ -211,7 +211,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * @param elseValue
      * @return
      */
-    public final T elseIfInvalid(T elseValue) {
+    public final T defaultIfInvalid(T elseValue) {
         return isValid() ? value : elseValue;
     }
 
@@ -340,6 +340,12 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
         return current();
     }
 
+    /*
+     when() 与 end() 连用，
+     使用 when() 时，需要传入一个验证器，当内容满足验证条件时，
+     将继续执行后面的验证规则，否则将调跳过后续的验证规则，直到 end() 为止
+     */
+
     @Override
     public final IMPL when(Predicate<? super T> tester) {
         condition = tester.test(value);
@@ -347,9 +353,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
     }
 
     @Override
-    public final IMPL end() {
-        return when(o -> true);
-    }
+    public final IMPL end() { return when(o -> true); }
 
     /*
      * -----------------------------------------------------------------

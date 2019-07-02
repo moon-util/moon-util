@@ -1,8 +1,9 @@
 package com.moon.core.util.runner.core;
 
+import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.runner.RunnerFunction;
-import com.moon.core.util.runner.RunnerSettings;
+import com.moon.core.util.runner.RunnerSetting;
 
 import java.util.Objects;
 
@@ -29,7 +30,7 @@ class ParseCall {
      * @return
      */
     final static AsRunner parse(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings
     ) {
         AsRunner runner;
         Object runnerCache;
@@ -50,6 +51,7 @@ class ParseCall {
         } else {
             runner = throwErr(chars, indexer);
             // 为更多符号留位置，比如动态变化的类，等
+            // 稍微点复杂，目前不打算实现
         }
         return Objects.requireNonNull(runner);
     }
@@ -68,7 +70,7 @@ class ParseCall {
      * @return
      */
     private final static RunnerFunction tryParseNsCaller(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, RunnerFunction fn
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, RunnerFunction fn
     ) {
         int curr = nextVal(chars, indexer, len);
         if (curr == DOT) {
@@ -76,14 +78,14 @@ class ParseCall {
             assertTrue(ParseUtil.isVar(curr), chars, indexer);
             String name = ParseGetter.parseVar(chars, indexer, len, curr).toString();
             final String funcName = IGetFun.toName(fn.functionName(), name);
-            Object caller = null;
-            if (settings != null) {
-                caller = settings.getCaller(funcName);
-            }
-            if (caller == null) {
-                caller = IGetFun.tryLoad(funcName);
-            }
-            Objects.requireNonNull(caller);
+            Object caller = ParseSetting.getFunction(settings, funcName);
+            // if (settings != null) {
+            //     caller = settings.getCaller(funcName);
+            // }
+            // if (caller == null) {
+            //     caller = IGetFun.tryLoad(funcName);
+            // }
+            // Objects.requireNonNull(caller);
             assertTrue(caller instanceof RunnerFunction, chars, indexer);
             return (RunnerFunction) caller;
         }
@@ -92,7 +94,7 @@ class ParseCall {
     }
 
     /**
-     * 在{@link #tryLoaderOrSimpleFn(char[], IntAccessor, int, RunnerSettings, String)}
+     * 在{@link #tryLoaderOrSimpleFn(char[], IntAccessor, int, RunnerSetting, String)}
      * 加载失败后，这里解析具有命名空间的函数
      * 同样，settingWith 优先于内置函数
      * <p>
@@ -111,20 +113,21 @@ class ParseCall {
      * @return
      */
     private final static Object ensureLoadNsFn(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, String runnerName
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, String runnerName
     ) {
-        Object callerTemp = null;
+        // Object callerTemp = null;
         int curr = nextVal(chars, indexer, len);
         if (curr == Constants.DOT) {
             curr = nextVal(chars, indexer, len);
             String name = parseVar(chars, indexer, len, curr).toString();
             name = IGetFun.toName(runnerName, name);
-            if (settings != null) {
-                callerTemp = settings.getCaller(name);
-            }
-            if (callerTemp == null) {
-                callerTemp = IGetFun.tryLoad(name);
-            }
+            Object callerTemp = ParseSetting.getFunction(settings, name);
+            // if (settings != null) {
+            //     callerTemp = settings.getCaller(name);
+            // }
+            // if (callerTemp == null) {
+            //     callerTemp = IGetFun.tryLoad(name);
+            // }
             assertTrue(callerTemp instanceof RunnerFunction, chars, indexer);
             return callerTemp;
         }
@@ -152,38 +155,44 @@ class ParseCall {
      * @return
      */
     private final static Object tryLoaderOrSimpleFn(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, String runnerName
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, String runnerName
     ) {
-        if (settings == null) {
-            return tryLoadDefault(runnerName);
+        Object fn = ParseSetting.getFunction(settings, runnerName);
+        if (fn == null) {
+            fn = ParseSetting.getCaller(settings, runnerName);
+            return fn == null ? throwErr(runnerName, chars, indexer) : new DataClass((Class) fn);
         }
-        Object caller = settings.getCaller(runnerName);
-        if (caller == null) {
-            return tryLoadDefault(runnerName);
-        } else if (caller instanceof RunnerFunction) {
-            return caller;
-        } else if (caller instanceof Class) {
-            return new DataClass((Class) caller);
-        }
-        return throwErr(chars, indexer);
+        return fn;
+        // if (settings == null) {
+        //     return tryLoadDefault(runnerName);
+        // }
+        // Object caller = settings.getCaller(runnerName);
+        // if (caller == null) {
+        //     return tryLoadDefault(runnerName);
+        // } else if (caller instanceof RunnerFunction) {
+        //     return caller;
+        // } else if (caller instanceof Class) {
+        //     return new DataClass((Class) caller);
+        // }
+        // return throwErr(chars, indexer);
     }
 
-    /**
-     * 加载内置函数或静态方法类
-     *
-     * @param runnerName
-     *
-     * @return
-     */
-    private static Object tryLoadDefault(String runnerName) {
-        Object caller = IGetFun.tryLoad(runnerName);
-        if (caller != null) {
-            return caller;
-        }
-        caller = IGetLoad.tryLoad(runnerName);
-        if (caller != null) {
-            return new DataClass((Class) caller);
-        }
-        return null;
-    }
+    // /**
+    //  * 加载内置函数或静态方法类
+    //  *
+    //  * @param runnerName
+    //  *
+    //  * @return
+    //  */
+    // private static Object tryLoadDefault(String runnerName) {
+    //     Object caller = IGetFun.tryLoad(runnerName);
+    //     if (caller != null) {
+    //         return caller;
+    //     }
+    //     caller = IGetLoad.tryLoad(runnerName);
+    //     if (caller != null) {
+    //         return new DataClass((Class) caller);
+    //     }
+    //     return null;
+    // }
 }

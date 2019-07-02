@@ -2,7 +2,7 @@ package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.ReferenceUtil;
-import com.moon.core.util.runner.RunnerSettings;
+import com.moon.core.util.runner.RunnerSetting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +31,11 @@ final class ParseDelimiters {
         return parsed;
     }
 
-    final static AsRunner parse(String expression, String[] delimiters, RunnerSettings settings) {
+    final static AsRunner parse(String expression, String[] delimiters, RunnerSetting settings) {
         return parseCore(expression, delimiters, settings);
     }
 
-    private static AsRunner parseCore(String str, String[] ds, RunnerSettings sets) {
+    private static AsRunner parseCore(String str, String[] ds, RunnerSetting sets) {
         String begin = StringUtil.requireNotBlank(ds[0]);
         String ender = StringUtil.requireNotBlank(ds[1]);
         final int length = str.length(),

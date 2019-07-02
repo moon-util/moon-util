@@ -2,7 +2,7 @@ package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.runner.RunnerFunction;
-import com.moon.core.util.runner.RunnerSettings;
+import com.moon.core.util.runner.RunnerSetting;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.runner.core.Constants.YUAN_L;
@@ -17,7 +17,7 @@ final class ParseFunc {
     private ParseFunc() { noInstanceError(); }
 
     final static AsRunner parseFunCaller(
-        char[] chars, IntAccessor indexer, int len, RunnerSettings settings, RunnerFunction fn
+        char[] chars, IntAccessor indexer, int len, RunnerSetting settings, RunnerFunction fn
     ) {
         int curr = nextVal(chars, indexer, len);
         assertTrue(curr == YUAN_L, chars, indexer);

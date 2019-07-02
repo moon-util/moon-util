@@ -3,19 +3,27 @@ package com.moon.core.util.runner.core;
 import com.moon.core.util.runner.core.InvokeEnsure.*;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.moon.core.lang.reflect.MethodUtil.getPublicMemberMethods;
 import static com.moon.core.lang.reflect.MethodUtil.getPublicStaticMethods;
+import static java.lang.reflect.Array.getLength;
 import static java.util.Arrays.copyOfRange;
 
 /**
  * @author benshaoye
  */
 abstract class InvokeAbstract {
+
+    static List<Method> filterByParamCount(List<Method> ms, int count) {
+        return ms.stream().filter(m -> m.getParameterCount() == count).collect(Collectors.toList());
+    }
+
+    static List<Method> varArgsAndPrevCountOf(List<Method> ms, int count) {
+        return ms.stream().filter(m -> m.getParameterCount() == count + 1 && m.isVarArgs())
+            .collect(Collectors.toList());
+    }
 
     static List<Method> memberMethods(Class source, String name) { return getPublicMemberMethods(source, name); }
 
@@ -77,6 +85,15 @@ abstract class InvokeAbstract {
             }
         }
         return Objects.requireNonNull(searchedMethod);
+    }
+
+    static int length(Object arr) {
+        if (arr == null) { return 0; }
+        if (arr instanceof CharSequence) { return ((CharSequence) arr).length(); }
+        if (arr instanceof Collection) { return ((Collection) arr).size(); }
+        if (arr instanceof Map) { return ((Map) arr).size(); }
+        if (arr.getClass().isArray()) { return getLength(arr); }
+        throw new IllegalArgumentException();
     }
 
     enum PrimitiveType {
