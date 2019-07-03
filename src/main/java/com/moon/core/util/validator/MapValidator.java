@@ -7,21 +7,21 @@ import java.util.function.BiPredicate;
 /**
  * @author benshaoye
  */
-public final class MapValidator<M extends Map<K, V>, K, V>
-    extends BaseValidator<M, MapValidator<M, K, V>>
+public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator<M, MapValidator<M, K, V>>
     implements IKeyedValidator<M, K, V, MapValidator<M, K, V>> {
 
-    public MapValidator(M value) {
-        super(value, null, SEPARATOR, false);
+    public MapValidator(M value) { this(value, false); }
+
+    public MapValidator(M value, boolean nullable) { super(value, nullable, null, SEPARATOR, false); }
+
+    MapValidator(M value, boolean nullable, List<String> messages, String separator, boolean immediate) {
+        super(value, nullable, messages, separator, immediate);
     }
 
-    MapValidator(M value, List<String> messages, String separator, boolean immediate) {
-        super(value, messages, separator, immediate);
-    }
+    public final static <M extends Map<K, V>, K, V> MapValidator<M, K, V> of(M map) { return new MapValidator<>(map); }
 
-    public final static <M extends Map<K, V>, K, V> MapValidator<M, K, V>
-    of(M map) {
-        return new MapValidator<>(map);
+    public final static <M extends Map<K, V>, K, V> MapValidator<M, K, V> ofNullable(M map) {
+        return new MapValidator<>(map, true);
     }
 
     /*
@@ -37,13 +37,15 @@ public final class MapValidator<M extends Map<K, V>, K, V>
 
     @Override
     public MapValidator<M, K, V> requireAtLeastCountOf(
-        BiPredicate<? super K, ? super V> tester, int count, String message) {
+        BiPredicate<? super K, ? super V> tester, int count, String message
+    ) {
         return requireAtLeastCountOf(this, tester, count, message);
     }
 
     @Override
     public MapValidator<M, K, V> requireAtMostCountOf(
-        BiPredicate<? super K, ? super V> tester, int count, String message) {
+        BiPredicate<? super K, ? super V> tester, int count, String message
+    ) {
         return requireAtMostCountOf(this, tester, count, message);
     }
 }

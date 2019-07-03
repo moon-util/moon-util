@@ -18,12 +18,10 @@ class ValidatorTestTest {
             .require(item -> item.contains("b"), "必须包含字母‘b’")
             .require(item -> item.contains("a"), "必须包含字母‘a’");
 
-        assertThrows(IllegalArgumentException.class,
-            () -> validator.get(str -> new IllegalArgumentException(str)));
+        assertThrows(IllegalArgumentException.class, () -> validator.get(str -> new IllegalArgumentException(str)));
 
         Validator<Employee> employeeValidator = Validator.of(new Employee());
-        Employee employee = employeeValidator
-            .setImmediate(false)
+        Employee employee = employeeValidator.setImmediate(false)
             .when(val -> false)
             .require(item -> item.age > 18, "未成年人不行")
             .require(item -> item.id != null, "ID 不能为空")
@@ -43,12 +41,22 @@ class ValidatorTestTest {
 
         employeeValidator.get();
 
+        String value = null;
+        assertThrows(Exception.class, () -> {
+            Validator.ofNullable(value)
+                .require(str -> str != null, "不可为空")
+                .when(str -> str != null)
+                .require(str -> str.length() > 3)
+                .get();
+        }, "不可为空");
+
         // new 一个对象根本没有时间成本嘛...
         // new Integer.MAX_VALUE 个对象，花费时间 0 ms，完全可忽略
         // 那么 new 对象有不可忽略的空间成本吗? 如果有，应该怎么评估?
     }
 
     static class Employee {
+
         private int age;
         private String id;
         private String name;
