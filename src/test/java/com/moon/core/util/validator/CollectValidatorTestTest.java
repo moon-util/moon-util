@@ -89,4 +89,10 @@ class CollectValidatorTestTest {
         final int sex = (certNo.charAt(16) - 48) % 2;
         return (sex == 0 && age > 43) || (sex == 1 && age > 53);
     }
+    static final int HASH_BITS = 0x7fffffff; // usable bits of normal node hash
+
+    @Test
+    void testName() {
+        System.out.println(HASH_BITS);
+    }
 }
