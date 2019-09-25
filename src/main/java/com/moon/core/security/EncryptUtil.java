@@ -26,7 +26,7 @@ public final class EncryptUtil {
 
     public final static String encrypt(String input, String... types) {
         for (int i = 0; i < types.length; i++) {
-            input = EncryptType.encrypt(input, EncryptType.forName(types[i]));
+            input = EncryptType.encrypt(input, forName(types[i]));
         }
         return input;
     }
