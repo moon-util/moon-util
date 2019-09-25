@@ -265,6 +265,83 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
         @Override
         public Object cast(Object o) { return o instanceof Optional ? o : ofNullable(o); }
     },
+    toOptionalInt(OptionalInt.class) {
+        @Override
+        public Object createArr(int length) { return new OptionalInt[length]; }
+
+        @Override
+        public Object cast(Object o) {
+            if (o == null) {
+                return OptionalInt.empty();
+            }
+            if (o instanceof OptionalInt) {
+                return o;
+            } else if (o instanceof Integer) {
+                return OptionalInt.of(((Integer) o).intValue());
+            } else if (o instanceof Number) {
+                int intVal = ((Number) o).intValue();
+                long value = ((Number) o).longValue();
+                if (intVal == value) {
+                    return OptionalInt.of(intVal);
+                }
+            }
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalInt of value" + o);
+        }
+    },
+    toOptionalLong(OptionalLong.class) {
+        @Override
+        public Object createArr(int length) { return new OptionalLong[length]; }
+
+        @Override
+        public Object cast(Object o) {
+            if (o == null) {
+                return OptionalLong.empty();
+            }
+            if (o instanceof OptionalLong) {
+                return o;
+            } else if (o instanceof Long) {
+                return OptionalLong.of(((Long) o).intValue());
+            } else if (o instanceof Number) {
+                long longVal = ((Number) o).longValue();
+                double value = ((Number) o).doubleValue();
+                if (longVal == 0) {
+                    if (value == 0) {
+                        return OptionalLong.of(0);
+                    }
+                } else if (value / longVal == 0 && value % longVal == 0) {
+                    return OptionalLong.of(longVal);
+                }
+            }
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalLong of value" + o);
+        }
+    },
+    toOptionalDouble(OptionalDouble.class) {
+        @Override
+        public Object createArr(int length) { return new OptionalDouble[length]; }
+
+        @Override
+        public Object cast(Object o) {
+            if (o == null) {
+                return OptionalDouble.empty();
+            }
+            if (o instanceof OptionalDouble) {
+                return o;
+            } else if (o instanceof Double) {
+                return OptionalDouble.of(((Double) o).doubleValue());
+            } else if (o instanceof Number) {
+                long longVal = ((Number) o).longValue();
+                double value = ((Number) o).doubleValue();
+                if (longVal == 0) {
+                    if (value == 0) {
+                        return OptionalDouble.of(0);
+                    }
+                } else if (value / longVal == 0 && value % longVal == 0) {
+                    return OptionalDouble.of(longVal);
+                }
+            }
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalDouble of value" + o);
+        }
+    },
     toEnum(Enum.class) {
         @Override
         public Object createArr(int length) { return new Enum[length]; }
@@ -295,9 +372,7 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
         }
         int length = values.length;
         Object array = Array.newInstance(TYPE, length);
-        for (int i = 0; i < length; i++) {
-            Array.set(array, i, values[i]);
-        }
+        System.arraycopy(values, 0, array, 0, length);
         return array;
     }
 
@@ -317,4 +392,5 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
     @Override
     public final String getText() { return TYPE.getName(); }
 
-    public final static <T> T to(Object o, Class type) { return (T) requireNonNull(getOrNull(type)).apply(o, type); }}
+    public final static <T> T to(Object o, Class type) { return (T) requireNonNull(getOrNull(type)).apply(o, type); }
+}

@@ -11,6 +11,7 @@ import com.moon.core.lang.reflect.ConstructorUtil;
 import com.moon.core.util.CollectUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
+import com.moon.core.util.Optional;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
@@ -51,7 +52,7 @@ public class GenericTypeCaster implements TypeCaster {
             BiFunction converter = value;
             add(value.TYPE, converter);
         }
-        add(com.moon.core.util.Optional.class, (value, tyType) -> value instanceof com.moon.core.util.Optional ? (com.moon.core.util.Optional) value : com.moon.core.util.Optional.ofNullable(value));
+        add(Optional.class, (value, tyType) -> value instanceof Optional ? (Optional) value : Optional.ofNullable(value));
         // Collection convert
         add(Collection.class, (value, toType) -> {
             if (value == null || toType == null) { return null; }

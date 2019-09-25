@@ -16,7 +16,7 @@ final class OptionalImpl<T> implements Optional<T> {
     public OptionalImpl(T value) { this.value = Objects.requireNonNull(value); }
 
     @Override
-    public Optional<T> nullableSet(T value) {
+    public Optional<T> setNullable(T value) {
         this.value = value;
         return this;
     }

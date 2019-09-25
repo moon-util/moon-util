@@ -9,6 +9,7 @@ import java.util.*;
 
 import static com.moon.core.beans.BeanInfoUtil.getFieldDescriptorsMap;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.lang.reflect.ConstructorUtil.newInstance;
 
 /**
  * 映射器：提供实体到 Map，实体到另一个实体，实体到类，Map 到实体之间的映射
@@ -17,9 +18,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @see com.moon.core.sql.ResultSetUtil 提供 SQL 查询结果集到实体、数组、Map 的映射
  */
 public final class MapperUtil {
-    private MapperUtil() {
-        noInstanceError();
-    }
+    private MapperUtil() { noInstanceError(); }
 
     /*
      * ---------------------------------------------------------------------------
@@ -29,20 +28,20 @@ public final class MapperUtil {
 
     public final static Map<String, Object> toMap(Object bean) { return toMap(bean, new HashMap(16)); }
 
-    public final static Map<String, Object> toMap(Object bean, Map container) {
+    public final static Map<String, Object> toMap(Object bean, Map result) {
         if (bean != null) {
             getFieldDescriptorsMap(bean.getClass()).forEach((name, d) ->
-                container.put(name, d.getValueIfPresent(bean, true)));
+                result.put(name, d.getValueIfPresent(bean, true)));
         }
-        return container;
+        return result;
     }
 
     public final static <T> T toInstance(Map<String, ?> data, Class<T> type) {
-        return overrideImpl(data, ConstructorUtil.newInstance(type, true), type);
+        return overrideImpl(data, newInstance(type, true), type);
     }
 
     public final static <T, E> T toInstance(E data, Class<T> type) {
-        return override(data, ConstructorUtil.newInstance(type, true));
+        return override(data, newInstance(type, true));
     }
 
     public final static <T> T override(Map<String, ?> data, T bean) {

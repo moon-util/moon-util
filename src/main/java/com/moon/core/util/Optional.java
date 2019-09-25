@@ -59,14 +59,14 @@ public interface Optional<T> extends Optionally {
      * @param value
      * @return
      */
-    default Optional<T> nullableSet(T value) { return this; }
+    default Optional<T> setNullable(T value) { return this; }
 
     /**
      * 设置 null 值
      *
      * @return
      */
-    default Optional<T> setNull() { return nullableSet(null); }
+    default Optional<T> setNull() { return setNullable(null); }
 
     /**
      * 设置值，不可为 null
@@ -74,7 +74,7 @@ public interface Optional<T> extends Optionally {
      * @param value
      * @return
      */
-    default Optional<T> set(T value) { return value == null ? doThrow(null) : nullableSet(value); }
+    default Optional<T> set(T value) { return value == null ? doThrow(null) : setNullable(value); }
 
     /**
      * 返回值
@@ -151,7 +151,7 @@ public interface Optional<T> extends Optionally {
      * @param supplier
      * @return
      */
-    default Optional<T> elseIfAbsent(Supplier<T> supplier) { return isAbsent() ? nullableSet(supplier.get()) : this; }
+    default Optional<T> elseIfAbsent(Supplier<T> supplier) { return isAbsent() ? setNullable(supplier.get()) : this; }
 
     /**
      * 不存在的情况设置默认值
@@ -159,7 +159,7 @@ public interface Optional<T> extends Optionally {
      * @param defaultValue
      * @return
      */
-    default Optional<T> defaultIfAbsent(T defaultValue) { return isAbsent() ? nullableSet(defaultValue) : this; }
+    default Optional<T> defaultIfAbsent(T defaultValue) { return isAbsent() ? setNullable(defaultValue) : this; }
 
     /**
      * 存在的情况下消费
