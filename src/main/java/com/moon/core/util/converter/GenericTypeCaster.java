@@ -14,6 +14,7 @@ import com.moon.core.util.ListUtil;
 import com.moon.core.util.Optional;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -27,7 +28,12 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import static com.moon.core.enums.Casters.*;
+import static com.moon.core.lang.ClassUtil.forNameOrNull;
+import static com.moon.core.lang.reflect.MethodUtil.getDeclaredMethod;
+import static com.moon.core.lang.reflect.MethodUtil.invokeStatic;
 import static com.moon.core.util.CollectUtil.addAll;
+import static com.moon.core.util.Optional.ofNullable;
+import static com.moon.core.util.OptionalUtil.resolveOrNull;
 
 /**
  * @author benshaoye
@@ -52,39 +58,43 @@ public class GenericTypeCaster implements TypeCaster {
             BiFunction converter = value;
             add(value.TYPE, converter);
         }
-        add(Optional.class, (value, tyType) -> value instanceof Optional ? (Optional) value : Optional.ofNullable(value));
+        ofNullable(forNameOrNull("com.google.common.base.Optional")).ifPresent(optCls -> {
+            Method m = getDeclaredMethod(optCls, "fromNullable", Object.class);
+            add(optCls, (v, t) -> optCls.isInstance(v) ? v : invokeStatic(m, resolveOrNull(v)));
+        });
+        add(Optional.class, (v, t) -> v instanceof Optional ? (Optional) v : ofNullable(resolveOrNull(v)));
         // Collection convert
         add(Collection.class, (value, toType) -> {
             if (value == null || toType == null) { return null; }
             Class cls;
             CollectBuilder builder = collectAccessor.get();
             if (value instanceof List) {
-                return builder.toCollection((List) value, toType);
+                return builder.toCollect((List) value, toType);
             } else if (value instanceof Collection) {
-                return builder.toCollection((Collection) value, toType);
+                return builder.toCollect((Collection) value, toType);
             } else if (value instanceof Map) {
-                return builder.toCollection((Map) value, toType);
+                return builder.toCollect((Map) value, toType);
             } else if ((cls = value.getClass()).isArray()) {
                 if (cls == int[].class) {
-                    return builder.toCollection((int[]) value, toType);
+                    return builder.toCollect((int[]) value, toType);
                 } else if (cls == long[].class) {
-                    return builder.toCollection((long[]) value, toType);
+                    return builder.toCollect((long[]) value, toType);
                 } else if (cls == double[].class) {
-                    return builder.toCollection((double[]) value, toType);
+                    return builder.toCollect((double[]) value, toType);
                 } else if (cls == byte[].class) {
-                    return builder.toCollection((byte[]) value, toType);
+                    return builder.toCollect((byte[]) value, toType);
                 } else if (cls == char[].class) {
-                    return builder.toCollection((char[]) value, toType);
+                    return builder.toCollect((char[]) value, toType);
                 } else if (cls == short[].class) {
-                    return builder.toCollection((short[]) value, toType);
+                    return builder.toCollect((short[]) value, toType);
                 } else if (cls == boolean[].class) {
-                    return builder.toCollection((boolean[]) value, toType);
+                    return builder.toCollect((boolean[]) value, toType);
                 } else if (cls == float[].class) {
-                    return builder.toCollection((float[]) value, toType);
+                    return builder.toCollect((float[]) value, toType);
                 }
-                return builder.toCollection((Object[]) value, toType);
+                return builder.toCollect((Object[]) value, toType);
             }
-            return builder.toCollection(value, toType);
+            return builder.toCollect(value, toType);
         });
         // List convert
         add(List.class, (value, toType) -> {
@@ -127,6 +137,7 @@ public class GenericTypeCaster implements TypeCaster {
      * Map convert
      *
      * @param <C>
+     *
      * @return
      */
     private <C> BiFunction<Object, Class<C>, C> converterOfMap() {
@@ -169,6 +180,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param toType
      * @param func
      * @param <C>
+     *
      * @return
      */
     private <C> TypeCaster add(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
@@ -183,6 +195,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param toType
      * @param func
      * @param <C>
+     *
      * @return
      */
     @Override
@@ -196,6 +209,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param toType
      * @param func
      * @param <C>
+     *
      * @return
      */
     @Override
@@ -211,6 +225,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param value
      * @param type
      * @param <T>
+     *
      * @return
      */
     @Override
@@ -343,6 +358,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param value
      * @param clazz
      * @param <T>
+     *
      * @return
      */
     @Override
@@ -355,6 +371,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param map
      * @param clazz
      * @param <T>
+     *
      * @return
      */
     @Override
@@ -366,8 +383,7 @@ public class GenericTypeCaster implements TypeCaster {
         if (!map.isEmpty()) {
             BeanInfoUtil.getFieldDescriptorsMap(clazz).forEach((name, desc) -> {
                 map.computeIfPresent(name, (key, value) -> {
-                    desc.ifSetterPresent(descriptor ->
-                        descriptor.setValue(obj, value, true));
+                    desc.ifSetterPresent(descriptor -> descriptor.setValue(obj, value, true));
                     return value;
                 });
             });
@@ -381,6 +397,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param value
      * @param arrayType
      * @param <T>
+     *
      * @return
      */
     @Override
@@ -401,6 +418,7 @@ public class GenericTypeCaster implements TypeCaster {
      * @param value
      * @param componentType
      * @param <T>
+     *
      * @return
      */
     @Override
@@ -419,8 +437,7 @@ public class GenericTypeCaster implements TypeCaster {
         } else if ((cls = value.getClass()).isArray()) {
             ArrayOperator operator = ArraysEnum.getOrObjects(cls);
             T[] array = createArray(componentType, operator.length(value));
-            operator.forEach(value, (item, index) ->
-                array[index] = toType(item, componentType));
+            operator.forEach(value, (item, index) -> array[index] = toType(item, componentType));
             return array;
         }
         return builder.toArray(value, componentType);
@@ -443,61 +460,54 @@ public class GenericTypeCaster implements TypeCaster {
     // **********************************************************************************************
 
     private static class CollectBuilder {
-        Collection toCollection(Map value, Class listImplType) {
+
+        Collection toCollect(Map value, Class listImplType) {
             return addAll(createCollect(listImplType, isAbstract(listImplType)), value.values());
         }
 
-        Collection toCollection(Collection value, Class listImplType) {
-            return listImplType.isInstance(value) ? value
-                : createCollect(listImplType, isAbstract(listImplType), value);
+        Collection toCollect(Collection value, Class listImplType) {
+            return listImplType.isInstance(value) ? value : createCollect(listImplType,
+                isAbstract(listImplType),
+                value);
         }
 
-        Collection toCollection(Object[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(Object[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(int[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(int[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(long[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(long[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(double[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(double[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(char[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(char[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(byte[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(byte[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(short[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(short[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(float[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(float[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(boolean[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createCollect(listImplType, false, array);
+        Collection toCollect(boolean[] array, Class listImplType) {
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createCollect(listImplType, false, array);
         }
 
-        Collection toCollection(Object value, Class listImplType) {
+        Collection toCollect(Object value, Class listImplType) {
             return CollectUtil.add(createCollect(listImplType, isAbstract(listImplType)), value);
         }
 
@@ -506,65 +516,58 @@ public class GenericTypeCaster implements TypeCaster {
         }
 
         <T extends Collection> Collection createCollect(Class<T> listImplType, boolean isDefault) {
-            return newInstance(isDefault, listImplType,
-                isDefault && Set.class.isAssignableFrom(listImplType)
-                    ? HashSet::new : ArrayList::new);
+            return newInstance(isDefault,
+                listImplType,
+                isDefault && Set.class.isAssignableFrom(listImplType) ? HashSet::new : ArrayList::new);
         }
     }
 
     private static class ListBuilder {
+
         List toList(Map value, Class listImplType) {
             return addAll(createList(listImplType, isAbstract(listImplType)), value.values());
         }
 
         List toList(Collection value, Class listImplType) {
-            return listImplType.isInstance(value) ? (List) value
-                : createList(listImplType, isAbstract(listImplType), value);
+            return listImplType.isInstance(value) ? (List) value : createList(listImplType,
+                isAbstract(listImplType),
+                value);
         }
 
         List toList(Object[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(int[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(long[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(double[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(short[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(char[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(byte[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(float[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(boolean[] array, Class listImplType) {
-            return isAbstract(listImplType) ? ListUtil.toList(array)
-                : createList(listImplType, false, array);
+            return isAbstract(listImplType) ? ListUtil.toList(array) : createList(listImplType, false, array);
         }
 
         List toList(Object value, Class listImplType) {
@@ -581,6 +584,7 @@ public class GenericTypeCaster implements TypeCaster {
     }
 
     private static class ArrayBuilder {
+
         <T> T[] toArray(List value, Class<T> componentType) {
             return (T[]) value.toArray(createArray(componentType, value.size()));
         }
@@ -599,16 +603,20 @@ public class GenericTypeCaster implements TypeCaster {
     }
 
     private enum StructureEnum {
-        NONE, DEFAULT, ARRAY_LENGTH_2, ENTRY, LIST_SIZE_2
+        NONE,
+        DEFAULT,
+        ARRAY_LENGTH_2,
+        ENTRY,
+        LIST_SIZE_2
     }
 
     private static class MapBuilder {
 
         <T> T toMap(Object value, Class mapClass) {
             Map result = createMap(mapClass);
-            BeanInfoUtil.getFieldDescriptorsMap(value.getClass()).forEach((name, desc) ->
-                desc.ifGetterPresent(descriptor ->
-                    result.put(name, descriptor.getValue(value, true))));
+            BeanInfoUtil.getFieldDescriptorsMap(value.getClass())
+                .forEach((name, desc) -> desc.ifGetterPresent(descriptor -> result.put(name,
+                    descriptor.getValue(value, true))));
             return (T) result;
         }
 

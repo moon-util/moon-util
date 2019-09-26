@@ -37,6 +37,7 @@ import static com.moon.core.math.BigIntegerUtil.toBigInteger;
 import static com.moon.core.time.TimeUtil.toDateTime;
 import static com.moon.core.time.TimeUtil.toTime;
 import static com.moon.core.util.DateUtil.*;
+import static com.moon.core.util.OptionalUtil.resolveOrNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -263,11 +264,27 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
         public Object createArr(int length) { return new Optional[length]; }
 
         @Override
-        public Object cast(Object o) { return o instanceof Optional ? o : ofNullable(o); }
+        public Object cast(Object o) {
+            if (o == null) {
+                return Optional.empty();
+            } else if (o instanceof Optional) {
+                return o;
+            }
+            return ofNullable(resolveOrNull(o));
+        }
     },
     toOptionalInt(OptionalInt.class) {
         @Override
         public Object createArr(int length) { return new OptionalInt[length]; }
+
+        private OptionalInt fromNumber(Number num) {
+            int intVal = num.intValue();
+            long value = num.longValue();
+            if (intVal == value) {
+                return OptionalInt.of(intVal);
+            }
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalInt of value: " + num);
+        }
 
         @Override
         public Object cast(Object o) {
@@ -279,18 +296,33 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
             } else if (o instanceof Integer) {
                 return OptionalInt.of(((Integer) o).intValue());
             } else if (o instanceof Number) {
-                int intVal = ((Number) o).intValue();
-                long value = ((Number) o).longValue();
-                if (intVal == value) {
-                    return OptionalInt.of(intVal);
-                }
+                return fromNumber((Number) o);
+            } else if (o instanceof OptionalLong) {
+                OptionalLong opt = (OptionalLong) o;
+                return opt.isPresent() ? fromNumber(opt.getAsLong()) : OptionalInt.empty();
+            } else if (o instanceof OptionalDouble) {
+                OptionalDouble opt = (OptionalDouble) o;
+                return opt.isPresent() ? fromNumber(opt.getAsDouble()) : OptionalInt.empty();
             }
-            throw new IllegalArgumentException("Can not cast to java.util.OptionalInt of value" + o);
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalInt of value: " + o);
         }
     },
     toOptionalLong(OptionalLong.class) {
         @Override
         public Object createArr(int length) { return new OptionalLong[length]; }
+
+        private OptionalLong fromNumber(Number num) {
+            long longVal = num.longValue();
+            double value = num.doubleValue();
+            if (longVal == 0) {
+                if (value == 0) {
+                    return OptionalLong.of(0);
+                }
+            } else if (value / longVal == 0 && value % longVal == 0) {
+                return OptionalLong.of(longVal);
+            }
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalLong of value: " + num);
+        }
 
         @Override
         public Object cast(Object o) {
@@ -302,22 +334,33 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
             } else if (o instanceof Long) {
                 return OptionalLong.of(((Long) o).intValue());
             } else if (o instanceof Number) {
-                long longVal = ((Number) o).longValue();
-                double value = ((Number) o).doubleValue();
-                if (longVal == 0) {
-                    if (value == 0) {
-                        return OptionalLong.of(0);
-                    }
-                } else if (value / longVal == 0 && value % longVal == 0) {
-                    return OptionalLong.of(longVal);
-                }
+                return fromNumber((Number) o);
+            } else if (o instanceof OptionalInt) {
+                OptionalInt opt = (OptionalInt) o;
+                return opt.isPresent() ? fromNumber(opt.getAsInt()) : OptionalLong.empty();
+            } else if (o instanceof OptionalDouble) {
+                OptionalDouble opt = (OptionalDouble) o;
+                return opt.isPresent() ? fromNumber(opt.getAsDouble()) : OptionalLong.empty();
             }
-            throw new IllegalArgumentException("Can not cast to java.util.OptionalLong of value" + o);
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalLong of value: " + o);
         }
     },
     toOptionalDouble(OptionalDouble.class) {
         @Override
         public Object createArr(int length) { return new OptionalDouble[length]; }
+
+        private OptionalDouble fromNumber(Number num) {
+            long longVal = num.longValue();
+            double value = num.doubleValue();
+            if (longVal == 0) {
+                if (value == 0) {
+                    return OptionalDouble.of(0);
+                }
+            } else if (value / longVal == 0 && value % longVal == 0) {
+                return OptionalDouble.of(longVal);
+            }
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalDouble of value: " + num);
+        }
 
         @Override
         public Object cast(Object o) {
@@ -329,17 +372,15 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
             } else if (o instanceof Double) {
                 return OptionalDouble.of(((Double) o).doubleValue());
             } else if (o instanceof Number) {
-                long longVal = ((Number) o).longValue();
-                double value = ((Number) o).doubleValue();
-                if (longVal == 0) {
-                    if (value == 0) {
-                        return OptionalDouble.of(0);
-                    }
-                } else if (value / longVal == 0 && value % longVal == 0) {
-                    return OptionalDouble.of(longVal);
-                }
+                return fromNumber((Number) o);
+            } else if (o instanceof OptionalInt) {
+                OptionalInt opt = (OptionalInt) o;
+                return opt.isPresent() ? OptionalDouble.of(opt.getAsInt()) : OptionalDouble.empty();
+            } else if (o instanceof OptionalLong) {
+                OptionalLong opt = (OptionalLong) o;
+                return opt.isPresent() ? OptionalDouble.of(opt.getAsLong()) : OptionalDouble.empty();
             }
-            throw new IllegalArgumentException("Can not cast to java.util.OptionalDouble of value" + o);
+            throw new IllegalArgumentException("Can not cast to java.util.OptionalDouble of value: " + o);
         }
     },
     toEnum(Enum.class) {
