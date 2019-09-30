@@ -21,7 +21,7 @@ public final class TypeUtil {
     private TypeUtil() { ThrowUtil.noInstanceError(); }
 
     /**
-     * default converter CACHE or create new one
+     * default converter cache or create new one
      */
     private final static WeakAccessor<TypeCaster> accessor = WeakAccessor.of(UnmodifiableTypeCaster::new);
 

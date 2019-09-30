@@ -28,9 +28,7 @@ interface IValidator<T, IMPL> {
      *
      * @return
      */
-    default IMPL end() {
-        return when(o -> true);
-    }
+    default IMPL end() { return when(o -> true); }
 
     /**
      * 返回对象
@@ -62,7 +60,5 @@ interface IValidator<T, IMPL> {
      * @param tester
      * @return
      */
-    default IMPL require(Predicate<? super T> tester) {
-        return require(tester, Value.NONE);
-    }
+    default IMPL require(Predicate<? super T> tester) { return require(tester, Value.NONE); }
 }

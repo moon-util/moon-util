@@ -2,6 +2,7 @@ package com.moon.core.lang.reflect;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.RandomStringUtil;
+import com.moon.core.util.interfaces.ValueSupplier;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -14,14 +15,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.System.out;
+import static java.lang.System.setOut;
 
 /**
  * @author benshaoye
  */
 class ProxyUtilTestTest {
 
-    @FunctionalInterface
-    interface Getter<T> {
+    @Test
+    void testNewProxyInstance() {
+        Student student = new Student();
+        ValueSupplier supplier = ProxyUtil.newProxyInstance(student, (proxy, method, args) -> {
+            out.println("before");
+            Object ret = method.invoke(student, args);
+            out.println("after");
+            return ret;
+        });
+
+        out.println(supplier.getValue());;
+    }
+
+    interface Getter<T> extends ValueSupplier<String> {
         T get();
     }
 
@@ -39,6 +53,11 @@ class ProxyUtilTestTest {
 
         @Override
         public Object get() {
+            return str;
+        }
+
+        @Override
+        public Object getValue() {
             return str;
         }
     }

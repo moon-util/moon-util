@@ -13,13 +13,14 @@ import java.util.function.*;
 /**
  * @author benshaoye
  */
-abstract class BaseValidator<T, IMPL extends BaseValidator>
-    extends Value<T> implements Cloneable,
-    Serializable, IValidator<T, IMPL>, Supplier<T> {
+abstract class BaseValidator<T, IMPL extends BaseValidator> extends Value<T>
+    implements Cloneable, Serializable, IValidator<T, IMPL>, Supplier<T> {
 
     static final long serialVersionUID = 1L;
 
     static final String SEPARATOR = ", ";
+
+    private final IMPL parent = null;
 
     private List<String> messages;
 
@@ -29,8 +30,8 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
 
     private boolean condition;
 
-    BaseValidator(T value, List<String> messages, String separator, boolean immediate) {
-        super(value);
+    BaseValidator(T value, boolean nullable, List<String> messages, String separator, boolean immediate) {
+        super(value, nullable);
         this.separator = separator;
         this.immediate = immediate;
         this.messages = messages;
@@ -47,6 +48,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * 添加一条错误信息，如果设置了立即结束将抛出异常
      *
      * @param message
+     *
      * @return
      */
     final IMPL createMsg(String message) {
@@ -58,9 +60,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
         return current();
     }
 
-    final IMPL createMsg(boolean tested, String message) {
-        return tested ? current() : createMsg(message);
-    }
+    final IMPL createMsg(boolean tested, String message) { return tested ? current() : createMsg(message); }
 
     final IMPL createMsgOfCount(String message, int count) {
         return createMsg(message == null ? String.format("必须有 %d 项符合条件", count) : message);
@@ -84,17 +84,11 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * -----------------------------------------------------------------
      */
 
-    final List<String> ensureMessages() {
-        return messages == null ? (messages = new ArrayList<>()) : messages;
-    }
+    final List<String> ensureMessages() { return messages == null ? (messages = new ArrayList<>()) : messages; }
 
-    final IMPL ifCondition(Function<T, IMPL> handler) {
-        return condition ? handler.apply(value) : current();
-    }
+    final IMPL ifCondition(Function<T, IMPL> handler) { return condition ? handler.apply(value) : current(); }
 
-    final IMPL current() {
-        return (IMPL) this;
-    }
+    final IMPL current() { return (IMPL) this; }
 
     /*
      * -----------------------------------------------------------------
@@ -102,8 +96,9 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * -----------------------------------------------------------------
      */
 
-    final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL
-    requireAtMostCountOf(IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message) {
+    final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL requireAtMostCountOf(
+        IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message
+    ) {
         return impl.ifCondition(value -> {
             int amount = 0;
             for (Map.Entry<K, V> item : value.entrySet()) {
@@ -115,8 +110,9 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
         });
     }
 
-    final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL
-    requireAtLeastCountOf(IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message) {
+    final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL requireAtLeastCountOf(
+        IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message
+    ) {
         return impl.ifCondition(value -> {
             int amount = 0;
             for (Map.Entry<K, V> item : value.entrySet()) {
@@ -128,8 +124,9 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
         });
     }
 
-    final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL
-    requireCountOf(IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message) {
+    final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL requireCountOf(
+        IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message
+    ) {
         return impl.ifCondition(value -> {
             int amount = 0;
             for (Map.Entry<K, V> item : value.entrySet()) {
@@ -147,40 +144,26 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * -----------------------------------------------------------------
      */
 
-    public final List<String> getMessages() {
-        return new ArrayList<>(ensureMessages());
-    }
+    public final List<String> getMessages() { return new ArrayList<>(ensureMessages()); }
 
-    public final boolean isImmediate() {
-        return immediate;
-    }
+    public final boolean isImmediate() { return immediate; }
 
-    public final String getSeparator() {
-        return separator;
-    }
+    public final String getSeparator() { return separator; }
 
     /**
      * 获取错误信息，用默认分隔符
      *
      * @return
      */
-    public final String getMessage() {
-        return getMessage(StringUtil.defaultIfNull(separator, SEPARATOR));
-    }
+    public final String getMessage() { return getMessage(StringUtil.defaultIfNull(separator, SEPARATOR)); }
 
-    public final String getMessage(String separator) {
-        return JoinerUtil.joinSkipNulls(ensureMessages(), separator);
-    }
+    public final String getMessage(String separator) { return JoinerUtil.joinSkipNulls(ensureMessages(), separator); }
 
     @Override
-    public final String toString() {
-        return getMessage();
-    }
+    public final String toString() { return getMessage(); }
 
     @Override
-    public final int hashCode() {
-        return Objects.hashCode(value);
-    }
+    public final int hashCode() { return Objects.hashCode(value); }
 
     @Override
     public final boolean equals(Object obj) {
@@ -201,29 +184,25 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      *
      * @return
      */
-    public final T nullIfInvalid() {
-        return defaultIfInvalid(null);
-    }
+    public final T nullIfInvalid() { return defaultIfInvalid(null); }
 
     /**
      * 验证通过，返回该对象，否则返回指定的默认值
      *
      * @param elseValue
+     *
      * @return
      */
-    public final T defaultIfInvalid(T elseValue) {
-        return isValid() ? value : elseValue;
-    }
+    public final T defaultIfInvalid(T elseValue) { return isValid() ? value : elseValue; }
 
     /**
      * 验证通过，返回该对象，否则返回指定的默认值
      *
      * @param elseGetter
+     *
      * @return
      */
-    public final T elseIfInvalid(Supplier<T> elseGetter) {
-        return isValid() ? value : elseGetter.get();
-    }
+    public final T elseIfInvalid(Supplier<T> elseGetter) { return isValid() ? value : elseGetter.get(); }
 
     /**
      * 验证通过，返回该对象，否则抛出异常
@@ -242,6 +221,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * 验证通过，返回该对象，否则抛出指定信息异常
      *
      * @param errorMessage
+     *
      * @return
      */
     public final T get(String errorMessage) {
@@ -256,7 +236,9 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      *
      * @param exception
      * @param <EX>
+     *
      * @return
+     *
      * @throws EX
      */
     public final <EX extends Throwable> T get(Function<String, EX> exception) throws EX {
@@ -273,14 +255,13 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      */
 
     @Override
-    public final IMPL addErrorMessage(String message) {
-        return createMsg(message);
-    }
+    public final IMPL addErrorMessage(String message) { return createMsg(message); }
 
     /**
      * 可用于在后面条件验证前预先设置一部分默认值
      *
      * @param consumer
+     *
      * @return
      */
     public final IMPL preset(Consumer<? super T> consumer) {
@@ -292,6 +273,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * 设置是否立即终止
      *
      * @param immediate
+     *
      * @return
      */
     public final IMPL setImmediate(boolean immediate) {
@@ -303,6 +285,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
      * 设置错误信息分隔符，不能为 null
      *
      * @param separator
+     *
      * @return
      */
     public final IMPL setSeparator(String separator) {
@@ -310,13 +293,9 @@ abstract class BaseValidator<T, IMPL extends BaseValidator>
         return current();
     }
 
-    public final boolean isValid() {
-        return messages == null || messages.isEmpty();
-    }
+    public final boolean isValid() { return messages == null || messages.isEmpty(); }
 
-    public final boolean isInvalid() {
-        return !isValid();
-    }
+    public final boolean isInvalid() { return !isValid(); }
 
     public final IMPL ifValid(Consumer<? super T> consumer) {
         if (isValid()) {

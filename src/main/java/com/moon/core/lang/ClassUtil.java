@@ -9,6 +9,8 @@ import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * @author benshaoye
@@ -16,9 +18,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class ClassUtil {
 
-    private ClassUtil() {
-        noInstanceError();
-    }
+    private ClassUtil() { noInstanceError(); }
 
     static final Map<Class, Class> PRIMITIVE_TO_WRAPPER_MAP;
     static final Map<Class, Class> WRAPPER_TO_PRIMITIVE_MAP;
@@ -52,9 +52,8 @@ public final class ClassUtil {
             map2.put(WRAPPER_CLASSES[i], PRIMITIVE_CLASSES[i]);
         }
 
-        PRIMITIVE_TO_WRAPPER_MAP = Collections.unmodifiableMap(map1);
-        WRAPPER_TO_PRIMITIVE_MAP = Collections.unmodifiableMap(map2);
-
+        PRIMITIVE_TO_WRAPPER_MAP = unmodifiableMap(map1);
+        WRAPPER_TO_PRIMITIVE_MAP = unmodifiableMap(map2);
     }
 
 
@@ -68,7 +67,7 @@ public final class ClassUtil {
             if ((type = type.getSuperclass()) != null) {
                 classes.add(type);
             } else {
-                return Collections.unmodifiableList(classes);
+                return unmodifiableList(classes);
             }
         } while (true);
     }
@@ -77,13 +76,9 @@ public final class ClassUtil {
         return cls1 != null && cls2 != null && cls1.isAssignableFrom(cls2);
     }
 
-    public static boolean isInstanceOf(Object o, Class c) {
-        return c != null && c.isInstance(o);
-    }
+    public static boolean isInstanceOf(Object o, Class c) { return c != null && c.isInstance(o); }
 
-    public static boolean isInnerClass(Class clazz) {
-        return clazz != null && clazz.getName().indexOf('$') > 0;
-    }
+    public static boolean isInnerClass(Class clazz) { return clazz != null && clazz.getName().indexOf('$') > 0; }
 
     public static Class[] getClasses(Object... objects) {
         int len = objects.length;
@@ -101,27 +96,21 @@ public final class ClassUtil {
      *
      * @param clazz
      */
-    public final static Class toWrapperClass(Class clazz) {
-        return PRIMITIVE_TO_WRAPPER_MAP.get(clazz);
-    }
+    public final static Class toWrapperClass(Class clazz) { return PRIMITIVE_TO_WRAPPER_MAP.get(clazz); }
 
-    public final static Class toPrimitiveClass(Class clazz) {
-        return WRAPPER_TO_PRIMITIVE_MAP.get(clazz);
-    }
+    public final static Class toPrimitiveClass(Class clazz) { return WRAPPER_TO_PRIMITIVE_MAP.get(clazz); }
 
     public static Class forName(String className) {
         try {
             return Class.forName(className);
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             return doThrow(e);
         }
     }
 
-    public static <R> R applyOrNull(String className, Function<Class, R> function) {
+    public static Class forNameOrNull(String className) {
         try {
-            return OptionalUtil.computeOrNull(
-                OptionalUtil.computeOrNull(
-                    className, ClassUtil::forName), function);
+            return Class.forName(className);
         } catch (Exception e) {
             return null;
         }

@@ -24,9 +24,7 @@ import static com.moon.core.lang.ThrowUtil.wrapRuntime;
 public final class ResultSetUtil {
     private static Map<Object, Object> CACHE = ReferenceUtil.manageMap();
 
-    private ResultSetUtil() {
-        noInstanceError();
-    }
+    private ResultSetUtil() { noInstanceError(); }
 
     public static Map<String, Object> oneToMap(ResultSet set, String... columnsLabel) {
         try {
@@ -48,9 +46,7 @@ public final class ResultSetUtil {
      * @param set
      * @return
      */
-    public static Map<String, Object> oneToMap(ResultSet set) {
-        return oneToMap(set, getColumnsLabel(set));
-    }
+    public static Map<String, Object> oneToMap(ResultSet set) { return oneToMap(set, getColumnsLabel(set)); }
 
     /**
      * 将剩余行每行映射成一个 Map 对象，所有数据用一个 List 返回

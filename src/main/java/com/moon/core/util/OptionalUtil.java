@@ -3,6 +3,9 @@ package com.moon.core.util;
 import com.moon.core.lang.Executable;
 import com.moon.core.lang.ThrowUtil;
 
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.function.*;
 
 import static com.moon.core.lang.ThrowUtil.doThrow;
@@ -13,6 +16,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @date 2018/9/14
  */
 public final class OptionalUtil {
+
     private OptionalUtil() {
         noInstanceError();
     }
@@ -117,5 +121,25 @@ public final class OptionalUtil {
 
     public static <T> T getOrElse(T value, Supplier<T> defaultSupplier) {
         return value == null ? defaultSupplier.get() : value;
+    }
+
+    public static Object resolveOrNull(Object optionalReference) {
+        Object value = optionalReference;
+        if (value instanceof java.util.Optional) {
+            java.util.Optional optional = (java.util.Optional) value;
+            value = optional.isPresent() ? optional.get() : null;
+        } else if (value instanceof OptionalLong) {
+            OptionalLong optional = (OptionalLong) value;
+            value = optional.isPresent() ? optional.getAsLong() : null;
+        } else if (value instanceof OptionalInt) {
+            OptionalInt optional = (OptionalInt) value;
+            value = optional.isPresent() ? optional.getAsInt() : null;
+        } else if (value instanceof OptionalDouble) {
+            OptionalDouble optional = (OptionalDouble) value;
+            value = optional.isPresent() ? optional.getAsDouble() : null;
+        } else if (value instanceof Optional) {
+            value = ((Optional) value).getOrNull();
+        }
+        return value;
     }
 }

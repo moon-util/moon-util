@@ -16,20 +16,24 @@ import java.util.function.Predicate;
  *
  * @author benshaoye
  */
-public final class CollectValidator<C extends Collection<E>, E>
-    extends BaseValidator<C, CollectValidator<C, E>>
+public final class CollectValidator<C extends Collection<E>, E> extends BaseValidator<C, CollectValidator<C, E>>
     implements ICollectValidator<C, E, CollectValidator<C, E>> {
 
-    public CollectValidator(C value) {
-        this(value, null, SEPARATOR, false);
+    public CollectValidator(C value) { this(value, false); }
+
+    public CollectValidator(C value, boolean nullable) { this(value, nullable, null, SEPARATOR, false); }
+
+    CollectValidator(C value, boolean nullable, List<String> messages, String separator, boolean immediate) {
+        super(value, nullable, messages, separator, immediate);
     }
 
-    CollectValidator(C value, List<String> messages, String separator, boolean immediate) {
-        super(value, messages, separator, immediate);
+    public final static <C extends Collection<E>, E> CollectValidator<C, E> of(C collect) {
+        return new CollectValidator<>(collect);
     }
 
-    public final static <C extends Collection<E>, E> CollectValidator<C, E>
-    of(C collect) { return new CollectValidator<>(collect); }
+    public final static <C extends Collection<E>, E> CollectValidator<C, E> ofNullable(C collect) {
+        return new CollectValidator<>(collect, true);
+    }
 
 
     /*
@@ -84,8 +88,8 @@ public final class CollectValidator<C extends Collection<E>, E>
      */
 
     public final <O> GroupValidator<Map<O, Collection<E>>, O, Collection<E>, E> groupBy(Function<? super E, O> grouper) {
-        return new GroupValidator<>(GroupUtil.groupBy(value, grouper),
-            ensureMessages(), getSeparator(), isImmediate());
+        return new GroupValidator<>(GroupUtil.groupBy(value, grouper), nullable, ensureMessages(), getSeparator(),
+            isImmediate());
     }
 
     /*
@@ -95,7 +99,7 @@ public final class CollectValidator<C extends Collection<E>, E>
      */
 
     public final CollectValidator<List<E>, E> filter(Predicate<? super E> filter) {
-        return new CollectValidator<>(FilterUtil.filter(value, filter,
-            new ArrayList<>()), ensureMessages(), getSeparator(), isImmediate());
+        return new CollectValidator<>(FilterUtil.filter(value, filter, new ArrayList<>()), nullable, ensureMessages(),
+            getSeparator(), isImmediate());
     }
 }

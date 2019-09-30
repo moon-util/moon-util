@@ -9,13 +9,15 @@ import java.util.List;
  */
 public final class Validator<T> extends BaseValidator<T, Validator<T>> {
 
-    public Validator(T value) { this(value, null, SEPARATOR, false); }
+    public Validator(T value) { this(value, false); }
 
-    Validator(T value, List<String> messages, String separator, boolean immediate) {
-        super(value, messages, separator, immediate);
+    public Validator(T value, boolean nullable) { this(value, nullable, null, SEPARATOR, false); }
+
+    Validator(T value, boolean nullable, List<String> messages, String separator, boolean immediate) {
+        super(value, nullable, messages, separator, immediate);
     }
 
-    public final static <T> Validator<T> of(T object) {
-        return new Validator<>(object);
-    }
+    public final static <T> Validator<T> of(T value) { return new Validator<>(value); }
+
+    public final static <T> Validator<T> ofNullable(T value) { return new Validator<>(value, true); }
 }

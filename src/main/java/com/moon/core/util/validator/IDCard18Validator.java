@@ -58,7 +58,7 @@ public final class IDCard18Validator extends BaseValidator<String, IDCard18Valid
     public IDCard18Validator(String value) { this(value, null, SEPARATOR, false); }
 
     private IDCard18Validator(String value, List<String> messages, String separator, boolean immediate) {
-        super(value == null ? "" : value, messages, separator, immediate);
+        super(value == null ? "" : value, false, messages, separator, immediate);
         boolean isValid = require(IDCard18Validator::isValid, null).isValid();
         this.birthYear = isValid ? valueOf(value.substring(6, 10)) : INVALID_ITEM_VALUE;
         this.birthMonth = isValid ? valueOf(value.substring(10, 12)) : INVALID_ITEM_VALUE;

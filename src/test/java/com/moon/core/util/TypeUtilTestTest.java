@@ -32,4 +32,10 @@ class TypeUtilTestTest {
 
         assertTrue(TypeUtil.cast().toOptional(null) == java.util.Optional.empty());
     }
+
+    @Test
+    void testOptionalLong() throws Exception {
+        Number value = 0.3D;
+        System.out.println(value.longValue());
+    }
 }
