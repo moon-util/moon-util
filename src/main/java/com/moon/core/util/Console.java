@@ -1,8 +1,11 @@
 package com.moon.core.util;
 
+import com.moon.core.lang.StringUtil;
 import com.moon.core.util.console.*;
 
 import static com.moon.core.lang.EnumUtil.last;
+import static com.moon.core.lang.StringUtil.padEnd;
+import static java.lang.Thread.currentThread;
 
 /**
  * Appender 决定输出位置
@@ -83,7 +86,15 @@ public interface Console extends Printable, Timing {
      *
      * @param level
      */
-    void printStackTrace(Level level);
+    default void printStackTrace(Level level) {
+        StackTraceElement[] traces = currentThread().getStackTrace();
+        int len = traces.length;
+        StringBuilder builder = new StringBuilder(len * 100);
+        for (int i = 0; i < len; i++) {
+            builder.append(padEnd(i + 1, 4, ' ')).append("at ").append(traces[i]).append('\n');
+        }
+        println(level, builder);
+    }
 
     /**
      * 级别控制
