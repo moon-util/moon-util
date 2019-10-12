@@ -14,7 +14,9 @@ class ConsoleDefault {
 
     final static ConsoleSettings SETTINGS;
 
-    final static ConsoleEnabled ENABLED = ConsoleGlobalControl.GLOBAL;
+    public static ConsoleEnabled getEnabled() {
+        return ConsoleGlobalControl.GLOBAL;
+    }
 
     static {
         SETTINGS = new ConsoleSettings(
