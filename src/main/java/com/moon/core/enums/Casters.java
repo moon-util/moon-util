@@ -1,5 +1,6 @@
 package com.moon.core.enums;
 
+import com.moon.core.lang.ClassUtil;
 import com.moon.core.time.TimeUtil;
 import com.moon.core.util.converter.TypeConverter;
 
@@ -392,6 +393,23 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
 
         @Override
         public Object apply(Object o, Class type) { return toEnum(o, type); }
+    },
+    toClass(Class.class) {
+        @Override
+        public <T> T cast(Object o) {
+            if (o instanceof Class) {
+                return (T) o;
+            } else if (o instanceof CharSequence) {
+                return (T) ClassUtil.forName(o.toString());
+            } else if (o == null) {
+                return doThrow(String.valueOf(null));
+            } else {
+                return (T) o.getClass();
+            }
+        }
+
+        @Override
+        public Object createArr(int length) { return new Class[length]; }
     };
 
     public final Class TYPE;
