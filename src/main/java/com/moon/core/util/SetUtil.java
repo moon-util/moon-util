@@ -111,6 +111,14 @@ public final class SetUtil extends CollectUtil {
 
     public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator) { return new TreeSet<>(comparator); }
 
+    public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator, Iterable<T> iterable) {
+        return addAll(ofTreeSet(comparator), iterable);
+    }
+
+    public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator, T... values) {
+        return addAll(ofTreeSet(comparator), values);
+    }
+
     public static <S, T> Set<T> mapAsSet(Collection<S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);
         return collect instanceof List ? (Set<T>) collect : ofHashSet(collect);
