@@ -188,21 +188,21 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
         public Object createArr(int length) { return new String[length]; }
 
         @Override
-        public Object cast(Object o) { return String.valueOf(o); }
+        public Object cast(Object o) { return o == null ? null : o.toString(); }
     },
     toStringBuffer(StringBuffer.class) {
         @Override
         public Object createArr(int length) { return new StringBuffer[length]; }
 
         @Override
-        public Object cast(Object o) { return new StringBuffer(String.valueOf(o)); }
+        public Object cast(Object o) { return o == null ? null : new StringBuffer(o.toString()); }
     },
     toStringBuilder(StringBuilder.class) {
         @Override
         public Object createArr(int length) { return new StringBuilder[length]; }
 
         @Override
-        public Object cast(Object o) { return new StringBuilder(String.valueOf(o)); }
+        public Object cast(Object o) { return o == null ? null : new StringBuilder(o.toString()); }
     },
     toDate(Date.class) {
         @Override

@@ -546,4 +546,36 @@ public final class IOUtil {
 
         public Closer close(AutoCloseable close) { return closeCloseable(close); }
     }
+
+    public static byte[] serialize(Object object) {
+        if (object == null) {
+            return null;
+        }
+        ByteArrayOutputStream arrOut = new ByteArrayOutputStream(1024);
+        try (ObjectOutputStream oos = new ObjectOutputStream(arrOut)) {
+            oos.writeObject(object);
+            oos.flush();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Failed to serialize object of type: " + object.getClass(), ex);
+        }
+        return arrOut.toByteArray();
+    }
+
+    public static Object deserialize(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
+            return ois.readObject();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Failed to deserialize object", ex);
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalStateException("Failed to deserialize object type", ex);
+        }
+    }
+
+    public static <T> T deserializeAs(byte[] bytes, Class<T> type) {
+        Object deserialized = deserialize(bytes);
+        return deserialized == null ? null : type.cast(deserialized);
+    }
 }

@@ -3,7 +3,7 @@ package com.moon.core.util.console;
 import com.moon.core.util.Console;
 import com.moon.core.util.Console.Level;
 
-import static com.moon.core.util.console.ConsoleDefault.ENABLED;
+import static com.moon.core.util.console.ConsoleDefault.getEnabled;
 
 /**
  * @author benshaoye
@@ -37,7 +37,7 @@ abstract class BaseConsoleEnabled implements ConsoleEnabled {
 
     @Override
     public final boolean isAllowSystemOut() {
-        return ENABLED.isAllowSystemOut() && allowSystemOut;
+        return getEnabled().isAllowSystemOut() && allowSystemOut;
     }
 
     /**
@@ -48,6 +48,6 @@ abstract class BaseConsoleEnabled implements ConsoleEnabled {
      */
     @Override
     public final boolean isEnabled(Level level) {
-        return ENABLED.isEnabled(level) && level.ordinal() <= this.lowestLevel.ordinal();
+        return getEnabled().isEnabled(level) && level.ordinal() <= this.lowestLevel.ordinal();
     }
 }

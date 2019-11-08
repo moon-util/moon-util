@@ -13,6 +13,7 @@ import static com.moon.core.lang.ThrowUtil.doThrow;
  * @author benshaoye
  */
 public interface Optional<T> extends Optionally {
+
     /**
      * null 对象
      */
@@ -30,6 +31,7 @@ public interface Optional<T> extends Optionally {
      *
      * @param value
      * @param <E>
+     *
      * @return
      */
     static <E> Optional<E> of(E value) { return of(value, OptionalImpl::new); }
@@ -39,9 +41,22 @@ public interface Optional<T> extends Optionally {
      *
      * @param value
      * @param <E>
+     *
      * @return
      */
     static <E> Optional<E> ofNullable(E value) { return value == null ? empty : of(value); }
+
+    /**
+     * 从{@link java.util.Optional}转化
+     *
+     * @param utilOptional
+     * @param <T>
+     *
+     * @return
+     */
+    static <T> Optional<T> fromUtil(java.util.Optional<T> utilOptional) {
+        return ofNullable(utilOptional.orElse(null));
+    }
 
     /**
      * 构造对象
@@ -49,6 +64,7 @@ public interface Optional<T> extends Optionally {
      * @param value
      * @param mapper
      * @param <E>
+     *
      * @return
      */
     static <E, OI extends Optional<E>> OI of(E value, Function<? super E, OI> mapper) { return mapper.apply(value); }
@@ -57,6 +73,7 @@ public interface Optional<T> extends Optionally {
      * 设置值，可为 null
      *
      * @param value
+     *
      * @return
      */
     default Optional<T> setNullable(T value) { return this; }
@@ -72,6 +89,7 @@ public interface Optional<T> extends Optionally {
      * 设置值，不可为 null
      *
      * @param value
+     *
      * @return
      */
     default Optional<T> set(T value) { return value == null ? doThrow(null) : setNullable(value); }
@@ -94,6 +112,7 @@ public interface Optional<T> extends Optionally {
      * 返回值或使用默认值
      *
      * @param defaultValue
+     *
      * @return
      */
     default T getOrDefault(T defaultValue) { return isPresent() ? getOrNull() : defaultValue; }
@@ -102,6 +121,7 @@ public interface Optional<T> extends Optionally {
      * 返回值或使用默认值
      *
      * @param supplier
+     *
      * @return
      */
     default T getOrElse(Supplier<T> supplier) { return isPresent() ? getOrNull() : supplier.get(); }
@@ -111,7 +131,9 @@ public interface Optional<T> extends Optionally {
      *
      * @param supplier
      * @param <EX>
+     *
      * @return
+     *
      * @throws EX
      */
     default <EX extends Throwable> T getOrThrow(Supplier<EX> supplier) throws EX {
@@ -139,6 +161,7 @@ public interface Optional<T> extends Optionally {
      * 确保符合条件，否则返回 null 对象
      *
      * @param predicate
+     *
      * @return
      */
     default Optional<T> filter(Predicate<? super T> predicate) {
@@ -149,6 +172,7 @@ public interface Optional<T> extends Optionally {
      * 不存在的情况设置默认值
      *
      * @param supplier
+     *
      * @return
      */
     default Optional<T> elseIfAbsent(Supplier<T> supplier) { return isAbsent() ? setNullable(supplier.get()) : this; }
@@ -157,6 +181,7 @@ public interface Optional<T> extends Optionally {
      * 不存在的情况设置默认值
      *
      * @param defaultValue
+     *
      * @return
      */
     default Optional<T> defaultIfAbsent(T defaultValue) { return isAbsent() ? setNullable(defaultValue) : this; }
@@ -165,6 +190,7 @@ public interface Optional<T> extends Optionally {
      * 存在的情况下消费
      *
      * @param consumer
+     *
      * @return
      */
     default Optional<T> ifPresent(Consumer<? super T> consumer) {
@@ -176,6 +202,7 @@ public interface Optional<T> extends Optionally {
      * 不存在的情况下执行
      *
      * @param executor
+     *
      * @return
      */
     default Optional<T> ifAbsent(Executable executor) {
@@ -187,16 +214,29 @@ public interface Optional<T> extends Optionally {
      * 计算
      *
      * @param computer
+     *
      * @return
      */
     default <E> E compute(Function<? super T, ? extends E> computer) { return computer.apply(getOrNull()); }
+
+    /**
+     * 转换为{@link java.util.Optional}
+     *
+     * @return
+     */
+    default java.util.Optional<T> toUtil() {
+        return java.util.Optional.ofNullable(getOrNull());
+    }
 
     /**
      * 转换
      *
      * @param computer
      * @param <E>
+     *
      * @return
      */
-    default <E> Optional<E> transform(Function<? super T, ? extends E> computer) { return ofNullable(computer.apply(getOrNull())); }
+    default <E> Optional<E> transform(Function<? super T, ? extends E> computer) {
+        return ofNullable(computer.apply(getOrNull()));
+    }
 }

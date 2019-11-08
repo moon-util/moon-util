@@ -59,7 +59,7 @@ public class CollectUtil extends BaseCollectUtil {
     }
 
     public final static <E, C extends Collection<E>> C addAll(C collect, E... elements) {
-        if (collect != null) {
+        if (collect != null && elements != null) {
             for (E element : elements) {
                 collect.add(element);
             }
@@ -68,21 +68,21 @@ public class CollectUtil extends BaseCollectUtil {
     }
 
     public final static <E, C extends Collection<E>> C addAll(C collect, Collection<E> collection) {
-        if (collect != null) {
+        if (collect != null && collection != null) {
             collect.addAll(collection);
         }
         return collect;
     }
 
     public final static <E, C extends Collection<E>> C addAll(C collect, Iterable<E> iterable) {
-        if (collect != null) {
+        if (collect != null && iterable != null) {
             iterable.forEach(collect::add);
         }
         return collect;
     }
 
     public final static <E, C extends Collection<E>> C addAll(C collect, Iterator<E> iterator) {
-        if (collect != null) {
+        if (collect != null && iterator != null) {
             iterator.forEachRemaining(collect::add);
         }
         return collect;

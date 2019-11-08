@@ -3,6 +3,7 @@ package com.moon.core.util;
 import com.moon.core.lang.ThrowUtil;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author benshaoye
@@ -39,8 +40,9 @@ public final class SetUtil extends CollectUtil {
     }
 
     public static <T> HashSet<T> ofHashSet(Iterable<T> iterable) {
-        return iterable == null ? ofHashSet() : (iterable instanceof Collection ? new HashSet(
-            (Collection) iterable) : addAll(ofHashSet(), iterable));
+        return iterable == null ? ofHashSet() : (iterable instanceof Collection ? new HashSet((Collection) iterable) : addAll(
+            ofHashSet(),
+            iterable));
     }
 
     /*
@@ -72,8 +74,9 @@ public final class SetUtil extends CollectUtil {
     }
 
     public static <T> LinkedHashSet<T> ofLinkedHashSet(Iterable<T> iterable) {
-        return iterable == null ? ofLinkedHashSet() : (iterable instanceof Collection ? new LinkedHashSet(
-            (Collection) iterable) : addAll(ofLinkedHashSet(), iterable));
+        return iterable == null ? ofLinkedHashSet() : (iterable instanceof Collection ? new LinkedHashSet((Collection) iterable) : addAll(
+            ofLinkedHashSet(),
+            iterable));
     }
 
     /*
@@ -99,13 +102,27 @@ public final class SetUtil extends CollectUtil {
     }
 
     public static <T> TreeSet<T> ofTreeSet(Iterable<T> iterable) {
-        return iterable == null ? ofTreeSet() : (iterable instanceof Collection ? new TreeSet(
-            (Collection) iterable) : addAll(ofTreeSet(), iterable));
+        return iterable == null ? ofTreeSet() : (iterable instanceof Collection ? new TreeSet((Collection) iterable) : addAll(
+            ofTreeSet(),
+            iterable));
     }
 
     public static <T> TreeSet<T> ofTreeSet(SortedSet<T> sortedSet) { return new TreeSet<>(sortedSet); }
 
     public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator) { return new TreeSet<>(comparator); }
+
+    public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator, Iterable<T> iterable) {
+        return addAll(ofTreeSet(comparator), iterable);
+    }
+
+    public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator, T... values) {
+        return addAll(ofTreeSet(comparator), values);
+    }
+
+    public static <S, T> Set<T> mapAsSet(Collection<S> src, Function<? super S, T> mapper) {
+        Collection<T> collect = map(src, mapper);
+        return collect instanceof List ? (Set<T>) collect : ofHashSet(collect);
+    }
 
     public static <T> Set<T> concat(Set<T> set, Set<T>... sets) { return (Set) concat0(set, sets); }
 

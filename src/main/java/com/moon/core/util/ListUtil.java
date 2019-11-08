@@ -4,6 +4,7 @@ import com.moon.core.enums.Collects;
 import com.moon.core.lang.ThrowUtil;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author benshaoye
@@ -64,6 +65,11 @@ public final class ListUtil extends CollectUtil {
         return iterable == null ? ofLinkedList()
             : (iterable instanceof Collection ? new LinkedList((Collection) iterable)
             : addAll(ofLinkedList(), iterable));
+    }
+
+    public static <S,T> List<T> mapAsList(Collection<S> src, Function<? super S, T> mapper){
+        Collection<T> collect = map(src, mapper);
+        return collect instanceof List ? (List<T>) collect : ofArrayList(collect);
     }
 
     /*
