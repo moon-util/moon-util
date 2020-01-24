@@ -1,25 +1,16 @@
 package com.moon.core.util;
 
-import com.alibaba.fastjson.JSON;
 import com.moon.core.util.validator.IDCard18Validator;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author benshaoye
  */
 class IDCard18ValidatorTestTest {
+
     String value;
 
     @Test
@@ -44,6 +35,7 @@ class IDCard18ValidatorTestTest {
     }
 
     public static class Company {
+
         String username;
         String password;
         String companyName;
@@ -81,31 +73,31 @@ class IDCard18ValidatorTestTest {
             this.companyName = companyName;
         }
     }
-
-    @Test
-    void testWorkbook() {
-        final String mark = "登录密码";
-        String path = "";
-        Workbook workbook;
-        try {
-            File file = new File(path);
-            workbook = new XSSFWorkbook(file);
-        } catch (Exception e) {
-            System.out.println(e);
-            return;
-        }
-        Sheet sheet = workbook.getSheetAt(0);
-        Iterator<Row> iterator = sheet.iterator();
-        List<Company> companies = new ArrayList<>();
-        IteratorUtil.forEach(iterator, row -> {
-            Cell usernameCell = row.getCell(1);
-            Cell companyNameCell = row.getCell(2);
-            String username = usernameCell.getStringCellValue();
-            username = username.contains(mark) ? username.substring(0, username.indexOf(mark)) : username;
-            String password = username.contains(mark) ? username.substring(username.indexOf(mark) + 4) : "sbgs001";
-            companies.add(new Company(username, password, companyNameCell.getStringCellValue()));
-        });
-        String json = JSON.toJSONString(companies);
-        System.out.println(json);
-    }
+    //
+    // @Test
+    // void testWorkbook() {
+    //     final String mark = "登录密码";
+    //     String path = "";
+    //     Workbook workbook;
+    //     try {
+    //         File file = new File(path);
+    //         workbook = new XSSFWorkbook(file);
+    //     } catch (Exception e) {
+    //         System.out.println(e);
+    //         return;
+    //     }
+    //     Sheet sheet = workbook.getSheetAt(0);
+    //     Iterator<Row> iterator = sheet.iterator();
+    //     List<Company> companies = new ArrayList<>();
+    //     IteratorUtil.forEach(iterator, row -> {
+    //         Cell usernameCell = row.getCell(1);
+    //         Cell companyNameCell = row.getCell(2);
+    //         String username = usernameCell.getStringCellValue();
+    //         username = username.contains(mark) ? username.substring(0, username.indexOf(mark)) : username;
+    //         String password = username.contains(mark) ? username.substring(username.indexOf(mark) + 4) : "sbgs001";
+    //         companies.add(new Company(username, password, companyNameCell.getStringCellValue()));
+    //     });
+    //     // String json = JSON.toJSONString(companies);
+    //     System.out.println(json);
+    // }
 }

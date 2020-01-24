@@ -3,9 +3,6 @@ package com.moon.core.lang.reflect;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.interfaces.ValueSupplier;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationHandler;
@@ -15,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.System.out;
-import static java.lang.System.setOut;
 
 /**
  * @author benshaoye
@@ -109,35 +105,35 @@ class ProxyUtilTestTest {
         return getter;
     }
 
-    public static class StudentMethodInterceptor implements MethodInterceptor {
+    // public static class StudentMethodInterceptor implements MethodInterceptor {
+    //
+    //     private final Student student;
+    //
+    //     public StudentMethodInterceptor() {this.student = new Student();}
+    //
+    //     @Override
+    //     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+    //         //            System.out.println("-----------------------------------  before");
+    //         Object invoked = proxy.invoke(student, args);
+    //         //            System.out.println("-----------------------------------  after");
+    //         return invoked;
+    //     }
+    // }
+    //
+    // Getter getByCglib() {
+    //     Enhancer enhancer = new Enhancer();
+    //     enhancer.setSuperclass(Student.class);
+    //     enhancer.setCallback(new StudentMethodInterceptor());
+    //     Student student = (Student) enhancer.create();
+    //     return student;
+    // }
 
-        private final Student student;
-
-        public StudentMethodInterceptor() {this.student = new Student();}
-
-        @Override
-        public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-            //            System.out.println("-----------------------------------  before");
-            Object invoked = proxy.invoke(student, args);
-            //            System.out.println("-----------------------------------  after");
-            return invoked;
-        }
-    }
-
-    Getter getByCglib() {
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(Student.class);
-        enhancer.setCallback(new StudentMethodInterceptor());
-        Student student = (Student) enhancer.create();
-        return student;
-    }
-
-    @Test
-    void testFirstMethod() {
-        Getter getter = getByCglib();
-        Object res = getter.get();
-        System.out.println("===================================  " + res);
-    }
+    // @Test
+    // void testFirstMethod() {
+    //     Getter getter = getByCglib();
+    //     Object res = getter.get();
+    //     System.out.println("===================================  " + res);
+    // }
 
     @Test
     void testTimeZone() {
@@ -182,11 +178,11 @@ class ProxyUtilTestTest {
 
     @Test
     void testProxy() {
-        Getter getter1 = getByCglib();
+        Getter getter1 = getByJdkProxy();
         Getter getter2 = getByJdkProxy();
         Getter getter3 = new Student();
 
-        getter1.get();
+        // getter1.get();
         getter2.get();
 
         final int count = 100000000;
