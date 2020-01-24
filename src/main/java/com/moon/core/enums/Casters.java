@@ -400,7 +400,8 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
             if (o instanceof Class) {
                 return (T) o;
             } else if (o instanceof CharSequence) {
-                return (T) ClassUtil.forName(o.toString());
+                Class type = ClassUtil.forNameOrNull(o.toString());
+                return (T) (type == null ? o.getClass() : type);
             } else if (o == null) {
                 return doThrow(String.valueOf(null));
             } else {
