@@ -125,27 +125,21 @@ public final class FieldDescriptor {
         return descriptor;
     }
 
-    public Class getDeclaringClass() {
-        return declaringClass;
-    }
+    public Class getDeclaringClass() { return declaringClass; }
 
     /**
      * 属性是否有对应 getter 方法
      *
      * @return true or false
      */
-    public boolean isGetterMethodPresent() {
-        return getterMethod != null;
-    }
+    public boolean isGetterMethodPresent() { return getterMethod != null; }
 
     /**
      * 属性是否有对应 setter 方法
      *
      * @return true or false
      */
-    public boolean isSetterMethodPresent() {
-        return setterMethod != null;
-    }
+    public boolean isSetterMethodPresent() { return setterMethod != null; }
 
     /**
      * 属性是否有对应字段
@@ -163,48 +157,35 @@ public final class FieldDescriptor {
         return true;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     /**
      * 返回属性描述信息
      *
      * @return 返回属性描述信息
      */
-    public PropertyDescriptor getProperty() {
-        return property;
-    }
+    public PropertyDescriptor getProperty() { return property; }
 
     /**
      * 返回字段，如果有的话，否则返回 null
      *
      * @return 返回字段，如果存在的话，否则返回 null
      */
-    public Field getField() {
-        if (isFieldPresent()) {
-            return field;
-        }
-        return null;
-    }
+    public Field getField() { return isFieldPresent() ? field : null; }
 
     /**
      * 返回标准 setter 方法
      *
      * @return
      */
-    public Method getSetterMethod() {
-        return setterMethod;
-    }
+    public Method getSetterMethod() { return setterMethod; }
 
     /**
      * 返回标准 getter 方法
      *
      * @return
      */
-    public Method getGetterMethod() {
-        return getterMethod;
-    }
+    public Method getGetterMethod() { return getterMethod; }
 
     /**
      * 获取 setter 执行器
