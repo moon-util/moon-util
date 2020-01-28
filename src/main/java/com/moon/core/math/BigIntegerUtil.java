@@ -10,7 +10,6 @@ import static com.moon.core.lang.NumberComparator.*;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class BigIntegerUtil {
     private BigIntegerUtil() {

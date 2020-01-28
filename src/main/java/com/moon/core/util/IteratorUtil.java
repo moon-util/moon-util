@@ -39,7 +39,6 @@ import static com.moon.core.util.iterator.EmtpyIterator.EMPTY;
  * 此时{@link Iterator#remove()}方法根据具体集合实现。
  *
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class IteratorUtil {
 

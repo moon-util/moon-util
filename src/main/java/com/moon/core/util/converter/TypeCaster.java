@@ -15,7 +15,6 @@ import java.util.function.BiFunction;
  * type converter
  *
  * @author benshaoye
- * @date 2018/9/11
  */
 @FunctionalInterface
 public interface TypeCaster {

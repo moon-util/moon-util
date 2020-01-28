@@ -10,7 +10,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author benshaoye
- * @date 2018/9/12
  */
 public final class ArrayUtil {
 

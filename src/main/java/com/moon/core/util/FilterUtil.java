@@ -14,7 +14,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author benshaoye
- * @date 2018/9/15
  */
 public final class FilterUtil {
 

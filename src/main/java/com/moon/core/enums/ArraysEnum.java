@@ -12,7 +12,6 @@ import static com.moon.core.util.IteratorUtil.of;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public enum ArraysEnum implements ArrayOperator {
     OBJECTS(new Object[0]) {

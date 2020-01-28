@@ -5,7 +5,6 @@ import java.util.Map;
 
 /**
  * @author benshaoye
- * @date 2018/9/14
  */
 public enum JSONBoolean implements JSON<Object>,
     Comparable<JSONBoolean> {

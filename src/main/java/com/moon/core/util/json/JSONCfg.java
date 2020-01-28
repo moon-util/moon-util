@@ -4,7 +4,6 @@ import com.moon.core.lang.ref.WeakAccessor;
 
 /**
  * @author benshaoye
- * @date 2018/9/14
  */
 class JSONCfg {
     final static WeakAccessor<JSONStringer> WEAK = WeakAccessor.of(JSONStringer::new);

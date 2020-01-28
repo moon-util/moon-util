@@ -37,7 +37,6 @@ import static com.moon.core.util.OptionalUtil.resolveOrNull;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public class GenericTypeCaster implements TypeCaster {
 

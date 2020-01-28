@@ -2,7 +2,6 @@ package com.moon.core.enums;
 
 /**
  * @author 28678
- * @date 2018/9/11
  */
 public interface Chars {
     /**

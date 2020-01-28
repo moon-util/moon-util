@@ -47,9 +47,9 @@ abstract class BaseValidator<T, IMPL extends BaseValidator> extends Value<T>
     /**
      * 添加一条错误信息，如果设置了立即结束将抛出异常
      *
-     * @param message
+     * @param message 消息内容
      *
-     * @return
+     * @return this
      */
     final IMPL createMsg(String message) {
         if (immediate) {

@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author benshaoye
- * @date 2018/9/16
  */
 public class BooleanAccessorTest {
 

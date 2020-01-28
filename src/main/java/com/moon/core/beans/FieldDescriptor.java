@@ -3,8 +3,8 @@ package com.moon.core.beans;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.FieldUtil;
-import com.moon.core.util.converter.TypeCaster;
 import com.moon.core.util.TypeUtil;
+import com.moon.core.util.converter.TypeCaster;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
@@ -21,7 +21,6 @@ import java.util.function.Consumer;
  * 不包括父类的私有字段
  *
  * @author ZhangDongMin
- * @date 2018/9/11
  * @see PropertyDescriptor
  */
 public final class FieldDescriptor {
@@ -105,6 +104,7 @@ public final class FieldDescriptor {
      * @param belongClass 这个字段属于哪个类
      * @param name        字段名
      * @param property    属性描述器
+     *
      * @return 返回一个字段描述器
      */
     static FieldDescriptor of(Class belongClass, String name, PropertyDescriptor property) {
@@ -117,6 +117,7 @@ public final class FieldDescriptor {
      * @param belongClass 这个字段属于哪个类
      * @param name        字段名
      * @param field       字段
+     *
      * @return 返回一个字段描述器
      */
     static FieldDescriptor of(Class belongClass, String name, Field field) {
@@ -176,47 +177,49 @@ public final class FieldDescriptor {
     /**
      * 返回标准 setter 方法
      *
-     * @return
+     * @return setter 方法
      */
     public Method getSetterMethod() { return setterMethod; }
 
     /**
      * 返回标准 getter 方法
      *
-     * @return
+     * @return getter 方法
      */
     public Method getGetterMethod() { return getterMethod; }
 
     /**
      * 获取 setter 执行器
      *
-     * @return
+     * @return setter 执行器
      */
     public FieldExecutor getSetterExecutor() {
         if (isSetterPresent()) {
             return setterExecutor;
         }
-        String msg = exMsg("No setter defaultExecutor of ", name, " in class ", String.valueOf(declaringClass), " for you!");
+        String msg = exMsg("No setter defaultExecutor of ", name, " in class ", String.valueOf(declaringClass),
+            " for you!");
         return ThrowUtil.doThrow(msg);
     }
 
     /**
      * 获取 getter 执行器
      *
-     * @return
+     * @return getter 执行器
      */
     public FieldExecutor getGetterExecutor() {
         if (isGetterPresent()) {
             return getterExecutor;
         }
-        String msg = exMsg("No getter defaultExecutor of ", name, " in class ", String.valueOf(declaringClass), " for you!");
+        String msg = exMsg("No getter defaultExecutor of ", name, " in class ", String.valueOf(declaringClass),
+            " for you!");
         return ThrowUtil.doThrow(msg);
     }
 
     /**
      * is present setter defaultExecutor
      *
-     * @return
+     * @return is present setter defaultExecutor
      */
     public boolean isSetterPresent() {
         if (isSetterPresent == null) {
@@ -232,7 +235,7 @@ public final class FieldDescriptor {
     /**
      * is present getter defaultExecutor
      *
-     * @return
+     * @return is present getter defaultExecutor
      */
     public boolean isGetterPresent() {
         if (isGetterPresent == null) {
@@ -248,8 +251,9 @@ public final class FieldDescriptor {
     /**
      * apply consumer when setter defaultExecutor is present
      *
-     * @param c
-     * @return
+     * @param c consumer
+     *
+     * @return 返回当前执行器
      */
     public FieldDescriptor ifSetterPresent(Consumer<FieldDescriptor> c) {
         if (isSetterPresent()) {
@@ -261,8 +265,9 @@ public final class FieldDescriptor {
     /**
      * apply consumer when setter method is present
      *
-     * @param c
-     * @return
+     * @param c consumer
+     *
+     * @return 返回当前执行器
      */
     public FieldDescriptor ifSetterMethodPresent(Consumer<FieldDescriptor> c) {
         if (isSetterMethodPresent()) {
@@ -274,8 +279,9 @@ public final class FieldDescriptor {
     /**
      * apply consumer when getter defaultExecutor is present
      *
-     * @param c
-     * @return
+     * @param c consumer
+     *
+     * @return 返回当前执行器
      */
     public FieldDescriptor ifGetterPresent(Consumer<FieldDescriptor> c) {
         if (isGetterMethodPresent()) {
@@ -287,8 +293,9 @@ public final class FieldDescriptor {
     /**
      * apply consumer when setter method is present
      *
-     * @param c
-     * @return
+     * @param c consumer
+     *
+     * @return 返回当前执行器
      */
     public FieldDescriptor ifGetterMethodPresent(Consumer<FieldDescriptor> c) {
         if (getGetterMethod() != null) {
@@ -300,7 +307,7 @@ public final class FieldDescriptor {
     /**
      * 返回属性类型
      *
-     * @return
+     * @return 字段类型
      */
     public Class getPropertyType() {
         if (propertyType == null) {
@@ -329,9 +336,10 @@ public final class FieldDescriptor {
     /**
      * 如果存在可执行的 setter 方法，则执行，否则不执行并返回源对象 obj
      *
-     * @param obj
-     * @param value
-     * @return
+     * @param obj   将要设置值的对象
+     * @param value 值
+     *
+     * @return 被设置值的对象
      */
     public Object setValueIfPresent(Object obj, Object value) {
         return setValueIfPresent(obj, value, FALSE);
@@ -340,10 +348,11 @@ public final class FieldDescriptor {
     /**
      * 如果存在可执行的 setter 方法，则执行，否则不执行并返回源对象 obj
      *
-     * @param obj
-     * @param value
-     * @param accessible
-     * @return
+     * @param obj        将要设置值的对象
+     * @param value      值
+     * @param accessible 可见性
+     *
+     * @return 被设置值的对象
      */
     public Object setValueIfPresent(Object obj, Object value, boolean accessible) {
         if (isSetterPresent()) {
@@ -355,9 +364,10 @@ public final class FieldDescriptor {
     /**
      * 给执行对象的属性设置值
      *
-     * @param obj
-     * @param value
-     * @return
+     * @param obj   将要设置值的对象
+     * @param value 值
+     *
+     * @return 被设置值的对象
      */
     public Object setValue(Object obj, Object value) {
         return setValue(obj, value, FALSE);
@@ -366,10 +376,11 @@ public final class FieldDescriptor {
     /**
      * 给执行对象的属性设置值
      *
-     * @param obj
-     * @param value
-     * @param accessible
-     * @return
+     * @param obj        将要设置值的对象
+     * @param value      值
+     * @param accessible 可见性
+     *
+     * @return 被设置值的对象
      */
     public Object setValue(Object obj, Object value, boolean accessible) {
         return setValue(obj, value, accessible, TypeUtil.cast());
@@ -378,11 +389,12 @@ public final class FieldDescriptor {
     /**
      * 给执行对象的属性设置值
      *
-     * @param obj
-     * @param value
-     * @param accessible
-     * @param converter
-     * @return
+     * @param obj        将要设置值的对象
+     * @param value      值
+     * @param accessible 可见性
+     * @param converter  设置前将值转换成字段相容的数据类型
+     *
+     * @return 被设置值的对象
      */
     public Object setValue(Object obj, Object value, boolean accessible, TypeCaster converter) {
         try {
@@ -399,8 +411,9 @@ public final class FieldDescriptor {
     /**
      * 如果存在可执行的读取属性的方法，则读取属性值，否则返回 null
      *
-     * @param obj
-     * @return
+     * @param obj 将要获取值的对象
+     *
+     * @return 获取的值
      */
     public Object getValueIfPresent(Object obj) {
         return getValueIfPresent(obj, FALSE);
@@ -409,9 +422,10 @@ public final class FieldDescriptor {
     /**
      * 如果存在可执行的读取属性的方法，则读取属性值，否则返回 null
      *
-     * @param obj
-     * @param accessible
-     * @return
+     * @param obj        将要获取值的对象
+     * @param accessible 可见性
+     *
+     * @return 获取的值
      */
     public Object getValueIfPresent(Object obj, boolean accessible) {
         if (isGetterPresent()) {
@@ -494,21 +508,18 @@ public final class FieldDescriptor {
     // ==================================================================
 
     /**
-     * getSheet a getOrLoad defaultExecutor with field
-     *
-     * @return
+     * get a getOrLoad defaultExecutor with field
      */
     private boolean createReaderExecutor() {
         if (getterMethod == null) {
             if (isFieldPresent()) {
-                this.getterExecutor = createExecutorWithField(field, (source, value) ->
-                    field.get(source));
+                this.getterExecutor = createExecutorWithField(field, (source, value) -> field.get(source));
             } else {
                 return false;
             }
         } else {
-            this.getterExecutor = createExecutorWithMethod(getterMethod, (source, value) ->
-                getterMethod.invoke(source));
+            this.getterExecutor = createExecutorWithMethod(getterMethod,
+                (source, value) -> getterMethod.invoke(source));
         }
         return true;
     }
@@ -524,30 +535,31 @@ public final class FieldDescriptor {
                 return false;
             }
         } else {
-            this.setterExecutor = createExecutorWithMethod(setterMethod, (source, value) ->
-                setterMethod.invoke(source, value));
+            this.setterExecutor = createExecutorWithMethod(setterMethod,
+                (source, value) -> setterMethod.invoke(source, value));
         }
         return true;
     }
 
     private FieldExecutor createExecutorWithMethod(
-        final Method method, final FieldHandler handler) {
+        final Method method, final FieldHandler handler
+    ) {
         final boolean isNotPublic = !isPublic(method);
-        return (source, value, accessAble) ->
-            accessorAndExecute(source, value, isNotPublic, accessAble, handler, method);
+        return (source, value, accessAble) -> accessorAndExecute(source, value, isNotPublic, accessAble, handler,
+            method);
     }
 
     private FieldExecutor createExecutorWithField(
-        final Field field, final FieldHandler handler) {
+        final Field field, final FieldHandler handler
+    ) {
         final boolean isNotPublic = !isPublic(field);
-        return (source, value, accessAble) ->
-            accessorAndExecute(source, value, isNotPublic, accessAble, handler, field);
+        return (source, value, accessAble) -> accessorAndExecute(source, value, isNotPublic, accessAble, handler,
+            field);
     }
 
     private Object accessorAndExecute(
-        Object source, Object value, boolean isNotPublic,
-        boolean accessAble, FieldHandler handler, AccessibleObject ao)
-        throws Exception {
+        Object source, Object value, boolean isNotPublic, boolean accessAble, FieldHandler handler, AccessibleObject ao
+    ) throws Exception {
         Object result;
         if (accessAble) {
             if (isNotPublic) {

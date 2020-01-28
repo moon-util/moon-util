@@ -6,7 +6,6 @@ import static java.lang.System.out;
 
 /**
  * @author benshaoye
- * @date 2018/9/12
  */
 class OSUtilTestTest {
 

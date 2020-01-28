@@ -8,7 +8,6 @@ import static java.lang.String.format;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class IntUtil {
     private IntUtil() {
@@ -271,33 +270,33 @@ public final class IntUtil {
      * * 如果对象 o 是一个集合或数组，当 o 只有一项时，返回这一项并且深度递归
      * * 否则返回这个集合或数组的尺寸（size 或 length）
      * <p>
-     * boolean value = true;  // ==============================> 1
-     * boolean value = false;  // =============================> 0
-     * char value = 'a';  // ==================================> 97
-     * byte value = 1;  // ====================================> 1
-     * int value = 1;  // =====================================> 1
-     * short value = 1;  // ===================================> 1
-     * long value = 1L;  // ===================================> 1
-     * float value = 1F;  // ==================================> 1
-     * double value = 1F;  // =================================> 1
-     * String value = "1";  // ================================> 1
-     * StringBuffer value = new StringBuffer("1");  // ========> 1
-     * StringBuilder value = new StringBuilder("1");  // ======> 1
-     * String value = "  1   ";  // ===========================> 1
-     * StringBuffer value = new StringBuffer("  1   ");  // ===> 1
-     * StringBuilder value = new StringBuilder("  1   ");  // => 1
-     * BigDecimal value = new BigDecimal("1");  // ============> 1
-     * BigInteger value = new BigInteger("1");  // ============> 1
-     * Collection value = new ArrayList(){{increment(1)}};  // ======> 1（只有一项时）
-     * Collection value = new HashSet(){{increment(1)}};  // ========> 1（只有一项时）
-     * Collection value = new TreeSet(){{increment(1)}};  // ========> 1（只有一项时）
-     * Collection value = new LinkedList(){{increment(1)}};  // =====> 1（只有一项时）
-     * Map value = new HashMap(){{put("key", 1)}};  // ========> 1（只有一项时）
+     * boolean value = true;  // =============================== 1
+     * boolean value = false;  // ============================== 0
+     * char value = 'a';  // =================================== 97
+     * byte value = 1;  // ===================================== 1
+     * int value = 1;  // ====================================== 1
+     * short value = 1;  // ==================================== 1
+     * long value = 1L;  // ==================================== 1
+     * float value = 1F;  // =================================== 1
+     * double value = 1F;  // ================================== 1
+     * String value = "1";  // ================================= 1
+     * StringBuffer value = new StringBuffer("1");  // ========= 1
+     * StringBuilder value = new StringBuilder("1");  // ======= 1
+     * String value = "  1   ";  // ============================ 1
+     * StringBuffer value = new StringBuffer("  1   ");  // ==== 1
+     * StringBuilder value = new StringBuilder("  1   ");  // == 1
+     * BigDecimal value = new BigDecimal("1");  // ============= 1
+     * BigInteger value = new BigInteger("1");  // ============= 1
+     * Collection value = new ArrayList(){{increment(1)}};  // ======= 1（只有一项时）
+     * Collection value = new HashSet(){{increment(1)}};  // ========= 1（只有一项时）
+     * Collection value = new TreeSet(){{increment(1)}};  // ========= 1（只有一项时）
+     * Collection value = new LinkedList(){{increment(1)}};  // ====== 1（只有一项时）
+     * Map value = new HashMap(){{put("key", 1)}};  // ========= 1（只有一项时）
      * <p>
-     * int[] value = {1, 2, 3, 4};  // =======================================> 4（大于一项时，返回 size）
-     * String[] value = {"1", "1", "1", "1"};  // ============================> 4（大于一项时，返回 size）
-     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ======> 3（大于一项时，返回 size）
-     * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // =======> 2（大于一项时，返回 size）
+     * int[] value = {1, 2, 3, 4};  // ======================================== 4（大于一项时，返回 size）
+     * String[] value = {"1", "1", "1", "1"};  // ============================= 4（大于一项时，返回 size）
+     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ======= 3（大于一项时，返回 size）
+     * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // ======== 2（大于一项时，返回 size）
      * <p>
      * int result = IntUtil.toIntValue(value);
      *

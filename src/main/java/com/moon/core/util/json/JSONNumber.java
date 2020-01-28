@@ -6,7 +6,6 @@ import java.util.Objects;
 
 /**
  * @author benshaoye
- * @date 2018/9/14
  */
 public final class JSONNumber extends Number
     implements JSON<Object>, Comparable<JSONNumber> {

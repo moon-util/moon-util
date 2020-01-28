@@ -12,7 +12,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author ZhangDongMin
- * @date 2018/3/7 11:38
  */
 public final class PropertyUtil {
 

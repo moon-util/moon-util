@@ -5,7 +5,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class CharacterUtil {
     private CharacterUtil() {

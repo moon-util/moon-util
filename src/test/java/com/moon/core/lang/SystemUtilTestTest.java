@@ -6,7 +6,6 @@ import java.io.IOException;
 
 /**
  * @author benshaoye
- * @date 2018/9/12
  */
 class SystemUtilTestTest {
 

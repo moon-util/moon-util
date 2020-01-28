@@ -44,7 +44,6 @@ import static java.util.Optional.ofNullable;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>, TypeConverter {
 

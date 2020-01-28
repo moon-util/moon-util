@@ -6,7 +6,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class FloatUtil {
     private FloatUtil() {
@@ -60,20 +59,20 @@ public final class FloatUtil {
      * * 如果对象 o 是一个集合或数组，当 o 只有一项时，返回这一项并且深度递归
      * * 否则返回这个集合或数组的尺寸（size 或 length）
      * <p>
-     * Object value = null;  // ===============================> null
-     * boolean value = true;  // ==============================> 1
-     * boolean value = false;  // =============================> 0
-     * char value = 'a';  // ==================================> 97
-     * byte value = 1;  // ====================================> 1
-     * int value = 1;  // =====================================> 1
-     * short value = 1;  // ===================================> 1
-     * long value = 1L;  // ===================================> 1
-     * float value = 1F;  // ==================================> 1
-     * double value = 1F;  // =================================> 1
-     * String value = "1";  // ================================> 1
-     * StringBuffer value = new StringBuffer("1");  // ========> 1
-     * StringBuilder value = new StringBuilder("1");  // ======> 1
-     * String value = "  1   ";  // ===========================> 1
+     * Object value = null;  // ================================ null
+     * boolean value = true;  // =============================== 1
+     * boolean value = false;  // ============================== 0
+     * char value = 'a';  // =================================== 97
+     * byte value = 1;  // ===================================== 1
+     * int value = 1;  // ====================================== 1
+     * short value = 1;  // ==================================== 1
+     * long value = 1L;  // ==================================== 1
+     * float value = 1F;  // =================================== 1
+     * double value = 1F;  // ================================== 1
+     * String value = "1";  // ================================= 1
+     * StringBuffer value = new StringBuffer("1");  // ========= 1
+     * StringBuilder value = new StringBuilder("1");  // ======= 1
+     * String value = "  1   ";  // ============================ 1
      * StringBuffer value = new StringBuffer("  1   ");  // ===> 1
      * StringBuilder value = new StringBuilder("  1   ");  // => 1
      * BigDecimal value = new BigDecimal("1");  // ============> 1

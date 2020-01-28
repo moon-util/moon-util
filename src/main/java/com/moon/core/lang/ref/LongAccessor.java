@@ -6,7 +6,6 @@ import java.util.function.ToLongFunction;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public class LongAccessor {
 

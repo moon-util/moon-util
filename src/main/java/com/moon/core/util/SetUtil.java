@@ -7,7 +7,6 @@ import java.util.function.Function;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class SetUtil extends CollectUtil {
 

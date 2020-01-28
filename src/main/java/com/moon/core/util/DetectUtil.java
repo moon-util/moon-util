@@ -4,7 +4,6 @@ import com.moon.core.lang.ThrowUtil;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class DetectUtil {
     private DetectUtil() { ThrowUtil.noInstanceError(); }

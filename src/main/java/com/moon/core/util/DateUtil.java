@@ -12,7 +12,6 @@ import static java.util.Calendar.*;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class DateUtil extends CalendarUtil {
 

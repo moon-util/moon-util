@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public interface Traveller<T> extends Supplier<List<T>>, List<T> {
 

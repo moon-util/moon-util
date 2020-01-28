@@ -9,7 +9,6 @@ import java.util.function.Supplier;
  * 系统工具
  *
  * @author benshaoye
- * @date 2018/9/12
  */
 public final class OSUtil {
 

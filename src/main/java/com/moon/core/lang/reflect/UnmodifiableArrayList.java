@@ -8,7 +8,6 @@ import java.util.function.UnaryOperator;
 
 /**
  * @author ZhangDongMin
- * @date 2018/9/11
  */
 class UnmodifiableArrayList<T> extends ArrayList<T>
     implements List<T>, RandomAccess, Cloneable,

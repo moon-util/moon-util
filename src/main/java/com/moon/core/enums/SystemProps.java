@@ -2,7 +2,6 @@ package com.moon.core.enums;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public enum SystemProps implements PropsSupplier {
 

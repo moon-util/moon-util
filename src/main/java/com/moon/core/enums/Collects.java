@@ -17,7 +17,6 @@ import static com.moon.core.util.FilterUtil.nullableFirst;
  * 注意：{@link #ArrayBlockingQueue}.getSheet() 方法会直接抛出异常
  *
  * @author benshaoye
- * @date 2018/9/11
  */
 public enum Collects
     implements Supplier<Collection>, IntFunction<Collection>, Function<Collection, Collection>, EnumDescriptor {
@@ -248,7 +247,7 @@ public enum Collects
      * HashMap 的键 - 所有键对应的值都指向同一个对象 {@link HashSet#PRESENT} - {@link HashMap#put(Object, Object)} - {@link
      * HashSet#add(Object)}
      * <p>
-     * - 实际上 HashSet 自身也能实现一个有序的集合{@link HashSet#(int, float, boolean)} > 这个构造器中的第三个参数 dummy，并没有任何实际作用， &nbsp;
+     * - 实际上 HashSet 自身也能实现一个有序的集合{@link HashSet#(int, float, boolean)} 这个构造器中的第三个参数 dummy，并没有任何实际作用， &nbsp;
      * 只是用来标记通过此构造方法得到的是一个用{@link LinkedHashMap}维护数据而不是{@link HashMap} &nbsp;  但这个构造器是用 default 修饰的，无法被外界调用， &nbsp;
      * 详见：{@link LinkedHashSet}、{@link #LinkedHashSet}、{@link Maps#LinkedHashMap}
      * <p>

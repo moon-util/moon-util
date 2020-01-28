@@ -6,7 +6,6 @@ import java.util.Collection;
 
 /**
  * @author benshaoye
- * @date 2018/9/12
  */
 class BaseCollectUtil {
 

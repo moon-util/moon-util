@@ -13,7 +13,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author ZhangDongMin
- * @date 2018/9/11
  */
 final class ReflectionSupport {
 
@@ -109,7 +108,7 @@ final class ReflectionSupport {
 
     /**
      * 返回匹配级别，
-     * 完全相同 ==> 强匹配
+     * 完全相同 == 强匹配
      * type1 是基本类型， type2 是相应包装类似
      *
      * @param type1

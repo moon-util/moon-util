@@ -4,7 +4,6 @@ import com.moon.core.lang.StringUtil;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public interface Strings {
     /**

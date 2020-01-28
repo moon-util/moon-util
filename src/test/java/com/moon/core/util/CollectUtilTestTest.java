@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author benshaoye
- * @date 2018/9/12
  */
 class CollectUtilTestTest {
 

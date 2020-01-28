@@ -127,15 +127,15 @@ public final class StringUtil {
     /**
      * string is null、""(EMPTY string)
      * <p>
-     * StringUtil.isEmpty(null)         ==> true
-     * StringUtil.isEmpty("")           ==> true
+     * StringUtil.isEmpty(null)         === true
+     * StringUtil.isEmpty("")           === true
      * <p>
-     * StringUtil.isEmpty("null")       ==> false
-     * StringUtil.isEmpty("undefined")  ==> false
-     * StringUtil.isEmpty(" ")          ==> false
-     * StringUtil.isEmpty("a")          ==> false
-     * StringUtil.isEmpty("abc")        ==> false
-     * StringUtil.isEmpty(" a b c ")    ==> false
+     * StringUtil.isEmpty("null")       === false
+     * StringUtil.isEmpty("undefined")  === false
+     * StringUtil.isEmpty(" ")          === false
+     * StringUtil.isEmpty("a")          === false
+     * StringUtil.isEmpty("abc")        === false
+     * StringUtil.isEmpty(" a b c ")    === false
      *
      * @param string
      * @return
@@ -152,15 +152,15 @@ public final class StringUtil {
     /**
      * string is null、""(EMPTY string) or " "(all char is whitespace)
      * <p>
-     * StringUtil.isBlank(null)         ==> true
-     * StringUtil.isBlank("")           ==> true
-     * StringUtil.isBlank(" ")          ==> true
+     * StringUtil.isBlank(null)         === true
+     * StringUtil.isBlank("")           === true
+     * StringUtil.isBlank(" ")          === true
      * <p>
-     * StringUtil.isBlank("null")       ==> false
-     * StringUtil.isBlank("undefined")  ==> false
-     * StringUtil.isBlank("a")          ==> false
-     * StringUtil.isBlank("abc")        ==> false
-     * StringUtil.isBlank(" a b c ")    ==> false
+     * StringUtil.isBlank("null")       === false
+     * StringUtil.isBlank("undefined")  === false
+     * StringUtil.isBlank("a")          === false
+     * StringUtil.isBlank("abc")        === false
+     * StringUtil.isBlank(" a b c ")    === false
      *
      * @param string
      * @return
@@ -179,15 +179,15 @@ public final class StringUtil {
     /**
      * cs is null or "null"
      * <p>
-     * StringUtil.isNullString(null)         ==> true
-     * StringUtil.isNullString("null")       ==> true
+     * StringUtil.isNullString(null)         === true
+     * StringUtil.isNullString("null")       === true
      * <p>
-     * StringUtil.isNullString("undefined")  ==> false
-     * StringUtil.isNullString("")           ==> false
-     * StringUtil.isNullString(" ")          ==> false
-     * StringUtil.isNullString("a")          ==> false
-     * StringUtil.isNullString("abc")        ==> false
-     * StringUtil.isNullString(" a b c ")    ==> false
+     * StringUtil.isNullString("undefined")  === false
+     * StringUtil.isNullString("")           === false
+     * StringUtil.isNullString(" ")          === false
+     * StringUtil.isNullString("a")          === false
+     * StringUtil.isNullString("abc")        === false
+     * StringUtil.isNullString(" a b c ")    === false
      *
      * @param cs
      * @return

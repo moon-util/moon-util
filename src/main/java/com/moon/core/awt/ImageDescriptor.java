@@ -4,17 +4,18 @@ package com.moon.core.awt;
  * @author benshaoye
  */
 interface ImageDescriptor {
+
     /**
      * 名称
      *
-     * @return
+     * @return 图片类型
      */
     String name();
 
     /**
      * 扩展名
      *
-     * @return
+     * @return 图片类型扩展名
      */
     default String extensionName() {
         return name().replace('_', '.').toLowerCase();
@@ -23,7 +24,7 @@ interface ImageDescriptor {
     /**
      * 文件后缀
      *
-     * @return
+     * @return 图片文件后缀
      */
     default String suffix() {
         return '.' + extensionName();

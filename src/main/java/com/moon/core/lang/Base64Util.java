@@ -6,7 +6,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author benshaoye
- * @date 2018/9/18
  */
 public final class Base64Util {
 

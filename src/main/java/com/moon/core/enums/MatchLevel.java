@@ -2,7 +2,6 @@ package com.moon.core.enums;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public enum MatchLevel {
     /**
@@ -10,7 +9,7 @@ public enum MatchLevel {
      */
     FINAL,
     /**
-     * 软匹配，比如自动类型转换，int ==> long、char ==> int 等；
+     * 软匹配，比如自动类型转换，int to long、char to int 等；
      */
     SOFT,
     /**

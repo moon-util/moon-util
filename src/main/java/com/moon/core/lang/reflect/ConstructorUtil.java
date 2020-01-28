@@ -19,7 +19,6 @@ import static com.moon.core.util.OptionalUtil.computeOrNull;
 
 /**
  * @author ZhangDongMin
- * @date 2018/9/11
  */
 public final class ConstructorUtil {
 

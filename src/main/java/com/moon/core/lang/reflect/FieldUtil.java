@@ -32,7 +32,6 @@ import java.util.function.Predicate;
  * 15、获取指定名称的可访问字段：从本类逐级向上查找字段名称字段，可返回本类的指定名称字段或父类指定名称非私有字段
  *
  * @author ZhangDongMin
- * @date 2018/9/11
  */
 public final class FieldUtil {
 

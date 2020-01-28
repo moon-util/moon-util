@@ -9,7 +9,6 @@ import static com.moon.core.util.TypeUtil.cast;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class MapUtil {
     private MapUtil() {

@@ -9,7 +9,6 @@ import java.net.UnknownHostException;
 
 /**
  * @author benshaoye
- * @date 2018/9/17
  */
 class InternetUtilTestTest {
 

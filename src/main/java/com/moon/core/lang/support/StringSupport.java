@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public class StringSupport {
 

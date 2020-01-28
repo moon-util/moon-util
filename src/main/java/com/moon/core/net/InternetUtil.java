@@ -8,7 +8,6 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
  * @author benshaoye
- * @date 2018/9/17
  */
 public final class InternetUtil {
 

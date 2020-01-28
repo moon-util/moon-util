@@ -26,7 +26,6 @@ import static com.moon.core.util.IteratorUtil.forEachLines;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class IOUtil {
 

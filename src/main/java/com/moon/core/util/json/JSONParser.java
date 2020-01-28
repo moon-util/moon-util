@@ -9,7 +9,6 @@ import static com.moon.core.lang.ThrowUtil.doThrow;
 
 /**
  * @author benshaoye
- * @date 2018/9/14
  */
 final class JSONParser {
 

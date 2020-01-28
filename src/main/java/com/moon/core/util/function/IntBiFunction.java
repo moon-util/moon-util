@@ -2,7 +2,6 @@ package com.moon.core.util.function;
 
 /**
  * @author benshaoye
- * @date 2018/9/12
  */
 @FunctionalInterface
 public interface IntBiFunction<T, R> {

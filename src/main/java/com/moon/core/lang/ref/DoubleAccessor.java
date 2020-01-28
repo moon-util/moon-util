@@ -6,7 +6,6 @@ import java.util.function.ToDoubleFunction;
 
 /**
  * @author benshaoye
- * @date 2018/9/15
  */
 public class DoubleAccessor {
 

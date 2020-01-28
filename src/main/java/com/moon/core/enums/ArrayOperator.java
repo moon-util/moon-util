@@ -30,28 +30,28 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
     /**
      * 获取空数组对象
      *
-     * @param <T>
+     * @param <T> 数组元素泛型类型
      *
-     * @return
+     * @return 空数组
      */
     default <T> T empty() { return null; }
 
     /**
      * 创建一个指定长度数组
      *
-     * @param length
-     * @param <T>
+     * @param length 数组长度
+     * @param <T>    数组元素泛型类型
      *
-     * @return
+     * @return 指定长度数组
      */
     default <T> T create(int length) {return (T) apply(length);}
 
     /**
      * 字符串化对象
      *
-     * @param o
+     * @param o 目标数组
      *
-     * @return
+     * @return 数组字符串
      */
     @Override
     default String stringify(Object o) {return ArrayUtil.stringify(o);}
@@ -70,9 +70,9 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
     /**
      * 获取一个迭代器
      *
-     * @param o
+     * @param o 数组
      *
-     * @return
+     * @return 数组迭代器，不可执行{@link Iterator#remove()}方法
      */
     @Override
     default Iterator iterator(Object o) { return IteratorUtil.ofAny(o); }
@@ -80,73 +80,73 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
     /**
      * 包装类型数组转换为基本数据类型数组
      *
-     * @param arr
-     * @param <T>
+     * @param arr 包装数据类型数组
+     * @param <T> 基本数据类型
      *
-     * @return
+     * @return 基本数据类型数组
      */
     default <T> T toPrimitives(Object arr) { return (T) arr; }
 
     /**
      * 基本数据类型数组转换为包装类型数组
      *
-     * @param arr
-     * @param <T>
+     * @param arr 基本数据类型数组
+     * @param <T> 包装数据类型
      *
-     * @return
+     * @return 包装数据类型数组
      */
     default <T> T toObjects(Object arr) { return (T) arr; }
 
     /**
      * 默认空数组
      *
-     * @param arr
-     * @param <T>
+     * @param arr 数组
+     * @param <T> 泛型类型
      *
-     * @return
+     * @return 空数组或 null
      */
     default <T> T emptyIfNull(Object arr) { return defaultIfNull(arr, empty()); }
 
     /**
      * 指定默认值
      *
-     * @param arr
-     * @param empty
-     * @param <T>
+     * @param arr   数组
+     * @param empty 空数组
+     * @param <T>   泛型类型
      *
-     * @return
+     * @return 返回值
      */
     default <T> T defaultIfNull(Object arr, T empty) { return arr == null ? empty : (T) arr; }
 
     /**
      * 指定默认值
      *
-     * @param arr
-     * @param empty
-     * @param <T>
+     * @param arr   数组
+     * @param empty 空数组
+     * @param <T>   泛型类型
      *
-     * @return
+     * @return 返回值
      */
     default <T> T defaultIfEmpty(Object arr, T empty) { return isEmpty(arr) ? empty : (T) arr; }
 
     /**
      * 或者数组指定索引项
      *
-     * @param arr
-     * @param index
+     * @param arr   数组
+     * @param index 索引
      *
-     * @return
+     * @return 指定索引的值
      */
     default <T> T get(Object arr, int index) { return (T) Array.get(arr, index); }
 
     /**
      * 设置值
      *
-     * @param arr
-     * @param index
-     * @param value
+     * @param arr   数组
+     * @param index 指定索引
+     * @param value 值
      *
-     * @return
+     * @return 数组
      */
     default Object set(Object arr, int index, Object value) {
         Object old = Array.get(arr, index);
@@ -157,17 +157,17 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
     /**
      * 求数组长度
      *
-     * @param arr
+     * @param arr 数组
      *
-     * @return
+     * @return 数组长度
      */
     default int length(Object arr) { return arr == null ? 0 : Array.getLength(arr); }
 
     /**
      * 迭代处理数组每一项
      *
-     * @param arr
-     * @param consumer
+     * @param arr      数组
+     * @param consumer 数组依次执行的函数
      */
     default void forEach(Object arr, IntBiConsumer consumer) {
         for (int i = 0, len = length(arr); i < len; i++) {
@@ -178,10 +178,10 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
     /**
      * 数组是否包含某一项
      *
-     * @param arr
-     * @param item
+     * @param arr  目标数组
+     * @param item 目标项
      *
-     * @return
+     * @return 数组是否包含某一项
      */
     default boolean contains(Object arr, Object item) {
         if (arr == null) {
@@ -209,9 +209,9 @@ public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFu
     /**
      * 数组是否为空
      *
-     * @param arr
+     * @param arr 目标数组
      *
-     * @return
+     * @return 目标数组是否是空数组
      */
     default boolean isEmpty(Object arr) { return length(arr) == 0; }
 }

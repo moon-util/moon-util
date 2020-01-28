@@ -84,6 +84,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <encoding>UTF-8</encoding>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -108,6 +111,7 @@
         <configuration>
           <source>8</source>
           <target>8</target>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
     </plugins>

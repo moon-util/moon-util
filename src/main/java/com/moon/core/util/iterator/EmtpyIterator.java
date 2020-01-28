@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 /**
  * @author ZhangDongMin
- * @date 2018/3/9 16:20
  */
 public enum EmtpyIterator implements Iterator {
 

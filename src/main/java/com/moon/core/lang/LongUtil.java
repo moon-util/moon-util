@@ -12,7 +12,6 @@ import static java.lang.String.format;
 
 /**
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class LongUtil {
     private LongUtil() {

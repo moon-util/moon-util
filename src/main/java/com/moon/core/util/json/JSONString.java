@@ -8,7 +8,6 @@ import static com.moon.core.util.TypeUtil.cast;
 
 /**
  * @author benshaoye
- * @date 2018/9/14
  * @see #hashCode() == {@link String#hashCode()}
  * @see #equals(Object) == {@link String#equals(Object)}
  */

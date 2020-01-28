@@ -12,7 +12,6 @@ import java.util.function.Supplier;
  * 通用类型转换器
  *
  * @author benshaoye
- * @date 2018/9/11
  */
 public final class TypeUtil {
     /**
