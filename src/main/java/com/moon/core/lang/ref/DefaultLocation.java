@@ -34,10 +34,11 @@ public class DefaultLocation<X, Y, Z> implements Location<X, Y, Z> {
     /**
      * 设置一个值
      *
-     * @param x
-     * @param y
-     * @param z
-     * @return
+     * @param x first key
+     * @param y second key
+     * @param z value
+     *
+     * @return this
      */
     @Override
     public DefaultLocation<X, Y, Z> put(X x, Y y, Z z) {
@@ -48,9 +49,10 @@ public class DefaultLocation<X, Y, Z> implements Location<X, Y, Z> {
     /**
      * 放置所有
      *
-     * @param x
-     * @param map
-     * @return
+     * @param x   namespace
+     * @param map values entry
+     *
+     * @return this
      */
     @Override
     public DefaultLocation<X, Y, Z> putAll(X x, Map<? extends Y, ? extends Z> map) {
@@ -61,9 +63,10 @@ public class DefaultLocation<X, Y, Z> implements Location<X, Y, Z> {
     /**
      * 获取一个值
      *
-     * @param x
-     * @param y
-     * @return
+     * @param x namespace
+     * @param y key
+     *
+     * @return value
      */
     @Override
     public Z get(X x, Y y) {
@@ -74,7 +77,7 @@ public class DefaultLocation<X, Y, Z> implements Location<X, Y, Z> {
     /**
      * 清空
      *
-     * @return
+     * @return this
      */
     @Override
     public DefaultLocation<X, Y, Z> clear() {
@@ -85,8 +88,9 @@ public class DefaultLocation<X, Y, Z> implements Location<X, Y, Z> {
     /**
      * 清空
      *
-     * @param x
-     * @return
+     * @param x namespace
+     *
+     * @return this
      */
     @Override
     public DefaultLocation<X, Y, Z> clear(X x) {

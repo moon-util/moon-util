@@ -22,7 +22,7 @@ public final class StackTraceUtil {
     /**
      * 获取调用位置的栈信息
      *
-     * @return
+     * @return 栈信息
      */
     public static StackTraceElement getCallerTrace() {
         return traces(0);
@@ -31,7 +31,7 @@ public final class StackTraceUtil {
     /**
      * 获取调用位置类名
      *
-     * @return
+     * @return 调用位置类名
      */
     public static String getCallerTypeName() {
         return getCallerTrace().getClassName();
@@ -40,7 +40,7 @@ public final class StackTraceUtil {
     /**
      * 获取调用位置方法名
      *
-     * @return
+     * @return 调用位置方法名
      */
     public static String getCallerMethodName() {
         return toMethodString(getCallerTrace());
@@ -49,18 +49,17 @@ public final class StackTraceUtil {
     /**
      * 获取调用位置全名
      *
-     * @return
+     * @return 调用位置全名
      */
     public static String getCallerFullName() {
         StackTraceElement el = getCallerTrace();
-        return new StringBuilder(85).append(el.getClassName())
-            .append('.').append(el.getMethodName()).toString();
+        return new StringBuilder(85).append(el.getClassName()).append('.').append(el.getMethodName()).toString();
     }
 
     /**
      * 获取调用位置上一个调用方法的栈信息
      *
-     * @return
+     * @return 上一个调用位置栈信息
      */
     public static StackTraceElement getPrevCallerTrace() {
         return traces(Mode.PREV);
@@ -69,7 +68,7 @@ public final class StackTraceUtil {
     /**
      * 获取调用位置上一个调用方法的类名
      *
-     * @return
+     * @return 上一个调用方法的类名
      */
     public static String getPrevCallerTypeName() {
         return getPrevCallerTrace().getClassName();
@@ -78,7 +77,7 @@ public final class StackTraceUtil {
     /**
      * 获取调用位置上一个方法的方法名
      *
-     * @return
+     * @return 上一个方法的方法名
      */
     public static String getPrevCallerMethodName() {
         return toMethodString(getPrevCallerTrace());
@@ -87,7 +86,7 @@ public final class StackTraceUtil {
     /**
      * 获取跳过当前调用位置所在类，上一个类相关的栈信息
      *
-     * @return
+     * @return 上一个类相关的栈信息
      */
     public static StackTraceElement getSkipCallerTrace() {
         return traces(Mode.SKIP);
@@ -96,7 +95,7 @@ public final class StackTraceUtil {
     /**
      * 获取上一个类的类名
      *
-     * @return
+     * @return 上一个类的类名
      */
     public static String getSkipCallerTypeName() {
         return getSkipCallerTrace().getClassName();
@@ -105,17 +104,18 @@ public final class StackTraceUtil {
     /**
      * 获取上一个类的调用者方法名
      *
-     * @return
+     * @return 上一个类的调用者方法名
      */
     public static String getSkipCallerMethodName() {
         return toMethodString(getSkipCallerTrace());
     }
 
     /**
-     * 获取动调用位置开始前 skips 步的栈信息
+     * 获取动调用位置开始前 steps 步的栈信息
      *
-     * @param steps
-     * @return
+     * @param steps 跳过的步数
+     *
+     * @return 目标栈信息
      */
     public static StackTraceElement getPrevTraceOfSteps(int steps) {
         return traces(steps);
@@ -135,9 +135,8 @@ public final class StackTraceUtil {
             element = traceElements[i];
             classname = element.getClassName();
             if (isCurrent) {
-                if (mode == Mode.SKIP
-                    && (isAbstract(tempClass = classForName(classname))
-                    || targetClass.isAssignableFrom(tempClass))) {
+                if (mode == Mode.SKIP &&
+                    (isAbstract(tempClass = classForName(classname)) || targetClass.isAssignableFrom(tempClass))) {
                     continue;
                 }
                 return element;
@@ -183,7 +182,9 @@ public final class StackTraceUtil {
     // ============================= tool ================================================================
 
     private enum Mode {
-        CALLER, SKIP, PREV
+        CALLER,
+        SKIP,
+        PREV
     }
 
     private static boolean isNotThisType(Class type) {

@@ -7,14 +7,14 @@ public interface Optionally {
     /**
      * 是否存在
      *
-     * @return
+     * @return 是否存在
      */
     boolean isPresent();
 
     /**
      * 是否缺失
      *
-     * @return
+     * @return 是否不存在
      */
     default boolean isAbsent() { return !isPresent(); }
 }

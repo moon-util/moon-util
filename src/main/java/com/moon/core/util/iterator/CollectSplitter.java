@@ -211,7 +211,7 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      * Returns the next element in the iteration.
      *
      * @return the next element in the iteration
-     * @throws NoSuchElementException if the iteration has no more cells
+     * @see NoSuchElementException if the iteration has no more cells
      */
     @Override
     public T next() { return (T) this.container[index++]; }

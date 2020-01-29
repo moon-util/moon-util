@@ -12,7 +12,7 @@ public interface ThrowingSupplier<T> {
      * 运行并获取值
      *
      * @return
-     * @throws Throwable
+     * @see Throwable
      */
     T get() throws Throwable;
 

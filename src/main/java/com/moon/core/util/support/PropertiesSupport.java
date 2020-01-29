@@ -18,9 +18,7 @@ import static java.lang.String.valueOf;
  * @author benshaoye
  */
 public final class PropertiesSupport {
-    private PropertiesSupport() {
-        ThrowUtil.noInstanceError();
-    }
+    private PropertiesSupport() { ThrowUtil.noInstanceError(); }
 
     private static final Map<String, HashMap<String, String>> CACHE = new ConcurrentHashMap<>();
 

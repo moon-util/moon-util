@@ -92,7 +92,7 @@ public final class FileUtil {
     /**
      * 获取文件的输出流，如果文件不存在，会创建文件以及目录结构，创建失败返回空
      *
-     * @param file
+     * @param file 目标文件
      */
     public static FileOutputStream getOutputStream(File file) {
         return getOutputStream(file, false);
@@ -118,7 +118,7 @@ public final class FileUtil {
     /**
      * 从已知文件获取输入流，如不存在返回空
      *
-     * @param file
+     * @param file 目标文件
      */
     public static FileInputStream getInputStream(File file) {
         return LangUtil.apply(file, FileInputStream::new);
@@ -149,7 +149,7 @@ public final class FileUtil {
     /**
      * 创建文件以其目录结构，返回创建成功与否的状态
      *
-     * @param file
+     * @param file 目标文件
      */
     public static boolean createNewFile(File file) {
         if (!exists(file)) {
@@ -178,7 +178,7 @@ public final class FileUtil {
     /**
      * 文件列表遍历器
      *
-     * @return
+     * @return 文件列表遍历器
      */
     public static FileTraveller traveller() {
         return new FileTraveller();
@@ -187,7 +187,7 @@ public final class FileUtil {
     /**
      * 遍历指定目录的文件列表，如遇不可访问的安全保护会打印相应错误信息，但不会影响程序执行
      *
-     * @param dirPath
+     * @param dirPath 目标文件路径
      */
     public static List<File> traverseDirectory(String dirPath) {
         return traveller().traverse(dirPath);
@@ -305,80 +305,80 @@ public final class FileUtil {
     /**
      * 返回文件大小(单位 Bit)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 返回文件大小(单位 Bit)
      */
     public static long lengthToBit(File file) { return lengthToB(file) << 3; }
 
     /**
      * 返回文件大小(单位 B)
      *
-     * @param filepath
-     * @return
+     * @param filepath 目标文件绝对路径
+     * @return 返回文件大小(单位 B)
      */
     public static long length(String filepath) { return lengthToB(new File(filepath)); }
 
     /**
      * 返回文件大小(单位 B)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 返回文件大小(单位 B)
      */
     public static long lengthToB(File file) { return file.length(); }
 
     /**
      * 返回文件大小(单位 KB)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 返回文件大小(单位 KB)
      */
     public static long lengthToKB(File file) { return lengthToB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 MB)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 文件大小(单位 MB)
      */
     public static long lengthToMB(File file) { return lengthToKB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 GB)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 文件大小(单位 GB)
      */
     public static long lengthToGB(File file) { return lengthToMB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 TB)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 文件大小(单位 TB)
      */
     public static long lengthToTB(File file) { return lengthToGB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 PB)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 文件大小(单位 PB)
      */
     public static long lengthToPB(File file) { return lengthToTB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 EB)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 文件大小(单位 EB)
      */
     public static long lengthToEB(File file) { return lengthToPB(file) >> 10; }
 
     /**
      * 返回文件大小(单位 ZB)
      *
-     * @param file
-     * @return
+     * @param file 目标文件
+     * @return 文件大小(单位 ZB)
      */
     public static long lengthToZB(File file) { return lengthToEB(file) >> 10; }
 
@@ -391,16 +391,16 @@ public final class FileUtil {
     /**
      * 深度删除所有文件
      *
-     * @param dir
-     * @return
+     * @param dir 目标目录
+     * @return 是否还存在目标目录
      */
     public static boolean deleteAllFiles(String dir) { return deleteAllFiles(new File(dir)); }
 
     /**
      * 深度删除所有文件
      *
-     * @param dir
-     * @return
+     * @param dir 目标目录
+     * @return 是否还存在目标目录
      */
     public static boolean deleteAllFiles(File dir) {
         if (dir == null) {
@@ -421,8 +421,8 @@ public final class FileUtil {
     /**
      * 删除文件，返回 file 所指向的文件是否还存在
      *
-     * @param file
-     * @return
+     * @param file 待删除文件
+     * @return 是否还存在目标文件
      */
     public static boolean delete(File file) {
         if (file == null) {

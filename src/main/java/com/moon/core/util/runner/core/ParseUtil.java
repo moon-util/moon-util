@@ -23,7 +23,7 @@ public class ParseUtil {
     protected final static String[] DELIMITERS = {"{{", "}}"};
 
     /**
-     * @throws AssertionError 不可实例化
+     * @see AssertionError 不可实例化
      */
     protected ParseUtil() { noInstanceError(); }
 
@@ -56,11 +56,11 @@ public class ParseUtil {
      * 运行完成之后 indexer 指向下一个非空白字符索引或字符串长度
      * 返回当前非空白字符或 -1
      *
-     * @param chars
-     * @param indexer
-     * @param len
+     * @param chars 字符集合
+     * @param indexer 索引器
+     * @param len chars 长度
      *
-     * @return
+     * @return 下一个非空白字符
      */
     final static int nextVal(char[] chars, IntAccessor indexer, final int len) {
         return SupportUtil.skipWhitespaces(chars, indexer, len);

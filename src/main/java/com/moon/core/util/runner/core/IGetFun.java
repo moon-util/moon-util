@@ -259,7 +259,7 @@ class IGetFun {
         /**
          * 这个函数执行相同参数的返回值是否相同
          *
-         * @return
+         * @return 是否不可变
          */
         @Override
         default boolean isChangeless() { return false; }
@@ -368,18 +368,18 @@ class IGetFun {
             public boolean isChangeless() { return true; }
 
             @Override
-            public List apply(Object value) { return ListUtil.ofArrayList(value); }
+            public List apply(Object value) { return ListUtil.newArrayList(value); }
 
             @Override
-            public List apply(Object value1, Object value2) { return ListUtil.ofArrayList(value1, value2); }
+            public List apply(Object value1, Object value2) { return ListUtil.newArrayList(value1, value2); }
 
             @Override
             public List apply(Object value1, Object value2, Object value3) {
-                return ListUtil.ofArrayList(value1, value2, value3);
+                return ListUtil.newArrayList(value1, value2, value3);
             }
 
             @Override
-            public List apply(Object... values) { return ListUtil.ofArrayList(values); }
+            public List apply(Object... values) { return ListUtil.newArrayList(values); }
         };
 
         @Override

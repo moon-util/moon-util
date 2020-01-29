@@ -17,9 +17,10 @@ public final class EnumUtil {
     /**
      * 枚举的第一项值
      *
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 第一个元素或 null
      */
     public static <T extends Enum<T>> T first(Class<T> enumType) {
         T[] enums = values(enumType);
@@ -29,9 +30,10 @@ public final class EnumUtil {
     /**
      * 枚举类最后一项值
      *
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 最后一个元素
      */
     public static <T extends Enum<T>> T last(Class<T> enumType) {
         T[] enums = values(enumType);
@@ -41,9 +43,10 @@ public final class EnumUtil {
     /**
      * 枚举类所有值
      *
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> T[] values(Class<T> enumType) {
         return enumType.getEnumConstants();
@@ -52,9 +55,10 @@ public final class EnumUtil {
     /**
      * 枚举类所有值
      *
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> List<T> valuesList(Class<T> enumType) {
         return ListUtil.toList(values(enumType));
@@ -63,18 +67,20 @@ public final class EnumUtil {
     /**
      * {@link EnumSet}
      *
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> EnumSet<T> valuesSet(Class<T> enumType) { return EnumSet.allOf(enumType); }
 
     /**
      * 按名称排序后枚举类所有值
      *
-     * @param type
-     * @param <T>
-     * @return
+     * @param type 枚举类型
+     * @param <T>  泛型
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> T[] sortValues(Class<T> type) {
         return sortValues(type, Comparator.comparing(Enum::name));
@@ -83,10 +89,11 @@ public final class EnumUtil {
     /**
      * 按指定顺序排序的枚举类所有值
      *
-     * @param type
-     * @param comparator
-     * @param <T>
-     * @return
+     * @param comparator 比较强
+     * @param type       枚举类型
+     * @param <T>        泛型
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> T[] sortValues(Class<T> type, Comparator<? super T> comparator) {
         return ArrayUtil.sort(comparator, values(type));
@@ -96,9 +103,11 @@ public final class EnumUtil {
      * 枚举类所有值的名称与值的 Map
      * enum's name map to enum's value
      *
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 枚举值
+     *
      * @see Enum#name()
      */
     public static <T extends Enum<T>> Map<String, T> valuesMap(Class<T> enumType) {
@@ -114,9 +123,10 @@ public final class EnumUtil {
     /**
      * 枚举类包含多少项
      *
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 枚举值数量
      */
     public static <T extends Enum<T>> int length(Class<T> enumType) { return values(enumType).length; }
 
@@ -127,10 +137,11 @@ public final class EnumUtil {
     /**
      * 是否包含指定名称的枚举值
      *
-     * @param enumType
-     * @param name
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     * @param name     枚举名
+     *
+     * @return 是否包含枚举值
      */
     public static <T extends Enum<T>> boolean contains(Class<T> enumType, String name) {
         if (name == null) {
@@ -147,10 +158,11 @@ public final class EnumUtil {
     /**
      * 返回符合指定名称的枚举值
      *
-     * @param enumType
-     * @param name
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     * @param name     枚举名
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> T toEnum(Class<T> enumType, String name) {
         try {
@@ -163,10 +175,11 @@ public final class EnumUtil {
     /**
      * 返回指定位置的枚举值
      *
-     * @param enumType
-     * @param ordinal
-     * @param <T>
-     * @return
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     * @param ordinal  序号
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> T toEnum(Class<T> enumType, int ordinal) {
         try {
@@ -179,10 +192,11 @@ public final class EnumUtil {
     /**
      * 超级转换器
      *
-     * @param value
-     * @param enumType
-     * @param <T>
-     * @return
+     * @param value    带转换的值
+     * @param enumType 枚举类型
+     * @param <T>      泛型
+     *
+     * @return 枚举值
      */
     public static <T extends Enum<T>> T toEnum(Object value, Class<T> enumType) {
         if (value == null || enumType == null) {
@@ -207,7 +221,6 @@ public final class EnumUtil {
     }
 
     private static <T> T throwEnumConst(Class type, Object value) {
-        throw new IllegalArgumentException(
-            "No enum constant " + type.getCanonicalName() + "[" + value + "]");
+        throw new IllegalArgumentException("No enum constant " + type.getCanonicalName() + "[" + value + "]");
     }
 }

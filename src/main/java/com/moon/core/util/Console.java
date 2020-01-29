@@ -22,10 +22,12 @@ import static java.lang.Thread.currentThread;
  * @author benshaoye
  */
 public interface Console extends Printable, Timing {
+
     /**
      * 最低级别
      */
     Level LOWEST = Level.PRINT;
+
     /**
      * 全局默认输出
      */
@@ -34,7 +36,7 @@ public interface Console extends Printable, Timing {
     /**
      * 默认 Console 实例
      *
-     * @return
+     * @return this
      */
     static Console of() {
         return new GenericConsolePrinter();
@@ -43,8 +45,9 @@ public interface Console extends Printable, Timing {
     /**
      * 自定义输出顶层类的 Console 实例
      *
-     * @param topClass
-     * @return
+     * @param topClass 顶层 class
+     *
+     * @return this
      */
     static Console of(Class topClass) {
         return new GenericConsolePrinter(topClass);
@@ -53,15 +56,17 @@ public interface Console extends Printable, Timing {
     /**
      * 设置输出流
      *
-     * @param appender
-     * @return
+     * @param appender 输出器
+     *
+     * @return this
      */
     Console setAppender(Appender appender);
 
     /**
      * 设置是否允许当前实例输出内容
      *
-     * @param allowOutput
+     * @param allowOutput 是否允许控制台输出
+     *
      * @see #isClosed()
      */
     void setAllowOutputStatus(boolean allowOutput);
@@ -70,6 +75,7 @@ public interface Console extends Printable, Timing {
      * 当前 Console 是否不可以输出
      *
      * @return 返回是否当前实例是否可以输出
+     *
      * @see #setAllowOutputStatus(boolean)
      */
     boolean isClosed();
@@ -84,7 +90,7 @@ public interface Console extends Printable, Timing {
     /**
      * 以指定输出级别打印堆栈追踪信息
      *
-     * @param level
+     * @param level 输出级别
      */
     default void printStackTrace(Level level) {
         StackTraceElement[] traces = currentThread().getStackTrace();

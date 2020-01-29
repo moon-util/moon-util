@@ -12,8 +12,8 @@ public final class CharacterUtil {
     }
 
     /**
-     * @param value
-     * @return
+     * @param value 带转换的值
+     * @return 字符
      * @see IntUtil#toIntValue(Object)
      */
     public static final Character toCharacter(Object value) {

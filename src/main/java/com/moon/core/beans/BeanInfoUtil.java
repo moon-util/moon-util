@@ -39,8 +39,8 @@ public final class BeanInfoUtil {
      *
      * @return setter 方法或抛出异常
      *
-     * @throws NoSuchMethodException    找不到 setter 方法（被{@link IllegalArgumentException}）包裹
-     * @throws IllegalArgumentException 找不到 setter 方法
+     * @see NoSuchMethodException    找不到 setter 方法（被{@link IllegalArgumentException}）包裹
+     * @see IllegalArgumentException 找不到 setter 方法
      */
     public static Method getSetterMethod(Field field) {
         return (Method) WEAK
@@ -54,8 +54,8 @@ public final class BeanInfoUtil {
      *
      * @return getter 方法或抛出异常
      *
-     * @throws NoSuchMethodException    找不到 getter 方法（被{@link IllegalArgumentException}）包裹
-     * @throws IllegalArgumentException 找不到 getter 方法
+     * @see NoSuchMethodException    找不到 getter 方法（被{@link IllegalArgumentException}）包裹
+     * @see IllegalArgumentException 找不到 getter 方法
      */
     public static Method getGetterMethod(Field field) {
         return (Method) WEAK
@@ -70,8 +70,8 @@ public final class BeanInfoUtil {
      *
      * @return setter 方法或抛出异常
      *
-     * @throws NoSuchMethodException    找不到 setter 方法（被{@link IllegalArgumentException}）包裹
-     * @throws IllegalArgumentException 找不到 setter 方法
+     * @see NoSuchMethodException    找不到 setter 方法（被{@link IllegalArgumentException}）包裹
+     * @see IllegalArgumentException 找不到 setter 方法
      */
     public static Method getSetterMethod(Class clazz, String fieldName) {
         FieldDescriptor descriptor = getFieldDescriptor(clazz, fieldName);
@@ -90,8 +90,8 @@ public final class BeanInfoUtil {
      *
      * @return getter 方法或抛出异常
      *
-     * @throws NoSuchMethodException    找不到 getter 方法（被{@link IllegalArgumentException}）包裹
-     * @throws IllegalArgumentException 找不到 getter 方法
+     * @see NoSuchMethodException    找不到 getter 方法（被{@link IllegalArgumentException}）包裹
+     * @see IllegalArgumentException 找不到 getter 方法
      */
     public static Method getGetterMethod(Class clazz, String fieldName) {
         FieldDescriptor descriptor = getFieldDescriptor(clazz, fieldName);
@@ -125,7 +125,7 @@ public final class BeanInfoUtil {
      *
      * @return setter 执行器
      *
-     * @throws IllegalArgumentException 当 field 被 final 修饰，且没有对应的 setter 方法就会抛出异常
+     * @see IllegalArgumentException 当 field 被 final 修饰，且没有对应的 setter 方法就会抛出异常
      */
     public static FieldExecutor getSetterExecutor(Field field) {
         return (FieldExecutor) WEAK.getOrWithElse(field, TypeEnum.SET_EXECUTOR,
@@ -137,13 +137,12 @@ public final class BeanInfoUtil {
      * 执行器与 getter 方法的区别是，getter 是方法，
      * 而执行器是在没有 getter 方法的时候直接对字段获取值
      *
-     *
-     * @param clazz     目标类
+     * @param clazz        目标类
      * @param propertyName 待获取字段名
      *
      * @return getter 执行器
      *
-     * @throws IllegalArgumentException 当 clazz 不存在字段属性时
+     * @see IllegalArgumentException 当 clazz 不存在字段属性时
      */
     public static FieldExecutor getGetterExecutor(Class clazz, String propertyName) {
         return getFieldDescriptor(clazz, propertyName).getGetterExecutor();
@@ -154,13 +153,12 @@ public final class BeanInfoUtil {
      * 执行器与 setter 方法的区别是，setter 是方法，
      * 而执行器是在没有 setter 方法的时候直接对字段设置值
      *
-     *
-     * @param clazz     目标类
+     * @param clazz        目标类
      * @param propertyName 待获取字段名
      *
      * @return setter 执行器
      *
-     * @throws IllegalArgumentException 当 clazz 不存在对应属性，或对应字段被 final 修饰时，抛出异常
+     * @see IllegalArgumentException 当 clazz 不存在对应属性，或对应字段被 final 修饰时，抛出异常
      */
     public static FieldExecutor getSetterExecutor(Class clazz, String propertyName) {
         return getFieldDescriptor(clazz, propertyName).getSetterExecutor();
@@ -240,12 +238,12 @@ public final class BeanInfoUtil {
     /**
      * 返回属性描述信息
      *
-     * @param clazz 目标类
+     * @param clazz        目标类
      * @param propertyName 目标属性名
      *
      * @return 目标属性描述器
      *
-     * @throws IllegalArgumentException 当 clazz 不存在能访问到的对应名称属性时
+     * @see IllegalArgumentException 当 clazz 不存在能访问到的对应名称属性时
      */
     public static PropertyDescriptor getPropertyDescriptor(Class clazz, String propertyName) {
         FieldDescriptor descriptor = getFieldDescriptor(clazz, propertyName);
@@ -269,12 +267,12 @@ public final class BeanInfoUtil {
      * PropertyDescriptor 不包含同时没有 getter / setter 方法的字段，
      * 而通过 FieldDescriptor 能返回对应字段信息
      *
-     * @param clazz 目标类
+     * @param clazz        目标类
      * @param propertyName 目标属性
      *
      * @return 目标字段描述器
      *
-     * @throws IllegalArgumentException 当 clazz 不存在能访问到的对应名称属性时
+     * @see IllegalArgumentException 当 clazz 不存在能访问到的对应名称属性时
      */
     public static FieldDescriptor getFieldDescriptor(Class clazz, String propertyName) {
         String name = Objects.requireNonNull(propertyName);

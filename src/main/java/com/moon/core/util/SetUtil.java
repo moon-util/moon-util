@@ -20,27 +20,27 @@ public final class SetUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <T> HashSet<T> ofHashSet() { return new HashSet<>(); }
+    public static <T> HashSet<T> newHashSet() { return new HashSet<>(); }
 
-    public static <T> HashSet<T> ofHashSet(int initCapacity) { return new HashSet<>(initCapacity); }
+    public static <T> HashSet<T> newHashSet(int initCapacity) { return new HashSet<>(initCapacity); }
 
-    public static <T> HashSet<T> ofHashSet(T value) { return add(ofHashSet(), value); }
+    public static <T> HashSet<T> newHashSet(T value) { return add(newHashSet(), value); }
 
-    public static <T> HashSet<T> ofHashSet(T value1, T value2) { return add(ofHashSet(value1), value2); }
+    public static <T> HashSet<T> newHashSet(T value1, T value2) { return add(newHashSet(value1), value2); }
 
-    public static <T> HashSet<T> ofHashSet(T value1, T value2, T value3) {
-        return add(ofHashSet(value1, value2), value3);
+    public static <T> HashSet<T> newHashSet(T value1, T value2, T value3) {
+        return add(newHashSet(value1, value2), value3);
     }
 
-    public static <T> HashSet<T> ofHashSet(T... values) { return addAll(ofHashSet(values.length), values); }
+    public static <T> HashSet<T> newHashSet(T... values) { return addAll(newHashSet(values.length), values); }
 
-    public static <T> HashSet<T> ofHashSet(Collection<T> collect) {
-        return collect == null ? ofHashSet() : new HashSet<>(collect);
+    public static <T> HashSet<T> newHashSet(Collection<T> collect) {
+        return collect == null ? newHashSet() : new HashSet<>(collect);
     }
 
-    public static <T> HashSet<T> ofHashSet(Iterable<T> iterable) {
-        return iterable == null ? ofHashSet() : (iterable instanceof Collection ? new HashSet((Collection) iterable) : addAll(
-            ofHashSet(),
+    public static <T> HashSet<T> newHashSet(Iterable<T> iterable) {
+        return iterable == null ? newHashSet() : (iterable instanceof Collection ? new HashSet((Collection) iterable) : addAll(
+            newHashSet(),
             iterable));
     }
 
@@ -50,31 +50,31 @@ public final class SetUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet() { return new LinkedHashSet<>(); }
+    public static <T> LinkedHashSet<T> newLinkedHashSet() { return new LinkedHashSet<>(); }
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet(int initCapacity) { return new LinkedHashSet<>(initCapacity); }
+    public static <T> LinkedHashSet<T> newLinkedHashSet(int initCapacity) { return new LinkedHashSet<>(initCapacity); }
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet(T value) { return add(ofLinkedHashSet(), value); }
+    public static <T> LinkedHashSet<T> newLinkedHashSet(T value) { return add(newLinkedHashSet(), value); }
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet(T value1, T value2) {
-        return add(ofLinkedHashSet(value1), value2);
+    public static <T> LinkedHashSet<T> newLinkedHashSet(T value1, T value2) {
+        return add(newLinkedHashSet(value1), value2);
     }
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet(T value1, T value2, T value3) {
-        return add(ofLinkedHashSet(value1, value2), value3);
+    public static <T> LinkedHashSet<T> newLinkedHashSet(T value1, T value2, T value3) {
+        return add(newLinkedHashSet(value1, value2), value3);
     }
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet(T... values) {
-        return addAll(ofLinkedHashSet(values.length), values);
+    public static <T> LinkedHashSet<T> newLinkedHashSet(T... values) {
+        return addAll(newLinkedHashSet(values.length), values);
     }
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet(Collection<T> collect) {
-        return collect == null ? ofLinkedHashSet() : new LinkedHashSet<>(collect);
+    public static <T> LinkedHashSet<T> newLinkedHashSet(Collection<T> collect) {
+        return collect == null ? newLinkedHashSet() : new LinkedHashSet<>(collect);
     }
 
-    public static <T> LinkedHashSet<T> ofLinkedHashSet(Iterable<T> iterable) {
-        return iterable == null ? ofLinkedHashSet() : (iterable instanceof Collection ? new LinkedHashSet((Collection) iterable) : addAll(
-            ofLinkedHashSet(),
+    public static <T> LinkedHashSet<T> newLinkedHashSet(Iterable<T> iterable) {
+        return iterable == null ? newLinkedHashSet() : (iterable instanceof Collection ? new LinkedHashSet((Collection) iterable) : addAll(
+            newLinkedHashSet(),
             iterable));
     }
 
@@ -84,43 +84,43 @@ public final class SetUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <T> TreeSet<T> ofTreeSet() { return new TreeSet<>(); }
+    public static <T> TreeSet<T> newTreeSet() { return new TreeSet<>(); }
 
-    public static <T> TreeSet<T> ofTreeSet(T value) { return add(ofTreeSet(), value); }
+    public static <T> TreeSet<T> newTreeSet(T value) { return add(newTreeSet(), value); }
 
-    public static <T> TreeSet<T> ofTreeSet(T value1, T value2) { return add(ofTreeSet(value1), value2); }
+    public static <T> TreeSet<T> newTreeSet(T value1, T value2) { return add(newTreeSet(value1), value2); }
 
-    public static <T> TreeSet<T> ofTreeSet(T value1, T value2, T value3) {
-        return add(ofTreeSet(value1, value2), value3);
+    public static <T> TreeSet<T> newTreeSet(T value1, T value2, T value3) {
+        return add(newTreeSet(value1, value2), value3);
     }
 
-    public static <T> TreeSet<T> ofTreeSet(T... values) { return addAll(ofTreeSet(), values); }
+    public static <T> TreeSet<T> newTreeSet(T... values) { return addAll(newTreeSet(), values); }
 
-    public static <T> TreeSet<T> ofTreeSet(Collection<T> collect) {
-        return collect == null ? ofTreeSet() : new TreeSet<>(collect);
+    public static <T> TreeSet<T> newTreeSet(Collection<T> collect) {
+        return collect == null ? newTreeSet() : new TreeSet<>(collect);
     }
 
-    public static <T> TreeSet<T> ofTreeSet(Iterable<T> iterable) {
-        return iterable == null ? ofTreeSet() : (iterable instanceof Collection ? new TreeSet((Collection) iterable) : addAll(
-            ofTreeSet(),
+    public static <T> TreeSet<T> newTreeSet(Iterable<T> iterable) {
+        return iterable == null ? newTreeSet() : (iterable instanceof Collection ? new TreeSet((Collection) iterable) : addAll(
+            newTreeSet(),
             iterable));
     }
 
-    public static <T> TreeSet<T> ofTreeSet(SortedSet<T> sortedSet) { return new TreeSet<>(sortedSet); }
+    public static <T> TreeSet<T> newTreeSet(SortedSet<T> sortedSet) { return new TreeSet<>(sortedSet); }
 
-    public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator) { return new TreeSet<>(comparator); }
+    public static <T> TreeSet<T> newTreeSet(Comparator<? super T> comparator) { return new TreeSet<>(comparator); }
 
-    public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator, Iterable<T> iterable) {
-        return addAll(ofTreeSet(comparator), iterable);
+    public static <T> TreeSet<T> newTreeSet(Comparator<? super T> comparator, Iterable<T> iterable) {
+        return addAll(newTreeSet(comparator), iterable);
     }
 
-    public static <T> TreeSet<T> ofTreeSet(Comparator<? super T> comparator, T... values) {
-        return addAll(ofTreeSet(comparator), values);
+    public static <T> TreeSet<T> newTreeSet(Comparator<? super T> comparator, T... values) {
+        return addAll(newTreeSet(comparator), values);
     }
 
     public static <S, T> Set<T> mapAsSet(Collection<S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);
-        return collect instanceof List ? (Set<T>) collect : ofHashSet(collect);
+        return collect instanceof List ? (Set<T>) collect : newHashSet(collect);
     }
 
     public static <T> Set<T> concat(Set<T> set, Set<T>... sets) { return (Set) concat0(set, sets); }

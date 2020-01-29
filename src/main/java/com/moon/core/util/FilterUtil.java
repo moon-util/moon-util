@@ -30,10 +30,13 @@ public final class FilterUtil {
     /**
      * 找出符合条件的第一项，没有匹配项抛出异常
      *
-     * @param ts
-     * @param tester
-     * @param <T>
-     * @return
+     * @param ts     数组
+     * @param tester 匹配器
+     * @param <T>    目标类型
+     *
+     * @return 匹配的第一个元素
+     *
+     * @See NullPointerException 找不到符合条件的元素
      */
     public static <T> T requireFirst(T[] ts, Predicate<? super T> tester) {
         for (int i = 0, len = ts.length; i < len; i++) {
@@ -56,10 +59,11 @@ public final class FilterUtil {
     /**
      * 找出符合条件的第一项，任何情况导致找不到匹配项都返回 null
      *
-     * @param ts
-     * @param tester
-     * @param <T>
-     * @return
+     * @param ts     数组
+     * @param tester 匹配器
+     * @param <T>    目标类型
+     *
+     * @return 匹配的第一个元素 或 null
      */
     public static <T> T nullableFirst(T[] ts, Predicate<? super T> tester) {
         if (ts != null) {
@@ -89,6 +93,7 @@ public final class FilterUtil {
      * @param collect
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> T requireFirst(Iterable<T> collect, Predicate<? super T> tester) {
@@ -106,6 +111,7 @@ public final class FilterUtil {
      * @param collect
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> T nullableFirst(Iterable<T> collect, Predicate<? super T> tester) {
@@ -125,6 +131,7 @@ public final class FilterUtil {
      * @param iterator
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> T requireFirst(Iterator<T> iterator, Predicate<? super T> tester) {
@@ -143,6 +150,7 @@ public final class FilterUtil {
      * @param iterator
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> T nullableFirst(Iterator<T> iterator, Predicate<? super T> tester) {
@@ -169,6 +177,7 @@ public final class FilterUtil {
      * @param ts
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> boolean matchAny(T[] ts, Predicate<? super T> tester) {
@@ -188,6 +197,7 @@ public final class FilterUtil {
      * @param iterable
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> boolean matchAny(Iterable<T> iterable, Predicate<? super T> tester) {
@@ -207,6 +217,7 @@ public final class FilterUtil {
      * @param ts
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> boolean matchAll(T[] ts, Predicate<? super T> tester) {
@@ -228,6 +239,7 @@ public final class FilterUtil {
      * @param iterable
      * @param tester
      * @param <T>
+     *
      * @return
      */
     public static <T> boolean matchAll(Iterable<T> iterable, Predicate<? super T> tester) {
@@ -249,8 +261,9 @@ public final class FilterUtil {
      * --------------------------------------------------------------
      */
 
-    public final static <E, C extends Collection<? super E>> C
-    filter(E[] es, Predicate<? super E> tester, C container) {
+    public final static <E, C extends Collection<? super E>> C filter(
+        E[] es, Predicate<? super E> tester, C container
+    ) {
         if (es != null) {
             for (int i = 0, len = es.length; i < len; i++) {
                 if (tester.test(es[i])) {
@@ -268,6 +281,7 @@ public final class FilterUtil {
      * @param tester
      * @param <E>
      * @param <L>
+     *
      * @return
      */
     public static <E, L extends List<E>> List<E> filter(L list, Predicate<? super E> tester) {
@@ -287,6 +301,7 @@ public final class FilterUtil {
      * @param tester
      * @param <E>
      * @param <S>
+     *
      * @return
      */
     public static <E, S extends Set<E>> Set<E> filter(S set, Predicate<? super E> tester) {
@@ -308,6 +323,7 @@ public final class FilterUtil {
      * @param <E>
      * @param <C>
      * @param <CR>
+     *
      * @return
      */
     public static <E, C extends Collection<E>, CR extends Collection<? super E>>
@@ -331,6 +347,7 @@ public final class FilterUtil {
      * @param <E>
      * @param <C>
      * @param <CR>
+     *
      * @return 返回提供的容器 container
      */
     public static <E, C extends Iterable<E>, CR extends Collection<? super E>>
@@ -398,7 +415,8 @@ public final class FilterUtil {
      * @param <T>
      */
     public static <T> void forEachMatched(
-        Collection<T> collect, Predicate<? super T> tester, Consumer<T> consumer) {
+        Collection<T> collect, Predicate<? super T> tester, Consumer<T> consumer
+    ) {
         if (collect != null) {
             for (T item : collect) {
                 if (tester.test(item)) {
@@ -417,7 +435,8 @@ public final class FilterUtil {
      * @param <T>
      */
     public static <T> void forEachMatched(
-        T[] ts, Predicate<? super T> tester, Consumer<T> consumer) {
+        T[] ts, Predicate<? super T> tester, Consumer<T> consumer
+    ) {
         final int length = ts == null ? 0 : ts.length;
         for (int i = 0; i < length; i++) {
             T item = ts[i];

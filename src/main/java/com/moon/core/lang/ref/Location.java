@@ -8,56 +8,62 @@ import java.util.function.Supplier;
  * @author benshaoye
  */
 public interface Location<X, Y, Z> {
+
     /**
      * 设置一个值
      *
-     * @param x
-     * @param y
-     * @param z
-     * @return
+     * @param x namespace
+     * @param y key
+     * @param z value
+     *
+     * @return this
      */
     Location<X, Y, Z> put(X x, Y y, Z z);
 
     /**
      * 放置所有
      *
-     * @param x
-     * @param map
-     * @return
+     * @param x   namespace
+     * @param map values entry
+     *
+     * @return this
      */
     Location<X, Y, Z> putAll(X x, Map<? extends Y, ? extends Z> map);
 
     /**
      * 获取一个值
      *
-     * @param x
-     * @param y
-     * @return
+     * @param x namespace
+     * @param y key
+     *
+     * @return this
      */
     Z get(X x, Y y);
 
     /**
      * 清空
      *
-     * @return
+     * @return this
      */
     Location<X, Y, Z> clear();
 
     /**
      * 清空
      *
-     * @param x
-     * @return
+     * @param x namespace
+     *
+     * @return this
      */
     Location<X, Y, Z> clear(X x);
 
     /**
      * 获取值，或返回默认值
      *
-     * @param x
-     * @param y
-     * @param defaultValue
-     * @return
+     * @param x            namespace
+     * @param y            key
+     * @param defaultValue defaultValue
+     *
+     * @return this
      */
     default Z getOrDefault(X x, Y y, Z defaultValue) {
         Z value = get(x, y);
@@ -67,10 +73,11 @@ public interface Location<X, Y, Z> {
     /**
      * 获取值，或返回默认值
      *
-     * @param x
-     * @param y
-     * @param supplier
-     * @return
+     * @param x        namespace
+     * @param y        key
+     * @param supplier 默认值 getter
+     *
+     * @return value
      */
     default Z getOrElse(X x, Y y, Supplier<Z> supplier) {
         Z value = get(x, y);
@@ -80,10 +87,7 @@ public interface Location<X, Y, Z> {
     /**
      * 获取值，或返回默认值
      *
-     * @param x
-     * @param y
-     * @param defaultValue
-     * @return
+     * @return value
      */
     default Z getOrWithDefault(X x, Y y, Z defaultValue) {
         Z value = get(x, y);
@@ -94,10 +98,11 @@ public interface Location<X, Y, Z> {
     /**
      * 获取值，或返回执行结果
      *
-     * @param x
-     * @param y
-     * @param supplier
-     * @return
+     * @param x        namespace
+     * @param y        key
+     * @param supplier 默认值
+     *
+     * @return value
      */
     default Z getOrWithElse(X x, Y y, Supplier<Z> supplier) {
         Z value = get(x, y);
@@ -108,10 +113,11 @@ public interface Location<X, Y, Z> {
     /**
      * 获取值，或返回执行结果
      *
-     * @param x
-     * @param y
-     * @param computer
-     * @return
+     * @param x        namespace
+     * @param y        key
+     * @param computer computer
+     *
+     * @return value
      */
     default Z getOrWithCompute(X x, Y y, BiFunction<X, Y, Z> computer) {
         Z value = get(x, y);

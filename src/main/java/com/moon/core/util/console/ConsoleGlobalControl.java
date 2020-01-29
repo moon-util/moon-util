@@ -60,7 +60,7 @@ enum ConsoleGlobalControl implements ConsoleEnabled {
     /**
      * 返回最多输出级别
      *
-     * @return
+     * @return 最低输出级别
      */
     @Override
     public Level getLowestLevel() {

@@ -3,6 +3,7 @@ package com.moon.core.util;
 import com.moon.core.lang.ThrowUtil;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import static com.moon.core.util.TypeUtil.cast;
@@ -11,9 +12,7 @@ import static com.moon.core.util.TypeUtil.cast;
  * @author benshaoye
  */
 public final class MapUtil {
-    private MapUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private MapUtil() { ThrowUtil.noInstanceError(); }
 
     public static Map empty() {return EmptyHashMap.EMPTY_MAP;}
 
@@ -23,17 +22,17 @@ public final class MapUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <K, V> HashMap<K, V> ofHashMap() { return new HashMap<>(); }
+    public static <K, V> HashMap<K, V> newHashMap() { return new HashMap<>(); }
 
-    public static <K, V> HashMap<K, V> ofHashMap(int capacity) { return new HashMap<>(capacity); }
+    public static <K, V> HashMap<K, V> newHashMap(int capacity) { return new HashMap<>(capacity); }
 
-    public static <K, V> HashMap<K, V> ofHashMap(Map<K, V> map) { return new HashMap<>(map); }
+    public static <K, V> HashMap<K, V> newHashMap(Map<K, V> map) { return new HashMap<>(map); }
 
-    public static <K, V> HashMap<K, V> ofHashMap(Map<K, V> map, Map<K, V>... maps) {
-        return putAll(putAll(ofHashMap((maps.length + 1) * 16), map), maps);
+    public static <K, V> HashMap<K, V> newHashMap(Map<K, V> map, Map<K, V>... maps) {
+        return putAll(putAll(newHashMap((maps.length + 1) * 16), map), maps);
     }
 
-    public static <K, V> Map<K, V> ofHashMapIfNull(Map<K, V> map) { return map == null ? new HashMap<>(16) : map; }
+    public static <K, V> Map<K, V> emptyHashMapIfNull(Map<K, V> map) { return map == null ? newHashMap() : map; }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -41,18 +40,58 @@ public final class MapUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <K, V> LinkedHashMap<K, V> ofLinkedHashMap() { return new LinkedHashMap<>(); }
+    public static <K, V> LinkedHashMap<K, V> newLinkedHashMap() { return new LinkedHashMap<>(); }
 
-    public static <K, V> LinkedHashMap<K, V> ofLinkedHashMap(int capacity) { return new LinkedHashMap<>(capacity); }
+    public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(int capacity) { return newLinkedHashMap(capacity); }
 
-    public static <K, V> LinkedHashMap<K, V> ofLinkedHashMap(Map<K, V> map) { return new LinkedHashMap<>(map); }
+    public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(Map<K, V> map) { return new LinkedHashMap<>(map); }
 
-    public static <K, V> LinkedHashMap<K, V> ofLinkedHashMap(Map<K, V> map, Map<K, V>... maps) {
-        return putAll(putAll(ofLinkedHashMap((maps.length + 1) * 16), map), maps);
+    public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(Map<K, V> map, Map<K, V>... maps) {
+        return putAll(putAll(newLinkedHashMap((maps.length + 1) * 16), map), maps);
     }
 
-    public static <K, V> LinkedHashMap<K, V> ofLinkedHashMapIfNull(Map<K, V> map) {
-        return map == null ? new LinkedHashMap<>() : null;
+    public static <K, V> LinkedHashMap<K, V> emptyLinkedHashMapIfNull(Map<K, V> map) {
+        return map == null ? newLinkedHashMap() : null;
+    }
+
+    /*
+     * ---------------------------------------------------------------------------------
+     * of tree hash map
+     * ---------------------------------------------------------------------------------
+     */
+
+    public static <K, V> TreeMap<K, V> newTreeMap() { return new TreeMap<>(); }
+
+    public static <K, V> TreeMap<K, V> newTreeMap(int capacity) { return newTreeMap(); }
+
+    public static <K, V> TreeMap<K, V> newTreeMap(Map<K, V> map) { return new TreeMap<>(map); }
+
+    public static <K, V> TreeMap<K, V> newTreeMap(Map<K, V> map, Map<K, V>... maps) {
+        return putAll(putAll(newTreeMap((maps.length + 1) * 16), map), maps);
+    }
+
+    public static <K, V> TreeMap<K, V> emptyTreeMapIfNull(Map<K, V> map) {
+        return map == null ? newTreeMap() : null;
+    }
+
+    /*
+     * ---------------------------------------------------------------------------------
+     * of concurrent hash map
+     * ---------------------------------------------------------------------------------
+     */
+
+    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap() { return new ConcurrentHashMap<>(); }
+
+    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(int capacity) { return new ConcurrentHashMap(capacity); }
+
+    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(Map<K, V> map) { return new ConcurrentHashMap<>(map); }
+
+    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(Map<K, V> map, Map<K, V>... maps) {
+        return putAll(putAll(newConcurrentMap((maps.length + 1) * 16), map), maps);
+    }
+
+    public static <K, V> ConcurrentHashMap<K, V> emptyConcurrentMapIfNull(Map<K, V> map) {
+        return map == null ? newConcurrentMap() : null;
     }
 
     /*
@@ -108,7 +147,7 @@ public final class MapUtil {
      * @param <V>
      */
     public static <K, V> Map<K, V> put(Map<K, V> map, Object key, Object value) {
-        map = ofHashMapIfNull(map);
+        map = emptyHashMapIfNull(map);
         map.put((K) key, (V) value);
         return map;
     }

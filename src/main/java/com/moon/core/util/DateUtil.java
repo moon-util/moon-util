@@ -214,9 +214,9 @@ public final class DateUtil extends CalendarUtil {
     /**
      * java.util.Calendar to java.util.Date
      *
-     * @param value
+     * @param value 带转换值
      *
-     * @return
+     * @return 转换后的值
      */
     public final static Date toDate(Calendar value) { return value == null ? null : value.getTime(); }
 

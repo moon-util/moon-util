@@ -73,20 +73,20 @@ public final class FloatUtil {
      * StringBuffer value = new StringBuffer("1");  // ========= 1
      * StringBuilder value = new StringBuilder("1");  // ======= 1
      * String value = "  1   ";  // ============================ 1
-     * StringBuffer value = new StringBuffer("  1   ");  // ===> 1
-     * StringBuilder value = new StringBuilder("  1   ");  // => 1
-     * BigDecimal value = new BigDecimal("1");  // ============> 1
-     * BigInteger value = new BigInteger("1");  // ============> 1
-     * Collection value = new ArrayList(){{increment(1)}};  // ======> 1（只有一项时）
-     * Collection value = new HashSet(){{increment(1)}};  // ========> 1（只有一项时）
-     * Collection value = new TreeSet(){{increment(1)}};  // ========> 1（只有一项时）
-     * Collection value = new LinkedList(){{increment(1)}};  // =====> 1（只有一项时）
-     * Map value = new HashMap(){{put("key", 1)}};  // ========> 1（只有一项时）
+     * StringBuffer value = new StringBuffer("  1   ");  // ==== 1
+     * StringBuilder value = new StringBuilder("  1   ");  // == 1
+     * BigDecimal value = new BigDecimal("1");  // ============= 1
+     * BigInteger value = new BigInteger("1");  // ============= 1
+     * Collection value = new ArrayList(){{increment(1)}};  // ======= 1（只有一项时）
+     * Collection value = new HashSet(){{increment(1)}};  // ========= 1（只有一项时）
+     * Collection value = new TreeSet(){{increment(1)}};  // ========= 1（只有一项时）
+     * Collection value = new LinkedList(){{increment(1)}};  // ====== 1（只有一项时）
+     * Map value = new HashMap(){{put("key", 1)}};  // =============== 1（只有一项时）
      * <p>
-     * int[] value = {1, 2, 3, 4};  // =======================================> 4（大于一项时，返回 size）
-     * String[] value = {"1", "1", "1", "1"};  // ============================> 4（大于一项时，返回 size）
-     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ======> 3（大于一项时，返回 size）
-     * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // =======> 2（大于一项时，返回 size）
+     * int[] value = {1, 2, 3, 4};  // ======================================== 4（大于一项时，返回 size）
+     * String[] value = {"1", "1", "1", "1"};  // ============================= 4（大于一项时，返回 size）
+     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ======= 3（大于一项时，返回 size）
+     * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // ======== 2（大于一项时，返回 size）
      * <p>
      * Float result = FloatUtil.toFloat(value);
      *

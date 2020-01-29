@@ -16,7 +16,8 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 public final class ResourceSupport {
 
     static final char SEP = '/';
-    static final String ROOT = "src/main/resource";
+    static final String ROOT = "src/main/resources";
+    static final String ROOTs = "src/main/resource";
 
     private ResourceSupport() {
         noInstanceError();
@@ -34,7 +35,7 @@ public final class ResourceSupport {
                         if (new File(path).exists() || new File(resetPath(path)).exists()) {
                             return true;
                         } else {
-                            return new File(ROOT, path).exists();
+                            return new File(ROOT, path).exists() || new File(ROOTs, path).exists();
                         }
                     } else {
                         return true;
@@ -73,6 +74,8 @@ public final class ResourceSupport {
                             return toUrlOrNull(file);
                         } else if ((file = new File(ROOT, path)).exists()) {
                             return toUrlOrNull(file);
+                        } else if ((file = new File(ROOTs, path)).exists()) {
+                            return toUrlOrNull(file);
                         }
                     }
                 }
@@ -81,9 +84,7 @@ public final class ResourceSupport {
         }
     }
 
-    static URL getUrl(String path) {
-        return SystemSupport.class.getResource(path);
-    }
+    static URL getUrl(String path) { return SystemSupport.class.getResource(path); }
 
     public static InputStream getResourceAsStream(String path) {
         try {

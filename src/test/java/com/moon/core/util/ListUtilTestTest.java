@@ -18,12 +18,12 @@ class ListUtilTestTest {
 
     @Test
     void testOfArrayList() {
-        assertTrue(ListUtil.ofArrayList() instanceof ArrayList);
+        assertTrue(ListUtil.newArrayList() instanceof ArrayList);
     }
 
     @Test
     void testOfLinkedList() {
-        assertTrue(ListUtil.ofLinkedList() instanceof LinkedList);
+        assertTrue(ListUtil.newLinkedList() instanceof LinkedList);
     }
 
     @Test

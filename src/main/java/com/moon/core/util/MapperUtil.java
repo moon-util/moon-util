@@ -72,10 +72,10 @@ public final class MapperUtil {
     /**
      * type 必须有一个空构造器
      *
-     * @param dataList
-     * @param type
-     * @param <T>
-     * @return
+     * @param dataList 目标数据
+     * @param type 目标 bean class
+     * @param <T> 泛型
+     * @return 转换后的数据集合
      */
     public final static <T> List<T> forEachToInstance(Collection<Map<String, Object>> dataList, Class<T> type) {
         List<T> result = new ArrayList<>(CollectUtil.size(dataList));

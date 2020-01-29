@@ -135,9 +135,9 @@ public class GenericTypeCaster implements TypeCaster {
     /**
      * Map convert
      *
-     * @param <C>
+     * @param <C> 泛型
      *
-     * @return
+     * @return 转换器
      */
     private <C> BiFunction<Object, Class<C>, C> converterOfMap() {
         return (value, toType) -> {
@@ -176,11 +176,11 @@ public class GenericTypeCaster implements TypeCaster {
     /**
      * 添加新的转换器，受保护，实际执行的方法
      *
-     * @param toType
-     * @param func
-     * @param <C>
+     * @param toType 目标类型
+     * @param func   转换器
+     * @param <C>    泛型
      *
-     * @return
+     * @return this
      */
     private <C> TypeCaster add(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
         BiFunction converter = func;
@@ -191,11 +191,11 @@ public class GenericTypeCaster implements TypeCaster {
     /**
      * 注册新的转换器，如果已存在将覆盖原有转换器
      *
-     * @param toType
-     * @param func
-     * @param <C>
+     * @param toType 目标类型
+     * @param func   转换器
+     * @param <C>    泛型
      *
-     * @return
+     * @return this
      */
     @Override
     public <C> TypeCaster register(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
@@ -205,11 +205,11 @@ public class GenericTypeCaster implements TypeCaster {
     /**
      * 注册缺少的转换器
      *
-     * @param toType
-     * @param func
-     * @param <C>
+     * @param toType 目标类型
+     * @param func   转换器
+     * @param <C>    泛型
      *
-     * @return
+     * @return this
      */
     @Override
     public <C> TypeCaster registerIfAbsent(Class<C> toType, BiFunction<Object, Class<C>, ? extends C> func) {
@@ -221,11 +221,11 @@ public class GenericTypeCaster implements TypeCaster {
     /**
      * 转换成指定类型数据
      *
-     * @param value
-     * @param type
-     * @param <T>
+     * @param value 带转换值
+     * @param type  目标类型
+     * @param <T>   泛型
      *
-     * @return
+     * @return this
      */
     @Override
     public <T> T toType(Object value, Class<T> type) {
@@ -367,11 +367,11 @@ public class GenericTypeCaster implements TypeCaster {
      * if data is null or clazz is null will back null.
      * And can not convert to clazz will throw Exception
      *
-     * @param map
-     * @param clazz
-     * @param <T>
+     * @param map   带转换值
+     * @param clazz 目标类型
+     * @param <T>   泛型
      *
-     * @return
+     * @return 转换后的值
      */
     @Override
     public <T> T toBean(Map map, Class<T> clazz) {
@@ -393,11 +393,11 @@ public class GenericTypeCaster implements TypeCaster {
     /**
      * if data is null or clazz is null will back null
      *
-     * @param value
-     * @param arrayType
-     * @param <T>
+     * @param value     带转换值
+     * @param arrayType 数组类型
+     * @param <T>       数组类型泛型
      *
-     * @return
+     * @return 数组
      */
     @Override
     public <T> T toArray(Object value, Class<T> arrayType) {
@@ -414,11 +414,11 @@ public class GenericTypeCaster implements TypeCaster {
     /**
      * if data is null or clazz is null will back null
      *
-     * @param value
-     * @param componentType
-     * @param <T>
+     * @param value         待转换值
+     * @param componentType 数组元素类型
+     * @param <T>           数组元素类型
      *
-     * @return
+     * @return 数组
      */
     @Override
     public <T> T[] toTypeArray(Object value, Class<T> componentType) {
@@ -465,8 +465,7 @@ public class GenericTypeCaster implements TypeCaster {
         }
 
         Collection toCollect(Collection value, Class listImplType) {
-            return listImplType.isInstance(value) ? value : createCollect(listImplType,
-                isAbstract(listImplType),
+            return listImplType.isInstance(value) ? value : createCollect(listImplType, isAbstract(listImplType),
                 value);
         }
 
@@ -515,8 +514,7 @@ public class GenericTypeCaster implements TypeCaster {
         }
 
         <T extends Collection> Collection createCollect(Class<T> listImplType, boolean isDefault) {
-            return newInstance(isDefault,
-                listImplType,
+            return newInstance(isDefault, listImplType,
                 isDefault && Set.class.isAssignableFrom(listImplType) ? HashSet::new : ArrayList::new);
         }
     }
@@ -528,8 +526,7 @@ public class GenericTypeCaster implements TypeCaster {
         }
 
         List toList(Collection value, Class listImplType) {
-            return listImplType.isInstance(value) ? (List) value : createList(listImplType,
-                isAbstract(listImplType),
+            return listImplType.isInstance(value) ? (List) value : createList(listImplType, isAbstract(listImplType),
                 value);
         }
 
@@ -613,9 +610,8 @@ public class GenericTypeCaster implements TypeCaster {
 
         <T> T toMap(Object value, Class mapClass) {
             Map result = createMap(mapClass);
-            BeanInfoUtil.getFieldDescriptorsMap(value.getClass())
-                .forEach((name, desc) -> desc.ifGetterPresent(descriptor -> result.put(name,
-                    descriptor.getValue(value, true))));
+            BeanInfoUtil.getFieldDescriptorsMap(value.getClass()).forEach(
+                (name, desc) -> desc.ifGetterPresent(descriptor -> result.put(name, descriptor.getValue(value, true))));
             return (T) result;
         }
 

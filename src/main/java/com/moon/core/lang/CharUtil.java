@@ -72,9 +72,9 @@ public final class CharUtil {
     /**
      * "[4e00-9fa5]"
      *
-     * @param ch
+     * @param ch 字符
      *
-     * @return
+     * @return 是否是汉字
      */
     public static final boolean isChinese(int ch) { return ch < 40870 && ch > 19967; }
 
@@ -83,36 +83,36 @@ public final class CharUtil {
     /**
      * A-Z,a-z
      *
-     * @param ch
+     * @param ch 字符
      *
-     * @return
+     * @return 是否是字母
      */
     public static final boolean isLetter(int ch) { return isLowerCase(ch) || isUpperCase(ch); }
 
     /**
      * A-Z
      *
-     * @param ch
+     * @param ch 字符
      *
-     * @return
+     * @return 是否是大写字母
      */
     public static final boolean isUpperCase(int ch) { return ch > 64 && ch < 91; }
 
     /**
      * a-z
      *
-     * @param ch
+     * @param ch 字符
      *
-     * @return
+     * @return 是否是小写字母
      */
     public static final boolean isLowerCase(int ch) { return ch > 96 && ch < 123; }
 
     /**
      * 0-9
      *
-     * @param ch
+     * @param ch 字符
      *
-     * @return
+     * @return 是否是数字
      */
     public static final boolean isDigit(int ch) { return ch > 47 && ch < 58; }
 
@@ -153,9 +153,9 @@ public final class CharUtil {
     }
 
     /**
-     * @param o
+     * @param o 带转换值
      *
-     * @return
+     * @return 转换后的值
      *
      * @see IntUtil#toIntValue(Object)
      */

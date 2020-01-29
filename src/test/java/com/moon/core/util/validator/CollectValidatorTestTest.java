@@ -26,7 +26,7 @@ class CollectValidatorTestTest {
 
     @Test
     void testOf() {
-        List<String> collect = ListUtil.ofArrayList(
+        List<String> collect = ListUtil.newArrayList(
             "1111",
             "22222",
             "333333",

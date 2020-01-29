@@ -15,7 +15,11 @@ import static com.moon.core.enums.Const.ZERO;
  */
 public enum ImageJoiner implements ImageDescriptor {
 
-    JPG, JPEG, GIF, PNG, BMP;
+    JPG,
+    JPEG,
+    GIF,
+    PNG,
+    BMP;
 
     /*
      * ----------------------------------------------------------------------------
@@ -72,22 +76,31 @@ public enum ImageJoiner implements ImageDescriptor {
 
     private static BufferedImage joinWithSameSize(Operator operator, String... sourceImages) {
         final int length = sourceImages.length;
-        return length < 1 ? OpUtil.empty() : operator.accept(sourceImages, IntAccessor.of(Integer.MAX_VALUE),
-            new int[length], new int[length], new ArrayList(length));
+        return length < 1 ? OpUtil.empty() : operator
+            .accept(sourceImages, IntAccessor.of(Integer.MAX_VALUE), new int[length], new int[length],
+                new ArrayList(length));
     }
 
     private interface Operator {
+
         /**
          * inner
          *
-         * @param sources
-         * @param accessor
-         * @param heights
-         * @param widths
-         * @param images
-         * @return
+         * @param sources  源
+         * @param accessor 索引
+         * @param heights  高
+         * @param widths   宽
+         * @param images   图片文件列表
+         *
+         * @return 操作后的图片
          */
-        BufferedImage accept(String[] sources, IntAccessor accessor, int[] heights, int[] widths, List<BufferedImage> images);
+        BufferedImage accept(
+            String[] sources,
+            IntAccessor accessor,
+            int[] heights,
+            int[] widths,
+            List<BufferedImage> images
+        );
     }
 
     private static BufferedImage joinWithSameWidth(String... sourceImages) {
@@ -116,8 +129,7 @@ public enum ImageJoiner implements ImageDescriptor {
                 int[] imageRgbPoints = new int[width * height];
 
                 newImage.getGraphics().drawImage(image, ZERO, ZERO, width, height, null);
-                imageRgbPoints = newImage.getRGB(ZERO, ZERO,
-                    width, height, imageRgbPoints, ZERO, width);
+                imageRgbPoints = newImage.getRGB(ZERO, ZERO, width, height, imageRgbPoints, ZERO, width);
 
                 resultImage.setRGB(ZERO, index, width, height, imageRgbPoints, ZERO, width);
                 index += height;
@@ -151,8 +163,7 @@ public enum ImageJoiner implements ImageDescriptor {
                 BufferedImage newImage = OpUtil.createBuffered(width, height);
 
                 newImage.getGraphics().drawImage(image, ZERO, ZERO, width, height, null);
-                int[] points = newImage.getRGB(ZERO, ZERO, width,
-                    height, new int[width * height], ZERO, width);
+                int[] points = newImage.getRGB(ZERO, ZERO, width, height, new int[width * height], ZERO, width);
 
                 resultImage.setRGB(index, ZERO, width, height, points, ZERO, width);
                 index += width;
@@ -183,6 +194,7 @@ public enum ImageJoiner implements ImageDescriptor {
     }
 
     private static final class Join {
+
         static BufferedImage newSize(
             BufferedImage[] images, int[][] rgbArrays, Direction direction
         ) {
@@ -193,13 +205,11 @@ public enum ImageJoiner implements ImageDescriptor {
                 width = direction.computeWidth(Maths.MAX, width, images[i].getWidth());
             }
 
-            return height < 1 || width < 1 ? OpUtil.empty()
-                : Join.out(images, rgbArrays, width, height, direction);
+            return height < 1 || width < 1 ? OpUtil.empty() : Join.out(images, rgbArrays, width, height, direction);
         }
 
         static BufferedImage out(
-            BufferedImage[] images, int[][] rgbArrays,
-            int outWidth, int outHeight, Direction direction
+            BufferedImage[] images, int[][] rgbArrays, int outWidth, int outHeight, Direction direction
         ) {
             BufferedImage outImage = OpUtil.createBuffered(outWidth, outHeight);
             int index = 0;

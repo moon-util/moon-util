@@ -14,7 +14,7 @@ public interface ThrowingBiFunction<T, O, R> {
      * @param value1
      * @param value2
      * @return
-     * @throws Throwable
+     * @see Throwable
      */
     R apply(T value1, O value2) throws Throwable;
 

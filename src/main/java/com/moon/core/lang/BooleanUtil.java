@@ -73,8 +73,8 @@ public final class BooleanUtil {
     }
 
     /**
-     * @param o
-     * @return
+     * @param o 带转换值
+     * @return boolean value
      * @see IntUtil#toIntValue(Object)
      */
     public static boolean toBooleanValue(Object o) {
@@ -83,8 +83,8 @@ public final class BooleanUtil {
     }
 
     /**
-     * @param o
-     * @return
+     * @param o 带转换值
+     * @return boolean value
      * @see IntUtil#toIntValue(Object)
      */
     public static Boolean toBoolean(Object o) {

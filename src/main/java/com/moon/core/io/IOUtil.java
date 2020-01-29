@@ -291,10 +291,10 @@ public final class IOUtil {
     /**
      * 将字符串写入 Writer
      *
-     * @param cs
-     * @param writer
+     * @param cs     字符串
+     * @param writer writer
      *
-     * @return
+     * @return 写入字节数
      */
     public final static int copy(CharSequence cs, Writer writer) {
         int len = cs == null ? 0 : cs.length();
@@ -310,10 +310,10 @@ public final class IOUtil {
     /**
      * 将字符串写入输出流
      *
-     * @param cs
-     * @param os
+     * @param cs 待写字符串
+     * @param os output stream
      *
-     * @return
+     * @return 写出字符数
      */
     public final static int copy(CharSequence cs, OutputStream os) {
         int len = cs == null ? 0 : cs.length();
@@ -326,11 +326,11 @@ public final class IOUtil {
     /**
      * 将字符串写入输出流
      *
-     * @param cs
-     * @param os
-     * @param charset
+     * @param cs      待写出字符串
+     * @param os      Output Stream
+     * @param charset 字符集
      *
-     * @return
+     * @return 写出字节数
      */
     public final static int copy(CharSequence cs, OutputStream os, String charset) {
         int len = cs == null ? 0 : cs.length();
@@ -347,11 +347,11 @@ public final class IOUtil {
     /**
      * 将字符串写入输出流
      *
-     * @param cs
-     * @param os
-     * @param charset
+     * @param cs      待写出字符串
+     * @param os      Output Stream
+     * @param charset 字符集
      *
-     * @return
+     * @return 写出字节数
      */
     public final static int copy(CharSequence cs, OutputStream os, Charset charset) {
         int len = cs == null ? 0 : cs.length();
@@ -414,8 +414,8 @@ public final class IOUtil {
     /**
      * write a char array in to Writer of all char
      *
-     * @param writer
-     * @param chars
+     * @param writer writer
+     * @param chars 字符
      */
     public final static void write(Writer writer, char[] chars) { write(writer, chars, 0, chars.length); }
 

@@ -67,7 +67,7 @@ import java.util.Date;
  * <p>
  * <strong>【 八 】</strong>、静态方法调用符：@ ；
  * <p>
- * 如：@System.currentTimeMillis() ===> 无参公共静态方法调用；
+ * 如：@System.currentTimeMillis() ==== 无参公共静态方法调用；
  * <p>
  * <strong>说明：</strong>
  * 静态方法调用只能调用此工具库所包含的类和 JDK 中以下包的静态方法：
@@ -80,7 +80,7 @@ import java.util.Date;
  * <p>
  * 无参公共实例方法调用：'string'.length()；
  * <p>
- * {0}.getSheet(0) ===> 带有一个参数的公共实例方法调用；
+ * {0}.getSheet(0) ==== 带有一个参数的公共实例方法调用；
  * <p>
  * <strong>【 十 】</strong>、链式取值和方法调用：employee.name.length()
  * <p>
@@ -166,7 +166,7 @@ import java.util.Date;
 public final class RunnerUtil extends ParseUtil {
 
     /**
-     * @throws AssertionError 不可实例化
+     * @see AssertionError 不可实例化
      */
     private RunnerUtil() { super(); }
 
@@ -183,18 +183,18 @@ public final class RunnerUtil extends ParseUtil {
      *
      * @return
      *
-     * @throws Throwable 如果字符串表达式中包含变量
+     * @see Throwable 如果字符串表达式中包含变量
      */
     public final static Object run(String expression) { return parse(expression).run(); }
 
     /**
      * 计算带有变量复杂表达式，可接受一个参数，形如：
      * <p>
-     * 1 + 2 + key1[0].name      ==> key1 可以是 Map 的 key 或一个实体对象的字段
+     * 1 + 2 + key1[0].name      === key1 可以是 Map 的 key 或一个实体对象的字段
      * <p>
      * 或
      * <p>
-     * 'a' + '2' + [0].key.name  ==> 0 是数组或 List 的索引
+     * 'a' + '2' + [0].key.name  === 0 是数组或 List 的索引
      * <p>
      * 等带有参数的表达式
      *
@@ -203,7 +203,7 @@ public final class RunnerUtil extends ParseUtil {
      *
      * @return
      *
-     * @throws NullPointerException 如果字符串表达式中包含 data 中没有的变量
+     * @see NullPointerException 如果字符串表达式中包含 data 中没有的变量
      */
     public final static Object run(String expression, Object data) { return parse(expression).run(data); }
 
@@ -226,11 +226,11 @@ public final class RunnerUtil extends ParseUtil {
     /**
      * 运行字符串中的表达式，如：
      * <p>
-     * RunnerUtil.parseRun("1 + 2 = {{1+2}}");        // =====> "1 + 2 = 3"
+     * RunnerUtil.parseRun("1 + 2 = {{1+2}}");        // ====== "1 + 2 = 3"
      * <p>
-     * RunnerUtil.parseRun("中华人民共和国{{'棒棒的'}}"); // =====> "中华人民共和国棒棒的"
+     * RunnerUtil.parseRun("中华人民共和国{{'棒棒的'}}"); // ====== "中华人民共和国棒棒的"
      * <p>
-     * 默认分隔符为：${@link #DELIMITERS} ==> {"{{", "}}"}；
+     * 默认分隔符为：${@link #DELIMITERS} === {"{{", "}}"}；
      * 可包含多个表达式，但不能嵌套包含，也不能交叉嵌套，如下：
      * <p>
      * 错误示例："1 + 2 = {{ 1 + {{ 3 + 4 }} + 2 }}"
@@ -239,26 +239,26 @@ public final class RunnerUtil extends ParseUtil {
      * <p>
      * <strong>说明：</strong>如果字符串中只有一个表达式，并且始末位置分别就是始末分割符，
      * 那么这个表达式返回值可以是任意对象，否则只能返回字符串，如：
-     * RunnerUtil.parseRun("中华人民共和国{{'棒棒的'}}"); // =====> "中华人民共和国棒棒的"
+     * RunnerUtil.parseRun("中华人民共和国{{'棒棒的'}}"); // ====== "中华人民共和国棒棒的"
      * <p>
-     * RunnerUtil.parseRun("{{'棒棒的'}}");             // =====> "棒棒的"
+     * RunnerUtil.parseRun("{{'棒棒的'}}");             // ====== "棒棒的"
      * <p>
-     * RunnerUtil.parseRun("{{1}}");                  // =====> 1
+     * RunnerUtil.parseRun("{{1}}");                  // ====== 1
      * <p><strong>【注意：】</strong>
      * 由于花括号 “{}、{:}” 在此工具中可表示 Map 或 List，
      * 所以在可能引起边界混淆的地方最好自定义分隔符，如：
      * <p>
      * 错误示例： {{{'name'}}}
      * <p>
-     * 应该写成： {{ {'name'}[0] }} ==> 边界处留有空格；
+     * 应该写成： {{ {'name'}[0] }} === 边界处留有空格；
      * <p>
-     * 或： $[{'name'}] ==> 自定义分隔符；
+     * 或： $[{'name'}] === 自定义分隔符；
      *
      * @param expression 包含插值语法的字符串表达式
      *
      * @return
      *
-     * @throws Throwable 如果字符串表达式中包含变量
+     * @see Throwable 如果字符串表达式中包含变量
      */
     public final static Object parseRun(String expression) { return parse(expression, DELIMITERS).run(); }
 
@@ -267,9 +267,9 @@ public final class RunnerUtil extends ParseUtil {
      * <p>
      * Map data = {"desc": "棒棒的"} // 这是一个 Map
      * <p>
-     * RunnerUtil.parseRun("中华人民共和国{{desc}}", data); // =====> "中华人民共和国棒棒的"
+     * RunnerUtil.parseRun("中华人民共和国{{desc}}", data); // ====== "中华人民共和国棒棒的"
      * <p>
-     * 默认分隔符为：${@link #DELIMITERS} ==> {"{{", "}}"}
+     * 默认分隔符为：${@link #DELIMITERS} === {"{{", "}}"}
      * <p>
      * <strong>【注意：】</strong>
      * 由于花括号 “{}、{:}” 在此工具中可表示 Map 或 List，
@@ -277,16 +277,16 @@ public final class RunnerUtil extends ParseUtil {
      * <p>
      * 错误示例： {{{'name'}}}
      * <p>
-     * 应该写成： {{ {'name'}[0] }} ==> 边界处留有空格；
+     * 应该写成： {{ {'name'}[0] }} === 边界处留有空格；
      * <p>
-     * 或： $[{'name'}] ==> 自定义分隔符；
+     * 或： $[{'name'}] === 自定义分隔符；
      *
      * @param expression 包含插值语法的字符串表达式
      * @param data       表达式运行时变量所引用的数据
      *
      * @return
      *
-     * @throws NullPointerException 如果字符串表达式中包含 data 中没有的变量
+     * @see NullPointerException 如果字符串表达式中包含 data 中没有的变量
      * @see #parseRun(String)
      */
     public final static Object parseRun(String expression, Object data) {
@@ -304,7 +304,7 @@ public final class RunnerUtil extends ParseUtil {
      * <p>
      * String[] delimiters = {"${", "}"};
      * <p>
-     * RunnerUtil.parseRun("本草纲目{desc}", delimiters, data); // =====> "本草纲目棒棒的"
+     * RunnerUtil.parseRun("本草纲目{desc}", delimiters, data); // ====== "本草纲目棒棒的"
      * <p>
      * <strong>【注意：】</strong>同一个字符串中不可包含多种不同的分隔符而运行多次；
      * <p>
@@ -313,16 +313,16 @@ public final class RunnerUtil extends ParseUtil {
      * <p>
      * 错误示例： {{{'name'}}}
      * <p>
-     * 应该写成： {{ {'name'}[0] }} ==> 边界处留有空格；
+     * 应该写成： {{ {'name'}[0] }} === 边界处留有空格；
      * <p>
-     * 或： $[{'name'}] ==> 自定义分隔符；
+     * 或： $[{'name'}] === 自定义分隔符；
      *
      * @param expression 包含插值语法的字符串表达式
      * @param delimiters 必须是一个长度不小于 2 包含始末标记的非空字符串，长度大于 2 后面的内容会被忽略
      *
      * @return
      *
-     * @throws Throwable 如果字符串表达式中包含变量
+     * @see Throwable 如果字符串表达式中包含变量
      * @see #parseRun(String, String[], Object)
      */
     public final static Object parseRun(String expression, String[] delimiters) {
@@ -336,7 +336,7 @@ public final class RunnerUtil extends ParseUtil {
      * <p>
      * String[] delimiters = {"${", "}"};
      * <p>
-     * RunnerUtil.parseRun("本草纲目${desc}", delimiters, data); // =====> "本草纲目棒棒的"
+     * RunnerUtil.parseRun("本草纲目${desc}", delimiters, data); // ====== "本草纲目棒棒的"
      * <p>
      * <strong>【注意：】</strong>同一个字符串中不可包含多种不同的分隔符而运行多次；
      * <p>
@@ -345,9 +345,9 @@ public final class RunnerUtil extends ParseUtil {
      * <p>
      * 错误示例： {{{'name'}}}
      * <p>
-     * 应该写成： {{ {'name'}[0] }} ==> 边界处留有空格；
+     * 应该写成： {{ {'name'}[0] }} === 边界处留有空格；
      * <p>
-     * 或： $[{'name'}] ==> 自定义分隔符；
+     * 或： $[{'name'}] === 自定义分隔符；
      *
      * @param expression 包含插值语法的字符串表达式
      * @param delimiters 必须是一个长度不小于 2 包含始末标记的非空字符串，长度大于 2 后面的内容会被忽略
@@ -355,7 +355,7 @@ public final class RunnerUtil extends ParseUtil {
      *
      * @return
      *
-     * @throws NullPointerException 如果字符串表达式中包含 data 中没有的变量
+     * @see NullPointerException 如果字符串表达式中包含 data 中没有的变量
      * @see #parseRun(String)
      */
     public final static Object parseRun(String expression, String[] delimiters, Object data) {

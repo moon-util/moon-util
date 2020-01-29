@@ -148,9 +148,9 @@ public class CollectUtil extends BaseCollectUtil {
 
     public final static <T> Collection<T> concat(Collection<T> collect, Collection<T>... collections) { return concat0(collect, collections); }
 
-    public final static <T> Set<T> toSet(T... items) { return SetUtil.ofHashSet(items); }
+    public final static <T> Set<T> toSet(T... items) { return SetUtil.newHashSet(items); }
 
-    public final static <T> List<T> toList(T... items) { return ListUtil.ofArrayList(items); }
+    public final static <T> List<T> toList(T... items) { return ListUtil.newArrayList(items); }
 
     public final static <E, T> T[] toTypeArray(Collection<E> collection, Class<T> componentType) {
         int index = 0;

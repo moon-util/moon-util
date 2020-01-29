@@ -12,23 +12,23 @@ public interface Traveller<T> extends Supplier<List<T>>, List<T> {
     /**
      * 遍历指定目录下的文件
      *
-     * @param path
-     * @return
+     * @param path 目标绝对路径
+     *
+     * @return 当前文件遍历器
      */
     Traveller<T> traverse(String path);
 
     /**
      * 遍历指定目录下的文件
      *
-     * @param path
-     * @return
+     * @param path 绝对路径
+     *
+     * @return 当前文件遍历器
      */
     Traveller<T> traverse(File path);
 
     /**
      * 初始化或重置
-     *
-     * @return
      */
     @Override
     void clear();
@@ -36,7 +36,7 @@ public interface Traveller<T> extends Supplier<List<T>>, List<T> {
     /**
      * 获取所有内容
      *
-     * @return
+     * @return 当前遍历器
      */
     @Override
     default List<T> get() {

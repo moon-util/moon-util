@@ -10,8 +10,8 @@ import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 /**
  * @author benshaoye
  */
-abstract class BaseAccessor<T, A extends BaseAccessor<T, A>>
-    implements Accessor<T, A> {
+abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> implements Accessor<T, A> {
+
     /**
      * 缓存取值过程
      */
@@ -36,8 +36,9 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>>
     /**
      * 子类实现引用对象
      *
-     * @param value
-     * @return
+     * @param value 引用值
+     *
+     * @return 目标引用
      */
     protected abstract Reference<T> reference(T value);
 
@@ -50,7 +51,7 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>>
     /**
      * 获取值
      *
-     * @return
+     * @return 返回目标值或 null
      */
 
     public final T getOrDefault(T obj) { return defaultIfNull(get(), obj); }

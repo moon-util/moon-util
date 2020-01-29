@@ -2,10 +2,8 @@ package com.moon.core.lang;
 
 import com.moon.core.lang.support.ClassSupport;
 import com.moon.core.util.ListUtil;
-import com.moon.core.util.OptionalUtil;
 
 import java.util.*;
-import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -57,7 +55,7 @@ public final class ClassUtil {
 
 
     public static List<Class> getAllInterfaces(Class type) {
-        return ClassSupport.addAllInterfaces(ListUtil.ofArrayList(), type);
+        return ClassSupport.addAllInterfaces(ListUtil.newArrayList(), type);
     }
 
     public static List<Class> getAllSuperclasses(Class type) {

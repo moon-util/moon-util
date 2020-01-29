@@ -56,11 +56,12 @@ public final class ThrowUtil {
     /**
      * 忽略指定类型异常
      *
-     * @param t
-     * @param type
-     * @param <T>
-     * @param <EX>
-     * @return
+     * @param t    异常
+     * @param type 异常类型
+     * @param <T>  泛型（无意义）
+     * @param <EX> 期望忽略的异常类型
+     *
+     * @return 如果被忽略就返回 null，否则抛出异常
      */
     public final static <T, EX extends Throwable> T ignoreAssignException(Throwable t, Class<EX> type) {
         if (type.isInstance(t)) {
@@ -72,11 +73,12 @@ public final class ThrowUtil {
     /**
      * 忽略包含指定类型 cause 的异常，否则抛出异常
      *
-     * @param t
-     * @param type
-     * @param <T>
-     * @param <EX>
-     * @return
+     * @param t    异常
+     * @param type 异常类型
+     * @param <T>  泛型（无意义）
+     * @param <EX> 期望忽略的异常类型
+     *
+     * @return 如果被忽略就返回 null，否则抛出异常
      */
     public final static <T, EX extends Throwable> T ignoreAssignExceptionWithCause(Throwable t, Class<EX> type) {
         for (Throwable ex = t; ex != null; ex = ex.getCause()) {
@@ -90,10 +92,11 @@ public final class ThrowUtil {
     /**
      * 忽略指定类抛出的异常
      *
-     * @param t
-     * @param targetClass
-     * @param <T>
-     * @return
+     * @param t           异常
+     * @param targetClass 目标位置
+     * @param <T>         泛型（无意义）
+     *
+     * @return 如果被忽略就返回 null，否则抛出异常
      */
     public final static <T> T ignoreAssignPosition(Throwable t, Class targetClass) {
         String name = targetClass.getName();
@@ -111,11 +114,12 @@ public final class ThrowUtil {
     /**
      * 忽略自身或 cause 中包含指定方法抛出的异常，否则抛出异常
      *
-     * @param t
-     * @param targetClass
-     * @param methodName
-     * @param <T>
-     * @return
+     * @param t           异常
+     * @param targetClass 目标位置
+     * @param methodName  目标方法
+     * @param <T>         异常泛型
+     *
+     * @return 如果被忽略就返回 null，否则抛出异常
      */
     public final static <T> T ignoreAssignPosition(Throwable t, Class targetClass, String methodName) {
         final String name = targetClass.getName();
@@ -123,8 +127,7 @@ public final class ThrowUtil {
         for (Throwable th = t; th != null; th = th.getCause()) {
             StackTraceElement[] elements = th.getStackTrace();
             for (int i = 0; i < elements.length; i++) {
-                if (name.equals((element = elements[i]).getClassName())
-                    && methodName.equals(element.getMethodName())) {
+                if (name.equals((element = elements[i]).getClassName()) && methodName.equals(element.getMethodName())) {
                     return null;
                 }
             }
@@ -141,7 +144,7 @@ public final class ThrowUtil {
     /**
      * 忽略所有异常调用、运行一段代码
      *
-     * @param runner
+     * @param runner 将要执行的代码块
      */
     public static void ignoreThrowsRun(ThrowingRunnable runner) {
         ignoreThrowsRun(runner, false);
@@ -150,8 +153,8 @@ public final class ThrowUtil {
     /**
      * 如存在异常，打印异常信息，但不影响执行
      *
-     * @param runner
-     * @param println
+     * @param runner  将要执行的代码块
+     * @param println 是否打印异常栈
      */
     public static void ignoreThrowsRun(ThrowingRunnable runner, boolean println) {
         optionalThrowsRun(runner, println ? Throwable::printStackTrace : t -> {});
@@ -173,7 +176,9 @@ public final class ThrowUtil {
         optionalThrowsAccept(value, consumer, println ? Throwable::printStackTrace : t -> {});
     }
 
-    public static <T> void optionalThrowsAccept(T value, ThrowingConsumer<T> consumer, Consumer<Throwable> throwableConsumer) {
+    public static <T> void optionalThrowsAccept(
+        T value, ThrowingConsumer<T> consumer, Consumer<Throwable> throwableConsumer
+    ) {
         try {
             consumer.accept(value);
         } catch (Throwable t) {
@@ -227,9 +232,10 @@ public final class ThrowUtil {
         return rejectAccessError("Refuse to apply. \n\tLocation: " + StackTraceUtil.getPrevTraceOfSteps(1));
     }
 
-    /***
+    /**
      * 不能访问指定位置
-     * @param message
+     *
+     * @param message 异常信息
      */
     public final static <T> T rejectAccessError(String message) {
         throw new IllegalAccessError(message);

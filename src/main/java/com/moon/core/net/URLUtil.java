@@ -15,6 +15,7 @@ import static com.moon.core.net.enums.Protocol.HTTPS;
  * @author benshaoye
  */
 public final class URLUtil {
+
     private URLUtil() {
         noInstanceError();
     }
@@ -22,8 +23,9 @@ public final class URLUtil {
     /**
      * 屏蔽 URL 构造器的检查异常
      *
-     * @param url
-     * @return
+     * @param url url 地址
+     *
+     * @return url instance
      */
     public static URL ofOrigin(String url) {
         return LangUtil.apply(url, URL::new);

@@ -24,7 +24,7 @@ public interface BooleanConsumer {
      * @param after the operation to perform after this operation
      * @return a composed {@code BooleanConsumer} that performs in sequence this
      * operation followed by the {@code after} operation
-     * @throws NullPointerException if {@code after} is null
+     * @see NullPointerException if {@code after} is null
      */
     default BooleanConsumer andThen(BooleanConsumer after) {
         Objects.requireNonNull(after);

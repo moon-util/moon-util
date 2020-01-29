@@ -11,18 +11,14 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 public final class ResourceUtil {
-    private ResourceUtil() {
-        noInstanceError();
-    }
+    private ResourceUtil() { noInstanceError(); }
 
     /**
      * 检测系统资源文件或本地文件是否存在
      *
      * @param sourcePath
      */
-    public static final boolean resourceExists(String sourcePath) {
-        return ResourceSupport.resourceExists(sourcePath);
-    }
+    public static final boolean resourceExists(String sourcePath) { return ResourceSupport.resourceExists(sourcePath); }
 
     /**
      * 读取系统资源文件或者本地文件的输入流

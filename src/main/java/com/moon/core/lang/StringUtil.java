@@ -21,6 +21,7 @@ import static java.lang.Character.*;
  * @date 2018-09-11
  */
 public final class StringUtil {
+
     private StringUtil() {
         noInstanceError();
     }
@@ -33,13 +34,16 @@ public final class StringUtil {
     /**
      * 比较两个字符序列是否相同
      *
-     * @param str1
-     * @param str2
-     * @return
+     * @param str1 字符串
+     * @param str2 字符串
+     *
+     * @return 内容是否相等
      */
     public static <T> boolean equals(T str1, T str2) { return Objects.equals(str1, str2); }
 
-    public static boolean equalsIgnoreCase(String str1, String str2) { return str1 != null && str1.equalsIgnoreCase(str2); }
+    public static boolean equalsIgnoreCase(String str1, String str2) {
+        return str1 != null && str1.equalsIgnoreCase(str2);
+    }
 
     /**
      * 比较两个字符序列内容是否一致
@@ -59,9 +63,10 @@ public final class StringUtil {
      * <p>
      * StringUtil.contentEquals(new StringBuffer("1"), new StringBuilder("1")) --> false
      *
-     * @param str1
-     * @param str2
-     * @return
+     * @param str1 字符串
+     * @param str2 字符串
+     *
+     * @return 内容是否相同
      */
     public static <T extends CharSequence> boolean contentEquals(T str1, T str2) {
         return str1 == null ? str2 == null : (str1.equals(str2) || StringSupport.matches(str1, str2));
@@ -96,8 +101,9 @@ public final class StringUtil {
     /**
      * 经一定量测试后，程序中运行的每个字符串长度平均值约在 6 - 14 之间，取 11 作为默认值，一定程度提高效率
      *
-     * @param css
-     * @return
+     * @param css 字符串列表
+     *
+     * @return 连接后的字符串
      */
     public static String concat(CharSequence... css) { return concatHandler(Predicates.TRUE, css); }
 
@@ -118,8 +124,10 @@ public final class StringUtil {
      */
 
     /**
-     * @param string
-     * @return
+     * @param string 字符串
+     *
+     * @return 是否不是空字符串
+     *
      * @see #isEmpty(CharSequence)
      */
     public static boolean isNotEmpty(CharSequence string) { return !isEmpty(string); }
@@ -137,14 +145,17 @@ public final class StringUtil {
      * StringUtil.isEmpty("abc")        === false
      * StringUtil.isEmpty(" a b c ")    === false
      *
-     * @param string
-     * @return
+     * @param string 待测字符串
+     *
+     * @return 是否为空
      */
     public static boolean isEmpty(CharSequence string) { return string == null || string.length() == 0; }
 
     /**
-     * @param string
-     * @return
+     * @param string 待测字符串
+     *
+     * @return 是否不为空
+     *
      * @see #isBlank(CharSequence)
      */
     public static boolean isNotBlank(CharSequence string) { return !isBlank(string); }
@@ -162,8 +173,9 @@ public final class StringUtil {
      * StringUtil.isBlank("abc")        === false
      * StringUtil.isBlank(" a b c ")    === false
      *
-     * @param string
-     * @return
+     * @param string 待测字符串
+     *
+     * @return 是否为空
      */
     public static boolean isBlank(CharSequence string) {
         if (string != null) {
@@ -189,8 +201,9 @@ public final class StringUtil {
      * StringUtil.isNullString("abc")        === false
      * StringUtil.isNullString(" a b c ")    === false
      *
-     * @param cs
-     * @return
+     * @param cs 待测字符串
+     *
+     * @return 是否是空或 null 字符串
      */
     public static boolean isNullString(CharSequence cs) {
         if (cs == null) {
@@ -200,10 +213,7 @@ public final class StringUtil {
             return "null".equals(cs.toString());
         }
         if (cs.length() == 4) {
-            return cs.charAt(0) == 'n'
-                && cs.charAt(1) == 'u'
-                && cs.charAt(2) == 'l'
-                && cs.charAt(3) == 'l';
+            return cs.charAt(0) == 'n' && cs.charAt(1) == 'u' && cs.charAt(2) == 'l' && cs.charAt(3) == 'l';
         }
         return false;
     }
@@ -211,18 +221,19 @@ public final class StringUtil {
     /**
      * cs is null、"null" or "undefined"
      * <p>
-     * StringUtil.isUndefined(null)         ==> true
-     * StringUtil.isUndefined("null")       ==> true
-     * StringUtil.isUndefined("undefined")  ==> true
+     * StringUtil.isUndefined(null)         === true
+     * StringUtil.isUndefined("null")       === true
+     * StringUtil.isUndefined("undefined")  === true
      * <p>
-     * StringUtil.isUndefined("")           ==> false
-     * StringUtil.isUndefined(" ")          ==> false
-     * StringUtil.isUndefined("a")          ==> false
-     * StringUtil.isUndefined("abc")        ==> false
-     * StringUtil.isUndefined(" a b c ")    ==> false
+     * StringUtil.isUndefined("")           === false
+     * StringUtil.isUndefined(" ")          === false
+     * StringUtil.isUndefined("a")          === false
+     * StringUtil.isUndefined("abc")        === false
+     * StringUtil.isUndefined(" a b c ")    === false
      *
-     * @param cs
-     * @return
+     * @param cs 待测字符串
+     *
+     * @return 是否是空或 null、undefined
      */
     public static boolean isUndefined(CharSequence cs) {
         if (cs == null) {
@@ -234,20 +245,17 @@ public final class StringUtil {
         }
         switch (cs.length()) {
             case 4:
-                return cs.charAt(0) == 'n'
-                    && cs.charAt(1) == 'u'
-                    && cs.charAt(2) == 'l'
-                    && cs.charAt(3) == 'l';
+                return cs.charAt(0) == 'n' && cs.charAt(1) == 'u' && cs.charAt(2) == 'l' && cs.charAt(3) == 'l';
             case 9:
-                return cs.charAt(0) == 'u'
-                    && cs.charAt(1) == 'n'
-                    && cs.charAt(2) == 'd'
-                    && cs.charAt(3) == 'e'
-                    && cs.charAt(4) == 'f'
-                    && cs.charAt(5) == 'i'
-                    && cs.charAt(6) == 'n'
-                    && cs.charAt(7) == 'e'
-                    && cs.charAt(8) == 'd';
+                return cs.charAt(0) == 'u' &&
+                    cs.charAt(1) == 'n' &&
+                    cs.charAt(2) == 'd' &&
+                    cs.charAt(3) == 'e' &&
+                    cs.charAt(4) == 'f' &&
+                    cs.charAt(5) == 'i' &&
+                    cs.charAt(6) == 'n' &&
+                    cs.charAt(7) == 'e' &&
+                    cs.charAt(8) == 'd';
             default:
                 return false;
         }
@@ -255,9 +263,13 @@ public final class StringUtil {
 
     public final static boolean isAllLetter(CharSequence cs) { return isAllMatched(cs, curr -> isLetter(curr)); }
 
-    public final static boolean isAllUpperCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isUpperCase(curr)); }
+    public final static boolean isAllUpperCase(CharSequence cs) {
+        return isAllMatched(cs, curr -> Character.isUpperCase(curr));
+    }
 
-    public final static boolean isAllLowerCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isLowerCase(curr)); }
+    public final static boolean isAllLowerCase(CharSequence cs) {
+        return isAllMatched(cs, curr -> Character.isLowerCase(curr));
+    }
 
     public final static boolean isAllMatched(CharSequence cs, IntPredicate tester) {
         final int length = length(cs);
@@ -273,9 +285,13 @@ public final class StringUtil {
 
     public final static boolean isAnyLetter(CharSequence cs) { return isAllMatched(cs, curr -> isLetter(curr)); }
 
-    public final static boolean isAnyUpperCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isUpperCase(curr)); }
+    public final static boolean isAnyUpperCase(CharSequence cs) {
+        return isAllMatched(cs, curr -> Character.isUpperCase(curr));
+    }
 
-    public final static boolean isAnyLowerCase(CharSequence cs) { return isAllMatched(cs, curr -> Character.isLowerCase(curr)); }
+    public final static boolean isAnyLowerCase(CharSequence cs) {
+        return isAllMatched(cs, curr -> Character.isLowerCase(curr));
+    }
 
     public final static boolean isAnyMatched(CharSequence cs, IntPredicate tester) {
         final int length = length(cs);
@@ -367,9 +383,12 @@ public final class StringUtil {
     /**
      * 以下几个方法主要是针对 JavaScript
      *
-     * @param cs
-     * @param defaultValue
-     * @return
+     * @param cs           待测字符串
+     * @param defaultValue 默认值
+     *
+     * @return 测试后的值
+     *
+     * @see #isNullString(CharSequence)
      */
     public static <T extends CharSequence> T defaultIfNullString(T cs, T defaultValue) {
         return isNullString(cs) ? defaultValue : cs;
@@ -476,7 +495,9 @@ public final class StringUtil {
 
     public static String stringifyOrEmpty(Object value) { return stringifyOrDefault(value, Const.EMPTY); }
 
-    public static String stringifyOrDefault(Object value, String defaultValue) { return value == null ? defaultValue : value.toString(); }
+    public static String stringifyOrDefault(Object value, String defaultValue) {
+        return value == null ? defaultValue : value.toString();
+    }
 
     /*
      * -------------------------------------------------------------------
@@ -532,8 +553,7 @@ public final class StringUtil {
 
     public static String trimToDefault(CharSequence cs, String defaultValue) {
         String ret = isEmpty(cs) ? defaultValue : cs.toString().trim();
-        return ret == null ? null : (length(ret) > 0
-            ? (ret.charAt(0) == 65279 ? ret.substring(1) : ret) : EMPTY);
+        return ret == null ? null : (length(ret) > 0 ? (ret.charAt(0) == 65279 ? ret.substring(1) : ret) : EMPTY);
     }
 
     /*
@@ -546,10 +566,12 @@ public final class StringUtil {
      * 删除{@link String}、{@link StringBuilder}、{@link StringBuffer}中的空白字符
      * 不支持其他类型{@link CharSequence}
      *
-     * @param cs
-     * @param <T>
-     * @return
-     * @throws IllegalArgumentException can not support except types in String、StringBuilder、StringBuffer
+     * @param cs  待测字符串
+     * @param <T> 字符串类型
+     *
+     * @return 删除所有空白字符后的字符串
+     *
+     * @see IllegalArgumentException can not support except types in String、StringBuilder、StringBuffer
      */
     public static <T extends CharSequence> T deleteWhitespaces(T cs) {
         if (cs != null) {
@@ -584,8 +606,9 @@ public final class StringUtil {
     /**
      * 连续空白只保留一个
      *
-     * @param str
-     * @return
+     * @param str 待操作字符串
+     *
+     * @return 操作成功后的字符串
      */
     public final static String onlyWhitespace(String str) {
         char[] chars = toCharArray(str), value = ArraysEnum.CHARS.empty();
@@ -693,14 +716,15 @@ public final class StringUtil {
     /**
      * 首字母大写
      * <p>
-     * "className"    ==>      "ClassName"
-     * "ClassName"    ==>      "ClassName"
-     * null           ==>      null
-     * ""             ==>      ""
-     * " "            ==>      " "
+     * "className"    ===      "ClassName"
+     * "ClassName"    ===      "ClassName"
+     * null           ===      null
+     * ""             ===      ""
+     * " "            ===      " "
      *
-     * @param str
-     * @return
+     * @param str 字符串
+     *
+     * @return 首字母大写后的字符串
      */
     public static final String capitalize(String str) {
         int len = str == null ? 0 : str.length();
@@ -718,8 +742,9 @@ public final class StringUtil {
     /**
      * 首字母小写
      *
-     * @param str
-     * @return
+     * @param str 字符串
+     *
+     * @return 首字母小写后的字符串
      */
     public static final String uncapitalize(String str) {
         int len = length(str);
@@ -737,17 +762,19 @@ public final class StringUtil {
     /**
      * 连字符号转驼峰
      *
-     * @param str
-     * @return
+     * @param str 字符串
+     *
+     * @return 转换后的字符串
      */
     public final static String camelcase(String str) { return camelcase(str, false); }
 
     /**
      * 连字符号转驼峰
      *
-     * @param str
+     * @param str 字符串
      * @param firstToUpper 第一个字母是否大写
-     * @return
+     *
+     * @return 转换后的字符串
      */
     public final static String camelcase(String str, boolean firstToUpper) {
         final int len = str == null ? 0 : str.length();
@@ -758,8 +785,7 @@ public final class StringUtil {
         boolean isCamel = false, isLetter;
         for (; index < len; index++) {
             if (isLetter = isLetterOrDigit(curr = str.charAt(index))) {
-                curr = (firstToUpper && count == 0) || isCamel
-                    ? toUpperCase(curr) : toLowerCase(curr);
+                curr = (firstToUpper && count == 0) || isCamel ? toUpperCase(curr) : toLowerCase(curr);
                 chars[count++] = curr;
             } else if (index == 0) {
                 isCamel = count != 0;
@@ -771,55 +797,61 @@ public final class StringUtil {
     }
 
     /**
-     * "oneOnlyWhitespace"      ===>    "one_only_whitespace"
-     * "StringUtilTestTest"     ===>    "string_util_test_test"
-     * null                     ===>    null
-     * ""                       ===>    ""
-     * " "                      ===>    " "
+     * "oneOnlyWhitespace"      ====    "one_only_whitespace"
+     * "StringUtilTestTest"     ====    "string_util_test_test"
+     * null                     ====    null
+     * ""                       ====    ""
+     * " "                      ====    " "
      *
-     * @param str
-     * @return
+     * @param str 字符串
+     *
+     * @return 转换后的字符串
      */
     public final static String underscore(String str) { return camelcaseToHyphen(str, '_'); }
 
     /**
      * 驼峰转连字符号，可自定义连字符号和是否拆分连接连续大写字母
      * <p>
-     * "oneOnlyWhitespace"      ===>    "one-only-whitespace"
-     * "StringUtilTestTest"     ===>    "string-util-test-test"
-     * null                     ===>    null
-     * ""                       ===>    ""
-     * " "                      ===>    " "
+     * "oneOnlyWhitespace"      ====    "one-only-whitespace"
+     * "StringUtilTestTest"     ====    "string-util-test-test"
+     * null                     ====    null
+     * ""                       ====    ""
+     * " "                      ====    " "
      *
-     * @param str
-     * @return
+     * @param str 字符串
+     *
+     * @return 转换后的字符串
      */
     public final static String camelcaseToHyphen(String str) { return camelcaseToHyphen(str, '-'); }
 
     /**
      * 驼峰转连字符
      *
-     * @param str
      * @param hyphen 自定义连字符号
-     * @return
+     * @param str 字符串
+     *
+     * @return 转换后的字符串
      */
-    public final static String camelcaseToHyphen(String str, char hyphen) { return camelcaseToHyphen(str, hyphen, true); }
+    public final static String camelcaseToHyphen(String str, char hyphen) {
+        return camelcaseToHyphen(str, hyphen, true);
+    }
 
     /**
      * 驼峰转连字符
      * <p>
-     * camelcaseToHyphen(null, ',')                             ===>   null
-     * camelcaseToHyphen("", ',')                               ===>   ""
-     * camelcaseToHyphen("   ", ',')                            ===>   ""
-     * camelcaseToHyphen("oneOnlyWhitespace", ',')              ===>   "one,only,whitespace"
-     * camelcaseToHyphen("StringUtilTestTest", ',')             ===>   "string,util,test,test"
-     * camelcaseToHyphen("SSStringUtilTestTest", ',', false)    ===>   "ss,string,util,test,test"
-     * camelcaseToHyphen("SSStringUtilTestTest", ',', true)     ===>   "s,s,string,util,test,test"
+     * camelcaseToHyphen(null, ',')                             ====   null
+     * camelcaseToHyphen("", ',')                               ====   ""
+     * camelcaseToHyphen("   ", ',')                            ====   ""
+     * camelcaseToHyphen("oneOnlyWhitespace", ',')              ====   "one,only,whitespace"
+     * camelcaseToHyphen("StringUtilTestTest", ',')             ====   "string,util,test,test"
+     * camelcaseToHyphen("SSStringUtilTestTest", ',', false)    ====   "ss,string,util,test,test"
+     * camelcaseToHyphen("SSStringUtilTestTest", ',', true)     ====   "s,s,string,util,test,test"
      *
-     * @param str
+     * @param str 字符串
      * @param hyphen          自定义连字符号
      * @param continuousSplit 自定义连续大写字母是否拆分连接
-     * @return
+     *
+     * @return 转换后的字符串
      */
     public final static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {
         final int len = length(str);
@@ -859,7 +891,9 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public final static String replace(String str, char old, char now) { return str == null ? null : str.replace(old, now); }
+    public final static String replace(String str, char old, char now) {
+        return str == null ? null : str.replace(old, now);
+    }
 
     public final static String replaceFirst(String src, String old, String now) { return src.replaceFirst(old, now); }
 }

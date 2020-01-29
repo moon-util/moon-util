@@ -85,7 +85,7 @@ public final class SupportUtil {
      * @param len     源数组长度
      * @param current 当前数字字符，如：1234，则为 1
      *
-     * @return
+     * @return number
      */
     public final static Number parseNum(char[] chars, IntAccessor indexer, int len, int current) {
         char curr = (char) current;
@@ -149,11 +149,11 @@ public final class SupportUtil {
     /**
      * 跳过空字符
      *
-     * @param chars
-     * @param indexer
-     * @param len
+     * @param chars   字符数组
+     * @param indexer 索引器
+     * @param len     字符数组长度
      *
-     * @return
+     * @return 下一个非空白字符
      */
     public final static int skipWhitespaces(char[] chars, IntAccessor indexer, final int len) {
         int index = indexer.get(), ch = 0;
@@ -165,11 +165,11 @@ public final class SupportUtil {
     /**
      * 抛出指定位置异常，异常信息为 indexer 指向的前后 amount 个字符，超出首尾自动以首尾为止
      *
-     * @param chars
-     * @param indexer
-     * @param <T>
+     * @param chars   字符数组
+     * @param indexer 索引器
+     * @param <T> 无
      *
-     * @return
+     * @return 无
      */
     public final static <T> T throwErr(char[] chars, IntAccessor indexer) {
         return throwErr(null, chars, indexer);
@@ -195,9 +195,9 @@ public final class SupportUtil {
      * 当数组或集合只有一项时，返回第一项，否则返回数组长度或集合 size
      * 其他自定义对象或集合均抛出异常
      *
-     * @param o
+     * @param o 目标集合
      *
-     * @return
+     * @return 第一项或集合长度
      */
     public static Object onlyOneItemOrSize(Object o) {
         if (o == null) { return null; }

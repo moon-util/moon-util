@@ -20,7 +20,8 @@ public @interface ConsoleControl {
      * 与{@link #fromImplement()}等效，详细注释见{@link #fromImplement()}
      * 优先于 fromImplement()
      *
-     * @return
+     * @return 目标设置提供器
+     *
      * @see #fromImplement()
      */
     Class<? extends ConsoleSettingsSupplier> value() default ConsoleSettingsSupplier.class;
@@ -34,21 +35,21 @@ public @interface ConsoleControl {
     /**
      * 用 html 格式输出
      *
-     * @return
+     * @return 是否 html 格式
      */
     boolean html() default false;
 
     /**
      * 是否异步打印
      *
-     * @return
+     * @return 是否异步打印
      */
     boolean async() default true;
 
     /**
      * 当前类最低输出级别
      *
-     * @return
+     * @return 最低输出级别
      */
     Console.Level lowestLevel() default Console.Level.PRINT;
 
@@ -56,7 +57,7 @@ public @interface ConsoleControl {
      * 输出内容格式
      * level 是可选择，同{@link #filenameFormat()}类似，手动设置 level 只是用来改变位置的
      *
-     * @return
+     * @return 输出内容格式
      */
     String pattern() default "HH:mm:ss,SSS level";
 
@@ -65,7 +66,7 @@ public @interface ConsoleControl {
      * 如果为 true，则当前配置至少默认，检查会继续沿着调用栈先前查找直到为 false 或 最后一个为止
      * 主要用于覆盖默认设置，只能通过注解设置此属性，不能通过自定义类或 JSON 文件设置
      *
-     * @return
+     * @return 当前配置是否只是默认参数
      */
     boolean isDefault() default false;
     /*
@@ -77,10 +78,9 @@ public @interface ConsoleControl {
     /**
      * 目录分类依据，根据设置的顺序分类
      *
-     * @return
+     * @return 目录分类依据，根据设置的顺序分类
      */
-    @Deprecated
-    Classify[] classifies() default {};
+    @Deprecated Classify[] classifies() default {};
 
     /**
      * 文件名格式
@@ -93,10 +93,9 @@ public @interface ConsoleControl {
      * <p>
      * 设置的时候注意防止文件名冲突
      *
-     * @return
+     * @return 文件名格式
      */
-    @Deprecated
-    String filenameFormat() default "yyyy-MM-dd-?level";
+    @Deprecated String filenameFormat() default "yyyy-MM-dd-?level";
 
     /*
      * ------------------------------------------------------------------
@@ -109,12 +108,12 @@ public @interface ConsoleControl {
      * 单例，引用同一个类得到的是同一个对象
      * 与{@link #value()}等效，但 value() 优先于 fromImplement()
      *
-     * @return
-     * @throws IllegalArgumentException 当如果指定类没有实现接口{@link ConsoleSettingsSupplier}或没有空构造器时
+     * @return 实现类
+     *
+     * @see IllegalArgumentException 当如果指定类没有实现接口{@link ConsoleSettingsSupplier}或没有空构造器时
      * @see #value()
      */
-    @Deprecated
-    Class fromImplement() default ConsoleSettingsSupplier.class;
+    @Deprecated Class fromImplement() default ConsoleSettingsSupplier.class;
 
     /**
      * 从 JSON 文件解析
@@ -128,10 +127,9 @@ public @interface ConsoleControl {
      * "pattern": "",
      * }
      *
-     * @return
+     * @return JSON 文件
      */
-    @Deprecated
-    String fromJson() default "";
+    @Deprecated String fromJson() default "";
 
     /*
      * ------------------------------------------------------------------

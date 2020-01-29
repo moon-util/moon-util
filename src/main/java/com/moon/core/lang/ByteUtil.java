@@ -8,6 +8,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 public final class ByteUtil {
+
     private ByteUtil() {
         noInstanceError();
     }
@@ -91,8 +92,10 @@ public final class ByteUtil {
      * <p>
      * Byte result = ByteUtil.toByte(value);
      *
-     * @param object
-     * @return
+     * @param object 待转换的值
+     *
+     * @return 转换后的 byte 值
+     *
      * @see IntUtil#toIntValue(Object)
      * @see #toByteValue(Object)
      */
@@ -121,8 +124,10 @@ public final class ByteUtil {
     }
 
     /**
-     * @param value
-     * @return
+     * @param value 待转换的值
+     *
+     * @return 转换后的 byte 值
+     *
      * @see IntUtil#toIntValue(Object)
      */
     public static byte toByteValue(Object value) {

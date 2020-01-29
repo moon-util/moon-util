@@ -10,6 +10,7 @@ import static java.lang.String.format;
  * @author benshaoye
  */
 public final class IntUtil {
+
     private IntUtil() {
         noInstanceError();
     }
@@ -87,10 +88,11 @@ public final class IntUtil {
     /**
      * 要求期望值在指定范围里，不包含范围边界
      *
-     * @param value
-     * @param min
-     * @param max
-     * @return
+     * @param value 待测值
+     * @param min   最小值
+     * @param max   最大值
+     *
+     * @return 是否在范围内
      */
     public static int requireInRange(int value, int min, int max) {
         requireGt(value, min);
@@ -107,10 +109,11 @@ public final class IntUtil {
     /**
      * 要求期望值在指定范围里，包含范围边界
      *
-     * @param value
-     * @param min
-     * @param max
-     * @return
+     * @param value 待测值
+     * @param min   最小值
+     * @param max   最大值
+     *
+     * @return 是否在范围内
      */
     public static int requireBetween(int value, int min, int max) {
         requireGtOrEq(value, min);
@@ -177,9 +180,10 @@ public final class IntUtil {
     /**
      * convert a CharSequence to int, if is an invalid CharSequence will return defaultVal
      *
-     * @param cs
-     * @param defaultVal
-     * @return
+     * @param cs         数字字符串
+     * @param defaultVal 默认值
+     *
+     * @return 数值
      */
     public static int defaultIfInvalid(CharSequence cs, int defaultVal) {
         try {
@@ -192,8 +196,9 @@ public final class IntUtil {
     /**
      * convert a CharSequence to int, if is an invalid CharSequence will return 0
      *
-     * @param cs
-     * @return
+     * @param cs 数字字符串
+     *
+     * @return 数字
      */
     public static int zeroIfInvalid(CharSequence cs) {
         return defaultIfInvalid(cs, 0);
@@ -202,8 +207,9 @@ public final class IntUtil {
     /**
      * convert a CharSequence to int, if is an invalid CharSequence will return 1
      *
-     * @param cs
-     * @return
+     * @param cs 数字字符串
+     *
+     * @return 数字
      */
     public static int oneIfInvalid(CharSequence cs) {
         return defaultIfInvalid(cs, 1);
@@ -291,7 +297,7 @@ public final class IntUtil {
      * Collection value = new HashSet(){{increment(1)}};  // ========= 1（只有一项时）
      * Collection value = new TreeSet(){{increment(1)}};  // ========= 1（只有一项时）
      * Collection value = new LinkedList(){{increment(1)}};  // ====== 1（只有一项时）
-     * Map value = new HashMap(){{put("key", 1)}};  // ========= 1（只有一项时）
+     * Map value = new HashMap(){{put("key", 1)}};  // =============== 1（只有一项时）
      * <p>
      * int[] value = {1, 2, 3, 4};  // ======================================== 4（大于一项时，返回 size）
      * String[] value = {"1", "1", "1", "1"};  // ============================= 4（大于一项时，返回 size）
@@ -300,8 +306,10 @@ public final class IntUtil {
      * <p>
      * int result = IntUtil.toIntValue(value);
      *
-     * @param o
-     * @return
+     * @param o 待转换值
+     *
+     * @return 转换后的值
+     *
      * @see BooleanUtil#toBoolean(Object)
      * @see BooleanUtil#toBooleanValue(Object)
      * @see CharUtil#toCharValue(Object)

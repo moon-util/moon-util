@@ -10,9 +10,8 @@ import java.util.function.Function;
  * @author benshaoye
  */
 public final class ListUtil extends CollectUtil {
-    private ListUtil() {
-        ThrowUtil.noInstanceError();
-    }
+
+    private ListUtil() { ThrowUtil.noInstanceError(); }
 
     public static List empty() {return Collections.EMPTY_LIST;}
 
@@ -22,24 +21,27 @@ public final class ListUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <T> ArrayList<T> ofArrayList() { return new ArrayList<>(); }
+    public static <T> ArrayList<T> newArrayList() { return new ArrayList<>(); }
 
-    public static <T> ArrayList<T> ofArrayList(int initCapacity) { return new ArrayList<>(initCapacity); }
+    public static <T> ArrayList<T> newArrayList(int initCapacity) { return new ArrayList<>(initCapacity); }
 
-    public static <T> ArrayList<T> ofArrayList(T value) { return add(ofArrayList(), value); }
+    public static <T> ArrayList<T> newArrayList(T value) { return add(newArrayList(), value); }
 
-    public static <T> ArrayList<T> ofArrayList(T value1, T value2) { return add(ofArrayList(value1), value2); }
+    public static <T> ArrayList<T> newArrayList(T value1, T value2) { return add(newArrayList(value1), value2); }
 
-    public static <T> ArrayList<T> ofArrayList(T value1, T value2, T value3) { return add(ofArrayList(value1, value2), value3); }
+    public static <T> ArrayList<T> newArrayList(T value1, T value2, T value3) {
+        return add(newArrayList(value1, value2), value3);
+    }
 
-    public static <T> ArrayList<T> ofArrayList(T... values) { return addAll(ofArrayList(values.length), values); }
+    public static <T> ArrayList<T> newArrayList(T... values) { return addAll(newArrayList(values.length), values); }
 
-    public static <T> ArrayList<T> ofArrayList(Collection<T> collect) { return collect == null ? ofArrayList() : new ArrayList<>(collect); }
+    public static <T> ArrayList<T> newArrayList(Collection<T> collect) {
+        return collect == null ? newArrayList() : new ArrayList<>(collect);
+    }
 
-    public static <T> ArrayList<T> ofArrayList(Iterable<T> iterable) {
-        return iterable == null ? ofArrayList()
-            : (iterable instanceof Collection ? new ArrayList((Collection) iterable)
-            : addAll(ofArrayList(), iterable));
+    public static <T> ArrayList<T> newArrayList(Iterable<T> iterable) {
+        return iterable == null ? newArrayList() : (iterable instanceof Collection ? new ArrayList(
+            (Collection) iterable) : addAll(newArrayList(), iterable));
     }
 
     /*
@@ -48,27 +50,30 @@ public final class ListUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <T> LinkedList<T> ofLinkedList() { return new LinkedList<>(); }
+    public static <T> LinkedList<T> newLinkedList() { return new LinkedList<>(); }
 
-    public static <T> LinkedList<T> ofLinkedList(T value) { return add(ofLinkedList(), value); }
+    public static <T> LinkedList<T> newLinkedList(T value) { return add(newLinkedList(), value); }
 
-    public static <T> LinkedList<T> ofLinkedList(T value1, T value2) { return add(ofLinkedList(value1), value2); }
+    public static <T> LinkedList<T> newLinkedList(T value1, T value2) { return add(newLinkedList(value1), value2); }
 
-    public static <T> LinkedList<T> ofLinkedList(T value1, T value2, T value3) { return add(ofLinkedList(value1, value2), value3); }
-
-    public static <T> LinkedList<T> ofLinkedList(T... values) { return addAll(ofLinkedList(), values); }
-
-    public static <T> LinkedList<T> ofLinkedList(Collection<T> collect) { return collect == null ? ofLinkedList() : new LinkedList<>(collect); }
-
-    public static <T> LinkedList<T> ofLinkedList(Iterable<T> iterable) {
-        return iterable == null ? ofLinkedList()
-            : (iterable instanceof Collection ? new LinkedList((Collection) iterable)
-            : addAll(ofLinkedList(), iterable));
+    public static <T> LinkedList<T> newLinkedList(T value1, T value2, T value3) {
+        return add(newLinkedList(value1, value2), value3);
     }
 
-    public static <S,T> List<T> mapAsList(Collection<S> src, Function<? super S, T> mapper){
+    public static <T> LinkedList<T> newLinkedList(T... values) { return addAll(newLinkedList(), values); }
+
+    public static <T> LinkedList<T> newLinkedList(Collection<T> collect) {
+        return collect == null ? newLinkedList() : new LinkedList<>(collect);
+    }
+
+    public static <T> LinkedList<T> newLinkedList(Iterable<T> iterable) {
+        return iterable == null ? newLinkedList() : (iterable instanceof Collection ? new LinkedList(
+            (Collection) iterable) : addAll(newLinkedList(), iterable));
+    }
+
+    public static <S, T> List<T> mapAsList(Collection<S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);
-        return collect instanceof List ? (List<T>) collect : ofArrayList(collect);
+        return collect instanceof List ? (List<T>) collect : newArrayList(collect);
     }
 
     /*
@@ -80,27 +85,30 @@ public final class ListUtil extends CollectUtil {
     /**
      * 如果集合是空集合（null 或 size() == 0）这返回 null
      *
-     * @param list
-     * @param <T>
-     * @return
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return null list if is an empty list or null
      */
     public static <T> List<T> nullIfEmpty(List<T> list) { return list == null ? null : list.size() == 0 ? null : list; }
 
     /**
      * 如果 valuesList 是 null 则创建一个新的 ArrayList 返回
      *
-     * @param list
-     * @param <T>
-     * @return
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return empty list if null
      */
     public static <T> List<T> emptyIfNull(List<T> list) { return list == null || list.size() == 0 ? empty() : list; }
 
     /**
      * 获取 valuesList 第一项，任何非法情况下都返回 null
      *
-     * @param list
-     * @param <T>
-     * @return
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return list 第一个元素或 null
      */
     public static <T> T nullableGetFirst(List<T> list) {
         return list == null ? null : list.size() > 0 ? list.get(0) : null;
@@ -109,31 +117,35 @@ public final class ListUtil extends CollectUtil {
     /**
      * 获取 valuesList 第一项，任何非法情况下都将抛出特定异常
      *
-     * @param list
-     * @param <T>
-     * @return
-     * @throws ArrayIndexOutOfBoundsException
-     * @throws IndexOutOfBoundsException
-     * @throws NullPointerException
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return list 第一个元素
+     *
+     * @see ArrayIndexOutOfBoundsException
+     * @see IndexOutOfBoundsException
+     * @see NullPointerException
      */
     public static <T> T requireGetFirst(List<T> list) { return requireGet(list, 0); }
 
     /**
      * 获取 valuesList 第一项，任何非法情况下都将抛出特定异常
      *
-     * @param list
-     * @param errorMessage
-     * @param <T>
-     * @return
+     * @param list         list
+     * @param <T>          list 元素类型
+     * @param errorMessage 错误消息
+     *
+     * @return list 第一个元素
      */
     public static <T> T requireGetFirst(List<T> list, String errorMessage) { return requireGet(list, 0, errorMessage); }
 
     /**
      * 获取 valuesList 最后一项，任何非法情况下都返回 null
      *
-     * @param list
-     * @param <T>
-     * @return
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return list 第一个元素
      */
     public static <T> T nullableGetLast(List<T> list) {
         if (list != null) {
@@ -146,22 +158,25 @@ public final class ListUtil extends CollectUtil {
     /**
      * 获取 valuesList 最后一项，任何非法情况下都将抛出特定异常
      *
-     * @param list
-     * @param <T>
-     * @return
-     * @throws ArrayIndexOutOfBoundsException
-     * @throws IndexOutOfBoundsException
-     * @throws NullPointerException
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return list 第一个元素
+     *
+     * @see ArrayIndexOutOfBoundsException
+     * @see IndexOutOfBoundsException
+     * @see NullPointerException
      */
     public static <T> T requireGetLast(List<T> list) { return requireGet(list, (list.size() - 1)); }
 
     /**
      * 获取 valuesList 最后一项，任何非法情况下都将抛出特定异常
      *
-     * @param list
-     * @param errorMessage
-     * @param <T>
-     * @return
+     * @param errorMessage 错误消息
+     * @param list         list
+     * @param <T>          list 元素类型
+     *
+     * @return list 第一个元素
      */
     public static <T> T requireGetLast(List<T> list, String errorMessage) {
         T item = get(requireNotEmpty(list, errorMessage), list.size() - 1);
@@ -171,10 +186,11 @@ public final class ListUtil extends CollectUtil {
     /**
      * 获取 valuesList 第 index 项，任何非法情况下都返回 null
      *
-     * @param list
-     * @param index
-     * @param <T>
-     * @return
+     * @param index 索引
+     * @param list  list
+     * @param <T>   list 元素类型
+     *
+     * @return list 第 index 元素
      */
     public static <T> T nullableGet(List<T> list, int index) {
         if (list != null || index < 0) {
@@ -187,24 +203,27 @@ public final class ListUtil extends CollectUtil {
     /**
      * 获取 valuesList 第 index 项，任何非法情况下都将抛出特定异常
      *
-     * @param list
-     * @param index
-     * @param <T>
-     * @return
-     * @throws ArrayIndexOutOfBoundsException
-     * @throws IndexOutOfBoundsException
-     * @throws NullPointerException
+     * @param index 索引
+     * @param list  list
+     * @param <T>   list 元素类型
+     *
+     * @return list 第 index 元素
+     *
+     * @see ArrayIndexOutOfBoundsException
+     * @see IndexOutOfBoundsException
+     * @see NullPointerException
      */
     public static <T> T requireGet(List<T> list, int index) { return Objects.requireNonNull(get(list, index)); }
 
     /**
      * 获取 valuesList 第 index 项，任何非法情况下都将抛出特定异常
      *
-     * @param list
-     * @param index
-     * @param errorMessage
-     * @param <T>
-     * @return
+     * @param list         list
+     * @param index        索引
+     * @param errorMessage 错误消息
+     * @param <T>          泛型
+     *
+     * @return 第 index 个元素
      */
     public static <T> T requireGet(List<T> list, int index, String errorMessage) {
         T item = get(requireNotEmpty(list, errorMessage), index);
@@ -237,11 +256,12 @@ public final class ListUtil extends CollectUtil {
     /**
      * 获取 valuesList 第 index 项，任何非法情况下都返回或第 index 项为 null 时将返回 defaultValue
      *
-     * @param list
-     * @param index
-     * @param defaultValue
-     * @param <T>
-     * @return
+     * @param list         list
+     * @param index        index
+     * @param defaultValue 默认值
+     * @param <T>          泛型
+     *
+     * @return 第 index 个元素或 defaultValue
      */
     public static <T> T getOrDefault(List<T> list, int index, T defaultValue) {
         T res = nullableGet(list, index);
@@ -251,10 +271,11 @@ public final class ListUtil extends CollectUtil {
     /**
      * 获取 valuesList 最后一项，任何非法情况下都返回或最后一项为 null 时将返回 defaultValue
      *
-     * @param list
-     * @param defaultValue
-     * @param <T>
-     * @return
+     * @param list         list
+     * @param defaultValue 默认值
+     * @param <T>          泛型
+     *
+     * @return 最后一个元素或 defaultValue
      */
     public static <T> T getLastOrDefault(List<T> list, T defaultValue) {
         T res = nullableGetLast(list);
@@ -264,10 +285,11 @@ public final class ListUtil extends CollectUtil {
     /**
      * 获取 valuesList 第一项，任何非法情况下都返回或最后一项为 null 时将返回 defaultValue
      *
-     * @param list
-     * @param defaultValue
-     * @param <T>
-     * @return
+     * @param list         list
+     * @param defaultValue 默认值
+     * @param <T>          泛型
+     *
+     * @return 第一个元素或 defaultValue
      */
     public static <T> T getFirstOrDefault(List<T> list, T defaultValue) {
         T res = nullableGetFirst(list);
@@ -277,10 +299,10 @@ public final class ListUtil extends CollectUtil {
     /**
      * 普通获取第 index 项
      *
-     * @param list
-     * @param index
-     * @param <T>
-     * @return
+     * @param list list
+     * @param <T>  泛型
+     *
+     * @return 第 index 个元素
      */
     public static <T> T get(List<T> list, int index) { return list.get(index); }
 
@@ -288,10 +310,11 @@ public final class ListUtil extends CollectUtil {
      * 从一个声明类型是 Object 的 valuesList 集合获取第 index 项
      * 主要是为了屏蔽强制类型转换
      *
-     * @param list
-     * @param index
-     * @param <T>
-     * @return
+     * @param index 索引
+     * @param list  list
+     * @param <T>   泛型
+     *
+     * @return 第 index 个元素
      */
     public static <T> T getByObject(Object list, int index) { return (T) get(((List) list), index); }
 
@@ -308,6 +331,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @param list
      * @param <T>
+     *
      * @return 集合本身
      */
     public static <T> List<T> unique(List<T> list) {
@@ -329,6 +353,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @param list
      * @param <T>
+     *
      * @return 删除的重复项，默认用 ArrayList 包装
      */
     public static <T> List<T> removeRepeats(List<T> list) {
@@ -345,7 +370,7 @@ public final class ListUtil extends CollectUtil {
                         try {
                             repeated = (List) collect.apply(size);
                         } catch (Throwable e) {
-                            repeated = ofArrayList(size);
+                            repeated = newArrayList(size);
                         }
                     }
                     repeated.add(item);
@@ -361,11 +386,12 @@ public final class ListUtil extends CollectUtil {
     /**
      * 增加 ArrayList 容量，避免频繁扩容
      *
-     * @param list
-     * @param needSize
-     * @param <E>
-     * @param <L>
-     * @return
+     * @param list list
+     * @param needSize 目标容量
+     * @param <E> 元素类型
+     * @param <L> list 类型
+     *
+     * @return 扩容后的 list
      */
     public static final <E, L extends List<E>> L increaseCapacity(L list, int needSize) {
         if (list instanceof ArrayList && needSize > 0) {

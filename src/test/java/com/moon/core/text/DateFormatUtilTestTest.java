@@ -18,17 +18,17 @@ class DateFormatUtilTestTest {
     void testWith() {
         String pattern = "yyyy-MM-dd HH:mm:ss";
         Date date = new Date();
-        List<String> messages = ListUtil.ofArrayList(DateFormatUtil.values()).stream()
+        List<String> messages = ListUtil.newArrayList(DateFormatUtil.values()).stream()
             .map(item -> item.with(pattern).format(date))
             .sorted().collect(Collectors.toList());
         messages.forEach(System.out::println);
 
-        ListUtil.ofArrayList(DateFormatUtil.values()).stream().map(KeyValue::of)
+        ListUtil.newArrayList(DateFormatUtil.values()).stream().map(KeyValue::of)
             .collect(Collectors.toList()).stream()
             .sorted(Comparator.comparingInt(o -> o.toString().length()))
             .forEach(System.out::println);
 
         Class<DateFormatUtil> type = DateFormatUtil.class;
-        ListUtil.ofArrayList(type.getDeclaredClasses()).forEach(System.out::println);
+        ListUtil.newArrayList(type.getDeclaredClasses()).forEach(System.out::println);
     }
 }
