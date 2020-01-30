@@ -206,7 +206,7 @@ public final class StringUtil {
      * @return 是否是空或 null 字符串
      */
     public static boolean isNullString(CharSequence cs) {
-        if (cs == null) {
+        if (isEmpty(cs)) {
             return true;
         }
         if (cs instanceof StringBuffer) {
@@ -236,7 +236,7 @@ public final class StringUtil {
      * @return 是否是空或 null、undefined
      */
     public static boolean isUndefined(CharSequence cs) {
-        if (cs == null) {
+        if (isEmpty(cs)) {
             return true;
         }
         if (cs instanceof StringBuffer) {
