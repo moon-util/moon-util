@@ -7,7 +7,7 @@
   <groupId>com.github.moon-util</groupId>
   <artifactId>moon-util</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.12</version>
+  <version>0.0.13</version>
 
   <name>moon-util</name>
   <description>a java tool library</description>
@@ -140,6 +140,13 @@
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4.7</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.26.0-GA</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
