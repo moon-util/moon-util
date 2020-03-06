@@ -533,9 +533,9 @@ class RunnerUtilTestTest extends AbstractTest {
         runner = RunnerUtil.parse("3+(2-5)*6/3 ");
         assertEquals(runner.run(), (Object) (3 + (2 - 5) * 6 / 3));
         runner = RunnerUtil.parse("5 * ( 4.1 + 2 -6 /(8-2))");
-        assertEquals(runner.run(), 5 * (4.1 + 2 - 6 / (8 - 2)));
+        assertEquals(runner.run(), (Object) (5 * (4.1 + 2 - 6 / (8 - 2))));
         runner = RunnerUtil.parse("5 * ( 4.1 + 2.9 )");
-        assertEquals(runner.run(), 5 * (4.1 + 2.9));
+        assertEquals(runner.run(), (Object) (5 * (4.1 + 2.9)));
         runner = RunnerUtil.parse("14/3*2");
         assertEquals(runner.run(), (Object) (14 / 3 * 2));
 

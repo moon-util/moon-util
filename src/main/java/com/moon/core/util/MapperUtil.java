@@ -51,9 +51,11 @@ public final class MapperUtil {
     public final static <T, E> E override(T t, E e) {
         final Class targetType = e.getClass();
 
-        getFieldDescriptorsMap(t.getClass()).forEach((name, srcDesc) ->
-            BeanInfoUtil.ifSetterExecutorPresent(targetType, name, setDesc ->
-                setDesc.setValue(e, srcDesc.getValue(t, true), true)));
+        getFieldDescriptorsMap(t.getClass()).forEach((name, srcDesc) -> {
+            BeanInfoUtil.ifSetterExecutorPresent(targetType, name, setDesc -> {
+                setDesc.setValue(e, srcDesc.getValue(t, true), true);
+            });
+        });
         return e;
     }
 

@@ -12,9 +12,18 @@ import static com.moon.core.util.TypeUtil.cast;
  * @author benshaoye
  */
 public final class MapUtil {
+
     private MapUtil() { ThrowUtil.noInstanceError(); }
 
     public static Map empty() {return EmptyHashMap.EMPTY_MAP;}
+
+    public static <K, V> Map<K, V> with(K key, V value) {
+        return with(key, value, newHashMap());
+    }
+
+    public static <K, V> Map<K, V> with(K key, V value, Map<K, V> map) {
+        return put(map, key, value);
+    }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -82,9 +91,13 @@ public final class MapUtil {
 
     public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap() { return new ConcurrentHashMap<>(); }
 
-    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(int capacity) { return new ConcurrentHashMap(capacity); }
+    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(int capacity) {
+        return new ConcurrentHashMap(capacity);
+    }
 
-    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(Map<K, V> map) { return new ConcurrentHashMap<>(map); }
+    public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(Map<K, V> map) {
+        return new ConcurrentHashMap<>(map);
+    }
 
     public static <K, V> ConcurrentHashMap<K, V> newConcurrentMap(Map<K, V> map, Map<K, V>... maps) {
         return putAll(putAll(newConcurrentMap((maps.length + 1) * 16), map), maps);
@@ -137,6 +150,21 @@ public final class MapUtil {
     public static Object getByObject(Object map, Object key) { return map == null ? null : ((Map) map).get(key); }
 
     /**
+     * 返回 map
+     *
+     * @param map
+     * @param key
+     * @param value
+     * @param <K>
+     * @param <V>
+     */
+    public static <K, V, M extends Map<K, V>> M put(M map, K key, V value) {
+        map = (M) emptyHashMapIfNull(map);
+        map.put(key, value);
+        return map;
+    }
+
+    /**
      * 忽略类型兼容，数据一定能放进 map 里面；
      * 如果数据类型与 map 不一致，可能会导致处理返回数据的过程中出现异常；
      *
@@ -145,9 +173,11 @@ public final class MapUtil {
      * @param value
      * @param <K>
      * @param <V>
+     * @param <M>
+     *
+     * @return
      */
-    public static <K, V> Map<K, V> put(Map<K, V> map, Object key, Object value) {
-        map = emptyHashMapIfNull(map);
+    public static <K, V, M extends Map<K, V>> M putWithObject(M map, Object key, Object value) {
         map.put((K) key, (V) value);
         return map;
     }
@@ -160,10 +190,11 @@ public final class MapUtil {
      * @param value
      * @param <K>
      * @param <V>
+     *
      * @return
      */
     public static <K, V> Map<K, V> putToObject(Object map, Object key, Object value) {
-        return put((Map) map, key, value);
+        return putWithObject((Map) map, key, value);
     }
 
     /**
@@ -197,11 +228,13 @@ public final class MapUtil {
 
     public static <K, V> Iterator<Map.Entry<K, V>> iterator(Map<K, V> map) { return IteratorUtil.of(map); }
 
-    public static <K, V> Set<K> keys(Map<K, V> map) { return map == null ? null : map.keySet(); }
+    public static <K, V> Set<K> keys(Map<K, V> map) { return map == null ? SetUtil.empty() : map.keySet(); }
 
-    public static <K, V> Collection<V> values(Map<K, V> map) { return map == null ? null : map.values(); }
+    public static <K, V> Collection<V> values(Map<K, V> map) { return map == null ? SetUtil.empty() : map.values(); }
 
-    public static <K, V> Set<Map.Entry<K, V>> entries(Map<K, V> map) { return map == null ? null : map.entrySet(); }
+    public static <K, V> Set<Map.Entry<K, V>> entries(Map<K, V> map) {
+        return map == null ? SetUtil.empty() : map.entrySet();
+    }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -219,7 +252,7 @@ public final class MapUtil {
      * @param <E>
      * @param <C>
      */
-    public static <T, E, C> C getOfType(Map<T, E> map, T key, Class<C> clazz) {
+    public static <T, E, C> C getAsType(Map<T, E> map, T key, Class<C> clazz) {
         if (map == null) {
             return null;
         }
@@ -301,74 +334,49 @@ public final class MapUtil {
 
     public static <K> char getOrDefault(Map<K, ?> map, K key, char defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : ((value = map.get(key)) instanceof Character
-            ? ((Character) value).charValue()
-            : defaultVal);
+        return map == null ? defaultVal
+            : ((value = map.get(key)) instanceof Character ? ((Character) value).charValue() : defaultVal);
     }
 
     public static <K> double getOrDefault(Map<K, ?> map, K key, double defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : ((value = map.get(key)) instanceof Number
-            ? ((Number) value).doubleValue()
-            : defaultVal);
+        return map == null ? defaultVal
+            : ((value = map.get(key)) instanceof Number ? ((Number) value).doubleValue() : defaultVal);
     }
 
     public static <K> float getOrDefault(Map<K, ?> map, K key, float defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : ((value = map.get(key)) instanceof Number
-            ? ((Number) value).floatValue()
-            : defaultVal);
+        return map == null ? defaultVal
+            : ((value = map.get(key)) instanceof Number ? ((Number) value).floatValue() : defaultVal);
     }
 
     public static <K> long getOrDefault(Map<K, ?> map, K key, long defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : ((value = map.get(key)) instanceof Number
-            ? ((Number) value).longValue()
-            : defaultVal);
+        return map == null ? defaultVal
+            : ((value = map.get(key)) instanceof Number ? ((Number) value).longValue() : defaultVal);
     }
 
     public static <K> int getOrDefault(Map<K, ?> map, K key, int defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : ((value = map.get(key)) instanceof Number
-            ? ((Number) value).intValue()
-            : defaultVal);
+        return map == null ? defaultVal
+            : ((value = map.get(key)) instanceof Number ? ((Number) value).intValue() : defaultVal);
     }
 
     public static <K> short getOrDefault(Map<K, ?> map, K key, short defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : ((value = map.get(key)) instanceof Number
-            ? ((Number) value).shortValue()
-            : defaultVal);
+        return map == null ? defaultVal
+            : ((value = map.get(key)) instanceof Number ? ((Number) value).shortValue() : defaultVal);
     }
 
     public static <K> byte getOrDefault(Map<K, ?> map, K key, byte defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : ((value = map.get(key)) instanceof Number
-            ? ((Number) value).byteValue()
-            : defaultVal);
+        return map == null ? defaultVal
+            : ((value = map.get(key)) instanceof Number ? ((Number) value).byteValue() : defaultVal);
     }
 
     public static <K> boolean getOrDefault(Map<K, ?> map, K key, boolean defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : (value = map.get(key)) instanceof Boolean
-            ? (Boolean) value
-            : defaultVal;
+        return map == null ? defaultVal : (value = map.get(key)) instanceof Boolean ? (Boolean) value : defaultVal;
     }
 
     /**
@@ -377,6 +385,7 @@ public final class MapUtil {
      *
      * @param map
      * @param key
+     *
      * @return
      */
     public static <K> boolean getOrTrue(Map<K, ?> map, K key) { return getOrDefault(map, key, true); }
@@ -387,17 +396,15 @@ public final class MapUtil {
      *
      * @param map
      * @param key
+     *
      * @return
      */
     public static <K> boolean getOrFalse(Map<K, ?> map, K key) { return getOrDefault(map, key, false); }
 
     public static <K> String getOrDefault(Map<K, ?> map, K key, String defaultVal) {
         Object value;
-        return map == null
-            ? defaultVal
-            : (value = map.get(key)) instanceof CharSequence
-            ? value.toString()
-            : defaultVal;
+        return map == null ? defaultVal
+            : (value = map.get(key)) instanceof CharSequence ? value.toString() : defaultVal;
     }
 
     public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultVal) {
@@ -406,8 +413,6 @@ public final class MapUtil {
 
     public static <K, V> V getOrElse(Map<K, V> map, K key, Supplier<V> supplier) {
         V value;
-        return map == null ? supplier.get() :
-            (value = map.get(key)) == null
-                ? supplier.get() : value;
+        return map == null ? supplier.get() : (value = map.get(key)) == null ? supplier.get() : value;
     }
 }

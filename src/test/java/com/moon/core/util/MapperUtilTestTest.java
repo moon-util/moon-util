@@ -1,6 +1,8 @@
 package com.moon.core.util;
 
 import com.moon.core.lang.reflect.FieldUtil;
+import lombok.Data;
+import lombok.ToString;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -34,10 +36,6 @@ class MapperUtilTestTest {
     }
 
     @Test
-    void testOverride1() {
-    }
-
-    @Test
     void testForEachToMap() {
         List<Employee> employees = Employee.list(20);
         List<Map<String, Object>> maps = MapperUtil.forEachToMap(employees);
@@ -50,11 +48,19 @@ class MapperUtilTestTest {
 
     @Test
     void testForEachToInstance() {
+
         List<Employee> employees = Employee.list(20);
         List<Map<String, Object>> maps = MapperUtil.forEachToMap(employees);
 
         List<Employee> newList = MapperUtil.forEachToInstance(maps, Employee.class);
         IteratorUtil.forEach((newList), (item, i) -> assertTrue(item.equals(employees.get(i))));
+
+        List<Employee> employeeList = Employee.list(5);
+        employeeList.forEach(System.out::println);
+        List<User> users = MapperUtil.forEachToOther(employeeList, User.class);
+        users.forEach(System.out::println);
+        List<UserVO> userVOS = MapperUtil.forEachToOther(users, UserVO.class);
+        userVOS.forEach(System.out::println);
     }
 
     Object res = 0x4e00;
@@ -66,7 +72,20 @@ class MapperUtilTestTest {
 
     static ThreadLocalRandom random = ThreadLocalRandom.current();
 
+    @Data
+    public static class User {
+
+        String name;
+        int age;
+    }
+
+    @Data
+    @ToString(callSuper = true)
+    public static class UserVO extends User {}
+
+    @Data
     public static class Employee {
+
         String name;
         int age;
 
@@ -95,45 +114,6 @@ class MapperUtilTestTest {
         public Employee(String name, int age) {
             this.name = name;
             this.age = age;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Employee employee = (Employee) o;
-            return age == employee.age &&
-                Objects.equals(name, employee.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, age);
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder("Employee{");
-            sb.append("name='").append(name).append('\'');
-            sb.append(", age=").append(age);
-            sb.append('}');
-            return sb.toString();
         }
     }
 

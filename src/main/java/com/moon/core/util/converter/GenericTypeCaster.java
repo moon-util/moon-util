@@ -248,6 +248,26 @@ public class GenericTypeCaster implements TypeCaster {
             return toBean((Map) value, type);
         } else if (type.isInstance(value)) {
             return (T) value;
+        } else if (value == null) {
+            if (type.isPrimitive()) {
+                if (type == int.class) {
+                    return (T) Integer.valueOf(0);
+                } else if (type == long.class) {
+                    return (T) Long.valueOf(0);
+                } else if (type == double.class) {
+                    return (T) Double.valueOf(0);
+                } else if (type == short.class) {
+                    return (T) Short.valueOf((short) 0);
+                } else if (type == byte.class) {
+                    return (T) Byte.valueOf((byte) 0);
+                } else if (type == float.class) {
+                    return (T) Float.valueOf(0);
+                } else if (type == boolean.class) {
+                    return (T) Boolean.FALSE;
+                }
+            } else {
+                return null;
+            }
         }
 
         throw new ClassCastException(StringUtil.format("Can not cast: {} to type of: {}", value, type));
@@ -465,8 +485,8 @@ public class GenericTypeCaster implements TypeCaster {
         }
 
         Collection toCollect(Collection value, Class listImplType) {
-            return listImplType.isInstance(value) ? value : createCollect(listImplType, isAbstract(listImplType),
-                value);
+            return listImplType.isInstance(value) ? value
+                : createCollect(listImplType, isAbstract(listImplType), value);
         }
 
         Collection toCollect(Object[] array, Class listImplType) {
@@ -526,8 +546,8 @@ public class GenericTypeCaster implements TypeCaster {
         }
 
         List toList(Collection value, Class listImplType) {
-            return listImplType.isInstance(value) ? (List) value : createList(listImplType, isAbstract(listImplType),
-                value);
+            return listImplType.isInstance(value) ? (List) value
+                : createList(listImplType, isAbstract(listImplType), value);
         }
 
         List toList(Object[] array, Class listImplType) {

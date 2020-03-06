@@ -111,31 +111,31 @@ class ParseCoreTestTest {
     @Test
     void testGetOpposite() {
         handler = ParseCore.parse("1+-1*5");
-        assertEquals((Integer) handler.run(), 1 + -1 * 5);
+        assertEquals((Integer) handler.run(), (Object) (1 + -1 * 5));
         handler = ParseCore.parse("(1+-1)*5");
-        assertEquals((Integer) handler.run(), (1 + -1) * 5);
+        assertEquals((Integer) handler.run(), (Object) ((1 + -1) * 5));
         handler = ParseCore.parse("-1*5");
-        assertEquals((Integer) handler.run(), -1 * 5);
+        assertEquals((Integer) handler.run(), (Object) (-1 * 5));
 
         data = new HashMap() {{
             put(true, 20);
         }};
         handler = ParseCore.parse("-[true]*5");
-        assertEquals((Integer) handler.run(data), -100);
+        assertEquals((Integer) handler.run(data), (Object) (-100));
     }
 
     @Test
     void testParse() {
         handler = ParseCore.parse("1+1");
-        assertEquals((Integer) handler.run(), 2);
+        assertEquals((Integer) handler.run(), (Object) (2));
         handler = ParseCore.parse("(1+1+205)");
-        assertEquals((Integer) handler.run(), 207);
+        assertEquals((Integer) handler.run(), (Object) (207));
         handler = ParseCore.parse("2100-21*53+2255");
         num = 2100 - 21 * 53 + 2255;
-        assertEquals((Integer) handler.run(), num);
+        assertEquals((Integer) handler.run(), (Object) (num));
         handler = ParseCore.parse("40 * 48 - (1472 + 328) / 5");
         num = 40 * 48 - (1472 + 328) / 5;
-        assertEquals((Integer) handler.run(), num);
+        assertEquals((Integer) handler.run(), (Object) (num));
 
         str = "aaaaaaaaaaa";
         data = new HashMap() {{
