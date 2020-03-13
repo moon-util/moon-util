@@ -20,9 +20,8 @@ import static com.moon.core.lang.ThrowUtil.doThrow;
  * @author benshaoye
  */
 public final class FileUtil {
-    private FileUtil() {
-        ThrowUtil.noInstanceError();
-    }
+
+    private FileUtil() { ThrowUtil.noInstanceError(); }
 
     /*
      * -----------------------------------------------------------------------
@@ -59,8 +58,8 @@ public final class FileUtil {
         } else if (sourceFile.isDirectory()) {
             String root = sourceFile.getParent();
             int len = root.length();
-            IteratorUtil.forEach(traverseDirectory(sourceFile), file ->
-                copyToFile(file, new File(targetDir, file.getAbsolutePath().substring(len))));
+            IteratorUtil.forEach(traverseDirectory(sourceFile),
+                file -> copyToFile(file, new File(targetDir, file.getAbsolutePath().substring(len))));
         }
     }
 
@@ -94,17 +93,12 @@ public final class FileUtil {
      *
      * @param file 目标文件
      */
-    public static FileOutputStream getOutputStream(File file) {
-        return getOutputStream(file, false);
-    }
+    public static FileOutputStream getOutputStream(File file) { return getOutputStream(file, false); }
 
-    public static FileOutputStream getOutputStream(String filePath) {
-        return getOutputStream(filePath, false);
-    }
+    public static FileOutputStream getOutputStream(String filePath) { return getOutputStream(filePath, false); }
 
     public static FileOutputStream getOutputStream(File file, boolean append) {
-        return createNewFile(file) ? applyBi(file, append, FileOutputStream::new)
-            : doThrow("File not exist: " + file);
+        return createNewFile(file) ? applyBi(file, append, FileOutputStream::new) : doThrow("File not exist: " + file);
     }
 
     public static FileOutputStream getOutputStream(String filePath, boolean append) {
@@ -120,8 +114,21 @@ public final class FileUtil {
      *
      * @param file 目标文件
      */
-    public static FileInputStream getInputStream(File file) {
-        return LangUtil.apply(file, FileInputStream::new);
+    public static FileInputStream getInputStream(File file) { return LangUtil.apply(file, FileInputStream::new); }
+
+    public static File getFile(String... paths) {
+        int length = paths == null ? 0 : paths.length;
+        if (length < 1) {
+            return null;
+        }
+        if (length == 1) {
+            return new File(paths[0]);
+        }
+        File file = new File(paths[0], paths[1]);
+        for (int i = 2; i < length; i++) {
+            file = new File(file, paths[i]);
+        }
+        return file;
     }
 
     /*
@@ -130,9 +137,12 @@ public final class FileUtil {
      * -----------------------------------------------------------------------
      */
 
-    public static boolean mkdirs(String path) {
-        return mkdirs(new File(path));
+    public static boolean mkdirs(String... pathOptions) {
+        File dir = getFile(pathOptions);
+        return dir == null ? false : mkdirs(dir);
     }
+
+    public static boolean mkdirs(String path) { return mkdirs(new File(path)); }
 
     public static boolean mkdirs(File dir) {
         if (dir.exists()) {
@@ -165,9 +175,7 @@ public final class FileUtil {
         return true;
     }
 
-    public static boolean createNewFile(String filepath) {
-        return createNewFile(new File(filepath));
-    }
+    public static boolean createNewFile(String filepath) { return createNewFile(new File(filepath)); }
 
     /*
      * -----------------------------------------------------------------------
@@ -180,30 +188,20 @@ public final class FileUtil {
      *
      * @return 文件列表遍历器
      */
-    public static FileTraveller traveller() {
-        return new FileTraveller();
-    }
+    public static FileTraveller traveller() { return new FileTraveller(); }
 
     /**
      * 遍历指定目录的文件列表，如遇不可访问的安全保护会打印相应错误信息，但不会影响程序执行
      *
      * @param dirPath 目标文件路径
      */
-    public static List<File> traverseDirectory(String dirPath) {
-        return traveller().traverse(dirPath);
-    }
+    public static List<File> traverseDirectory(String dirPath) { return traveller().traverse(dirPath); }
 
-    public static List<File> traverseDirectory(File dirPath) {
-        return traveller().traverse(dirPath);
-    }
+    public static List<File> traverseDirectory(File dirPath) { return traveller().traverse(dirPath); }
 
-    public static List<File> traverse(String dirPath) {
-        return traveller().traverse(dirPath);
-    }
+    public static List<File> traverse(String dirPath) { return traveller().traverse(dirPath); }
 
-    public static List<File> traverse(File dir) {
-        return traveller().traverse(dir);
-    }
+    public static List<File> traverse(File dir) { return traveller().traverse(dir); }
 
     public static List<File> traverseAll(File... dirs) {
         FileTraveller traveller = traveller();
@@ -306,6 +304,7 @@ public final class FileUtil {
      * 返回文件大小(单位 Bit)
      *
      * @param file 目标文件
+     *
      * @return 返回文件大小(单位 Bit)
      */
     public static long lengthToBit(File file) { return lengthToB(file) << 3; }
@@ -314,6 +313,7 @@ public final class FileUtil {
      * 返回文件大小(单位 B)
      *
      * @param filepath 目标文件绝对路径
+     *
      * @return 返回文件大小(单位 B)
      */
     public static long length(String filepath) { return lengthToB(new File(filepath)); }
@@ -322,6 +322,7 @@ public final class FileUtil {
      * 返回文件大小(单位 B)
      *
      * @param file 目标文件
+     *
      * @return 返回文件大小(单位 B)
      */
     public static long lengthToB(File file) { return file.length(); }
@@ -330,6 +331,7 @@ public final class FileUtil {
      * 返回文件大小(单位 KB)
      *
      * @param file 目标文件
+     *
      * @return 返回文件大小(单位 KB)
      */
     public static long lengthToKB(File file) { return lengthToB(file) >> 10; }
@@ -338,6 +340,7 @@ public final class FileUtil {
      * 返回文件大小(单位 MB)
      *
      * @param file 目标文件
+     *
      * @return 文件大小(单位 MB)
      */
     public static long lengthToMB(File file) { return lengthToKB(file) >> 10; }
@@ -346,6 +349,7 @@ public final class FileUtil {
      * 返回文件大小(单位 GB)
      *
      * @param file 目标文件
+     *
      * @return 文件大小(单位 GB)
      */
     public static long lengthToGB(File file) { return lengthToMB(file) >> 10; }
@@ -354,6 +358,7 @@ public final class FileUtil {
      * 返回文件大小(单位 TB)
      *
      * @param file 目标文件
+     *
      * @return 文件大小(单位 TB)
      */
     public static long lengthToTB(File file) { return lengthToGB(file) >> 10; }
@@ -362,6 +367,7 @@ public final class FileUtil {
      * 返回文件大小(单位 PB)
      *
      * @param file 目标文件
+     *
      * @return 文件大小(单位 PB)
      */
     public static long lengthToPB(File file) { return lengthToTB(file) >> 10; }
@@ -370,6 +376,7 @@ public final class FileUtil {
      * 返回文件大小(单位 EB)
      *
      * @param file 目标文件
+     *
      * @return 文件大小(单位 EB)
      */
     public static long lengthToEB(File file) { return lengthToPB(file) >> 10; }
@@ -378,6 +385,7 @@ public final class FileUtil {
      * 返回文件大小(单位 ZB)
      *
      * @param file 目标文件
+     *
      * @return 文件大小(单位 ZB)
      */
     public static long lengthToZB(File file) { return lengthToEB(file) >> 10; }
@@ -392,6 +400,7 @@ public final class FileUtil {
      * 深度删除所有文件
      *
      * @param dir 目标目录
+     *
      * @return 是否还存在目标目录
      */
     public static boolean deleteAllFiles(String dir) { return deleteAllFiles(new File(dir)); }
@@ -400,6 +409,7 @@ public final class FileUtil {
      * 深度删除所有文件
      *
      * @param dir 目标目录
+     *
      * @return 是否还存在目标目录
      */
     public static boolean deleteAllFiles(File dir) {
@@ -422,6 +432,7 @@ public final class FileUtil {
      * 删除文件，返回 file 所指向的文件是否还存在
      *
      * @param file 待删除文件
+     *
      * @return 是否还存在目标文件
      */
     public static boolean delete(File file) {

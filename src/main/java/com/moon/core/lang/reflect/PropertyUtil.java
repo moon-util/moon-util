@@ -6,6 +6,8 @@ import com.moon.core.lang.ref.WeakLocation;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Objects;
+import java.util.function.Function;
 
 import static com.moon.core.enums.Casters.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -18,18 +20,48 @@ public final class PropertyUtil {
     private PropertyUtil() { noInstanceError(); }
 
     /**
+     * 获取某个属性
+     *
+     * @param t      对象
+     * @param getter 对象属性 getter
+     * @param <T>    对象数据类型
+     * @param <R>    将要获取的属性的数据类型
+     *
+     * @return 对象属性值或 null
+     */
+    public static <T, R> R getOrNull(T t, Function<? super T, ? extends R> getter) {
+        return t == null ? null : getter.apply(t);
+    }
+
+    /**
+     * 用 equals 比较某个属性是否相等
+     *
+     * @param t1     被比较对象
+     * @param t2     比较对象
+     * @param getter 比较的属性
+     * @param <T>    对象数据类型
+     *
+     * @return 对象属性是否想通
+     */
+    public static <T> boolean propertyEquals(T t1, T t2, Function<? super T, ?> getter) {
+        return (t1 == t2) || ((t1 != null && t2 != null) && Objects.equals(getter.apply(t1), getter.apply(t2)));
+    }
+
+    /**
      * 获取标准 setter 方法
      *
-     * @param field
-     * @return
+     * @param field 字段
+     *
+     * @return 字段对应的 setter 方法
      */
     public static Method getSetterMethod(Field field) { return BeanInfoUtil.getSetterMethod(field); }
 
     /**
      * 获取标准 getter 方法
      *
-     * @param field
-     * @return
+     * @param field 字段
+     *
+     * @return 字段对应的 getter 方法
      */
     public static Method getGetterMethod(Field field) { return BeanInfoUtil.getGetterMethod(field); }
 
@@ -38,6 +70,7 @@ public final class PropertyUtil {
      *
      * @param clazz
      * @param name
+     *
      * @return
      */
     public static Method getGetterMethod(Class clazz, String name) { return BeanInfoUtil.getGetterMethod(clazz, name); }
@@ -47,6 +80,7 @@ public final class PropertyUtil {
      *
      * @param clazz
      * @param name
+     *
      * @return
      */
     public static Method getSetterMethod(Class clazz, String name) { return BeanInfoUtil.getSetterMethod(clazz, name); }
@@ -102,6 +136,7 @@ public final class PropertyUtil {
      *
      * @param field
      * @param source
+     *
      * @return
      */
     public static Object getValue(Field field, Object source) { return getValue(field, source, false); }
@@ -112,6 +147,7 @@ public final class PropertyUtil {
      * @param field
      * @param source
      * @param accessAble
+     *
      * @return
      */
     public static Object getValue(Field field, Object source, boolean accessAble) {
@@ -123,6 +159,7 @@ public final class PropertyUtil {
      *
      * @param fieldName
      * @param source
+     *
      * @return
      */
     public static Object getValue(String fieldName, Object source) { return getValue(fieldName, source, false); }
@@ -133,6 +170,7 @@ public final class PropertyUtil {
      * @param fieldName
      * @param source
      * @param accessAble
+     *
      * @return
      */
     public static Object getValue(String fieldName, Object source, boolean accessAble) {
@@ -214,10 +252,8 @@ public final class PropertyUtil {
     /**
      * 缓存字段读取和设置的执行器
      */
-    private final static WeakLocation<Class, String, FieldExecutor>
-        SETTER_EXECUTOR = WeakLocation.ofManaged();
-    private final static WeakLocation<Class, String, FieldExecutor>
-        GETTER_EXECUTOR = WeakLocation.ofManaged();
+    private final static WeakLocation<Class, String, FieldExecutor> SETTER_EXECUTOR = WeakLocation.ofManaged();
+    private final static WeakLocation<Class, String, FieldExecutor> GETTER_EXECUTOR = WeakLocation.ofManaged();
 
     /**
      * 读取值
@@ -226,6 +262,7 @@ public final class PropertyUtil {
      * @param propertyName 属性名
      * @param source       作用对象，一般 source 是 targetType 的实例
      * @param accessible   可见状态
+     *
      * @return 返回字段值
      */
     private static Object readValue(
@@ -246,6 +283,7 @@ public final class PropertyUtil {
      * @param source       作用对象，一般 source 是 targetType 的实例
      * @param value        要设置的值
      * @param accessible   可见状态
+     *
      * @return 返回作用对象 source
      */
     private static Object writeValue(

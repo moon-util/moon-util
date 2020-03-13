@@ -2,6 +2,10 @@ package com.moon.core.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 /**
  * @author benshaoye
  */
@@ -53,6 +57,8 @@ class CollectUtilTestTest {
 
     @Test
     void testToArray() {
+        List<String> list = new ArrayList<>();
+        Object[] arr = CollectUtil.toArray(list, Object[]::new);
     }
 
     @Test

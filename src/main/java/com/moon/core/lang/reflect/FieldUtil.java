@@ -35,9 +35,7 @@ import java.util.function.Predicate;
  */
 public final class FieldUtil {
 
-    private FieldUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private FieldUtil() { ThrowUtil.noInstanceError(); }
 
     private final static WeakLocation<Class, TypeEnum, List<Field>> WEAK = WeakLocation.ofManaged();
 
@@ -49,9 +47,7 @@ public final class FieldUtil {
      * @param field
      * @return
      */
-    public static Method getSetterMethod(Field field) {
-        return BeanInfoUtil.getSetterMethod(field);
-    }
+    public static Method getSetterMethod(Field field) { return BeanInfoUtil.getSetterMethod(field); }
 
     /**
      * 获取标准 getter 方法
@@ -59,9 +55,7 @@ public final class FieldUtil {
      * @param field
      * @return
      */
-    public static Method getGetterMethod(Field field) {
-        return BeanInfoUtil.getGetterMethod(field);
-    }
+    public static Method getGetterMethod(Field field) { return BeanInfoUtil.getGetterMethod(field); }
 
     /**
      * 获取标准 getter 方法
@@ -70,9 +64,7 @@ public final class FieldUtil {
      * @param name
      * @return
      */
-    public static Method getGetterMethod(Class clazz, String name) {
-        return BeanInfoUtil.getGetterMethod(clazz, name);
-    }
+    public static Method getGetterMethod(Class clazz, String name) { return BeanInfoUtil.getGetterMethod(clazz, name); }
 
     /**
      * 获取标准 getter 方法
@@ -81,9 +73,7 @@ public final class FieldUtil {
      * @param name
      * @return
      */
-    public static Method getSetterMethod(Class clazz, String name) {
-        return BeanInfoUtil.getSetterMethod(clazz, name);
-    }
+    public static Method getSetterMethod(Class clazz, String name) { return BeanInfoUtil.getSetterMethod(clazz, name); }
 
     /**
      * 获取指定公共字段

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -17,11 +18,11 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public class CollectUtil extends BaseCollectUtil {
 
-    protected CollectUtil() {
-        noInstanceError();
-    }
+    protected CollectUtil() { noInstanceError(); }
 
-    public final static <E, C extends Collection<E>> int size(C collect) { return collect == null ? 0 : collect.size(); }
+    public final static <E, C extends Collection<E>> int size(C collect) {
+        return collect == null ? 0 : collect.size();
+    }
 
     public final static int sizeByObject(Object collect) { return collect == null ? 0 : ((Collection) collect).size(); }
 
@@ -32,7 +33,13 @@ public class CollectUtil extends BaseCollectUtil {
         return size;
     }
 
-    public final static <E, C extends Collection<E>> boolean isEmpty(C collect) { return collect == null || collect.isEmpty(); }
+    public final static <T> T[] toArray(Collection<? extends T> collect, IntFunction<? extends T[]> arrCreator) {
+        return collect == null ? arrCreator.apply(0) : collect.toArray(arrCreator.apply(size(collect)));
+    }
+
+    public final static <E, C extends Collection<E>> boolean isEmpty(C collect) {
+        return collect == null || collect.isEmpty();
+    }
 
     public final static <E, C extends Collection<E>> boolean isNotEmpty(C collect) { return !isEmpty(collect); }
 
@@ -146,7 +153,9 @@ public class CollectUtil extends BaseCollectUtil {
         return IteratorUtil.map(src, function);
     }
 
-    public final static <T> Collection<T> concat(Collection<T> collect, Collection<T>... collections) { return concat0(collect, collections); }
+    public final static <T> Collection<T> concat(Collection<T> collect, Collection<T>... collections) {
+        return concat0(collect, collections);
+    }
 
     public final static <T> Set<T> toSet(T... items) { return SetUtil.newHashSet(items); }
 
@@ -283,7 +292,9 @@ public class CollectUtil extends BaseCollectUtil {
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C requireSizeGtOrEq(C collect, int expectedMinSize, String errorMessage) {
+    public final static <E, C extends Collection<E>> C requireSizeGtOrEq(
+        C collect, int expectedMinSize, String errorMessage
+    ) {
         IntUtil.requireGtOrEq(size(collect), expectedMinSize, errorMessage);
         return collect;
     }
@@ -293,7 +304,9 @@ public class CollectUtil extends BaseCollectUtil {
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C requireSizeLtOrEq(C collect, int expectedMaxSize, String errorMessage) {
+    public final static <E, C extends Collection<E>> C requireSizeLtOrEq(
+        C collect, int expectedMaxSize, String errorMessage
+    ) {
         IntUtil.requireLtOrEq(size(collect), expectedMaxSize, errorMessage);
         return collect;
     }

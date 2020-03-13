@@ -68,7 +68,7 @@ public final class StringUtil {
      *
      * @return 内容是否相同
      */
-    public static <T extends CharSequence> boolean contentEquals(T str1, T str2) {
+    public static boolean contentEquals(CharSequence str1, CharSequence str2) {
         return str1 == null ? str2 == null : (str1.equals(str2) || StringSupport.matches(str1, str2));
     }
 
@@ -771,7 +771,7 @@ public final class StringUtil {
     /**
      * 连字符号转驼峰
      *
-     * @param str 字符串
+     * @param str          字符串
      * @param firstToUpper 第一个字母是否大写
      *
      * @return 转换后的字符串
@@ -828,7 +828,7 @@ public final class StringUtil {
      * 驼峰转连字符
      *
      * @param hyphen 自定义连字符号
-     * @param str 字符串
+     * @param str    字符串
      *
      * @return 转换后的字符串
      */
@@ -847,7 +847,7 @@ public final class StringUtil {
      * camelcaseToHyphen("SSStringUtilTestTest", ',', false)    ====   "ss,string,util,test,test"
      * camelcaseToHyphen("SSStringUtilTestTest", ',', true)     ====   "s,s,string,util,test,test"
      *
-     * @param str 字符串
+     * @param str             字符串
      * @param hyphen          自定义连字符号
      * @param continuousSplit 自定义连续大写字母是否拆分连接
      *
