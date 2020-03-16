@@ -1,9 +1,11 @@
 package com.moon.core.enums;
 
+import com.moon.core.getter.NameGetter;
+
 /**
  * @author benshaoye
  */
-public interface EnumDescriptor {
+public interface EnumDescriptor extends NameGetter {
 
     /**
      * 枚举信息
@@ -16,6 +18,7 @@ public interface EnumDescriptor {
      * 枚举名字
      *
      * @return
+     *
      * @see Enum#name()
      */
     String name();
@@ -26,11 +29,13 @@ public interface EnumDescriptor {
      * 与{@link #name()}相同
      *
      * @return
-     * @see com.moon.core.models.IdName
-     * @see com.moon.core.models.KeyValue
+     *
+     * @see com.moon.core.model.IdName
+     * @see com.moon.core.model.KeyValue
      * @see com.moon.core.net.enums.StatusCode
      * @see Enum#name()
      */
+    @Override
     default String getName() {
         return name();
     }

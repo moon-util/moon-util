@@ -11,15 +11,9 @@ final class OptionalImpl<T> implements Optional<T> {
 
     final static Optional EMPTY = Empty.INSTANCE;
 
-    private T value;
+    private final T value;
 
     public OptionalImpl(T value) { this.value = Objects.requireNonNull(value); }
-
-    @Override
-    public Optional<T> setNullable(T value) {
-        this.value = value;
-        return this;
-    }
 
     @Override
     public T getOrNull() { return value; }

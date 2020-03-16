@@ -1,7 +1,8 @@
-package com.moon.core.models;
+package com.moon.core.model;
 
 import com.moon.core.enums.EnumDescriptor;
-import com.moon.core.util.interfaces.IdSupplier;
+import com.moon.core.getter.KeyGetter;
+import com.moon.core.getter.ValueGetter;
 import com.moon.core.util.interfaces.KeySupplier;
 import com.moon.core.util.interfaces.ValueSupplier;
 
@@ -10,7 +11,8 @@ import java.util.Objects;
 /**
  * @author benshaoye
  */
-public final class KeyValue implements ValueSupplier<String>, KeySupplier<String> {
+public final class KeyValue implements ValueSupplier<String>, KeySupplier<String>, KeyGetter, ValueGetter {
+
     private String key;
     private String value;
 
@@ -60,8 +62,7 @@ public final class KeyValue implements ValueSupplier<String>, KeySupplier<String
             return false;
         }
         KeyValue keyValue = (KeyValue) o;
-        return Objects.equals(key, keyValue.key) &&
-            Objects.equals(value, keyValue.value);
+        return Objects.equals(key, keyValue.key) && Objects.equals(value, keyValue.value);
     }
 
     @Override

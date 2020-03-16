@@ -70,31 +70,6 @@ public interface Optional<T> extends Optionally {
     static <E, OI extends Optional<E>> OI of(E value, Function<? super E, OI> mapper) { return mapper.apply(value); }
 
     /**
-     * 设置值，可为 null
-     *
-     * @param value
-     *
-     * @return
-     */
-    default Optional<T> setNullable(T value) { return this; }
-
-    /**
-     * 设置 null 值
-     *
-     * @return
-     */
-    default Optional<T> setNull() { return setNullable(null); }
-
-    /**
-     * 设置值，不可为 null
-     *
-     * @param value
-     *
-     * @return
-     */
-    default Optional<T> set(T value) { return value == null ? doThrow(null) : setNullable(value); }
-
-    /**
      * 返回值
      *
      * @return
@@ -175,7 +150,7 @@ public interface Optional<T> extends Optionally {
      *
      * @return
      */
-    default Optional<T> elseIfAbsent(Supplier<T> supplier) { return isAbsent() ? setNullable(supplier.get()) : this; }
+    default Optional<T> elseIfAbsent(Supplier<T> supplier) { return isAbsent() ? ofNullable(supplier.get()) : this; }
 
     /**
      * 不存在的情况设置默认值
@@ -184,7 +159,7 @@ public interface Optional<T> extends Optionally {
      *
      * @return
      */
-    default Optional<T> defaultIfAbsent(T defaultValue) { return isAbsent() ? setNullable(defaultValue) : this; }
+    default Optional<T> defaultIfAbsent(T defaultValue) { return isAbsent() ? ofNullable(defaultValue) : this; }
 
     /**
      * 存在的情况下消费
@@ -224,9 +199,7 @@ public interface Optional<T> extends Optionally {
      *
      * @return
      */
-    default java.util.Optional<T> toUtil() {
-        return java.util.Optional.ofNullable(getOrNull());
-    }
+    default java.util.Optional<T> toUtil() { return java.util.Optional.ofNullable(getOrNull()); }
 
     /**
      * 转换

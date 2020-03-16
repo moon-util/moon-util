@@ -17,9 +17,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class FilterUtil {
 
-    private FilterUtil() {
-        noInstanceError();
-    }
+    private FilterUtil() { noInstanceError(); }
 
     /*
      * --------------------------------------------------------------

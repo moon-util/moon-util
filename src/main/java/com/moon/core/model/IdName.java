@@ -1,6 +1,8 @@
-package com.moon.core.models;
+package com.moon.core.model;
 
 import com.moon.core.enums.EnumDescriptor;
+import com.moon.core.getter.IdGetter;
+import com.moon.core.getter.NameGetter;
 import com.moon.core.util.interfaces.IdOperator;
 import com.moon.core.util.interfaces.IdSupplier;
 import com.moon.core.util.interfaces.NameSupplier;
@@ -10,8 +12,9 @@ import java.util.Objects;
 /**
  * @author benshaoye
  */
-public final class IdName implements NameSupplier<String>,
-    IdOperator<String>, IdSupplier<String> {
+public final class IdName
+    implements NameSupplier<String>, IdOperator<String>,
+               IdSupplier<String>, IdGetter, NameGetter {
 
     private String id;
 
@@ -67,8 +70,7 @@ public final class IdName implements NameSupplier<String>,
             return false;
         }
         IdName idName = (IdName) o;
-        return Objects.equals(id, idName.id) &&
-            Objects.equals(name, idName.name);
+        return Objects.equals(id, idName.id) && Objects.equals(name, idName.name);
     }
 
     @Override
