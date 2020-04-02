@@ -3,6 +3,7 @@ package com.moon.core.web;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.moon.core.lang.StringUtil.isEmpty;
+import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.web.RequestUtil.header;
 
 /**
@@ -10,22 +11,13 @@ import static com.moon.core.web.RequestUtil.header;
  */
 public final class ContentTypeUtil {
 
-    public ContentTypeUtil() {}
+    private ContentTypeUtil() { noInstanceError(); }
 
-    public final static String lowerAccept = "accept";
-    public final static String capitalizeAccept = "Accept";
+    public static boolean isAcceptAny(HttpServletRequest request) { return isAcceptOf(request, "*/*"); }
 
-    public static boolean isAcceptAny(HttpServletRequest request) {
-        return isAcceptOf(request, "*/*");
-    }
+    public static boolean isAcceptJson(HttpServletRequest request) { return isAcceptOf(request, "application/json"); }
 
-    public static boolean isAcceptJson(HttpServletRequest request) {
-        return isAcceptOf(request, "application/json");
-    }
-
-    public static boolean isAcceptHtml(HttpServletRequest request) {
-        return isAcceptOf(request, "text/html");
-    }
+    public static boolean isAcceptHtml(HttpServletRequest request) { return isAcceptOf(request, "text/html"); }
 
     @SuppressWarnings("all")
     public static boolean isAcceptOf(HttpServletRequest request, String expected) {
@@ -36,7 +28,5 @@ public final class ContentTypeUtil {
         return isAcceptOf(acceptVal, expected);
     }
 
-    private static boolean isAcceptOf(String acceptVal, String expected) {
-        return acceptVal.contains(expected);
-    }
+    private static boolean isAcceptOf(String acceptVal, String expected) { return acceptVal.contains(expected); }
 }

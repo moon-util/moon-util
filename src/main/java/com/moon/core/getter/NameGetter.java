@@ -6,7 +6,7 @@ import com.moon.core.util.interfaces.NameSupplier;
  * @author benshaoye
  */
 @FunctionalInterface
-public interface NameGetter extends NameSupplier<String> {
+public interface NameGetter extends NameSupplier<String>, Getter {
 
     /**
      * get name

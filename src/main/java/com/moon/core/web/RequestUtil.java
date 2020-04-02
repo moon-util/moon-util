@@ -1,8 +1,12 @@
 package com.moon.core.web;
 
+import com.moon.core.lang.JoinerUtil;
 import com.moon.core.lang.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.moon.core.lang.StringUtil.isEmpty;
 import static com.moon.core.lang.StringUtil.nullIfEmpty;
@@ -14,6 +18,22 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 public final class RequestUtil {
 
     private RequestUtil() { noInstanceError(); }
+
+    public static Map<String, String> headersMap(HttpServletRequest request, String... keys) {
+        Map<String, String> headers = new HashMap<>(16);
+        if (keys == null || keys.length < 1) {
+            Enumeration<String> enums = request.getHeaderNames();
+            while (enums.hasMoreElements()) {
+                String key = enums.nextElement();
+                headers.put(key, header(request, key));
+            }
+        } else {
+            for (String key : keys) {
+                headers.put(key, header(request, key));
+            }
+        }
+        return headers;
+    }
 
     public static String header(HttpServletRequest request, String name) { return request.getHeader(name); }
 
@@ -30,16 +50,14 @@ public final class RequestUtil {
         return (T) request.getAttribute(key);
     }
 
-    public static void attr(HttpServletRequest request, String key, Object value) {
-        request.setAttribute(key, value);
-    }
+    public static void attr(HttpServletRequest request, String key, Object value) { request.setAttribute(key, value); }
 
     private static boolean isUnknown(String str) {
         return StringUtil.isEmpty(str) || "unknown".equalsIgnoreCase(str);
     }
 
     @SuppressWarnings("all")
-    public static String getRemoteRealIP(HttpServletRequest request) {
+    public static String getRequestRealIP(HttpServletRequest request) {
         String ip = null, comma = ",";
         try {
             ip = header(request, "x-forwarded-for");
@@ -59,5 +77,26 @@ public final class RequestUtil {
             // ignore
         }
         return ip;
+    }
+
+    public static String getRequestDomain(HttpServletRequest request) {
+        int port = request.getServerPort(), dftPort = 80;
+        String protocol = request.getProtocol();
+        String host = getRequestRealIP(request);
+        if (port == dftPort) {
+            return JoinerUtil.join(new String[]{protocol, "://", host}, "");
+        } else {
+            String[] s = {protocol, "://", host, ":", String.valueOf(port)};
+            return JoinerUtil.join(s, "");
+        }
+    }
+
+    public static String getRequestURL(HttpServletRequest request) {
+        return StringUtil.concat(getRequestDomain(request), request.getContextPath(), request.getServletPath());
+    }
+
+    public static String getRequestFullURL(HttpServletRequest request) {
+        String url = getRequestURL(request), query = request.getQueryString();
+        return isEmpty(query) ? url : StringUtil.concat(url, "?", query);
     }
 }

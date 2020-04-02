@@ -6,7 +6,7 @@ import com.moon.core.util.interfaces.IdSupplier;
  * @author benshaoye
  */
 @FunctionalInterface
-public interface IdGetter extends IdSupplier<String> {
+public interface IdGetter extends IdSupplier<String>, Getter {
 
     /**
      * get id

@@ -6,7 +6,7 @@ import com.moon.core.util.interfaces.ValueSupplier;
  * @author benshaoye
  */
 @FunctionalInterface
-public interface ValueGetter extends ValueSupplier<String> {
+public interface ValueGetter extends ValueSupplier<String>, Getter {
 
     /**
      * get value

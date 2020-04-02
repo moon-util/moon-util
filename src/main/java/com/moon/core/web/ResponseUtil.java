@@ -1,5 +1,7 @@
 package com.moon.core.web;
 
+import com.moon.core.lang.ThrowUtil;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
@@ -11,6 +13,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author benshaoye
  */
 public final class ResponseUtil {
+
+    private ResponseUtil() { ThrowUtil.noInstanceError(); }
+
+    public static ResponseWriter writer(HttpServletResponse response) { return new ResponseWriter(response); }
 
     public static void write200(HttpServletResponse response, String content) throws IOException {
         write(response, content, 200);
