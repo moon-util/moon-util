@@ -896,4 +896,243 @@ public final class StringUtil {
     }
 
     public final static String replaceFirst(String src, String old, String now) { return src.replaceFirst(old, now); }
+
+    public static char charAt(CharSequence str, int index) {
+        int length = str.length();
+        if (index < 0) {
+            return str.charAt(length + (index > -length ? index : (index % length)));
+        } else {
+            return str.charAt(index < length ? index : index % length);
+        }
+    }
+
+    /**
+     * StringUtil.substrBefore(null, *)      = null
+     * StringUtil.substrBefore("", *)        = ""
+     * StringUtil.substrBefore("abc", "a")   = ""
+     * StringUtil.substrBefore("abcba", "b") = "a"
+     * StringUtil.substrBefore("abc", "c")   = "ab"
+     * StringUtil.substrBefore("abc", "d")   = "abc"
+     * StringUtil.substrBefore("abc", "")    = ""
+     * StringUtil.substrBefore("abc", null)  = "abc"
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String substrBefore(String str, String search) {
+        if (isEmpty(str) || search == null) {
+            return str;
+        }
+        if (search.isEmpty()) {
+            return EMPTY;
+        }
+        int index = str.indexOf(search);
+        return index < 0 ? str : str.substring(0, index);
+    }
+
+    /**
+     * StringUtil.substrBeforeLast(null, *)      = null
+     * StringUtil.substrBeforeLast("", *)        = ""
+     * StringUtil.substrBeforeLast("abcba", "b") = "abc"
+     * StringUtil.substrBeforeLast("abc", "c")   = "ab"
+     * StringUtil.substrBeforeLast("a", "a")     = ""
+     * StringUtil.substrBeforeLast("a", "z")     = "a"
+     * StringUtil.substrBeforeLast("a", null)    = "a"
+     * StringUtil.substrBeforeLast("a", "")      = "a"
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String substrBeforeLast(String str, String search) {
+        if (isEmpty(str) || isEmpty(search)) {
+            return str;
+        }
+        int index = str.lastIndexOf(search);
+        return index < 0 ? str : str.substring(0, index);
+    }
+
+    /**
+     * StringUtil.substrAfter(null, *)      = null
+     * StringUtil.substrAfter("", *)        = ""
+     * StringUtil.substrAfter(*, null)      = ""
+     * StringUtil.substrAfter("abc", "a")   = "bc"
+     * StringUtil.substrAfter("abcba", "b") = "cba"
+     * StringUtil.substrAfter("abc", "c")   = ""
+     * StringUtil.substrAfter("abc", "d")   = ""
+     * StringUtil.substrAfter("abc", "")    = "abc"
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String substrAfter(String str, String search) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        if (search == null) {
+            return EMPTY;
+        }
+        int index = str.indexOf(search);
+        return index < 0 ? EMPTY : str.substring(index + search.length());
+    }
+
+    /**
+     * StringUtil.substrAfterLast(null, *)      = null
+     * StringUtil.substrAfterLast("", *)        = ""
+     * StringUtil.substrAfterLast(*, "")        = ""
+     * StringUtil.substrAfterLast(*, null)      = ""
+     * StringUtil.substrAfterLast("abc", "a")   = "bc"
+     * StringUtil.substrAfterLast("abcba", "b") = "a"
+     * StringUtil.substrAfterLast("abc", "c")   = ""
+     * StringUtil.substrAfterLast("a", "a")     = ""
+     * StringUtil.substrAfterLast("a", "z")     = ""
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String substrAfterLast(String str, String search) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        if (isEmpty(search)) {
+            return EMPTY;
+        }
+        int index = str.lastIndexOf(search);
+        if (index < 0 || index == str.length() - search.length()) {
+            return EMPTY;
+        }
+        return str.substring(index + search.length());
+    }
+
+    public static String substringBetween(String str, String search) {
+        return substringBetween(str, search, search);
+    }
+
+    public static String substringBetween(String str, String open, String close) {
+        if (str == null || open == null || close == null) {
+            return null;
+        }
+        int start = str.indexOf(open);
+        if (start < 0) {
+            return null;
+        }
+        int end = str.indexOf(close, start + open.length());
+        if (end < 0) {
+            return null;
+        }
+        return str.substring(start + open.length(), end);
+    }
+
+    /*
+    discard indexOf 和 lastIndexOf 小于 0 的情况有待商榷
+     */
+
+    /**
+     * StringUtil.discardAfter(null, *)      = null
+     * StringUtil.discardAfter("", *)        = ""
+     * StringUtil.discardAfter(*, "")        = ""
+     * StringUtil.discardAfter(*, null)      = ""
+     * StringUtil.discardAfter("12345", "6") = "12345"
+     * StringUtil.discardAfter("12345", "23") = "123"
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String discardAfter(String str, String search) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        if (isEmpty(search)) {
+            return EMPTY;
+        }
+        int index = str.indexOf(search);
+        if (index < 0) {
+            return str;
+        }
+        return str.substring(0, index + search.length());
+    }
+
+    /**
+     * StringUtil.discardAfterLast(null, *)      = null
+     * StringUtil.discardAfterLast("", *)        = ""
+     * StringUtil.discardAfterLast(*, "")        = *
+     * StringUtil.discardAfterLast(*, null)      = *
+     * StringUtil.discardAfterLast("12345", "6") = "12345"
+     * StringUtil.discardAfterLast("12345", "23") = "123"
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String discardAfterLast(String str, String search) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        if (isEmpty(search)) {
+            return str;
+        }
+        int index = str.lastIndexOf(search);
+        if (index < 0) {
+            return str;
+        }
+        return str.substring(0, index + search.length());
+    }
+
+    /**
+     * StringUtil.discardBefore(null, *)      = null
+     * StringUtil.discardBefore("", *)        = ""
+     * StringUtil.discardBefore(*, "")        = *
+     * StringUtil.discardBefore(*, null)      = *
+     * StringUtil.discardBefore("12345", "6") = "12345"
+     * StringUtil.discardBefore("12345", "23") = "2345"
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String discardBefore(String str, String search) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        if (isEmpty(search)) {
+            return str;
+        }
+        int index = str.indexOf(search);
+        return index < 0 ? str : str.substring(index);
+    }
+
+    /**
+     * StringUtil.discardBeforeLast(null, *)      = *
+     * StringUtil.discardBeforeLast("", *)        = *
+     * StringUtil.discardBeforeLast(*, "")        = ""
+     * StringUtil.discardBeforeLast(*, null)      = ""
+     * StringUtil.discardBeforeLast("12345", "6") = "12345"
+     * StringUtil.discardBeforeLast("12345", "23") = "2345"
+     *
+     * @param str
+     * @param search
+     *
+     * @return
+     */
+    public static String discardBeforeLast(String str, String search) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        if (isEmpty(search)) {
+            return EMPTY;
+        }
+        int index = str.lastIndexOf(search);
+        return index < 0 ? str : str.substring(index);
+    }
 }

@@ -14,6 +14,143 @@ import static org.junit.jupiter.api.Assertions.*;
 class StringUtilTestTest {
 
     @Test
+    void testSubstrBefore() {
+        assertEquals(StringUtil.substrBefore(null, "1234567890"), null);
+        assertEquals(StringUtil.substrBefore("", "asdfghjkl"), "");
+        assertEquals(StringUtil.substrBefore("abc", "a"), "");
+        assertEquals(StringUtil.substrBefore("abcba", "b"), "a");
+        assertEquals(StringUtil.substrBefore("abc", "b"), "a");
+        assertEquals(StringUtil.substrBefore("abc", "c"), "ab");
+        assertEquals(StringUtil.substrBefore("abc", "d"), "abc");
+        assertEquals(StringUtil.substrBefore("abc", ""), "");
+        assertEquals(StringUtil.substrBefore("abc", null), "abc");
+    }
+
+    @Test
+    void testSubstrBeforeLast() {
+        assertEquals(StringUtil.substrBeforeLast(null, "1234567890"), null);
+        assertEquals(StringUtil.substrBeforeLast("", "asdfghjkl"), "");
+        assertEquals(StringUtil.substrBeforeLast("abcba", "b"), "abc");
+        assertEquals(StringUtil.substrBeforeLast("abc", "c"), "ab");
+        assertEquals(StringUtil.substrBeforeLast("a", "a"), "");
+        assertEquals(StringUtil.substrBeforeLast("a", "z"), "a");
+        assertEquals(StringUtil.substrBeforeLast("a", null), "a");
+        assertEquals(StringUtil.substrBeforeLast("a", ""), "a");
+    }
+
+
+    @Test
+    void testSubstrAfter() {
+        assertEquals(StringUtil.substrAfter(null, "1234567890"), null);
+        assertEquals(StringUtil.substrAfter("", "asdfghjkl"), "");
+        assertEquals(StringUtil.substrAfter("abc", null), "");
+        assertEquals(StringUtil.substrAfter("abc", "a"), "bc");
+        assertEquals(StringUtil.substrAfter("abcba", "b"), "cba");
+        assertEquals(StringUtil.substrAfter("abc", "c"), "");
+        assertEquals(StringUtil.substrAfter("abc", "d"), "");
+        assertEquals(StringUtil.substrAfter("abc", ""), "abc");
+    }
+
+
+    @Test
+    void testSubstrAfterLast() {
+        assertEquals(StringUtil.substrAfterLast(null, "124567890"), null);
+        assertEquals(StringUtil.substrAfterLast("", "poiuytrewq"), "");
+        assertEquals(StringUtil.substrAfterLast("asdfghjkl", ""), "");
+        assertEquals(StringUtil.substrAfterLast(",mnbvcxz", null), "");
+        assertEquals(StringUtil.substrAfterLast("abc", "a"), "bc");
+        assertEquals(StringUtil.substrAfterLast("abcba", "b"), "a");
+        assertEquals(StringUtil.substrAfterLast("abc", "c"), "");
+        assertEquals(StringUtil.substrAfterLast("a", "a"), "");
+        assertEquals(StringUtil.substrAfterLast("a", "z"), "");
+    }
+
+    @Test
+    void testSubstrDiscardAfter() {
+        assertEquals(StringUtil.discardAfter(null, "*"), null);
+        assertEquals(StringUtil.discardAfter("", "*"), "");
+        assertEquals(StringUtil.discardAfter("*", ""), "");
+        assertEquals(StringUtil.discardAfter("*", null), "");
+        assertEquals(StringUtil.discardAfter("12345", "6"), "12345");
+        assertEquals(StringUtil.discardAfter("12345", "23"), "123");
+    }
+
+    @Test
+    void testSubstrDiscardAfterLast() {
+        assertEquals(StringUtil.discardAfterLast(null, "*"), null);
+        assertEquals(StringUtil.discardAfterLast(null, "1234567890"), null);
+        assertEquals(StringUtil.discardAfterLast(null, "qwetyuiop"), null);
+        assertEquals(StringUtil.discardAfterLast(null, "asdfghjkl"), null);
+        assertEquals(StringUtil.discardAfterLast(null, "zxcvbnm"), null);
+        assertEquals(StringUtil.discardAfterLast("", "*"), "");
+        assertEquals(StringUtil.discardAfterLast("", "12346789"), "");
+        assertEquals(StringUtil.discardAfterLast("", "qweio"), "");
+        assertEquals(StringUtil.discardAfterLast("", "asdfghjkl;"), "");
+        assertEquals(StringUtil.discardAfterLast("", "asdfbnm;"), "");
+        assertEquals(StringUtil.discardAfterLast("*", ""), "*");
+        assertEquals(StringUtil.discardAfterLast("123467890", ""), "123467890");
+        assertEquals(StringUtil.discardAfterLast("qwertyuiop", ""), "qwertyuiop");
+        assertEquals(StringUtil.discardAfterLast("123467890", null), "123467890");
+        assertEquals(StringUtil.discardAfterLast("qwertyuiop", null), "qwertyuiop");
+        assertEquals(StringUtil.discardAfterLast("*", null), "*");
+        assertEquals(StringUtil.discardAfterLast("12345", "6"), "12345");
+        assertEquals(StringUtil.discardAfterLast("12345", "23"), "123");
+    }
+
+    @Test
+    void testDiscardBefore() {
+        assertEquals(StringUtil.discardBefore(null, "*"), null);
+        assertEquals(StringUtil.discardBefore(null, "234567890"), null);
+        assertEquals(StringUtil.discardBefore(null, "qwertyuiop"), null);
+        assertEquals(StringUtil.discardBefore(null, "wsdfbmki876"), null);
+        assertEquals(StringUtil.discardBefore("", "*"), "");
+        assertEquals(StringUtil.discardBefore("", "234567890"), "");
+        assertEquals(StringUtil.discardBefore("", "qwertyuiop"), "");
+        assertEquals(StringUtil.discardBefore("", "wsdfbmki876"), "");
+        assertEquals(StringUtil.discardBefore("*", ""), "*");
+        assertEquals(StringUtil.discardBefore("wsdfbmki876", ""), "wsdfbmki876");
+        assertEquals(StringUtil.discardBefore("qwertyuiop", ""), "qwertyuiop");
+        assertEquals(StringUtil.discardBefore("234567890", ""), "234567890");
+        assertEquals(StringUtil.discardBefore("*", null), "*");
+        assertEquals(StringUtil.discardBefore("wsdfbmki876", null), "wsdfbmki876");
+        assertEquals(StringUtil.discardBefore("qwertyuiop", null), "qwertyuiop");
+        assertEquals(StringUtil.discardBefore("234567890", null), "234567890");
+        assertEquals(StringUtil.discardBefore("12345", "6"), "12345");
+        assertEquals(StringUtil.discardBefore("12345", "23"), "2345");
+    }
+
+    @Test
+    void testDiscardBeforeLast() {
+        assertEquals(StringUtil.discardBefore(null, "*"), null);
+        assertEquals(StringUtil.discardBefore(null, "234567890"), null);
+        assertEquals(StringUtil.discardBefore(null, "qwertyuiop"), null);
+        assertEquals(StringUtil.discardBefore(null, "wsdfbmki876"), null);
+        assertEquals(StringUtil.discardBefore("", "*"), "");
+        assertEquals(StringUtil.discardBefore("", "234567890"), "");
+        assertEquals(StringUtil.discardBefore("", "qwertyuiop"), "");
+        assertEquals(StringUtil.discardBefore("", "wsdfbmki876"), "");
+        assertEquals(StringUtil.discardBefore("*", ""), "*");
+        assertEquals(StringUtil.discardBefore("wsdfbmki876", ""), "wsdfbmki876");
+        assertEquals(StringUtil.discardBefore("qwertyuiop", ""), "qwertyuiop");
+        assertEquals(StringUtil.discardBefore("234567890", ""), "234567890");
+        assertEquals(StringUtil.discardBefore("*", null), "*");
+        assertEquals(StringUtil.discardBefore("wsdfbmki876", null), "wsdfbmki876");
+        assertEquals(StringUtil.discardBefore("qwertyuiop", null), "qwertyuiop");
+        assertEquals(StringUtil.discardBefore("234567890", null), "234567890");
+        assertEquals(StringUtil.discardBefore("12345", "6"), "12345");
+        assertEquals(StringUtil.discardBefore("12345", "23"), "2345");
+    }
+
+    @Test
+    void testName() {
+        String str = "123456789";
+        assertEquals(StringUtil.charAt(str, -1), '9');
+        assertEquals(StringUtil.charAt(str, -10), '9');
+        assertEquals(StringUtil.charAt(str, 0), '1');
+        assertEquals(StringUtil.charAt(str, 9), '1');
+    }
+
+    @Test
     void testFormat() {
         String template = "name: {}, age: {}, sex: {}";
         StringBuilder builder = new StringBuilder(template);
@@ -138,9 +275,9 @@ class StringUtilTestTest {
     void testIsNullString() {
         assertTrue(StringUtil.isNullString(null));
         assertTrue(StringUtil.isNullString("null"));
+        assertTrue(StringUtil.isNullString(""));
 
         assertFalse(StringUtil.isNullString("undefined"));
-        assertFalse(StringUtil.isNullString(""));
         assertFalse(StringUtil.isNullString(" "));
         assertFalse(StringUtil.isNullString("a"));
         assertFalse(StringUtil.isNullString("abc"));
