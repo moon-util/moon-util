@@ -1,10 +1,10 @@
-package com.moon.core.web;
+package com.moon.more.web;
 
 import javax.servlet.http.HttpServletRequest;
 
 import static com.moon.core.lang.StringUtil.isEmpty;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
-import static com.moon.core.web.RequestUtil.header;
+import static com.moon.more.web.RequestUtil.header;
 
 /**
  * @author benshaoye

@@ -415,7 +415,7 @@ public final class IOUtil {
      * write a char array in to Writer of all char
      *
      * @param writer writer
-     * @param chars 字符
+     * @param chars  字符
      */
     public final static void write(Writer writer, char[] chars) { write(writer, chars, 0, chars.length); }
 
@@ -510,7 +510,11 @@ public final class IOUtil {
     public static Flusher flush() { return Flusher.VALUE; }
 
     public static Flusher flush(Flushable flushable) {
-        ThrowUtil.ignoreThrowsAccept(flushable, Flushable::flush);
+        try {
+            flushable.flush();
+        } catch (NullPointerException | IOException e) {
+            // ignore
+        }
         return flush();
     }
 
@@ -533,10 +537,12 @@ public final class IOUtil {
      */
 
     public static Closer closeCloseable(AutoCloseable close) {
-        ThrowUtil.ignoreThrowsAccept(close, c -> {
-            flushCloseable(c);
-            c.close();
-        });
+        try {
+            flushCloseable(close);
+            close.close();
+        } catch (Exception e) {
+            // ignore
+        }
         return Closer.VALUE;
     }
 

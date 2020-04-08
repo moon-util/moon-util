@@ -1,4 +1,4 @@
-package com.moon.core.web;
+package com.moon.more.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
