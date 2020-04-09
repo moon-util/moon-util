@@ -1,6 +1,7 @@
 package com.moon.more.excel;
 
 import com.moon.core.io.IOUtil;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
@@ -16,9 +17,23 @@ import java.util.function.Consumer;
  */
 public class ExcelFactory extends BaseFactory<Workbook, ExcelFactory> {
 
-    private final SheetFactory factory = new SheetFactory(proxy);
+    private final SheetFactory factory;
 
-    public ExcelFactory(Workbook workbook) { super(new WorkbookProxy(workbook)); }
+    private Sheet sheet;
+
+    public ExcelFactory(Workbook workbook) {
+        super(new WorkbookProxy(workbook));
+        factory = new SheetFactory(proxy);
+    }
+
+    Sheet getSheet() {
+        return sheet;
+    }
+
+    Sheet setSheet(Sheet sheet) {
+        this.sheet = sheet;
+        return sheet;
+    }
 
     @Override
     Workbook get() { return proxy.getWorkbook(); }
@@ -28,7 +43,7 @@ public class ExcelFactory extends BaseFactory<Workbook, ExcelFactory> {
     public ExcelFactory sheet(Consumer<SheetFactory> operator) { return sheet(null, operator); }
 
     public ExcelFactory sheet(String sheetName, Consumer<SheetFactory> operator) {
-        proxy.useSheet(sheetName);
+        factory.setSheet(setSheet(proxy.useSheet(sheetName)));
         operator.accept(getSheetFactory());
         return this;
     }

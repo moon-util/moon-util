@@ -1,6 +1,7 @@
 package com.moon.more.excel;
 
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Font;
 
 import java.util.function.BiConsumer;
@@ -17,18 +18,27 @@ public abstract class BaseFactory<T, F extends BaseFactory<T, F>> {
 
     abstract T get();
 
+    WorkbookType getWorkbookType() {
+        return proxy.getWorkbookType();
+    }
+
     public F definitionStyle(String classname, BiConsumer<CellStyle, Font> builder) {
-        proxy.definitionStyle(new StyleBuilder(classname, builder));
+        proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
         return (F) this;
     }
 
     public F definitionStyle(String classname, Consumer<CellStyle> builder) {
-        proxy.definitionStyle(new StyleBuilder(classname, builder));
+        proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
+        return (F) this;
+    }
+
+    protected F definitionComment(String uniqueName, Consumer<Comment> builder) {
+        proxy.definitionBuilder(new ProxyCommentBuilder(uniqueName, proxy.getSheet(), getWorkbookType(), builder));
         return (F) this;
     }
 
     public F finish() {
-        proxy.applyCellStyle();
+        proxy.applyProxiedModel();
         return (F) this;
     }
 

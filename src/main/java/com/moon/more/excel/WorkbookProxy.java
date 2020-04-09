@@ -3,11 +3,13 @@ package com.moon.more.excel;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -21,10 +23,11 @@ class WorkbookProxy {
 
     private final Map<Sheet, Table<Integer, Integer, Object>> sheetMap = new HashMap<>();
 
+    private final WorkbookType type;
     private final Workbook workbook;
-    private Map<String, StyleBuilder> styleBuilderMap;
-    private Map<String, CellStyle> styleSheetDefined;
-    private LinkedHashMap<StyleSetter, String> styleSettersMap;
+
+    private ProxyStyleModel proxyStyleModel;
+    private ProxyCommentModel proxyCommentModel;
 
     private Table<Integer, Integer, Object> table;
     private Sheet sheet;
@@ -36,7 +39,18 @@ class WorkbookProxy {
     private Map<Integer, Object> rowFilled;
     private Cell cell;
 
-    WorkbookProxy(Workbook workbook) { this.workbook = workbook; }
+    WorkbookProxy(Workbook workbook) {
+        this.workbook = workbook;
+        if (workbook instanceof SXSSFWorkbook) {
+            type = WorkbookType.SUPER;
+        } else if (workbook instanceof XSSFWorkbook) {
+            type = WorkbookType.XLSX;
+        } else if (workbook instanceof HSSFWorkbook) {
+            type = WorkbookType.XLS;
+        } else {
+            type = null;
+        }
+    }
 
     Workbook getWorkbook() { return workbook; }
 
@@ -62,8 +76,6 @@ class WorkbookProxy {
         return rowFilled;
     }
 
-    private Map<Integer, Object> getRowFilled(int rowIdx) { return getRowFilled(getTable(sheet), rowIdx); }
-
     private Map<Integer, Object> getRowFilled() {
         Map<Integer, Object> rowFilled = this.rowFilled;
         if (rowFilled == null) {
@@ -83,100 +95,80 @@ class WorkbookProxy {
      * style
      */
 
-    void definitionStyle(StyleBuilder builder) {
-        getStyleSheetBuilderMap().put(builder.getClassname(), builder);
-    }
-
-    Map<String, StyleBuilder> getStyleSheetBuilderMap() {
-        Map map = this.styleBuilderMap;
-        if (map == null) {
-            map = new HashMap(8);
-            this.styleBuilderMap = map;
-        }
-        return map;
-    }
-
-    Map<String, CellStyle> getStyleSheetDefined() {
-        Map map = this.styleSheetDefined;
-        if (map == null) {
-            map = new HashMap(8);
-            this.styleSheetDefined = map;
-        }
-        return map;
-    }
-
-    Map<String, StyleBuilder> obtainStyleSheetMap() {
-        return this.styleBuilderMap;
-    }
-
-    Map<String, CellStyle> obtainStyleSheetDefined() {
-        return this.styleSheetDefined;
-    }
-
-    LinkedHashMap<StyleSetter, String> getStyleSettersSet() {
-        LinkedHashMap map = this.styleSettersMap;
-        if (map == null) {
-            map = new LinkedHashMap(8);
-            this.styleSettersMap = map;
-        }
-        return map;
-    }
-
-    LinkedHashMap<StyleSetter, String> exchangeStyleSettersSet() {
-        LinkedHashMap map = this.styleSettersMap;
-        if (isEmpty(map)) {
-            return null;
-        }
-        map = new LinkedHashMap(map);
-        this.styleBuilderMap = null;
-        return map;
-    }
-
-    void addSetter(StyleSetter setter, String classname) {
-        LinkedHashMap<StyleSetter, String> settersMap = getStyleSettersSet();
-        settersMap.put(setter, classname);
-    }
-
-    void applyCellStyle() {
-        Map<String, CellStyle> defined = obtainStyleSheetDefined();
-        Map<String, StyleBuilder> builderMap = obtainStyleSheetMap();
-        if (isEmpty(defined) && isEmpty(builderMap)) {
-            return;
-        }
-        LinkedHashMap<StyleSetter, String> setters = exchangeStyleSettersSet();
-        if (isEmpty(setters)) {
-            return;
-        }
-        CellStyle style;
-        StyleBuilder builder;
-        Workbook workbook = this.workbook;
-        for (Map.Entry<StyleSetter, String> entry : setters.entrySet()) {
-            StyleSetter setter = entry.getKey();
-            String classname = entry.getValue();
-
-            if (builderMap == null) {
-                style = defined.get(classname);
-            } else {
-                if (defined == null) {
-                    defined = getStyleSheetDefined();
-                }
-                builder = builderMap.remove(classname);
-                if (builder == null) {
-                    style = defined.get(classname);
-                } else {
-                    style = builder.build(workbook);
-                    defined.put(classname, style);
-                }
-            }
-            if (style != null) {
-                setter.useStyle(style);
-            }
+    private static void useProxyModel(ProxyModel proxyModel, Object from) {
+        if (proxyModel != null) {
+            proxyModel.use(from);
         }
     }
 
-    private static boolean isEmpty(Map map) {
-        return map == null || map.isEmpty();
+    private ProxyCommentModel getCommentProxy() { return proxyCommentModel; }
+
+    private ProxyStyleModel getStyleProxy() { return this.proxyStyleModel; }
+
+    private ProxyCommentModel ensureCommentProxy() {
+        ProxyCommentModel proxy = this.getCommentProxy();
+        if (proxy == null) {
+            proxy = new ProxyCommentModel();
+            this.proxyCommentModel = proxy;
+        }
+        return proxy;
     }
+
+    private ProxyStyleModel ensureStyleProxy() {
+        ProxyStyleModel proxy = this.getStyleProxy();
+        if (proxy == null) {
+            proxy = new ProxyStyleModel();
+            this.proxyStyleModel = proxy;
+        }
+        return proxy;
+    }
+
+    void definitionBuilder(ProxyStyleBuilder builder) {
+        ensureStyleProxy().addBuilder(builder);
+    }
+
+    void addSetter(ProxyStyleSetter setter, String classname) {
+        ensureStyleProxy().addSetter(classname, setter);
+    }
+
+    void definitionBuilder(ProxyCommentBuilder builder) {
+        ensureCommentProxy().addBuilder(builder);
+    }
+
+    void addSetter(ProxyCommentSetter setter, String classname) {
+        ensureCommentProxy().addSetter(classname, setter);
+    }
+
+    void removeSetter(ProxyCommentSetter setter) {
+        ensureCommentProxy().removeSetter(setter);
+    }
+
+    void applyProxiedModel() {
+        useProxyModel(getStyleProxy(), workbook);
+        useProxyModel(getCommentProxy(), null);
+    }
+
+    /*
+     workbook
+     */
+
+    Comment createComment(String content) {
+        Comment comment = createComment();
+        comment.setString(createRichText(content));
+        return comment;
+    }
+
+    Comment createComment() {
+        Drawing drawing = getSheet().createDrawingPatriarch();
+        return drawing.createCellComment(getWorkbookType().newAnchor());
+    }
+
+    RichTextString createRichText(String content) {
+        RichTextString str = getWorkbookType().newRichText(content);
+        return str;
+    }
+
+    WorkbookType getWorkbookType() { return type; }
 
     /*
      sheet
@@ -185,7 +177,8 @@ class WorkbookProxy {
     Sheet setSheet(Sheet sheet, int startOfRowIndex) {
         this.indexOfRow = startOfRowIndex;
         this.table = null;
-        return this.sheet = sheet;
+        this.sheet = sheet;
+        return sheet;
     }
 
     Sheet setSheet(Sheet sheet, boolean appendRow) {

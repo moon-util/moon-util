@@ -1,6 +1,8 @@
 package com.moon.more.excel;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Comment;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,11 +13,11 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class RowFactory extends BaseFactory<Cell, RowFactory> {
+public class RowFactory extends BaseFactory<Row, RowFactory> {
 
     private final CellFactory factory;
 
-    private Cell cell;
+    private Row row;
 
     public RowFactory(WorkbookProxy proxy) {
         super(proxy);
@@ -24,100 +26,103 @@ public class RowFactory extends BaseFactory<Cell, RowFactory> {
 
     private CellFactory getCellFactory() { return factory; }
 
+    public Row getRow() {
+        return row;
+    }
+
+    void setRow(Row row) { this.row = row; }
+
     @Override
-    Cell get() { return getCell(); }
+    Row get() { return getRow(); }
 
-    void setCell(Cell cell) { this.cell = cell; }
-
-    public Cell getCell() {
-        Cell cell = this.cell;
-        if (cell == null) {
-            this.setCell(cell = proxy.getCell());
-        }
-        return cell;
+    @Override
+    public RowFactory definitionComment(String classname, Consumer<Comment> commentBuilder){
+        super.definitionComment(classname, commentBuilder);
+        return this;
     }
 
     public RowFactory style(String classname) {
-        proxy.addSetter(new StyleSetter(proxy.getRow()), classname);
+        proxy.addSetter(new ProxyStyleSetter(proxy.getRow()), classname);
         return this;
     }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * create cell and set value
      */
 
-    public void cell(Date value) { cell(value, 1); }
+    public void next(Date value) { next(value, 1); }
 
-    public void cell(String value) { cell(value, 1); }
+    public void next(String value) { next(value, 1); }
 
-    public void cell(double value) { cell(value, 1, 1); }
+    public void next(double value) { next(value, 1, 1); }
 
-    public void cell(boolean value) { cell(value, 1); }
+    public void next(boolean value) { next(value, 1); }
 
-    public void cell(Calendar value) { cell(value, 1); }
+    public void next(Calendar value) { next(value, 1); }
 
-    public void cell(LocalDate value) { cell(value, 1); }
+    public void next(LocalDate value) { next(value, 1); }
 
-    public void cell(LocalDateTime value) { cell(value, 1); }
+    public void next(LocalDateTime value) { next(value, 1); }
 
-    public void cell(Date value, int colspan) { cell(value, 1, colspan); }
 
-    public void cell(String value, int colspan) { cell(value, 1, colspan); }
+    public void next(Date value, int colspan) { next(value, 1, colspan); }
 
-    // 不提供 double 的 colspan 避免和 cell(int, int) 歧义
+    public void next(String value, int colspan) { next(value, 1, colspan); }
 
-    public void cell(boolean value, int colspan) { cell(value, 1, colspan); }
+    // 不提供 double 的 colspan 避免和 next(int, int) 歧义
 
-    public void cell(Calendar value, int colspan) { cell(value, 1, colspan); }
+    public void next(boolean value, int colspan) { next(value, 1, colspan); }
 
-    public void cell(LocalDate value, int colspan) { cell(value, 1, colspan); }
+    public void next(Calendar value, int colspan) { next(value, 1, colspan); }
 
-    public void cell(LocalDateTime value, int colspan) { cell(value, 1, colspan); }
+    public void next(LocalDate value, int colspan) { next(value, 1, colspan); }
 
-    public void cell(String value, int rowspan, int colspan) {
-        nextCell(rowspan, colspan).setCellValue(value);
-    }
+    public void next(LocalDateTime value, int colspan) { next(value, 1, colspan); }
 
-    public void cell(double value, int rowspan, int colspan) {
-        nextCell(rowspan, colspan).setCellValue(value);
-    }
 
-    public void cell(boolean value, int rowspan, int colspan) {
-        nextCell(rowspan, colspan).setCellValue(value);
-    }
+    public void next(String value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
 
-    public void cell(Date value, int rowspan, int colspan) {
-        nextCell(rowspan, colspan).setCellValue(value);
-    }
+    public void next(double value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
 
-    public void cell(Calendar value, int rowspan, int colspan) {
-        nextCell(rowspan, colspan).setCellValue(value);
-    }
+    public void next(boolean value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
 
-    public void cell(LocalDate value, int rowspan, int colspan) {
-        nextCell(rowspan, colspan).setCellValue(value);
-    }
+    public void next(Date value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
 
-    public void cell(LocalDateTime value, int rowspan, int colspan) {
-        nextCell(rowspan, colspan).setCellValue(value);
-    }
+    public void next(Calendar value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
+
+    public void next(LocalDate value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
+
+    public void next(LocalDateTime value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
+
+    // return CellFactory
 
     public CellFactory cell() { return cell(1, 1); }
 
-    public CellFactory cell(int rowspan, int colspan) {
-        CellFactory factory = getCellFactory();
-        factory.setCell(nextCell(rowspan, colspan));
-        return factory;
+    public CellFactory cell(int rowspan, int colspan) { return cell(rowspan, colspan, 0); }
+
+    public CellFactory cell(int rowspan, int colspan, int skipCells) {
+        nextCell(rowspan, colspan, skipCells);
+        return getCellFactory();
     }
 
-    public RowFactory cell(Consumer<CellFactory> consumer) { return cell(consumer, 1, 1); }
+    // consumer CellFactory
 
-    public RowFactory cell(Consumer<CellFactory> consumer, int rowspan, int colspan) {
-        CellFactory factory = getCellFactory();
-        factory.setCell(nextCell(rowspan, colspan));
-        consumer.accept(factory);
+    public RowFactory cell(Consumer<CellFactory> consumer) { return cell(1, consumer); }
+
+    public RowFactory cell(int colspan, Consumer<CellFactory> consumer) { return cell(1, colspan, consumer); }
+
+    public RowFactory cell(int rowspan, int colspan, Consumer<CellFactory> consumer) {
+        return cell(rowspan, colspan, consumer, 0);
+    }
+
+    public RowFactory cell(int rowspan, int colspan, Consumer<CellFactory> consumer, int skipCells) {
+        nextCell(rowspan, colspan, skipCells);
+        consumer.accept(getCellFactory());
         return this;
     }
+
+    // create an original Cell
 
     public Cell nextCell() { return nextCell(0); }
 
@@ -126,6 +131,6 @@ public class RowFactory extends BaseFactory<Cell, RowFactory> {
     public Cell nextCell(int rowspan, int colspan) { return nextCell(rowspan, colspan, 0); }
 
     public Cell nextCell(int rowspan, int colspan, int skipCells) {
-        return proxy.nextCell(skipCells, rowspan, colspan);
+        return factory.setCell(proxy.nextCell(skipCells, rowspan, colspan));
     }
 }

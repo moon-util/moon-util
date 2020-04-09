@@ -540,7 +540,7 @@ public final class IOUtil {
         try {
             flushCloseable(close);
             close.close();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // ignore
         }
         return Closer.VALUE;
