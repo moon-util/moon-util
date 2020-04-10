@@ -1,6 +1,6 @@
 package com.moon.core.util.asserts;
 
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.util.Optionally;
 
 import java.util.Collection;
@@ -37,7 +37,7 @@ class Use {
         if (value instanceof Map) { return emptyM((Map) value); }
         if (value instanceof Optional) { return !((Optional) value).isPresent(); }
         if (value instanceof Optionally) { return ((Optionally) value).isAbsent(); }
-        if ((value.getClass()).isArray()) { return ArraysEnum.getOrObjects(value).length(value) == 0; }
+        if ((value.getClass()).isArray()) { return Arrays2.getOrObjects(value).length(value) == 0; }
         if (value instanceof Class && ((Class) value).isEnum()) {
             return ((Class) value).getEnumConstants().length == 0;
         }

@@ -1,6 +1,6 @@
 package com.moon.core.util;
 
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Const;
 import com.moon.core.io.FileUtil;
 import com.moon.core.lang.ArrayUtil;
@@ -91,7 +91,7 @@ import static com.moon.core.lang.StringUtil.*;
 public class PropertiesParser implements Parser<PropertiesHashMap, String> {
 
     private final static PropertiesHashMap EMPTY_MAP = EmptyHashMap.DEFAULT;
-    private final static String[] EMPTY_STRINGS = ArraysEnum.STRINGS.empty();
+    private final static String[] EMPTY_STRINGS = Arrays2.STRINGS.empty();
     private final static String[] DEFAULT_NAMES = {"import", "active"};
 
     private final static boolean DEFAULT_BUBBLE_DELIMITERS = false;
@@ -438,7 +438,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
 
     private static Set<String> namesToIncludesSet(String namespace, String... names) {
         final String ns = requireNotEmpty(trimToNull(namespace));
-        names = ArraysEnum.STRINGS.defaultIfEmpty(names, DEFAULT_NAMES);
+        names = Arrays2.STRINGS.defaultIfEmpty(names, DEFAULT_NAMES);
         Set<String> ret = new LinkedHashSet<>();
         for (String name : names) {
             ret.add(requireNonDelimitersName(ns, name));

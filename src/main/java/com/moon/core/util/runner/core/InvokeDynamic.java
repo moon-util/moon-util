@@ -1,6 +1,6 @@
 package com.moon.core.util.runner.core;
 
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.ThrowUtil;
 
 import java.lang.reflect.Method;
@@ -15,7 +15,7 @@ class InvokeDynamic {
 
     private InvokeDynamic() { ThrowUtil.noInstanceError(); }
 
-    protected final static Object[] EMPTY_OBJECTS = ArraysEnum.OBJECTS.empty();
+    protected final static Object[] EMPTY_OBJECTS = Arrays2.OBJECTS.empty();
 
     static abstract class BaseDynamic implements AsInvoker {
 

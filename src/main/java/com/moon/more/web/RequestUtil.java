@@ -46,15 +46,11 @@ public final class RequestUtil {
         return isEmpty(tokenVal) ? param(request, name) : nullIfEmpty(tokenVal);
     }
 
-    public static <T> T attr(HttpServletRequest request, String key) {
-        return (T) request.getAttribute(key);
-    }
+    public static <T> T attr(HttpServletRequest request, String key) { return (T) request.getAttribute(key); }
 
     public static void attr(HttpServletRequest request, String key, Object value) { request.setAttribute(key, value); }
 
-    private static boolean isUnknown(String str) {
-        return StringUtil.isEmpty(str) || "unknown".equalsIgnoreCase(str);
-    }
+    private static boolean isUnknown(String str) { return StringUtil.isEmpty(str) || "unknown".equalsIgnoreCase(str); }
 
     @SuppressWarnings("all")
     public static String getRequestRealIP(HttpServletRequest request) {

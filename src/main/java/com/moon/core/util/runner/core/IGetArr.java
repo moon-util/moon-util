@@ -1,7 +1,7 @@
 package com.moon.core.util.runner.core;
 
 import com.moon.core.enums.ArrayOperator;
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 
 /**
  * @author benshaoye
@@ -26,7 +26,7 @@ class IGetArr implements IGetter {
     }
 
     ArrayOperator reset(Object data) {
-        getter = ArraysEnum.getOrObjects(data.getClass());
+        getter = Arrays2.getOrObjects(data.getClass());
         return getter;
     }
 

@@ -34,19 +34,19 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
 
     @Override
-    public GroupValidator<M, K, C, E> requireCountOf(BiPredicate<? super K, ? super C> tester, int count, String message) {
+    public GroupValidator<M, K, C, E> requireCountOf(int count, BiPredicate<? super K, ? super C> tester, String message) {
         return requireCountOf(this, tester, count, message);
     }
 
     @Override
-    public GroupValidator<M, K, C, E> requireAtLeastCountOf(
-        BiPredicate<? super K, ? super C> tester, int count, String message) {
+    public GroupValidator<M, K, C, E> requireAtLeastOf(
+        int count, BiPredicate<? super K, ? super C> tester, String message) {
         return requireAtLeastCountOf(this, tester, count, message);
     }
 
     @Override
-    public GroupValidator<M, K, C, E> requireAtMostCountOf(
-        BiPredicate<? super K, ? super C> tester, int count, String message) {
+    public GroupValidator<M, K, C, E> requireAtMostOf(
+        int count, BiPredicate<? super K, ? super C> tester, String message) {
         return requireAtMostCountOf(this, tester, count, message);
     }
 

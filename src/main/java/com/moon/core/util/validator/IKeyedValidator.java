@@ -9,8 +9,7 @@ import java.util.function.Predicate;
 /**
  * @author benshaoye
  */
-interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
-    extends IValidator<M, IMPL> {
+interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL> extends IValidator<M, IMPL> {
 
     /**
      * 要求包含指定数目项符合验证，使用指定错误信息
@@ -18,9 +17,10 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      * @param tester
      * @param count
      * @param message
+     *
      * @return
      */
-    IMPL requireCountOf(BiPredicate<? super K, ? super V> tester, int count, String message);
+    IMPL requireCountOf(int count, BiPredicate<? super K, ? super V> tester, String message);
 
     /**
      * 要求至少指定数目项符合验证，使用指定错误信息
@@ -28,9 +28,10 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      * @param tester
      * @param count
      * @param message
+     *
      * @return
      */
-    IMPL requireAtLeastCountOf(BiPredicate<? super K, ? super V> tester, int count, String message);
+    IMPL requireAtLeastOf(int count, BiPredicate<? super K, ? super V> tester, String message);
 
     /**
      * 要求最多指定数目项符合验证，使用指定错误信息
@@ -38,9 +39,10 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      * @param tester
      * @param count
      * @param message
+     *
      * @return
      */
-    IMPL requireAtMostCountOf(BiPredicate<? super K, ? super V> tester, int count, String message);
+    IMPL requireAtMostOf(int count, BiPredicate<? super K, ? super V> tester, String message);
 
     /*
      * -----------------------------------------------------
@@ -54,6 +56,7 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      * @param key
      * @param tester
      * @param message
+     *
      * @return
      */
     default IMPL requireIfPresent(K key, Predicate<? super V> tester, String message) {
@@ -69,6 +72,7 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      *
      * @param key
      * @param tester
+     *
      * @return
      */
     default IMPL requireIfPresent(K key, Predicate<? super V> tester) {
@@ -85,31 +89,32 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      * 要求所有项都符合验证
      *
      * @param tester
+     *
      * @return
      */
-    default IMPL requireEvery(BiPredicate<? super K, ? super V> tester) {
-        return requireEvery(tester, Value.NONE);
-    }
+    default IMPL requireEvery(BiPredicate<? super K, ? super V> tester) { return requireEvery(tester, Value.NONE); }
 
     /**
      * 要求所有项都符合验证，使用指定错误信息
      *
      * @param tester
      * @param message
+     *
      * @return
      */
     default IMPL requireEvery(BiPredicate<? super K, ? super V> tester, String message) {
-        return requireAtLeastCountOf(tester, MapUtil.size(getValue()), message);
+        return requireAtLeastOf(MapUtil.size(getValue()), tester, message);
     }
 
     /**
      * 要求至少一项符合验证
      *
      * @param tester
+     *
      * @return
      */
-    default IMPL requireAtLeastOne(BiPredicate<? super K, ? super V> tester) {
-        return requireAtLeastOne(tester, Value.NONE);
+    default IMPL requireAtLeast1(BiPredicate<? super K, ? super V> tester) {
+        return requireAtLeast1(tester, Value.NONE);
     }
 
     /**
@@ -117,10 +122,11 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      *
      * @param tester
      * @param message
+     *
      * @return
      */
-    default IMPL requireAtLeastOne(BiPredicate<? super K, ? super V> tester, String message) {
-        return requireAtLeastCountOf(tester, 1, message);
+    default IMPL requireAtLeast1(BiPredicate<? super K, ? super V> tester, String message) {
+        return requireAtLeastOf(1, tester, message);
     }
 
     /**
@@ -128,10 +134,11 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      *
      * @param tester
      * @param count
+     *
      * @return
      */
-    default IMPL requireAtLeastCountOf(BiPredicate<? super K, ? super V> tester, int count) {
-        return requireAtLeastCountOf(tester, count, Value.NONE);
+    default IMPL requireAtLeastOf(int count, BiPredicate<? super K, ? super V> tester) {
+        return requireAtLeastOf(count, tester, Value.NONE);
     }
 
     /*
@@ -144,31 +151,32 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      * 要求所有项都不符合验证
      *
      * @param tester
+     *
      * @return
      */
-    default IMPL requireNone(BiPredicate<? super K, ? super V> tester) {
-        return requireNone(tester, Value.NONE);
-    }
+    default IMPL requireNone(BiPredicate<? super K, ? super V> tester) { return requireNone(tester, Value.NONE); }
 
     /**
      * 要求所有项都不符合验证，使用指定错误信息
      *
      * @param tester
      * @param message
+     *
      * @return
      */
     default IMPL requireNone(BiPredicate<? super K, ? super V> tester, String message) {
-        return requireAtMostCountOf(tester, 0, message);
+        return requireAtMostOf(0, tester, message);
     }
 
     /**
      * 要求最多一项符合验证
      *
      * @param tester
+     *
      * @return
      */
-    default IMPL requireAtMostOne(BiPredicate<? super K, ? super V> tester) {
-        return requireAtMostOne(tester, Value.NONE);
+    default IMPL requireAtMost1(BiPredicate<? super K, ? super V> tester) {
+        return requireAtMost1(tester, Value.NONE);
     }
 
     /**
@@ -176,10 +184,11 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      *
      * @param tester
      * @param message
+     *
      * @return
      */
-    default IMPL requireAtMostOne(BiPredicate<? super K, ? super V> tester, String message) {
-        return requireAtMostCountOf(tester, 1, message);
+    default IMPL requireAtMost1(BiPredicate<? super K, ? super V> tester, String message) {
+        return requireAtMostOf(1, tester, message);
     }
 
     /**
@@ -187,10 +196,11 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      *
      * @param tester
      * @param count
+     *
      * @return
      */
-    default IMPL requireAtMostCountOf(BiPredicate<? super K, ? super V> tester, int count) {
-        return requireAtMostCountOf(tester, count, Value.NONE);
+    default IMPL requireAtMostOf(int count, BiPredicate<? super K, ? super V> tester) {
+        return requireAtMostOf(count, tester, Value.NONE);
     }
 
     /*
@@ -203,21 +213,21 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      * 要求包含唯一项符合验证
      *
      * @param tester
+     *
      * @return
      */
-    default IMPL requireOnly(BiPredicate<? super K, ? super V> tester) {
-        return requireOnly(tester, Value.NONE);
-    }
+    default IMPL requireOnly(BiPredicate<? super K, ? super V> tester) { return requireOnly(tester, Value.NONE); }
 
     /**
      * 要求包含唯一项符合验证，使用指定错误信息
      *
      * @param tester
      * @param message
+     *
      * @return
      */
     default IMPL requireOnly(BiPredicate<? super K, ? super V> tester, String message) {
-        return requireCountOf(tester, 1, message);
+        return requireCountOf(1, tester, message);
     }
 
     /**
@@ -225,9 +235,10 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL>
      *
      * @param tester
      * @param count
+     *
      * @return
      */
-    default IMPL requireCountOf(BiPredicate<? super K, ? super V> tester, int count) {
-        return requireCountOf(tester, count, Value.NONE);
+    default IMPL requireCountOf(int count, BiPredicate<? super K, ? super V> tester) {
+        return requireCountOf(count, tester, Value.NONE);
     }
 }

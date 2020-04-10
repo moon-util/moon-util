@@ -3,14 +3,13 @@ package com.moon.more.excel;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.moon.more.excel.WorkbookType.*;
 
 /**
  * @author benshaoye
@@ -41,12 +40,12 @@ class WorkbookProxy {
 
     WorkbookProxy(Workbook workbook) {
         this.workbook = workbook;
-        if (workbook instanceof SXSSFWorkbook) {
-            type = WorkbookType.SUPER;
-        } else if (workbook instanceof XSSFWorkbook) {
-            type = WorkbookType.XLSX;
-        } else if (workbook instanceof HSSFWorkbook) {
-            type = WorkbookType.XLS;
+        if (XLSX.test(workbook)) {
+            type = XLSX;
+        } else if (XLS.test(workbook)) {
+            type = XLS;
+        } else if (SUPER.test(workbook)) {
+            type = SUPER;
         } else {
             type = null;
         }
@@ -131,17 +130,11 @@ class WorkbookProxy {
         ensureStyleProxy().addSetter(classname, setter);
     }
 
-    void definitionBuilder(ProxyCommentBuilder builder) {
-        ensureCommentProxy().addBuilder(builder);
-    }
+    void definitionBuilder(ProxyCommentBuilder builder) { ensureCommentProxy().addBuilder(builder); }
 
-    void addSetter(ProxyCommentSetter setter, String classname) {
-        ensureCommentProxy().addSetter(classname, setter);
-    }
+    void addSetter(ProxyCommentSetter setter, String unique) { ensureCommentProxy().addSetter(unique, setter); }
 
-    void removeSetter(ProxyCommentSetter setter) {
-        ensureCommentProxy().removeSetter(setter);
-    }
+    void removeSetter(ProxyCommentSetter setter) { ensureCommentProxy().removeSetter(setter); }
 
     void applyProxiedModel() {
         useProxyModel(getStyleProxy(), workbook);
@@ -189,7 +182,7 @@ class WorkbookProxy {
 
     Sheet useSheet(String sheetName, boolean appendRow) {
         if (StringUtil.isEmpty(sheetName)) {
-            return setSheet(workbook.createSheet(), appendRow);
+            return setSheet(workbook.createSheet(), false);
         }
         Sheet sheet = workbook.getSheet(sheetName);
         if (sheet == null) {
@@ -209,13 +202,9 @@ class WorkbookProxy {
 
     Sheet useSheet() { return useSheet(null); }
 
-    Sheet useSheet(String sheetName) {
-        return useSheet(sheetName, DEFAULT_APPEND_DATA);
-    }
+    Sheet useSheet(String sheetName) { return useSheet(sheetName, DEFAULT_APPEND_DATA); }
 
-    Sheet useSheet(int index) {
-        return useSheet(index, DEFAULT_APPEND_DATA);
-    }
+    Sheet useSheet(int index) { return useSheet(index, DEFAULT_APPEND_DATA); }
 
     /*
      row
@@ -315,13 +304,16 @@ class WorkbookProxy {
 
     Cell createCell(int index) { return setCell(row.createCell(index)); }
 
+    Cell useOrCreateCell(int index) {
+        Cell cell = row.getCell(index);
+        return setCell(cell == null ? row.createCell(index) : cell);
+    }
+
     Cell nextCell() { return nextCell(0); }
 
     Cell nextCell(int skip) { return nextCell(skip, 1, 1); }
 
     Cell nextCell(int rowspan, int colspan) { return nextCell(0, rowspan, colspan); }
 
-    Cell nextCell(int skip, int rowspan, int colspan) {
-        return createCell(nextIndexOfCell(skip, rowspan, colspan));
-    }
+    Cell nextCell(int skip, int rowspan, int colspan) { return createCell(nextIndexOfCell(skip, rowspan, colspan)); }
 }

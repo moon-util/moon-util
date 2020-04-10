@@ -1,6 +1,6 @@
 package com.moon.core.util.runner.core;
 
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Casters;
 import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
@@ -22,7 +22,7 @@ import static com.moon.core.util.runner.core.ParseUtil.isAllConst;
  */
 class InvokeEnsure {
 
-    protected final static Object[] EMPTY_OBJECTS = ArraysEnum.OBJECTS.empty();
+    protected final static Object[] EMPTY_OBJECTS = Arrays2.OBJECTS.empty();
 
     static abstract class BaseEnsure implements AsInvoker {
 

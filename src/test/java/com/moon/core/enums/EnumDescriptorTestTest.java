@@ -19,7 +19,7 @@ class EnumDescriptorTestTest {
 
         maped.forEach(System.out::println);
 
-        maped = IteratorUtil.map(ListUtil.newArrayList(ArraysEnum.values()), KeyValue::of);
+        maped = IteratorUtil.map(ListUtil.newArrayList(Arrays2.values()), KeyValue::of);
 
         maped.forEach(System.out::println);
     }

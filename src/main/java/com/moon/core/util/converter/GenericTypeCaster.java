@@ -2,7 +2,7 @@ package com.moon.core.util.converter;
 
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.enums.ArrayOperator;
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Casters;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
@@ -454,7 +454,7 @@ public class GenericTypeCaster implements TypeCaster {
         } else if (value instanceof Map) {
             return builder.toArray((Map) value, componentType);
         } else if ((cls = value.getClass()).isArray()) {
-            ArrayOperator operator = ArraysEnum.getOrObjects(cls);
+            ArrayOperator operator = Arrays2.getOrObjects(cls);
             T[] array = createArray(componentType, operator.length(value));
             operator.forEach(value, (item, index) -> array[index] = toType(item, componentType));
             return array;

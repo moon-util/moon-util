@@ -13,7 +13,7 @@ import static com.moon.core.util.IteratorUtil.of;
 /**
  * @author benshaoye
  */
-public enum ArraysEnum implements ArrayOperator {
+public enum Arrays2 implements ArrayOperator {
     OBJECTS(new Object[0]) {
         @Override
         public Object apply(int value) {
@@ -1027,7 +1027,7 @@ public enum ArraysEnum implements ArrayOperator {
     public final Class TYPE;
     private final Object EMPTY;
 
-    ArraysEnum(Object empty) {
+    Arrays2(Object empty) {
         Cached.CACHE.put(TYPE = (this.EMPTY = empty).getClass(), this);
     }
 

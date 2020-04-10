@@ -13,9 +13,8 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 public final class ScriptUtil {
-    private ScriptUtil() {
-        noInstanceError();
-    }
+
+    private ScriptUtil() { noInstanceError(); }
 
     public final static Object runJSCode(String code) {
         try {
@@ -33,7 +32,5 @@ public final class ScriptUtil {
         }
     }
 
-    public final static ScriptEngine newJSEngine() {
-        return new ScriptEngineManager().getEngineByName("JavaScript");
-    }
+    public final static ScriptEngine newJSEngine() { return new ScriptEngineManager().getEngineByName("JavaScript"); }
 }

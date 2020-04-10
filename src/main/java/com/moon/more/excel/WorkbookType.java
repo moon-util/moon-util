@@ -4,33 +4,73 @@ import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
  * @author benshaoye
  */
-enum WorkbookType {
-    SUPER,
-    XLSX,
-    XLS(HSSFClientAnchor::new, HSSFRichTextString::new);
+enum WorkbookType implements Predicate<Workbook> {
+    SUPER("org.apache.poi.xssf.streaming.SXSSFWorkbook"),
+    XLSX("org.apache.poi.xssf.usermodel.XSSFWorkbook"),
+    XLS("org.apache.poi.hssf.usermodel.HSSFWorkbook", new HAnchor(), new HRich());
 
     private final Supplier<ClientAnchor> anchorCreator;
     private final Function<String, RichTextString> richTextBuilder;
+    private final Class taregt;
 
-    WorkbookType() { this(XSSFClientAnchor::new, XSSFRichTextString::new); }
+    WorkbookType(String type) { this(type, new XAnchor(), new XRich()); }
 
     WorkbookType(
-        Supplier<ClientAnchor> anchorCreator, Function<String, RichTextString> richTextBuilder
+        String type, Supplier<ClientAnchor> anchorCreator, Function<String, RichTextString> richTextBuilder
     ) {
+        Class target;
+        try {
+            target = Class.forName(type);
+        } catch (Throwable t) {
+            target = null;
+        }
+        this.taregt = target;
         this.richTextBuilder = richTextBuilder;
         this.anchorCreator = anchorCreator;
+    }
+
+    @Override
+    public boolean test(Workbook workbook) {
+        Class target = this.taregt;
+        return target == null ? false : target.isInstance(workbook);
     }
 
     RichTextString newRichText(String content) { return richTextBuilder.apply(content); }
 
     ClientAnchor newAnchor() { return anchorCreator.get(); }
+
+    private static class HRich implements Function<String, RichTextString> {
+
+        @Override
+        public RichTextString apply(String s) { return new HSSFRichTextString(s); }
+    }
+
+    private static class XRich implements Function<String, RichTextString> {
+
+        @Override
+        public RichTextString apply(String s) { return new XSSFRichTextString(s); }
+    }
+
+    private static class HAnchor implements Supplier<ClientAnchor> {
+
+        @Override
+        public ClientAnchor get() { return new HSSFClientAnchor(); }
+    }
+
+    private static class XAnchor implements Supplier<ClientAnchor> {
+
+        @Override
+        public ClientAnchor get() { return new XSSFClientAnchor(); }
+    }
 }

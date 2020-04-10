@@ -1,6 +1,6 @@
 package com.moon.core.lang;
 
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Const;
 import com.moon.core.enums.Predicates;
 import com.moon.core.lang.support.StringSupport;
@@ -27,7 +27,7 @@ public final class StringUtil {
     }
 
     public final static String EMPTY = "";
-    private final static char[] EMPTY_CHARS = ArraysEnum.CHARS.empty();
+    private final static char[] EMPTY_CHARS = Arrays2.CHARS.empty();
     private static final String NULL = null;
     private final static int NO = -1;
 
@@ -587,7 +587,7 @@ public final class StringUtil {
                     }
                 }
             } else {
-                chars = ArraysEnum.CHARS.empty();
+                chars = Arrays2.CHARS.empty();
             }
             if (cs instanceof String) {
                 return (T) (curr == 0 ? EMPTY : String.valueOf(chars, 0, curr));
@@ -611,7 +611,7 @@ public final class StringUtil {
      * @return 操作成功后的字符串
      */
     public final static String onlyWhitespace(String str) {
-        char[] chars = toCharArray(str), value = ArraysEnum.CHARS.empty();
+        char[] chars = toCharArray(str), value = Arrays2.CHARS.empty();
         boolean isNotWhitespace = true;
         int i = 0, idx = 0, len = chars.length;
         char curr;

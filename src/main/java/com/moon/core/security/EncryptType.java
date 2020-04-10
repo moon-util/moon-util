@@ -37,9 +37,7 @@ public enum EncryptType implements Supplier<MessageDigest> {
         }
     }
 
-    public String encrypt(String input) {
-        return encrypt(input, get());
-    }
+    public String encrypt(String input) { return encrypt(input, get()); }
 
     private final static String toHexValue(byte[] arr) {
         StringBuilder sb = new StringBuilder();
@@ -50,7 +48,5 @@ public enum EncryptType implements Supplier<MessageDigest> {
     }
 
     @Override
-    public MessageDigest get() {
-        return forName(name().replace('_', '-'));
-    }
+    public MessageDigest get() { return forName(name().replace('_', '-')); }
 }

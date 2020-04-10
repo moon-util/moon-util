@@ -1,6 +1,6 @@
 package com.moon.core.lang;
 
-import static com.moon.core.enums.ArraysEnum.STRINGS;
+import static com.moon.core.enums.Arrays2.STRINGS;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**

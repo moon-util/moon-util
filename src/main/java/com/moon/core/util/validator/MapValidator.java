@@ -31,21 +31,17 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
 
     @Override
-    public MapValidator<M, K, V> requireCountOf(BiPredicate<? super K, ? super V> tester, int count, String message) {
+    public MapValidator<M, K, V> requireCountOf(int count, BiPredicate<? super K, ? super V> tester, String message) {
         return requireCountOf(this, tester, count, message);
     }
 
     @Override
-    public MapValidator<M, K, V> requireAtLeastCountOf(
-        BiPredicate<? super K, ? super V> tester, int count, String message
-    ) {
-        return requireAtLeastCountOf(this, tester, count, message);
-    }
+    public MapValidator<M, K, V> requireAtLeastOf(
+        int count, BiPredicate<? super K, ? super V> tester, String message
+    ) { return requireAtLeastCountOf(this, tester, count, message); }
 
     @Override
-    public MapValidator<M, K, V> requireAtMostCountOf(
-        BiPredicate<? super K, ? super V> tester, int count, String message
-    ) {
-        return requireAtMostCountOf(this, tester, count, message);
-    }
+    public MapValidator<M, K, V> requireAtMostOf(
+        int count, BiPredicate<? super K, ? super V> tester, String message
+    ) { return requireAtMostCountOf(this, tester, count, message); }
 }

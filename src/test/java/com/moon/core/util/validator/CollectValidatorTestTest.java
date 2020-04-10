@@ -21,33 +21,24 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class CollectValidatorTestTest {
 
     public static class Employee {
+
         String name;
     }
 
     @Test
     void testOf() {
-        List<String> collect = ListUtil.newArrayList(
-            "1111",
-            "22222",
-            "333333",
-            "4444444",
-            "55555555",
-            "dsfgsdfgasdf",
-            "sdfbhdfhnrththn"
-        );
+        List<String> collect = ListUtil
+            .newArrayList("1111", "22222", "333333", "4444444", "55555555", "dsfgsdfgasdf", "sdfbhdfhnrththn");
         Assertions.assertThrows(Exception.class, () -> {
-            CollectValidator.of(collect).setImmediate(true).requireCountOf(str -> str.length() < 2, 3);
+            CollectValidator.of(collect).setImmediate(true).requireCountOf(3, str -> str.length() < 2);
         });
         Assertions.assertTrue(CollectValidator.of(collect).require(list -> list.size() == 7).isValid());
         assertFalse(CollectValidator.of(collect).require(list -> list.size() == 7).isInvalid());
-        assertFalse(CollectValidator.of(collect)
-            .requireAtLeastCountOf(str -> str.length() > 3, 5)
-            .isInvalid());
-        Assertions.assertTrue(CollectValidator.of(collect)
-            .requireAtMostCountOf(str -> str.length() > 3, 5)
-            .isInvalid());
+        assertFalse(CollectValidator.of(collect).requireAtLeastOf(5, str -> str.length() > 3).isInvalid());
+        Assertions.assertTrue(CollectValidator.of(collect).requireAtMostOf(5, str -> str.length() > 3).isInvalid());
         CollectValidator va = CollectValidator.of(collect);
         Assertions.assertTrue(va == va.current());
+
     }
 
     @Test
@@ -89,6 +80,7 @@ class CollectValidatorTestTest {
         final int sex = (certNo.charAt(16) - 48) % 2;
         return (sex == 0 && age > 43) || (sex == 1 && age > 53);
     }
+
     static final int HASH_BITS = 0x7fffffff; // usable bits of normal node hash
 
     @Test

@@ -1,6 +1,6 @@
 package com.moon.core.lang;
 
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.ref.IntAccessor;
 
 import java.lang.reflect.Array;
@@ -119,7 +119,7 @@ public final class SupportUtil {
     }
 
     public final static String parseStr(char[] chars, IntAccessor indexer, int endChar) {
-        char[] value = ArraysEnum.CHARS.empty();
+        char[] value = Arrays2.CHARS.empty();
         int index = 0, pr = -1, es = '\\', i = indexer.get();
         for (char ch; (ch = chars[i++]) != endChar || pr == es; pr = ch) {
             if (ch == endChar && pr == es) {

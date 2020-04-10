@@ -17,9 +17,7 @@ import static java.util.Calendar.*;
  * @author benshaoye
  */
 public final class TimeUtil {
-    private TimeUtil() {
-        noInstanceError();
-    }
+    private TimeUtil() { noInstanceError(); }
 
     public final static long now() { return System.currentTimeMillis(); }
 

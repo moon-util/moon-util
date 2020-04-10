@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static com.moon.core.enums.ArraysEnum.getOrObjects;
+import static com.moon.core.enums.Arrays2.getOrObjects;
 
 /**
  * @author benshaoye

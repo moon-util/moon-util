@@ -12,9 +12,7 @@ public final class HttpUtil {
      */
     final static int TIMEOUT = 60000;
 
-    private HttpUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private HttpUtil() { ThrowUtil.noInstanceError(); }
 
     public static HttpConnector get(String url) {
         return null;

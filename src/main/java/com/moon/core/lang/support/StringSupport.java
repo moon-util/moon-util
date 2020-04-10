@@ -1,6 +1,6 @@
 package com.moon.core.lang.support;
 
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.CharUtil;
 import com.moon.core.util.function.IntBiFunction;
 
@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 public class StringSupport {
 
     static final char[] MARK = {'{', '}'};
-    static final char[] EMPTY = ArraysEnum.CHARS.empty();
+    static final char[] EMPTY = Arrays2.CHARS.empty();
 
     public final static void checkIndexesBetween(int from, int to, int len) {
         if (from < 0) {

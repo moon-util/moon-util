@@ -2,7 +2,7 @@ package com.moon.core.util;
 
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.beans.FieldDescriptor;
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Collects;
 import com.moon.core.io.FileUtil;
 import com.moon.core.lang.EnumUtil;
@@ -409,7 +409,7 @@ public final class IteratorUtil {
         } else {
             Class type = data.getClass();
             if (type.isArray()) {
-                ArraysEnum.getOrObjects(data).forEach(data, consumer);
+                Arrays2.getOrObjects(data).forEach(data, consumer);
             } else {
                 forEachFields(data, consumer);
             }

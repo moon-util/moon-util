@@ -3,7 +3,7 @@ package com.moon.core.util.runner;
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.beans.FieldDescriptor;
 import com.moon.core.enums.ArrayOperator;
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.util.IteratorUtil;
 
 import java.util.*;
@@ -26,10 +26,10 @@ public class RunnerDataMap extends HashMap {
     private final int lastIndex;
     private final int length;
 
-    public RunnerDataMap() { this(ArraysEnum.OBJECTS.empty()); }
+    public RunnerDataMap() { this(Arrays2.OBJECTS.empty()); }
 
     public RunnerDataMap(Object... dataArr) {
-        dataArr = ArraysEnum.OBJECTS.emptyIfNull(dataArr);
+        dataArr = Arrays2.OBJECTS.emptyIfNull(dataArr);
         int length = this.length = dataArr.length;
         this.dataArr = dataArr;
         this.lastIndex = length - 1;
@@ -296,7 +296,7 @@ public class RunnerDataMap extends HashMap {
 
         public ArrayGetter(Object arr) {
             this.data = arr;
-            getter = ArraysEnum.getOrObjects(arr);
+            getter = Arrays2.getOrObjects(arr);
             length = getter.length(arr);
         }
 

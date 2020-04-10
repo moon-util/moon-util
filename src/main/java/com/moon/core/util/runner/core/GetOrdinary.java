@@ -3,7 +3,7 @@ package com.moon.core.util.runner.core;
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.beans.FieldDescriptor;
 import com.moon.core.enums.ArrayOperator;
-import com.moon.core.enums.ArraysEnum;
+import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.BooleanUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
@@ -204,7 +204,7 @@ class GetOrdinary implements AsGetter {
         LENGTH;
 
         @Override
-        public Object run(Object data) { return ArraysEnum.getOrObjects(data).length(data); }
+        public Object run(Object data) { return Arrays2.getOrObjects(data).length(data); }
     }
 
     private static class ArrayGetter implements AsGetter {
@@ -232,7 +232,7 @@ class GetOrdinary implements AsGetter {
             return getter.get(data, index);
         }
 
-        private ArrayOperator reset(Object data) { return getter = ArraysEnum.getOrObjects(data.getClass()); }
+        private ArrayOperator reset(Object data) { return getter = Arrays2.getOrObjects(data.getClass()); }
 
         /**
          * Evaluates this predicate on the given argument.

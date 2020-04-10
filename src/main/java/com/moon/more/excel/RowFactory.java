@@ -13,31 +13,54 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class RowFactory extends BaseFactory<Row, RowFactory> {
+public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
 
     private final CellFactory factory;
 
     private Row row;
 
-    public RowFactory(WorkbookProxy proxy) {
-        super(proxy);
-        this.factory = new CellFactory(proxy);
+    public RowFactory(WorkbookProxy proxy, SheetFactory parent) {
+        super(proxy, parent);
+        this.factory = new CellFactory(proxy, this);
     }
 
     private CellFactory getCellFactory() { return factory; }
 
-    public Row getRow() {
-        return row;
-    }
+    public Row getRow() { return row; }
 
     void setRow(Row row) { this.row = row; }
 
     @Override
     Row get() { return getRow(); }
-
+    /**
+     * 预定义注释
+     *
+     * @param uniqueName 整个工作簿注释唯一命名
+     * @param commentBuilder    将要如何定义注释的具体逻辑
+     *
+     * @return 当前对象
+     */
     @Override
-    public RowFactory definitionComment(String classname, Consumer<Comment> commentBuilder){
-        super.definitionComment(classname, commentBuilder);
+    public RowFactory definitionComment(String uniqueName, Consumer<Comment> commentBuilder) {
+        super.definitionComment(uniqueName, commentBuilder);
+        return this;
+    }
+    /**
+     * 预定义注释
+     *
+     * @param uniqueName 整个工作簿注释唯一命名
+     * @param comment    注释内容
+     *
+     * @return 当前对象
+     */
+    @Override
+    public RowFactory definitionComment(String uniqueName, String comment) {
+        super.definitionComment(uniqueName, comment);
+        return this;
+    }
+
+    public RowFactory height(int height) {
+        getRow().setHeight((short) height);
         return this;
     }
 
@@ -132,5 +155,25 @@ public class RowFactory extends BaseFactory<Row, RowFactory> {
 
     public Cell nextCell(int rowspan, int colspan, int skipCells) {
         return factory.setCell(proxy.nextCell(skipCells, rowspan, colspan));
+    }
+
+    public RowFactory useCell(int cellIndexInRow, Consumer<CellFactory> consumer) {
+        consumer.accept(useCell(cellIndexInRow));
+        return this;
+    }
+
+    public CellFactory useCell(int cellIndexInRow) {
+        factory.setCell(proxy.useOrCreateCell(cellIndexInRow));
+        return factory;
+    }
+
+    public RowFactory useCell(int cellIndexInRow, int rowspan, int colspan, Consumer<CellFactory> consumer) {
+        consumer.accept(useCell(cellIndexInRow, rowspan, colspan));
+        return this;
+    }
+
+    public CellFactory useCell(int cellIndexInRow, int rowspan, int colspan) {
+        factory.setCell(proxy.useOrCreateCell(cellIndexInRow));
+        return factory;
     }
 }

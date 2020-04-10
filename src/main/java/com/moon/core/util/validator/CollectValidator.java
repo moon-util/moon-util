@@ -43,7 +43,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
 
     @Override
-    public CollectValidator<C, E> requireAtLeastCountOf(Predicate<? super E> tester, int count, String message) {
+    public CollectValidator<C, E> requireAtLeastOf(int count,Predicate<? super E> tester,  String message) {
         return ifCondition(value -> {
             int amount = 0;
             for (E item : value) {
@@ -56,7 +56,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
     }
 
     @Override
-    public CollectValidator<C, E> requireAtMostCountOf(Predicate<? super E> tester, int count, String message) {
+    public CollectValidator<C, E> requireAtMostOf(int count, Predicate<? super E> tester, String message) {
         return ifCondition(value -> {
             int amount = 0;
             for (E item : value) {
@@ -69,7 +69,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
     }
 
     @Override
-    public CollectValidator<C, E> requireCountOf(Predicate<? super E> tester, int count, String message) {
+    public CollectValidator<C, E> requireCountOf(int count, Predicate<? super E> tester, String message) {
         return ifCondition(value -> {
             int amount = 0;
             for (E item : value) {
