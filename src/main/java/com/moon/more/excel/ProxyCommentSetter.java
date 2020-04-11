@@ -4,22 +4,21 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Comment;
 
 /**
+ * 注释设置器
+ *
  * @author benshaoye
  */
 class ProxyCommentSetter extends ProxySetter<Comment, Cell> {
 
-    private boolean removed = false;
-
     public ProxyCommentSetter(Cell cell) { super(cell); }
 
-    public boolean isRemoved() { return removed; }
-
-    public void setRemoved(boolean removed) { this.removed = removed; }
-
+    /**
+     * 设置注释到单元格
+     *
+     * @param comment
+     */
     @Override
     void setup(Comment comment) {
-        if (!removed) {
-            getKey().setCellComment(comment);
-        }
+        getKey().setCellComment(comment);
     }
 }

@@ -30,7 +30,7 @@ class ExcelUtilTestTest {
 
     @Test
     void testXlsx() {
-        ExcelFactory excelFactory = ExcelUtil.xlsx();
+        WorkbookFactory excelFactory = ExcelUtil.xlsx();
         excelFactory.sheet("招聘进度分析", sheetFactory -> {
             sheetFactory.definitionStyle("header", (style, font) -> {
                 font.setColor(IndexedColors.RED.index);
@@ -76,7 +76,11 @@ class ExcelUtilTestTest {
             });
             sheetFactory.row(rowFactory -> {
                 rowFactory.cell(cellFactory -> cellFactory.val("女性"));
-                rowFactory.cell().val(0).style("header").comment("今天是个好日子");
+                rowFactory.cell().val(0).comment("今天是个好日子");
+            });
+            sheetFactory.row(rowFactory -> {
+                rowFactory.cell(cellFactory -> cellFactory.val("女性"));
+                rowFactory.cell(1, 1, -1).val(0).comment("今天是个好日子");
             });
         }).finish().write2Filepath("D:/test.xlsx");
         // excelFactory.shee

@@ -11,9 +11,9 @@ abstract class BaseProxy<T> {
 
     private final T key;
 
-    public BaseProxy(T key) { this.key = key; }
+    protected BaseProxy(T key) { this.key = key; }
 
-    public T getKey() { return key; }
+    public final T getKey() { return key; }
 
     @Override
     public final boolean equals(Object o) {

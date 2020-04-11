@@ -20,14 +20,14 @@ public interface BaseSupporter {
     default String stringify(Object data) { return data == null ? null : data.toString(); }
 
     /**
-     * 转换
+     * 转换，确保不会返回空对象
      *
-     * @param set
-     * @param mapper
-     * @param container
-     * @param <T>
-     * @param <E>
-     * @param <C>
+     * @param set       源集合
+     * @param mapper    转换器
+     * @param container 转换后的容器
+     * @param <T>       源类型
+     * @param <E>       目标类型
+     * @param <C>       集合容器类型
      *
      * @return
      */
@@ -40,14 +40,14 @@ public interface BaseSupporter {
     }
 
     /**
-     * 转换
+     * 转换成 HashSet
      *
-     * @param set
-     * @param mapper
-     * @param <T>
-     * @param <E>
+     * @param set    源集合
+     * @param mapper 转换器
+     * @param <T>    源类型
+     * @param <E>    目标类型
      *
-     * @return
+     * @return 转换后的 HashSet
      */
     default <T, E> HashSet<E> mapAsSetOrEmpty(
         Collection<T> set, Function<? super T, ? extends E> mapper

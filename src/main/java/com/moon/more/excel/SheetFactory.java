@@ -7,9 +7,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.util.function.Consumer;
 
 /**
+ * 工作表操作器
+ *
  * @author benshaoye
  */
-public class SheetFactory extends BaseFactory<Sheet, SheetFactory, ExcelFactory> {
+public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFactory> {
 
     /**
      * row 工厂
@@ -26,7 +28,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, ExcelFactory>
      * @param proxy  代理中心
      * @param parent 父节点
      */
-    public SheetFactory(WorkbookProxy proxy, ExcelFactory parent) {
+    public SheetFactory(WorkbookProxy proxy, WorkbookFactory parent) {
         super(proxy, parent);
         factory = new RowFactory(proxy, this);
     }
@@ -45,6 +47,11 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, ExcelFactory>
      */
     void setSheet(Sheet sheet) { this.sheet = sheet; }
 
+    /**
+     * 获取正在操作的 sheet 表
+     *
+     * @return 正在操作的 sheet 表
+     */
     @Override
     Sheet get() { return getSheet(); }
 

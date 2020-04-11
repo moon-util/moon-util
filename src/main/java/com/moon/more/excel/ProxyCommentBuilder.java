@@ -22,6 +22,15 @@ class ProxyCommentBuilder extends ProxyBuilder<Sheet, Comment> {
         this.type = type;
     }
 
+    /**
+     * 从 sheet 工作表创建一条注释
+     *
+     * @param unUse 工作表，由于注释是与 sheet 绑定的，需要在创建时就绑定，故这里不使用
+     *
+     * @return 注释
+     *
+     * @see #sheet
+     */
     @Override
     Comment build(Sheet unUse) {
         Drawing drawing = this.sheet.createDrawingPatriarch();

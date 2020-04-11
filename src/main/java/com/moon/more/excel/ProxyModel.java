@@ -5,13 +5,29 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * 代理模型
+ *
  * @author benshaoye
  */
 class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySetter<R, K>> {
 
-    private Map<String, B> builderMap;
+    /**
+     * 构建器列表
+     */
+    private volatile Map<String, B> builderMap;
+    /**
+     * 已定义的构建器列表
+     */
     private Map<String, R> defined;
+    /**
+     * 应用列表
+     */
     private LinkedHashMap<S, String> setterMap;
+    /**
+     * 是否启用缓存已定义
+     * <p>
+     * 有些信息可以重复定义，有些则可以重复利用
+     */
     private final boolean cacheDefined;
 
     private Map<String, B> getBuilderMap() { return builderMap; }
@@ -90,6 +106,29 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
         }
     }
 
+    private void afterApplied(Map<String, B> builderMap) {
+        if (isEmpty(builderMap)) {
+            return;
+        }
+        if (isEmpty(this.builderMap)) {
+            synchronized (this) {
+                if (isEmpty(this.builderMap)) {
+                    this.builderMap = builderMap;
+                } else {
+                    this.builderMap.putAll(builderMap);
+                }
+            }
+        } else {
+            synchronized (this) {
+                if (!isEmpty(this.builderMap)) {
+                    this.builderMap.putAll(builderMap);
+                } else {
+                    this.builderMap = builderMap;
+                }
+            }
+        }
+    }
+
     private void useUncached(FROM from) {
         Map<String, B> builderMap = getBuilderMap();
         if (isEmpty(builderMap)) {
@@ -113,6 +152,7 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
                 }
             }
         }
+        afterApplied(builderMap);
     }
 
     private void useCached(FROM from) {
@@ -148,5 +188,6 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
                 setter.setup(style);
             }
         }
+        afterApplied(builderMap);
     }
 }

@@ -13,9 +13,13 @@ import java.util.function.Consumer;
 public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFactory> {
 
     protected final static boolean DFT_APPEND_TYPE = true;
-
+    /**
+     * excel 总代理
+     */
     protected final WorkbookProxy proxy;
-
+    /**
+     * parent factory
+     */
     protected final P parent;
 
     public BaseFactory(WorkbookProxy proxy, P parent) {
@@ -23,15 +27,41 @@ public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends B
         this.proxy = proxy;
     }
 
+    /**
+     * 获取当前正在操作的对象
+     *
+     * @return 当前正在操作的对象
+     */
     abstract T get();
 
+    /**
+     * 当前正在操作的工作簿类型
+     *
+     * @return 工作簿类型
+     */
     WorkbookType getWorkbookType() { return proxy.getWorkbookType(); }
 
+    /**
+     * 预定义样式
+     *
+     * @param classname 唯一样式名
+     * @param builder   构建样式和字体，需要手动调用 style.setFont(font)
+     *
+     * @return 当前对象
+     */
     public F definitionStyle(String classname, BiConsumer<CellStyle, Font> builder) {
         proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
         return (F) this;
     }
 
+    /**
+     * 预定义样式
+     *
+     * @param classname 唯一样式名
+     * @param builder   构建样式（不包括字体）
+     *
+     * @return 当前对象
+     */
     public F definitionStyle(String classname, Consumer<CellStyle> builder) {
         proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
         return (F) this;
@@ -77,7 +107,9 @@ public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends B
     }
 
     /**
-     * 返回父节点工厂，如果当前是“根”（ExcelFactory），则返回自身
+     * 返回父节点工厂，如果当前是“根”（{@link WorkbookFactory}），则返回自身
+     * <p>
+     * 最好别调用这个方法
      *
      * @return 父节点工厂
      */

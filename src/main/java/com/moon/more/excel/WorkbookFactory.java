@@ -1,7 +1,6 @@
 package com.moon.more.excel;
 
 import com.moon.core.io.IOUtil;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
@@ -15,22 +14,27 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class ExcelFactory extends BaseFactory<Workbook, ExcelFactory, ExcelFactory> {
+public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, WorkbookFactory> {
 
     private final SheetFactory factory;
 
-    public ExcelFactory(Workbook workbook) {
+    public WorkbookFactory(Workbook workbook) {
         super(new WorkbookProxy(workbook), null);
         factory = new SheetFactory(proxy, this);
     }
 
     /**
-     * 获取正在操作的 sheet
+     * 获取正在操作的 Excel 工作簿
      *
-     * @return
+     * @return 正在操作的 Excel 工作簿
      */
     public Workbook getWorkbook() { return proxy.getWorkbook(); }
 
+    /**
+     * 获取正在操作的 Excel 工作簿
+     *
+     * @return 正在操作的 Excel 工作簿
+     */
     @Override
     Workbook get() { return proxy.getWorkbook(); }
 
@@ -39,13 +43,13 @@ public class ExcelFactory extends BaseFactory<Workbook, ExcelFactory, ExcelFacto
     /**
      * 创建工作表，如果存在则使用已存在的
      *
-     * @param sheetName
+     * @param sheetName sheet name
      * @param append    如果是已存在的工作表，这个是决定是“覆盖”或者“追加”到工作表数据
-     * @param operator
+     * @param operator  sheet 操作器
      *
-     * @return
+     * @return 当前 WorkbookFactory
      */
-    public ExcelFactory sheet(String sheetName, boolean append, Consumer<SheetFactory> operator) {
+    public WorkbookFactory sheet(String sheetName, boolean append, Consumer<SheetFactory> operator) {
         factory.setSheet(proxy.useSheet(sheetName, append));
         operator.accept(getSheetFactory());
         return this;
@@ -54,42 +58,42 @@ public class ExcelFactory extends BaseFactory<Workbook, ExcelFactory, ExcelFacto
     /**
      * 创建工作表，如果存在则使用已存在的
      *
-     * @param sheetName
-     * @param operator
+     * @param sheetName sheet name
+     * @param operator  sheet 操作器
      *
-     * @return
+     * @return 当前 WorkbookFactory
      */
-    public ExcelFactory sheet(String sheetName, Consumer<SheetFactory> operator) {
+    public WorkbookFactory sheet(String sheetName, Consumer<SheetFactory> operator) {
         return sheet(sheetName, DFT_APPEND_TYPE, operator);
     }
 
     /**
      * 创建一个工作表
      *
-     * @param operator
+     * @param operator sheet 操作器
      *
-     * @return
+     * @return 当前 WorkbookFactory
      */
-    public ExcelFactory sheet(Consumer<SheetFactory> operator) { return sheet(null, operator); }
+    public WorkbookFactory sheet(Consumer<SheetFactory> operator) { return sheet(null, operator); }
 
     /**
      * 将 Excel 写入到指定路径文件
      *
-     * @param path
+     * @param path 将要写出的目标文件路径
      */
     public void write2Filepath(String path) { write2Path(Paths.get(path)); }
 
     /**
      * 将 Excel 写入到指定文件
      *
-     * @param file
+     * @param file 将要写出的目标文件
      */
     public void write2File(File file) { write2Path(file.toPath()); }
 
     /**
      * 将 Excel 写入到指定位置
      *
-     * @param path
+     * @param path 将要写出的目标路径
      */
     public void write2Path(Path path) {
         OutputStream out = null;
@@ -113,7 +117,7 @@ public class ExcelFactory extends BaseFactory<Workbook, ExcelFactory, ExcelFacto
     /**
      * 将 Excel 写入到输出流
      *
-     * @param outputStream
+     * @param outputStream 写出的目标输出流
      */
     public void write(OutputStream outputStream) {
         finish();

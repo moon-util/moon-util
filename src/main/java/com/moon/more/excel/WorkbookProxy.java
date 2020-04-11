@@ -14,7 +14,7 @@ import static com.moon.more.excel.WorkbookType.*;
 /**
  * @author benshaoye
  */
-class WorkbookProxy {
+final class WorkbookProxy {
 
     private final static boolean DEFAULT_APPEND_DATA = true;
 
@@ -66,7 +66,7 @@ class WorkbookProxy {
         return t;
     }
 
-    private Map<Integer, Object> getRowFilled(Table table, int rowIdx) {
+    private static Map<Integer, Object> getRowFilled(Table table, int rowIdx) {
         Map<Integer, Object> rowFilled = table.get(rowIdx);
         if (rowFilled == null) {
             rowFilled = new HashMap<>();
@@ -157,8 +157,7 @@ class WorkbookProxy {
     }
 
     RichTextString createRichText(String content) {
-        RichTextString str = getWorkbookType().newRichText(content);
-        return str;
+        return getWorkbookType().newRichText(content);
     }
 
     WorkbookType getWorkbookType() { return type; }
@@ -288,9 +287,9 @@ class WorkbookProxy {
             }
         }
         if (rowspan > 1 || colspan > 1) {
-            int firstRow = rowIdx - 1;
-            int lastRow = firstRow + rowspan - 1;
-            sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, nCellIdx, eCellIdx - 1));
+            int fr = rowIdx - 1;
+            int lr = fr + rowspan - 1;
+            sheet.addMergedRegion(new CellRangeAddress(fr, lr, nCellIdx, eCellIdx - 1));
         }
         this.indexOfCell = eCellIdx;
         return nCellIdx;
