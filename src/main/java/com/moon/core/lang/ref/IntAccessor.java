@@ -2,12 +2,13 @@ package com.moon.core.lang.ref;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
+import java.util.function.IntSupplier;
 import java.util.function.ToIntFunction;
 
 /**
  * @author benshaoye
  */
-public class IntAccessor {
+public class IntAccessor implements IntSupplier {
 
     private int value;
 
@@ -51,6 +52,9 @@ public class IntAccessor {
      */
 
     public int get() { return value; }
+
+    @Override
+    public int getAsInt() { return get(); }
 
     public int getAndIncrement() { return value++; }
 

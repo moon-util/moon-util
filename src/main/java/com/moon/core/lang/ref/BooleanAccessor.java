@@ -12,7 +12,7 @@ import static com.moon.core.lang.ThrowUtil.doThrow;
 /**
  * @author benshaoye
  */
-public class BooleanAccessor {
+public class BooleanAccessor implements BooleanSupplier {
 
     private boolean value;
 
@@ -41,6 +41,9 @@ public class BooleanAccessor {
      */
 
     public boolean get() { return value; }
+
+    @Override
+    public boolean getAsBoolean() { return get(); }
 
     public BooleanAccessor set(boolean value) {
         this.value = value;

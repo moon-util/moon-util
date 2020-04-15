@@ -2,12 +2,13 @@ package com.moon.core.lang.ref;
 
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
+import java.util.function.LongSupplier;
 import java.util.function.ToLongFunction;
 
 /**
  * @author benshaoye
  */
-public class LongAccessor {
+public class LongAccessor implements LongSupplier {
 
     private long value;
 
@@ -51,6 +52,9 @@ public class LongAccessor {
      */
 
     public long get() { return value; }
+
+    @Override
+    public long getAsLong() { return get(); }
 
     public long getAndIncrement() { return value++; }
 

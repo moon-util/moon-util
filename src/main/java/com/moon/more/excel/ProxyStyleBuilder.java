@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * @author benshaoye
  */
-class ProxyStyleBuilder extends ProxyBuilder<Workbook, CellStyle> {
+class ProxyStyleBuilder extends ProxyBuilder<Workbook, CellStyleProxy> {
 
     /**
      * 不包含字体
@@ -43,14 +43,17 @@ class ProxyStyleBuilder extends ProxyBuilder<Workbook, CellStyle> {
      * @return CellStyle 实例
      */
     @Override
-    CellStyle build(Workbook workbook) {
+    CellStyleProxy build(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         if (hasFontBuilder != null) {
             Font font = workbook.createFont();
             hasFontBuilder.accept(style, font);
+            if (style.getFontIndexAsInt() < 1) {
+                style.setFont(font);
+            }
         } else if (nonFontBuilder != null) {
             nonFontBuilder.accept(style);
         }
-        return style;
+        return new CellStyleProxy(style);
     }
 }

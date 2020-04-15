@@ -85,4 +85,26 @@ class ExcelUtilTestTest {
         }).finish().write2Filepath("D:/test.xlsx");
         // excelFactory.shee
     }
+
+    @Test
+    void testExportExcel() {
+        ExcelUtil.xlsx().definitionStyle("header", (style, font) -> {
+            style.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
+            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            style.setAlignment(HorizontalAlignment.CENTER);
+            style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            style.setBorderBottom(BorderStyle.DASH_DOT);
+
+            font.setBold(true);
+            font.setColor(IndexedColors.RED.index);
+        }).sheet(sheetFactory -> {
+            sheetFactory.row(rowFactory -> {
+                rowFactory.cell(3, 3).val("值").style("header");
+                rowFactory.cell().style("header");
+                rowFactory.cell(2, 2).val("值").style("header");
+                rowFactory.cell().active();
+            });
+        }).finish().write2Filepath("D:/test.xlsx");
+    }
 }

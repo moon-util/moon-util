@@ -2,12 +2,13 @@ package com.moon.core.lang.ref;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
+import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
 /**
  * @author benshaoye
  */
-public class DoubleAccessor {
+public class DoubleAccessor implements DoubleSupplier {
 
     private double value;
 
@@ -51,6 +52,9 @@ public class DoubleAccessor {
      */
 
     public double get() { return value; }
+
+    @Override
+    public double getAsDouble() { return get(); }
 
     public double getAndIncrement() { return value++; }
 

@@ -1,10 +1,14 @@
 package com.moon.more.excel;
 
+import com.moon.more.excel.annotation.DataColumn;
+import com.moon.more.excel.annotation.DataColumnFlatten;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * 工作表操作器
@@ -219,5 +223,46 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
         factory.setRow(proxy.nextRow(skipRows));
         consumer.accept(getRowFactory());
         return this;
+    }
+
+    /**
+     * 从下一行开始将 List 数据渲染到当前 sheet 表中
+     * <p>
+     * 可用{@link DataColumn}定义表头
+     * <p>
+     * 否则将按照字段顺序写入到表格，并且忽略集合、数组或 Map 字段
+     * <p>
+     * 关于集合字段的处理方式参考{@link DataColumnFlatten}
+     *
+     * @param collect     数据
+     * @param targetClass 目标类型
+     * @param <T>         数据类型
+     */
+    private <T> void renderList(Iterator<T> collect, Class<T> targetClass) {
+
+    }
+
+    private <T> void renderList(Iterator<T> collect) {
+
+    }
+
+    private <T> void renderList(Iterable<T> collect, Class<T> targetClass) {
+        renderList(collect.iterator(), targetClass);
+    }
+
+    private <T> void renderList(Iterable<T> collect) {
+        renderList(collect.iterator());
+    }
+
+    private <T> void renderList(Stream<T> stream, Class<T> targetClass) {
+        renderList(stream.iterator(), targetClass);
+    }
+
+    private <T> void renderList(Stream<T> stream) {
+        renderList(stream.iterator());
+    }
+
+    private <T> void renderList(T... collect) {
+
     }
 }

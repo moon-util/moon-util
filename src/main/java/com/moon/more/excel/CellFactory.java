@@ -149,7 +149,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @see #definitionStyle(String, BiConsumer)
      */
     public CellFactory style(String classname) {
-        proxy.addSetter(new ProxyStyleSetter(getCell()), classname);
+        proxy.addSetter(new ProxyStyleSetter(getCell(), proxy.getRegion()), classname);
         return this;
     }
 

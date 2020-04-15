@@ -10,7 +10,7 @@ import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 /**
  * @author benshaoye
  */
-abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> implements Accessor<T, A> {
+abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> implements Accessor<T, A>, Supplier<T> {
 
     /**
      * 缓存取值过程
@@ -61,6 +61,7 @@ abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> implements Accessor
         return curr == null ? supplier.get() : curr;
     }
 
+    @Override
     public final T get() {
         T curr = getValue();
         if (curr == null) {

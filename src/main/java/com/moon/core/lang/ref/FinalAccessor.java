@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
-public class FinalAccessor<T> {
+public class FinalAccessor<T> implements Supplier<T> {
 
     private T value;
 
@@ -51,6 +51,7 @@ public class FinalAccessor<T> {
      * ------------------------------------------------------------
      */
 
+    @Override
     public T get() { return value; }
 
     public T getOrDefault(T defaultValue) { return isPresent() ? value : defaultValue; }
@@ -111,7 +112,8 @@ public class FinalAccessor<T> {
     }
 
     public <EX extends Throwable> FinalAccessor<T> ifPresentOrThrow(
-        Consumer<T> consumer, Supplier<EX> supplier) throws EX {
+        Consumer<T> consumer, Supplier<EX> supplier
+    ) throws EX {
         if (isPresent()) {
             consumer.accept(value);
         } else {
@@ -125,6 +127,12 @@ public class FinalAccessor<T> {
      * computer
      * ------------------------------------------------------------
      */
+
+    public T replaceAs(T newValue) {
+        T value = get();
+        set(newValue);
+        return value;
+    }
 
     public FinalAccessor<T> compute(Function<T, T> computer) {
         value = computer.apply(value);

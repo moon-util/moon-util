@@ -1,6 +1,7 @@
 package com.moon.more.excel;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.core.lang.ref.FinalAccessor;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
 import org.apache.poi.ss.usermodel.*;
@@ -19,6 +20,8 @@ final class WorkbookProxy {
     private final static boolean DEFAULT_APPEND_DATA = true;
 
     private final static Object PLACEHOLDER = new byte[0];
+
+    private final FinalAccessor<CellRangeAddress> mergedOnCell = FinalAccessor.of();
 
     private final Map<Sheet, Table<Integer, Integer, Object>> sheetMap = new HashMap<>();
 
@@ -286,11 +289,14 @@ final class WorkbookProxy {
                 }
             }
         }
+        CellRangeAddress region = null;
         if (rowspan > 1 || colspan > 1) {
             int fr = rowIdx - 1;
             int lr = fr + rowspan - 1;
-            sheet.addMergedRegion(new CellRangeAddress(fr, lr, nCellIdx, eCellIdx - 1));
+            region = new CellRangeAddress(fr, lr, nCellIdx, eCellIdx - 1);
+            sheet.addMergedRegion(region);
         }
+        mergedOnCell.replaceAs(region);
         this.indexOfCell = eCellIdx;
         return nCellIdx;
     }
@@ -298,6 +304,8 @@ final class WorkbookProxy {
     Cell setCell(Cell cell) { return this.cell = cell; }
 
     Cell getCell() { return cell; }
+
+    CellRangeAddress getRegion() { return mergedOnCell.get(); }
 
     Cell useCell(int index) { return setCell(row.getCell(index)); }
 

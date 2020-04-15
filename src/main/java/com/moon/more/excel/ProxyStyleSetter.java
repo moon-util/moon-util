@@ -1,19 +1,27 @@
 package com.moon.more.excel;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
  * 应用样式
  *
  * @author benshaoye
  */
-class ProxyStyleSetter extends ProxySetter<CellStyle, Object> {
+class ProxyStyleSetter extends ProxySetter<CellStyleProxy, Object> {
 
-    public ProxyStyleSetter(Cell cell) { super(cell); }
+    private final CellRangeAddress rangeAddress;
 
-    public ProxyStyleSetter(Row row) { super(row); }
+    public ProxyStyleSetter(Cell cell, CellRangeAddress rangeAddress) {
+        super(cell);
+        this.rangeAddress = rangeAddress;
+    }
+
+    public ProxyStyleSetter(Row row) {
+        super(row);
+        this.rangeAddress = null;
+    }
 
     /**
      * 应用到单元格或单元行
@@ -21,12 +29,12 @@ class ProxyStyleSetter extends ProxySetter<CellStyle, Object> {
      * @param style 样式
      */
     @Override
-    void setup(CellStyle style) {
+    void setup(CellStyleProxy style) {
         Object object = this.getKey();
         if (object instanceof Cell) {
-            ((Cell) object).setCellStyle(style);
+            style.accept((Cell) object, rangeAddress);
         } else if (object instanceof Row) {
-            ((Row) object).setRowStyle(style);
+            style.accept((Row) object);
         }
     }
 }
