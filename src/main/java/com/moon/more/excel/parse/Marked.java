@@ -47,17 +47,13 @@ class Marked<M extends Member> {
         return flatten == null ? (column == null ? null : column.value()) : flatten.value();
     }
 
-    public String getHeadLabelAsIndexer() {
-        return getIndexer().value();
-    }
+    public String getHeadLabelAsIndexer() { return getIndexer().value(); }
 
     boolean isAnnotated() { return column != null || flatten != null || indexer != null; }
 
     boolean isDefined() { return getFlatten() != null || getColumn() != null; }
 
-    boolean isIndexer() {
-        return getIndexer() != null;
-    }
+    boolean isIndexer() { return getIndexer() != null; }
 
     public String getName() { return name; }
 
