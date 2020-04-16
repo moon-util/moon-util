@@ -22,7 +22,7 @@ enum WorkbookType implements Predicate<Workbook> {
 
     private final Supplier<ClientAnchor> anchorCreator;
     private final Function<String, RichTextString> richTextBuilder;
-    private final Class taregt;
+    private final Class target;
 
     WorkbookType(String type) { this(type, new XAnchor(), new XRich()); }
 
@@ -35,15 +35,15 @@ enum WorkbookType implements Predicate<Workbook> {
         } catch (Throwable t) {
             target = null;
         }
-        this.taregt = target;
+        this.target = target;
         this.richTextBuilder = richTextBuilder;
         this.anchorCreator = anchorCreator;
     }
 
     @Override
     public boolean test(Workbook workbook) {
-        Class target = this.taregt;
-        return target == null ? false : target.isInstance(workbook);
+        Class target = this.target;
+        return target != null && target.isInstance(workbook);
     }
 
     RichTextString newRichText(String content) { return richTextBuilder.apply(content); }

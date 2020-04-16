@@ -49,7 +49,7 @@ abstract class Header {
             List<ColDef> fullColumns = new ArrayList<>();
             List<DefinedGet> columns = new ArrayList<>(getter.getColumns());
             for (DefinedGet column : columns) {
-                if (column.isFlatColumn()) {
+                if (column.isDataFlatten()) {
                     ParsedDetail children = column.getChildrenGroup();
 
                 } else {
