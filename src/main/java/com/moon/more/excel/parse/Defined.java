@@ -34,7 +34,7 @@ abstract class Defined implements Serializable, HeadSortable {
      * tests
      */
 
-    public boolean isDefined() { return isOnlyColumn() || isFlatColumn(); }
+    public boolean isDefined() { return isDataColumn() || isDataFlatten(); }
 
     public boolean isUndefined() { return !isDefined(); }
 
@@ -42,9 +42,9 @@ abstract class Defined implements Serializable, HeadSortable {
 
     public boolean hasIndexer() { return getIndexer() != null; }
 
-    public boolean isFlatColumn() { return getFlatten() != null; }
+    public boolean isDataFlatten() { return getFlatten() != null; }
 
-    public boolean isOnlyColumn() { return getColumn() != null; }
+    public boolean isDataColumn() { return getColumn() != null; }
 
     /*
      * getters
@@ -81,7 +81,10 @@ abstract class Defined implements Serializable, HeadSortable {
         }
     }
 
-    protected static <T> boolean isEmpty(T... arr) { return arr == null || arr.length == 0; }
+    @SafeVarargs
+    protected static <T> boolean isEmpty(T... arr) {
+        return arr == null || arr.length == 0;
+    }
 
     protected String[] defaultLabelsIfEmpty(String[] labels) { return isEmpty(labels) ? getOtherwiseLabels() : labels; }
 
@@ -89,7 +92,7 @@ abstract class Defined implements Serializable, HeadSortable {
 
     public String[] getHeadLabels() {
         String[] labels = gotIfNonNull(Marked::getHeadLabels);
-        return isFlatColumn() ? ensureNonNull(labels) : defaultLabelsIfEmpty(labels);
+        return isDataFlatten() ? ensureNonNull(labels) : defaultLabelsIfEmpty(labels);
     }
 
     public int getRowsLength() {

@@ -43,10 +43,10 @@ class DefinedSet extends Defined {
         public boolean isOnlyIndexer() { return true; }
 
         @Override
-        public boolean isOnlyColumn() { return false; }
+        public boolean isDataColumn() { return false; }
 
         @Override
-        public boolean isFlatColumn() { return false; }
+        public boolean isDataFlatten() { return false; }
 
         @Override
         public boolean hasIndexer() { return true; }
