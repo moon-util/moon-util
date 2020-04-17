@@ -2,6 +2,7 @@ package com.moon.core.util;
 
 import com.moon.core.lang.reflect.FieldUtil;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.junit.jupiter.api.Test;
 
@@ -80,6 +81,7 @@ class MapperUtilTestTest {
     }
 
     @Data
+    @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = true)
     public static class UserVO extends User {}
 

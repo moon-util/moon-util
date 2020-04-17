@@ -16,7 +16,7 @@ interface Creator<T extends Defined> {
 
     Type getGenericType(Method method);
 
-    ParsedDetail parsed(List list, ParsedRootDetail root, T starting, T ending);
+    ParsedDetail parsed(List list, RootDetail root, T starting, T ending);
 
     T info(String propertyName, Marked<Method> onMethod);
 

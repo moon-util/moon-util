@@ -23,7 +23,7 @@ class PropGetterParsedTestTest {
         System.out.println();
         parsed.columns.forEach(col -> {
             System.out.println(Arrays.toString(col.getColumn().value()));
-            System.out.println(col.getPropertyName());
+            System.out.println(col.getName());
         });
     }
 

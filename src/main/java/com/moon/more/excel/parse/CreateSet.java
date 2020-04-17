@@ -38,6 +38,6 @@ class CreateSet implements Creator<DefinedSet> {
 
     @Override
     public ParsedDetail parsed(
-        List list, ParsedRootDetail root, DefinedSet starting, DefinedSet ending
+        List list, RootDetail root, DefinedSet starting, DefinedSet ending
     ) { return ParsedDetail.ofSetter(list, root, starting, ending); }
 }

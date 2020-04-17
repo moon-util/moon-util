@@ -8,6 +8,6 @@ import java.util.List;
 class ParsedSetDetail extends ParsedDetail<DefinedSet> {
 
     public ParsedSetDetail(
-        List<DefinedSet> setters, ParsedRootDetail root, DefinedSet starting, DefinedSet ending
+        List<DefinedSet> setters, RootDetail root, DefinedSet starting, DefinedSet ending
     ) { super(setters, root, starting, ending); }
 }

@@ -27,7 +27,7 @@ class DefinedGet extends Defined {
     ) { return new IndexedGetter(name, indexer); }
 
     PropertyGetter getPropertyGetter() {
-        return ValueGetter.of(getMethod(), getField());
+        return ValueGetter.of(getAtMethod(), getAtField());
     }
 
     static class IndexedGetter extends DefinedGet {
@@ -58,10 +58,10 @@ class DefinedGet extends Defined {
         public boolean hasIndexer() { return true; }
 
         @Override
-        Field getField() { return null; }
+        Field getAtField() { return null; }
 
         @Override
-        Method getMethod() { return null; }
+        Method getAtMethod() { return null; }
 
         @Override
         public ParsedDetail getChildrenGroup() { return null; }

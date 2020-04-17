@@ -167,7 +167,7 @@ abstract class Parser<T extends Defined> extends BaseParser {
             }
         }
 
-        ParsedRootDetail root = ParsedRootDetail.of(obtain(type, DataRecord.class));
+        RootDetail root = RootDetail.of(obtain(type, DataRecord.class));
         return creator.parsed(columns, root, starting, ending);
     }
 }

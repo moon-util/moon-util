@@ -74,19 +74,5 @@ class HeaderTestTest {
 
     @Test
     void testTestTreeMap() {
-        Map<Header.HeaderCell, Object> map = new TreeMap<>();
-
-        map.put(new Header.HeaderCell("微信", 0), this);
-        map.put(new Header.HeaderCell("电脑", 2), this);
-        map.put(new Header.HeaderCell("鼠标", 100), this);
-        map.put(new Header.HeaderCell("打印机", 20), this);
-        map.put(new Header.HeaderCell("面膜", 50), this);
-        map.put(new Header.HeaderCell("微信", 2), this);
-        map.put(new Header.HeaderCell("微信", 1), this);
-        map.put(new Header.HeaderCell("微信", -1), this);
-
-        map.forEach((k, v) -> {
-            System.out.println(k);
-        });
     }
 }

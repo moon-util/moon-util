@@ -125,9 +125,7 @@ public final class SetUtil extends CollectUtil {
 
     public static <T> Set<T> concat(Set<T> set, Set<T>... sets) { return (Set) concat0(set, sets); }
 
-    public static <T> T requireGet(Set<T> set, int index) {
-        return get(set, index);
-    }
+    public static <T> T requireGet(Set<T> set, int index) { return get(set, index); }
 
     public static <T> T nullableGet(Set<T> set, int index) {
         int size = set.size(), idx = 0;
@@ -155,7 +153,5 @@ public final class SetUtil extends CollectUtil {
         throw new IndexOutOfBoundsException(String.valueOf(index));
     }
 
-    public static <T> T getByObject(Object set, int index) {
-        return get((Set<T>) set, index);
-    }
+    public static <T> T getByObject(Object set, int index) { return get((Set<T>) set, index); }
 }
