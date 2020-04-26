@@ -8,7 +8,7 @@
   <artifactId>moon-util</artifactId>
   <packaging>jar</packaging>
   <!-- 每次 deploy 【成功后】、【成功后】、【成功后】加 1 保存，提交！！！ -->
-  <version>0.0.22</version>
+  <version>0.0.23</version>
 
   <name>moon-util</name>
   <description>a java tool library</description>
@@ -231,11 +231,13 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
       <version>5.4.10.Final</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>javax.persistence</groupId>
       <artifactId>javax.persistence-api</artifactId>
       <version>2.2</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
