@@ -1,6 +1,6 @@
 package com.moon.more.data.access;
 
-import com.moon.more.data.AfterStartedRunner;
+import com.moon.more.data.RunnerRegistration;
 import com.moon.more.data.registry.LayerEnum;
 import com.moon.more.data.registry.LayerRegistry;
 import com.moon.more.model.id.IdSupplier;
@@ -56,7 +56,7 @@ abstract class DefaultAccessor<ID, T extends IdSupplier<ID>> implements BaseAcce
             rawType = paramType.getRawType();
 
             LayerRegistry.register(accessorLayer, domainClass, this);
-            AfterStartedRunner.registry(getRunner(accessorLayer, domainClass));
+            RunnerRegistration.getInstance().registry(getRunner(accessorLayer, domainClass));
         } else if (type instanceof Class) {
             Class cls = (Class) type;
             // log.warn("没有为泛型指定实体类：{}", cls.getSimpleName());
