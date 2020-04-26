@@ -49,7 +49,7 @@ public abstract class HttpConnector {
         return new HeaderAddr(this);
     }
 
-    public static class HeaderAddr implements EndSupplier<HttpConnector> {
+    public static class HeaderAddr {
 
         private final HttpConnector connector;
 
@@ -57,7 +57,6 @@ public abstract class HttpConnector {
             this.connector = Objects.requireNonNull(connector);
         }
 
-        @Override
         public HttpConnector end() {
             return connector;
         }

@@ -1,6 +1,6 @@
 package com.moon.core.net.enums;
 
-import com.moon.core.model.KeyValue;
+import com.moon.more.model.KeyValue;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
 import org.junit.jupiter.api.Assertions;

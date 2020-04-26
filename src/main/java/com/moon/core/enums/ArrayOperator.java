@@ -3,7 +3,7 @@ package com.moon.core.enums;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.function.IntBiConsumer;
-import com.moon.core.util.interfaces.IteratorAble;
+import com.moon.core.util.interfaces.IteratorSupplier;
 import com.moon.core.util.interfaces.Stringify;
 
 import java.lang.reflect.Array;
@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 /**
  * @author benshaoye
  */
-public interface ArrayOperator extends IteratorAble, Predicate, Stringify, IntFunction {
+public interface ArrayOperator extends IteratorSupplier, Predicate, Stringify, IntFunction {
 
     /**
      * Applies this function to the given argument.
