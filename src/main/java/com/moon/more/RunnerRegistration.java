@@ -1,4 +1,4 @@
-package com.moon.more.data;
+package com.moon.more;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,7 +24,9 @@ public final class RunnerRegistration {
         return runners;
     }
 
-    private final static RunnerRegistration REGISTRATION = new RunnerRegistration();
+    private final static RunnerRegistration REGISTRATION = newInstance();
 
     public static RunnerRegistration getInstance() { return REGISTRATION; }
+
+    public static RunnerRegistration newInstance() { return new RunnerRegistration(); }
 }

@@ -7,4 +7,12 @@ import com.moon.more.model.id.IdSupplier;
 /**
  * @author benshaoye
  */
-public interface Recordable<ID> extends IdOperator<ID>, IdSupplier<ID>, BaseSupporter, Cloneable {}
+public interface Recordable<ID> extends IdOperator<ID>, IdSupplier<ID>, BaseSupporter, Cloneable {
+
+    /**
+     * 是否是新对象
+     *
+     * @return
+     */
+    boolean isNew();
+}

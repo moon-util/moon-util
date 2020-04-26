@@ -1,6 +1,6 @@
-package com.moon.more.data.access;
+package com.moon.spring.data;
 
-import com.moon.more.data.RunnerRegistration;
+import com.moon.more.RunnerRegistration;
 import com.moon.more.data.registry.LayerEnum;
 import com.moon.more.data.registry.LayerRegistry;
 import com.moon.more.model.id.IdSupplier;
@@ -21,7 +21,7 @@ import static java.lang.Thread.currentThread;
 /**
  * @author benshaoye
  */
-abstract class DefaultAccessor<ID, T extends IdSupplier<ID>> implements BaseAccessor<ID, T>, InitializingBean {
+public abstract class BaseRecordAccessor<ID, T extends IdSupplier<ID>> implements RecordAccessor<ID, T>, InitializingBean {
 
     private final static Class NONE_CLASS = null;
 
@@ -41,11 +41,11 @@ abstract class DefaultAccessor<ID, T extends IdSupplier<ID>> implements BaseAcce
     protected final LayerEnum accessorLayer;
     protected final Class serviceBeanType;
     protected final Class rawClass;
-    private BaseAccessor<ID, T> accessor;
+    private RecordAccessor<ID, T> accessor;
 
-    protected DefaultAccessor(LayerEnum accessorLayer, Class rawClass) { this(null, accessorLayer, rawClass); }
+    protected BaseRecordAccessor(LayerEnum accessorLayer, Class rawClass) { this(null, accessorLayer, rawClass); }
 
-    protected DefaultAccessor(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
+    protected BaseRecordAccessor(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
         Type rawType;
         Class domainClass;
         Type type = getClass().getGenericSuperclass();
@@ -72,17 +72,17 @@ abstract class DefaultAccessor<ID, T extends IdSupplier<ID>> implements BaseAcce
         this.domainClass = domainClass;
     }
 
-    protected DefaultAccessor(LayerEnum accessorLayer) { this(accessorLayer, NONE_CLASS); }
+    protected BaseRecordAccessor(LayerEnum accessorLayer) { this(accessorLayer, NONE_CLASS); }
 
-    protected DefaultAccessor(Class serviceBeanType, LayerEnum accessorLayer) {
+    protected BaseRecordAccessor(Class serviceBeanType, LayerEnum accessorLayer) {
         this(serviceBeanType, accessorLayer, null);
     }
 
     protected Runnable getRunner(LayerEnum accessorLayer, Class domainClass) {
         return () -> {
-            BaseAccessor accessor = getDefaultAccessor();
+            RecordAccessor accessor = getDefaultAccessor();
             if (accessor == null && serviceBeanType != null) {
-                accessor = (BaseAccessor) getContext().getBean(serviceBeanType);
+                accessor = (RecordAccessor) getContext().getBean(serviceBeanType);
             }
             if (accessor == null) {
                 accessor = LayerRegistry.get(accessorLayer, domainClass);
@@ -98,7 +98,7 @@ abstract class DefaultAccessor<ID, T extends IdSupplier<ID>> implements BaseAcce
 
     protected WebApplicationContext getContext() { return context; }
 
-    protected BaseAccessor<ID, T> getAccessor() { return accessor; }
+    protected RecordAccessor<ID, T> getAccessor() { return accessor; }
 
     @Override
     public void afterPropertiesSet() throws Exception {}
@@ -112,7 +112,7 @@ abstract class DefaultAccessor<ID, T extends IdSupplier<ID>> implements BaseAcce
      *
      * @return
      */
-    protected BaseAccessor<ID, T> getDefaultAccessor() { return null; }
+    protected RecordAccessor<ID, T> getDefaultAccessor() { return null; }
 
     /**
      * 保存
