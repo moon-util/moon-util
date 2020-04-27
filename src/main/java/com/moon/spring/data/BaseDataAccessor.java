@@ -21,7 +21,7 @@ import static java.lang.Thread.currentThread;
 /**
  * @author benshaoye
  */
-public abstract class BaseRecordAccessor<ID, T extends IdSupplier<ID>> implements RecordAccessor<ID, T>, InitializingBean {
+public abstract class BaseDataAccessor<ID, T extends IdSupplier<ID>> implements DataAccessor<ID, T>, InitializingBean {
 
     private final static Class NONE_CLASS = null;
 
@@ -41,11 +41,11 @@ public abstract class BaseRecordAccessor<ID, T extends IdSupplier<ID>> implement
     protected final LayerEnum accessorLayer;
     protected final Class serviceBeanType;
     protected final Class rawClass;
-    private RecordAccessor<ID, T> accessor;
+    private DataAccessor<ID, T> accessor;
 
-    protected BaseRecordAccessor(LayerEnum accessorLayer, Class rawClass) { this(null, accessorLayer, rawClass); }
+    protected BaseDataAccessor(LayerEnum accessorLayer, Class rawClass) { this(null, accessorLayer, rawClass); }
 
-    protected BaseRecordAccessor(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
+    protected BaseDataAccessor(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
         Type rawType;
         Class domainClass;
         Type type = getClass().getGenericSuperclass();
@@ -72,17 +72,17 @@ public abstract class BaseRecordAccessor<ID, T extends IdSupplier<ID>> implement
         this.domainClass = domainClass;
     }
 
-    protected BaseRecordAccessor(LayerEnum accessorLayer) { this(accessorLayer, NONE_CLASS); }
+    protected BaseDataAccessor(LayerEnum accessorLayer) { this(accessorLayer, NONE_CLASS); }
 
-    protected BaseRecordAccessor(Class serviceBeanType, LayerEnum accessorLayer) {
+    protected BaseDataAccessor(Class serviceBeanType, LayerEnum accessorLayer) {
         this(serviceBeanType, accessorLayer, null);
     }
 
     protected Runnable getRunner(LayerEnum accessorLayer, Class domainClass) {
         return () -> {
-            RecordAccessor accessor = getDefaultAccessor();
+            DataAccessor accessor = getDefaultAccessor();
             if (accessor == null && serviceBeanType != null) {
-                accessor = (RecordAccessor) getContext().getBean(serviceBeanType);
+                accessor = (DataAccessor) getContext().getBean(serviceBeanType);
             }
             if (accessor == null) {
                 accessor = LayerRegistry.get(accessorLayer, domainClass);
@@ -98,7 +98,7 @@ public abstract class BaseRecordAccessor<ID, T extends IdSupplier<ID>> implement
 
     protected WebApplicationContext getContext() { return context; }
 
-    protected RecordAccessor<ID, T> getAccessor() { return accessor; }
+    protected DataAccessor<ID, T> getAccessor() { return accessor; }
 
     @Override
     public void afterPropertiesSet() throws Exception {}
@@ -112,7 +112,7 @@ public abstract class BaseRecordAccessor<ID, T extends IdSupplier<ID>> implement
      *
      * @return
      */
-    protected RecordAccessor<ID, T> getDefaultAccessor() { return null; }
+    protected DataAccessor<ID, T> getDefaultAccessor() { return null; }
 
     /**
      * 保存

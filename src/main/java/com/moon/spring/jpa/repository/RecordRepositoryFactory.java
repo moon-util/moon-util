@@ -43,11 +43,11 @@ public class RecordRepositoryFactory extends JpaRepositoryFactory {
         RepositoryInformation information, EntityManager em
     ) {
         JpaEntityInformation ei = getEntityInformation(information.getDomainType());
-        return new RecordRepositoryImpl<>(ei, em);
+        return new DataRepositoryImpl<>(ei, em);
     }
 
     @Override
-    protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) { return RecordRepositoryImpl.class; }
+    protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) { return DataRepositoryImpl.class; }
 
 
     @Override

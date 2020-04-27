@@ -1,5 +1,6 @@
 package com.moon.spring.data;
 
+import com.moon.more.model.BaseSupporter;
 import com.moon.more.model.id.IdSupplier;
 import org.springframework.data.domain.*;
 
@@ -10,7 +11,7 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
-public interface RecordAccessor<ID,T extends IdSupplier<ID>> {
+public interface DataAccessor<ID,T extends IdSupplier<ID>> extends BaseSupporter {
 
     /**
      * 保存

@@ -40,8 +40,8 @@ import static org.springframework.data.jpa.convert.QueryByExamplePredicateBuilde
  * @author benshaoye
  */
 @NoRepositoryBean
-public class RecordRepositoryImpl<T extends Recordable<String>> extends SimpleJpaRepository<T, String>
-    implements RecordRepository<T> {
+public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaRepository<T, String>
+    implements DataRepository<T> {
 
     final static CacheManager NO_OP = new NoOpCacheManager();
 
@@ -56,14 +56,14 @@ public class RecordRepositoryImpl<T extends Recordable<String>> extends SimpleJp
     private final Class domainClass;
     private final EntityManager em;
 
-    public RecordRepositoryImpl(JpaEntityInformation<T, ?> ei, EntityManager em) {
+    public DataRepositoryImpl(JpaEntityInformation<T, ?> ei, EntityManager em) {
         super(ei, em);
         this.em = em;
         domainClass = ei.getJavaType();
         LayerRegistry.registerRepository(domainClass, this);
     }
 
-    public RecordRepositoryImpl(Class<T> domainClass, EntityManager em) {
+    public DataRepositoryImpl(Class<T> domainClass, EntityManager em) {
         super(domainClass, em);
         this.em = em;
         this.domainClass = domainClass;
@@ -303,7 +303,7 @@ public class RecordRepositoryImpl<T extends Recordable<String>> extends SimpleJp
     protected <S extends T> S doSaveEntity(Cache cache, S s) {
         String beforeSaveId = s.getId();
         boolean newer = s.isNew();
-        // 在更新前删除一次，防止多并发下删除异常，（在一定情况下，课考虑不要这一步）
+        // 在更新前删除一次，防止多并发下删除异常，（在某些情况下，可考虑不要这一步）
         if (!newer) {
             cache.evict(beforeSaveId);
         }

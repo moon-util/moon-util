@@ -9,7 +9,7 @@ import javax.persistence.EntityManager;
 /**
  * @author benshaoye
  */
-public class RecordRepositoryFactoryBean<T extends RecordRepository<E>, E extends JpaRecordable<String>>
+public class RecordRepositoryFactoryBean<T extends DataRepository<E>, E extends JpaRecordable<String>>
     extends JpaRepositoryFactoryBean<T, E, String> {
 
     public RecordRepositoryFactoryBean(Class<? extends T> ri) { super(ri); }

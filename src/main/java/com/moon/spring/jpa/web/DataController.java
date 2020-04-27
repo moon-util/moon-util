@@ -4,10 +4,10 @@ import com.moon.core.lang.StringUtil;
 import com.moon.more.data.registry.EntityRegistry;
 import com.moon.more.data.registry.EntityRegistryException;
 import com.moon.more.data.registry.LayerEnum;
-import com.moon.spring.data.BaseRecordAccessor;
-import com.moon.spring.data.RecordAccessor;
+import com.moon.spring.data.BaseDataAccessor;
+import com.moon.spring.data.DataAccessor;
 import com.moon.spring.jpa.JpaRecordable;
-import com.moon.spring.jpa.service.RecordService;
+import com.moon.spring.jpa.service.DataService;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -17,13 +17,12 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
-public class RecordController<T extends JpaRecordable<String>> extends BaseRecordAccessor<String, T> {
+public class DataController<T extends JpaRecordable<String>> extends BaseDataAccessor<String, T> {
 
 
-    protected RecordController(Class<? extends RecordService> classname) { super(classname, LayerEnum.SERVICE); }
+    protected DataController(Class<? extends DataService> classname) { super(classname, LayerEnum.SERVICE); }
 
-    protected RecordController() { this(null); }
-
+    protected DataController() { this(null); }
 
     private static void debug(Type type, Class clazz) {
         // if (log.isDebugEnabled()) {
@@ -42,7 +41,7 @@ public class RecordController<T extends JpaRecordable<String>> extends BaseRecor
                 if (rawClass == getClass()) {
                     debug(rawClass, domainClass);
                     return;
-                } else if (rawClass == RecordController.class) {
+                } else if (rawClass == DataController.class) {
                     Type supertype = rawClass.getGenericSuperclass();
                     if (supertype instanceof ParameterizedType) {
                         // ParameterizedType type = (ParameterizedType) supertype;
@@ -59,14 +58,14 @@ public class RecordController<T extends JpaRecordable<String>> extends BaseRecor
     }
 
     @Override
-    protected RecordAccessor<String, T> getDefaultAccessor() { return getService(); }
+    protected DataAccessor<String, T> getDefaultAccessor() { return getService(); }
 
     /**
      * 目标服务
      *
      * @return
      */
-    protected RecordService<T> getService() { return null; }
+    protected DataService<T> getService() { return null; }
 
 
     /* registry -------------------------------------------------------- */
@@ -90,7 +89,7 @@ public class RecordController<T extends JpaRecordable<String>> extends BaseRecor
     }
 
     protected final <T> void registryVo2Entity(
-        Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends RecordService> serviceSupplier
+        Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends DataService> serviceSupplier
     ) {
         EntityRegistry.registry(type, id -> {
             if (StringUtil.isEmpty(id)) {
