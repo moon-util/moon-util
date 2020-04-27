@@ -112,7 +112,7 @@ public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends B
      */
     @Override
     public void deleteAll(T first, T second, T... entities) {
-        BeforeLifeChain<T> before = obtainBeforeSave();
+        BeforeLifeChain<T> before = obtainBeforeDelete();
         super.deleteAll(before(before, first), before(before, second), before(before, entities));
     }
 
@@ -145,7 +145,7 @@ public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends B
      */
     @Override
     public <S extends T> void disableAll(S first, S second, S... entities) {
-        BeforeLifeChain<T> before = obtainBeforeSave();
+        BeforeLifeChain<T> before = obtainBeforeDelete();
         super.disableAll(before(before, first), before(before, second), before(before, entities));
     }
 
