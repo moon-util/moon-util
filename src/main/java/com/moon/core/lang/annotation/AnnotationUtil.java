@@ -12,11 +12,11 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 public final class AnnotationUtil {
     private AnnotationUtil() { noInstanceError(); }
 
-    public final static <T extends Annotation> boolean
+    public static <T extends Annotation> boolean
     isAnnotationPresent(AnnotatedElement ae, Class<T> annotationType) { return ae.isAnnotationPresent(annotationType); }
 
-    public final static <T extends Annotation> T
+    public static <T extends Annotation> T
     get(AnnotatedElement ae, Class<T> annotationType) { return ae.getAnnotation(annotationType); }
 
-    public final static <A extends Annotation> boolean equals(A a1, A a2) { return Objects.equals(a1, a2); }
+    public static <A extends Annotation> boolean equals(A a1, A a2) { return Objects.equals(a1, a2); }
 }

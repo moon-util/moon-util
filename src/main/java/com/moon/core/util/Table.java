@@ -12,9 +12,9 @@ public interface Table<X, Y, Z> {
     /**
      * 指定坐标设置值
      *
-     * @param x
-     * @param y
-     * @param z
+     * @param x X轴
+     * @param y Y轴
+     * @param z 值
      *
      * @return
      */
@@ -23,37 +23,37 @@ public interface Table<X, Y, Z> {
     /**
      * 指定坐标获取值
      *
-     * @param x
-     * @param y
+     * @param x X轴
+     * @param y Y轴
      *
-     * @return
+     * @return 值
      */
     Z get(Object x, Object y);
 
     /**
      * 指定行设置值（替换）
      *
-     * @param x
-     * @param map
+     * @param x   X轴
+     * @param map 行数据
      *
-     * @return
+     * @return 值
      */
     Map<Y, Z> put(X x, Map<? extends Y, ? extends Z> map);
 
     /**
      * 指定行设置值（增量）
      *
-     * @param x
-     * @param map
+     * @param x   X轴
+     * @param map 行数据
      */
     void putAll(X x, Map<? extends Y, ? extends Z> map);
 
     /**
      * 获取指定行数据
      *
-     * @param x
+     * @param x X轴
      *
-     * @return
+     * @return 行数据
      */
     Map<Y, Z> get(Object x);
 
@@ -67,49 +67,51 @@ public interface Table<X, Y, Z> {
     /**
      * 删除
      *
-     * @param x
-     * @param y
+     * @param x X轴
+     * @param y Y轴
      *
-     * @return
+     * @return 值
      */
     Z remove(Object x, Object y);
 
     /**
      * 删除指定行
      *
-     * @param x
+     * @param x X轴
      *
-     * @return
+     * @return 返回被删除的行数据
      */
     Map<Y, Z> remove(Object x);
 
     /**
      * 是否包含值
      *
-     * @param value
+     * @param value 待测试值
      *
-     * @return
+     * @return 是否包含
+     *
+     * @see Map#containsValue(Object)
      */
     boolean containsValue(Object value);
 
     /**
      * 所有 x
      *
-     * @return
+     * @return 所有存在数据的 X 轴键
      */
     Set<X> keys();
 
     /**
      * 所有行
      *
-     * @return
+     * @return 所有行数据
      */
     Collection<Map<Y, Z>> rows();
 
     /**
      * 所有行
      *
-     * @return
+     * @return 所有行数据，X 轴 ——> 行数据
      */
     Set<Map.Entry<X, Map<Y, Z>>> rowsEntrySet();
 
@@ -156,7 +158,7 @@ public interface Table<X, Y, Z> {
     /**
      * 是否包含
      *
-     * @param x
+     * @param x X轴
      *
      * @return
      */
@@ -165,8 +167,8 @@ public interface Table<X, Y, Z> {
     /**
      * 是否包含
      *
-     * @param x
-     * @param y
+     * @param x X轴
+     * @param y Y轴
      *
      * @return
      */
