@@ -41,23 +41,23 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
-    public static <T> T[] with(T... values) { return values; }
+    public static <T> T[] as(T... values) { return values; }
 
-    public static char[] with(char... values) { return values; }
+    public static char[] as(char... values) { return values; }
 
-    public static byte[] with(byte... values) { return values; }
+    public static byte[] as(byte... values) { return values; }
 
-    public static short[] with(short... values) { return values; }
+    public static short[] as(short... values) { return values; }
 
-    public static int[] with(int... values) { return values; }
+    public static int[] as(int... values) { return values; }
 
-    public static long[] with(long... values) { return values; }
+    public static long[] as(long... values) { return values; }
 
-    public static float[] with(float... values) { return values; }
+    public static float[] as(float... values) { return values; }
 
-    public static double[] with(double... values) { return values; }
+    public static double[] as(double... values) { return values; }
 
-    public static boolean[] with(boolean... values) { return values; }
+    public static boolean[] as(boolean... values) { return values; }
 
     /*
      * ----------------------------------------------------------------
@@ -98,15 +98,94 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
+    @SuppressWarnings("all")
     public static <T> T[] reverse(T... values) {
-        return ifNonNull(values, items -> {
-            T cache;
-            for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
-                cache = items[len - i];
-                items[len - i] = items[i];
-                items[i] = cache;
-            }
-        });
+        if (values == null) {
+            return null;
+        }
+        T[] items = values;
+        T cache;
+        for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
+            cache = items[len - i];
+            items[len - i] = items[i];
+            items[i] = cache;
+        }
+        return items;
+    }
+
+    @SuppressWarnings("all")
+    public static char[] reverse(char... values) {
+        if (values == null) {
+            return null;
+        }
+        char[] items = values;
+        char cache;
+        for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
+            cache = items[len - i];
+            items[len - i] = items[i];
+            items[i] = cache;
+        }
+        return items;
+    }
+
+    @SuppressWarnings("all")
+    public static byte[] reverse(byte... values) {
+        if (values == null) {
+            return null;
+        }
+        byte[] items = values;
+        byte cache;
+        for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
+            cache = items[len - i];
+            items[len - i] = items[i];
+            items[i] = cache;
+        }
+        return items;
+    }
+
+    @SuppressWarnings("all")
+    public static int[] reverse(int... values) {
+        if (values == null) {
+            return null;
+        }
+        int[] items = values;
+        int cache;
+        for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
+            cache = items[len - i];
+            items[len - i] = items[i];
+            items[i] = cache;
+        }
+        return items;
+    }
+
+    @SuppressWarnings("all")
+    public static long[] reverse(long... values) {
+        if (values == null) {
+            return null;
+        }
+        long[] items = values;
+        long cache;
+        for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
+            cache = items[len - i];
+            items[len - i] = items[i];
+            items[i] = cache;
+        }
+        return items;
+    }
+
+    @SuppressWarnings("all")
+    public static double[] reverse(double... values) {
+        if (values == null) {
+            return null;
+        }
+        double[] items = values;
+        double cache;
+        for (int i = 0, two = 2, len = items.length, half = len-- / two; i < half; i++) {
+            cache = items[len - i];
+            items[len - i] = items[i];
+            items[i] = cache;
+        }
+        return items;
     }
 
     /*
@@ -143,29 +222,65 @@ public final class ArrayUtil {
 
     public static int length(char[] arr) { return arr == null ? 0 : arr.length; }
 
+    public static <T> boolean isEmpty(T... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(double... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(long... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(int... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(byte... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(char... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(float... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(short... arr) { return length(arr) == 0; }
+
+    public static boolean isEmpty(boolean... arr) { return length(arr) == 0; }
+
+    public static <T> boolean isNotEmpty(T... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(double... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(long... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(int... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(byte... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(char... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(float... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(short... arr) { return isEmpty(arr); }
+
+    public static boolean isNotEmpty(boolean... arr) { return isEmpty(arr); }
+
     /*
      * ----------------------------------------------------------------
      * fill
      * ----------------------------------------------------------------
      */
 
-    public static <T> T[] fill(T[] arr, T value) { return fillFrom(arr, 0, value); }
+    public static <T> T[] fill(T[] arr, T value) { return fillBegin(arr, 0, value); }
 
-    public static boolean[] fill(boolean[] arr, boolean value) { return fillFrom(arr, 0, value); }
+    public static boolean[] fill(boolean[] arr, boolean value) { return fillBegin(arr, 0, value); }
 
-    public static double[] fill(double[] arr, double value) { return fillFrom(arr, 0, value); }
+    public static double[] fill(double[] arr, double value) { return fillBegin(arr, 0, value); }
 
-    public static float[] fill(float[] arr, float value) { return fillFrom(arr, 0, value); }
+    public static float[] fill(float[] arr, float value) { return fillBegin(arr, 0, value); }
 
-    public static long[] fill(long[] arr, long value) { return fillFrom(arr, 0, value); }
+    public static long[] fill(long[] arr, long value) { return fillBegin(arr, 0, value); }
 
-    public static int[] fill(int[] arr, int value) { return fillFrom(arr, 0, value); }
+    public static int[] fill(int[] arr, int value) { return fillBegin(arr, 0, value); }
 
-    public static short[] fill(short[] arr, short value) { return fillFrom(arr, 0, value); }
+    public static short[] fill(short[] arr, short value) { return fillBegin(arr, 0, value); }
 
-    public static byte[] fill(byte[] arr, byte value) { return fillFrom(arr, 0, value); }
+    public static byte[] fill(byte[] arr, byte value) { return fillBegin(arr, 0, value); }
 
-    public static char[] fill(char[] arr, char value) { return fillFrom(arr, 0, value); }
+    public static char[] fill(char[] arr, char value) { return fillBegin(arr, 0, value); }
 
     /*
      * ----------------------------------------------------------------
@@ -173,37 +288,39 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
-    public static <T> T[] fillFrom(T[] arr, int fromIndex, T value) { return fill(arr, fromIndex, length(arr), value); }
-
-    public static boolean[] fillFrom(boolean[] arr, int fromIndex, boolean value) {
+    public static <T> T[] fillBegin(T[] arr, int fromIndex, T value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
-    public static double[] fillFrom(double[] arr, int fromIndex, double value) {
+    public static boolean[] fillBegin(boolean[] arr, int fromIndex, boolean value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
-    public static float[] fillFrom(float[] arr, int fromIndex, float value) {
+    public static double[] fillBegin(double[] arr, int fromIndex, double value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
-    public static long[] fillFrom(long[] arr, int fromIndex, long value) {
+    public static float[] fillBegin(float[] arr, int fromIndex, float value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
-    public static int[] fillFrom(int[] arr, int fromIndex, int value) {
+    public static long[] fillBegin(long[] arr, int fromIndex, long value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
-    public static short[] fillFrom(short[] arr, int fromIndex, short value) {
+    public static int[] fillBegin(int[] arr, int fromIndex, int value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
-    public static byte[] fillFrom(byte[] arr, int fromIndex, byte value) {
+    public static short[] fillBegin(short[] arr, int fromIndex, short value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
-    public static char[] fillFrom(char[] arr, int fromIndex, char value) {
+    public static byte[] fillBegin(byte[] arr, int fromIndex, byte value) {
+        return fill(arr, fromIndex, length(arr), value);
+    }
+
+    public static char[] fillBegin(char[] arr, int fromIndex, char value) {
         return fill(arr, fromIndex, length(arr), value);
     }
 
@@ -322,7 +439,12 @@ public final class ArrayUtil {
      */
 
     public static <T> T[] splice(T[] arr, int fromIndex, int count, T... elements) {
-        return (T[]) spliceArray(arr, arr.length, elements, elements.length, fromIndex, count,
+        return (T[]) spliceArray(arr,
+            arr.length,
+            elements,
+            elements.length,
+            fromIndex,
+            count,
             l -> Array.newInstance(arr.getClass().getComponentType(), l));
     }
 

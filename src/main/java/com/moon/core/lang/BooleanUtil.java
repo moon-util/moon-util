@@ -7,6 +7,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 public final class BooleanUtil {
+
     private BooleanUtil() { noInstanceError(); }
 
     /*
@@ -64,17 +65,17 @@ public final class BooleanUtil {
             return false;
         }
         String temp = cs.toString();
-        if (NULL_STR.equals(temp)
-            || FALSE_STR.equals(temp)
-            || UNDEFINED_STR.equals(temp)) {
+        if (NULL_STR.equals(temp) || FALSE_STR.equals(temp) || UNDEFINED_STR.equals(temp)) {
             return false;
         }
         return temp.length() > 0;
     }
 
     /**
-     * @param o 带转换值
+     * @param o 待转换值
+     *
      * @return boolean value
+     *
      * @see IntUtil#toIntValue(Object)
      */
     public static boolean toBooleanValue(Object o) {
@@ -84,7 +85,9 @@ public final class BooleanUtil {
 
     /**
      * @param o 带转换值
+     *
      * @return boolean value
+     *
      * @see IntUtil#toIntValue(Object)
      */
     public static Boolean toBoolean(Object o) {
@@ -132,82 +135,4 @@ public final class BooleanUtil {
     public static boolean isFalse(Object value) {return Boolean.FALSE.equals(value);}
 
     public static boolean isNotFalse(Object value) {return !Boolean.FALSE.equals(value);}
-
-    /*
-     * --------------------------------------------------------------
-     * multi asserts
-     * --------------------------------------------------------------
-     */
-
-    public static boolean isAnyTrue(boolean... values) {
-        for (int i = 0; i < values.length; i++) {
-            if (values[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isAnyFalse(boolean... values) {
-        for (int i = 0; i < values.length; i++) {
-            if (!values[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isAllTrue(boolean... values) {
-        for (int i = 0; i < values.length; i++) {
-            if (!values[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean isAllFalse(boolean... values) {
-        for (int i = 0; i < values.length; i++) {
-            if (values[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean isAnyTrue(Boolean[] booleans) {
-        for (int i = 0; i < booleans.length; i++) {
-            if (isTrue(booleans[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isAnyFalse(Boolean[] booleans) {
-        for (int i = 0; i < booleans.length; i++) {
-            if (isFalse(booleans[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isAllTrue(Boolean[] booleans) {
-        for (int i = 0; i < booleans.length; i++) {
-            if (isFalse(booleans[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean isAllFalse(Boolean[] booleans) {
-        for (int i = 0; i < booleans.length; i++) {
-            if (isTrue(booleans[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

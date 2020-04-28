@@ -2,6 +2,7 @@ package com.moon.more;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 import static com.moon.core.util.ListUtil.newArrayList;
 
@@ -10,20 +11,49 @@ import static com.moon.core.util.ListUtil.newArrayList;
  */
 public final class RunnerRegistration {
 
-    private final List<Runnable> REGISTERED_RUNNERS
+    private final List<Runnable> REGISTERED_RUNNERS;
 
-        = new CopyOnWriteArrayList<>();
+    public RunnerRegistration() { this(CopyOnWriteArrayList::new); }
 
+    public RunnerRegistration(Supplier<List<Runnable>> creator) {
+        this.REGISTERED_RUNNERS = creator.get();
+    }
+
+    /**
+     * 注册一个 runner
+     *
+     * @param runner
+     */
     public void registry(Runnable runner) { REGISTERED_RUNNERS.add(runner); }
 
-    public void runningTakeAll() { takeAll().forEach(Runnable::run); }
+    /**
+     * 执行所有任务,并删除
+     */
+    public void runningTakeAll() { takeAll(true).forEach(Runnable::run); }
 
-    private synchronized List<Runnable> takeAll() {
+    /**
+     * 执行所有任务
+     */
+    public void runningAll() { takeAll(false).forEach(Runnable::run); }
+
+    /**
+     * 取出所有任务
+     *
+     * @param clear
+     *
+     * @return
+     */
+    private synchronized List<Runnable> takeAll(boolean clear) {
         List<Runnable> runners = newArrayList(REGISTERED_RUNNERS);
-        REGISTERED_RUNNERS.clear();
+        if (clear) {
+            REGISTERED_RUNNERS.clear();
+        }
         return runners;
     }
 
+    /**
+     * 默认队列
+     */
     private final static RunnerRegistration REGISTRATION = newInstance();
 
     public static RunnerRegistration getInstance() { return REGISTRATION; }
