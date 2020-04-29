@@ -1,6 +1,7 @@
 package com.moon.spring.jpa.identity;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.spring.ContextUtil;
 import com.moon.spring.MoonConst;
 import org.hibernate.HibernateException;
@@ -16,27 +17,34 @@ import java.io.Serializable;
  */
 public class Identifier implements IdentifierGenerator {
 
-    private final IdentifierGenerator generator;
+    private final LazyAccessor<IdentifierGenerator> generator;
 
     public Identifier() {
-        ApplicationContext context = ContextUtil.getContext();
-        Environment env = context.getEnvironment();
-        String value = env.getProperty(MoonConst.Data.IDENTIFIER);
-        if (StringUtil.isNotBlank(value)) {
+        this.generator = LazyAccessor.of(() -> {
             try {
-                this.generator = IdentifierUtil.newInstance(value);
-            } catch (Throwable t) {
-                throw new IllegalStateException(value);
+                ApplicationContext context = ContextUtil.getContext();
+                Environment env = context.getEnvironment();
+                String value = env.getProperty(MoonConst.Data.IDENTIFIER);
+                if (StringUtil.isNotBlank(value)) {
+                    try {
+                        return IdentifierUtil.newInstance(value);
+                    } catch (Throwable t) {
+                        throw new IllegalStateException(value);
+                    }
+                } else {
+                    return new SnowflakeIdentifier();
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                return new SnowflakeIdentifier();
             }
-        } else {
-            this.generator = new SnowflakeIdentifier();
-        }
+        });
     }
 
     @Override
     public Serializable generate(
         SharedSessionContractImplementor session, Object object
     ) throws HibernateException {
-        return generator.generate(session, object);
+        return generator.get().generate(session, object);
     }
 }
