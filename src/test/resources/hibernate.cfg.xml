@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!-- 根节点没有任何属性可设置 -->
+<hibernate-configuration>
+  <!-- session-factory 可指定一个名称 name -->
+  <!-- 时区（根据情况设置）：&amp;serverTimezone=GMT%2B8 -->
+  <session-factory>
+    <!--    <property name="connection.url">jdbc:mysql://localhost:3306/learn_orm_mybatis_plus?useEncoding=true&amp;characterEncoding=UTF-8&amp;serverTimezone=GMT%2B8</property>-->
+    <!--    <property name="connection.username">root</property>-->
+    <!--    <property name="connection.password">12345678</property>-->
+    <!--    <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>-->
+    <!--    <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>-->
+
+    <property name="connection.url">jdbc:mysql://192.168.1.197:3306/moon-super?useEncoding=true&amp;characterEncoding=UTF-8</property>
+    <property name="connection.username">root</property>
+    <property name="connection.password">1QAZ2wsx,</property>
+    <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+    <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+
+
+    <!-- 其他配置 -->
+
+    <property name="show_sql">true</property>
+    <property name="format_sql">true</property>
+    <property name="hbm2ddl.auto">update</property>
+
+    <!--
+     单向一对多关系
+    -->
+    <!-- “一”方维护关系（默认）
+    <mapping resource="com/moonsky/orm/hibernate/xml/one2many/AddressEntity.hbm.xml"/>
+    <mapping resource="com/moonsky/orm/hibernate/xml/one2many/AccountEntity.hbm.xml"/> -->
+    <!-- “多”方维护关系
+    <mapping resource="com/moonsky/orm/hibernate/xml/one2many/O2MAndMany.hbm.xml"/>
+    <mapping resource="com/moonsky/orm/hibernate/xml/one2many/O2MAndOne.hbm.xml"/> -->
+
+    <!-- 组件属性
+    <mapping resource="com/moonsky/orm/hibernate/xml/component/ComponentEnterpriseEntity.hbm.xml"/> -->
+
+    <!-- 单向多对一关系
+    <mapping resource="com/moonsky/orm/hibernate/xml/many2one/GradeEntity.hbm.xml"/>
+    <mapping resource="com/moonsky/orm/hibernate/xml/many2one/StudentEntity.hbm.xml"/> -->
+
+    <!-- 双向一对多关系
+    <mapping resource="com/moonsky/orm/hibernate/xml/twowaymany2one/CompanyEntity.hbm.xml"/>
+    <mapping resource="com/moonsky/orm/hibernate/xml/twowaymany2one/MemberEntity.hbm.xml"/> -->
+
+    <!-- 多对多映射关系
+    <mapping resource="com/moonsky/orm/hibernate/xml/many2many/DeveloperEntity.hbm.xml"/>
+    <mapping resource="com/moonsky/orm/hibernate/xml/many2many/ProjectEntity.hbm.xml"/> -->
+
+    <!-- 基本单表注解
+    <mapping class="com.moonsky.orm.hibernate.annotation.basic.BasicEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.basic.MultiIdEntity"/> -->
+
+    <!--
+     主键策略演示
+    -->
+    <!-- GenerationType#AUTO
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.AutoIdEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.AutoIdSecondaryEntity"/> -->
+    <!-- GenerationType#AUTO + generator (@GenericGenerator(strategy="native"))
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.native0.AutoNativeEntity"/> -->
+    <!-- GenerationType#AUTO + generator (@GenericGenerator(strategy="assigned"))
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.assigned.AutoAssignedIdEntity"/> -->
+    <!-- GenerationType#AUTO + generator (@GenericGenerator(strategy="increment"))
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.increment.AutoIncrementEntity"/> -->
+    <!-- GenerationType#AUTO + generator (@GenericGenerator(strategy="uuid"))
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.uuid.AutoUuidEntity"/> -->
+    <!-- GenerationType#AUTO + generator (@GenericGenerator(strategy="uuid2"))
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.uuid2.AutoUuid2Entity"/> -->
+    <!-- GenerationType#AUTO + generator (@GenericGenerator(strategy="guid"))
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.auto.guid.AutoGuidEntity"/> -->
+
+    <!-- GenerationType#TABLE
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.identity.IdentityEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.table.TableIdDefaultEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.table.TableIdentityEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.strategy.table.TableIdentitySecondaryEntity"/> -->
+
+
+    <!--
+     映射关系
+    -->
+    <!-- 单向一对多关系: 用 @JoinColumn 维护关系
+    <mapping class="com.moonsky.orm.hibernate.annotation.relation.o2m.O2mOnCompanyEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.relation.o2m.O2mOnMemberEntity"/> -->
+    <!-- 单向一对多关系: 用 @OneToMany#mappedBy 维护关系
+    <mapping class="com.moonsky.orm.hibernate.annotation.relation.o2m.O2mOnAccountEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.relation.o2m.O2mOnAddressEntity"/> -->
+
+    <!-- 单向多对一关系
+    <mapping class="com.moonsky.orm.hibernate.annotation.relation.m2o.M2oEnterpriseEntity"/>
+    <mapping class="com.moonsky.orm.hibernate.annotation.relation.m2o.M2oEmployeeEntity"/> -->
+  </session-factory>
+</hibernate-configuration>

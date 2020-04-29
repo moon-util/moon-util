@@ -17,10 +17,10 @@ import java.io.Serializable;
  */
 public class Identifier implements IdentifierGenerator {
 
-    private final LazyAccessor<IdentifierGenerator> generator;
+    private final LazyAccessor<IdentifierGenerator> accessor;
 
     public Identifier() {
-        this.generator = LazyAccessor.of(() -> {
+        this.accessor = LazyAccessor.of(() -> {
             try {
                 ApplicationContext context = ContextUtil.getContext();
                 Environment env = context.getEnvironment();
@@ -35,7 +35,7 @@ public class Identifier implements IdentifierGenerator {
                     return new SnowflakeIdentifier();
                 }
             } catch (NullPointerException e) {
-                e.printStackTrace();
+                System.err.println("初始化 ID 生成器错误: " + e);
                 return new SnowflakeIdentifier();
             }
         });
@@ -45,6 +45,6 @@ public class Identifier implements IdentifierGenerator {
     public Serializable generate(
         SharedSessionContractImplementor session, Object object
     ) throws HibernateException {
-        return generator.get().generate(session, object);
+        return accessor.get().generate(session, object);
     }
 }
