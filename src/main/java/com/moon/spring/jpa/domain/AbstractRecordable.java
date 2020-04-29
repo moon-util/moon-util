@@ -2,7 +2,10 @@ package com.moon.spring.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
@@ -16,6 +19,9 @@ public abstract class AbstractRecordable<ID extends Serializable>
     implements JpaRecordable<ID>, Cloneable, Serializable {
 
     @Id
+    @Column(length = 38)
+    @GeneratedValue(generator = "generator")
+    @GenericGenerator(name = "generator", strategy = "com.moon.spring.jpa.identity.Identifier")
     private ID id;
 
     public AbstractRecordable() { }

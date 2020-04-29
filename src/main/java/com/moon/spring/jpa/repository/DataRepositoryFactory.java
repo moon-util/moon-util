@@ -20,13 +20,13 @@ import java.util.Optional;
 /**
  * @author benshaoye
  */
-public class RecordRepositoryFactory extends JpaRepositoryFactory {
+public class DataRepositoryFactory extends JpaRepositoryFactory {
 
     protected final EntityManager em;
     private final QueryExtractor extractor;
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
-    public RecordRepositoryFactory(EntityManager em) {
+    public DataRepositoryFactory(EntityManager em) {
         super(em);
         this.em = em;
         this.extractor = PersistenceProvider.fromEntityManager(em);

@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 /**
  * @author benshaoye
  */
+@Component
 public final class ContextUtil implements ApplicationContextAware {
 
     private static volatile ApplicationContext CTX;
+
     @Autowired(required = false)
     private ConfigurableApplicationContext context;
 

@@ -9,13 +9,13 @@ import javax.persistence.EntityManager;
 /**
  * @author benshaoye
  */
-public class RecordRepositoryFactoryBean<T extends BaseRepository<E>, E extends JpaRecordable<String>>
+public class DataRepositoryFactoryBean<T extends BaseRepository<E>, E extends JpaRecordable<String>>
     extends JpaRepositoryFactoryBean<T, E, String> {
 
-    public RecordRepositoryFactoryBean(Class<? extends T> ri) { super(ri); }
+    public DataRepositoryFactoryBean(Class<? extends T> ri) { super(ri); }
 
     @Override
     protected RepositoryFactorySupport createRepositoryFactory(EntityManager em) {
-        return new RecordRepositoryFactory(em);
+        return new DataRepositoryFactory(em);
     }
 }
