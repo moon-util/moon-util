@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
-public interface BaseAccessor<ID,T extends IdSupplier<ID>> extends BaseSupporter {
+public interface BaseAccessor<ID, T extends IdSupplier<ID>> extends BaseSupporter {
 
     /**
      * 保存
@@ -156,6 +156,20 @@ public interface BaseAccessor<ID,T extends IdSupplier<ID>> extends BaseSupporter
      * @return
      */
     Optional<T> findById(ID id);
+
+    /**
+     * 表中是否存在对应 ID 存在的值
+     * @param id
+     * @return
+     */
+    boolean existsById(String id);
+
+    /**
+     * 返回表总数
+     *
+     * @return 表中数据总数
+     */
+    long count();
 
     /**
      * 查询

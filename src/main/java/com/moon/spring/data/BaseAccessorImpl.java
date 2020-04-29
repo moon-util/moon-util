@@ -34,6 +34,24 @@ public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements 
         }
     }
 
+    /**
+     * 表中是否存在对应 ID 存在的值
+     *
+     * @param id
+     *
+     * @return
+     */
+    @Override
+    public boolean existsById(String id) { return getAccessor().existsById(id); }
+
+    /**
+     * 返回表总数
+     *
+     * @return 表中数据总数
+     */
+    @Override
+    public long count() { return getAccessor().count(); }
+
     @Autowired
     private WebApplicationContext context;
 
