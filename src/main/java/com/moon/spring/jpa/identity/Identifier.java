@@ -45,6 +45,7 @@ public class Identifier implements IdentifierGenerator {
     public Serializable generate(
         SharedSessionContractImplementor session, Object object
     ) throws HibernateException {
-        return accessor.get().generate(session, object);
+        Serializable generatedId = accessor.get().generate(session, object);
+        return generatedId;
     }
 }

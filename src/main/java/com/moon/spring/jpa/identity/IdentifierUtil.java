@@ -8,6 +8,7 @@ import com.moon.core.util.converter.TypeCaster;
 import org.hibernate.id.IdentifierGenerator;
 
 import java.lang.reflect.Constructor;
+import java.util.Objects;
 
 /**
  * @author benshaoye
@@ -22,13 +23,39 @@ final class IdentifierUtil {
 
     private IdentifierUtil() { }
 
+    private static void assertNot(String classname, Class<?> type) {
+        if (type.getName().equals(classname)) {
+            throw new IllegalStateException("不允许：" + classname);
+        }
+    }
+
+    private static String assertClassname(String classname) {
+        assertNot(classname, IdentifierUtil.class);
+        assertNot(classname, Identifier.class);
+        return classname;
+    }
+
+    private static Class toClassOrNull(String classname) {
+        return ClassUtil.forName(assertClassname(classname));
+    }
+
+    private static Class toIdentifierClass(String classname) {
+        Class type = toClassOrNull(classname);
+        if (type == null) {
+            classname = packageName + "." + classname;
+            type = toClassOrNull(classname);
+        }
+        if (type == null) {
+            classname = classname + "Identifier";
+            type = toClassOrNull(classname);
+        }
+        return Objects.requireNonNull(type);
+    }
+
     public static IdentifierGenerator newInstance(String description) {
         Assert.hasText(description);
         String[] descriptions = description.split(":");
-        Class type = ClassUtil.forNameOrNull(descriptions[0]);
-        if (type == null) {
-            type = ClassUtil.forName(packageName + "." + descriptions[0]);
-        }
+        Class type = toIdentifierClass(descriptions[0]);
         final int length = descriptions.length;
         if (length == 1) {
             return (IdentifierGenerator) ConstructorUtil.newInstance(type);
