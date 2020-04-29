@@ -14,12 +14,21 @@ import java.lang.reflect.Constructor;
  */
 final class IdentifierUtil {
 
+    private final static String packageName;
+
+    static {
+        packageName = IdentifierUtil.class.getPackage().getName();
+    }
+
     private IdentifierUtil() { }
 
     public static IdentifierGenerator newInstance(String description) {
         Assert.hasText(description);
         String[] descriptions = description.split(":");
-        Class type = ClassUtil.forName(descriptions[0]);
+        Class type = ClassUtil.forNameOrNull(descriptions[0]);
+        if (type == null) {
+            type = ClassUtil.forName(packageName + "." + descriptions[0]);
+        }
         final int length = descriptions.length;
         if (length == 1) {
             return (IdentifierGenerator) ConstructorUtil.newInstance(type);

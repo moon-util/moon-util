@@ -29,7 +29,7 @@ public class Identifier implements IdentifierGenerator {
                 throw new IllegalStateException(value);
             }
         } else {
-            this.generator = new RandomTimestampIdentifier();
+            this.generator = new SnowflakeIdentifier();
         }
     }
 

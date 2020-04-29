@@ -14,13 +14,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author benshaoye
  */
-public class RandomTimestampIdentifier implements IdentifierGenerator {
+public class TimestampOrderedIdentifier implements IdentifierGenerator {
 
     private final static int THRESHOLD = 94999;
 
     private final AtomicInteger adder = new AtomicInteger();
 
-    public RandomTimestampIdentifier() { }
+    public TimestampOrderedIdentifier() { }
 
     @Override
     public Serializable generate(
