@@ -37,18 +37,14 @@ public final class LazyAccessor<T> implements Supplier<T> {
      */
     private T value = null;
 
-    public LazyAccessor(Supplier<? extends T> supplier) {
-        this(supplier, false);
-    }
+    public LazyAccessor(Supplier<? extends T> supplier) { this(supplier, false); }
 
     public LazyAccessor(Supplier<? extends T> supplier, boolean nullable) {
         this.supplier = supplier;
         this.nullable = nullable;
     }
 
-    public static <T> LazyAccessor<T> of(Supplier<? extends T> supplier) {
-        return new LazyAccessor<>(supplier);
-    }
+    public static <T> LazyAccessor<T> of(Supplier<? extends T> supplier) { return new LazyAccessor<>(supplier); }
 
     public static <T> LazyAccessor<T> of(T value) { return new LazyAccessor<>(() -> value); }
 
@@ -86,9 +82,9 @@ public final class LazyAccessor<T> implements Supplier<T> {
         return value == null ? defaultValue : value;
     }
 
-    public T getOrElse(T defaultValue) {
+    public T getOrElse(Supplier<T> defaultSupplier) {
         T value = this.getNullable();
-        return value == null ? defaultValue : value;
+        return value == null ? defaultSupplier.get() : value;
     }
 
     public Optional<T> getOptional() { return Optional.ofNullable(getNullable()); }
