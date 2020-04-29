@@ -7,8 +7,7 @@
   <groupId>com.github.moon-util</groupId>
   <artifactId>moon-util</artifactId>
   <packaging>jar</packaging>
-  <!-- 每次 deploy 【成功后】、【成功后】、【成功后】加 1 保存，提交！！！ -->
-  <version>0.0.23</version>
+  <version>0.0.24</version>
 
   <name>moon-util</name>
   <description>a java tool library</description>
