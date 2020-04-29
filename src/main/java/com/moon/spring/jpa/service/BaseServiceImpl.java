@@ -1,10 +1,8 @@
 package com.moon.spring.jpa.service;
 
-import com.moon.core.util.life.AfterLifeChain;
-import com.moon.core.util.life.BeforeLifeChain;
-import com.moon.core.util.life.NoneLifeChainEnum;
+import com.moon.core.util.life.*;
 import com.moon.more.data.registry.LayerEnum;
-import com.moon.spring.data.DataAccessorImpl;
+import com.moon.spring.data.BaseAccessorImpl;
 import com.moon.spring.jpa.domain.JpaRecordable;
 
 import java.util.List;
@@ -15,8 +13,8 @@ import static com.moon.core.util.life.LifeUtil.before;
 /**
  * @author benshaoye
  */
-public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends DataAccessorImpl<String, T>
-    implements DataService<T> {
+public abstract class BaseServiceImpl<T extends JpaRecordable<String>> extends BaseAccessorImpl<String, T>
+    implements BaseService<T> {
 
     private final BeforeLifeChain DEFAULT_BEFORE = NoneLifeChainEnum.DEFAULT;
     private final AfterLifeChain DEFAULT_AFTER = NoneLifeChainEnum.DEFAULT;
@@ -25,9 +23,9 @@ public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends D
     private AfterLifeChain<T> afterSave;
     private BeforeLifeChain<T> beforeDelete;
 
-    public DataServiceImpl() { this(null); }
+    public BaseServiceImpl() { this(null); }
 
-    public DataServiceImpl(Class classname) { super(classname, LayerEnum.REPOSITORY); }
+    public BaseServiceImpl(Class classname) { super(classname, LayerEnum.REPOSITORY); }
 
     /*
      overrides
@@ -116,39 +114,6 @@ public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends D
     public void deleteAll(T first, T second, T... entities) {
         BeforeLifeChain<T> before = obtainBeforeDelete();
         super.deleteAll(before(before, first), before(before, second), before(before, entities));
-    }
-
-    /**
-     * 逻辑删除
-     *
-     * @param entity
-     */
-    @Override
-    public void disable(T entity) {
-        super.disable(before(obtainBeforeDelete(), entity));
-    }
-
-    /**
-     * 逻辑删除
-     *
-     * @param entities
-     */
-    @Override
-    public void disableAll(Iterable<? extends T> entities) {
-        super.disableAll(before(obtainBeforeDelete(), entities));
-    }
-
-    /**
-     * 逻辑删除
-     *
-     * @param first
-     * @param second
-     * @param entities
-     */
-    @Override
-    public <S extends T> void disableAll(S first, S second, S... entities) {
-        BeforeLifeChain<T> before = obtainBeforeDelete();
-        super.disableAll(before(before, first), before(before, second), before(before, entities));
     }
 
     /*

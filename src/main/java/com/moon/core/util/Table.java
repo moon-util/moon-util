@@ -16,7 +16,7 @@ public interface Table<X, Y, Z> {
      * @param y Y轴
      * @param z 值
      *
-     * @return
+     * @return 旧值或 null
      */
     Z put(X x, Y y, Z z);
 
@@ -26,7 +26,7 @@ public interface Table<X, Y, Z> {
      * @param x X轴
      * @param y Y轴
      *
-     * @return 值
+     * @return 存在的值或 null
      */
     Z get(Object x, Object y);
 
@@ -36,7 +36,7 @@ public interface Table<X, Y, Z> {
      * @param x   X轴
      * @param map 行数据
      *
-     * @return 值
+     * @return 旧的行数据
      */
     Map<Y, Z> put(X x, Map<? extends Y, ? extends Z> map);
 

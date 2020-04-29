@@ -2,7 +2,7 @@ package com.moon.spring.jpa.repository;
 
 import com.moon.core.enums.Placeholder;
 import com.moon.core.util.ListUtil;
-import com.moon.more.data.LogicRecordable;
+import com.moon.more.data.DataRecordable;
 import com.moon.more.data.Recordable;
 import com.moon.more.data.registry.LayerRegistry;
 import org.springframework.cache.Cache;
@@ -166,8 +166,8 @@ public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaR
 
     protected <S extends T> void disableOne(S entity) {
         if (entity != null) {
-            if (entity instanceof LogicRecordable) {
-                ((LogicRecordable) entity).withUnavailable();
+            if (entity instanceof DataRecordable) {
+                ((DataRecordable) entity).withUnavailable();
                 save(entity);
             } else {
                 delete(entity);
@@ -344,7 +344,7 @@ public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaR
         }
     }
 
-    static <T> List<T> asList(T first,T second,T...rest){
+    static <T> List<T> asList(T first, T second, T... rest) {
         return ListUtil.addAll(ListUtil.newArrayList(first, second), rest);
     }
 }

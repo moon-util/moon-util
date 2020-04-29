@@ -1,7 +1,7 @@
 package com.moon.spring.jpa.service;
 
 import com.moon.spring.data.DataAccessor;
-import com.moon.spring.jpa.JpaRecordable;
+import com.moon.spring.jpa.domain.JpaRecordable;
 
 /**
  * @author benshaoye

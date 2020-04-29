@@ -4,11 +4,10 @@ import com.moon.core.lang.StringUtil;
 import com.moon.more.data.registry.EntityRegistry;
 import com.moon.more.data.registry.EntityRegistryException;
 import com.moon.more.data.registry.LayerEnum;
-import com.moon.spring.data.DataAccessor;
-import com.moon.spring.data.DataAccessorImpl;
+import com.moon.spring.data.BaseAccessorImpl;
+import com.moon.spring.data.BaseAccessor;
 import com.moon.spring.jpa.domain.JpaRecordable;
 import com.moon.spring.jpa.service.BaseService;
-import com.moon.spring.jpa.service.DataService;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -18,11 +17,12 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
-public class DataController<T extends JpaRecordable<String>> extends DataAccessorImpl<String, T> {
+public class BaseController<T extends JpaRecordable<String>> extends BaseAccessorImpl<String, T> {
 
-    protected DataController(Class<? extends BaseService> classname) { super(classname, LayerEnum.SERVICE); }
 
-    protected DataController() { this(null); }
+    protected BaseController(Class<? extends BaseService> classname) { super(classname, LayerEnum.SERVICE); }
+
+    protected BaseController() { this(null); }
 
     private static void debug(Type type, Class clazz) {
         // if (log.isDebugEnabled()) {
@@ -41,7 +41,7 @@ public class DataController<T extends JpaRecordable<String>> extends DataAccesso
                 if (rawClass == getClass()) {
                     debug(rawClass, domainClass);
                     return;
-                } else if (rawClass == DataController.class) {
+                } else if (rawClass == BaseController.class) {
                     Type supertype = rawClass.getGenericSuperclass();
                     if (supertype instanceof ParameterizedType) {
                         // ParameterizedType type = (ParameterizedType) supertype;
@@ -58,14 +58,14 @@ public class DataController<T extends JpaRecordable<String>> extends DataAccesso
     }
 
     @Override
-    protected DataAccessor<String, T> getDefaultAccessor() { return getService(); }
+    protected BaseAccessor<String, T> getDefaultAccessor() { return getService(); }
 
     /**
      * 目标服务
      *
      * @return
      */
-    protected DataService<T> getService() { return null; }
+    protected BaseService<T> getService() { return null; }
 
 
     /* registry -------------------------------------------------------- */
@@ -89,7 +89,7 @@ public class DataController<T extends JpaRecordable<String>> extends DataAccesso
     }
 
     protected final <T> void registryVo2Entity(
-        Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends DataService> serviceSupplier
+        Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends BaseService> serviceSupplier
     ) {
         EntityRegistry.registry(type, id -> {
             if (StringUtil.isEmpty(id)) {

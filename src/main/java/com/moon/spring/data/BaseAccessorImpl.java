@@ -21,7 +21,7 @@ import static java.lang.Thread.currentThread;
 /**
  * @author benshaoye
  */
-public abstract class BaseDataAccessor<ID, T extends IdSupplier<ID>> implements DataAccessor<ID, T>, InitializingBean {
+public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements BaseAccessor<ID, T>, InitializingBean {
 
     private final static Class NONE_CLASS = null;
 
@@ -41,11 +41,11 @@ public abstract class BaseDataAccessor<ID, T extends IdSupplier<ID>> implements 
     protected final LayerEnum accessorLayer;
     protected final Class serviceBeanType;
     protected final Class rawClass;
-    private DataAccessor<ID, T> accessor;
+    private BaseAccessor<ID, T> accessor;
 
-    protected BaseDataAccessor(LayerEnum accessorLayer, Class rawClass) { this(null, accessorLayer, rawClass); }
+    protected BaseAccessorImpl(LayerEnum accessorLayer, Class rawClass) { this(null, accessorLayer, rawClass); }
 
-    protected BaseDataAccessor(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
+    protected BaseAccessorImpl(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
         Type rawType;
         Class domainClass;
         Type type = getClass().getGenericSuperclass();
@@ -72,17 +72,17 @@ public abstract class BaseDataAccessor<ID, T extends IdSupplier<ID>> implements 
         this.domainClass = domainClass;
     }
 
-    protected BaseDataAccessor(LayerEnum accessorLayer) { this(accessorLayer, NONE_CLASS); }
+    protected BaseAccessorImpl(LayerEnum accessorLayer) { this(accessorLayer, NONE_CLASS); }
 
-    protected BaseDataAccessor(Class serviceBeanType, LayerEnum accessorLayer) {
+    protected BaseAccessorImpl(Class serviceBeanType, LayerEnum accessorLayer) {
         this(serviceBeanType, accessorLayer, null);
     }
 
     protected Runnable getRunner(LayerEnum accessorLayer, Class domainClass) {
         return () -> {
-            DataAccessor accessor = getDefaultAccessor();
+            BaseAccessor accessor = getDefaultAccessor();
             if (accessor == null && serviceBeanType != null) {
-                accessor = (DataAccessor) getContext().getBean(serviceBeanType);
+                accessor = (BaseAccessor) getContext().getBean(serviceBeanType);
             }
             if (accessor == null) {
                 accessor = LayerRegistry.get(accessorLayer, domainClass);
@@ -98,7 +98,7 @@ public abstract class BaseDataAccessor<ID, T extends IdSupplier<ID>> implements 
 
     protected WebApplicationContext getContext() { return context; }
 
-    protected DataAccessor<ID, T> getAccessor() { return accessor; }
+    protected BaseAccessor<ID, T> getAccessor() { return accessor; }
 
     @Override
     public void afterPropertiesSet() throws Exception {}
@@ -112,7 +112,7 @@ public abstract class BaseDataAccessor<ID, T extends IdSupplier<ID>> implements 
      *
      * @return
      */
-    protected DataAccessor<ID, T> getDefaultAccessor() { return null; }
+    protected BaseAccessor<ID, T> getDefaultAccessor() { return null; }
 
     /**
      * 保存
@@ -395,44 +395,4 @@ public abstract class BaseDataAccessor<ID, T extends IdSupplier<ID>> implements 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void deleteAll(T first, T second, T... entities) { getAccessor().deleteAll(first, second, entities); }
-
-    /**
-     * 逻辑删除
-     *
-     * @param id
-     */
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void disableById(ID id) { getAccessor().disableById(id); }
-
-    /**
-     * 逻辑删除
-     *
-     * @param entity
-     */
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void disable(T entity) { getAccessor().disable(entity); }
-
-    /**
-     * 逻辑删除
-     *
-     * @param entities
-     */
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void disableAll(Iterable<? extends T> entities) { getAccessor().disableAll(entities); }
-
-    /**
-     * 逻辑删除
-     *
-     * @param first
-     * @param second
-     * @param entities
-     */
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public <S extends T> void disableAll(S first, S second, S... entities) {
-        getAccessor().disableAll(first, second, entities);
-    }
 }
