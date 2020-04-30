@@ -2,7 +2,6 @@ package com.moon.spring.jpa.identity;
 
 import com.moon.core.util.OSUtil;
 import com.moon.core.util.RandomUtil;
-import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
 
@@ -14,7 +13,7 @@ import java.util.Date;
 /**
  * @author benshaoye
  */
-public class SnowflakeIdentifier implements IdentifierGenerator {
+public class SnowflakeLongIdentifier implements IdentifierGenerator {
 
     // =================== fields ==========================================
 
@@ -88,15 +87,15 @@ public class SnowflakeIdentifier implements IdentifierGenerator {
      */
     private long lastTimestamp = -1L;
 
-    private final static SnowflakeIdentifier WORKER = new SnowflakeIdentifier();
+    private final static SnowflakeLongIdentifier WORKER = new SnowflakeLongIdentifier();
 
-    public static SnowflakeIdentifier of() {return WORKER; }
+    public static SnowflakeLongIdentifier of() {return WORKER; }
 
-    public static SnowflakeIdentifier of(long workerId, long centerId) {
-        return new SnowflakeIdentifier(workerId, centerId);
+    public static SnowflakeLongIdentifier of(long workerId, long centerId) {
+        return new SnowflakeLongIdentifier(workerId, centerId);
     }
 
-    public SnowflakeIdentifier() { this(getWorkId(), getDataCenterId()); }
+    public SnowflakeLongIdentifier() { this(getWorkId(), getDataCenterId()); }
 
     // ============================ Constructors ====================================
 
@@ -106,7 +105,7 @@ public class SnowflakeIdentifier implements IdentifierGenerator {
      * @param workerId 工作ID (0~31)
      * @param centerId 数据中心ID (0~31)
      */
-    public SnowflakeIdentifier(long workerId, long centerId) {
+    public SnowflakeLongIdentifier(long workerId, long centerId) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("workerId can't be greater than %d or less than 0",
                 maxWorkerId));

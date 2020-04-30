@@ -11,7 +11,7 @@ class IdentifierUtilTestTest {
 
     @Test
     void testNewInstance() throws Exception {
-        newInstance(TimestampOrderedIdentifier.class);
+        newInstance(TimestampOrderedStringIdentifier.class);
         newInstance("TimestampOrderedIdentifier");
         newInstance("SnowflakeIdentifier");
         System.out.println(newInstance("com.moon.spring.jpa.identity.ThisIdentifier:30:20"));

@@ -19,24 +19,23 @@ public class Identifier implements IdentifierGenerator {
 
     private final LazyAccessor<IdentifierGenerator> accessor;
 
+    private static IdentifierGenerator asDefault() {
+        return new TimestampOrderedStringIdentifier();
+    }
+
     public Identifier() {
         this.accessor = LazyAccessor.of(() -> {
-            try {
-                ApplicationContext context = ContextUtil.getContext();
-                Environment env = context.getEnvironment();
-                String value = env.getProperty(MoonConst.Data.IDENTIFIER);
-                if (StringUtil.isNotBlank(value)) {
-                    try {
-                        return IdentifierUtil.newInstance(value);
-                    } catch (Throwable t) {
-                        throw new IllegalStateException(value);
-                    }
-                } else {
-                    return new SnowflakeIdentifier();
+            ApplicationContext context = ContextUtil.getContext();
+            Environment env = context.getEnvironment();
+            String value = env.getProperty(MoonConst.Data.IDENTIFIER);
+            if (StringUtil.isNotBlank(value)) {
+                try {
+                    return IdentifierUtil.newInstance(value);
+                } catch (Throwable t) {
+                    throw new IllegalStateException(value);
                 }
-            } catch (NullPointerException e) {
-                System.err.println("初始化 ID 生成器错误: " + e);
-                return new SnowflakeIdentifier();
+            } else {
+                return asDefault();
             }
         });
     }
