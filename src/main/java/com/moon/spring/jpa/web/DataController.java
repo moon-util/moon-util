@@ -10,6 +10,7 @@ import com.moon.spring.jpa.domain.JpaRecordable;
 import com.moon.spring.jpa.service.BaseService;
 import com.moon.spring.jpa.service.DataService;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -20,38 +21,33 @@ import java.util.function.Supplier;
  */
 public class DataController<T extends JpaRecordable<String>> extends DataAccessorImpl<String, T> {
 
-    protected DataController(Class<? extends BaseService> classname) { super(classname, LayerEnum.SERVICE); }
-
     protected DataController() { this(null); }
 
-    private static void debug(Type type, Class clazz) {
-        // if (log.isDebugEnabled()) {
-        //     Object tName = type instanceof Class ? ((Class) type).getSimpleName() : type;
-        //     log.debug("来自：{}，重复注册：{}", tName, clazz);
-        // }
+    protected DataController(Class accessType) { super(accessType, null); }
+
+    protected DataController(Class accessType, Class domainClass) {
+        super(accessType, LayerEnum.SERVICE, LayerEnum.CONTROLLER, domainClass);
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Class domainClass = this.domainClass;
+    protected DataController(LayerEnum accessLay, Class domainClass) {
+        this(accessLay, LayerEnum.CONTROLLER, domainClass);
+    }
+
+    protected DataController(LayerEnum accessLay, LayerEnum registryLay, Class domainClass) {
+        super(null, accessLay, registryLay, domainClass);
+    }
+
+    protected DataController(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+    ) { super(accessServeClass, accessLay, registryMeLay, domainClass); }
+
+    @PostConstruct
+    public void postConstruct() {
+        Class domainClass = this.getDomainClass();
         if (domainClass != null) {
             try {
                 registryVo2Entity(domainClass);
             } catch (EntityRegistryException e) {
-                if (rawClass == getClass()) {
-                    debug(rawClass, domainClass);
-                    return;
-                } else if (rawClass == DataController.class) {
-                    Type supertype = rawClass.getGenericSuperclass();
-                    if (supertype instanceof ParameterizedType) {
-                        // ParameterizedType type = (ParameterizedType) supertype;
-                        // if (log.isDebugEnabled()) {
-                        //     debug(type.getRawType(), domainClass);
-                        // }
-                    }
-                    return;
-                }
-                debug(getClass(), domainClass);
                 // ignore
             }
         }

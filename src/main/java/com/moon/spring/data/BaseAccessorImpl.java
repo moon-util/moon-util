@@ -1,6 +1,7 @@
 package com.moon.spring.data;
 
 import com.moon.more.RunnerRegistration;
+import com.moon.more.data.Recordable;
 import com.moon.more.data.registry.LayerEnum;
 import com.moon.more.data.registry.LayerRegistry;
 import com.moon.more.model.id.IdSupplier;
@@ -16,97 +17,117 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static java.lang.Thread.currentThread;
-
 /**
  * @author benshaoye
  */
 public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements BaseAccessor<ID, T>, InitializingBean {
 
-    private final static Class NONE_CLASS = null;
+    private final static Class NULL = null;
 
-    protected final static Class getPrevClass(int step) {
-        StackTraceElement[] es = currentThread().getStackTrace();
-        try {
-            return Class.forName(es[step].getClassName());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    protected static boolean isAccessorType(Class cls) {
+        return BaseAccessor.class.isAssignableFrom(cls);
     }
 
-    /**
-     * 表中是否存在对应 ID 存在的值
-     *
-     * @param id
-     *
-     * @return
-     */
-    @Override
-    public boolean existsById(String id) { return getAccessor().existsById(id); }
+    protected static boolean isRecordableType(Class cls) {
+        return IdSupplier.class.isAssignableFrom(cls);
+    }
 
-    /**
-     * 返回表总数
-     *
-     * @return 表中数据总数
-     */
-    @Override
-    public long count() { return getAccessor().count(); }
+    protected final Class deduceDomainClass() {
+        Class domainClass = null;
+        Type type = getClass().getGenericSuperclass();
+        if (type instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType) type;
+            Type[] types = paramType.getActualTypeArguments();
+            if (types.length == 1) {
+                domainClass = (Class) types[0];
+            } else {
+                Class recordable = null;
+                for (Type entityType : types) {
+                    if (entityType instanceof Class) {
+                        Class cls = (Class) entityType;
+                        if (isRecordableType(cls)) {
+                            recordable = cls;
+                        }
+                    }
+                }
+                domainClass = recordable;
+            }
+        }
+        return domainClass;
+    }
 
     @Autowired
     private WebApplicationContext context;
 
     protected final Class domainClass;
-    protected final LayerEnum accessorLayer;
-    protected final Class serviceBeanType;
-    protected final Class rawClass;
     private BaseAccessor<ID, T> accessor;
 
-    protected BaseAccessorImpl(LayerEnum accessorLayer, Class rawClass) { this(null, accessorLayer, rawClass); }
+    protected BaseAccessorImpl(LayerEnum accessLay) {
+        this(accessLay, NULL);
+    }
 
-    protected BaseAccessorImpl(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
-        Type rawType;
-        Class domainClass;
-        Type type = getClass().getGenericSuperclass();
-        if (type instanceof ParameterizedType) {
-            ParameterizedType paramType = (ParameterizedType) type;
-            Type[] types = paramType.getActualTypeArguments();
-            domainClass = (Class) types[0];
-            rawType = paramType.getRawType();
+    protected BaseAccessorImpl(LayerEnum accessLay, Class domainClass) {
+        this(NULL, accessLay, domainClass);
+    }
 
-            LayerRegistry.register(accessorLayer, domainClass, this);
-            RunnerRegistration.getInstance().registry(getRunner(accessorLayer, domainClass));
-        } else if (type instanceof Class) {
-            Class cls = (Class) type;
-            // log.warn("没有为泛型指定实体类：{}", cls.getSimpleName());
-            domainClass = null;
-            rawType = type;
-        } else {
-            throw new IllegalArgumentException();
+    protected BaseAccessorImpl(LayerEnum accessLay, LayerEnum registryMeLay) {
+        this(NULL, accessLay, registryMeLay, NULL);
+    }
+
+    protected BaseAccessorImpl(Class accessServeClass, LayerEnum registryMeLay) {
+        this(accessServeClass, registryMeLay, NULL);
+    }
+
+    protected BaseAccessorImpl(Class accessServeClass, LayerEnum registryMeLay, Class domainClass) {
+        this(accessServeClass, null, registryMeLay, domainClass);
+    }
+
+    protected BaseAccessorImpl(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay
+    ) { this(accessServeClass, accessLay, registryMeLay, NULL); }
+
+    /**
+     * 构造器
+     *
+     * @param accessServeClass 将要访问的服务具体实现类型，如：UserServiceImpl
+     * @param accessLay        内部管理访问的层
+     * @param registryMeLay    内部管理注册的层，注册后供其他层访问
+     * @param domainClass      具体实体类型
+     */
+    protected BaseAccessorImpl(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+    ) {
+        if (domainClass == null || !(domainClass != null && isRecordableType(domainClass))) {
+            if (isRecordableType(accessServeClass)) {
+                domainClass = accessServeClass;
+                accessServeClass = null;
+            } else {
+                domainClass = deduceDomainClass();
+            }
         }
 
-        this.rawClass = rawClass == null && rawType instanceof Class ? (Class) rawType : rawClass;
-        this.serviceBeanType = serviceBeanType;
-        this.accessorLayer = accessorLayer;
+        if (!(accessServeClass != null && isAccessorType(accessServeClass))) {
+            if (domainClass == null && isRecordableType(accessServeClass)) {
+                domainClass = accessServeClass;
+            }
+            accessServeClass = null;
+        }
+
+        domainClass = domainClass == null ? deduceDomainClass() : domainClass;
+        Runnable runner = getRunner(accessServeClass, accessLay, domainClass);
+        LayerRegistry.registry(registryMeLay, domainClass, this);
+        RunnerRegistration.getInstance().registry(runner);
         this.domainClass = domainClass;
     }
 
-    protected BaseAccessorImpl(LayerEnum accessorLayer) { this(accessorLayer, NONE_CLASS); }
-
-    protected BaseAccessorImpl(Class serviceBeanType, LayerEnum accessorLayer) {
-        this(serviceBeanType, accessorLayer, null);
-    }
-
-    protected Runnable getRunner(LayerEnum accessorLayer, Class domainClass) {
+    protected Runnable getRunner(Class accessServeClass, LayerEnum accessLay, Class domainClass) {
         return () -> {
             BaseAccessor accessor = getDefaultAccessor();
-            if (accessor == null && serviceBeanType != null) {
-                accessor = (BaseAccessor) getContext().getBean(serviceBeanType);
+            if (accessor == null && accessServeClass != null) {
+                accessor = (BaseAccessor) getContext().getBean(accessServeClass);
             }
             if (accessor == null) {
-                accessor = LayerRegistry.get(accessorLayer, domainClass);
-            }
-            if (accessor == null) {
-                // log.info("找不到 {} 访问器：{}", accessorLayer, domainClass);
+                accessor = LayerRegistry.get(accessLay, domainClass);
             }
             this.accessor = accessor;
         };
@@ -131,6 +152,12 @@ public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements 
      * @return
      */
     protected BaseAccessor<ID, T> getDefaultAccessor() { return null; }
+
+    @Override
+    public boolean existsById(String id) { return getAccessor().existsById(id); }
+
+    @Override
+    public long count() { return getAccessor().count(); }
 
     /**
      * 保存

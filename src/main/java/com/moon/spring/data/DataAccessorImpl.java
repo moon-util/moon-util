@@ -10,26 +10,38 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class DataAccessorImpl<ID, T extends IdSupplier<ID>> extends BaseAccessorImpl<ID, T>
     implements DataAccessor<ID, T> {
 
-    protected DataAccessorImpl(LayerEnum accessorLayer, Class rawClass) {
-        super(accessorLayer, rawClass);
+    protected DataAccessorImpl(LayerEnum accessLay) { super(accessLay); }
+
+    protected DataAccessorImpl(LayerEnum accessLay, Class domainClass) {
+        super(accessLay, domainClass);
     }
 
-    protected DataAccessorImpl(Class serviceBeanType, LayerEnum accessorLayer, Class rawClass) {
-        super(serviceBeanType, accessorLayer, rawClass);
+    protected DataAccessorImpl(LayerEnum accessLay, LayerEnum registryMeLay) {
+        super(accessLay, registryMeLay);
     }
 
-    protected DataAccessorImpl(LayerEnum accessorLayer) {
-        super(accessorLayer);
+    protected DataAccessorImpl(Class accessServeClass, LayerEnum registryMeLay) {
+        super(accessServeClass, registryMeLay);
     }
 
-    protected DataAccessorImpl(Class serviceBeanType, LayerEnum accessorLayer) {
-        super(serviceBeanType, accessorLayer);
+    protected DataAccessorImpl(Class accessServeClass, LayerEnum registryMeLay, Class domainClass) {
+        super(accessServeClass, registryMeLay, domainClass);
+    }
+
+    protected DataAccessorImpl(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay
+    ) {
+        super(accessServeClass, accessLay, registryMeLay);
+    }
+
+    protected DataAccessorImpl(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+    ) {
+        super(accessServeClass, accessLay, registryMeLay, domainClass);
     }
 
     @Override
-    protected DataAccessor<ID, T> getAccessor() {
-        return (DataAccessor<ID, T>) super.getAccessor();
-    }
+    protected DataAccessor<ID, T> getAccessor() { return (DataAccessor<ID, T>) super.getAccessor(); }
 
     @Override
     protected DataAccessor<ID, T> getDefaultAccessor() { return null; }

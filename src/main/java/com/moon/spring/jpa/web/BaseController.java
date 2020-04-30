@@ -9,6 +9,7 @@ import com.moon.spring.data.BaseAccessor;
 import com.moon.spring.jpa.domain.JpaRecordable;
 import com.moon.spring.jpa.service.BaseService;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -19,39 +20,33 @@ import java.util.function.Supplier;
  */
 public class BaseController<T extends JpaRecordable<String>> extends BaseAccessorImpl<String, T> {
 
-
-    protected BaseController(Class<? extends BaseService> classname) { super(classname, LayerEnum.SERVICE); }
-
     protected BaseController() { this(null); }
 
-    private static void debug(Type type, Class clazz) {
-        // if (log.isDebugEnabled()) {
-        //     Object tName = type instanceof Class ? ((Class) type).getSimpleName() : type;
-        //     log.debug("来自：{}，重复注册：{}", tName, clazz);
-        // }
+    protected BaseController(Class accessType) { super(accessType, null); }
+
+    protected BaseController(Class accessType, Class domainClass) {
+        super(accessType, LayerEnum.SERVICE, LayerEnum.CONTROLLER, domainClass);
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Class domainClass = this.domainClass;
+    protected BaseController(LayerEnum accessLay, Class domainClass) {
+        this(accessLay, LayerEnum.CONTROLLER, domainClass);
+    }
+
+    protected BaseController(LayerEnum accessLay, LayerEnum registryLay, Class domainClass) {
+        super(null, accessLay, registryLay, domainClass);
+    }
+
+    protected BaseController(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+    ) { super(accessServeClass, accessLay, registryMeLay, domainClass); }
+
+    @PostConstruct
+    public void postConstruct() {
+        Class domainClass = this.getDomainClass();
         if (domainClass != null) {
             try {
                 registryVo2Entity(domainClass);
             } catch (EntityRegistryException e) {
-                if (rawClass == getClass()) {
-                    debug(rawClass, domainClass);
-                    return;
-                } else if (rawClass == BaseController.class) {
-                    Type supertype = rawClass.getGenericSuperclass();
-                    if (supertype instanceof ParameterizedType) {
-                        // ParameterizedType type = (ParameterizedType) supertype;
-                        // if (log.isDebugEnabled()) {
-                        //     debug(type.getRawType(), domainClass);
-                        // }
-                    }
-                    return;
-                }
-                debug(getClass(), domainClass);
                 // ignore
             }
         }

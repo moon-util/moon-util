@@ -40,18 +40,14 @@ public final class ContextUtil implements ApplicationContextAware {
         return ctx == null ? null : ctx.getEnvironment();
     }
 
-    public static String getProperty(String key) {
-        return getProperty(key, null);
-    }
+    public static String getProperty(String key) { return getProperty(key, null); }
 
     public static String getProperty(String key, String defaultValue) {
         Environment env = getEnvironment();
         return env == null ? defaultValue : env.getProperty(key, defaultValue);
     }
 
-    public static void publish(ApplicationEvent event) {
-        publish((Object) event);
-    }
+    public static void publish(ApplicationEvent event) { publish((Object) event); }
 
     public static void publish(Object event) {
         ApplicationContext ctx = getContext();

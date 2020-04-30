@@ -1,6 +1,6 @@
 package com.moon.spring.jpa.identity;
 
-import com.moon.spring.jpa.domain.DataAuditable;
+import com.moon.spring.jpa.domain.BaseDataAuditable;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -10,7 +10,7 @@ import javax.persistence.Entity;
  */
 @Data
 @Entity(name = "tb_pushed_hook_detail")
-public class PushedHookDetail extends DataAuditable {
+public class PushedHookDetail extends BaseDataAuditable {
 
     private String name;
 

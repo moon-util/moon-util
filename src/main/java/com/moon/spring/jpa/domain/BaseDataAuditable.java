@@ -6,18 +6,29 @@ import com.moon.core.enums.Available;
 import com.moon.more.data.DataRecordable;
 
 import javax.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
  * @author benshaoye
  */
 @MappedSuperclass
-public abstract class DataAuditable extends BaseAuditable implements DataRecordable<String> {
+public abstract class BaseDataAuditable extends BaseAuditable implements DataRecordable<String> {
 
     @JsonIgnore
     private Available available;
 
-    public DataAuditable() { }
+    public BaseDataAuditable() { }
+
+    public BaseDataAuditable(AbstractAuditable<String, LocalDateTime> audit) { super(audit); }
+
+    public BaseDataAuditable(
+        String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt
+    ) { super(createdBy, updatedBy, createdAt, updatedAt); }
+
+    public BaseDataAuditable(
+        String id, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt
+    ) { super(id, createdBy, updatedBy, createdAt, updatedAt); }
 
     @Override
     @JSONField(serialize = false)
@@ -31,7 +42,7 @@ public abstract class DataAuditable extends BaseAuditable implements DataRecorda
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         if (!super.equals(o)) { return false; }
-        DataAuditable that = (DataAuditable) o;
+        BaseDataAuditable that = (BaseDataAuditable) o;
         return available == that.available;
     }
 

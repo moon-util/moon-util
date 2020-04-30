@@ -29,9 +29,7 @@ public enum LayerEnum implements Function<Class, BaseAccessor> {
 
     LayerEnum() {}
 
-    public void registry(Class domainClass, BaseAccessor accessor){
-        cached.put(domainClass, accessor);
-    }
+    public void registry(Class domainClass, BaseAccessor accessor){ cached.put(domainClass, accessor); }
 
     public BaseAccessor get(Class domainClass){ return apply(domainClass); }
 

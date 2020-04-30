@@ -25,9 +25,25 @@ public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends D
     private AfterLifeChain<T> afterSave;
     private BeforeLifeChain<T> beforeDelete;
 
-    public DataServiceImpl() { this(null); }
+    protected DataServiceImpl() { this(null); }
 
-    public DataServiceImpl(Class classname) { super(classname, LayerEnum.REPOSITORY); }
+    protected DataServiceImpl(Class accessType) { super(accessType, null); }
+
+    protected DataServiceImpl(Class accessType, Class domainClass) {
+        super(accessType, LayerEnum.REPOSITORY, LayerEnum.SERVICE, domainClass);
+    }
+
+    protected DataServiceImpl(LayerEnum accessLay, Class domainClass) {
+        this(accessLay, LayerEnum.SERVICE, domainClass);
+    }
+
+    protected DataServiceImpl(LayerEnum accessLay, LayerEnum registryLay, Class domainClass) {
+        super(null, accessLay, registryLay, domainClass);
+    }
+
+    protected DataServiceImpl(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+    ) { super(accessServeClass, accessLay, registryMeLay, domainClass); }
 
     /*
      overrides

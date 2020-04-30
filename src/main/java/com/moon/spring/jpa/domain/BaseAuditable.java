@@ -21,8 +21,8 @@ public abstract class BaseAuditable extends AbstractAuditable<String, LocalDateT
     }
 
     public BaseAuditable(
-        String s, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt
-    ) { super(s, createdBy, updatedBy, createdAt, updatedAt); }
+        String id, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt
+    ) { super(id, createdBy, updatedBy, createdAt, updatedAt); }
 
     @Override
     @JSONField(serialize = false)

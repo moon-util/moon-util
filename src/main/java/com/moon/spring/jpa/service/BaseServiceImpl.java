@@ -23,9 +23,25 @@ public abstract class BaseServiceImpl<T extends JpaRecordable<String>> extends B
     private AfterLifeChain<T> afterSave;
     private BeforeLifeChain<T> beforeDelete;
 
-    public BaseServiceImpl() { this(null); }
+    protected BaseServiceImpl() { this(null); }
 
-    public BaseServiceImpl(Class classname) { super(classname, LayerEnum.REPOSITORY); }
+    protected BaseServiceImpl(Class accessType) { super(accessType, null); }
+
+    protected BaseServiceImpl(Class accessType, Class domainClass) {
+        super(accessType, LayerEnum.REPOSITORY, LayerEnum.SERVICE, domainClass);
+    }
+
+    protected BaseServiceImpl(LayerEnum accessLay, Class domainClass) {
+        this(accessLay, LayerEnum.SERVICE, domainClass);
+    }
+
+    protected BaseServiceImpl(LayerEnum accessLay, LayerEnum registryLay, Class domainClass) {
+        super(null, accessLay, registryLay, domainClass);
+    }
+
+    protected BaseServiceImpl(
+        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+    ) { super(accessServeClass, accessLay, registryMeLay, domainClass); }
 
     /*
      overrides

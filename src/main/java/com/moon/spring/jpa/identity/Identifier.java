@@ -7,8 +7,6 @@ import com.moon.spring.MoonConst;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 
 import java.io.Serializable;
 
@@ -25,9 +23,7 @@ public class Identifier implements IdentifierGenerator {
 
     public Identifier() {
         this.accessor = LazyAccessor.of(() -> {
-            ApplicationContext context = ContextUtil.getContext();
-            Environment env = context.getEnvironment();
-            String value = env.getProperty(MoonConst.Data.IDENTIFIER);
+            String value = ContextUtil.getProperty(MoonConst.Data.IDENTIFIER);
             if (StringUtil.isNotBlank(value)) {
                 try {
                     return IdentifierUtil.newInstance(value);
@@ -44,7 +40,6 @@ public class Identifier implements IdentifierGenerator {
     public Serializable generate(
         SharedSessionContractImplementor session, Object object
     ) throws HibernateException {
-        Serializable generatedId = accessor.get().generate(session, object);
-        return generatedId;
+        return accessor.get().generate(session, object);
     }
 }
