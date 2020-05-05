@@ -1,5 +1,6 @@
 package com.moon.spring.data;
 
+import com.moon.core.lang.ClassUtil;
 import com.moon.more.RunnerRegistration;
 import com.moon.more.data.Recordable;
 import com.moon.more.data.registry.LayerEnum;
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static com.moon.core.lang.ClassUtil.isAssignableFrom;
+
 /**
  * @author benshaoye
  */
@@ -25,11 +28,11 @@ public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements 
     private final static Class NULL = null;
 
     protected static boolean isAccessorType(Class cls) {
-        return BaseAccessor.class.isAssignableFrom(cls);
+        return isAssignableFrom(BaseAccessor.class, cls);
     }
 
     protected static boolean isRecordableType(Class cls) {
-        return IdSupplier.class.isAssignableFrom(cls);
+        return isAssignableFrom(IdSupplier.class, cls);
     }
 
     protected final Class deduceDomainClass() {

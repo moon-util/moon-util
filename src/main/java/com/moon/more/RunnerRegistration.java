@@ -11,12 +11,12 @@ import static com.moon.core.util.ListUtil.newArrayList;
  */
 public final class RunnerRegistration {
 
-    private final List<Runnable> REGISTERED_RUNNERS;
+    private final List<Runnable> RUNNERS;
 
     public RunnerRegistration() { this(CopyOnWriteArrayList::new); }
 
     public RunnerRegistration(Supplier<List<Runnable>> creator) {
-        this.REGISTERED_RUNNERS = creator.get();
+        this.RUNNERS = creator.get();
     }
 
     /**
@@ -24,7 +24,7 @@ public final class RunnerRegistration {
      *
      * @param runner
      */
-    public void registry(Runnable runner) { REGISTERED_RUNNERS.add(runner); }
+    public void registry(Runnable runner) { RUNNERS.add(runner); }
 
     /**
      * 执行所有任务,并删除
@@ -43,10 +43,10 @@ public final class RunnerRegistration {
      *
      * @return
      */
-    private synchronized List<Runnable> takeAll(boolean clear) {
-        List<Runnable> runners = newArrayList(REGISTERED_RUNNERS);
+    public synchronized List<Runnable> takeAll(boolean clear) {
+        List<Runnable> runners = newArrayList(RUNNERS);
         if (clear) {
-            REGISTERED_RUNNERS.clear();
+            RUNNERS.clear();
         }
         return runners;
     }

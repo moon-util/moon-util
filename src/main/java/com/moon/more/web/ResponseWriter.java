@@ -54,10 +54,10 @@ public final class ResponseWriter {
         return this;
     }
 
-    public void write(String data) {
+    public void write(CharSequence data) {
         HttpServletResponse response = this.response;
         try (PrintWriter writer = response.getWriter()) {
-            writer.write(data);
+            writer.write(data == null ? null : data.toString());
         } catch (Throwable t) {
             throw new IllegalStateException(t);
         }

@@ -32,11 +32,11 @@ public final class Assert {
      * object
      */
 
-    public static <T> T nonNull(T value) { return nonNull(value, none()); }
+    public static <T> T notNull(T value) { return notNull(value, none()); }
 
-    public static <T> T nonNull(T value, String message) { return value == null ? throwNull(message) : value; }
+    public static <T> T notNull(T value, String message) { return value == null ? throwNull(message) : value; }
 
-    public static <T> T nonNull(T value, Supplier<String> supplier) {
+    public static <T> T notNull(T value, Supplier<String> supplier) {
         return value == null ? throwNull(supplier.get()) : value;
     }
 
@@ -56,23 +56,23 @@ public final class Assert {
         return ret ? throwIllegal(supplier.get()) : value;
     }
 
-    public static <T extends CharSequence> T nonBlank(T value) { return hasText(value); }
+    public static <T extends CharSequence> T notBlank(T value) { return hasText(value); }
 
-    public static <T extends CharSequence> T nonBlank(T value, String message) {
+    public static <T extends CharSequence> T notBlank(T value, String message) {
         return hasText(value, message);
     }
 
-    public static <T extends CharSequence> T nonBlank(T value, Supplier<String> supplier) {
+    public static <T extends CharSequence> T notBlank(T value, Supplier<String> supplier) {
         return hasText(value, supplier);
     }
 
-    public static <T extends CharSequence> T nonEmpty(T value) { return nonEmpty(value, empty()); }
+    public static <T extends CharSequence> T notEmpty(T value) { return notEmpty(value, empty()); }
 
-    public static <T extends CharSequence> T nonEmpty(T value, String message) {
+    public static <T extends CharSequence> T notEmpty(T value, String message) {
         return value == null || value.length() == 0 ? throwIllegal(message) : value;
     }
 
-    public static <T extends CharSequence> T nonEmpty(T value, Supplier<String> supplier) {
+    public static <T extends CharSequence> T notEmpty(T value, Supplier<String> supplier) {
         return value == null || value.length() == 0 ? throwIllegal(supplier.get()) : value;
     }
 
@@ -80,13 +80,13 @@ public final class Assert {
      * collection
      */
 
-    public static <T extends Collection> T nonEmpty(T value) { return nonEmpty(value, empty()); }
+    public static <T extends Collection> T notEmpty(T value) { return notEmpty(value, empty()); }
 
-    public static <T extends Collection> T nonEmpty(T value, String message) {
+    public static <T extends Collection> T notEmpty(T value, String message) {
         return value == null || value.isEmpty() ? throwIllegal(message) : value;
     }
 
-    public static <T extends Collection> T nonEmpty(T value, Supplier<String> supplier) {
+    public static <T extends Collection> T notEmpty(T value, Supplier<String> supplier) {
         return value == null || value.isEmpty() ? throwIllegal(supplier.get()) : value;
     }
 
@@ -94,13 +94,13 @@ public final class Assert {
      * Map
      */
 
-    public static <T extends Map> T nonEmpty(T value) { return nonEmpty(value, empty()); }
+    public static <T extends Map> T notEmpty(T value) { return notEmpty(value, empty()); }
 
-    public static <T extends Map> T nonEmpty(T value, String message) {
+    public static <T extends Map> T notEmpty(T value, String message) {
         return value == null || value.isEmpty() ? throwIllegal(message) : value;
     }
 
-    public static <T extends Map> T nonEmpty(T value, Supplier<String> supplier) {
+    public static <T extends Map> T notEmpty(T value, Supplier<String> supplier) {
         return value == null || value.isEmpty() ? throwIllegal(supplier.get()) : value;
     }
 
@@ -152,18 +152,16 @@ public final class Assert {
      * object
      */
 
-    public static <T> T requireEquals(T actual, Object expected) {
+    public static <T> T equals(T actual, Object expected) {
         return actual != null && actual.equals(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static <T> T requireEquals(T actual, Object expected, String message) {
+    public static <T> T equals(T actual, Object expected, String message) {
         return actual != null && actual.equals(expected) ? actual : throwIllegal(message == null ? format(
-            "Expected: %s, Actual: %s",
-            valueOf(expected),
-            valueOf(actual)) : message);
+            "Expected: %s, Actual: %s", expected, actual) : message);
     }
 
-    public static <T> T requireEquals(T actual, Object expected, Supplier<String> supplier) {
+    public static <T> T equals(T actual, Object expected, Supplier<String> supplier) {
         return actual != null && actual.equals(expected) ? actual : throwIllegal(supplier.get());
     }
 
@@ -171,42 +169,42 @@ public final class Assert {
      * number
      */
 
-    public static int requireEq(int actual, int expected) {
+    public static int eq(int actual, int expected) {
         return actual != expected ? actual : throwIllegal("Expected: %d, Actual: %d", expected, actual);
     }
 
-    public static int requireEq(int actual, int expected, String message) {
-        return message == null ? requireEq(actual, expected) : actual == expected ? actual : throwIllegal(message);
+    public static int eq(int actual, int expected, String message) {
+        return message == null ? eq(actual, expected) : actual == expected ? actual : throwIllegal(message);
     }
 
-    public static int requireEq(int actual, int expected, Supplier<String> supplier) {
-        return supplier == null ? requireEq(actual,
+    public static int eq(int actual, int expected, Supplier<String> supplier) {
+        return supplier == null ? eq(actual,
             expected) : actual == expected ? actual : throwIllegal(supplier.get());
     }
 
-    public static long requireEq(long actual, long expected) {
+    public static long eq(long actual, long expected) {
         return actual != expected ? actual : throwIllegal("Expected: %d, Actual: %d", expected, actual);
     }
 
-    public static long requireEq(long actual, long expected, String message) {
-        return message == null ? requireEq(actual, expected) : actual == expected ? actual : throwIllegal(message);
+    public static long eq(long actual, long expected, String message) {
+        return message == null ? eq(actual, expected) : actual == expected ? actual : throwIllegal(message);
     }
 
-    public static long requireEq(long actual, long expected, Supplier<String> supplier) {
-        return supplier == null ? requireEq(actual,
+    public static long eq(long actual, long expected, Supplier<String> supplier) {
+        return supplier == null ? eq(actual,
             expected) : actual == expected ? actual : throwIllegal(supplier.get());
     }
 
-    public static double requireEq(double actual, double expected) {
+    public static double eq(double actual, double expected) {
         return actual != expected ? actual : throwIllegal("Expected: %d, Actual: %d", expected, actual);
     }
 
-    public static double requireEq(double actual, double expected, String message) {
-        return message == null ? requireEq(actual, expected) : actual == expected ? actual : throwIllegal(message);
+    public static double eq(double actual, double expected, String message) {
+        return message == null ? eq(actual, expected) : actual == expected ? actual : throwIllegal(message);
     }
 
-    public static double requireEq(double actual, double expected, Supplier<String> supplier) {
-        return supplier == null ? requireEq(actual,
+    public static double eq(double actual, double expected, Supplier<String> supplier) {
+        return supplier == null ? eq(actual,
             expected) : actual == expected ? actual : throwIllegal(supplier.get());
     }
 
@@ -214,176 +212,179 @@ public final class Assert {
      * date
      */
 
+    private final static String actualValIsNull = "Actual value: null";
+    private final static String expectedValIsNull = "Expected value: null";
+
     static <T> T throwVal(T actual, Object expected) {
         return throwIllegal("Expected: %s, Actual: %s", valueOf(expected), valueOf(actual));
     }
 
-    static <T> T nonNull(T value1, String message1, Object value2, String message2) {
-        nonNull(value2, message2);
-        return nonNull(value1, message1);
+    static <T> T notNull(T actual, String message1, Object expected, String message2) {
+        notNull(expected, message2);
+        return notNull(actual, message1);
     }
 
-    static <T> T nonNull(T actual, Object expected) {
-        return nonNull(actual, "Actual value: null", expected, "Expected value: null");
+    static <T> T notNull(T actual, Object expected) {
+        return notNull(actual, actualValIsNull, expected, expectedValIsNull);
     }
 
-    public static Date requireBefore(Date actual, Date expected) {
-        return nonNull(actual, expected).before(expected) ? actual : throwVal(actual, expected);
+    public static Date before(Date actual, Date expected) {
+        return notNull(actual, expected).before(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static Date requireBefore(Date actual, Date expected, String message) {
+    public static Date before(Date actual, Date expected, String message) {
         if (message == null) {
-            return requireBefore(actual, expected);
+            return before(actual, expected);
         } else {
-            return nonNull(actual, expected).before(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).before(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static Date requireBefore(Date actual, Date expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
+    public static Date before(Date actual, Date expected, Supplier<String> supplier) {
+        return notNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static Date requireAfter(Date actual, Date expected) {
-        return nonNull(actual, expected).after(expected) ? actual : throwVal(actual, expected);
+    public static Date after(Date actual, Date expected) {
+        return notNull(actual, expected).after(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static Date requireAfter(Date actual, Date expected, String message) {
+    public static Date after(Date actual, Date expected, String message) {
         if (message == null) {
-            return requireAfter(actual, expected);
+            return after(actual, expected);
         } else {
-            return nonNull(actual, expected).after(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).after(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static Date requireAfter(Date actual, Date expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
+    public static Date after(Date actual, Date expected, Supplier<String> supplier) {
+        return notNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static Calendar requireBefore(Calendar actual, Calendar expected) {
-        return nonNull(actual, expected).before(expected) ? actual : throwVal(actual, expected);
+    public static Calendar before(Calendar actual, Calendar expected) {
+        return notNull(actual, expected).before(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static Calendar requireBefore(Calendar actual, Calendar expected, String message) {
+    public static Calendar before(Calendar actual, Calendar expected, String message) {
         if (message == null) {
-            return requireBefore(actual, expected);
+            return before(actual, expected);
         } else {
-            return nonNull(actual, expected).before(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).before(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static Calendar requireBefore(Calendar actual, Calendar expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
+    public static Calendar before(Calendar actual, Calendar expected, Supplier<String> supplier) {
+        return notNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static Calendar requireAfter(Calendar actual, Calendar expected) {
-        return nonNull(actual, expected).after(expected) ? actual : throwVal(actual, expected);
+    public static Calendar after(Calendar actual, Calendar expected) {
+        return notNull(actual, expected).after(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static Calendar requireAfter(Calendar actual, Calendar expected, String message) {
+    public static Calendar after(Calendar actual, Calendar expected, String message) {
         if (message == null) {
-            return requireAfter(actual, expected);
+            return after(actual, expected);
         } else {
-            return nonNull(actual, expected).after(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).after(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static Calendar requireAfter(Calendar actual, Calendar expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
+    public static Calendar after(Calendar actual, Calendar expected, Supplier<String> supplier) {
+        return notNull(actual, expected).after(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static LocalDate requireBefore(LocalDate actual, LocalDate expected) {
-        return nonNull(actual, expected).isBefore(expected) ? actual : throwVal(actual, expected);
+    public static LocalDate before(LocalDate actual, LocalDate expected) {
+        return notNull(actual, expected).isBefore(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static LocalDate requireBefore(LocalDate actual, LocalDate expected, String message) {
+    public static LocalDate before(LocalDate actual, LocalDate expected, String message) {
         if (message == null) {
-            return requireBefore(actual, expected);
+            return before(actual, expected);
         } else {
-            return nonNull(actual, expected).isBefore(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).isBefore(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static LocalDate requireBefore(LocalDate actual, LocalDate expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).isBefore(expected) ? actual : throwIllegal(supplier.get());
+    public static LocalDate before(LocalDate actual, LocalDate expected, Supplier<String> supplier) {
+        return notNull(actual, expected).isBefore(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static LocalDate requireAfter(LocalDate actual, LocalDate expected) {
-        return nonNull(actual, expected).isAfter(expected) ? actual : throwVal(actual, expected);
+    public static LocalDate after(LocalDate actual, LocalDate expected) {
+        return notNull(actual, expected).isAfter(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static LocalDate requireAfter(LocalDate actual, LocalDate expected, String message) {
+    public static LocalDate after(LocalDate actual, LocalDate expected, String message) {
         if (message == null) {
-            return requireAfter(actual, expected);
+            return after(actual, expected);
         } else {
-            return nonNull(actual, expected).isAfter(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).isAfter(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static LocalDate requireAfter(LocalDate actual, LocalDate expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).isAfter(expected) ? actual : throwIllegal(supplier.get());
+    public static LocalDate after(LocalDate actual, LocalDate expected, Supplier<String> supplier) {
+        return notNull(actual, expected).isAfter(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static LocalTime requireBefore(LocalTime actual, LocalTime expected) {
-        return nonNull(actual, expected).isBefore(expected) ? actual : throwVal(actual, expected);
+    public static LocalTime before(LocalTime actual, LocalTime expected) {
+        return notNull(actual, expected).isBefore(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static LocalTime requireBefore(LocalTime actual, LocalTime expected, String message) {
+    public static LocalTime before(LocalTime actual, LocalTime expected, String message) {
         if (message == null) {
-            return requireBefore(actual, expected);
+            return before(actual, expected);
         } else {
-            return nonNull(actual, expected).isBefore(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).isBefore(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static LocalTime requireBefore(LocalTime actual, LocalTime expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).isBefore(expected) ? actual : throwIllegal(supplier.get());
+    public static LocalTime before(LocalTime actual, LocalTime expected, Supplier<String> supplier) {
+        return notNull(actual, expected).isBefore(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static LocalTime requireAfter(LocalTime actual, LocalTime expected) {
-        return nonNull(actual, expected).isAfter(expected) ? actual : throwVal(actual, expected);
+    public static LocalTime after(LocalTime actual, LocalTime expected) {
+        return notNull(actual, expected).isAfter(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static LocalTime requireAfter(LocalTime actual, LocalTime expected, String message) {
+    public static LocalTime after(LocalTime actual, LocalTime expected, String message) {
         if (message == null) {
-            return requireAfter(actual, expected);
+            return after(actual, expected);
         } else {
-            return nonNull(actual, expected).isAfter(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).isAfter(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static LocalTime requireAfter(LocalTime actual, LocalTime expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).isAfter(expected) ? actual : throwIllegal(supplier.get());
+    public static LocalTime after(LocalTime actual, LocalTime expected, Supplier<String> supplier) {
+        return notNull(actual, expected).isAfter(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static LocalDateTime requireBefore(LocalDateTime actual, LocalDateTime expected) {
-        return nonNull(actual, expected).isBefore(expected) ? actual : throwVal(actual, expected);
+    public static LocalDateTime before(LocalDateTime actual, LocalDateTime expected) {
+        return notNull(actual, expected).isBefore(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static LocalDateTime requireBefore(LocalDateTime actual, LocalDateTime expected, String message) {
+    public static LocalDateTime before(LocalDateTime actual, LocalDateTime expected, String message) {
         if (message == null) {
-            return requireBefore(actual, expected);
+            return before(actual, expected);
         } else {
-            return nonNull(actual, expected).isBefore(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).isBefore(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static LocalDateTime requireBefore(LocalDateTime actual, LocalDateTime expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).isBefore(expected) ? actual : throwIllegal(supplier.get());
+    public static LocalDateTime before(LocalDateTime actual, LocalDateTime expected, Supplier<String> supplier) {
+        return notNull(actual, expected).isBefore(expected) ? actual : throwIllegal(supplier.get());
     }
 
-    public static LocalDateTime requireAfter(LocalDateTime actual, LocalDateTime expected) {
-        return nonNull(actual, expected).isAfter(expected) ? actual : throwVal(actual, expected);
+    public static LocalDateTime after(LocalDateTime actual, LocalDateTime expected) {
+        return notNull(actual, expected).isAfter(expected) ? actual : throwVal(actual, expected);
     }
 
-    public static LocalDateTime requireAfter(LocalDateTime actual, LocalDateTime expected, String message) {
+    public static LocalDateTime after(LocalDateTime actual, LocalDateTime expected, String message) {
         if (message == null) {
-            return requireAfter(actual, expected);
+            return after(actual, expected);
         } else {
-            return nonNull(actual, expected).isAfter(expected) ? actual : throwIllegal(message);
+            return notNull(actual, expected).isAfter(expected) ? actual : throwIllegal(message);
         }
     }
 
-    public static LocalDateTime requireAfter(LocalDateTime actual, LocalDateTime expected, Supplier<String> supplier) {
-        return nonNull(actual, expected).isAfter(expected) ? actual : throwIllegal(supplier.get());
+    public static LocalDateTime after(LocalDateTime actual, LocalDateTime expected, Supplier<String> supplier) {
+        return notNull(actual, expected).isAfter(expected) ? actual : throwIllegal(supplier.get());
     }
 }
