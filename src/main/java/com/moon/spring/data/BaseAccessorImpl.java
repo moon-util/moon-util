@@ -77,16 +77,16 @@ public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements 
         this(NULL, accessLay, registryMeLay, NULL);
     }
 
-    protected BaseAccessorImpl(Class accessServeClass, LayerEnum registryMeLay) {
+    protected BaseAccessorImpl(Class<? extends BaseAccessor> accessServeClass, LayerEnum registryMeLay) {
         this(accessServeClass, registryMeLay, NULL);
     }
 
-    protected BaseAccessorImpl(Class accessServeClass, LayerEnum registryMeLay, Class domainClass) {
-        this(accessServeClass, null, registryMeLay, domainClass);
-    }
+    protected BaseAccessorImpl(
+        Class<? extends BaseAccessor> accessServeClass, LayerEnum registryMeLay, Class domainClass
+    ) { this(accessServeClass, null, registryMeLay, domainClass); }
 
     protected BaseAccessorImpl(
-        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay
+        Class<? extends BaseAccessor> accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay
     ) { this(accessServeClass, accessLay, registryMeLay, NULL); }
 
     /**
@@ -98,7 +98,7 @@ public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements 
      * @param domainClass      具体实体类型
      */
     protected BaseAccessorImpl(
-        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+        Class<? extends BaseAccessor> accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
     ) {
         if (domainClass == null || !(domainClass != null && isRecordableType(domainClass))) {
             if (isRecordableType(accessServeClass)) {
@@ -123,11 +123,13 @@ public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements 
         this.domainClass = domainClass;
     }
 
-    protected Runnable getRunner(Class accessServeClass, LayerEnum accessLay, Class domainClass) {
+    protected Runnable getRunner(
+        Class<? extends BaseAccessor> accessServeClass, LayerEnum accessLay, Class domainClass
+    ) {
         return () -> {
             BaseAccessor accessor = getDefaultAccessor();
             if (accessor == null && accessServeClass != null) {
-                accessor = (BaseAccessor) getContext().getBean(accessServeClass);
+                accessor = getContext().getBean(accessServeClass);
             }
             if (accessor == null) {
                 accessor = LayerRegistry.get(accessLay, domainClass);
