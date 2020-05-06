@@ -24,13 +24,9 @@ final class ParamUtil {
 
     private ParamUtil() { ThrowUtil.noInstanceError(); }
 
-    static <T> T dftIfNull(T v, T dft) {
-        return v == null ? dft : v;
-    }
+    static <T> T dftIfNull(T v, T dft) { return v == null ? dft : v; }
 
-    static String getNotAllowed(String prop) {
-        return NOT_ALLOWED.replace("{}", prop);
-    }
+    static String getNotAllowed(String prop) { return NOT_ALLOWED.replace("{}", prop); }
 
     static void requireNotDuplicated(DataColumn col, DataColumnFlatten flat, String prop) {
         if (col != null && flat != null) {
@@ -38,9 +34,7 @@ final class ParamUtil {
         }
     }
 
-    static Type getActual(Type type) {
-        return getActual(type, 0);
-    }
+    static Type getActual(Type type) { return getActual(type, 0); }
 
     static Type getActual(Type type, int index) {
         if (type instanceof ParameterizedType) {

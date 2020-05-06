@@ -26,9 +26,9 @@ class Marked<M extends Member> {
     private final DataColumnFlatten flatten;
     private final DataIndexer indexer;
     private final DataListable listable;
-    private final ParsedDetail children;
+    private final Detail children;
 
-    Marked(String name, Class propertyType, Type genericType, M member, ParsedDetail children) {
+    Marked(String name, Class propertyType, Type genericType, M member, Detail children) {
         this.name = name;
         this.member = member;
         this.genericType = genericType;
@@ -73,14 +73,14 @@ class Marked<M extends Member> {
 
     public boolean isCanListable() { return canListable; }
 
-    public ParsedDetail getChildren() { return children; }
+    public Detail getChildren() { return children; }
 
-    static Marked<Field> of(Field member, ParsedDetail children) {
+    static Marked<Field> of(Field member, Detail children) {
         return new Marked<>(member.getName(), member.getType(),//
             member.getGenericType(), member, children);
     }
 
-    static Marked<Method> of(String name, Class propertyType, Type genericType, Method method, ParsedDetail children) {
+    static Marked<Method> of(String name, Class propertyType, Type genericType, Method method, Detail children) {
         return new Marked<>(name, propertyType, genericType, method, children);
     }
 }

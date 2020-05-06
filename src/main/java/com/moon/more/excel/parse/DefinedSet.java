@@ -58,7 +58,7 @@ class DefinedSet extends Defined {
         Method getAtMethod() { return null; }
 
         @Override
-        public ParsedDetail getChildrenGroup() { return null; }
+        public Detail getChildrenGroup() { return null; }
 
         @Override
         public DataColumn getColumn() { return null; }

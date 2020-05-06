@@ -1,9 +1,11 @@
 package com.moon.more.excel.parse;
 
+import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.DataColumn;
+import lombok.ToString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +22,7 @@ class PropGetterParsedTestTest {
     @BeforeEach
     void setUp() { }
 
+    @ToString
     public static class EmployeeDetail {
 
         @DataColumn
@@ -36,19 +39,36 @@ class PropGetterParsedTestTest {
     }
 
     @Test
+    void testGenerateDetailExcel() {
+        DetailGet get = ParseUtil.parseGetter(EmployeeDetail.class);
+        System.out.println();
+        get.forEach(definedGet -> {
+            System.out.println(definedGet.getName());
+            System.out.println(definedGet.getPropertyType());
+            System.out.println(ArrayUtil.stringify(definedGet.getHeadLabels()));
+        });
+    }
+
+
+    @Test
     void testEmployeeDetailExport() throws Exception {
-        ExcelUtil.xlsx().sheet(sheetFactory -> {
-            List<EmployeeDetail> details = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                details.add(new EmployeeDetail());
-            }
-            sheetFactory.renderList(details);
+        List<EmployeeDetail> details = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            details.add(new EmployeeDetail());
+        }
+        DetailGet detailGet = ParseUtil.parseGetter(EmployeeDetail.class);
+        details.forEach(emp -> {
+            StringBuilder data = new StringBuilder();
+            detailGet.forEach(get -> {
+                data.append(get.getName()).append(": ").append(get.getValue(emp)).append("; ");
+            });
+            System.out.println(data);
         });
     }
 
     @Test
     void testName() {
-        ParsedDetail<DefinedGet> parsed = ParseUtil.parseGetter(UserDetail.class);
+        Detail<DefinedGet> parsed = ParseUtil.parseGetter(UserDetail.class);
         System.out.println();
         parsed.columns.forEach(col -> {
             System.out.println(Arrays.toString(col.getColumn().value()));

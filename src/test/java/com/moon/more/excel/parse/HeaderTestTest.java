@@ -5,9 +5,6 @@ import com.moon.more.excel.annotation.DataColumnFlatten;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 /**
  * @author benshaoye
  */
@@ -37,7 +34,7 @@ class HeaderTestTest {
 
     @Test
     void testParseHeadIfPriorityOrder() {
-        ParsedDetail<DefinedGet> getter = ParseUtil.parseGetter(UserDetails.class);
+        Detail<DefinedGet> getter = ParseUtil.parseGetter(UserDetails.class);
         Assertions.assertEquals(3, getter.getMaxRowsLength());
     }
 
@@ -69,7 +66,7 @@ class HeaderTestTest {
 
     @Test
     void testName() {
-        ParsedDetail<DefinedGet> getter = ParseUtil.parseGetter(StudentScore.class);
+        Detail<DefinedGet> getter = ParseUtil.parseGetter(StudentScore.class);
     }
 
     @Test

@@ -20,11 +20,11 @@ class ParseUtil {
 
     private ParseUtil() {}
 
-    public static ParsedGetDetail parseGetter(Class<?> targetClass) {
-        return (ParsedGetDetail) GETTER.doParse(targetClass);
+    public static DetailGet parseGetter(Class<?> targetClass) {
+        return (DetailGet) GETTER.doParse(targetClass);
     }
 
-    public static ParsedSetDetail parseSetter(Class<?> targetClass) {
-        return (ParsedSetDetail) SETTER.doParse(targetClass);
+    public static DetailSet parseSetter(Class<?> targetClass) {
+        return (DetailSet) SETTER.doParse(targetClass);
     }
 }

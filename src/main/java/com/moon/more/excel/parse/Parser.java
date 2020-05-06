@@ -25,7 +25,7 @@ abstract class Parser<T extends Defined> extends BaseParser {
 
     protected Parser(Creator creator) { this.creator = creator; }
 
-    protected ParsedDetail doParse(Class type) {
+    protected Detail doParse(Class type) {
         try {
             Map<String, T> annotated = new LinkedHashMap<>();
             Map<String, T> unAnnotated = new LinkedHashMap<>();
@@ -52,7 +52,7 @@ abstract class Parser<T extends Defined> extends BaseParser {
             String name = descriptor.getName();
             Class propType = descriptor.getPropertyType();
             Type genericType = creator.getGenericType(method);
-            ParsedDetail children = getGroupParsed(method, genericType, propType, name);
+            Detail children = getGroupParsed(method, genericType, propType, name);
             Marked<Method> onMethod = Marked.of(name, propType, genericType, method, children);
 
             Defined info = creator.info(name, onMethod);
@@ -102,11 +102,11 @@ abstract class Parser<T extends Defined> extends BaseParser {
         }
     }
 
-    ParsedDetail getGroupParsed(Field field) {
+    Detail getGroupParsed(Field field) {
         return getGroupParsed(field, field.getGenericType(), field.getType(), field.getName());
     }
 
-    ParsedDetail getGroupParsed(
+    Detail getGroupParsed(
         AnnotatedElement elem, Type paramType, Class actualType, String propName
     ) {
         DataColumnFlatten flatten = obtainFlatten(elem);
@@ -126,7 +126,7 @@ abstract class Parser<T extends Defined> extends BaseParser {
         return null;
     }
 
-    private static <T extends Defined> ParsedDetail toParsedResult(
+    private static <T extends Defined> Detail toParsedResult(
         Creator creator, Class type, Map<String, T> annotated, Map<String, T> unAnnotated
     ) {
         List columns;
@@ -167,7 +167,7 @@ abstract class Parser<T extends Defined> extends BaseParser {
             }
         }
 
-        RootDetail root = RootDetail.of(obtain(type, DataRecord.class));
+        DetailRoot root = DetailRoot.of(obtain(type, DataRecord.class));
         return creator.parsed(columns, root, starting, ending);
     }
 }

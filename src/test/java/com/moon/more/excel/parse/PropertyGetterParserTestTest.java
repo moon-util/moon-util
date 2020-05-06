@@ -220,7 +220,7 @@ class PropertyGetterParserTestTest {
 
     @Test
     void testParsed1() {
-        ParsedDetail<DefinedGet> parsed = ParseUtil.parseGetter(Employee0.class);
+        Detail<DefinedGet> parsed = ParseUtil.parseGetter(Employee0.class);
 
         assertTrue(parsed.hasStarting());
         assertFalse(parsed.hasEnding());
@@ -258,7 +258,7 @@ class PropertyGetterParserTestTest {
 
     @Test
     void testParsed() {
-        ParsedDetail<DefinedGet> parsed = ParseUtil.parseGetter(Employee.class);
+        Detail<DefinedGet> parsed = ParseUtil.parseGetter(Employee.class);
 
         assertEquals(1, parsed.columns.size());
     }

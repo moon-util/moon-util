@@ -100,4 +100,10 @@ public final class LazyAccessor<T> implements Supplier<T> {
         }
         return value;
     }
+
+    public LazyAccessor<T> clear() {
+        this.resolved = false;
+        this.value = null;
+        return this;
+    }
 }

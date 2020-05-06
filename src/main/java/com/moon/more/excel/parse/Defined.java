@@ -4,6 +4,7 @@ import com.moon.more.excel.annotation.DataColumn;
 import com.moon.more.excel.annotation.DataColumnFlatten;
 import com.moon.more.excel.annotation.DataIndexer;
 import com.moon.more.excel.annotation.DataListable;
+import org.apache.poi.ss.usermodel.Cell;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -23,7 +24,7 @@ abstract class Defined implements Serializable, HeadSortable {
 
     protected Marked<Field> atField;
 
-    protected ParsedDetail childrenGroup;
+    protected Detail childrenGroup;
 
     protected Defined(String name, Marked<Method> atMethod) {
         this.atMethod = atMethod;
@@ -82,9 +83,7 @@ abstract class Defined implements Serializable, HeadSortable {
     }
 
     @SafeVarargs
-    protected static <T> boolean isEmpty(T... arr) {
-        return arr == null || arr.length == 0;
-    }
+    protected static <T> boolean isEmpty(T... arr) { return arr == null || arr.length == 0; }
 
     protected String[] defaultLabelsIfEmpty(String[] labels) { return isEmpty(labels) ? getOtherwiseLabels() : labels; }
 
@@ -97,14 +96,12 @@ abstract class Defined implements Serializable, HeadSortable {
 
     public int getRowsLength() {
         int length = getHeadLabels().length;
-        ParsedDetail group = getChildrenGroup();
+        Detail group = getChildrenGroup();
         return group == null ? length : length + group.getMaxRowsLength();
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     @Override
     public int getOrder() {
@@ -123,16 +120,23 @@ abstract class Defined implements Serializable, HeadSortable {
 
     public DataColumn getColumn() { return gotIfNonNull(Marked::getColumn); }
 
-    public ParsedDetail getChildrenGroup() { return gotIfNonNull(Marked::getChildren); }
+    public Detail getChildrenGroup() { return gotIfNonNull(Marked::getChildren); }
 
     public Class getPropertyType() { return gotIfNonNull(Marked::getPropertyType); }
+
+    protected void afterSetField() {}
+
+    public void exec(Object data, Cell cell) { }
 
     /*
      * setters
      */
 
     void setAboutField(Marked<Field> atField) {
-        this.atField = atField;
-        ParamUtil.requireNotDuplicated(getColumn(), getFlatten(), getName());
+        if (this.atField == null) {
+            this.atField = atField;
+            ParamUtil.requireNotDuplicated(getColumn(), getFlatten(), getName());
+            afterSetField();
+        }
     }
 }

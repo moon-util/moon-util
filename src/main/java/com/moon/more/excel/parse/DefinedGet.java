@@ -1,10 +1,12 @@
 package com.moon.more.excel.parse;
 
 import com.moon.core.lang.ref.IntAccessor;
+import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.more.excel.PropertyGetter;
 import com.moon.more.excel.annotation.DataColumn;
 import com.moon.more.excel.annotation.DataColumnFlatten;
 import com.moon.more.excel.annotation.DataIndexer;
+import org.apache.poi.ss.usermodel.Cell;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,9 +16,14 @@ import java.lang.reflect.Method;
  */
 class DefinedGet extends Defined {
 
+    private final LazyAccessor<PropertyGetter> accessor;
+
     private DefinedGet(
         String name, Marked<Method> onMethod
-    ) { super(name, onMethod); }
+    ) {
+        super(name, onMethod);
+        accessor = LazyAccessor.of(() -> ValueGetter.of(getAtMethod(), getAtField()));
+    }
 
     static DefinedGet of(
         String name, Marked<Method> onMethod
@@ -26,8 +33,18 @@ class DefinedGet extends Defined {
         String name, DataIndexer indexer
     ) { return new IndexedGetter(name, indexer); }
 
-    PropertyGetter getPropertyGetter() {
-        return ValueGetter.of(getAtMethod(), getAtField());
+    @Override
+    protected void afterSetField() { accessor.clear(); }
+
+    @Override
+    public void exec(Object data, Cell cell) {
+
+    }
+
+    PropertyGetter getPropertyGetter() { return accessor.get(); }
+
+    Object getValue(Object data) {
+        return getPropertyGetter().getValue(data);
     }
 
     static class IndexedGetter extends DefinedGet {
@@ -64,7 +81,7 @@ class DefinedGet extends Defined {
         Method getAtMethod() { return null; }
 
         @Override
-        public ParsedDetail getChildrenGroup() { return null; }
+        public Detail getChildrenGroup() { return null; }
 
         @Override
         public DataColumn getColumn() { return null; }

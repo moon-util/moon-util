@@ -14,13 +14,9 @@ abstract class ValueGetter implements PropertyGetter {
 
     private final PropertyGetter getter;
 
-    protected ValueGetter(PropertyGetter getter) {
-        this.getter = getter;
-    }
+    protected ValueGetter(PropertyGetter getter) { this.getter = getter; }
 
-    static PropertyGetter of(Method method, Field field) {
-        return method == null ? of(field) : of(method);
-    }
+    static PropertyGetter of(Method method, Field field) { return method == null ? of(field) : of(method); }
 
     private static PropertyGetter of(Field field) { return newGetter(field); }
 
@@ -29,9 +25,7 @@ abstract class ValueGetter implements PropertyGetter {
     @Override
     public final Object getValue(Object data) { return getter.getValue(data); }
 
-    private static boolean isPublic(Member member) {
-        return Modifier.isPublic(member.getModifiers());
-    }
+    private static boolean isPublic(Member member) { return Modifier.isPublic(member.getModifiers()); }
 
     private static PropertyGetter newGetter(Field field) {
         return isPublic(field) ? new PubFieldGetter(field) : new DftFieldGetter(field);

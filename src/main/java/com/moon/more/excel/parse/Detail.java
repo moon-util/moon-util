@@ -2,6 +2,7 @@ package com.moon.more.excel.parse;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.moon.more.excel.parse.ParamUtil.dftIfNull;
 import static java.util.Collections.emptyList;
@@ -9,15 +10,15 @@ import static java.util.Collections.emptyList;
 /**
  * @author benshaoye
  */
-abstract class ParsedDetail<T extends Defined> implements Serializable {
+abstract class Detail<T extends Defined> implements Serializable {
 
     protected final List<T> columns;
-    protected final RootDetail root;
+    protected final DetailRoot root;
     protected final T starting;
     protected final T ending;
 
-    ParsedDetail(List<T> columns, RootDetail root, T starting, T ending) {
-        this.root = root == null ? RootDetail.DEFAULT : root;
+    Detail(List<T> columns, DetailRoot root, T starting, T ending) {
+        this.root = root == null ? DetailRoot.DEFAULT : root;
         this.columns = columns;
         this.starting = starting;
         this.ending = ending;
@@ -40,13 +41,17 @@ abstract class ParsedDetail<T extends Defined> implements Serializable {
         }).max().orElse(0);
     }
 
-    static ParsedDetail<DefinedGet> ofGetter(
-        List<DefinedGet> getters, RootDetail root,//
-        DefinedGet starting, DefinedGet ending
-    ) { return new ParsedGetDetail(getters, root, starting, ending); }
+    public void forEach(Consumer<T> consumer) {
+        columns.forEach(consumer);
+    }
 
-    static ParsedDetail<DefinedSet> ofSetter(
-        List<DefinedSet> setters, RootDetail root,//
+    static Detail<DefinedGet> ofGetter(
+        List<DefinedGet> getters, DetailRoot root,//
+        DefinedGet starting, DefinedGet ending
+    ) { return new DetailGet(getters, root, starting, ending); }
+
+    static Detail<DefinedSet> ofSetter(
+        List<DefinedSet> setters, DetailRoot root,//
         DefinedSet starting, DefinedSet ending
-    ) { return new ParsedSetDetail(setters, root, starting, ending); }
+    ) { return new DetailSet(setters, root, starting, ending); }
 }

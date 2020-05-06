@@ -39,7 +39,7 @@ class CreateGet implements Creator<DefinedGet> {
     }
 
     @Override
-    public ParsedDetail parsed(
-        List list, RootDetail root, DefinedGet starting, DefinedGet ending
-    ) { return ParsedDetail.ofGetter(list, root, starting, ending); }
+    public Detail parsed(
+        List list, DetailRoot root, DefinedGet starting, DefinedGet ending
+    ) { return Detail.ofGetter(list, root, starting, ending); }
 }
