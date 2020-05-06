@@ -24,7 +24,7 @@ class ParseUtil {
         return (ParsedGetDetail) GETTER.doParse(targetClass);
     }
 
-    public static ParsedGetDetail parseSetter(Class<?> targetClass) {
-        return (ParsedGetDetail) SETTER.doParse(targetClass);
+    public static ParsedSetDetail parseSetter(Class<?> targetClass) {
+        return (ParsedSetDetail) SETTER.doParse(targetClass);
     }
 }

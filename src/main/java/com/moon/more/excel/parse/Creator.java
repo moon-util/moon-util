@@ -20,17 +20,11 @@ interface Creator<T extends Defined> {
 
     T info(String propertyName, Marked<Method> onMethod);
 
-    default T info(String propertyName) {
-        return info(propertyName, (Marked<Method>) null);
-    }
+    default T info(String propertyName) { return info(propertyName, (Marked<Method>) null); }
 
     T info(String propertyName, DataIndexer indexer);
 
-    static CreateGet asGetter() {
-        return CreateGet.getInstance();
-    }
+    static CreateGet asGetter() { return CreateGet.getInstance(); }
 
-    static CreateSet asSetter() {
-        return CreateSet.getInstance();
-    }
+    static CreateSet asSetter() { return CreateSet.getInstance(); }
 }

@@ -5,9 +5,9 @@ import java.util.function.Function;
 /**
  * @author benshaoye
  */
-abstract class ProxyBuilder<FROM, R> extends BaseProxy<String> implements Function<FROM, R> {
+abstract class ProxyBuilder<FROM, R> extends BaseProxy<Object> implements Function<FROM, R> {
 
-    protected ProxyBuilder(String key) { super(key); }
+    protected ProxyBuilder(Object key) { super(key); }
 
     /**
      * build a R

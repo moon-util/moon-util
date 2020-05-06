@@ -242,11 +242,11 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
 
     private <T> void renderList(Iterator<T> collect) { }
 
-    private <T> void renderList(Iterable<T> collect, Class<T> targetClass) {
+    public <T> void renderList(Iterable<T> collect, Class<T> targetClass) {
         renderList(collect.iterator(), targetClass);
     }
 
-    private <T> void renderList(Iterable<T> collect) { renderList(collect.iterator()); }
+    public <T> void renderList(Iterable<T> collect) { renderList(collect.iterator()); }
 
     private <T> void renderList(Stream<T> stream, Class<T> targetClass) { renderList(stream.iterator(), targetClass); }
 

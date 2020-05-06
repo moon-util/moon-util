@@ -32,21 +32,15 @@ abstract class BaseParser {
 
         FLAT_NAME + " ]用于复合数据字段，如集合、数组、实体等。";
 
-    protected static String getNotAllowed(String prop) {
-        return NOT_ALLOWED.replace("{}", prop);
-    }
+    protected static String getNotAllowed(String prop) { return NOT_ALLOWED.replace("{}", prop); }
 
     protected static <T extends Annotation> T obtain(AnnotatedElement e, Class<T> type) {
         return e.getAnnotation(type);
     }
 
-    protected static DataIndexer obtainIndexer(AnnotatedElement e) {
-        return obtain(e, DataIndexer.class);
-    }
+    protected static DataIndexer obtainIndexer(AnnotatedElement e) { return obtain(e, DataIndexer.class); }
 
-    protected static DataColumnFlatten obtainFlatten(AnnotatedElement e) {
-        return obtain(e, DataColumnFlatten.class);
-    }
+    protected static DataColumnFlatten obtainFlatten(AnnotatedElement e) { return obtain(e, DataColumnFlatten.class); }
 
     protected BaseParser() {}
 
@@ -54,25 +48,15 @@ abstract class BaseParser {
      * tests
      */
 
-    protected static boolean isBasic(Class type) {
-        return isBasicSupports(type) && isBasicMatchers(type);
-    }
+    protected static boolean isBasic(Class type) { return isBasicSupports(type) && isBasicMatchers(type); }
 
-    protected static boolean isBasicDatetime(Class type) {
-        return DATETIME.contains(type);
-    }
+    protected static boolean isBasicDatetime(Class type) { return DATETIME.contains(type); }
 
-    protected static boolean isBasicStrings(Class type) {
-        return STRINGS.contains(type);
-    }
+    protected static boolean isBasicStrings(Class type) { return STRINGS.contains(type); }
 
-    protected static boolean isBasicNumbers(Class type) {
-        return NUMBERS.contains(type);
-    }
+    protected static boolean isBasicNumbers(Class type) { return NUMBERS.contains(type); }
 
-    protected static boolean isBasicSupports(Class type) {
-        return SUPPORTS.contains(type);
-    }
+    protected static boolean isBasicSupports(Class type) { return SUPPORTS.contains(type); }
 
     protected static boolean isBasicMatchers(Class type) {
         for (Class matcher : MATCHERS) {
@@ -83,31 +67,19 @@ abstract class BaseParser {
         return false;
     }
 
-    protected static boolean isMap(Class type) {
-        return is(Map.class, type);
-    }
+    protected static boolean isMap(Class type) { return is(Map.class, type); }
 
-    protected static boolean isIterable(Class type) {
-        return is(Iterable.class, type);
-    }
+    protected static boolean isIterable(Class type) { return is(Iterable.class, type); }
 
-    protected static boolean isIterator(Class type) {
-        return is(Iterator.class, type);
-    }
+    protected static boolean isIterator(Class type) { return is(Iterator.class, type); }
 
     protected static boolean isArray(Class type) { return type.isArray(); }
 
-    protected static boolean isCollect(Class type) {
-        return isIterable(type) || isIterator(type);
-    }
+    protected static boolean isCollect(Class type) { return isIterable(type) || isIterator(type); }
 
-    protected static boolean isSetColumn(Class type) {
-        return isCollect(type) || isMap(type) || isArray(type);
-    }
+    protected static boolean isSetColumn(Class type) { return isCollect(type) || isMap(type) || isArray(type); }
 
-    private static boolean is(Class superCls, Class target) {
-        return superCls.isAssignableFrom(target);
-    }
+    private static boolean is(Class superCls, Class target) { return superCls.isAssignableFrom(target); }
 
     /*
      * types
@@ -188,11 +160,11 @@ abstract class BaseParser {
 
     static Class getActual(Type genericPropType, Class propType) {
         if (propType.isArray()) {
-            Class tpe = propType.getComponentType();
-            if (isIterable(tpe) || isMap(tpe) || isIterator(tpe) || tpe.isArray()) {
-                throw new UnsupportedOperationException(tpe.toString());
+            Class type = propType.getComponentType();
+            if (isIterable(type) || isMap(type) || isIterator(type) || type.isArray()) {
+                throw new UnsupportedOperationException(type.toString());
             }
-            return tpe;
+            return type;
         }
         if (isIterable(propType)) {
             return toActualCls(ParamUtil.getActual(genericPropType));

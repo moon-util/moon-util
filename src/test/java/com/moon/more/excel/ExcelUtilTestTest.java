@@ -118,21 +118,24 @@ class ExcelUtilTestTest {
     @Disabled
     void testLoadExcelFile4Cell() throws Exception {
         ExcelUtil.load("D:/test001.xlsx").sheet("招聘进度分析", sheetFactory -> {
-            sheetFactory.use(9, false, rowFactory -> {
-                for (int i = 0; i < 20; i++) {
+            final int count = 10;
+            sheetFactory.useRow(9, false, rowFactory -> {
+                for (int i = 0; i < count; i++) {
                     rowFactory.useCell(i).cloneStyleAs("style" + i);
                 }
             });
-            sheetFactory.row(rowFactory -> {
-                for (int i = 0; i < 20; i++) {
-                    rowFactory.cell().val("电脑").styleAs("style" + i);
-                }
-            });
-            sheetFactory.row(rowFactory -> {
-                for (int i = 0; i < 20; i++) {
-                    rowFactory.cell().val("奖品").styleAs("style" + i);
-                }
-            });
+            for (int j = 0; j < count; j++) {
+                sheetFactory.row(rowFactory -> {
+                    for (int i = 0; i < count; i++) {
+                        rowFactory.cell().val("电脑").styleAs("style" + i);
+                    }
+                });
+                sheetFactory.row(rowFactory -> {
+                    for (int i = 0; i < count; i++) {
+                        rowFactory.cell().val("奖品").styleAs("style" + i);
+                    }
+                });
+            }
         }).write2Filepath("D:/test002.xlsx");
     }
 

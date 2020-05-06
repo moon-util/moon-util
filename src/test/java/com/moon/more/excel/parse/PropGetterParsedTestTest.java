@@ -2,12 +2,15 @@ package com.moon.more.excel.parse;
 
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.RandomUtil;
+import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.DataColumn;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author benshaoye
@@ -16,6 +19,32 @@ class PropGetterParsedTestTest {
 
     @BeforeEach
     void setUp() { }
+
+    public static class EmployeeDetail {
+
+        @DataColumn
+        private String name = "张三" + RandomStringUtil.nextDigit(4);
+
+        @DataColumn
+        private String sex = RandomUtil.nextBoolean() ? "男" : "女";
+
+        @DataColumn
+        private int age = RandomUtil.nextInt(10, 20);
+
+        @DataColumn
+        private String schoolName = "北大（" + RandomUtil.nextInt(5) + "）中";
+    }
+
+    @Test
+    void testEmployeeDetailExport() throws Exception {
+        ExcelUtil.xlsx().sheet(sheetFactory -> {
+            List<EmployeeDetail> details = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                details.add(new EmployeeDetail());
+            }
+            sheetFactory.renderList(details);
+        });
+    }
 
     @Test
     void testName() {

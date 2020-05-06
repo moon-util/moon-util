@@ -58,11 +58,37 @@ public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends B
      * 预定义样式
      *
      * @param classname 唯一样式名
+     * @param builder   构建样式和字体，需要手动调用 style.setFont(font)
+     *
+     * @return 当前对象
+     */
+    public F definitionStyle(Integer classname, BiConsumer<CellStyle, Font> builder) {
+        proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
+        return (F) this;
+    }
+
+    /**
+     * 预定义样式
+     *
+     * @param classname 唯一样式名
      * @param builder   构建样式（不包括字体）
      *
      * @return 当前对象
      */
     public F definitionStyle(String classname, Consumer<CellStyle> builder) {
+        proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
+        return (F) this;
+    }
+
+    /**
+     * 预定义样式
+     *
+     * @param classname 唯一样式名
+     * @param builder   构建样式（不包括字体）
+     *
+     * @return 当前对象
+     */
+    public F definitionStyle(Integer classname, Consumer<CellStyle> builder) {
         proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
         return (F) this;
     }
@@ -89,7 +115,9 @@ public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends B
      * @return 当前对象
      */
     protected F definitionComment(String uniqueName, String comment) {
-        proxy.definitionBuilder(new ProxyCommentBuilder(uniqueName, proxy.getSheet(), getWorkbookType(),
+        proxy.definitionBuilder(new ProxyCommentBuilder(uniqueName,
+            proxy.getSheet(),
+            getWorkbookType(),
             cmt -> getWorkbookType().newRichText(comment)));
         return (F) this;
     }

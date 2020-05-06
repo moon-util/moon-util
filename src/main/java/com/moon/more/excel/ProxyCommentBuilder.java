@@ -15,7 +15,7 @@ class ProxyCommentBuilder extends ProxyBuilder<Sheet, Comment> {
     private final WorkbookType type;
     private final Consumer<Comment> builder;
 
-    public ProxyCommentBuilder(String classname, Sheet sheet, WorkbookType type, Consumer<Comment> builder) {
+    public ProxyCommentBuilder(Object classname, Sheet sheet, WorkbookType type, Consumer<Comment> builder) {
         super(classname);
         this.builder = builder;
         this.sheet = sheet;

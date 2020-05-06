@@ -6,6 +6,9 @@ import java.util.Map;
 
 /**
  * 代理模型
+ * <p>
+ * 这个类只限内部使用，所以对数据类型要求放宽了，比如要求的 classname 是 String 类型
+ * 这里统一放宽为了 Object，这也是为了将来可能支持更多样式的 key
  *
  * @author benshaoye
  */
@@ -14,7 +17,7 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
     /**
      * 构建器列表
      */
-    private volatile Map<String, B> builderMap;
+    private volatile Map<Object, B> builderMap;
     /**
      * 已定义的构建器列表
      */
@@ -30,14 +33,14 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
      */
     private final boolean cacheDefined;
 
-    private Map<String, B> getBuilderMap() { return builderMap; }
+    private Map<Object, B> getBuilderMap() { return builderMap; }
 
     private Map<String, R> getDefined() { return defined; }
 
     private LinkedHashMap<S, String> getSetterMap() { return setterMap; }
 
-    private Map<String, B> ensureBuilderMap() {
-        Map<String, B> builderMap = getBuilderMap();
+    private Map<Object, B> ensureBuilderMap() {
+        Map<Object, B> builderMap = getBuilderMap();
         if (builderMap == null) {
             builderMap = new HashMap<>(8);
             this.builderMap = builderMap;
@@ -73,9 +76,9 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
         return this;
     }
 
-    B find(String classname) { return ensureBuilderMap().get(classname); }
+    B find(Object classname) { return ensureBuilderMap().get(classname); }
 
-    String find(S setter) { return ensureSetterMap().get(setter); }
+    Object find(S setter) { return ensureSetterMap().get(setter); }
 
     ProxyModel<FROM, R, K, B, S> removeSetter(S setter) {
         ensureSetterMap().remove(setter);
@@ -108,7 +111,7 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
         }
     }
 
-    private void afterApplied(Map<String, B> builderMap) {
+    private void afterApplied(Map<Object, B> builderMap) {
         if (isEmpty(builderMap)) {
             return;
         }
@@ -132,7 +135,7 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
     }
 
     private void useUncached(FROM from) {
-        Map<String, B> builderMap = getBuilderMap();
+        Map<Object, B> builderMap = getBuilderMap();
         if (isEmpty(builderMap)) {
             return;
         }
@@ -159,7 +162,7 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
 
     private void useCached(FROM from) {
         Map<String, R> defined = getDefined();
-        Map<String, B> builderMap = getBuilderMap();
+        Map<Object, B> builderMap = getBuilderMap();
         if (isEmpty(defined) && isEmpty(builderMap)) {
             return;
         }

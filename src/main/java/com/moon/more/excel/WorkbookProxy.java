@@ -131,7 +131,7 @@ final class WorkbookProxy {
 
     ProxyStyleBuilder findBuilder(ProxyStyleSetter setter) {
         ProxyStyleModel styleModel = ensureStyleProxy();
-        String classname = styleModel.find(setter);
+        Object classname = styleModel.find(setter);
         return styleModel.find(classname);
     }
 

@@ -154,7 +154,7 @@ abstract class Parser<T extends Defined> extends BaseParser {
                 .filter(info -> isBasic(info.getPropertyType()))
 
                 .collect(Collectors.toList());
-            throw new UnsupportedOperationException();
+            // throw new UnsupportedOperationException();
         }
 
         DataIndexer idx = obtainIndexer(type);

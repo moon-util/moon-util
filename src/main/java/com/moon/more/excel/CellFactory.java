@@ -177,13 +177,35 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前对象
      */
-    public CellFactory cloneStyleAs(String classname) {
+    public CellFactory cloneStyleAs(String classname) { return doCloneStyleAs(classname); }
+
+    /**
+     * 复制当前单元格样式并命名为指定名称
+     *
+     * @param classname 唯一名称
+     *
+     * @return 当前对象
+     */
+    public CellFactory cloneStyleAs(Integer classname) { return doCloneStyleAs(classname); }
+
+    /**
+     * 复制当前单元格样式并命名为指定名称
+     *
+     * @param classname 唯一名称
+     *
+     * @return 当前对象
+     */
+    private CellFactory doCloneStyleAs(Object classname) {
         ProxyStyleBuilder builder = proxy.findBuilder(newSetter());
         if (builder != null) {
             proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
         } else {
             CellStyle cellStyle = getCell().getCellStyle();
-            definitionStyle(classname, style -> style.cloneStyleFrom(cellStyle));
+            if (classname instanceof Integer) {
+                definitionStyle((Integer) classname, style -> style.cloneStyleFrom(cellStyle));
+            } else {
+                definitionStyle(classname.toString(), style -> style.cloneStyleFrom(cellStyle));
+            }
         }
         return this;
     }
