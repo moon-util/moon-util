@@ -177,8 +177,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory use(int rowIndex, Consumer<RowFactory> consumer) {
-        return use(rowIndex, DFT_APPEND_TYPE, consumer);
+    public SheetFactory useRow(int rowIndex, Consumer<RowFactory> consumer) {
+        return useRow(rowIndex, DFT_APPEND_TYPE, consumer);
     }
 
     /**
@@ -192,7 +192,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory use(int rowIndex, boolean append, Consumer<RowFactory> consumer) {
+    public SheetFactory useRow(int rowIndex, boolean append, Consumer<RowFactory> consumer) {
         factory.setRow(proxy.useOrCreateRow(rowIndex, append));
         consumer.accept(getRowFactory());
         return this;
