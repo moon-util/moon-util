@@ -251,7 +251,9 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      */
     public void next(LocalDateTime value, int rowspan, int colspan) { nextCell(rowspan, colspan).setCellValue(value); }
 
-    // return CellFactory
+    /*
+     * ~~~~~~~~~~ return CellFactory ~~~~~~~~~~ ~~~~~~~~~~ ~~~~~~~~~~ ~~~~~~~~~~ ~~~~~~~~~~
+     */
 
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
@@ -284,7 +286,9 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
         return getCellFactory();
     }
 
-    // consumer CellFactory
+    /*
+     * ~~~~~~~~~~ consumer CellFactory ~~~~~~~~~~ ~~~~~~~~~~ ~~~~~~~~~~ ~~~~~~~~~~ ~~~~~~~~~~
+     */
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器

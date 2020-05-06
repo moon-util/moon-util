@@ -1,7 +1,10 @@
 package com.moon.more.excel;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.core.util.TypeUtil;
+import com.moon.core.util.converter.TypeCaster;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -11,11 +14,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author benshaoye
  */
 public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
+
+    private final TypeCaster caster = TypeUtil.cast();
 
     /**
      * 当前正在操作的单元格
@@ -36,9 +42,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @param proxy  Excel 集中代理
      * @param parent 父节点
      */
-    public CellFactory(WorkbookProxy proxy, RowFactory parent) {
-        super(proxy, parent);
-    }
+    public CellFactory(WorkbookProxy proxy, RowFactory parent) { super(proxy, parent); }
 
     /**
      * 当前正在操作的单元格实例
@@ -111,6 +115,10 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      */
     public Cell getCell() { return cell; }
 
+    /*
+     * ~~~~~~~~ 操作单元格 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
     /**
      * 预定义注释
      *
@@ -140,6 +148,15 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
     }
 
     /**
+     * create an ProxyStyleSetter
+     *
+     * @return ProxyStyleSetter
+     */
+    private ProxyStyleSetter newSetter() {
+        return new ProxyStyleSetter(getCell(), proxy.getRegion());
+    }
+
+    /**
      * 给当前单元格应用预定义样式，定义样式参考{@link #definitionStyle(String, Consumer)}
      *
      * @param classname 样式类名，命名方式参考前端 html，
@@ -148,8 +165,26 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @see #definitionStyle(String, BiConsumer)
      */
-    public CellFactory style(String classname) {
-        proxy.addSetter(new ProxyStyleSetter(getCell(), proxy.getRegion()), classname);
+    public CellFactory styleAs(String classname) {
+        proxy.addSetter(newSetter(), classname);
+        return this;
+    }
+
+    /**
+     * 复制当前单元格样式并命名为指定名称
+     *
+     * @param classname 唯一名称
+     *
+     * @return 当前对象
+     */
+    public CellFactory cloneStyleAs(String classname) {
+        ProxyStyleBuilder builder = proxy.findBuilder(newSetter());
+        if (builder != null) {
+            proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
+        } else {
+            CellStyle cellStyle = getCell().getCellStyle();
+            definitionStyle(classname, style -> style.cloneStyleFrom(cellStyle));
+        }
         return this;
     }
 
@@ -292,6 +327,10 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
         return this;
     }
 
+    /*
+     * ~~~~~~~~ 设置单元格值 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
     /**
      * 给当前单元格设置值
      *
@@ -373,6 +412,91 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      */
     public CellFactory val(LocalDateTime value) {
         getCell().setCellValue(value);
+        return this;
+    }
+
+    /*
+     * ~~~~~~~~ 读取或使用单元格值 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    /**
+     * 读取当前单元格的值
+     *
+     * @return 当前单元格的值
+     */
+    public Object val() { return ExcelUtil.getValue(getCell()); }
+
+    /**
+     * 以指定类型获取值
+     *
+     * @param type 指定类型
+     * @param <T>  类型
+     *
+     * @return 当前单元格的值
+     */
+    public <T> T valAs(Class<? extends T> type) {
+        return caster.toType(val(), type);
+    }
+
+    /**
+     * 一指定类型获取值
+     *
+     * @param converter 转换器
+     * @param <T>       类型
+     *
+     * @return 当前单元格的值
+     */
+    public <T> T valAs(Function<Object, ? extends T> converter) {
+        return converter.apply(val());
+    }
+
+    /**
+     * 读取并使用单元格的内容
+     *
+     * @param consumer 消费者
+     *
+     * @return 当前 CellFactory
+     */
+    public CellFactory useVal(Consumer consumer) {
+        consumer.accept(val());
+        return this;
+    }
+
+    /**
+     * 读取并使用单元格的内容
+     *
+     * @param consumer 消费者
+     * @param <T>      类型
+     *
+     * @return 当前 CellFactory
+     */
+    public <T> CellFactory useVal(Class<? extends T> type, Consumer<? super T> consumer) {
+        consumer.accept(valAs(type));
+        return this;
+    }
+
+    /**
+     * 读取并使用单元格的内容
+     *
+     * @param consumer 消费者
+     * @param <T>      类型
+     *
+     * @return 当前 CellFactory
+     */
+    public <T> CellFactory useVal(Function<Object, ? extends T> converter, Consumer<? super T> consumer) {
+        consumer.accept(valAs(converter));
+        return this;
+    }
+
+    /**
+     * 完全控制当前 cell
+     *
+     * @param consumer consumer
+     *
+     * @return 当前 CellFactory
+     */
+    public CellFactory controlCell(Consumer<? super Cell> consumer) {
+        consumer.accept(getCell());
         return this;
     }
 }

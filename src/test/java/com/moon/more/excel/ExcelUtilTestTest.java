@@ -3,21 +3,13 @@ package com.moon.more.excel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * @author benshaoye
  */
 class ExcelUtilTestTest {
-
-    @Test
-    void testFilesCreateFile() throws IOException {
-        Files.createFile(Paths.get("D:/tmp/bb.text"));
-    }
 
     @Test
     void testCreateRow() {
@@ -29,6 +21,7 @@ class ExcelUtilTestTest {
     }
 
     @Test
+    @Disabled
     void testXlsx() {
         WorkbookFactory excelFactory = ExcelUtil.xlsx();
         excelFactory.sheet("招聘进度分析", sheetFactory -> {
@@ -87,6 +80,7 @@ class ExcelUtilTestTest {
     }
 
     @Test
+    @Disabled
     void testExportExcel() {
         ExcelUtil.xlsx().definitionStyle("header", (style, font) -> {
             style.setFillForegroundColor(IndexedColors.LIGHT_TURQUOISE.getIndex());
@@ -100,11 +94,49 @@ class ExcelUtilTestTest {
             font.setColor(IndexedColors.RED.index);
         }).sheet(sheetFactory -> {
             sheetFactory.row(rowFactory -> {
-                rowFactory.cell(3, 3).val("值").style("header");
-                rowFactory.cell().style("header");
-                rowFactory.cell(2, 2).val("值").style("header");
+                rowFactory.cell(3, 3).val("值").styleAs("header");
+                rowFactory.cell().styleAs("header");
+                rowFactory.cell(2, 2).val("值").styleAs("header");
                 rowFactory.cell().active();
             });
         }).finish().write2Filepath("D:/test.xlsx");
+    }
+
+    @Test
+    @Disabled
+    void testLoadExcelFile() throws Exception {
+        ExcelUtil.load("D:/test000.xlsx").sheet("招聘进度分析", false, sheetFactory -> {
+            sheetFactory.row(rowFactory -> {
+                for (int i = 0; i < 12; i++) {
+                    rowFactory.next("电脑" + i);
+                }
+            });
+        }).write2Filepath("D:/test001.xlsx");
+    }
+
+    @Test
+    @Disabled
+    void testLoadExcelFile4Cell() throws Exception {
+        ExcelUtil.load("D:/test001.xlsx").sheet("招聘进度分析", sheetFactory -> {
+            sheetFactory.use(9, false, rowFactory -> {
+                for (int i = 0; i < 20; i++) {
+                    rowFactory.useCell(i).cloneStyleAs("style" + i);
+                }
+            });
+            sheetFactory.row(rowFactory -> {
+                for (int i = 0; i < 20; i++) {
+                    rowFactory.cell().val("电脑").styleAs("style" + i);
+                }
+            });
+            sheetFactory.row(rowFactory -> {
+                for (int i = 0; i < 20; i++) {
+                    rowFactory.cell().val("奖品").styleAs("style" + i);
+                }
+            });
+        }).write2Filepath("D:/test002.xlsx");
+    }
+
+    @Test
+    void testName() throws Exception {
     }
 }

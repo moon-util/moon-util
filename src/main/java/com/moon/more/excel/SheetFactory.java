@@ -238,31 +238,20 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @param targetClass 目标类型
      * @param <T>         数据类型
      */
-    private <T> void renderList(Iterator<T> collect, Class<T> targetClass) {
+    private <T> void renderList(Iterator<T> collect, Class<T> targetClass) { }
 
-    }
-
-    private <T> void renderList(Iterator<T> collect) {
-
-    }
+    private <T> void renderList(Iterator<T> collect) { }
 
     private <T> void renderList(Iterable<T> collect, Class<T> targetClass) {
         renderList(collect.iterator(), targetClass);
     }
 
-    private <T> void renderList(Iterable<T> collect) {
-        renderList(collect.iterator());
-    }
+    private <T> void renderList(Iterable<T> collect) { renderList(collect.iterator()); }
 
-    private <T> void renderList(Stream<T> stream, Class<T> targetClass) {
-        renderList(stream.iterator(), targetClass);
-    }
+    private <T> void renderList(Stream<T> stream, Class<T> targetClass) { renderList(stream.iterator(), targetClass); }
 
-    private <T> void renderList(Stream<T> stream) {
-        renderList(stream.iterator());
-    }
+    private <T> void renderList(Stream<T> stream) { renderList(stream.iterator()); }
 
     private <T> void renderList(T... collect) {
-
     }
 }

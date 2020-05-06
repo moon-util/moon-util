@@ -56,6 +56,33 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
     }
 
     /**
+     * 使用或创建指定位置工作表，如果存在则使用已存在的
+     *
+     * @param index    sheet 位置索引
+     * @param append   是否采用追加行方式，默认{@code true}
+     * @param operator sheet 操作器
+     *
+     * @return 当前 WorkbookFactory
+     */
+    public WorkbookFactory sheetAt(int index, boolean append, Consumer<SheetFactory> operator) {
+        factory.setSheet(proxy.useSheet(index, append));
+        operator.accept(getSheetFactory());
+        return this;
+    }
+
+    /**
+     * 使用或创建指定位置工作表，如果存在则使用已存在的
+     *
+     * @param index    sheet 位置索引
+     * @param operator sheet 操作器
+     *
+     * @return 当前 WorkbookFactory
+     */
+    public WorkbookFactory sheetAt(int index, Consumer<SheetFactory> operator) {
+        return sheetAt(index, true, operator);
+    }
+
+    /**
      * 创建工作表，如果存在则使用已存在的
      *
      * @param sheetName sheet name

@@ -73,6 +73,10 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
         return this;
     }
 
+    B find(String classname) { return ensureBuilderMap().get(classname); }
+
+    String find(S setter) { return ensureSetterMap().get(setter); }
+
     ProxyModel<FROM, R, K, B, S> removeSetter(S setter) {
         ensureSetterMap().remove(setter);
         return this;
@@ -80,9 +84,7 @@ class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySet
 
     protected ProxyModel() { this(true); }
 
-    protected ProxyModel(boolean cacheDefined) {
-        this.cacheDefined = cacheDefined;
-    }
+    protected ProxyModel(boolean cacheDefined) { this.cacheDefined = cacheDefined; }
 
     private static boolean isEmpty(Map map) { return map == null || map.isEmpty(); }
 

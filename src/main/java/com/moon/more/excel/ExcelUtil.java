@@ -6,6 +6,9 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.function.Supplier;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -88,7 +91,7 @@ import static com.moon.more.excel.ExcelType.*;
  *
  * @author benshaoye
  */
-public final class ExcelUtil {
+public final class ExcelUtil extends LoadUtil {
 
     private ExcelUtil() { noInstanceError(); }
 
@@ -139,6 +142,62 @@ public final class ExcelUtil {
      * @return Excel 操作工厂（代理）
      */
     public static WorkbookFactory of(Workbook workbook) { return new WorkbookFactory(workbook); }
+
+    /**
+     * 从已知 Excel 文件加载
+     *
+     * @param absoluteFilepath Excel 文件绝对路径
+     *
+     * @return Excel 操作工厂（代理）
+     */
+    public static WorkbookFactory load(String absoluteFilepath) { return load(new File(absoluteFilepath)); }
+
+    /**
+     * 从已知 Excel 文件加载
+     *
+     * @param absoluteFilepath Excel 文件绝对路径
+     *
+     * @return Excel 操作工厂（代理）
+     */
+    public static WorkbookFactory load(Path absoluteFilepath) { return load(absoluteFilepath.toFile()); }
+
+    /**
+     * 从已知 Excel 文件加载
+     *
+     * @param excelFile Excel 文件
+     *
+     * @return Excel 操作工厂（代理）
+     *
+     * @throws NullPointerException          excelFile is null
+     * @throws UnsupportedOperationException excelFile type is unknown
+     */
+    public static WorkbookFactory load(File excelFile) {
+        return load(excelFile, deduceType(excelFile).orElseGet(() -> {
+            // 这里用文件内容的方式判断类型
+            throw new UnsupportedOperationException("等待支持.");
+        }));
+    }
+
+    /**
+     * 从已知 Excel 文件加载
+     *
+     * @param excelFile Excel 文件
+     * @param type      类型
+     *
+     * @return Excel 操作工厂（代理）
+     */
+    public static WorkbookFactory load(File excelFile, ExcelType type) { return of(type.load(excelFile)); }
+
+    /**
+     * 从已知 Excel 文件流加载
+     *
+     * @param excelInputStream Excel 输入流
+     *
+     * @return Excel 操作工厂（代理）
+     */
+    public static WorkbookFactory load(InputStream excelInputStream, ExcelType type) {
+        return of(type.load(excelInputStream));
+    }
 
     /**
      * 获取单元格的值

@@ -36,9 +36,7 @@ class CellStyleProxy implements BiConsumer<Cell, CellRangeAddress>, Consumer<Row
         this.lColor = style.getLeftBorderColor();
     }
 
-    private static boolean isBordered(BorderStyle style) {
-        return style != null && style != BorderStyle.NONE;
-    }
+    private static boolean isBordered(BorderStyle style) { return style != null && style != BorderStyle.NONE; }
 
     private void setBorder4Merged(CellRangeAddress region, Sheet sheet) {
         BorderStyle border;

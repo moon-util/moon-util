@@ -125,12 +125,14 @@ final class WorkbookProxy {
         return proxy;
     }
 
-    void definitionBuilder(ProxyStyleBuilder builder) {
-        ensureStyleProxy().addBuilder(builder);
-    }
+    void definitionBuilder(ProxyStyleBuilder builder) { ensureStyleProxy().addBuilder(builder); }
 
-    void addSetter(ProxyStyleSetter setter, String classname) {
-        ensureStyleProxy().addSetter(classname, setter);
+    void addSetter(ProxyStyleSetter setter, String classname) { ensureStyleProxy().addSetter(classname, setter); }
+
+    ProxyStyleBuilder findBuilder(ProxyStyleSetter setter) {
+        ProxyStyleModel styleModel = ensureStyleProxy();
+        String classname = styleModel.find(setter);
+        return styleModel.find(classname);
     }
 
     void definitionBuilder(ProxyCommentBuilder builder) { ensureCommentProxy().addBuilder(builder); }
@@ -177,7 +179,7 @@ final class WorkbookProxy {
     }
 
     Sheet setSheet(Sheet sheet, boolean appendRow) {
-        return appendRow ? setSheet(sheet, sheet.getLastRowNum()) : setSheet(sheet, 0);
+        return appendRow ? setSheet(sheet, sheet.getLastRowNum() + 1) : setSheet(sheet, 0);
     }
 
     Sheet getSheet() { return sheet; }
@@ -229,8 +231,8 @@ final class WorkbookProxy {
     }
 
     Row setRow(Row row, boolean appendCell) {
-        int index = appendCell ? row.getLastCellNum() + 1 : 0;
-        return setRow(row, index);
+        int index = appendCell ? row.getLastCellNum() : 0;
+        return setRow(row, Math.max(index, 0));
     }
 
     Row setRow(Row row) { return setRow(row, DEFAULT_APPEND_DATA); }

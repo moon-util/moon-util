@@ -23,6 +23,12 @@ class ProxyStyleBuilder extends ProxyBuilder<Workbook, CellStyleProxy> {
      */
     private final BiConsumer<CellStyle, Font> hasFontBuilder;
 
+    ProxyStyleBuilder(String classname, ProxyStyleBuilder builder) {
+        super(classname);
+        this.nonFontBuilder = builder.nonFontBuilder;
+        this.hasFontBuilder = builder.hasFontBuilder;
+    }
+
     ProxyStyleBuilder(String classname, Consumer<CellStyle> builder) {
         super(classname);
         this.nonFontBuilder = builder;
