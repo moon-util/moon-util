@@ -17,12 +17,14 @@ import java.lang.reflect.Method;
 class DefinedGet extends Defined {
 
     private final LazyAccessor<PropertyGetter> accessor;
+    final LazyAccessor<Transfer4Gets> transfer;
 
     private DefinedGet(
         String name, Marked<Method> onMethod
     ) {
         super(name, onMethod);
         accessor = LazyAccessor.of(() -> ValueGetter.of(getAtMethod(), getAtField()));
+        this.transfer = LazyAccessor.of(() -> Transfer4Gets.find(getPropertyType()));
     }
 
     static DefinedGet of(
@@ -38,14 +40,12 @@ class DefinedGet extends Defined {
 
     @Override
     public void exec(Object data, Cell cell) {
-
+        transfer.get().setCellValue(getValue(data), cell);
     }
 
     PropertyGetter getPropertyGetter() { return accessor.get(); }
 
-    Object getValue(Object data) {
-        return getPropertyGetter().getValue(data);
-    }
+    Object getValue(Object data) { return getPropertyGetter().getValue(data); }
 
     static class IndexedGetter extends DefinedGet {
 
@@ -96,9 +96,7 @@ class DefinedGet extends Defined {
         public DataIndexer getIndexer() { return indexer; }
 
         @Override
-        public String[] getHeadLabels() {
-            return null;
-        }
+        public String[] getHeadLabels() { return null; }
 
         @Override
         public String getHeadLabelAsIndexer() { return getIndexer().value(); }

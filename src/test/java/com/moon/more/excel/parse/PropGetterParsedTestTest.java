@@ -6,6 +6,7 @@ import com.moon.core.util.RandomUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.DataColumn;
 import lombok.ToString;
+import org.apache.poi.ss.usermodel.Cell;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,13 +58,24 @@ class PropGetterParsedTestTest {
             details.add(new EmployeeDetail());
         }
         DetailGet detailGet = ParseUtil.parseGetter(EmployeeDetail.class);
-        details.forEach(emp -> {
-            StringBuilder data = new StringBuilder();
-            detailGet.forEach(get -> {
-                data.append(get.getName()).append(": ").append(get.getValue(emp)).append("; ");
-            });
-            System.out.println(data);
-        });
+        // details.forEach(emp -> {
+        //     StringBuilder data = new StringBuilder();
+        //     detailGet.forEach(get -> {
+        //         data.append(get.getName()).append(": ").append(get.getValue(emp)).append("; ");
+        //     });
+        //     System.out.println(data);
+        // });
+
+        ExcelUtil.xlsx().sheet(sheetFactory -> {
+            for (EmployeeDetail detail : details) {
+                sheetFactory.row(rowFactory -> {
+                    detailGet.forEach(get -> {
+                        Cell cell = rowFactory.cell().getCell();
+                        get.exec(detail, cell);
+                    });
+                });
+            }
+        }).write2Filepath("/Users/moonsky/Workspaces/test.xlsx");
     }
 
     @Test
