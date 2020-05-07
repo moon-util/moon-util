@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataRecord {
+public @interface TableRecord {
 
     /**
      * 优先策略，默认分组优先
@@ -30,8 +30,8 @@ public @interface DataRecord {
      *
      * @return 优先策略
      *
-     * @see DataColumn#order()
-     * @see DataColumnFlatten#order()
+     * @see TableColumn#order()
+     * @see TableColumnFlatten#order()
      */
     Priority priority() default Priority.GROUP;
 }

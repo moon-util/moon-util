@@ -1,7 +1,7 @@
 package com.moon.more.excel.parse;
 
 import com.moon.more.excel.annotation.Priority;
-import com.moon.more.excel.annotation.DataRecord;
+import com.moon.more.excel.annotation.TableRecord;
 
 /**
  * @author benshaoye
@@ -16,7 +16,7 @@ class DetailRoot {
 
     private DetailRoot() { this(Priority.GROUP); }
 
-    private DetailRoot(DataRecord entity) {
+    private DetailRoot(TableRecord entity) {
         this(entity == null ? Priority.GROUP : entity.priority(), entity != null);
     }
 
@@ -27,7 +27,7 @@ class DetailRoot {
         this.annotatedOnClass = annotatedOnClass;
     }
 
-    static DetailRoot of(DataRecord record) { return record == null ? DEFAULT : new DetailRoot(record); }
+    static DetailRoot of(TableRecord record) { return record == null ? DEFAULT : new DetailRoot(record); }
 
     public Priority getPriority() { return priority; }
 

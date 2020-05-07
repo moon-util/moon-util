@@ -1,8 +1,8 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataColumn;
-import com.moon.more.excel.annotation.DataColumnFlatten;
-import com.moon.more.excel.annotation.DataIndexer;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnFlatten;
+import com.moon.more.excel.annotation.TableIndexer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,25 +10,25 @@ import java.lang.reflect.Method;
 /**
  * @author benshaoye
  */
-class DefinedSet extends Defined {
+public class PropertySet extends Property {
 
-    private DefinedSet(
+    private PropertySet(
         String name, Marked<Method> onMethod
     ) { super(name, onMethod); }
 
-    static DefinedSet of(
+    static PropertySet of(
         String name, Marked<Method> onMethod
-    ) { return new DefinedSet(name, onMethod); }
+    ) { return new PropertySet(name, onMethod); }
 
-    static DefinedSet of(
-        String name, DataIndexer indexer
+    static PropertySet of(
+        String name, TableIndexer indexer
     ) { return new IndexedSetter(name, indexer); }
 
-    static class IndexedSetter extends DefinedSet {
+    static class IndexedSetter extends PropertySet {
 
-        private final DataIndexer indexer;
+        private final TableIndexer indexer;
 
-        private IndexedSetter(String name, DataIndexer indexer) {
+        private IndexedSetter(String name, TableIndexer indexer) {
             super(name, null);
             this.indexer = indexer;
         }
@@ -58,18 +58,18 @@ class DefinedSet extends Defined {
         Method getAtMethod() { return null; }
 
         @Override
-        public Detail getChildrenGroup() { return null; }
+        public PropertiesGroup getGroup() { return null; }
 
         @Override
-        public DataColumn getColumn() { return null; }
+        public TableColumn getColumn() { return null; }
 
         @Override
-        public DataColumnFlatten getFlatten() { return null; }
+        public TableColumnFlatten getFlatten() { return null; }
 
         @Override
         public Class getPropertyType() { return null; }
 
         @Override
-        public DataIndexer getIndexer() { return indexer; }
+        public TableIndexer getIndexer() { return indexer; }
     }
 }

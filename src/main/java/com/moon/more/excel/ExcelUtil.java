@@ -1,10 +1,8 @@
 package com.moon.more.excel;
 
 import com.moon.core.util.TypeUtil;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.File;
 import java.io.InputStream;
@@ -240,5 +238,35 @@ public final class ExcelUtil extends LoadUtil {
         if (cell == null || type == null) { return null; }
         Object value = getValue(cell);
         return TypeUtil.cast().toType(value, type);
+    }
+
+    /**
+     * 合并单元格
+     *
+     * @param sheet    sheet
+     * @param firstRow 起始行
+     * @param lastRow  结束行
+     * @param firstCol 起始列
+     * @param lastCol  结束列
+     *
+     * @return sheet
+     */
+    public static Sheet merge(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+        sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
+        return sheet;
+    }
+
+    /**
+     * 区域
+     *
+     * @param firstRow y
+     * @param firstCol x
+     * @param rowspan  count of rows
+     * @param colspan  count of columns
+     *
+     * @return CellRangeAddress
+     */
+    public static CellRangeAddress region(int firstRow, int firstCol, int rowspan, int colspan) {
+        return new CellRangeAddress(firstRow, firstCol + rowspan - 1, firstCol, firstCol + colspan - 1);
     }
 }

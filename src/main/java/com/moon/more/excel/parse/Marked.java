@@ -1,9 +1,9 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataColumn;
-import com.moon.more.excel.annotation.DataColumnFlatten;
-import com.moon.more.excel.annotation.DataIndexer;
-import com.moon.more.excel.annotation.DataListable;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnFlatten;
+import com.moon.more.excel.annotation.TableIndexer;
+import com.moon.more.excel.annotation.TableListable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -21,26 +21,26 @@ class Marked<M extends Member> {
     private final M member;
     private final Class propertyType;
     private final Type genericType;
-    private final boolean canListable;
-    private final DataColumn column;
-    private final DataColumnFlatten flatten;
-    private final DataIndexer indexer;
-    private final DataListable listable;
-    private final Detail children;
+    private final boolean iterated;
+    private final TableColumn column;
+    private final TableColumnFlatten flatten;
+    private final TableIndexer indexer;
+    private final TableListable listable;
+    private final PropertiesGroup children;
 
-    Marked(String name, Class propertyType, Type genericType, M member, Detail children) {
+    Marked(String name, Class propertyType, Type genericType, M member, PropertiesGroup children) {
         this.name = name;
         this.member = member;
         this.genericType = genericType;
         this.propertyType = propertyType;
         this.children = children;
         AnnotatedElement elem = (AnnotatedElement) member;
-        this.column = obtain(elem, DataColumn.class);
-        this.flatten = obtain(elem, DataColumnFlatten.class);
-        this.indexer = obtain(elem, DataIndexer.class);
-        this.listable = obtain(elem, DataListable.class);
-        ParamUtil.requireNotDuplicated(column, flatten, name);
-        this.canListable = BaseParser.isSetColumn(propertyType);
+        this.column = obtain(elem, TableColumn.class);
+        this.flatten = obtain(elem, TableColumnFlatten.class);
+        this.indexer = obtain(elem, TableIndexer.class);
+        this.listable = obtain(elem, TableListable.class);
+        SupportUtil.requireNotDuplicated(column, flatten, name);
+        this.iterated = AbstractSupporter.isSetColumn(propertyType);
     }
 
     public String[] getHeadLabels() {
@@ -61,26 +61,28 @@ class Marked<M extends Member> {
 
     public Class<?> getPropertyType() { return propertyType; }
 
-    public DataColumn getColumn() { return column; }
+    public TableColumn getColumn() { return column; }
 
-    public DataColumnFlatten getFlatten() { return flatten; }
+    public TableColumnFlatten getFlatten() { return flatten; }
 
-    public DataIndexer getIndexer() { return indexer; }
+    public TableIndexer getIndexer() { return indexer; }
 
-    public DataListable getListable() { return listable; }
+    public TableListable getListable() { return listable; }
 
     public Type getGenericType() { return genericType; }
 
-    public boolean isCanListable() { return canListable; }
+    public boolean isCanListable() { return listable != null; }
 
-    public Detail getChildren() { return children; }
+    public boolean isIterated() { return iterated; }
 
-    static Marked<Field> of(Field member, Detail children) {
+    public PropertiesGroup getChildren() { return children; }
+
+    static Marked<Field> of(Field member, PropertiesGroup children) {
         return new Marked<>(member.getName(), member.getType(),//
             member.getGenericType(), member, children);
     }
 
-    static Marked<Method> of(String name, Class propertyType, Type genericType, Method method, Detail children) {
+    static Marked<Method> of(String name, Class propertyType, Type genericType, Method method, PropertiesGroup children) {
         return new Marked<>(name, propertyType, genericType, method, children);
     }
 }

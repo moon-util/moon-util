@@ -1,7 +1,7 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataColumn;
-import com.moon.more.excel.annotation.DataColumnFlatten;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnFlatten;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -12,51 +12,51 @@ class HeaderTestTest {
 
     public static class UserDetails {
 
-        @DataColumnFlatten({"基本信息", "列表"})
+        @TableColumnFlatten({"基本信息", "列表"})
         private BasicInfo info;
-        @DataColumnFlatten({"基本信息", "列表"})
+        @TableColumnFlatten({"基本信息", "列表"})
         private StudentScore studentScore;
-        @DataColumn({"基本信息", "姓名"})
+        @TableColumn({"基本信息", "姓名"})
         private String name;
-        @DataColumn({"基本信息", "性别"})
+        @TableColumn({"基本信息", "性别"})
         private String sex;
-        @DataColumn({"基本信息", "年龄"})
+        @TableColumn({"基本信息", "年龄"})
         private int age;
-        @DataColumn({"成绩", "语文"})
+        @TableColumn({"成绩", "语文"})
         private String chinese;
-        @DataColumn({"成绩", "数学"})
+        @TableColumn({"成绩", "数学"})
         private String math;
-        @DataColumn({"成绩", "理综"})
+        @TableColumn({"成绩", "理综"})
         private int natural;
-        @DataColumn({"成绩", "英语"})
+        @TableColumn({"成绩", "英语"})
         private int english;
     }
 
     @Test
     void testParseHeadIfPriorityOrder() {
-        Detail<DefinedGet> getter = ParseUtil.parseGetter(UserDetails.class);
+        PropertiesGroup<PropertyGet> getter = ParseUtil.parseGetter(UserDetails.class);
         Assertions.assertEquals(3, getter.getMaxRowsLength());
     }
 
     public static class BasicInfo {
 
-        @DataColumn("姓名")
+        @TableColumn("姓名")
         private String name;
-        @DataColumn("性别")
+        @TableColumn("性别")
         private String sex;
-        @DataColumn("年龄")
+        @TableColumn("年龄")
         private int age;
     }
 
     public static class StudentScore {
 
-        @DataColumnFlatten()
+        @TableColumnFlatten()
         private BasicInfo info;
 
-        @DataColumn
+        @TableColumn
         private String mathScore;
 
-        @DataColumn
+        @TableColumn
         private String englishScore;
 
         public BasicInfo getInfo() {
@@ -66,7 +66,7 @@ class HeaderTestTest {
 
     @Test
     void testName() {
-        Detail<DefinedGet> getter = ParseUtil.parseGetter(StudentScore.class);
+        PropertiesGroup<PropertyGet> getter = ParseUtil.parseGetter(StudentScore.class);
     }
 
     @Test

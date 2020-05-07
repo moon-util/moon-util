@@ -1,14 +1,11 @@
 package com.moon.more.excel;
 
-import com.moon.more.excel.annotation.DataColumn;
-import com.moon.more.excel.annotation.DataColumnFlatten;
+import com.moon.more.excel.annotation.*;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.util.Iterator;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 /**
  * 工作表操作器
@@ -21,6 +18,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * row 工厂
      */
     private final RowFactory factory;
+    private final TableFactory tableFactory;
+    private final TemplateFactory templateFactory;
     /**
      * 当前正在操作的 sheet 表
      */
@@ -35,6 +34,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     public SheetFactory(WorkbookProxy proxy, WorkbookFactory parent) {
         super(proxy, parent);
         factory = new RowFactory(proxy, this);
+        tableFactory = new TableFactory(proxy, this);
+        templateFactory = new TemplateFactory(proxy, this);
     }
 
     /**
@@ -57,7 +58,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return 正在操作的 sheet 表
      */
     @Override
-    Sheet get() { return getSheet(); }
+    protected Sheet get() { return getSheet(); }
 
     private RowFactory getRowFactory() { return this.factory; }
 
@@ -226,32 +227,39 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     }
 
     /**
-     * 从下一行开始将 List 数据渲染到当前 sheet 表中
-     * <p>
-     * 可用{@link DataColumn}定义表头
-     * <p>
-     * 否则将按照字段顺序写入到表格，并且忽略集合、数组或 Map 字段
-     * <p>
-     * 关于集合字段的处理方式参考{@link DataColumnFlatten}
+     * 注解式表格渲染
      *
-     * @param collect     数据
-     * @param targetClass 目标类型
-     * @param <T>         数据类型
+     * @param consumer
+     *
+     * @return
+     *
+     * @see TableColumn at field or method
+     * @see TableColumnFlatten at field or method
+     * @see TableListable at field or method if present {@link TableColumn} or {@link TableColumnFlatten}
+     * @see TableIndexer at field or method if present {@link TableColumn} or {@link TableColumnFlatten}
+     * @see TableRecord at type
      */
-    private <T> void renderList(Iterator<T> collect, Class<T> targetClass) { }
-
-    private <T> void renderList(Iterator<T> collect) { }
-
-    public <T> void renderList(Iterable<T> collect, Class<T> targetClass) {
-        renderList(collect.iterator(), targetClass);
+    public SheetFactory table(Consumer<TableFactory> consumer) {
+        tableFactory.setSheet(getSheet());
+        consumer.accept(tableFactory);
+        return this;
     }
 
-    public <T> void renderList(Iterable<T> collect) { renderList(collect.iterator()); }
-
-    private <T> void renderList(Stream<T> stream, Class<T> targetClass) { renderList(stream.iterator(), targetClass); }
-
-    private <T> void renderList(Stream<T> stream) { renderList(stream.iterator()); }
-
-    private <T> void renderList(T... collect) {
+    /**
+     * 模板渲染，在 sheet 中划定一块区域作为模板
+     * 模板中可以包含占位符、取值符号等
+     * 每个数据都用这个模板渲染并替换其中符合条件的占位符
+     * <p>
+     * 可以横向或纵向自由伸展，但请注意不要超过 sheet 的最大边界
+     *
+     * @param consumer
+     *
+     * @return
+     */
+    SheetFactory template(TemplateRegion region, Consumer<TemplateFactory> consumer) {
+        templateFactory.setSheet(getSheet());
+        templateFactory.setRegion(region);
+        consumer.accept(templateFactory);
+        return this;
     }
 }

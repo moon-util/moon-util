@@ -1,6 +1,6 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataColumn;
+import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.Priority;
 
 import java.util.Comparator;
@@ -12,7 +12,7 @@ import java.util.Map;
  */
 enum HeadSortEnum implements Comparator<HeadSortable> {
     /**
-     * 组内优先按{@link DataColumn#order()}排序，同序号按名称自然排序
+     * 组内优先按{@link TableColumn#order()}排序，同序号按名称自然排序
      * <p>
      * 组间按第一列（最小序号列）排序
      * <p>
@@ -48,8 +48,8 @@ enum HeadSortEnum implements Comparator<HeadSortable> {
             } else {
                 int compare = o1.getOrder() - o2.getOrder();
                 if (compare == 0) {
-                    Defined d1 = (Defined) o1;
-                    Defined d2 = (Defined) o2;
+                    Property d1 = (Property) o1;
+                    Property d2 = (Property) o2;
                     String[] ls1 = d1.getHeadLabels();
                     String[] ls2 = d2.getHeadLabels();
                     int len1 = ls1.length;

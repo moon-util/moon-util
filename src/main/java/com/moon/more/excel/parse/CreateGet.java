@@ -1,6 +1,6 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataIndexer;
+import com.moon.more.excel.annotation.TableIndexer;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-class CreateGet implements Creator<DefinedGet> {
+class CreateGet implements Creator<PropertyGet> {
 
     final static CreateGet CREATOR = new CreateGet();
 
@@ -19,27 +19,21 @@ class CreateGet implements Creator<DefinedGet> {
     static CreateGet getInstance() { return CREATOR; }
 
     @Override
-    public Method get(PropertyDescriptor descriptor) {
-        return descriptor.getReadMethod();
+    public Method get(PropertyDescriptor descriptor) { return descriptor.getReadMethod(); }
+
+    @Override
+    public Type getGenericType(Method method) { return method.getGenericReturnType(); }
+
+    @Override
+    public PropertyGet info(String propertyName, Marked<Method> onMethod) {
+        return PropertyGet.of(propertyName, onMethod);
     }
 
     @Override
-    public Type getGenericType(Method method) {
-        return method.getGenericReturnType();
-    }
+    public PropertyGet info(String propertyName, TableIndexer indexer) { return PropertyGet.of(propertyName, indexer); }
 
     @Override
-    public DefinedGet info(String propertyName, Marked<Method> onMethod) {
-        return DefinedGet.of(propertyName, onMethod);
-    }
-
-    @Override
-    public DefinedGet info(String propertyName, DataIndexer indexer) {
-        return DefinedGet.of(propertyName, indexer);
-    }
-
-    @Override
-    public Detail parsed(
-        List list, DetailRoot root, DefinedGet starting, DefinedGet ending
-    ) { return Detail.ofGetter(list, root, starting, ending); }
+    public PropertiesGroup parsed(
+        List list, DetailRoot root, PropertyGet starting, PropertyGet ending
+    ) { return PropertiesGroup.ofGetter(list, root, starting, ending); }
 }

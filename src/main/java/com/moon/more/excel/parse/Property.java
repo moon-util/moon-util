@@ -1,9 +1,9 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataColumn;
-import com.moon.more.excel.annotation.DataColumnFlatten;
-import com.moon.more.excel.annotation.DataIndexer;
-import com.moon.more.excel.annotation.DataListable;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnFlatten;
+import com.moon.more.excel.annotation.TableIndexer;
+import com.moon.more.excel.annotation.TableListable;
 import org.apache.poi.ss.usermodel.Cell;
 
 import java.io.Serializable;
@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * @author benshaoye
  */
-abstract class Defined implements Serializable, HeadSortable {
+public abstract class Property implements Serializable, HeadSortable {
 
     private final static String[] EMPTY = {};
 
@@ -24,9 +24,9 @@ abstract class Defined implements Serializable, HeadSortable {
 
     protected Marked<Field> atField;
 
-    protected Detail childrenGroup;
+    protected PropertiesGroup group;
 
-    protected Defined(String name, Marked<Method> atMethod) {
+    protected Property(String name, Marked<Method> atMethod) {
         this.atMethod = atMethod;
         this.name = name;
     }
@@ -46,6 +46,14 @@ abstract class Defined implements Serializable, HeadSortable {
     public boolean isDataFlatten() { return getFlatten() != null; }
 
     public boolean isDataColumn() { return getColumn() != null; }
+
+    public boolean isCanListable() {
+        return atMethod == null ? (atField != null && atField.isCanListable()) : atMethod.isCanListable();
+    }
+
+    public boolean isIterated() {
+        return atMethod == null ? (atField != null && atField.isIterated()) : atMethod.isIterated();
+    }
 
     /*
      * getters
@@ -74,14 +82,6 @@ abstract class Defined implements Serializable, HeadSortable {
         return value;
     }
 
-    public boolean isCanListable() {
-        if (atMethod == null) {
-            return atField.isCanListable();
-        } else {
-            return atMethod.isCanListable();
-        }
-    }
-
     @SafeVarargs
     protected static <T> boolean isEmpty(T... arr) { return arr == null || arr.length == 0; }
 
@@ -96,7 +96,7 @@ abstract class Defined implements Serializable, HeadSortable {
 
     public int getRowsLength() {
         int length = getHeadLabels().length;
-        Detail group = getChildrenGroup();
+        PropertiesGroup group = getGroup();
         return group == null ? length : length + group.getMaxRowsLength();
     }
 
@@ -105,22 +105,22 @@ abstract class Defined implements Serializable, HeadSortable {
 
     @Override
     public int getOrder() {
-        DataColumnFlatten flat = getFlatten();
-        DataColumn column = getColumn();
+        TableColumnFlatten flat = getFlatten();
+        TableColumn column = getColumn();
         return flat == null ? column.order() : flat.order();
     }
 
     public String getHeadLabelAsIndexer() { return gotIfNonNull(Marked::getHeadLabelAsIndexer); }
 
-    public DataListable getListable() { return gotIfNonNull(Marked::getListable); }
+    public TableListable getListable() { return gotIfNonNull(Marked::getListable); }
 
-    public DataIndexer getIndexer() { return gotIfNonNull(Marked::getIndexer); }
+    public TableIndexer getIndexer() { return gotIfNonNull(Marked::getIndexer); }
 
-    public DataColumnFlatten getFlatten() { return gotIfNonNull(Marked::getFlatten); }
+    public TableColumnFlatten getFlatten() { return gotIfNonNull(Marked::getFlatten); }
 
-    public DataColumn getColumn() { return gotIfNonNull(Marked::getColumn); }
+    public TableColumn getColumn() { return gotIfNonNull(Marked::getColumn); }
 
-    public Detail getChildrenGroup() { return gotIfNonNull(Marked::getChildren); }
+    public PropertiesGroup getGroup() { return gotIfNonNull(Marked::getChildren); }
 
     public Class getPropertyType() { return gotIfNonNull(Marked::getPropertyType); }
 
@@ -135,7 +135,7 @@ abstract class Defined implements Serializable, HeadSortable {
     void setAboutField(Marked<Field> atField) {
         if (this.atField == null) {
             this.atField = atField;
-            ParamUtil.requireNotDuplicated(getColumn(), getFlatten(), getName());
+            SupportUtil.requireNotDuplicated(getColumn(), getFlatten(), getName());
             afterSetField();
         }
     }

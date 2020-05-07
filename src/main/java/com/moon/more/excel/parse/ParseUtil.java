@@ -3,7 +3,7 @@ package com.moon.more.excel.parse;
 /**
  * @author benshaoye
  */
-class ParseUtil {
+public abstract class ParseUtil {
 
     private static class SetterParser extends Parser {
 
@@ -18,13 +18,7 @@ class ParseUtil {
     final static GetterParser GETTER = new GetterParser();
     final static SetterParser SETTER = new SetterParser();
 
-    private ParseUtil() {}
+    protected static PropertiesGroupGet parseGetter(Class<?> targetClass) { return (PropertiesGroupGet) GETTER.doParse(targetClass); }
 
-    public static DetailGet parseGetter(Class<?> targetClass) {
-        return (DetailGet) GETTER.doParse(targetClass);
-    }
-
-    public static DetailSet parseSetter(Class<?> targetClass) {
-        return (DetailSet) SETTER.doParse(targetClass);
-    }
+    protected static PropertiesGroupSet parseSetter(Class<?> targetClass) { return (PropertiesGroupSet) SETTER.doParse(targetClass); }
 }

@@ -1,8 +1,8 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataColumnFlatten;
-import com.moon.more.excel.annotation.DataIndexer;
-import com.moon.more.excel.annotation.DataRecord;
+import com.moon.more.excel.annotation.TableColumnFlatten;
+import com.moon.more.excel.annotation.TableIndexer;
+import com.moon.more.excel.annotation.TableRecord;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * @author benshaoye
  */
-abstract class Parser<T extends Defined> extends BaseParser {
+abstract class Parser<T extends Property> extends AbstractSupporter {
 
     private final Creator creator;
 
@@ -25,7 +25,7 @@ abstract class Parser<T extends Defined> extends BaseParser {
 
     protected Parser(Creator creator) { this.creator = creator; }
 
-    protected Detail doParse(Class type) {
+    protected PropertiesGroup doParse(Class type) {
         try {
             Map<String, T> annotated = new LinkedHashMap<>();
             Map<String, T> unAnnotated = new LinkedHashMap<>();
@@ -52,10 +52,10 @@ abstract class Parser<T extends Defined> extends BaseParser {
             String name = descriptor.getName();
             Class propType = descriptor.getPropertyType();
             Type genericType = creator.getGenericType(method);
-            Detail children = getGroupParsed(method, genericType, propType, name);
+            PropertiesGroup children = getGroupParsed(method, genericType, propType, name);
             Marked<Method> onMethod = Marked.of(name, propType, genericType, method, children);
 
-            Defined info = creator.info(name, onMethod);
+            Property info = creator.info(name, onMethod);
             if (onMethod.isAnnotated()) {
                 annotated.put(name, info);
             } else {
@@ -80,12 +80,12 @@ abstract class Parser<T extends Defined> extends BaseParser {
     }
 
     private void transform(
-        Field field, Map<String, Defined> annotated, Map<String, Defined> unAnnotated
+        Field field, Map<String, Property> annotated, Map<String, Property> unAnnotated
     ) {
         String name = field.getName();
         Marked<Field> onField = Marked.of(field, getGroupParsed(field));
 
-        Defined info = annotated.get(name);
+        Property info = annotated.get(name);
         if (info == null) {
             info = unAnnotated.remove(name);
             if (info == null) {
@@ -102,14 +102,14 @@ abstract class Parser<T extends Defined> extends BaseParser {
         }
     }
 
-    Detail getGroupParsed(Field field) {
+    PropertiesGroup getGroupParsed(Field field) {
         return getGroupParsed(field, field.getGenericType(), field.getType(), field.getName());
     }
 
-    Detail getGroupParsed(
+    PropertiesGroup getGroupParsed(
         AnnotatedElement elem, Type paramType, Class actualType, String propName
     ) {
-        DataColumnFlatten flatten = obtainFlatten(elem);
+        TableColumnFlatten flatten = obtainFlatten(elem);
         if (flatten != null) {
             Class actualTpe = flatten.targetClass();
             if (actualTpe == Void.class) {
@@ -126,12 +126,12 @@ abstract class Parser<T extends Defined> extends BaseParser {
         return null;
     }
 
-    private static <T extends Defined> Detail toParsedResult(
+    private static <T extends Property> PropertiesGroup toParsedResult(
         Creator creator, Class type, Map<String, T> annotated, Map<String, T> unAnnotated
     ) {
         List columns;
-        Defined ending = null;
-        Defined starting = null;
+        Property ending = null;
+        Property starting = null;
 
         boolean hasAnnotated = !annotated.isEmpty();
         if (hasAnnotated) {
@@ -157,9 +157,9 @@ abstract class Parser<T extends Defined> extends BaseParser {
             // throw new UnsupportedOperationException();
         }
 
-        DataIndexer idx = obtainIndexer(type);
+        TableIndexer idx = obtainIndexer(type);
         if (idx != null) {
-            Defined info = creator.info(type.getName(), idx);
+            Property info = creator.info(type.getName(), idx);
             if (idx.ending()) {
                 ending = info;
             } else {
@@ -167,7 +167,8 @@ abstract class Parser<T extends Defined> extends BaseParser {
             }
         }
 
-        DetailRoot root = DetailRoot.of(obtain(type, DataRecord.class));
+        SupportUtil.requireNotDuplicatedListable(columns);
+        DetailRoot root = DetailRoot.of(obtain(type, TableRecord.class));
         return creator.parsed(columns, root, starting, ending);
     }
 }

@@ -3,8 +3,9 @@ package com.moon.more.excel.parse;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.RandomUtil;
+import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.ExcelUtil;
-import com.moon.more.excel.annotation.DataColumn;
+import com.moon.more.excel.annotation.TableColumn;
 import lombok.ToString;
 import org.apache.poi.ss.usermodel.Cell;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,22 +27,22 @@ class PropGetterParsedTestTest {
     @ToString
     public static class EmployeeDetail {
 
-        @DataColumn
+        @TableColumn
         private String name = "张三" + RandomStringUtil.nextDigit(4);
 
-        @DataColumn
+        @TableColumn
         private String sex = RandomUtil.nextBoolean() ? "男" : "女";
 
-        @DataColumn
+        @TableColumn
         private int age = RandomUtil.nextInt(10, 20);
 
-        @DataColumn
+        @TableColumn
         private String schoolName = "北大（" + RandomUtil.nextInt(5) + "）中";
     }
 
     @Test
     void testGenerateDetailExcel() {
-        DetailGet get = ParseUtil.parseGetter(EmployeeDetail.class);
+        PropertiesGroupGet get = ParseUtil.parseGetter(EmployeeDetail.class);
         System.out.println();
         get.forEach(definedGet -> {
             System.out.println(definedGet.getName());
@@ -57,7 +58,7 @@ class PropGetterParsedTestTest {
         for (int i = 0; i < 10; i++) {
             details.add(new EmployeeDetail());
         }
-        DetailGet detailGet = ParseUtil.parseGetter(EmployeeDetail.class);
+        PropertiesGroupGet detailGet = ParseUtil.parseGetter(EmployeeDetail.class);
         // details.forEach(emp -> {
         //     StringBuilder data = new StringBuilder();
         //     detailGet.forEach(get -> {
@@ -70,17 +71,19 @@ class PropGetterParsedTestTest {
             for (EmployeeDetail detail : details) {
                 sheetFactory.row(rowFactory -> {
                     detailGet.forEach(get -> {
-                        Cell cell = rowFactory.cell().getCell();
+                        CellFactory factory = rowFactory.cell();
+                        Cell cell = factory.getCell();
                         get.exec(detail, cell);
                     });
                 });
             }
-        }).write2Filepath("/Users/moonsky/Workspaces/test.xlsx");
+            // sheetFactory.renderList();
+        }).write2Filepath("D:/test.xlsx");
     }
 
     @Test
     void testName() {
-        Detail<DefinedGet> parsed = ParseUtil.parseGetter(UserDetail.class);
+        PropertiesGroup<PropertyGet> parsed = ParseUtil.parseGetter(UserDetail.class);
         System.out.println();
         parsed.columns.forEach(col -> {
             System.out.println(Arrays.toString(col.getColumn().value()));
@@ -90,22 +93,22 @@ class PropGetterParsedTestTest {
 
     public static class UserDetail {
 
-        @DataColumn({"基本信息", "姓名"})
+        @TableColumn({"基本信息", "姓名"})
         private String name = "张三" + RandomStringUtil.nextDigit(4);
 
-        @DataColumn({"基本信息", "性别"})
+        @TableColumn({"基本信息", "性别"})
         private String sex = RandomUtil.nextBoolean() ? "男" : "女";
 
-        @DataColumn({"基本信息", "年龄"})
+        @TableColumn({"基本信息", "年龄"})
         private int age = RandomUtil.nextInt(10, 20);
 
-        @DataColumn({"学历信息", "毕业院校"})
+        @TableColumn({"学历信息", "毕业院校"})
         private String schoolName = RandomUtil.nextBoolean() ? "男" : "女";
 
-        @DataColumn({"学历信息", "毕业时间"})
+        @TableColumn({"学历信息", "毕业时间"})
         private Date datetime = new Date();
 
-        @DataColumn({"学历信息", "学历"})
+        @TableColumn({"学历信息", "学历"})
         private String education = RandomStringUtil.nextDigit(4);
 
         private String description = RandomStringUtil.nextDigit(4);

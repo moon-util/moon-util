@@ -1,6 +1,6 @@
 package com.moon.more.excel.parse;
 
-import com.moon.more.excel.annotation.DataIndexer;
+import com.moon.more.excel.annotation.TableIndexer;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-class CreateSet implements Creator<DefinedSet> {
+class CreateSet implements Creator<PropertySet> {
 
     final static CreateSet CREATOR = new CreateSet();
 
@@ -27,17 +27,17 @@ class CreateSet implements Creator<DefinedSet> {
     }
 
     @Override
-    public DefinedSet info(String propertyName, Marked<Method> onMethod) {
-        return DefinedSet.of(propertyName, onMethod);
+    public PropertySet info(String propertyName, Marked<Method> onMethod) {
+        return PropertySet.of(propertyName, onMethod);
     }
 
     @Override
-    public DefinedSet info(String propertyName, DataIndexer indexer) {
-        return DefinedSet.of(propertyName, indexer);
+    public PropertySet info(String propertyName, TableIndexer indexer) {
+        return PropertySet.of(propertyName, indexer);
     }
 
     @Override
-    public Detail parsed(
-        List list, DetailRoot root, DefinedSet starting, DefinedSet ending
-    ) { return Detail.ofSetter(list, root, starting, ending); }
+    public PropertiesGroup parsed(
+        List list, DetailRoot root, PropertySet starting, PropertySet ending
+    ) { return PropertiesGroup.ofSetter(list, root, starting, ending); }
 }

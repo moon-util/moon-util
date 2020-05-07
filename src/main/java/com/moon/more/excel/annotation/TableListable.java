@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 标注该列数据是可迭代列，此注解只是表示数据是可迭代数据，以及合并策略等
  * <p>
- * 但如果没有定义{@link DataColumn}或{@link DataColumnFlatten}，将不会渲染
+ * 但如果没有定义{@link TableColumn}或{@link TableColumnFlatten}，将不会渲染
  * <p>
  * 一个实体里最多只能有一列数据可迭代
  *
@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataListable {
+public @interface TableListable {
 
     /**
      * 参考列
@@ -34,13 +34,13 @@ public @interface DataListable {
      * <pre>
      * public class Student {
      *
-     *     &#064;SheetColumn("姓名")
+     *     &#064;TableColumn("姓名")
      *     private String name;
      *
-     *     &#064;SheetColumn("身份证号")
+     *     &#064;TableColumn("身份证号")
      *     private String idCard;
      *
-     *     &#064;SheetColumnListable(value = "身份证号")
+     *     &#064;TableListable(value = "身份证号")
      *     private List&lt;String&gt; scores;
      * }
      * </pre>

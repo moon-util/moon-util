@@ -57,7 +57,7 @@ import java.lang.annotation.Target;
  *
  * <h3>2、如果同时设置了{@link #order()}</h3>
  * 将首先按表头分组，然后对分组内的列，按{@code order}的值进行排序
- * {@link DataColumnFlatten#order()}
+ * {@link TableColumnFlatten#order()}
  *
  * <h3>3、如果表头数量不一致：</h3>
  * <pre>
@@ -89,7 +89,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataColumn {
+public @interface TableColumn {
 
     /**
      * 列标题，可设置合并标题

@@ -1,9 +1,9 @@
 package com.moon.more.excel.parse;
 
 import com.moon.core.lang.reflect.FieldUtil;
-import com.moon.more.excel.annotation.DataColumn;
-import com.moon.more.excel.annotation.DataColumnFlatten;
-import com.moon.more.excel.annotation.DataIndexer;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnFlatten;
+import com.moon.more.excel.annotation.TableIndexer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -105,29 +105,29 @@ class PropertyGetterParserTestTest {
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(ParamUtil.getActual(genericReturnType));
+                System.out.println(SupportUtil.getActual(genericReturnType));
             }
             if (descriptor.getName().equalsIgnoreCase("sex")) {
                 System.out.println("======== sex");
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(ParamUtil.getActual(genericReturnType));
+                System.out.println(SupportUtil.getActual(genericReturnType));
             }
             if (descriptor.getName().equalsIgnoreCase("keywords")) {
                 System.out.println("======== keywords");
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(ParamUtil.getActual(genericReturnType));
+                System.out.println(SupportUtil.getActual(genericReturnType));
             }
             if (descriptor.getName().equalsIgnoreCase("remarks")) {
                 System.out.println("======== remarks");
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(ParamUtil.getActual(genericReturnType));
-                System.out.println(ParamUtil.getActual(genericReturnType, 1));
+                System.out.println(SupportUtil.getActual(genericReturnType));
+                System.out.println(SupportUtil.getActual(genericReturnType, 1));
             }
         }
 
@@ -144,19 +144,19 @@ class PropertyGetterParserTestTest {
 
     public static class Employee21 {
 
-        @DataColumn
+        @TableColumn
         private String name;
 
-        @DataIndexer
+        @TableIndexer
         private String sex;
 
-        @DataIndexer
-        @DataColumnFlatten
+        @TableIndexer
+        @TableColumnFlatten
         public int getAge() {
             return 20;
         }
 
-        @DataIndexer(ending = true)
+        @TableIndexer(ending = true)
         public int getEmail() {
             return 20;
         }
@@ -164,19 +164,19 @@ class PropertyGetterParserTestTest {
 
     public static class Employee2 {
 
-        @DataColumn
+        @TableColumn
         private String name;
 
-        @DataIndexer
+        @TableIndexer
         private String sex;
 
-        @DataIndexer
-        @DataColumnFlatten
+        @TableIndexer
+        @TableColumnFlatten
         public int getAge() {
             return 20;
         }
 
-        @DataIndexer
+        @TableIndexer
         public int getEmail() {
             return 20;
         }
@@ -185,17 +185,17 @@ class PropertyGetterParserTestTest {
 
     public static class Employee1 {
 
-        @DataColumn
+        @TableColumn
         private String name;
         private String sex;
 
-        @DataIndexer
-        @DataColumnFlatten
+        @TableIndexer
+        @TableColumnFlatten
         public int getAge() {
             return 20;
         }
 
-        @DataIndexer
+        @TableIndexer
         public int getEmail() {
             return 20;
         }
@@ -203,16 +203,16 @@ class PropertyGetterParserTestTest {
 
     public static class Employee0 {
 
-        @DataColumn
+        @TableColumn
         private String name;
         private String sex;
 
-        @DataColumnFlatten
+        @TableColumnFlatten
         public int getAge() {
             return 20;
         }
 
-        @DataIndexer
+        @TableIndexer
         public int getEmail() {
             return 20;
         }
@@ -220,7 +220,7 @@ class PropertyGetterParserTestTest {
 
     @Test
     void testParsed1() {
-        Detail<DefinedGet> parsed = ParseUtil.parseGetter(Employee0.class);
+        PropertiesGroup<PropertyGet> parsed = ParseUtil.parseGetter(Employee0.class);
 
         assertTrue(parsed.hasStarting());
         assertFalse(parsed.hasEnding());
@@ -247,7 +247,7 @@ class PropertyGetterParserTestTest {
 
     public static class Employee {
 
-        @DataColumn
+        @TableColumn
         private String name;
         private String sex;
 
@@ -258,7 +258,7 @@ class PropertyGetterParserTestTest {
 
     @Test
     void testParsed() {
-        Detail<DefinedGet> parsed = ParseUtil.parseGetter(Employee.class);
+        PropertiesGroup<PropertyGet> parsed = ParseUtil.parseGetter(Employee.class);
 
         assertEquals(1, parsed.columns.size());
     }
@@ -293,17 +293,17 @@ class PropertyGetterParserTestTest {
 
     public static class User01 {
 
-        @DataColumn
-        @DataColumnFlatten
+        @TableColumn
+        @TableColumnFlatten
         private String name;
     }
 
     public static class User02 {
 
-        @DataColumn
+        @TableColumn
         private String age;
 
-        @DataColumnFlatten
+        @TableColumnFlatten
         public String getAge() {
             return age;
         }
@@ -311,10 +311,10 @@ class PropertyGetterParserTestTest {
 
     public static class User03 {
 
-        @DataColumn
+        @TableColumn
         private String sex;
 
-        @DataColumnFlatten
+        @TableColumnFlatten
         public void setSex(String sex) {
             this.sex = sex;
         }

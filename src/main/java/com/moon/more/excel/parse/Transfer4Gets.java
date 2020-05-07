@@ -5,6 +5,7 @@ import com.moon.core.time.TimeUtil;
 import com.moon.core.util.CalendarUtil;
 import com.moon.core.util.DateUtil;
 import org.apache.poi.ss.usermodel.Cell;
+import sun.util.BuddhistCalendar;
 
 import javax.lang.model.type.NullType;
 import java.math.BigDecimal;
@@ -17,6 +18,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.DoubleAdder;
+import java.util.concurrent.atomic.LongAdder;
 
 import static java.util.Collections.unmodifiableSet;
 
@@ -54,7 +59,11 @@ public enum Transfer4Gets {
         byte.class,
         Byte.class,
         BigDecimal.class,
-        BigInteger.class) {
+        BigInteger.class,
+        AtomicInteger.class,
+        AtomicLong.class,
+        DoubleAdder.class,
+        LongAdder.class) {
         @Override
         public boolean test(Object data) { return data instanceof Number; }
 
@@ -82,11 +91,9 @@ public enum Transfer4Gets {
             }
         }
     },
-    CALENDAR(Date.class, Time.class, Timestamp.class, java.sql.Date.class) {
+    CALENDAR(Calendar.class, GregorianCalendar.class, BuddhistCalendar.class) {
         @Override
-        public boolean test(Object data) {
-            return data instanceof Calendar;
-        }
+        public boolean test(Object data) { return data instanceof Calendar; }
 
         @Override
         public void setCellValue(Object data, Cell cell) {
@@ -102,14 +109,10 @@ public enum Transfer4Gets {
         private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
         @Override
-        public boolean test(Class type) {
-            return TemporalAccessor.class.isAssignableFrom(type);
-        }
+        public boolean test(Class type) { return TemporalAccessor.class.isAssignableFrom(type); }
 
         @Override
-        public boolean test(Object data) {
-            return data instanceof TemporalAccessor;
-        }
+        public boolean test(Object data) { return data instanceof TemporalAccessor; }
 
         @Override
         public void setCellValue(Object data, Cell cell) {
@@ -139,14 +142,7 @@ public enum Transfer4Gets {
 
     private static class Transfers {
 
-        final static Set<Transfer4Gets> VALUES;
-
-        static {
-            Set<Transfer4Gets> gets = new HashSet<>(Arrays.asList(Transfer4Gets.values()));
-            // gets.remove(STRING);
-            VALUES = gets;
-        }
-
+        final static Set<Transfer4Gets> VALUES = toSet(Transfer4Gets.values());
     }
 
     private static class Cached {
@@ -160,7 +156,11 @@ public enum Transfer4Gets {
         for (Class<?> support : supports) {
             Cached.SUPPORTS.put(support, this);
         }
-        defaults = unmodifiableSet(new HashSet<>(Arrays.asList(supports)));
+        defaults = toSet(supports);
+    }
+
+    private static <T> Set toSet(T... ts) {
+        return unmodifiableSet(new HashSet<>(Arrays.asList(ts)));
     }
 
     public static Transfer4Gets find(Class type) {

@@ -8,15 +8,15 @@ import java.lang.annotation.Target;
 /**
  * 扁平化集合数据，如果数据中有字段是集合或数组
  * <p>
- * 对字段注解{@link DataColumnFlatten}，会对数据进行合并行处理
+ * 对字段注解{@link TableColumnFlatten}，会对数据进行合并行处理
  * <p>
- * 同时，这个字段的数据的对应多列表头在其实体中再次使用{@link DataColumn}声明
+ * 同时，这个字段的数据的对应多列表头在其实体中再次使用{@link TableColumn}声明
  *
  * @author benshaoye
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataColumnFlatten {
+public @interface TableColumnFlatten {
 
     /**
      * 列标题，可设置合并标题

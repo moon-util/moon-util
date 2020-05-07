@@ -6,27 +6,27 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 定义序号列，将{@link DataIndexer}注解在字段上，
+ * 定义序号列，将{@link TableIndexer}注解在字段上，
  * <p>
- * 列标题合并规则与{@link DataColumn}一样
+ * 列标题合并规则与{@link TableColumn}一样
  *
- * <h3>一、如果该字段同时注解了{@link DataColumn}</h3>
+ * <h3>一、如果该字段同时注解了{@link TableColumn}</h3>
  * 1. 就会在在列前插入序号列，可以插入多列序号
  * <p>
  * 2. {@link #ending()}为{@code true}，序号列在后面插入
  *
- * <h3>二、如果该字段没有注解{@link DataColumn}</h3>
+ * <h3>二、如果该字段没有注解{@link TableColumn}</h3>
  * 1. 在第一列插入；
  * 2. {@link #ending()}为{@code true}，序号列在最后一列
  *
- * <h3>二、注解{@link DataColumnFlatten}</h3>
+ * <h3>二、注解{@link TableColumnFlatten}</h3>
  * 参考以上。
  *
  * @author benshaoye
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataIndexer {
+public @interface TableIndexer {
 
     /**
      * 序号列标题，始终为所依附列同级

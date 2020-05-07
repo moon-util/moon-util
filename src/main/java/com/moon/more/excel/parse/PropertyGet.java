@@ -3,9 +3,9 @@ package com.moon.more.excel.parse;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.more.excel.PropertyGetter;
-import com.moon.more.excel.annotation.DataColumn;
-import com.moon.more.excel.annotation.DataColumnFlatten;
-import com.moon.more.excel.annotation.DataIndexer;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnFlatten;
+import com.moon.more.excel.annotation.TableIndexer;
 import org.apache.poi.ss.usermodel.Cell;
 
 import java.lang.reflect.Field;
@@ -14,29 +14,30 @@ import java.lang.reflect.Method;
 /**
  * @author benshaoye
  */
-class DefinedGet extends Defined {
+public class PropertyGet extends Property {
 
     private final LazyAccessor<PropertyGetter> accessor;
-    final LazyAccessor<Transfer4Gets> transfer;
+    private final LazyAccessor<Transfer4Gets> transfer;
 
-    private DefinedGet(
-        String name, Marked<Method> onMethod
-    ) {
+    private PropertyGet(String name, Marked<Method> onMethod) {
         super(name, onMethod);
         accessor = LazyAccessor.of(() -> ValueGetter.of(getAtMethod(), getAtField()));
         this.transfer = LazyAccessor.of(() -> Transfer4Gets.find(getPropertyType()));
     }
 
-    static DefinedGet of(
+    static PropertyGet of(
         String name, Marked<Method> onMethod
-    ) { return new DefinedGet(name, onMethod); }
+    ) { return new PropertyGet(name, onMethod); }
 
-    static DefinedGet of(
-        String name, DataIndexer indexer
+    static PropertyGet of(
+        String name, TableIndexer indexer
     ) { return new IndexedGetter(name, indexer); }
 
     @Override
-    protected void afterSetField() { accessor.clear(); }
+    protected void afterSetField() {
+        transfer.clear();
+        accessor.clear();
+    }
 
     @Override
     public void exec(Object data, Cell cell) {
@@ -47,11 +48,11 @@ class DefinedGet extends Defined {
 
     Object getValue(Object data) { return getPropertyGetter().getValue(data); }
 
-    static class IndexedGetter extends DefinedGet {
+    static class IndexedGetter extends PropertyGet {
 
-        private final DataIndexer indexer;
+        private final TableIndexer indexer;
 
-        private IndexedGetter(String name, DataIndexer indexer) {
+        private IndexedGetter(String name, TableIndexer indexer) {
             super(name, null);
             this.indexer = indexer;
         }
@@ -81,19 +82,19 @@ class DefinedGet extends Defined {
         Method getAtMethod() { return null; }
 
         @Override
-        public Detail getChildrenGroup() { return null; }
+        public PropertiesGroup getGroup() { return null; }
 
         @Override
-        public DataColumn getColumn() { return null; }
+        public TableColumn getColumn() { return null; }
 
         @Override
-        public DataColumnFlatten getFlatten() { return null; }
+        public TableColumnFlatten getFlatten() { return null; }
 
         @Override
         public Class getPropertyType() { return null; }
 
         @Override
-        public DataIndexer getIndexer() { return indexer; }
+        public TableIndexer getIndexer() { return indexer; }
 
         @Override
         public String[] getHeadLabels() { return null; }

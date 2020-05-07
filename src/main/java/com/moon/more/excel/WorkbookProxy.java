@@ -15,7 +15,7 @@ import static com.moon.more.excel.WorkbookType.*;
 /**
  * @author benshaoye
  */
-final class WorkbookProxy {
+public final class WorkbookProxy {
 
     private final static boolean DEFAULT_APPEND_DATA = true;
 
@@ -161,11 +161,11 @@ final class WorkbookProxy {
         return drawing.createCellComment(getWorkbookType().newAnchor());
     }
 
-    RichTextString createRichText(String content) {
-        return getWorkbookType().newRichText(content);
-    }
+    RichTextString createRichText(String content) { return getWorkbookType().newRichText(content); }
 
     WorkbookType getWorkbookType() { return type; }
+
+    int currentIndexOfCell() { return indexOfCell; }
 
     /*
      sheet

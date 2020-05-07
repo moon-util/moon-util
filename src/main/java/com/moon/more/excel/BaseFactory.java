@@ -32,7 +32,7 @@ public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends B
      *
      * @return 当前正在操作的对象
      */
-    abstract T get();
+    protected abstract T get();
 
     /**
      * 当前正在操作的工作簿类型
@@ -40,6 +40,13 @@ public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends B
      * @return 工作簿类型
      */
     WorkbookType getWorkbookType() { return proxy.getWorkbookType(); }
+
+    /**
+     * 获取
+     *
+     * @return 获取代理模型
+     */
+    protected WorkbookProxy getProxy() { return proxy; }
 
     /**
      * 预定义样式

@@ -2,7 +2,7 @@ package com.moon.more.excel;
 
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.ListUtil;
-import com.moon.more.excel.annotation.DataColumn;
+import com.moon.more.excel.annotation.TableColumn;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class RendererParserTestTest {
 
     public static class Employee {
 
-        @DataColumn
+        @TableColumn
         private String name;
         private String sex;
 
