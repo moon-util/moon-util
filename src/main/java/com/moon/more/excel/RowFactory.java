@@ -31,7 +31,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
     void setRow(Row row) { this.row = row; }
 
     @Override
-    Row get() { return getRow(); }
+    protected Row get() { return getRow(); }
 
     /**
      * 预定义注释
@@ -265,6 +265,15 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
      *
+     * @param offset 单元格位置偏移量
+     *
+     * @return CellFactory
+     */
+    public CellFactory cell(int offset) { return cell(1, 1, offset); }
+
+    /**
+     * 创建下一个单元格，返回对下一个单元格的操作器
+     *
      * @param rowspan 合并行数，默认 1
      * @param colspan 合并列数，默认 1
      *
@@ -275,14 +284,14 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
      *
-     * @param rowspan   合并行数，默认 1
-     * @param colspan   合并列数，默认 1
-     * @param skipCells 跳过的单元格数量
+     * @param rowspan 合并行数，默认 1
+     * @param colspan 合并列数，默认 1
+     * @param offset  单元格位置偏移量
      *
      * @return CellFactory
      */
-    public CellFactory cell(int rowspan, int colspan, int skipCells) {
-        nextCell(rowspan, colspan, skipCells);
+    public CellFactory cell(int rowspan, int colspan, int offset) {
+        nextCell(rowspan, colspan, offset);
         return getCellFactory();
     }
 
@@ -297,17 +306,17 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory cell(Consumer<CellFactory> consumer) { return cell(1, consumer); }
+    public RowFactory cell(Consumer<CellFactory> consumer) { return cell(0, consumer); }
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器
      *
-     * @param colspan  合并列数，默认 1
+     * @param offset   单元格位置偏移量
      * @param consumer 操作单元格
      *
      * @return 当前 RowFactory
      */
-    public RowFactory cell(int colspan, Consumer<CellFactory> consumer) { return cell(1, colspan, consumer); }
+    public RowFactory cell(int offset, Consumer<CellFactory> consumer) { return cell(1, 1, offset, consumer); }
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器
@@ -319,21 +328,21 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      * @return 当前 RowFactory
      */
     public RowFactory cell(int rowspan, int colspan, Consumer<CellFactory> consumer) {
-        return cell(rowspan, colspan, consumer, 0);
+        return cell(rowspan, colspan, 0, consumer);
     }
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器
      *
-     * @param rowspan   合并行数，默认 1
-     * @param colspan   合并列数，默认 1
-     * @param consumer  操作单元格
-     * @param skipCells 跳过的单元格数量
+     * @param rowspan  合并行数，默认 1
+     * @param colspan  合并列数，默认 1
+     * @param consumer 操作单元格
+     * @param offset   单元格位置偏移量
      *
      * @return 当前 RowFactory
      */
-    public RowFactory cell(int rowspan, int colspan, Consumer<CellFactory> consumer, int skipCells) {
-        nextCell(rowspan, colspan, skipCells);
+    public RowFactory cell(int rowspan, int colspan, int offset, Consumer<CellFactory> consumer) {
+        nextCell(rowspan, colspan, offset);
         consumer.accept(getCellFactory());
         return this;
     }
@@ -350,11 +359,11 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
     /**
      * 创建并返回下一个单元格
      *
-     * @param skipCells 跳过的单元格数量
+     * @param offset 单元格位置偏移量
      *
      * @return 下一个单元格
      */
-    public Cell nextCell(int skipCells) { return nextCell(1, 1, skipCells); }
+    public Cell nextCell(int offset) { return nextCell(1, 1, offset); }
 
     /**
      * 创建并返回下一个单元格
@@ -369,15 +378,47 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
     /**
      * 创建并返回下一个单元格
      *
-     * @param rowspan   合并行数，默认 1
-     * @param colspan   合并列数，默认 1
-     * @param skipCells 跳过的单元格数量
+     * @param rowspan 合并行数，默认 1
+     * @param colspan 合并列数，默认 1
+     * @param offset  单元格位置偏移量
      *
      * @return 下一个单元格
      */
-    public Cell nextCell(int rowspan, int colspan, int skipCells) {
-        return factory.setCell(proxy.nextCell(skipCells, rowspan, colspan));
+    public Cell nextCell(int rowspan, int colspan, int offset) {
+        return factory.setCell(proxy.nextCell(offset, rowspan, colspan));
     }
+
+    // create a cell at index
+
+
+    /**
+     * 在指定位置使用或创建单元格
+     *
+     * @param index 单元格位置
+     *
+     * @return 单元格操作器
+     */
+    public CellFactory index(int index) {
+        factory.setCell(proxy.useOrCreateCell(index, true));
+        return factory;
+    }
+
+
+    /**
+     * 在指定位置使用或创建单元格
+     *
+     * @param index    单元格位置
+     * @param consumer 操作器
+     *
+     * @return 当前 RowFactory
+     */
+    public RowFactory index(int index, Consumer<CellFactory> consumer) {
+        factory.setCell(proxy.useOrCreateCell(index, true));
+        consumer.accept(factory);
+        return this;
+    }
+
+    // use a present cell or create a new cell
 
     /**
      * 在指定位置使用或创建单元格
@@ -414,7 +455,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory useCell(int cellIndexInRow, int rowspan, int colspan, Consumer<CellFactory> consumer) {
+    private RowFactory useCell(int cellIndexInRow, int rowspan, int colspan, Consumer<CellFactory> consumer) {
         consumer.accept(useCell(cellIndexInRow, rowspan, colspan));
         return this;
     }

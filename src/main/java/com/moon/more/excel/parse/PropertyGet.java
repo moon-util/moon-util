@@ -17,12 +17,12 @@ import java.lang.reflect.Method;
 public class PropertyGet extends Property {
 
     private final LazyAccessor<PropertyGetter> accessor;
-    private final LazyAccessor<Transfer4Gets> transfer;
+    private final LazyAccessor<Transfer4Get> transfer;
 
     private PropertyGet(String name, Marked<Method> onMethod) {
         super(name, onMethod);
         accessor = LazyAccessor.of(() -> ValueGetter.of(getAtMethod(), getAtField()));
-        this.transfer = LazyAccessor.of(() -> Transfer4Gets.find(getPropertyType()));
+        this.transfer = LazyAccessor.of(() -> Transfer4Get.find(getPropertyType()));
     }
 
     static PropertyGet of(

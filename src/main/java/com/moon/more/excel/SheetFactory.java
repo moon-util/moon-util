@@ -215,13 +215,13 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     /**
      * 跳过指定行数，创建新的一行并设置为当前操作行
      *
-     * @param skipRows 跳过的行数
+     * @param offset   行位置偏移量
      * @param consumer 操作器
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory row(int skipRows, Consumer<RowFactory> consumer) {
-        factory.setRow(proxy.nextRow(skipRows));
+    public SheetFactory row(int offset, Consumer<RowFactory> consumer) {
+        factory.setRow(proxy.nextRow(offset));
         consumer.accept(getRowFactory());
         return this;
     }

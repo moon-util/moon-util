@@ -50,7 +50,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @return 当前正在操作的单元格实例
      */
     @Override
-    Cell get() { return getCell(); }
+    protected Cell get() { return getCell(); }
 
     /**
      * 设置将要操作的单元格

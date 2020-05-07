@@ -165,7 +165,7 @@ public final class WorkbookProxy {
 
     WorkbookType getWorkbookType() { return type; }
 
-    int currentIndexOfCell() { return indexOfCell; }
+    // int currentIndexOfCell() { return indexOfCell; }
 
     /*
      sheet
@@ -204,22 +204,22 @@ public final class WorkbookProxy {
         }
     }
 
-    Sheet useSheet() { return useSheet(null); }
+    // Sheet useSheet() { return useSheet(null); }
 
     Sheet useSheet(String sheetName) { return useSheet(sheetName, DEFAULT_APPEND_DATA); }
 
-    Sheet useSheet(int index) { return useSheet(index, DEFAULT_APPEND_DATA); }
+    // Sheet useSheet(int index) { return useSheet(index, DEFAULT_APPEND_DATA); }
 
     /*
      row
      */
 
-    int getIndexOfRow() { return indexOfRow; }
+    // int getIndexOfRow() { return indexOfRow; }
 
     int nextIndexOfRow() { return indexOfRow++; }
 
-    int nextIndexOfRow(int skip) {
-        int index = indexOfRow + skip;
+    int nextIndexOfRow(int offset) {
+        int index = indexOfRow + offset;
         this.indexOfRow = index + 1;
         return index;
     }
@@ -235,45 +235,49 @@ public final class WorkbookProxy {
         return setRow(row, Math.max(index, 0));
     }
 
-    Row setRow(Row row) { return setRow(row, DEFAULT_APPEND_DATA); }
+    // Row setRow(Row row) { return setRow(row, DEFAULT_APPEND_DATA); }
 
     Row getRow() { return row; }
 
-    Row createRow(int index, boolean appendCell) { return setRow(sheet.createRow(index), appendCell); }
+    private Row createRow(int index, boolean appendCell) { return setRow(sheet.createRow(index), appendCell); }
 
-    Row createRow(int index) { return createRow(index, DEFAULT_APPEND_DATA); }
+    // Row createRow(int index) { return createRow(index, DEFAULT_APPEND_DATA); }
 
-    Row useRow(int index, boolean appendCell) { return setRow(sheet.getRow(index), appendCell); }
+    // Row useRow(int index, boolean appendCell) {
+    //     this.indexOfRow = index;
+    //     return setRow(sheet.getRow(index), appendCell);
+    // }
 
-    Row useRow(int index) { return useRow(index, DEFAULT_APPEND_DATA); }
+    // Row useRow(int index) { return useRow(index, DEFAULT_APPEND_DATA); }
 
     Row useOrCreateRow(int index, boolean appendCell) {
         Row row = sheet.getRow(index);
         if (row == null) {
             row = sheet.createRow(index);
         }
+        this.indexOfRow = index;
         return setRow(row, appendCell);
     }
 
-    Row useOrCreateRow(int index) { return useOrCreateRow(index, DEFAULT_APPEND_DATA); }
+    // Row useOrCreateRow(int index) { return useOrCreateRow(index, DEFAULT_APPEND_DATA); }
 
     Row nextRow(boolean appendCell) { return createRow(nextIndexOfRow(), appendCell); }
 
-    Row nextRow(int skip, boolean appendCell) { return createRow(nextIndexOfRow(skip), appendCell); }
+    Row nextRow(int offset, boolean appendCell) { return createRow(nextIndexOfRow(offset), appendCell); }
 
     Row nextRow() { return nextRow(DEFAULT_APPEND_DATA); }
 
-    Row nextRow(int skip) { return nextRow(skip, DEFAULT_APPEND_DATA); }
+    Row nextRow(int offset) { return nextRow(offset, DEFAULT_APPEND_DATA); }
 
     /*
      cell
      */
 
-    int nextIndexOfCell(int skip, int rowspan, int colspan) {
+    int nextIndexOfCell(int offset, int rowspan, int colspan) {
         int cIdx = this.indexOfCell;
         Map<Integer, Object> rowFilled = getRowFilled();
         for (; rowFilled.get(cIdx) != null; cIdx++) { }
-        int nCellIdx = cIdx + skip;
+        int nCellIdx = cIdx + offset;
         int eCellIdx = nCellIdx + colspan;
         Object placeholder = PLACEHOLDER;
         for (int i = nCellIdx; i < eCellIdx; i++) {
@@ -305,24 +309,48 @@ public final class WorkbookProxy {
 
     Cell setCell(Cell cell) { return this.cell = cell; }
 
-    Cell getCell() { return cell; }
+    // Cell getCell() { return cell; }
 
     CellRangeAddress getRegion() { return mergedOnCell.get(); }
 
-    Cell useCell(int index) { return setCell(row.getCell(index)); }
+    // Cell useCell(int index) { return setCell(row.getCell(index)); }
 
-    Cell createCell(int index) { return setCell(row.createCell(index)); }
+    private Cell createCell(int index) { return setCell(row.createCell(index)); }
 
-    Cell useOrCreateCell(int index) {
-        Cell cell = row.getCell(index);
-        return setCell(cell == null ? row.createCell(index) : cell);
+    private void fillIndex(Integer index) {
+        getRowFilled().put(index, PLACEHOLDER);
     }
 
-    Cell nextCell() { return nextCell(0); }
+    Cell setCellAndFill(Cell cell, int index) {
+        fillIndex(index);
+        return setCell(cell);
+    }
 
-    Cell nextCell(int skip) { return nextCell(skip, 1, 1); }
+    Cell createCellAndFill(int index) {
+        fillIndex(index);
+        return createCell(index);
+    }
 
-    Cell nextCell(int rowspan, int colspan) { return nextCell(0, rowspan, colspan); }
+    Cell useOrCreateCell(int index, boolean alwaysCreateCell) {
+        if (alwaysCreateCell) {
+            return createCellAndFill(index);
+        } else {
+            Cell cell = row.getCell(index);
+            return cell == null ? createCellAndFill(index) : setCellAndFill(cell, index);
+        }
+    }
 
-    Cell nextCell(int skip, int rowspan, int colspan) { return createCell(nextIndexOfCell(skip, rowspan, colspan)); }
+    Cell useOrCreateCell(int index) {
+        return useOrCreateCell(index, false);
+    }
+
+    // Cell nextCell() { return nextCell(0); }
+
+    // Cell nextCell(int offset) { return nextCell(offset, 1, 1); }
+
+    // Cell nextCell(int rowspan, int colspan) { return nextCell(0, rowspan, colspan); }
+
+    Cell nextCell(int offset, int rowspan, int colspan) {
+        return createCell(nextIndexOfCell(offset, rowspan, colspan));
+    }
 }

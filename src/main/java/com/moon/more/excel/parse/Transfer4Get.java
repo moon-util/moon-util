@@ -7,7 +7,6 @@ import com.moon.core.util.DateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import sun.util.BuddhistCalendar;
 
-import javax.lang.model.type.NullType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
@@ -28,7 +27,7 @@ import static java.util.Collections.unmodifiableSet;
 /**
  * @author benshaoye
  */
-public enum Transfer4Gets {
+public enum Transfer4Get {
     STRING(String.class,
         StringBuilder.class,
         StringBuffer.class,
@@ -142,17 +141,17 @@ public enum Transfer4Gets {
 
     private static class Transfers {
 
-        final static Set<Transfer4Gets> VALUES = toSet(Transfer4Gets.values());
+        final static Set<Transfer4Get> VALUES = toSet(Transfer4Get.values());
     }
 
     private static class Cached {
 
-        final static Map<Class, Transfer4Gets> SUPPORTS = new HashMap<>();
+        final static Map<Class, Transfer4Get> SUPPORTS = new HashMap<>();
     }
 
     private final Set<Class<?>> defaults;
 
-    Transfer4Gets(Class<?>... supports) {
+    Transfer4Get(Class<?>... supports) {
         for (Class<?> support : supports) {
             Cached.SUPPORTS.put(support, this);
         }
@@ -163,12 +162,12 @@ public enum Transfer4Gets {
         return unmodifiableSet(new HashSet<>(Arrays.asList(ts)));
     }
 
-    public static Transfer4Gets find(Class type) {
-        Transfer4Gets transfer = Cached.SUPPORTS.get(type);
+    public static Transfer4Get find(Class type) {
+        Transfer4Get transfer = Cached.SUPPORTS.get(type);
         if (transfer != null) {
             return transfer;
         }
-        for (Transfer4Gets gets : Transfers.VALUES) {
+        for (Transfer4Get gets : Transfers.VALUES) {
             if (gets.test(type)) {
                 return gets;
             }
