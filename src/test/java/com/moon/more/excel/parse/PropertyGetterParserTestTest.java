@@ -94,6 +94,17 @@ class PropertyGetterParserTestTest {
         }
     }
 
+    static Type getActual(Type type) { return getActual(type, 0); }
+
+    @Deprecated
+    static Type getActual(Type type, int index) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            return pType.getActualTypeArguments()[index];
+        }
+        return null;
+    }
+
     void testGetParameterType() throws IntrospectionException {
         Class type = Employee3.class;
         Field field = FieldUtil.getDeclaredField(type, "names");
@@ -105,29 +116,29 @@ class PropertyGetterParserTestTest {
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(SupportUtil.getActual(genericReturnType));
+                System.out.println(getActual(genericReturnType));
             }
             if (descriptor.getName().equalsIgnoreCase("sex")) {
                 System.out.println("======== sex");
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(SupportUtil.getActual(genericReturnType));
+                System.out.println(getActual(genericReturnType));
             }
             if (descriptor.getName().equalsIgnoreCase("keywords")) {
                 System.out.println("======== keywords");
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(SupportUtil.getActual(genericReturnType));
+                System.out.println(getActual(genericReturnType));
             }
             if (descriptor.getName().equalsIgnoreCase("remarks")) {
                 System.out.println("======== remarks");
                 Method reader = descriptor.getReadMethod();
                 Type genericReturnType = reader.getGenericReturnType();
                 System.out.println(genericReturnType);
-                System.out.println(SupportUtil.getActual(genericReturnType));
-                System.out.println(SupportUtil.getActual(genericReturnType, 1));
+                System.out.println(getActual(genericReturnType));
+                System.out.println(getActual(genericReturnType, 1));
             }
         }
 

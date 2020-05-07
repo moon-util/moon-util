@@ -18,7 +18,9 @@ public abstract class ParseUtil {
     final static GetterParser GETTER = new GetterParser();
     final static SetterParser SETTER = new SetterParser();
 
-    protected static PropertiesGroupGet parseGetter(Class<?> targetClass) { return (PropertiesGroupGet) GETTER.doParse(targetClass); }
+    static PropertiesGroupGet parseGetter(Class<?> targetClass) { return (PropertiesGroupGet) GETTER.doParse(targetClass); }
 
-    protected static PropertiesGroupSet parseSetter(Class<?> targetClass) { return (PropertiesGroupSet) SETTER.doParse(targetClass); }
+    protected static MarkedColumnGroup parse(Class targetClass) { return GETTER.doParseAsCol(targetClass); }
+
+    static PropertiesGroupSet parseSetter(Class<?> targetClass) { return (PropertiesGroupSet) SETTER.doParse(targetClass); }
 }

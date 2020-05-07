@@ -36,7 +36,7 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
      * @return 正在操作的 Excel 工作簿
      */
     @Override
-    Workbook get() { return proxy.getWorkbook(); }
+    protected Workbook get() { return proxy.getWorkbook(); }
 
     private SheetFactory getSheetFactory() { return factory; }
 

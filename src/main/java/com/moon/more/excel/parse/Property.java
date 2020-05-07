@@ -1,5 +1,6 @@
 package com.moon.more.excel.parse;
 
+import com.moon.more.excel.Evaluator;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnFlatten;
 import com.moon.more.excel.annotation.TableIndexer;
@@ -9,24 +10,25 @@ import org.apache.poi.ss.usermodel.Cell;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.function.Function;
 
 /**
  * @author benshaoye
  */
-public abstract class Property implements Serializable, HeadSortable {
+abstract class Property implements Serializable, HeadSortable {
 
     private final static String[] EMPTY = {};
 
     protected final String name;
 
-    protected final Marked<Method> atMethod;
+    protected final Annotated<Method> atMethod;
 
-    protected Marked<Field> atField;
+    protected Annotated<Field> atField;
 
     protected PropertiesGroup group;
 
-    protected Property(String name, Marked<Method> atMethod) {
+    protected Property(String name, Annotated<Method> atMethod) {
         this.atMethod = atMethod;
         this.name = name;
     }
@@ -69,9 +71,9 @@ public abstract class Property implements Serializable, HeadSortable {
 
     Field getAtField() { return atField == null ? null : atField.getMember(); }
 
-    private <T> T gotIfNonNull(Function<Marked, T> getter) {
-        Marked<Method> onMethod = this.atMethod;
-        Marked<Field> onField = this.atField;
+    private <T> T gotIfNonNull(Function<Annotated, T> getter) {
+        Annotated<Method> onMethod = this.atMethod;
+        Annotated<Field> onField = this.atField;
         T value = null;
         if (onMethod != null) {
             value = getter.apply(onMethod);
@@ -90,7 +92,7 @@ public abstract class Property implements Serializable, HeadSortable {
     protected static String[] ensureNonNull(String[] labels) { return labels == null ? EMPTY : labels; }
 
     public String[] getHeadLabels() {
-        String[] labels = gotIfNonNull(Marked::getHeadLabels);
+        String[] labels = gotIfNonNull(Annotated::getHeadLabels);
         return isDataFlatten() ? ensureNonNull(labels) : defaultLabelsIfEmpty(labels);
     }
 
@@ -110,19 +112,23 @@ public abstract class Property implements Serializable, HeadSortable {
         return flat == null ? column.order() : flat.order();
     }
 
-    public String getHeadLabelAsIndexer() { return gotIfNonNull(Marked::getHeadLabelAsIndexer); }
+    public String getHeadLabelAsIndexer() { return gotIfNonNull(Annotated::getHeadLabelAsIndexer); }
 
-    public TableListable getListable() { return gotIfNonNull(Marked::getListable); }
+    public TableListable getListable() { return gotIfNonNull(Annotated::getListable); }
 
-    public TableIndexer getIndexer() { return gotIfNonNull(Marked::getIndexer); }
+    public TableIndexer getIndexer() { return gotIfNonNull(Annotated::getIndexer); }
 
-    public TableColumnFlatten getFlatten() { return gotIfNonNull(Marked::getFlatten); }
+    public TableColumnFlatten getFlatten() { return gotIfNonNull(Annotated::getFlatten); }
 
-    public TableColumn getColumn() { return gotIfNonNull(Marked::getColumn); }
+    public TableColumn getColumn() { return gotIfNonNull(Annotated::getColumn); }
 
-    public PropertiesGroup getGroup() { return gotIfNonNull(Marked::getChildren); }
+    public PropertiesGroup getGroup() { return gotIfNonNull(Annotated::getChildren); }
 
-    public Class getPropertyType() { return gotIfNonNull(Marked::getPropertyType); }
+    public Class getPropertyType() { return gotIfNonNull(Annotated::getPropertyType); }
+
+    public Type getActualType() { return gotIfNonNull(Annotated::getGenericType); }
+
+    public Evaluator getEvaluator() { throw new UnsupportedOperationException(); }
 
     protected void afterSetField() {}
 
@@ -132,7 +138,7 @@ public abstract class Property implements Serializable, HeadSortable {
      * setters
      */
 
-    void setAboutField(Marked<Field> atField) {
+    void setAboutField(Annotated<Field> atField) {
         if (this.atField == null) {
             this.atField = atField;
             SupportUtil.requireNotDuplicated(getColumn(), getFlatten(), getName());

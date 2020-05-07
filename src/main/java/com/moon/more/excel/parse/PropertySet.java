@@ -10,14 +10,14 @@ import java.lang.reflect.Method;
 /**
  * @author benshaoye
  */
-public class PropertySet extends Property {
+class PropertySet extends Property {
 
     private PropertySet(
-        String name, Marked<Method> onMethod
+        String name, Annotated<Method> onMethod
     ) { super(name, onMethod); }
 
     static PropertySet of(
-        String name, Marked<Method> onMethod
+        String name, Annotated<Method> onMethod
     ) { return new PropertySet(name, onMethod); }
 
     static PropertySet of(

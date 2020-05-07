@@ -37,6 +37,28 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
         }
     }
 
+    protected MarkedColumnGroup doParseAsCol(Class type) {
+        return transform(doParse(type), 0);
+    }
+
+    private MarkedColumnGroup transform(PropertiesGroup group, final int offset) {
+        if (group == null) {
+            return null;
+        }
+        int index = 0;
+        List<MarkedColumn> columns = new ArrayList<>();
+        for (Object column : group.getColumns()) {
+            Property prop = (Property) column;
+            int columnOffset = (index++) + offset;
+            columns.add(new MarkedColumn(columnOffset, prop.getName(), prop.getPropertyType(),
+
+                prop.getActualType(), prop.getColumn(), prop.getFlatten(), prop.getListable(),
+
+                prop.getIndexer(), transform(prop.getGroup(), index - 1)));
+        }
+        return new MarkedColumnGroup(columns);
+    }
+
     @SuppressWarnings("all")
     private void parseDescriptors(
         Class type, Map annotated, Map unAnnotated
@@ -53,7 +75,7 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
             Class propType = descriptor.getPropertyType();
             Type genericType = creator.getGenericType(method);
             PropertiesGroup children = getGroupParsed(method, genericType, propType, name);
-            Marked<Method> onMethod = Marked.of(name, propType, genericType, method, children);
+            Annotated<Method> onMethod = Annotated.of(name, propType, genericType, method, children);
 
             Property info = creator.info(name, onMethod);
             if (onMethod.isAnnotated()) {
@@ -65,17 +87,12 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
     }
 
     private void parseFields(Class type, Map annotated, Map unAnnotated) {
-        while (type != null) {
+        while (type != null && type != Object.class) {
             Field[] fields = type.getDeclaredFields();
-            doParseFields(fields, annotated, unAnnotated);
+            for (Field field : fields) {
+                transform(field, annotated, unAnnotated);
+            }
             type = type.getSuperclass();
-        }
-    }
-
-    @SuppressWarnings("all")
-    private void doParseFields(Field[] fields, Map annotated, Map unAnnotated) {
-        for (Field field : fields) {
-            transform(field, annotated, unAnnotated);
         }
     }
 
@@ -83,7 +100,7 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
         Field field, Map<String, Property> annotated, Map<String, Property> unAnnotated
     ) {
         String name = field.getName();
-        Marked<Field> onField = Marked.of(field, getGroupParsed(field));
+        Annotated<Field> onField = Annotated.of(field, getGroupParsed(field));
 
         Property info = annotated.get(name);
         if (info == null) {

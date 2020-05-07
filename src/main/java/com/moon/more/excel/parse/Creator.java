@@ -19,13 +19,13 @@ interface Creator<T extends Property> {
 
     PropertiesGroup parsed(List list, DetailRoot root, T starting, T ending);
 
-    T info(String propertyName, Marked<Method> onMethod);
+    T info(String propertyName, Annotated<Method> onMethod);
 
-    default T info(String propertyName) { return info(propertyName, (Marked<Method>) null); }
+    default T info(String propertyName) { return info(propertyName, (Annotated<Method>) null); }
 
     T info(String propertyName, TableIndexer indexer);
 
-    static CreateGet asGetter() { return CreateGet.getInstance(); }
+    static Classes.CreateGet asGetter() { return Classes.CreateGet.getInstance(); }
 
-    static CreateSet asSetter() { return CreateSet.getInstance(); }
+    static Classes.CreateSet asSetter() { return Classes.CreateSet.getInstance(); }
 }

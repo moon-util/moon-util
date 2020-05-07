@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-public class PropertiesGroupSet extends PropertiesGroup<PropertySet> {
+class PropertiesGroupSet extends PropertiesGroup<PropertySet> {
 
     public PropertiesGroupSet(
         List<PropertySet> setters, DetailRoot root, PropertySet starting, PropertySet ending

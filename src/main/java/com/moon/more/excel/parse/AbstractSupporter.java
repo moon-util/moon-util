@@ -183,13 +183,13 @@ abstract class AbstractSupporter {
             return type;
         }
         if (isIterable(propType)) {
-            return toActualCls(SupportUtil.getActual(genericPropType));
+            return toActualCls(getActual(genericPropType));
         }
         if (isMap(propType)) {
-            return toActualCls(SupportUtil.getActual(genericPropType, 1));
+            return toActualCls(getActual(genericPropType, 1));
         }
         if (isIterator(propType)) {
-            return toActualCls(SupportUtil.getActual(genericPropType));
+            return toActualCls(getActual(genericPropType));
         }
         return propType;
     }
@@ -207,5 +207,15 @@ abstract class AbstractSupporter {
             return null;
         }
         throw new UnsupportedOperationException(type.toString());
+    }
+
+    private  static Type getActual(Type type) { return getActual(type, 0); }
+
+    private static Type getActual(Type type, int index) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            return pType.getActualTypeArguments()[index];
+        }
+        return null;
     }
 }

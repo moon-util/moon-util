@@ -2,6 +2,7 @@ package com.moon.more.excel.parse;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.LazyAccessor;
+import com.moon.more.excel.Evaluator;
 import com.moon.more.excel.PropertyGetter;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnFlatten;
@@ -14,19 +15,19 @@ import java.lang.reflect.Method;
 /**
  * @author benshaoye
  */
-public class PropertyGet extends Property {
+class PropertyGet extends Property {
 
     private final LazyAccessor<PropertyGetter> accessor;
     private final LazyAccessor<Transfer4Get> transfer;
 
-    private PropertyGet(String name, Marked<Method> onMethod) {
+    private PropertyGet(String name, Annotated<Method> onMethod) {
         super(name, onMethod);
         accessor = LazyAccessor.of(() -> ValueGetter.of(getAtMethod(), getAtField()));
         this.transfer = LazyAccessor.of(() -> Transfer4Get.find(getPropertyType()));
     }
 
     static PropertyGet of(
-        String name, Marked<Method> onMethod
+        String name, Annotated<Method> onMethod
     ) { return new PropertyGet(name, onMethod); }
 
     static PropertyGet of(
@@ -37,6 +38,13 @@ public class PropertyGet extends Property {
     protected void afterSetField() {
         transfer.clear();
         accessor.clear();
+    }
+
+    @Override
+    public Evaluator getEvaluator() {
+        PropertyGetter getter = accessor.get();
+        Transfer4Get transfer = this.transfer.get();
+        return null;
     }
 
     @Override

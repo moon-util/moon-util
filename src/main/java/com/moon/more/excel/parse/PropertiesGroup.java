@@ -13,7 +13,7 @@ import static java.util.Collections.emptyList;
 /**
  * @author benshaoye
  */
-public abstract class PropertiesGroup<T extends Property> implements Serializable {
+abstract class PropertiesGroup<T extends Property> implements Serializable {
 
     protected final List<T> columns;
     protected final DetailRoot root;

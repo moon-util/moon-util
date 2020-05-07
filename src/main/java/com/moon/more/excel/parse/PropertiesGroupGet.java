@@ -6,7 +6,7 @@ import java.util.function.IntFunction;
 /**
  * @author benshaoye
  */
-public class PropertiesGroupGet extends PropertiesGroup<PropertyGet> {
+class PropertiesGroupGet extends PropertiesGroup<PropertyGet> {
 
     public PropertiesGroupGet(
         List<PropertyGet> getters, DetailRoot root, PropertyGet starting, PropertyGet ending

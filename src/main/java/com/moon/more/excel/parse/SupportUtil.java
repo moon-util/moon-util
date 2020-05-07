@@ -25,14 +25,14 @@ final class SupportUtil {
 
         FLAT_NAME + " ] 用于复合字段（里面有普通字段组成）。\n\n";
 
+    private static String getNotAllowed(String prop) { return NOT_ALLOWED.replace("{}", prop); }
+
     private SupportUtil() { ThrowUtil.noInstanceError(); }
 
     static <T> T dftIfNull(T v, T dft) { return v == null ? dft : v; }
 
-    static String getNotAllowed(String prop) { return NOT_ALLOWED.replace("{}", prop); }
-
     /**
-     * 不能在同一个字段上同时注解{@link TableColumn}和{@link TableColumnFlatten}
+     * 同一字段不能同时注解{@link TableColumn}和{@link TableColumnFlatten}
      *
      * @param col
      * @param flat
@@ -45,7 +45,7 @@ final class SupportUtil {
     }
 
     /**
-     * 同一个实例，不能在多个字段上注解{@link TableListable}
+     * 同一个实例，不能有多个字段注解{@link TableListable}
      *
      * @param list
      * @param <T>
@@ -61,15 +61,5 @@ final class SupportUtil {
                 }
             }
         }
-    }
-
-    static Type getActual(Type type) { return getActual(type, 0); }
-
-    static Type getActual(Type type, int index) {
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pType = (ParameterizedType) type;
-            return pType.getActualTypeArguments()[index];
-        }
-        return null;
     }
 }

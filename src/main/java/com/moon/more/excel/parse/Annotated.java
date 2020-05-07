@@ -11,7 +11,7 @@ import java.lang.reflect.*;
 /**
  * @author benshaoye
  */
-class Marked<M extends Member> {
+class Annotated<M extends Member> {
 
     private static <M extends AnnotatedElement, T extends Annotation> T obtain(M m, Class<T> type) {
         return m.getAnnotation(type);
@@ -28,7 +28,7 @@ class Marked<M extends Member> {
     private final TableListable listable;
     private final PropertiesGroup children;
 
-    Marked(String name, Class propertyType, Type genericType, M member, PropertiesGroup children) {
+    Annotated(String name, Class propertyType, Type genericType, M member, PropertiesGroup children) {
         this.name = name;
         this.member = member;
         this.genericType = genericType;
@@ -77,13 +77,13 @@ class Marked<M extends Member> {
 
     public PropertiesGroup getChildren() { return children; }
 
-    static Marked<Field> of(Field member, PropertiesGroup children) {
-        return new Marked<>(member.getName(), member.getType(),//
+    static Annotated<Field> of(Field member, PropertiesGroup children) {
+        return new Annotated<>(member.getName(), member.getType(),//
             member.getGenericType(), member, children);
     }
 
-    static Marked<Method> of(String name, Class propertyType, Type genericType, Method method, PropertiesGroup children) {
-        return new Marked<>(name, propertyType, genericType, method, children);
+    static Annotated<Method> of(String name, Class propertyType, Type genericType, Method method, PropertiesGroup children) {
+        return new Annotated<>(name, propertyType, genericType, method, children);
     }
 }
 
