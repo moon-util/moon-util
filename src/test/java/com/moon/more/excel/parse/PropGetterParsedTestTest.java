@@ -66,19 +66,6 @@ class PropGetterParsedTestTest {
         //     });
         //     System.out.println(data);
         // });
-
-        ExcelUtil.xlsx().sheet(sheetFactory -> {
-            for (EmployeeDetail detail : details) {
-                sheetFactory.row(rowFactory -> {
-                    detailGet.forEach(get -> {
-                        CellFactory factory = rowFactory.cell();
-                        Cell cell = factory.getCell();
-                        get.exec(detail, cell);
-                    });
-                });
-            }
-            // sheetFactory.renderList();
-        }).write2Filepath("D:/test.xlsx");
     }
 
     @Test

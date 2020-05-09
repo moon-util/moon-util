@@ -27,9 +27,11 @@ public @interface TableListable {
      * <p>
      * 如：
      * <p>
-     * 此例演示了以身份证号列为参考，相同身份证号代表同一个学生的成绩列表，即时姓名不一致
+     * 此例演示了以身份证号列为参考，相同身份证号代表同一个学生的成绩列表，即使姓名不一致
      * <p>
      * 如果需要参考两列，只需要定义为数组即可
+     * <p>
+     * 如果是复杂表头，应该定义为最末级表头名称
      *
      * <pre>
      * public class Student {
@@ -43,6 +45,11 @@ public @interface TableListable {
      *     &#064;TableListable(value = "身份证号")
      *     private List&lt;String&gt; scores;
      * }
+     * </pre>
+     *
+     * <pre>
+     *     &#064;TableListable(value = {"身份证号", "姓名"})
+     *     private List&lt;String&gt; scores;
      * </pre>
      *
      * @return 列名

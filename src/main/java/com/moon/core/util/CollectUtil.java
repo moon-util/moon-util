@@ -37,6 +37,12 @@ public class CollectUtil extends BaseCollectUtil {
         return collect == null ? arrCreator.apply(0) : collect.toArray(arrCreator.apply(size(collect)));
     }
 
+    public final static <T> T[] toArrayOfEmpty(
+        Collection<? extends T> collect, IntFunction<? extends T[]> arrCreator, T[] emptyArr
+    ) {
+        return collect == null ? emptyArr : collect.toArray(arrCreator.apply(size(collect)));
+    }
+
     public final static <E, C extends Collection<E>> boolean isEmpty(C collect) {
         return collect == null || collect.isEmpty();
     }

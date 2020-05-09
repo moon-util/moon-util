@@ -19,11 +19,11 @@ import java.util.stream.Stream;
  */
 public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory> {
 
-    private final Executor HEAD_RENDERER
+    private final HeadExecutor HEAD_RENDERER
 
-        = (renderer, start) -> renderer.renderHead(end(), start);
+        = renderer -> renderer.renderHead(end());
 
-    private final Executor EMPTY = (r, l) -> {};
+    private final HeadExecutor EMPTY = r -> {};
 
     /**
      * 当前正在操作的 sheet 表
@@ -40,13 +40,11 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     public Sheet getSheet() { return sheet; }
 
     public TableFactory renderHead(Class targetClass) {
-        HEAD_RENDERER.doTask(parse(targetClass), 0);
+        HEAD_RENDERER.doTask(parse(targetClass));
         return this;
     }
 
-    public <T> TableFactory renderBody(Iterator<T> iterator) {
-        return renderBody(iterator, null);
-    }
+    public <T> TableFactory renderBody(Iterator<T> iterator) { return renderBody(iterator, null); }
 
     public <T> TableFactory renderBody(Iterator<T> iterator, Class<T> targetClass) {
         return renderAll(iterator, targetClass, EMPTY);
@@ -60,9 +58,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return renderBody(iterable.iterator(), targetClass);
     }
 
-    public <T> TableFactory renderBody(Stream<T> stream) {
-        return renderBody(stream.iterator());
-    }
+    public <T> TableFactory renderBody(Stream<T> stream) { return renderBody(stream.iterator()); }
 
     public <T> TableFactory renderBody(Stream<T> stream, Class<T> targetClass) {
         return renderBody(stream.iterator(), targetClass);
@@ -72,33 +68,25 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return data == null ? this : renderBody(data.getClass().getComponentType(), data);
     }
 
-    public <T> TableFactory renderBody(T[] data, Class targetClass) {
-        return renderBody(targetClass, data);
-    }
+    public <T> TableFactory renderBody(T[] data, Class targetClass) { return renderBody(targetClass, data); }
 
     public <T> TableFactory renderBody(Class targetClass, T... data) {
         return data == null ? this : renderBody(IteratorUtil.of(data), targetClass);
     }
 
-    public <T> TableFactory renderList(Iterator<T> iterator) {
-        return renderList(iterator, null);
-    }
+    public <T> TableFactory renderList(Iterator<T> iterator) { return renderList(iterator, null); }
 
     public <T> TableFactory renderList(Iterator<T> iterator, Class<T> targetClass) {
         return renderAll(iterator, targetClass, HEAD_RENDERER);
     }
 
-    public <T> TableFactory renderList(Iterable<T> iterable) {
-        return renderList(iterable.iterator());
-    }
+    public <T> TableFactory renderList(Iterable<T> iterable) { return renderList(iterable.iterator()); }
 
     public <T> TableFactory renderList(Iterable<T> iterable, Class<T> targetClass) {
         return renderList(iterable.iterator(), targetClass);
     }
 
-    public <T> TableFactory renderList(Stream<T> stream) {
-        return renderList(stream.iterator());
-    }
+    public <T> TableFactory renderList(Stream<T> stream) { return renderList(stream.iterator()); }
 
     public <T> TableFactory renderList(Stream<T> stream, Class<T> targetClass) {
         return renderList(stream.iterator(), targetClass);
@@ -108,9 +96,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return data == null ? this : renderList(data.getClass().getComponentType(), data);
     }
 
-    public <T> TableFactory renderList(T[] data, Class targetClass) {
-        return renderList(targetClass, data);
-    }
+    public <T> TableFactory renderList(T[] data, Class targetClass) { return renderList(targetClass, data); }
 
     public <T> TableFactory renderList(Class targetClass, T... data) {
         return data == null ? this : renderList(IteratorUtil.of(data), targetClass);
@@ -123,40 +109,39 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     protected SheetFactory end() { return getParentFactory(); }
 
     private <T> TableFactory renderAll(
-        Iterator<T> iterator, Class<T> targetClass, Executor beforeRenderBody
+        Iterator<T> iterator, Class<T> targetClass, HeadExecutor beforeRenderBody
     ) {
-        int skipCol = 0;
         SheetFactory factory = end();
         Renderer renderer = null;
+        Object firstItem = null;
         if (targetClass == null) {
             if (iterator.hasNext()) {
                 T data = iterator.next();
                 renderer = parse(data.getClass());
-                beforeRenderBody.doTask(renderer, skipCol);
-                renderer.renderRecord(factory, skipCol, data);
+                beforeRenderBody.doTask(renderer);
+                firstItem = data;
             }
         } else {
             renderer = parse(targetClass);
-            beforeRenderBody.doTask(renderer, skipCol);
+            beforeRenderBody.doTask(renderer);
         }
         if (renderer != null) {
-            while (iterator.hasNext()) {
-                renderer.renderRecord(factory, skipCol, iterator.next());
-            }
+            renderer.renderBody(factory, iterator, firstItem);
         }
         return this;
     }
 
-    private Renderer parse(Class targetClass) { return new RendererImpl(targetClass); }
+    private Renderer parse(Class targetClass) {
+        return SheetUtil.parseRenderer(targetClass);
+    }
 
-    interface Executor {
+    interface HeadExecutor {
 
         /**
          * 执行
          *
          * @param renderer
-         * @param skipCol
          */
-        void doTask(Renderer renderer, int skipCol);
+        void doTask(Renderer renderer);
     }
 }

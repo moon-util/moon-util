@@ -115,6 +115,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
         public Workbook load(File file) {
             try {
                 return new HSSFWorkbook(POIFSFileSystem.create(file));
+            } catch (RuntimeException e) {
+                throw e;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
@@ -139,6 +141,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
         public Workbook load(File file) {
             try {
                 return new XSSFWorkbook(file);
+            } catch (RuntimeException e) {
+                throw e;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
@@ -163,6 +167,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
         public Workbook load(File file) {
             try {
                 return new SXSSFWorkbook(new XSSFWorkbook(file));
+            } catch (RuntimeException e) {
+                throw e;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }

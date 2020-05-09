@@ -32,6 +32,8 @@ enum WorkbookType implements Predicate<Workbook> {
         Class target;
         try {
             target = Class.forName(type);
+        } catch (RuntimeException | Error e) {
+            throw e;
         } catch (Throwable t) {
             target = null;
         }

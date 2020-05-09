@@ -207,8 +207,9 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return 当前 SheetFactory
      */
     public SheetFactory row(Consumer<RowFactory> consumer) {
-        factory.setRow(proxy.nextRow());
-        consumer.accept(getRowFactory());
+        RowFactory rowFactory = getRowFactory();
+        rowFactory.setRow(proxy.nextRow());
+        consumer.accept(rowFactory);
         return this;
     }
 
@@ -221,9 +222,61 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return 当前 SheetFactory
      */
     public SheetFactory row(int offset, Consumer<RowFactory> consumer) {
-        factory.setRow(proxy.nextRow(offset));
-        consumer.accept(getRowFactory());
+        RowFactory rowFactory = getRowFactory();
+        rowFactory.setRow(proxy.nextRow(offset));
+        consumer.accept(rowFactory);
         return this;
+    }
+
+    /**
+     * 创建下一行并设置为当前操作行
+     *
+     * @return 行操作器
+     */
+    public RowFactory row() {
+        RowFactory rowFactory = getRowFactory();
+        rowFactory.setRow(proxy.nextRow());
+        return rowFactory;
+    }
+
+    /**
+     * 跳过指定行数，创建新的一行并设置为当前操作行
+     *
+     * @param offset 行位置偏移量
+     *
+     * @return 行操作器
+     */
+    public RowFactory row(int offset) {
+        RowFactory rowFactory = getRowFactory();
+        rowFactory.setRow(proxy.nextRow(offset));
+        return rowFactory;
+    }
+
+    /**
+     * 使用并操作指定行，如果不存在则创建
+     *
+     * @param rowIndex 指定行号
+     *
+     * @return 行操作器
+     */
+    public RowFactory useRow(int rowIndex) {
+        return useRow(rowIndex, DFT_APPEND_TYPE);
+    }
+
+    /**
+     * 使用并操作指定行，如果不存在则创建
+     *
+     * @param rowIndex 指定行号
+     * @param append   如果指定行存在，并且有数据，操作方式是采取追加数据还是覆盖数据；
+     *                 true: 追加新数据（默认）
+     *                 false: 覆盖旧数据
+     *
+     * @return 行操作器
+     */
+    public RowFactory useRow(int rowIndex, boolean append) {
+        RowFactory rowFactory = getRowFactory();
+        rowFactory.setRow(proxy.useOrCreateRow(rowIndex, append));
+        return rowFactory;
     }
 
     /**

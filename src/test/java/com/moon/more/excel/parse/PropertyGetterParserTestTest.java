@@ -64,31 +64,31 @@ class PropertyGetterParserTestTest {
             if (descriptor.getName().equalsIgnoreCase("age")) {
                 System.out.println("======== age");
                 Method reader = descriptor.getReadMethod();
-                Class clazz = Parser.getActual(reader.getGenericReturnType(), reader.getReturnType());
+                Class clazz = CoreParser.getActual(reader.getGenericReturnType(), reader.getReturnType());
                 System.out.println(clazz);
             }
             if (descriptor.getName().equalsIgnoreCase("sex")) {
                 System.out.println("======== sex");
                 Method reader = descriptor.getReadMethod();
-                Class clazz = Parser.getActual(reader.getGenericReturnType(), reader.getReturnType());
+                Class clazz = CoreParser.getActual(reader.getGenericReturnType(), reader.getReturnType());
                 System.out.println(clazz);
             }
             if (descriptor.getName().equalsIgnoreCase("keywords")) {
                 System.out.println("======== keywords");
                 Method reader = descriptor.getReadMethod();
-                Class clazz = Parser.getActual(reader.getGenericReturnType(), reader.getReturnType());
+                Class clazz = CoreParser.getActual(reader.getGenericReturnType(), reader.getReturnType());
                 System.out.println(clazz);
             }
             if (descriptor.getName().equalsIgnoreCase("remarks")) {
                 System.out.println("======== remarks");
                 Method reader = descriptor.getReadMethod();
-                Class clazz = Parser.getActual(reader.getGenericReturnType(), reader.getReturnType());
+                Class clazz = CoreParser.getActual(reader.getGenericReturnType(), reader.getReturnType());
                 System.out.println(clazz);
             }
             if (descriptor.getName().equalsIgnoreCase("other")) {
                 System.out.println("======== remarks");
                 Method reader = descriptor.getReadMethod();
-                Class clazz = Parser.getActual(reader.getGenericReturnType(), reader.getReturnType());
+                Class clazz = CoreParser.getActual(reader.getGenericReturnType(), reader.getReturnType());
                 System.out.println(clazz);
             }
         }
@@ -167,7 +167,7 @@ class PropertyGetterParserTestTest {
             return 20;
         }
 
-        @TableIndexer(ending = true)
+        @TableIndexer
         public int getEmail() {
             return 20;
         }
@@ -234,25 +234,21 @@ class PropertyGetterParserTestTest {
         PropertiesGroup<PropertyGet> parsed = ParseUtil.parseGetter(Employee0.class);
 
         assertTrue(parsed.hasStarting());
-        assertFalse(parsed.hasEnding());
         assertEquals(2, parsed.columns.size());
 
         parsed = ParseUtil.parseGetter(Employee1.class);
 
         assertTrue(parsed.hasStarting());
-        assertFalse(parsed.hasEnding());
         assertEquals(2, parsed.columns.size());
 
         parsed = ParseUtil.parseGetter(Employee2.class);
 
         assertTrue(parsed.hasStarting());
-        assertFalse(parsed.hasEnding());
         assertEquals(2, parsed.columns.size());
 
         parsed = ParseUtil.parseGetter(Employee21.class);
 
         assertTrue(parsed.hasStarting());
-        assertTrue(parsed.hasEnding());
         assertEquals(2, parsed.columns.size());
     }
 

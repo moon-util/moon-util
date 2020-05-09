@@ -2,12 +2,12 @@ package com.moon.more.excel.parse;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.LazyAccessor;
+import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.Evaluator;
 import com.moon.more.excel.PropertyGetter;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnFlatten;
 import com.moon.more.excel.annotation.TableIndexer;
-import org.apache.poi.ss.usermodel.Cell;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -41,20 +41,33 @@ class PropertyGet extends Property {
     }
 
     @Override
-    public Evaluator getEvaluator() {
-        PropertyGetter getter = accessor.get();
-        Transfer4Get transfer = this.transfer.get();
-        return null;
-    }
+    public Evaluator getEvaluator() { return new PropEvaluator(getPropertyGetter(), transfer.get()); }
 
-    @Override
-    public void exec(Object data, Cell cell) {
-        transfer.get().setCellValue(getValue(data), cell);
+    static class PropEvaluator implements Evaluator {
+
+        final PropertyGetter getter;
+        final Transfer4Get transfer;
+
+        PropEvaluator(PropertyGetter getter, Transfer4Get transfer) {
+            this.getter = getter;
+            this.transfer = transfer;
+        }
+
+        @Override
+        public Object getPropertyValue(Object data) { return getter.getValue(data); }
+
+        @Override
+        public void setCellValue(CellFactory factory, Object value) {
+            transfer.setCellValue(value, factory.getCell());
+        }
+
+        @Override
+        public void eval(CellFactory factory, Object data) {
+            setCellValue(factory, getPropertyValue(data));
+        }
     }
 
     PropertyGetter getPropertyGetter() { return accessor.get(); }
-
-    Object getValue(Object data) { return getPropertyGetter().getValue(data); }
 
     static class IndexedGetter extends PropertyGet {
 

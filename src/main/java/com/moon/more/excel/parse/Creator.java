@@ -17,7 +17,7 @@ interface Creator<T extends Property> {
 
     Type getGenericType(Method method);
 
-    PropertiesGroup parsed(List list, DetailRoot root, T starting, T ending);
+    PropertiesGroup parsed(List list, DetailRoot root, T rootProperty);
 
     T info(String propertyName, Annotated<Method> onMethod);
 

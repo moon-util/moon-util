@@ -60,13 +60,13 @@ public class IntAccessor implements IntSupplier {
 
     public int incrementAndGet() { return ++value; }
 
-    public int getAndIncrement(int value) { return this.value += value; }
-
-    public int incrementAndGet(int value) {
+    public int getAndIncrement(int value) {
         int now = this.value;
         increment(value);
         return now;
     }
+
+    public int incrementAndGet(int value) { return this.value += value; }
 
     public int getAndDecrement() { return value--; }
 

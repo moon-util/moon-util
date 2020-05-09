@@ -65,22 +65,22 @@ abstract class AbstractSupporter {
         return isBasicPrimitive(type);
     }
 
-    /* map */
+    /** map */
     protected static boolean isMap(Class type) { return is(Map.class, type); }
 
-    /* Iterable */
+    /** Iterable */
     protected static boolean isIterable(Class type) { return is(Iterable.class, type); }
 
-    /* Iterator */
+    /** Iterator */
     protected static boolean isIterator(Class type) { return is(Iterator.class, type); }
 
-    /* 数组 */
+    /** 数组 */
     protected static boolean isArray(Class type) { return type.isArray(); }
 
-    /* 列表集合 */
+    /** 列表集合 */
     protected static boolean isCollect(Class type) { return isIterable(type) || isIterator(type); }
 
-    /* 集合 */
+    /** 集合 */
     protected static boolean isSetColumn(Class type) { return isCollect(type) || isMap(type) || isArray(type); }
 
     private static boolean is(Class superCls, Class target) { return superCls.isAssignableFrom(target); }

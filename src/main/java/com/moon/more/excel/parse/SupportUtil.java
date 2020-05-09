@@ -53,7 +53,7 @@ final class SupportUtil {
     static <T extends Property> void requireNotDuplicatedListable(List<T> list) {
         boolean isListable = false;
         for (T defined : list) {
-            if (defined.isCanListable()) {
+            if (defined.isIterated()) {
                 if (isListable) {
                     throw new IllegalStateException("一个实体最多只能有一个字段注解 " + LISTABLE);
                 } else {

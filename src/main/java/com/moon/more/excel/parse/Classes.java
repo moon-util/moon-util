@@ -36,8 +36,8 @@ public class Classes {
 
         @Override
         public PropertiesGroup parsed(
-            List list, DetailRoot root, PropertyGet starting, PropertyGet ending
-        ) { return PropertiesGroup.ofGetter(list, root, starting, ending); }
+            List list, DetailRoot root, PropertyGet rootProperty
+        ) { return PropertiesGroup.ofGetter(list, root, rootProperty); }
     }
 
     static class CreateSet implements Creator<PropertySet> {
@@ -68,7 +68,7 @@ public class Classes {
 
         @Override
         public PropertiesGroup parsed(
-            List list, DetailRoot root, PropertySet starting, PropertySet ending
-        ) { return PropertiesGroup.ofSetter(list, root, starting, ending); }
+            List list, DetailRoot root, PropertySet rootProperty
+        ) { return PropertiesGroup.ofSetter(list, root, rootProperty); }
     }
 }

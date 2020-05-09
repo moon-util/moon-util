@@ -1,14 +1,29 @@
 package com.moon.more.excel;
 
-import com.moon.more.excel.RowFactory;
-
 /**
  * @author benshaoye
  */
 public interface Evaluator {
 
     /**
-     * 执行一”组“的操作
+     * get value
+     *
+     * @param data
+     *
+     * @return
+     */
+    Object getPropertyValue(Object data);
+
+    /**
+     * set cell value
+     *
+     * @param factory
+     * @param value
+     */
+    void setCellValue(CellFactory factory, Object value);
+
+    /**
+     * 执行一“组”的操作
      * <p>
      * 返回执行的行数
      *
@@ -17,5 +32,5 @@ public interface Evaluator {
      *
      * @return
      */
-    int evaluate(SheetFactory factory, Object data);
+    void eval(CellFactory factory, Object data);
 }

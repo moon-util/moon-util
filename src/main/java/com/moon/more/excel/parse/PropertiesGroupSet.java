@@ -8,6 +8,6 @@ import java.util.List;
 class PropertiesGroupSet extends PropertiesGroup<PropertySet> {
 
     public PropertiesGroupSet(
-        List<PropertySet> setters, DetailRoot root, PropertySet starting, PropertySet ending
-    ) { super(setters, root, starting, ending); }
+        List<PropertySet> setters, DetailRoot root, PropertySet rootProperty
+    ) { super(setters, root, rootProperty); }
 }

@@ -1,24 +1,25 @@
 package com.moon.more.excel;
 
+import java.util.Iterator;
+
 /**
  * @author benshaoye
  */
-public interface Renderer<T> {
+public interface Renderer {
 
     /**
      * 渲染表头
      *
      * @param sheetFactory sheet 渲染器
-     * @param skipCol      起始位置
      */
-    void renderHead(SheetFactory sheetFactory, int skipCol);
+    void renderHead(SheetFactory sheetFactory);
 
     /**
      * 渲染一条数据
      *
      * @param sheetFactory sheet 渲染器
-     * @param skipCol      起始位置
-     * @param data         数据
+     * @param iterator     数据集合，如果存在第一项（first != null），集合中则不应包含第一项
+     * @param first        第一项数据
      */
-    void renderRecord(SheetFactory sheetFactory, int skipCol, T data);
+    void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first);
 }

@@ -13,18 +13,16 @@ import java.lang.annotation.Target;
  * <h3>一、如果该字段同时注解了{@link TableColumn}</h3>
  * 1. 就会在在列前插入序号列，可以插入多列序号
  * <p>
- * 2. {@link #ending()}为{@code true}，序号列在后面插入
  *
  * <h3>二、如果该字段没有注解{@link TableColumn}</h3>
  * 1. 在第一列插入；
- * 2. {@link #ending()}为{@code true}，序号列在最后一列
  *
  * <h3>二、注解{@link TableColumnFlatten}</h3>
  * 参考以上。
  *
  * @author benshaoye
  */
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableIndexer {
 
@@ -45,11 +43,9 @@ public @interface TableIndexer {
     int startingAt() default 1;
 
     /**
-     * 是否渲染到标记列后面
-     * <p>
-     * 默认渲染在标记列前面
+     * 步长
      *
-     * @return true|false
+     * @return 步长
      */
-    boolean ending() default false;
+    int step() default 1;
 }

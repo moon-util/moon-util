@@ -42,10 +42,12 @@ abstract class ValueGetter implements PropertyGetter {
         public Object getValue(Object data) {
             Field field = this.field;
             try {
-                return field.get(field);
+                return field.get(data);
             } catch (IllegalAccessException e) {
                 try {
                     return field.get(data);
+                } catch (RuntimeException | Error exeception) {
+                    throw exeception;
                 } catch (Exception ex) {
                     throw new IllegalStateException(ex);
                 }
@@ -67,6 +69,8 @@ abstract class ValueGetter implements PropertyGetter {
                 field.setAccessible(true);
                 Object val = field.get(data);
                 return val;
+            } catch (RuntimeException | Error exeception) {
+                throw exeception;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             } finally {
@@ -89,6 +93,8 @@ abstract class ValueGetter implements PropertyGetter {
         public Object getValue(Object data) {
             try {
                 return getter.invoke(data);
+            } catch (RuntimeException | Error exeception) {
+                throw exeception;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
@@ -108,6 +114,8 @@ abstract class ValueGetter implements PropertyGetter {
                 Object val = getter.invoke(data);
                 getter.setAccessible(false);
                 return val;
+            } catch (RuntimeException | Error exeception) {
+                throw exeception;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }

@@ -1,5 +1,8 @@
 package com.moon.more.excel.parse;
 
+import com.moon.core.lang.ref.IntAccessor;
+import com.moon.core.util.Assert;
+import com.moon.more.excel.Renderer;
 import com.moon.more.excel.annotation.TableColumnFlatten;
 import com.moon.more.excel.annotation.TableIndexer;
 import com.moon.more.excel.annotation.TableRecord;
@@ -17,13 +20,13 @@ import java.util.stream.Collectors;
 /**
  * @author benshaoye
  */
-abstract class Parser<T extends Property> extends AbstractSupporter {
+abstract class CoreParser<T extends Property> extends AbstractSupporter {
 
     private final Creator creator;
 
     private Creator getCreator() { return creator; }
 
-    protected Parser(Creator creator) { this.creator = creator; }
+    protected CoreParser(Creator creator) { this.creator = creator; }
 
     protected PropertiesGroup doParse(Class type) {
         try {
@@ -32,31 +35,86 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
             parseDescriptors(type, annotated, unAnnotated);
             parseFields(type, annotated, unAnnotated);
             return toParsedResult(getCreator(), type, annotated, unAnnotated);
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
     }
 
-    protected MarkedColumnGroup doParseAsCol(Class type) {
-        return transform(doParse(type), 0);
+    protected MarkRenderer doParseAsCol(Class type) {
+        MarkRenderer renderer = transform(doParse(type), IntAccessor.of());
+        return renderer;
     }
 
-    private MarkedColumnGroup transform(PropertiesGroup group, final int offset) {
+    private MarkRenderer transform(PropertiesGroup group, final IntAccessor accessor) {
+        if (group.isIterated()) {
+            return transformIterated(group, accessor);
+        } else {
+            return transformDefault(group, accessor);
+        }
+    }
+
+    private MarkIteratedGroup transformIterated(PropertiesGroup group, final IntAccessor accessor) {
         if (group == null) {
             return null;
         }
-        int index = 0;
-        List<MarkedColumn> columns = new ArrayList<>();
+        boolean indexed = false;
+        MarkColumn rootIndexer = null;
+        if (group.rootProperty != null) {
+            rootIndexer = MarkColumn.of(accessor.get(), group.rootProperty, null);
+            accessor.increment();
+            indexed = true;
+        }
+        MarkIterated iteratedAt = null, current;
+        List<MarkIterated> columns = new ArrayList<>();
         for (Object column : group.getColumns()) {
             Property prop = (Property) column;
-            int columnOffset = (index++) + offset;
-            columns.add(new MarkedColumn(columnOffset, prop.getName(), prop.getPropertyType(),
-
-                prop.getActualType(), prop.getColumn(), prop.getFlatten(), prop.getListable(),
-
-                prop.getIndexer(), transform(prop.getGroup(), index - 1)));
+            final int offset = accessor.get();
+            if (prop.hasIndexer()) {
+                accessor.increment();
+                indexed = true;
+            }
+            final int referenceOffset = accessor.get();
+            current = MarkIterated.of(offset, prop, transformIterated(prop.getGroup(), accessor));
+            if (prop.isIterated()) {
+                iteratedAt = current;
+            } else {
+                columns.add(current);
+            }
+            if (accessor.isEq(referenceOffset)) {
+                accessor.increment();
+            }
         }
-        return new MarkedColumnGroup(columns);
+        return new MarkIteratedGroup(columns, iteratedAt, rootIndexer, group.root, indexed);
+    }
+
+    private MarkColumnGroup transformDefault(PropertiesGroup group, final IntAccessor accessor) {
+        if (group == null) {
+            return null;
+        }
+        boolean indexed = false;
+        MarkColumn rootIndexer = null;
+        if (group.rootProperty != null) {
+            rootIndexer = MarkColumn.of(accessor.get(), group.rootProperty, null);
+            accessor.increment();
+            indexed = true;
+        }
+        List<MarkColumn> columns = new ArrayList<>();
+        for (Object column : group.getColumns()) {
+            Property prop = (Property) column;
+            final int offset = accessor.get();
+            if (prop.hasIndexer()) {
+                accessor.increment();
+                indexed = true;
+            }
+            final int referenceOffset = accessor.get();
+            columns.add(MarkColumn.of(offset, prop, transformDefault(prop.getGroup(), accessor)));
+            if (accessor.isEq(referenceOffset)) {
+                accessor.increment();
+            }
+        }
+        return new MarkColumnGroup(columns, rootIndexer, group.root, indexed);
     }
 
     @SuppressWarnings("all")
@@ -132,11 +190,8 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
             if (actualTpe == Void.class) {
                 actualTpe = getActual(paramType, actualType);
             }
-            if (actualTpe == null) {
-                throw new IllegalStateException("[ " + propName + " ]未知集合目标类型");
-            }
-            if (isBasic(actualType)) {
-                // return strategy.create(propName, true);
+            if (actualTpe == null || isSetColumn(actualTpe)) {
+                throw new IllegalStateException("未知集合目标(泛型)类型: [" + propName + "] " + elem);
             }
             return doParse(actualTpe);
         }
@@ -147,8 +202,7 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
         Creator creator, Class type, Map<String, T> annotated, Map<String, T> unAnnotated
     ) {
         List columns;
-        Property ending = null;
-        Property starting = null;
+        Property rootIndexer = null;
 
         boolean hasAnnotated = !annotated.isEmpty();
         if (hasAnnotated) {
@@ -156,11 +210,7 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
             columns = new ArrayList(collection.size());
             for (T info : collection) {
                 if (info.isOnlyIndexer()) {
-                    if (info.getIndexer().ending()) {
-                        ending = info;
-                    } else {
-                        starting = info;
-                    }
+                    rootIndexer = info;
                 } else if (info.isDefined()) {
                     columns.add(info);
                 }
@@ -171,21 +221,15 @@ abstract class Parser<T extends Property> extends AbstractSupporter {
                 .filter(info -> isBasic(info.getPropertyType()))
 
                 .collect(Collectors.toList());
-            // throw new UnsupportedOperationException();
         }
 
         TableIndexer idx = obtainIndexer(type);
         if (idx != null) {
-            Property info = creator.info(type.getName(), idx);
-            if (idx.ending()) {
-                ending = info;
-            } else {
-                starting = info;
-            }
+            rootIndexer = creator.info(type.getName(), idx);
         }
 
         SupportUtil.requireNotDuplicatedListable(columns);
         DetailRoot root = DetailRoot.of(obtain(type, TableRecord.class));
-        return creator.parsed(columns, root, starting, ending);
+        return creator.parsed(columns, root, rootIndexer);
     }
 }

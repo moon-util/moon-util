@@ -71,8 +71,6 @@ class Annotated<M extends Member> {
 
     public Type getGenericType() { return genericType; }
 
-    public boolean isCanListable() { return listable != null; }
-
     public boolean isIterated() { return iterated; }
 
     public PropertiesGroup getChildren() { return children; }

@@ -49,12 +49,21 @@ abstract class Property implements Serializable, HeadSortable {
 
     public boolean isDataColumn() { return getColumn() != null; }
 
-    public boolean isCanListable() {
-        return atMethod == null ? (atField != null && atField.isCanListable()) : atMethod.isCanListable();
-    }
-
     public boolean isIterated() {
-        return atMethod == null ? (atField != null && atField.isIterated()) : atMethod.isIterated();
+        boolean iterated;
+        Annotated atM = this.atMethod;
+        Annotated atF = this.atField;
+        if (atM == null) {
+            iterated = atF != null && atF.isIterated();
+        } else {
+            iterated = atM.isIterated();
+        }
+        if (iterated) {
+            return true;
+        } else {
+            PropertiesGroup group = getGroup();
+            return group != null && group.isIterated();
+        }
     }
 
     /*
@@ -131,8 +140,6 @@ abstract class Property implements Serializable, HeadSortable {
     public Evaluator getEvaluator() { throw new UnsupportedOperationException(); }
 
     protected void afterSetField() {}
-
-    public void exec(Object data, Cell cell) { }
 
     /*
      * setters

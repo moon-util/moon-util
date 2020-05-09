@@ -32,6 +32,17 @@ public final class Assert {
      * object
      */
 
+    public static <T> T isNull(T value) {
+        return isNull(value, null);
+    }
+
+    public static <T> T isNull(T value, String message) {
+        if (value != null) {
+            throw new IllegalStateException(message);
+        }
+        return null;
+    }
+
     public static <T> T notNull(T value) { return notNull(value, none()); }
 
     public static <T> T notNull(T value, String message) { return value == null ? throwNull(message) : value; }

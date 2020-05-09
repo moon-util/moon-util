@@ -1,16 +1,18 @@
 package com.moon.more.excel.parse;
 
+import com.moon.more.excel.Renderer;
+
 /**
  * @author benshaoye
  */
 public abstract class ParseUtil {
 
-    private static class SetterParser extends Parser {
+    private static class SetterParser extends CoreParser {
 
         private SetterParser() { super(Creator.asSetter()); }
     }
 
-    private static class GetterParser extends Parser {
+    private static class GetterParser extends CoreParser {
 
         private GetterParser() { super(Creator.asGetter()); }
     }
@@ -20,7 +22,7 @@ public abstract class ParseUtil {
 
     static PropertiesGroupGet parseGetter(Class<?> targetClass) { return (PropertiesGroupGet) GETTER.doParse(targetClass); }
 
-    protected static MarkedColumnGroup parse(Class targetClass) { return GETTER.doParseAsCol(targetClass); }
+    protected static Renderer parse(Class targetClass) { return GETTER.doParseAsCol(targetClass); }
 
     static PropertiesGroupSet parseSetter(Class<?> targetClass) { return (PropertiesGroupSet) SETTER.doParse(targetClass); }
 }
