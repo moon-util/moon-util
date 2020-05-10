@@ -4,59 +4,14 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.Evaluator;
 import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.SheetFactory;
-import com.moon.more.excel.annotation.TableColumn;
-import com.moon.more.excel.annotation.TableColumnFlatten;
-import com.moon.more.excel.annotation.TableIndexer;
-import com.moon.more.excel.annotation.TableListable;
-
-import java.lang.reflect.Type;
-import java.util.Iterator;
 
 /**
  * @author benshaoye
  */
-public class MarkColumn extends AbstractSupporter implements MarkRenderer {
-
-    private final int offset;
-    /** property name */
-    private final String name;
-    /** property type */
-    private final Class type;
-    private final boolean iterated;
-
-    private final TableColumn tableColumn;
-    private final TableColumnFlatten columnFlatten;
-    private final TableListable tableListable;
-    private final Evaluator evaluator;
-
-    private final Type actualType;
-    private final Class actualClass;
-    private final MarkRenderer group;
-
-    private final TableIndexer tableIndexer;
-    private final IntAccessor indexer;
+public class MarkColumn extends AbstractMark implements MarkRenderer {
 
     private MarkColumn(int offset, Property property, MarkRenderer group) {
-        this.offset = offset;
-        this.group = group;
-
-        this.name = property.getName();
-        this.type = property.getPropertyType();
-        this.evaluator = property.getEvaluator();
-        this.tableColumn = property.getColumn();
-        this.columnFlatten = property.getFlatten();
-        this.tableListable = property.getListable();
-        this.iterated = property.isIterated();
-
-        Type actualType = property.getActualType();
-        Class actualCls = actualType instanceof Class ? (Class) actualType : null;
-        this.actualType = actualType;
-        this.actualClass = actualCls;
-
-        // init indexer
-        TableIndexer tableIndexer = property.getIndexer();
-        this.tableIndexer = tableIndexer;
-        this.indexer = tableIndexer == null ? null : IntAccessor.of();
+        super(offset, property, group);
     }
 
     /**
@@ -80,15 +35,21 @@ public class MarkColumn extends AbstractSupporter implements MarkRenderer {
     }
 
     @Override
-    public void renderRecord(MarkContainer container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+    public void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
         MarkRenderer childrenGroup = getGroup();
         Evaluator evaluator = getEvaluator();
         if (childrenGroup != null) {
             childrenGroup.renderRecord(container, sheetFactory, factory, evaluator.getPropertyValue(data));
         } else {
-            container.execute(factory);
+            container.execute(factory, null);
             evaluator.eval(factory.index(getOffset()), data);
         }
+    }
+
+    @Override
+    public void resetAll() {
+        resetIndexer();
+        resetGroup();
     }
 
     /*
@@ -100,7 +61,7 @@ public class MarkColumn extends AbstractSupporter implements MarkRenderer {
         public OnlyIndexedColumn(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
 
         @Override
-        public void renderRecord(MarkContainer container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        public void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
             factory.index(getOffset()).val(nextIndex());
         }
     }
@@ -110,7 +71,7 @@ public class MarkColumn extends AbstractSupporter implements MarkRenderer {
         public IndexedColumn(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
 
         @Override
-        public void renderRecord(MarkContainer container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        public void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
             final int offset = this.getOffset();
             Evaluator evaluator = getEvaluator();
             MarkRenderer childrenGroup = getGroup();
@@ -127,57 +88,4 @@ public class MarkColumn extends AbstractSupporter implements MarkRenderer {
     /*
      * ~~~~~ initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-
-    @Override
-    public void renderHead(SheetFactory sheetFactory) {
-        // TODO 表头
-    }
-
-    @Override
-    public void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
-        // TODO 数据
-    }
-
-    @Override
-    public void resetAll() {
-        resetIndexer();
-        resetGroup();
-    }
-
-    private void resetGroup() {
-        MarkRenderer group = getGroup();
-        if (group != null) {
-            group.resetAll();
-        }
-    }
-
-    private void resetIndexer() {
-        IntAccessor indexer = this.getIndexer();
-        if (indexer != null) {
-            indexer.set(tableIndexer.startingAt());
-        }
-    }
-
-    /*
-     * ~~~~~ getters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    public MarkRenderer getGroup() { return group; }
-
-    protected TableIndexer getTableIndexer() { return tableIndexer; }
-
-    protected IntAccessor getIndexer() { return indexer; }
-
-    protected Evaluator getEvaluator() { return evaluator; }
-
-    protected int getOffset() { return offset; }
-
-    protected boolean isIterated() { return iterated; }
-
-    /**
-     * 这里可能会报NPE，但由于是不同实现下才调，所以没有加 null 判断
-     *
-     * @see #renderRecord(MarkContainer, SheetFactory, RowFactory, Object)
-     */
-    protected int nextIndex() { return getIndexer().getAndIncrement(getTableIndexer().step()); }
 }

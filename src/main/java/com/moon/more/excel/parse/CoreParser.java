@@ -2,6 +2,7 @@ package com.moon.more.excel.parse;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.Assert;
+import com.moon.core.util.FilterUtil;
 import com.moon.more.excel.Renderer;
 import com.moon.more.excel.annotation.TableColumnFlatten;
 import com.moon.more.excel.annotation.TableIndexer;
@@ -22,12 +23,16 @@ import java.util.stream.Collectors;
  */
 abstract class CoreParser<T extends Property> extends AbstractSupporter {
 
+    @SuppressWarnings({"rawtypes"})
     private final Creator creator;
 
+    @SuppressWarnings({"rawtypes"})
     private Creator getCreator() { return creator; }
 
+    @SuppressWarnings({"rawtypes"})
     protected CoreParser(Creator creator) { this.creator = creator; }
 
+    @SuppressWarnings({"rawtypes"})
     protected PropertiesGroup doParse(Class type) {
         try {
             Map<String, T> annotated = new LinkedHashMap<>();
@@ -42,12 +47,16 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         }
     }
 
-    protected MarkRenderer doParseAsCol(Class type) {
-        MarkRenderer renderer = transform(doParse(type), IntAccessor.of());
+
+    @SuppressWarnings({"rawtypes"})
+    protected Renderer doParseAsCol(Class type) {
+        Renderer renderer = transform(doParse(type), IntAccessor.of());
         return renderer;
     }
 
-    private MarkRenderer transform(PropertiesGroup group, final IntAccessor accessor) {
+
+    @SuppressWarnings({"rawtypes"})
+    private Renderer transform(PropertiesGroup group, final IntAccessor accessor) {
         if (group.isIterated()) {
             return transformIterated(group, accessor);
         } else {
@@ -55,6 +64,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         }
     }
 
+    @SuppressWarnings({"rawtypes"})
     private MarkIteratedGroup transformIterated(PropertiesGroup group, final IntAccessor accessor) {
         if (group == null) {
             return null;
@@ -89,6 +99,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         return new MarkIteratedGroup(columns, iteratedAt, rootIndexer, group.root, indexed);
     }
 
+    @SuppressWarnings({"rawtypes"})
     private MarkColumnGroup transformDefault(PropertiesGroup group, final IntAccessor accessor) {
         if (group == null) {
             return null;
@@ -117,7 +128,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         return new MarkColumnGroup(columns, rootIndexer, group.root, indexed);
     }
 
-    @SuppressWarnings("all")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private void parseDescriptors(
         Class type, Map annotated, Map unAnnotated
     ) throws Exception {
@@ -132,18 +143,15 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
             String name = descriptor.getName();
             Class propType = descriptor.getPropertyType();
             Type genericType = creator.getGenericType(method);
-            PropertiesGroup children = getGroupParsed(method, genericType, propType, name);
-            Annotated<Method> onMethod = Annotated.of(name, propType, genericType, method, children);
+            Class actualClass = getActualClass(method, genericType, propType, name);
+            PropertiesGroup children = getGroupParsed(method, actualClass);
+            Annotated<Method> onMethod = Annotated.of(name, propType, genericType, actualClass, method, children);
 
-            Property info = creator.info(name, onMethod);
-            if (onMethod.isAnnotated()) {
-                annotated.put(name, info);
-            } else {
-                unAnnotated.put(name, info);
-            }
+            (onMethod.isAnnotated() ? annotated : unAnnotated).put(name, creator.info(name, onMethod));
         }
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private void parseFields(Class type, Map annotated, Map unAnnotated) {
         while (type != null && type != Object.class) {
             Field[] fields = type.getDeclaredFields();
@@ -158,7 +166,8 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         Field field, Map<String, Property> annotated, Map<String, Property> unAnnotated
     ) {
         String name = field.getName();
-        Annotated<Field> onField = Annotated.of(field, getGroupParsed(field));
+        @SuppressWarnings({"rawtypes"}) Class actualClass = getActualClass(field);
+        Annotated<Field> onField = Annotated.of(field, actualClass, getGroupParsed(field, actualClass));
 
         Property info = annotated.get(name);
         if (info == null) {
@@ -167,37 +176,43 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
                 info = getCreator().info(name);
             }
             info.setAboutField(onField);
-            if (onField.isAnnotated()) {
-                annotated.put(name, info);
-            } else {
-                unAnnotated.put(name, info);
-            }
+            (onField.isAnnotated() ? annotated : unAnnotated).put(name, info);
         } else {
             info.setAboutField(onField);
         }
     }
 
-    PropertiesGroup getGroupParsed(Field field) {
-        return getGroupParsed(field, field.getGenericType(), field.getType(), field.getName());
-    }
-
-    PropertiesGroup getGroupParsed(
-        AnnotatedElement elem, Type paramType, Class actualType, String propName
-    ) {
+    @SuppressWarnings({"rawtypes"})
+    static Class getActualClass(AnnotatedElement elem, Type genericType, Class propertyCls, String propName) {
         TableColumnFlatten flatten = obtainFlatten(elem);
         if (flatten != null) {
             Class actualTpe = flatten.targetClass();
             if (actualTpe == Void.class) {
-                actualTpe = getActual(paramType, actualType);
+                actualTpe = getActual(genericType, propertyCls);
             }
             if (actualTpe == null || isSetColumn(actualTpe)) {
                 throw new IllegalStateException("未知集合目标(泛型)类型: [" + propName + "] " + elem);
             }
-            return doParse(actualTpe);
+            return actualTpe;
+        } else if (isSetColumn(propertyCls)) {
+            Class actualTpe = getActual(genericType, propertyCls);
+            return actualTpe == propertyCls ? null : actualTpe;
         }
         return null;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    Class getActualClass(Field field) {
+        return getActualClass(field, field.getGenericType(), field.getType(), field.getName());
+    }
+
+    @SuppressWarnings({"rawtypes"})
+    PropertiesGroup getGroupParsed(AnnotatedElement elem, Class actualType) {
+        TableColumnFlatten flatten = obtainFlatten(elem);
+        return flatten == null ? null : doParse(actualType);
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private static <T extends Property> PropertiesGroup toParsedResult(
         Creator creator, Class type, Map<String, T> annotated, Map<String, T> unAnnotated
     ) {
@@ -216,10 +231,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
                 }
             }
         } else {
-            columns = unAnnotated.values().stream()
-
-                .filter(info -> isBasic(info.getPropertyType()))
-
+            columns = unAnnotated.values().stream().filter(info -> isBasic(info.getPropertyType()))
                 .collect(Collectors.toList());
         }
 

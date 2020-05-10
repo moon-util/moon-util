@@ -32,5 +32,17 @@ public interface Evaluator {
      *
      * @return
      */
-    void eval(CellFactory factory, Object data);
+    default void eval(CellFactory factory, Object data) {
+        evalOnOriginal(factory, getPropertyValue(data));
+    }
+
+    /**
+     * 始终直接设置
+     *
+     * @param factory
+     * @param data
+     */
+    default void evalOnOriginal(CellFactory factory, Object data) {
+        setCellValue(factory, data);
+    }
 }

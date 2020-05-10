@@ -60,11 +60,6 @@ class PropertyGet extends Property {
         public void setCellValue(CellFactory factory, Object value) {
             transfer.setCellValue(value, factory.getCell());
         }
-
-        @Override
-        public void eval(CellFactory factory, Object data) {
-            setCellValue(factory, getPropertyValue(data));
-        }
     }
 
     PropertyGetter getPropertyGetter() { return accessor.get(); }

@@ -17,7 +17,7 @@ public class ReverseIterator<E> implements Iterator<E> {
     private ReverseIterator(ListIterator<E> iterator) {this.iterator = iterator;}
 
     public static <T> Iterator of(Collection<? extends T> collect) {
-        return collect == null ? EmtpyIterator.EMPTY : new ReverseIterator<>(collect);
+        return collect == null ? EmptyIterator.EMPTY : new ReverseIterator<>(collect);
     }
 
     @Override

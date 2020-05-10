@@ -23,7 +23,7 @@ import java.util.function.*;
 import static com.moon.core.io.FileUtil.getInputStream;
 import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.util.iterator.CollectSplitter.DEFAULT_SPLIT_COUNT;
-import static com.moon.core.util.iterator.EmtpyIterator.EMPTY;
+import static com.moon.core.util.iterator.EmptyIterator.EMPTY;
 
 /**
  * 通用迭代器
@@ -49,7 +49,8 @@ public final class IteratorUtil {
      *
      * @return
      */
-    private static Iterator ofEmpty() { return EMPTY; }
+    @SuppressWarnings("rawtypes")
+    public static Iterator ofEmpty() { return EMPTY; }
 
     /**
      * 集合反序迭代器
@@ -354,6 +355,7 @@ public final class IteratorUtil {
         return clazz != null && clazz.isEnum() ? of(clazz.getEnumConstants()) : EMPTY;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static Iterator ofAny(Object value) {
         if (value == null) { return EMPTY; }
         if (value instanceof Iterable) { return of((Iterable) value); }
@@ -364,7 +366,7 @@ public final class IteratorUtil {
         if (type.isArray()) {
             if (value instanceof Object[]) { return of((Object[]) value); }
             if (value instanceof int[]) { return of((int[]) value); }
-            if (value instanceof long[]) { return of((double[]) value); }
+            if (value instanceof long[]) { return of((long[]) value); }
             if (value instanceof double[]) { return of((double[]) value); }
             if (value instanceof byte[]) { return of((byte[]) value); }
             if (value instanceof char[]) { return of((char[]) value); }
@@ -781,7 +783,7 @@ public final class IteratorUtil {
      * ----------------------------------------------------------------------------
      */
 
-    public static void forEachChars(CharSequence cs, CharConsumer consumer){
+    public static void forEachChars(CharSequence cs, CharConsumer consumer) {
         if (cs != null) { forEach(cs.toString().toCharArray(), consumer); }
     }
 

@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Cell;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.function.Function;
@@ -50,20 +51,14 @@ abstract class Property implements Serializable, HeadSortable {
     public boolean isDataColumn() { return getColumn() != null; }
 
     public boolean isIterated() {
-        boolean iterated;
         Annotated atM = this.atMethod;
         Annotated atF = this.atField;
-        if (atM == null) {
-            iterated = atF != null && atF.isIterated();
-        } else {
-            iterated = atM.isIterated();
-        }
-        if (iterated) {
-            return true;
-        } else {
-            PropertiesGroup group = getGroup();
-            return group != null && group.isIterated();
-        }
+        return (atM == null) ? (atF != null && atF.isIterated()) : atM.isIterated();
+    }
+
+    public boolean isChildrenIterated() {
+        PropertiesGroup group = getGroup();
+        return group != null && group.isIterated();
     }
 
     /*
@@ -135,7 +130,13 @@ abstract class Property implements Serializable, HeadSortable {
 
     public Class getPropertyType() { return gotIfNonNull(Annotated::getPropertyType); }
 
-    public Type getActualType() { return gotIfNonNull(Annotated::getGenericType); }
+    public Type getGenericType() { return gotIfNonNull(Annotated::getGenericType); }
+
+    public Class getActualClass() { return gotIfNonNull(Annotated::getActualClass); }
+
+    public Class getDeclaringClass() {
+        return gotIfNonNull(annotated -> annotated.getMember().getDeclaringClass());
+    }
 
     public Evaluator getEvaluator() { throw new UnsupportedOperationException(); }
 

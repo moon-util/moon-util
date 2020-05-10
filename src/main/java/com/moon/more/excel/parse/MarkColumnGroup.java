@@ -1,6 +1,7 @@
 package com.moon.more.excel.parse;
 
 import com.moon.core.lang.ref.IntAccessor;
+import com.moon.more.excel.Renderer;
 import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.SheetFactory;
 
@@ -12,7 +13,7 @@ import static com.moon.core.util.CollectUtil.toArrayOfEmpty;
 /**
  * @author benshaoye
  */
-public class MarkColumnGroup implements MarkRenderer {
+public class MarkColumnGroup implements MarkRenderer, Renderer {
 
     private final MarkRenderer[] columns;
 
@@ -63,26 +64,26 @@ public class MarkColumnGroup implements MarkRenderer {
     public final void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
         resetAll();
         if (first != null) {
-            renderRecord(MarkContainer.DEFAULT,sheetFactory,  sheetFactory.row(), first);
+            renderRecord(MarkIteratedExecutor.NULL,sheetFactory,  sheetFactory.row(), first);
         }
         while (iterator.hasNext()) {
-            renderRecord(MarkContainer.DEFAULT, sheetFactory, sheetFactory.row(), iterator.next());
+            renderRecord(MarkIteratedExecutor.NULL, sheetFactory, sheetFactory.row(), iterator.next());
         }
     }
 
     @Override
-    public final void renderRecord(MarkContainer container,SheetFactory sheetFactory,  RowFactory factory, Object data) {
+    public final void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
         renderRootCol(container,sheetFactory, factory);
         renderColumn(container,sheetFactory,  factory, data);
     }
 
-    private void renderColumn(MarkContainer container,SheetFactory sheetFactory,  RowFactory factory, Object data) {
+    private void renderColumn(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
         for (MarkRenderer column : getColumns()) {
             column.renderRecord(container,sheetFactory,  factory, data);
         }
     }
 
-    private void renderRootCol(MarkContainer container,SheetFactory sheetFactory,  RowFactory factory) {
+    private void renderRootCol(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory) {
         MarkColumn root = getRootIndexer();
         if (root != null) {
             root.renderRecord(container,sheetFactory,  factory, null);

@@ -21,6 +21,7 @@ class Annotated<M extends Member> {
     private final M member;
     private final Class propertyType;
     private final Type genericType;
+    private final Class actualClass;
     private final boolean iterated;
     private final TableColumn column;
     private final TableColumnFlatten flatten;
@@ -28,9 +29,12 @@ class Annotated<M extends Member> {
     private final TableListable listable;
     private final PropertiesGroup children;
 
-    Annotated(String name, Class propertyType, Type genericType, M member, PropertiesGroup children) {
+    Annotated(
+        String name, Class propertyType, Type genericType, Class actualClass, M member, PropertiesGroup children
+    ) {
         this.name = name;
         this.member = member;
+        this.actualClass = actualClass;
         this.genericType = genericType;
         this.propertyType = propertyType;
         this.children = children;
@@ -71,18 +75,23 @@ class Annotated<M extends Member> {
 
     public Type getGenericType() { return genericType; }
 
+    public Class getActualClass() { return actualClass; }
+
     public boolean isIterated() { return iterated; }
 
     public PropertiesGroup getChildren() { return children; }
 
-    static Annotated<Field> of(Field member, PropertiesGroup children) {
+    @SuppressWarnings("all")
+    static Annotated<Field> of(Field member, Class actualClass, PropertiesGroup children) {
         return new Annotated<>(member.getName(), member.getType(),//
-            member.getGenericType(), member, children);
+            member.getGenericType(), actualClass, member, children);
     }
 
-    static Annotated<Method> of(String name, Class propertyType, Type genericType, Method method, PropertiesGroup children) {
-        return new Annotated<>(name, propertyType, genericType, method, children);
-    }
+    @SuppressWarnings("all")
+    static Annotated<Method> of(
+        String name, Class propertyType, Type genericType,//
+        Class actualClass, Method method, PropertiesGroup children
+    ) { return new Annotated<>(name, propertyType, genericType, actualClass, method, children); }
 }
 
 

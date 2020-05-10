@@ -51,15 +51,27 @@ final class SupportUtil {
      * @param <T>
      */
     static <T extends Property> void requireNotDuplicatedListable(List<T> list) {
-        boolean isListable = false;
+        Property property = null;
         for (T defined : list) {
-            if (defined.isIterated()) {
-                if (isListable) {
-                    throw new IllegalStateException("一个实体最多只能有一个字段注解 " + LISTABLE);
+            if (defined.isIterated() || defined.isChildrenIterated()) {
+                if (property == null) {
+                    property = defined;
                 } else {
-                    isListable = true;
+                    throw new IllegalStateException("一个类最多只能有一个字段可迭代(展开字段内部包含可迭代字段也视为可迭代)" +
+                        ";\n " +
+                        property.getDeclaringClass() +
+                        ": [" +
+                        toErrMsg(property) +
+                        toErrMsg(defined) +
+                        "\n ]\n");
                 }
             }
         }
+    }
+
+    private static String toErrMsg(Property prop) {
+        return "\n  ~ " + prop.getPropertyType().getSimpleName() + " " +
+
+            prop.name + ": " + (prop.isIterated() ? "自身可迭代;" : "内部包含可迭代字段;");
     }
 }
