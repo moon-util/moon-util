@@ -35,7 +35,7 @@ public class MarkColumn extends AbstractMark implements MarkRenderer {
     }
 
     @Override
-    public void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+    public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
         MarkRenderer childrenGroup = getGroup();
         Evaluator evaluator = getEvaluator();
         if (childrenGroup != null) {
@@ -61,7 +61,7 @@ public class MarkColumn extends AbstractMark implements MarkRenderer {
         public OnlyIndexedColumn(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
 
         @Override
-        public void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
             factory.index(getOffset()).val(nextIndex());
         }
     }
@@ -71,7 +71,7 @@ public class MarkColumn extends AbstractMark implements MarkRenderer {
         public IndexedColumn(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
 
         @Override
-        public void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
             final int offset = this.getOffset();
             Evaluator evaluator = getEvaluator();
             MarkRenderer childrenGroup = getGroup();

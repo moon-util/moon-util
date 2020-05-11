@@ -7,35 +7,32 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author benshaoye
  */
-class MarkIteratedExecutor {
+class MarkExecutor {
 
-    private final MarkIteratedExecutor parent;
+    final static MarkExecutor NULL = new None();
 
-    final static MarkIteratedExecutor NULL = new None();
-
-    public static MarkIteratedExecutor of(MarkRenderer[] registries, MarkRenderer iterateAt) {
+    public static MarkExecutor of(MarkRenderer[] registries, MarkRenderer iterateAt) {
         return of(registries, iterateAt, null);
     }
 
-    public static MarkIteratedExecutor of(
-        MarkRenderer[] registries, MarkRenderer iterateAt, MarkIteratedExecutor parent
-    ) {
-        return new MarkIteratedExecutor(registries, iterateAt, parent == null ? NULL : parent);
-    }
+    public static MarkExecutor of(
+        MarkRenderer[] registries, MarkRenderer iterateAt, MarkExecutor parent
+    ) { return new MarkExecutor(registries, iterateAt, parent == null ? NULL : parent); }
 
+    private final MarkExecutor parent;
     private final MarkRenderer[] registries;
     private final MarkRenderer iterateAt;
     private Object registriesData;
 
-    private MarkIteratedExecutor(
-        MarkRenderer[] registries, MarkRenderer iterateAt, MarkIteratedExecutor parent, boolean initialize
+    private MarkExecutor(
+        MarkRenderer[] registries, MarkRenderer iterateAt, MarkExecutor parent, boolean initialize
     ) {
         this.parent = initialize ? parent : requireNonNull(parent);
         this.registries = registries == null ? MarkRenderer.EMPTY : registries;
         this.iterateAt = iterateAt == null ? MarkRenderer.NONE : iterateAt;
     }
 
-    private MarkIteratedExecutor(MarkRenderer[] registries, MarkRenderer iterateAt, MarkIteratedExecutor parent) {
+    private MarkExecutor(MarkRenderer[] registries, MarkRenderer iterateAt, MarkExecutor parent) {
         this(registries, iterateAt, parent, false);
     }
 
@@ -58,7 +55,7 @@ class MarkIteratedExecutor {
         iterateAt.renderRecord(null, null, factory, data);
     }
 
-    private static class None extends MarkIteratedExecutor {
+    private static class None extends MarkExecutor {
 
         public None() { super(null, null, null, true); }
 

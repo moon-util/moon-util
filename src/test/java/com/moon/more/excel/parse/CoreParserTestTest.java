@@ -1,5 +1,6 @@
 package com.moon.more.excel.parse;
 
+import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.more.excel.ExcelUtil;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author benshaoye
@@ -111,5 +112,17 @@ class CoreParserTestTest extends ParseUtil {
 
         @TableColumn
         List<String> values;
+    }
+
+    @Test
+    void testCopyArray() throws Exception {
+        String[] empty = new String[0];
+        String[] values = new String[4];
+        List<String> list = ListUtil.newArrayList("1", "1", "3", "4");
+        String[] copied = list.toArray(values);
+        assertSame(values, copied);
+
+        copied = list.toArray(empty);
+        assertArrayEquals(values, copied);
     }
 }

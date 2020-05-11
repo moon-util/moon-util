@@ -74,7 +74,7 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
     @SuppressWarnings({"rawtypes"})
     public final void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
         resetAll();
-        MarkIteratedExecutor executor = MarkIteratedExecutor.of(getColumns(), iterateAt);
+        MarkExecutor executor = MarkExecutor.of(getColumns(), iterateAt);
 
         renderRecord(executor, sheetFactory, sheetFactory.row(), first);
         while (iterator.hasNext()) {
@@ -84,31 +84,20 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
 
     @Override
     public final void renderRecord(
-        MarkIteratedExecutor executor, SheetFactory sheetFactory, RowFactory factory, Object data
+        MarkExecutor executor, SheetFactory sheetFactory, RowFactory factory, Object data
     ) {
         if (data == null) {
             return;
         }
         executor.setRegistriesData(data);
-        Object iterable = iterateAt.getEvaluator().getPropertyValue(data);
+        Object iterable = getIterateAt().getEvaluator().getPropertyValue(data);
         if (iterable == null) {
-            factory = sheetFactory.row();
-            executor.execute(factory, null);
+            executor.execute(sheetFactory.row(), null);
         } else {
             @SuppressWarnings("rawtypes") Iterator iter = strategy.iterator(iterable);
             while (iter.hasNext()) {
-                factory = sheetFactory.row();
-                Object iteratorItem = iter.next();
-                System.out.println(iteratorItem);
-                executor.execute(factory, iteratorItem);
+                executor.execute(sheetFactory.row(), iter.next());
             }
-        }
-    }
-
-    private void renderRootCol(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory) {
-        MarkColumn root = getRootIndexer();
-        if (root != null) {
-            root.renderRecord(container, sheetFactory, factory, null);
         }
     }
 
@@ -148,9 +137,7 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
         Class getTopClass();
 
         @Override
-        default boolean test(Class propertyClass) {
-            return getTopClass().isAssignableFrom(propertyClass);
-        }
+        default boolean test(Class propertyClass) { return getTopClass().isAssignableFrom(propertyClass); }
 
         static IterateStrategy getIterateStrategy(Class propertyClass) {
             if (propertyClass.isArray()) {

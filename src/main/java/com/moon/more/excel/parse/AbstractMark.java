@@ -95,7 +95,7 @@ abstract class AbstractMark extends AbstractSupporter {
     /**
      * 这里可能会报NPE，但由于是不同实现下才调，所以没有加 null 判断
      *
-     * @see #renderRecord(MarkIteratedExecutor, SheetFactory, RowFactory, Object)
+     * @see #renderRecord(MarkExecutor, SheetFactory, RowFactory, Object)
      */
     @SuppressWarnings("all")
     protected int nextIndex() { return getIndexer().getAndIncrement(getTableIndexer().step()); }

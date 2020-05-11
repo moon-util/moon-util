@@ -64,26 +64,26 @@ public class MarkColumnGroup implements MarkRenderer, Renderer {
     public final void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
         resetAll();
         if (first != null) {
-            renderRecord(MarkIteratedExecutor.NULL,sheetFactory,  sheetFactory.row(), first);
+            renderRecord(MarkExecutor.NULL,sheetFactory,  sheetFactory.row(), first);
         }
         while (iterator.hasNext()) {
-            renderRecord(MarkIteratedExecutor.NULL, sheetFactory, sheetFactory.row(), iterator.next());
+            renderRecord(MarkExecutor.NULL, sheetFactory, sheetFactory.row(), iterator.next());
         }
     }
 
     @Override
-    public final void renderRecord(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+    public final void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
         renderRootCol(container,sheetFactory, factory);
         renderColumn(container,sheetFactory,  factory, data);
     }
 
-    private void renderColumn(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+    private void renderColumn(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
         for (MarkRenderer column : getColumns()) {
             column.renderRecord(container,sheetFactory,  factory, data);
         }
     }
 
-    private void renderRootCol(MarkIteratedExecutor container, SheetFactory sheetFactory, RowFactory factory) {
+    private void renderRootCol(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory) {
         MarkColumn root = getRootIndexer();
         if (root != null) {
             root.renderRecord(container,sheetFactory,  factory, null);
