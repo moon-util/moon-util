@@ -21,5 +21,6 @@ public interface Renderer {
      * @param iterator     数据集合，如果存在第一项（first != null），集合中则不应包含第一项
      * @param first        第一项数据
      */
+    @SuppressWarnings("rawtypes")
     void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first);
 }

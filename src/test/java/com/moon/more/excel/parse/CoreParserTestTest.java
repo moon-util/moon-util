@@ -27,35 +27,48 @@ class CoreParserTestTest extends ParseUtil {
         }).write2Filepath("D:/test.xlsx");
     }
 
+    @Test
+    void testDoParseAsCol1() {
+        parse(Top.class);
+    }
+
     public static class Top {
 
         @TableColumn
         private String name = RandomStringUtil.nextChinese(2, 5);
 
-        @TableColumn
-        List<String> middleList;
+        @TableColumnFlatten
+        List<Middle> middleList;
 
         public Top() {
-            List<String> middleList = new ArrayList<>();
+            List<Middle> middleList = new ArrayList<>();
             this.middleList = middleList;
             for (int i = 0; i < RandomUtil.nextInt(5, 10); i++) {
-                middleList.add(RandomStringUtil.nextLetter(4, 6));
+                middleList.add(new Middle());
             }
         }
     }
 
     public static class Middle {
 
-        @TableColumn
+        // @TableColumn
         private List<String> names;
 
         @TableColumn
-        private Bottom bottom;
+        private Bottom bottom = new Bottom();
 
         @TableColumn
         private int value;
 
         List<Bottom> bottomList;
+
+        public Middle() {
+            List<String> names = new ArrayList<>();
+            this.names = names;
+            for (int i = 0; i < RandomUtil.nextInt(5, 10); i++) {
+                names.add(RandomStringUtil.nextLetter(4, 6));
+            }
+        }
     }
 
     public static class Bottom {

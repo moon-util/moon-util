@@ -11,44 +11,49 @@ class MarkExecutor {
 
     final static MarkExecutor NULL = new None();
 
-    public static MarkExecutor of(MarkRenderer[] registries, MarkRenderer iterateAt) {
-        return of(registries, iterateAt, null);
-    }
+    public static MarkExecutor of(
+        MarkRenderer[] columns, MarkRenderer iterateAt
+    ) { return of(columns, iterateAt, null); }
 
     public static MarkExecutor of(
-        MarkRenderer[] registries, MarkRenderer iterateAt, MarkExecutor parent
-    ) { return new MarkExecutor(registries, iterateAt, parent == null ? NULL : parent); }
+        MarkRenderer[] columns, MarkRenderer iterateAt, MarkExecutor parent
+    ) { return new MarkExecutor(columns, iterateAt, parent == null ? NULL : parent); }
 
     private final MarkExecutor parent;
-    private final MarkRenderer[] registries;
+    private final MarkRenderer[] columns;
     private final MarkRenderer iterateAt;
-    private Object registriesData;
+    private Object columnsData;
+    private Object iterateData;
 
     private MarkExecutor(
-        MarkRenderer[] registries, MarkRenderer iterateAt, MarkExecutor parent, boolean initialize
+        MarkRenderer[] columns, MarkRenderer iterateAt, MarkExecutor parent, boolean initialize
     ) {
         this.parent = initialize ? parent : requireNonNull(parent);
-        this.registries = registries == null ? MarkRenderer.EMPTY : registries;
+        this.columns = columns == null ? MarkRenderer.EMPTY : columns;
         this.iterateAt = iterateAt == null ? MarkRenderer.NONE : iterateAt;
     }
 
-    private MarkExecutor(MarkRenderer[] registries, MarkRenderer iterateAt, MarkExecutor parent) {
-        this(registries, iterateAt, parent, false);
+    private MarkExecutor(MarkRenderer[] columns, MarkRenderer iterateAt, MarkExecutor parent) {
+        this(columns, iterateAt, parent, false);
     }
 
-    public void setRegistriesData(Object data) { this.registriesData = data; }
+    void setIterateData(Object iterateData) { this.iterateData = iterateData; }
+
+    void setColumnsData(Object columnsData) { this.columnsData = columnsData; }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private MarkRenderer[] getRegistries() { return registries; }
+    private MarkRenderer[] getColumns() { return columns; }
 
-    private Object getRegistriesData() { return registriesData; }
+    private Object getColumnsData() { return columnsData; }
+
+    private Object getIterateData() { return iterateData; }
 
     void execute(RowFactory factory, Object data) {
-        Object registriesData = getRegistriesData();
-        MarkRenderer[] registries = getRegistries();
+        Object registriesData = getColumnsData();
+        MarkRenderer[] registries = getColumns();
         for (MarkRenderer registry : registries) {
             registry.renderRecord(null, null, factory, registriesData);
         }

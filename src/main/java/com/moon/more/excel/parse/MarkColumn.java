@@ -41,7 +41,6 @@ public class MarkColumn extends AbstractMark implements MarkRenderer {
         if (childrenGroup != null) {
             childrenGroup.renderRecord(container, sheetFactory, factory, evaluator.getPropertyValue(data));
         } else {
-            container.execute(factory, null);
             evaluator.eval(factory.index(getOffset()), data);
         }
     }

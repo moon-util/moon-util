@@ -52,7 +52,11 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
     public MarkIteratedGroup(
         List<MarkIterated> columns, MarkIterated iterateAt, MarkColumn rootIndexer, DetailRoot root, boolean indexed
     ) {
-        this.strategy = IterateStrategy.getIterateStrategy(iterateAt.getPropertyType());
+        if (iterateAt == null) {
+            this.strategy = NoneIterateStrategy.NONE;
+        } else {
+            this.strategy = IterateStrategy.getIterateStrategy(iterateAt.getPropertyType());
+        }
         this.columns = toArrayOfEmpty(columns, MarkIterated[]::new, EMPTY);
         this.rootIndexer = rootIndexer;
         this.iterateAt = iterateAt;
@@ -82,6 +86,8 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
         }
     }
 
+    private Object columnsData;
+
     @Override
     public final void renderRecord(
         MarkExecutor executor, SheetFactory sheetFactory, RowFactory factory, Object data
@@ -89,17 +95,50 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
         if (data == null) {
             return;
         }
-        executor.setRegistriesData(data);
+        // executor.setColumnsData(data);
+        MarkRenderer[] columns = getColumns();
+        if (canIterable()) {
+            MarkIterated iterateAt = getIterateAt();
+            if (iterateAt.getGroup() == null) {
+
+            } else {
+                MarkExecutor innerExecutor = MarkExecutor.of(columns, iterateAt, executor);
+                innerExecutor.setColumnsData(data);
+                Object iterable = iterateAt.getEvaluator().getPropertyValue(data);
+                if (iterable == null) {
+                    // todo
+                }else{
+                    @SuppressWarnings("rawtypes") Iterator iter = strategy.iterator(iterable);
+                    while (iter.hasNext()) {
+                        Object iteratedData = iter.next();
+                        innerExecutor.setIterateData(iteratedData);
+                        renderRecord(innerExecutor, sheetFactory, factory, iteratedData);
+                    }
+                }
+            }
+        } else {
+            // todo render
+        }
+        executor.setColumnsData(data);
         Object iterable = getIterateAt().getEvaluator().getPropertyValue(data);
         if (iterable == null) {
-            executor.execute(sheetFactory.row(), null);
+            // executor.execute(sheetFactory.row(), null);
         } else {
             @SuppressWarnings("rawtypes") Iterator iter = strategy.iterator(iterable);
             while (iter.hasNext()) {
-                executor.execute(sheetFactory.row(), iter.next());
+                executor.setIterateData(iter.next());
             }
         }
     }
+
+    // private void renderRows(
+    //     RowFactory factory, MarkRenderer[] columns, Object columnsData, MarkRenderer iterateAt, Object iterateData
+    // ) {
+    //     for (MarkRenderer registry : columns) {
+    //         registry.renderRecord(null, null, factory, columnsData);
+    //     }
+    //     iterateAt.renderRecord(null, null, factory, iterateData);
+    // }
 
     /*
      * ~~~~~ initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -121,6 +160,8 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
      * ~~~~~ getters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    private boolean canIterable() { return getIterateAt() != null; }
+
     public MarkIterated getIterateAt() { return iterateAt; }
 
     MarkRenderer[] getColumns() { return columns; }
@@ -128,6 +169,10 @@ public class MarkIteratedGroup implements MarkRenderer, Renderer {
     public boolean isIndexed() { return indexed; }
 
     MarkColumn getRootIndexer() { return rootIndexer; }
+
+    private Object getColumnsData() { return columnsData; }
+
+    private void setColumnsData(Object columnsData) { this.columnsData = columnsData; }
 
     @SuppressWarnings({"all"})
     interface IterateStrategy extends Predicate<Class> {
