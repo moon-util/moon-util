@@ -8,9 +8,9 @@ import com.moon.more.excel.SheetFactory;
 /**
  * @author benshaoye
  */
-public class MarkColumn extends AbstractMark implements MarkRenderer {
+public class MarkColumn extends AbstractMark<MarkColumnGroup> implements MarkRenderer {
 
-    private MarkColumn(int offset, Property property, MarkRenderer group) {
+    private MarkColumn(int offset, Property property, MarkColumnGroup group) {
         super(offset, property, group);
     }
 
@@ -24,7 +24,7 @@ public class MarkColumn extends AbstractMark implements MarkRenderer {
      * @see CoreParser#transform(PropertiesGroup, IntAccessor)
      */
     @SuppressWarnings("all")
-    static MarkColumn of(int offset, Property property, MarkRenderer group) {
+    static MarkColumn of(int offset, Property property, MarkColumnGroup group) {
         if (property.isOnlyIndexer()) {
             return new OnlyIndexedColumn(offset, property, group);
         } else if (property.hasIndexer()) {
@@ -57,7 +57,7 @@ public class MarkColumn extends AbstractMark implements MarkRenderer {
 
     private static class OnlyIndexedColumn extends MarkColumn {
 
-        public OnlyIndexedColumn(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
+        public OnlyIndexedColumn(int offset, Property property, MarkColumnGroup group) { super(offset, property, group); }
 
         @Override
         public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
@@ -67,7 +67,7 @@ public class MarkColumn extends AbstractMark implements MarkRenderer {
 
     private static class IndexedColumn extends MarkColumn {
 
-        public IndexedColumn(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
+        public IndexedColumn(int offset, Property property, MarkColumnGroup group) { super(offset, property, group); }
 
         @Override
         public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {

@@ -2,69 +2,33 @@ package com.moon.more.excel.parse;
 
 import com.moon.more.excel.RowFactory;
 
-import static java.util.Objects.requireNonNull;
+import java.util.LinkedList;
+import java.util.function.Consumer;
 
 /**
  * @author benshaoye
  */
 class MarkExecutor {
 
-    final static MarkExecutor NULL = new None();
+    final LinkedList<Consumer<RowFactory>> runnerList = new LinkedList<>();
 
-    public static MarkExecutor of(
-        MarkRenderer[] columns, MarkRenderer iterateAt
-    ) { return of(columns, iterateAt, null); }
+    private boolean running = false;
 
-    public static MarkExecutor of(
-        MarkRenderer[] columns, MarkRenderer iterateAt, MarkExecutor parent
-    ) { return new MarkExecutor(columns, iterateAt, parent == null ? NULL : parent); }
-
-    private final MarkExecutor parent;
-    private final MarkRenderer[] columns;
-    private final MarkRenderer iterateAt;
-    private Object columnsData;
-    private Object iterateData;
-
-    private MarkExecutor(
-        MarkRenderer[] columns, MarkRenderer iterateAt, MarkExecutor parent, boolean initialize
-    ) {
-        this.parent = initialize ? parent : requireNonNull(parent);
-        this.columns = columns == null ? MarkRenderer.EMPTY : columns;
-        this.iterateAt = iterateAt == null ? MarkRenderer.NONE : iterateAt;
+    public final void add(Consumer<RowFactory> runner) {
+        runnerList.addFirst(runner);
     }
 
-    private MarkExecutor(MarkRenderer[] columns, MarkRenderer iterateAt, MarkExecutor parent) {
-        this(columns, iterateAt, parent, false);
-    }
-
-    void setIterateData(Object iterateData) { this.iterateData = iterateData; }
-
-    void setColumnsData(Object columnsData) { this.columnsData = columnsData; }
-
-    /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    private MarkRenderer[] getColumns() { return columns; }
-
-    private Object getColumnsData() { return columnsData; }
-
-    private Object getIterateData() { return iterateData; }
-
-    void execute(RowFactory factory, Object data) {
-        Object registriesData = getColumnsData();
-        MarkRenderer[] registries = getColumns();
-        for (MarkRenderer registry : registries) {
-            registry.renderRecord(null, null, factory, registriesData);
+    public final void run(RowFactory rowFactory) {
+        if (!running) {
+            running = true;
+            runnerList.forEach(runner -> {
+                runner.accept(rowFactory);
+            });
+            running = false;
         }
-        iterateAt.renderRecord(null, null, factory, data);
     }
 
-    private static class None extends MarkExecutor {
-
-        public None() { super(null, null, null, true); }
-
-        @Override
-        void execute(RowFactory factory, Object data) { }
+    public final Consumer<RowFactory> removeFirst() {
+        return runnerList.removeFirst();
     }
 }

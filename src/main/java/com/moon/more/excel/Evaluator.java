@@ -42,7 +42,5 @@ public interface Evaluator {
      * @param factory
      * @param data
      */
-    default void evalOnOriginal(CellFactory factory, Object data) {
-        setCellValue(factory, data);
-    }
+    default void evalOnOriginal(CellFactory factory, Object data) { setCellValue(factory, data); }
 }

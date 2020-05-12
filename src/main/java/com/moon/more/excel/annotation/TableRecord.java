@@ -15,6 +15,23 @@ import java.lang.annotation.Target;
 public @interface TableRecord {
 
     /**
+     * 如果当前行数据是 null 是否插入一个空行
+     *
+     * @return true: 始终插入一个空行
+     */
+    boolean keepSkip() default false;
+
+    /**
+     * 偏移，
+     * <p>
+     * 当{@link #offset()}大于 0 时，可在当前行前插入空行
+     * 小于 0 时，会“回退”覆盖已有行
+     *
+     * @return
+     */
+    int offset() default 0;
+
+    /**
      * 优先策略，默认分组优先
      * <p>
      * 即相同顶级分组名的在一组，然后在同组下按序号先后排序

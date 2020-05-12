@@ -8,9 +8,11 @@ import com.moon.more.excel.SheetFactory;
 /**
  * @author benshaoye
  */
-public class MarkIterated extends AbstractMark implements MarkRenderer {
+public class MarkIterated extends AbstractMark<MarkIteratedGroup> implements MarkRenderer {
 
-    private MarkIterated(int offset, Property property, MarkRenderer group) {
+    final static MarkIterated[] EMPTY_ARR = new MarkIterated[0];
+
+    private MarkIterated(int offset, Property property, MarkIteratedGroup group) {
         super(offset, property, group);
     }
 
@@ -24,7 +26,7 @@ public class MarkIterated extends AbstractMark implements MarkRenderer {
      * @see CoreParser#transform(PropertiesGroup, IntAccessor)
      */
     @SuppressWarnings("all")
-    static MarkIterated of(int offset, Property property, MarkRenderer group) {
+    static MarkIterated of(int offset, Property property, MarkIteratedGroup group) {
         if (property.isOnlyIndexer()) {
             return new OnlyIndexedIterated(offset, property, group);
         } else if (property.hasIndexer()) {
@@ -35,11 +37,34 @@ public class MarkIterated extends AbstractMark implements MarkRenderer {
     }
 
     @Override
-    public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
-        if (this.isIterated()) {
-            getEvaluator().evalOnOriginal(factory.index(getOffset()), data);
-        }else{
-            getEvaluator().eval(factory.index(getOffset()), data);
+    public void renderRecord(MarkExecutor executor, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        MarkRenderer childrenGroup = getGroup();
+        Evaluator evaluator = getEvaluator();
+        if (childrenGroup != null) {
+            childrenGroup.renderRecord(executor, sheetFactory, factory, evaluator.getPropertyValue(data));
+        } else {
+            RowFactory rowFactory = factory == null ? sheetFactory.row() : factory;
+            // executor.setIterateData(data);
+            // executor.run(factory);
+            executor.run(rowFactory);
+            if (isIterated()) {
+                evaluator.evalOnOriginal(rowFactory.index(getOffset()), data);
+            } else {
+                evaluator.eval(rowFactory.index(getOffset()), data);
+            }
+        }
+    }
+
+    void originRenderRecord(SheetFactory sheetFactory, RowFactory factory, Object data) {
+        MarkRenderer childrenGroup = getGroup();
+        Evaluator evaluator = getEvaluator();
+        RowFactory rowFactory = factory == null ? sheetFactory.row() : factory;
+        // executor.setIterateData(data);
+        // executor.run(factory);
+        if (isIterated()) {
+            evaluator.evalOnOriginal(rowFactory.index(getOffset()), data);
+        } else {
+            evaluator.eval(rowFactory.index(getOffset()), data);
         }
     }
 
@@ -49,7 +74,9 @@ public class MarkIterated extends AbstractMark implements MarkRenderer {
 
     private static class OnlyIndexedIterated extends MarkIterated {
 
-        public OnlyIndexedIterated(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
+        public OnlyIndexedIterated(int offset, Property property, MarkIteratedGroup group) {
+            super(offset, property, group);
+        }
 
         @Override
         public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
@@ -59,18 +86,20 @@ public class MarkIterated extends AbstractMark implements MarkRenderer {
 
     private static class IndexedIterated extends MarkIterated {
 
-        public IndexedIterated(int offset, Property property, MarkRenderer group) { super(offset, property, group); }
+        public IndexedIterated(int offset, Property property, MarkIteratedGroup group) {
+            super(offset, property, group);
+        }
 
         @Override
-        public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        public void renderRecord(MarkExecutor executor, SheetFactory sheetFactory, RowFactory factory, Object data) {
             final int offset = this.getOffset();
             Evaluator evaluator = getEvaluator();
             MarkRenderer childrenGroup = getGroup();
             factory.index(offset).val(nextIndex());
             if (childrenGroup != null) {
-                childrenGroup.renderRecord(container, sheetFactory, factory, evaluator.getPropertyValue(data));
+                childrenGroup.renderRecord(executor, sheetFactory, factory, evaluator.getPropertyValue(data));
             } else {
-
+                executor.run(factory);
                 evaluator.eval(factory.index(offset + 1), data);
             }
         }
@@ -84,5 +113,14 @@ public class MarkIterated extends AbstractMark implements MarkRenderer {
     public void resetAll() {
         // resetIndexer();
         // resetGroup();
+    }
+
+    boolean hasGroup() {
+        return getGroup() != null;
+    }
+
+    boolean canIterable() {
+        MarkIteratedGroup group = getGroup();
+        return group != null && getGroup().canIterable();
     }
 }

@@ -14,7 +14,7 @@ import java.lang.reflect.Type;
 /**
  * @author benshaoye
  */
-abstract class AbstractMark extends AbstractSupporter {
+abstract class AbstractMark<G extends MarkRenderer> extends AbstractSupporter {
 
     private final int offset;
     /** property name */
@@ -30,12 +30,12 @@ abstract class AbstractMark extends AbstractSupporter {
 
     private final Type genericType;
     private final Class actualClass;
-    private final MarkRenderer group;
+    private final G group;
 
     private final TableIndexer tableIndexer;
     private final IntAccessor indexer;
 
-    protected AbstractMark(int offset, Property property, MarkRenderer group) {
+    protected AbstractMark(int offset, Property property, G group) {
         this.offset = offset;
         this.group = group;
 
@@ -77,7 +77,7 @@ abstract class AbstractMark extends AbstractSupporter {
      * ~~~~~ getters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public MarkRenderer getGroup() { return group; }
+    public G getGroup() { return group; }
 
     protected TableIndexer getTableIndexer() { return tableIndexer; }
 

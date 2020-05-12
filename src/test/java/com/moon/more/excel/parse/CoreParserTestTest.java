@@ -51,14 +51,14 @@ class CoreParserTestTest extends ParseUtil {
 
     public static class Middle {
 
-        // @TableColumn
+        @TableColumn
         private List<String> names;
 
-        @TableColumn
+        @TableColumnFlatten
         private Bottom bottom = new Bottom();
 
         @TableColumn
-        private int value;
+        private String value = "Value: 12";
 
         List<Bottom> bottomList;
 
@@ -66,7 +66,7 @@ class CoreParserTestTest extends ParseUtil {
             List<String> names = new ArrayList<>();
             this.names = names;
             for (int i = 0; i < RandomUtil.nextInt(5, 10); i++) {
-                names.add(RandomStringUtil.nextLetter(4, 6));
+                names.add("【" + (i + 1) + "】Name is: " + RandomStringUtil.nextLetter(4, 6));
             }
         }
     }
@@ -74,10 +74,22 @@ class CoreParserTestTest extends ParseUtil {
     public static class Bottom {
 
         @TableColumn
-        String name;
+        String name = "Name: 张三";
 
         @TableColumn
+        int age = 24;
+
+        // @TableColumn
         List<String> values;
+    }
+
+    @Test
+    void testDoParseAsCol4Middle() throws Exception {
+        ExcelUtil.xlsx().sheet(sheetFactory -> {
+            sheetFactory.table(tableFactory -> {
+                tableFactory.renderBody(new Middle());
+            });
+        }).write2Filepath("D:/test.xlsx");
     }
 
     @Test

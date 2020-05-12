@@ -7,6 +7,7 @@ import com.moon.more.excel.SheetFactory;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import static com.moon.core.util.CollectUtil.toArrayOfEmpty;
 
@@ -47,7 +48,7 @@ public class MarkColumnGroup implements MarkRenderer, Renderer {
         this.columns = toArrayOfEmpty(columns, MarkColumn[]::new, EMPTY);
         this.rootIndexer = rootIndexer;
         this.indexed = indexed;
-        this.root = root;
+        this.root = Objects.requireNonNull(root);
     }
 
     @Override
@@ -63,11 +64,12 @@ public class MarkColumnGroup implements MarkRenderer, Renderer {
     @Override
     public final void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
         resetAll();
+        int offsetRow = getRoot().getOffset();
         if (first != null) {
-            renderRecord(MarkExecutor.NULL, sheetFactory, sheetFactory.row(), first);
+            renderRecord(null, sheetFactory, sheetFactory.row(offsetRow), first);
         }
         while (iterator.hasNext()) {
-            renderRecord(MarkExecutor.NULL, sheetFactory, sheetFactory.row(), iterator.next());
+            renderRecord(null, sheetFactory, sheetFactory.row(offsetRow), iterator.next());
         }
     }
 
@@ -136,6 +138,8 @@ public class MarkColumnGroup implements MarkRenderer, Renderer {
     MarkRenderer[] getColumns() { return columns; }
 
     public boolean isIndexed() { return indexed; }
+
+    public DetailRoot getRoot() { return root; }
 
     MarkColumn getRootIndexer() { return rootIndexer; }
 }
