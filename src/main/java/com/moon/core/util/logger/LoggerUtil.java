@@ -55,7 +55,7 @@ public final class LoggerUtil {
                 creator = c.getCreator();
                 settingMessage = trace;
             } else if (c.getCreator() != creator) {
-                ThrowUtil.doThrow(settingMessage);
+                ThrowUtil.runtime(settingMessage);
             }
             return creator;
         }
@@ -84,7 +84,7 @@ public final class LoggerUtil {
                         }
                     }
                 }
-                return ThrowUtil.doThrow();
+                return ThrowUtil.runtime();
             }
         };
 

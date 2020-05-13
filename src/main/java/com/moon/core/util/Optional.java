@@ -1,13 +1,12 @@
 package com.moon.core.util;
 
 import com.moon.core.lang.Executable;
+import com.moon.core.lang.ThrowUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import static com.moon.core.lang.ThrowUtil.doThrow;
 
 /**
  * @author benshaoye
@@ -81,7 +80,7 @@ public interface Optional<T> extends Optionally {
      *
      * @return
      */
-    default T get() { return isPresent() ? getOrNull() : doThrow(null); }
+    default T get() { return isPresent() ? getOrNull() : ThrowUtil.runtime(null); }
 
     /**
      * 返回值或使用默认值

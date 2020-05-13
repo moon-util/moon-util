@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 import static com.moon.core.lang.ClassUtil.getClasses;
-import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.lang.ThrowUtil.runtime;
 import static com.moon.core.lang.reflect.ReflectionSupport.castAsPossibly;
 import static com.moon.core.lang.reflect.ReflectionSupport.findByParameterTypes;
 import static com.moon.core.lang.reflect.UnmodifiableArrayList.unmodifiable;
@@ -113,7 +113,7 @@ public final class ConstructorUtil {
                 return getEmptyConstructor(type);
             }
         } catch (Exception e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -209,7 +209,7 @@ public final class ConstructorUtil {
                 return newInstance(type, accessible);
             }
         } catch (Exception e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -282,7 +282,7 @@ public final class ConstructorUtil {
                 arguments = castAsPossibly(parameterTypes, arguments);
                 return newInstance(constructor, accessible, arguments);
             }
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -298,7 +298,7 @@ public final class ConstructorUtil {
             }
             return result;
         } catch (Exception e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 }

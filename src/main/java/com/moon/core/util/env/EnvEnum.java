@@ -29,7 +29,7 @@ enum EnvEnum implements Environmental {
             try {
                 executor.run();
             } catch (Throwable e) {
-                ThrowUtil.wrapRuntime(e);
+                ThrowUtil.runtime(e);
             }
         }
     }
@@ -39,7 +39,7 @@ enum EnvEnum implements Environmental {
         try {
             return isTrue() ? supplier.get() : defaultValue;
         } catch (Throwable e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -48,7 +48,7 @@ enum EnvEnum implements Environmental {
         try {
             return (isTrue() ? supplier : defaultSupplier).get();
         } catch (Throwable e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 

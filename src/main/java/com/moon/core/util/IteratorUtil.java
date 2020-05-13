@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.function.*;
 
 import static com.moon.core.io.FileUtil.getInputStream;
-import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.lang.ThrowUtil.runtime;
 import static com.moon.core.util.iterator.CollectSplitter.DEFAULT_SPLIT_COUNT;
 import static com.moon.core.util.iterator.EmptyIterator.EMPTY;
 
@@ -843,7 +843,7 @@ public final class IteratorUtil {
                     }
                 } while (hasValue);
             } catch (IOException e) {
-                doThrow(e);
+                runtime(e);
             }
         }
     }
@@ -868,7 +868,7 @@ public final class IteratorUtil {
                     }
                 } while (whiling);
             } catch (IOException e) {
-                doThrow(e);
+                runtime(e);
             }
         }
     }

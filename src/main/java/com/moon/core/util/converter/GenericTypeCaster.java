@@ -428,7 +428,7 @@ public class GenericTypeCaster implements TypeCaster {
         } else if (arrayType.isArray()) {
             return (T) toTypeArray(value, arrayType.getComponentType());
         }
-        return ThrowUtil.doThrow("Must an array type:" + arrayType);
+        return ThrowUtil.runtime("Must an array type:" + arrayType);
     }
 
     /**

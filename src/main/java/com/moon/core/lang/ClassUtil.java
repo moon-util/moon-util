@@ -5,7 +5,7 @@ import com.moon.core.util.ListUtil;
 
 import java.util.*;
 
-import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.lang.ThrowUtil.runtime;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
@@ -101,7 +101,7 @@ public final class ClassUtil {
         try {
             return Class.forName(className);
         } catch (Exception e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 

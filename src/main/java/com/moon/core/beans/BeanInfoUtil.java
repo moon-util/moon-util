@@ -79,7 +79,7 @@ public final class BeanInfoUtil {
             return descriptor.getSetterMethod();
         }
         return ThrowUtil
-            .doThrow(new NoSuchMethodException("Not exist setter in class: " + clazz + " of field: " + fieldName));
+            .runtime(new NoSuchMethodException("Not exist setter in class: " + clazz + " of field: " + fieldName));
     }
 
     /**
@@ -98,7 +98,7 @@ public final class BeanInfoUtil {
         if (descriptor.isGetterMethodPresent()) {
             return descriptor.getGetterMethod();
         }
-        return ThrowUtil.doThrow(
+        return ThrowUtil.runtime(
             new NoSuchMethodException("Not exist getter for class: " + clazz + " of field namespace: " + fieldName));
     }
 
@@ -230,7 +230,7 @@ public final class BeanInfoUtil {
                 BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
                 return beanInfo.getPropertyDescriptors();
             } catch (IntrospectionException e) {
-                return ThrowUtil.doThrow(e);
+                return ThrowUtil.runtime(e);
             }
         });
     }

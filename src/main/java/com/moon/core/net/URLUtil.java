@@ -52,7 +52,7 @@ public final class URLUtil {
             if (index >= 0 && index < endIndex) {
                 return ofOrigin(url);
             } else {
-                return ThrowUtil.doThrow("no protocol: " + url);
+                return ThrowUtil.runtime("no protocol: " + url);
             }
         } else {
             if (index == 0) {
@@ -60,7 +60,7 @@ public final class URLUtil {
             } else if (index < 0) {
                 return ofOrigin(StringUtil.concat(protocol, root, url));
             }
-            return ThrowUtil.doThrow("no protocol: " + url);
+            return ThrowUtil.runtime("no protocol: " + url);
         }
     }
 }

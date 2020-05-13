@@ -1,6 +1,7 @@
 package com.moon.core.enums;
 
 import com.moon.core.lang.ClassUtil;
+import com.moon.core.lang.ThrowUtil;
 import com.moon.core.time.TimeUtil;
 import com.moon.core.util.converter.TypeConverter;
 
@@ -32,7 +33,6 @@ import static com.moon.core.lang.LongUtil.toLong;
 import static com.moon.core.lang.LongUtil.toLongValue;
 import static com.moon.core.lang.ShortUtil.toShort;
 import static com.moon.core.lang.ShortUtil.toShortValue;
-import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.math.BigDecimalUtil.toBigDecimal;
 import static com.moon.core.math.BigIntegerUtil.toBigInteger;
 import static com.moon.core.time.TimeUtil.toDateTime;
@@ -388,7 +388,7 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
         public Object createArr(int length) { return new Enum[length]; }
 
         @Override
-        public Object cast(Object o) { return doThrow("Unsupported."); }
+        public Object cast(Object o) { return ThrowUtil.runtime("Unsupported."); }
 
         @Override
         public Object apply(Object o, Class type) { return toEnum(o, type); }
@@ -402,7 +402,7 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
                 Class type = ClassUtil.forNameOrNull(o.toString());
                 return (T) (type == null ? o.getClass() : type);
             } else if (o == null) {
-                return doThrow(String.valueOf(null));
+                return ThrowUtil.runtime(String.valueOf(null));
             } else {
                 return (T) o.getClass();
             }

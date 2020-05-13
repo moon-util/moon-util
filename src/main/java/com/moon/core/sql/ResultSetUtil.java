@@ -36,7 +36,7 @@ public final class ResultSetUtil {
             }
             return ret;
         } catch (Exception e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -65,7 +65,7 @@ public final class ResultSetUtil {
             }
             return ret;
         } catch (Exception e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -85,7 +85,7 @@ public final class ResultSetUtil {
             }
             return ret;
         } catch (Exception e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -109,7 +109,7 @@ public final class ResultSetUtil {
             }
             return ret;
         } catch (Exception e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -165,7 +165,7 @@ public final class ResultSetUtil {
             }
             return ret;
         } catch (Exception e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -190,7 +190,7 @@ public final class ResultSetUtil {
             }
             return arr;
         } catch (Exception e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -205,7 +205,7 @@ public final class ResultSetUtil {
         try {
             return set.getMetaData().getColumnCount();
         } catch (Exception e) {
-            return ThrowUtil.wrapRuntime(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -214,7 +214,7 @@ public final class ResultSetUtil {
             try {
                 desc.setValue(bean, set.getObject(desc.getName()));
             } catch (SQLException e) {
-                ThrowUtil.wrapRuntime(e);
+                ThrowUtil.runtime(e);
             }
         };
     }

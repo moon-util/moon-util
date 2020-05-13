@@ -69,7 +69,7 @@ public final class MethodUtil {
     public final static Method getPublicMethod(Class type, String methodName) {
         Method m = SupportUtil.matchOne(getPublicMethods(type, methodName), Asserts.noParams);
         if (m == null) {
-            ThrowUtil.doThrow("Can not find public method: "
+            ThrowUtil.runtime("Can not find public method: "
                 + type + "." + methodName + "();");
         }
         return m;
@@ -94,7 +94,7 @@ public final class MethodUtil {
     public final static Method getPublicMethod(Class type, String methodName, Class... parameterTypes) {
         List<Method> methods = getPublicMethods(type, methodName, parameterTypes);
         if (methods.isEmpty()) {
-            ThrowUtil.doThrow("Can not find public method: "
+            ThrowUtil.runtime("Can not find public method: "
                 + type + "." + methodName + "(" + Arrays.toString(parameterTypes) + ");");
         }
         return methods.get(0);
@@ -277,7 +277,7 @@ public final class MethodUtil {
             }
             return ret;
         } catch (Exception e) {
-            return ThrowUtil.doThrow(e);
+            return ThrowUtil.runtime(e);
         }
     }
 

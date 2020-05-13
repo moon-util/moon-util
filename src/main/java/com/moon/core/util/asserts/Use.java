@@ -1,6 +1,7 @@
 package com.moon.core.util.asserts;
 
 import com.moon.core.enums.Arrays2;
+import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.Optionally;
 
 import java.util.Collection;
@@ -9,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.moon.core.lang.StringUtil.format;
-import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -20,7 +20,7 @@ class Use {
 
     final static void err(String error) { throw new IllegalArgumentException(error); }
 
-    final static void err(String template, Object... objects) { doThrow(format(template, objects)); }
+    final static void err(String template, Object... objects) { ThrowUtil.runtime(format(template, objects)); }
 
     final static boolean blank(CharSequence cs) { return cs == null || cs.length() == 0 || cs.toString().trim().length() == 0;}
 

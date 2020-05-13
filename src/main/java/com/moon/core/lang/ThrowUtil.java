@@ -13,39 +13,47 @@ import java.util.function.Supplier;
  */
 public final class ThrowUtil {
 
-    private ThrowUtil() {
-        noInstanceError();
-    }
+    private ThrowUtil() { noInstanceError(); }
 
-    public static <T> T doThrow() {
-        throw new IllegalArgumentException();
-    }
+    public static <T> T illegalState() { throw new IllegalStateException(); }
 
-    public static <T> T doThrow(String reason) {
-        throw new IllegalArgumentException(reason);
-    }
+    public static <T> T illegalState(String reason) { throw new IllegalStateException(reason); }
 
-    public static <T> T doThrow(Object reason) {
+    public static <T> T illegalArg() { throw new IllegalArgumentException(); }
+
+    public static <T> T illegalArg(String reason) { throw new IllegalArgumentException(reason); }
+
+    public static <T> T runtime() { return illegalArg(); }
+
+    public static <T> T runtime(String reason) { return illegalArg(reason); }
+
+    public static <T> T runtime(Object reason) {
         if (reason == null) {
             throw new NullPointerException();
-        } else if (reason instanceof RuntimeException) {
-            throw (RuntimeException) reason;
-        } else if (reason instanceof Error) {
-            throw (Error) reason;
+        } else if (reason instanceof Throwable) {
+            return unchecked((Throwable) reason);
         } else if (reason instanceof Supplier) {
-            return doThrow(((Supplier) reason).get());
+            return runtime(((Supplier) reason).get());
         } else {
-            return doThrow(String.valueOf(reason));
+            return runtime(String.valueOf(reason));
         }
     }
 
-    public static <T> T wrapRuntime(Throwable e) {
-        return doThrow(e);
+    public static <T> T unchecked(Throwable e) { return runtime(e); }
+
+    public static <T> T unchecked(Throwable e, String msg) { return runtime(e, msg); }
+
+    public static <T> T runtime(Throwable e) {
+        if (e instanceof RuntimeException) {
+            throw (RuntimeException) e;
+        } else if (e instanceof Error) {
+            throw (Error) e;
+        } else {
+            throw new DefaultException(e);
+        }
     }
 
-    public static <T> T wrapRuntime(Throwable e, String msg) {
-        throw new DefaultException(msg, e);
-    }
+    public static <T> T runtime(Throwable e, String msg) { throw new DefaultException(msg, e); }
 
     /*
      * -----------------------------------------------------------------------
@@ -67,7 +75,7 @@ public final class ThrowUtil {
         if (type.isInstance(t)) {
             return null;
         }
-        return doThrow(t);
+        return ThrowUtil.runtime(t);
     }
 
     /**
@@ -86,7 +94,7 @@ public final class ThrowUtil {
                 return null;
             }
         }
-        return doThrow(t);
+        return ThrowUtil.runtime(t);
     }
 
     /**
@@ -108,7 +116,7 @@ public final class ThrowUtil {
                 }
             }
         }
-        return doThrow(t);
+        return ThrowUtil.runtime(t);
     }
 
     /**
@@ -132,7 +140,7 @@ public final class ThrowUtil {
                 }
             }
         }
-        return doThrow(t);
+        return ThrowUtil.runtime(t);
     }
 
     /*
@@ -245,5 +253,5 @@ public final class ThrowUtil {
 
     public static <T> T unsupported(String message) { throw new UnsupportedOperationException(message); }
 
-    public static <T> T unsupported(Object message) { return unsupported(String.valueOf(message)); }
+    public static <T> T unsupported(Object reason) { return unsupported(String.valueOf(reason)); }
 }

@@ -1,13 +1,12 @@
 package com.moon.core.lang.ref;
 
 import com.moon.core.lang.Executable;
+import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.function.BooleanConsumer;
 import com.moon.core.util.function.BooleanFunction;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-
-import static com.moon.core.lang.ThrowUtil.doThrow;
 
 /**
  * @author benshaoye
@@ -117,9 +116,9 @@ public class BooleanAccessor implements BooleanSupplier {
 
     public <T> T ifFalseOrNull(Supplier<T> supplier) { return isFalse() ? supplier.get() : null; }
 
-    public <T> T ifTrueOrThrow(Supplier<T> supplier) { return isTrue() ? supplier.get() : doThrow(toString()); }
+    public <T> T ifTrueOrThrow(Supplier<T> supplier) { return isTrue() ? supplier.get() : ThrowUtil.runtime(toString()); }
 
-    public <T> T ifFalseOrThrow(Supplier<T> supplier) { return isFalse() ? supplier.get() : doThrow(toString()); }
+    public <T> T ifFalseOrThrow(Supplier<T> supplier) { return isFalse() ? supplier.get() : ThrowUtil.runtime(toString()); }
 
     public <R> R apply(BooleanFunction<R> function) { return function.apply(value); }
 

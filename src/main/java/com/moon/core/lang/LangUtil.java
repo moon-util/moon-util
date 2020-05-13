@@ -5,7 +5,7 @@ import com.moon.core.util.function.*;
 
 import java.util.function.Supplier;
 
-import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.lang.ThrowUtil.runtime;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -26,7 +26,7 @@ public final class LangUtil {
         try {
             run.run();
         } catch (Throwable t) {
-            doThrow(t);
+            runtime(t);
         }
     }
 
@@ -42,7 +42,7 @@ public final class LangUtil {
         try {
             return supplier.get();
         } catch (Throwable t) {
-            return doThrow(t);
+            return runtime(t);
         }
     }
 
@@ -81,7 +81,7 @@ public final class LangUtil {
         try {
             consumer.accept(value);
         } catch (Throwable t) {
-            doThrow(t);
+            runtime(t);
         }
     }
 
@@ -99,7 +99,7 @@ public final class LangUtil {
         try {
             return function.apply(value);
         } catch (Throwable t) {
-            return doThrow(t);
+            return runtime(t);
         }
     }
 
@@ -116,7 +116,7 @@ public final class LangUtil {
         try {
             consumer.accept(v1, v2);
         } catch (Throwable t) {
-            doThrow(t);
+            runtime(t);
         }
     }
 
@@ -136,7 +136,7 @@ public final class LangUtil {
         try {
             return function.apply(v1, v2);
         } catch (Throwable t) {
-            return doThrow(t);
+            return runtime(t);
         }
     }
 }

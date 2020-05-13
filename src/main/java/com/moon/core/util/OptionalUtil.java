@@ -8,7 +8,6 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.function.*;
 
-import static com.moon.core.lang.ThrowUtil.doThrow;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -61,11 +60,11 @@ public final class OptionalUtil {
     }
 
     public static <T, R> R computeOrThrow(T obj, Function<T, R> function) {
-        return obj == null ? ThrowUtil.doThrow() : function.apply(obj);
+        return obj == null ? ThrowUtil.runtime() : function.apply(obj);
     }
 
     public static <T, R> R computeOrThrow(T obj, Function<T, R> function, String message) {
-        return obj == null ? doThrow(message) : function.apply(obj);
+        return obj == null ? ThrowUtil.runtime(message) : function.apply(obj);
     }
 
     /*
@@ -96,7 +95,7 @@ public final class OptionalUtil {
 
     public static <T> void ifPresentOrThrow(T obj, Consumer<T> consumer) {
         if (obj == null) {
-            ThrowUtil.doThrow();
+            ThrowUtil.runtime();
         } else {
             consumer.accept(obj);
         }
@@ -104,7 +103,7 @@ public final class OptionalUtil {
 
     public static <T> void ifPresentOrThrow(T obj, Consumer<T> consumer, String message) {
         if (obj == null) {
-            doThrow(message);
+            ThrowUtil.runtime(message);
         } else {
             consumer.accept(obj);
         }

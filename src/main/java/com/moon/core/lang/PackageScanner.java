@@ -39,7 +39,7 @@ public class PackageScanner extends HashSet<String> {
             }
             return result;
         } catch (IOException e) {
-            return ThrowUtil.doThrow(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -48,7 +48,7 @@ public class PackageScanner extends HashSet<String> {
         try {
             tempUrl = new URL(URLDecoder.decode(currUrl.toString(), "UTF-8"));
         } catch (Exception e) {
-            tempUrl = ThrowUtil.doThrow(e);
+            tempUrl = ThrowUtil.runtime(e);
         }
         final URL url = tempUrl;
         final String jar = "jar", file = "file", protocol = url.getProtocol();
@@ -60,7 +60,7 @@ public class PackageScanner extends HashSet<String> {
                 try (FileSystem fs = provider.newFileSystem(Paths.get(target), new HashMap<>())) {
                     return walkFileTree(fs.getPath(packageName), null);
                 } catch (Exception e) {
-                    ThrowUtil.doThrow(e);
+                    ThrowUtil.runtime(e);
                 }
             }
         } else if (protocol.equals(file)) {
@@ -70,7 +70,7 @@ public class PackageScanner extends HashSet<String> {
                 Path path = targetUrlToPath(url);
                 return walkFileTree(path, Paths.get(basePath));
             } catch (Exception e) {
-                ThrowUtil.doThrow(e);
+                ThrowUtil.runtime(e);
             }
         }
         return Collections.EMPTY_LIST;

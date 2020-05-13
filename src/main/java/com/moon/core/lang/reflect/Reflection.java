@@ -46,12 +46,12 @@ final class Reflection {
     }
 
     final static <T> T throwErr(Class type, String name) {
-        return ThrowUtil.doThrow("Can not find public method: "
+        return ThrowUtil.runtime("Can not find public method: "
             + type + "." + name + "();");
     }
 
     final static <T> T throwErr(Class type, String name, Class... parameterTypes) {
-        return ThrowUtil.doThrow("Can not find public method: "
+        return ThrowUtil.runtime("Can not find public method: "
             + type + "." + name + "(" + Arrays.toString(parameterTypes) + ");");
     }
 

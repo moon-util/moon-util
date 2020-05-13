@@ -207,7 +207,7 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
                 } else if (value == null) {
                     return null;
                 } else {
-                    ThrowUtil.doThrow(JoinerUtil.join(keys));
+                    ThrowUtil.runtime(JoinerUtil.join(keys));
                 }
             }
             return formatValue(group.superGet(keys[last]));

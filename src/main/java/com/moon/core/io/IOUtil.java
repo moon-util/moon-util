@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import static com.moon.core.enums.Charsets.UTF_8;
 import static com.moon.core.io.FileUtil.getInputStream;
 import static com.moon.core.io.FileUtil.getOutputStream;
-import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.lang.ThrowUtil.runtime;
 import static com.moon.core.util.IteratorUtil.forEachLines;
 
 /**
@@ -105,7 +105,7 @@ public final class IOUtil {
         try {
             return new FileWriter(file);
         } catch (IOException e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -155,7 +155,7 @@ public final class IOUtil {
         try {
             return new FileReader(file);
         } catch (FileNotFoundException e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -182,7 +182,7 @@ public final class IOUtil {
             copy(reader, writer);
             return writer.toString();
         } catch (IOException e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -204,7 +204,7 @@ public final class IOUtil {
         try (InputStream is = url.openStream()) {
             return toString(is, charset);
         } catch (IOException e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -338,7 +338,7 @@ public final class IOUtil {
             try {
                 write(os, cs.toString().getBytes(charset));
             } catch (UnsupportedEncodingException e) {
-                doThrow(e);
+                runtime(e);
             }
         }
         return len;
@@ -371,7 +371,7 @@ public final class IOUtil {
         try {
             return is.read(bytes, start, max);
         } catch (IOException e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -381,7 +381,7 @@ public final class IOUtil {
         try {
             return reader.read(chars, start, max);
         } catch (IOException e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 
@@ -397,7 +397,7 @@ public final class IOUtil {
         try {
             os.write(bytes, start, limit);
         } catch (IOException e) {
-            doThrow(e);
+            runtime(e);
         }
     }
 
@@ -407,7 +407,7 @@ public final class IOUtil {
         try {
             writer.write(chars, start, limit);
         } catch (IOException e) {
-            doThrow(e);
+            runtime(e);
         }
     }
 
@@ -449,7 +449,7 @@ public final class IOUtil {
         try {
             consumer.accept(closeable);
         } catch (Throwable throwable) {
-            ThrowUtil.wrapRuntime(throwable);
+            ThrowUtil.runtime(throwable);
         } finally {
             close(closeable);
         }

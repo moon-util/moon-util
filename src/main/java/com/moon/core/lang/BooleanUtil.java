@@ -20,26 +20,26 @@ public final class BooleanUtil {
         if (value) {
             return true;
         }
-        return ThrowUtil.doThrow(Boolean.FALSE.toString());
+        return ThrowUtil.runtime(Boolean.FALSE.toString());
     }
 
     public static boolean requireTrue(boolean value, String message) {
         if (value) {
             return true;
         }
-        return ThrowUtil.doThrow(message);
+        return ThrowUtil.runtime(message);
     }
 
     public static boolean requireFalse(boolean value) {
         if (value) {
-            return ThrowUtil.doThrow(Boolean.TRUE.toString());
+            return ThrowUtil.runtime(Boolean.TRUE.toString());
         }
         return false;
     }
 
     public static boolean requireFalse(boolean value, String message) {
         if (value) {
-            return ThrowUtil.doThrow(message);
+            return ThrowUtil.runtime(message);
         }
         return false;
     }

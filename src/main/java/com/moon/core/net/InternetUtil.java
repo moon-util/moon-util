@@ -3,7 +3,7 @@ package com.moon.core.net;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.lang.ThrowUtil.runtime;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -17,7 +17,7 @@ public final class InternetUtil {
         try {
             return InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            return doThrow(e);
+            return runtime(e);
         }
     }
 

@@ -199,7 +199,7 @@ public final class FieldDescriptor {
         }
         String msg = exMsg("No setter defaultExecutor of ", name, " in class ", String.valueOf(declaringClass),
             " for you!");
-        return ThrowUtil.doThrow(msg);
+        return ThrowUtil.runtime(msg);
     }
 
     /**
@@ -213,7 +213,7 @@ public final class FieldDescriptor {
         }
         String msg = exMsg("No getter defaultExecutor of ", name, " in class ", String.valueOf(declaringClass),
             " for you!");
-        return ThrowUtil.doThrow(msg);
+        return ThrowUtil.runtime(msg);
     }
 
     /**
@@ -319,13 +319,13 @@ public final class FieldDescriptor {
                             this.propertyType = types[0];
                             return propertyType;
                         } else {
-                            ThrowUtil.doThrow("Property isn't present of: " + name);
+                            ThrowUtil.runtime("Property isn't present of: " + name);
                         }
                     }
                     if (isFieldPresent()) {
                         this.propertyType = this.field.getType();
                     } else {
-                        ThrowUtil.doThrow("Property isn't present of: " + name);
+                        ThrowUtil.runtime("Property isn't present of: " + name);
                     }
                 }
             }
@@ -400,7 +400,7 @@ public final class FieldDescriptor {
         try {
             return getSetterExecutor().execute(obj, converter.toType(value, getPropertyType()), accessible);
         } catch (Exception e) {
-            return ThrowUtil.doThrow(e);
+            return ThrowUtil.runtime(e);
         }
     }
 
@@ -442,7 +442,7 @@ public final class FieldDescriptor {
         try {
             return getGetterExecutor().execute(obj, null, accessible);
         } catch (Exception e) {
-            return ThrowUtil.doThrow(e);
+            return ThrowUtil.runtime(e);
         }
     }
 

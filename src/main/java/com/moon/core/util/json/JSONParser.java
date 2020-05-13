@@ -1,11 +1,10 @@
 package com.moon.core.util.json;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.IntAccessor;
 
 import java.util.Objects;
-
-import static com.moon.core.lang.ThrowUtil.doThrow;
 
 /**
  * @author benshaoye
@@ -79,7 +78,7 @@ final class JSONParser {
             }
             i++;
         } while (i < len);
-        return doThrow("Not any content of json: " + source);
+        return ThrowUtil.runtime("Not any content of json: " + source);
     }
 
     /**
@@ -102,7 +101,7 @@ final class JSONParser {
             accessor.set(i + 1);
             return ch;
         }
-        return doThrow(source);
+        return ThrowUtil.runtime(source);
     }
 
     private void checkRestChars(final String source, IntAccessor accessor) {
@@ -114,7 +113,7 @@ final class JSONParser {
             if (Character.isWhitespace(ch)) {
                 continue;
             }
-            doThrow(
+            ThrowUtil.runtime(
                 source.substring(accessor.get()));
         }
     }
@@ -137,7 +136,7 @@ final class JSONParser {
         } else if (json instanceof JSONObject) {
             data = (JSONObject) json;
         } else {
-            doThrow(source);
+            ThrowUtil.runtime(source);
         }
         checkRestChars(source, accessor);
     }
@@ -178,7 +177,7 @@ final class JSONParser {
                 if (Character.isDigit(curr)) {
                     return parseDouble(source, len, curr);
                 } else {
-                    return doThrow(source);
+                    return ThrowUtil.runtime(source);
                 }
         }
     }
@@ -218,7 +217,7 @@ final class JSONParser {
         } else if (curr == RIGHT_O) {
             return ret;
         }
-        return doThrow(source.substring(accessor.get()));
+        return ThrowUtil.runtime(source.substring(accessor.get()));
     }
 
     private Object parseNull(final String source, final char curr) {
@@ -230,7 +229,7 @@ final class JSONParser {
             accessor.set(idx);
             return null;
         }
-        return doThrow(source.substring(accessor.get()));
+        return ThrowUtil.runtime(source.substring(accessor.get()));
     }
 
     private Object parseBoolean(final String source, final char curr) {
@@ -251,7 +250,7 @@ final class JSONParser {
                 return false;
             }
         }
-        return doThrow(source.substring(accessor.get()));
+        return ThrowUtil.runtime(source.substring(accessor.get()));
     }
 
     /**
@@ -281,7 +280,7 @@ final class JSONParser {
 
             if (ch == dot) {
                 if (isDouble) {
-                    doThrow(source.substring(start, len));
+                    ThrowUtil.runtime(source.substring(start, len));
                 }
                 isDouble = true;
                 newCache = setChar(cache, ch, index++, size);
@@ -296,7 +295,7 @@ final class JSONParser {
             String str = toStr(cache, index);
             return isDouble ? Double.valueOf(str) : Long.parseLong(str);
         }
-        return doThrow(source);
+        return ThrowUtil.runtime(source);
     }
 
     /**
@@ -332,7 +331,7 @@ final class JSONParser {
                 }
             }
         }
-        return doThrow(source.substring(start));
+        return ThrowUtil.runtime(source.substring(start));
     }
 
     private char[] parseEscapeChar(final String source, int srcIndex, char curr,

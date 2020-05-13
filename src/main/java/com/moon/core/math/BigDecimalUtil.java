@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static com.moon.core.lang.NumberComparator.*;
-import static com.moon.core.lang.ThrowUtil.wrapRuntime;
+import static com.moon.core.lang.ThrowUtil.runtime;
 
 /**
  * @author benshaoye
@@ -76,7 +76,7 @@ public final class BigDecimalUtil {
         try {
             return toBigDecimal(SupportUtil.onlyOneItemOrSize(value));
         } catch (Exception e) {
-            return wrapRuntime(e, String.format("Can not cast to BigDecimal of: %s", value));
+            return runtime(e, String.format("Can not cast to BigDecimal of: %s", value));
         }
     }
 

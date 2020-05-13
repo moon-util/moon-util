@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.moon.core.lang.LangUtil.applyBi;
-import static com.moon.core.lang.ThrowUtil.doThrow;
+import static com.moon.core.lang.ThrowUtil.runtime;
 
 /**
  * @author benshaoye
@@ -76,7 +76,7 @@ public final class FileUtil {
                      FileInputStream input = getInputStream(sourceFile)) {
                     IOUtil.copy(input, output);
                 } catch (IOException e) {
-                    doThrow(e);
+                    runtime(e);
                 }
             }
         }
@@ -98,7 +98,7 @@ public final class FileUtil {
     public static FileOutputStream getOutputStream(String filePath) { return getOutputStream(filePath, false); }
 
     public static FileOutputStream getOutputStream(File file, boolean append) {
-        return createNewFile(file) ? applyBi(file, append, FileOutputStream::new) : doThrow("File not exist: " + file);
+        return createNewFile(file) ? applyBi(file, append, FileOutputStream::new) : ThrowUtil.runtime("File not exist: " + file);
     }
 
     public static FileOutputStream getOutputStream(String filePath, boolean append) {
@@ -147,7 +147,7 @@ public final class FileUtil {
     public static boolean mkdirs(File dir) {
         if (dir.exists()) {
             if (dir.isFile()) {
-                return doThrow("The target exist and is a file: " + dir);
+                return ThrowUtil.runtime("The target exist and is a file: " + dir);
             } else {
                 return true;
             }
