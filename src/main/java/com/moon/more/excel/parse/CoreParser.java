@@ -64,6 +64,42 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         }
     }
 
+    @SuppressWarnings("all")
+    private MarkCollectGroup transformCollect(PropertiesGroup group, final IntAccessor accessor) {
+        if (group == null) {
+            return null;
+        }
+        boolean indexed = false;
+        MarkColumn rootIndexer = null;
+        if (group.rootProperty != null) {
+            rootIndexer = MarkColumn.of(accessor.get(), group.rootProperty, null);
+            accessor.increment();
+            indexed = true;
+        }
+        MarkCollect collectAt = null;
+        MarkColumn current;
+        List<MarkColumn> columns = new ArrayList<>();
+        for (Object column : group.getColumns()) {
+            Property prop = (Property) column;
+            final int offset = accessor.get();
+            if (prop.hasIndexer()) {
+                accessor.increment();
+                indexed = true;
+            }
+            final int referenceOffset = accessor.get();
+            current = MarkCollect.of(offset, prop, transformCollect(prop.getGroup(), accessor));
+            if (prop.isIterated()) {
+                collectAt = (MarkCollect) current;
+            } else {
+                columns.add(current);
+            }
+            if (accessor.isEq(referenceOffset)) {
+                accessor.increment();
+            }
+        }
+        return new MarkCollectGroup(columns, collectAt, rootIndexer, group.root, indexed);
+    }
+
     @SuppressWarnings({"rawtypes"})
     private MarkIteratedGroup transformIterated(PropertiesGroup group, final IntAccessor accessor) {
         if (group == null) {
@@ -231,7 +267,9 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
                 }
             }
         } else {
-            columns = unAnnotated.values().stream().filter(info -> isBasic(info.getPropertyType()))
+            columns = unAnnotated.values()
+                .stream()
+                .filter(info -> isBasic(info.getPropertyType()))
                 .collect(Collectors.toList());
         }
 

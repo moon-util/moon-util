@@ -10,7 +10,7 @@ import com.moon.more.excel.SheetFactory;
  */
 public class MarkColumn extends AbstractMark<MarkColumnGroup> implements MarkRenderer {
 
-    private MarkColumn(int offset, Property property, MarkColumnGroup group) {
+    protected MarkColumn(int offset, Property property, MarkColumnGroup group) {
         super(offset, property, group);
     }
 

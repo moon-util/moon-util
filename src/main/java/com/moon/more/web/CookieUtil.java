@@ -15,12 +15,12 @@ public class CookieUtil {
 
     private CookieUtil() { noInstanceError(); }
 
-    public static Cookie getCookie(HttpServletRequest request, String name) {
+    public static Cookie get(HttpServletRequest request, String name) {
         return WebUtils.getCookie(request, name);
     }
 
     public static String getValue(HttpServletRequest request, String name) {
-        Cookie cookie = getCookie(request, name);
+        Cookie cookie = get(request, name);
         return cookie == null ? null : cookie.getValue();
     }
 

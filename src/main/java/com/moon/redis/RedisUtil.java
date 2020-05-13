@@ -1,7 +1,7 @@
 package com.moon.redis;
 
 import com.moon.core.util.ListUtil;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,22 +19,18 @@ public class RedisUtil {
     private final RedisTemplate<String, Object> template;
     private final ExceptionHandler strategy;
 
-    public RedisUtil(RedisTemplate<String, Object> redisTemplate) {
-        this(redisTemplate, ExceptionStrategy.IGNORE);
-    }
+    public RedisUtil(RedisTemplate<String, Object> redisTemplate) { this(redisTemplate, ExceptionStrategy.IGNORE); }
 
     public RedisUtil(RedisTemplate<String, Object> redisTemplate, ExceptionStrategy exceptionStrategy) {
         this(redisTemplate, (ExceptionHandler) exceptionStrategy);
     }
 
     public RedisUtil(RedisTemplate<String, Object> redisTemplate, ExceptionHandler exceptionStrategy) {
-        this.strategy = exceptionStrategy;
+        this.strategy = exceptionStrategy == null ? ExceptionStrategy.IGNORE : exceptionStrategy;
         this.template = redisTemplate;
     }
 
-    private final void onCanIgnoreException(Exception ex) {
-        strategy.onException(ex);
-    }
+    private final void onCanIgnoreException(Exception ex) { strategy.onException(ex); }
 
     @FunctionalInterface
     public interface ExceptionHandler extends Consumer<Exception> {
@@ -49,28 +45,54 @@ public class RedisUtil {
         IGNORE,
         MESSAGE {
             @Override
-            public void onException(Exception ex) {
-                System.err.println(ex.getMessage());
-            }
+            public void onException(Exception ex) { System.err.println(ex.getMessage()); }
         },
         PRINT {
             @Override
-            public void onException(Exception ex) {
-                ex.printStackTrace();
-            }
+            public void onException(Exception ex) { ex.printStackTrace(); }
         },
         THROW {
             @Override
-            public void onException(Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            public void onException(Exception ex) { throw new RuntimeException(ex); }
         };
 
         @Override
         public void onException(Exception ex) {}
     }
 
-    //============================= common ============================
+    // ============================= ops ===============================
+
+    public ValueOperations value() { return template.opsForValue(); }
+
+    public ClusterOperations cluster() { return template.opsForCluster(); }
+
+    public GeoOperations geo() { return template.opsForGeo(); }
+
+    public HashOperations hash() { return template.opsForHash(); }
+
+    public ListOperations list() { return template.opsForList(); }
+
+    public SetOperations set() { return template.opsForSet(); }
+
+    public StreamOperations stream() { return template.opsForStream(); }
+
+    public ZSetOperations zset() { return template.opsForZSet(); }
+
+    public BoundGeoOperations geo(String key) { return template.boundGeoOps(key); }
+
+    public BoundHashOperations hash(String key) { return template.boundHashOps(key); }
+
+    public BoundListOperations list(String key) { return template.boundListOps(key); }
+
+    public BoundSetOperations collect(String key) { return template.boundSetOps(key); }
+
+    public BoundStreamOperations stream(String key) { return template.boundStreamOps(key); }
+
+    public BoundValueOperations value(String key) { return template.boundValueOps(key); }
+
+    public BoundZSetOperations zset(String key) { return template.boundZSetOps(key); }
+
+    // ============================= common ============================
 
     /**
      * 指定缓存失效时间
@@ -284,9 +306,7 @@ public class RedisUtil {
      *
      * @return long
      */
-    public long increment(String key, long delta) {
-        return template.opsForValue().increment(key, delta);
-    }
+    public long increment(String key, long delta) { return template.opsForValue().increment(key, delta); }
 
     /**
      * 递减
@@ -296,9 +316,7 @@ public class RedisUtil {
      *
      * @return long
      */
-    public long decrement(String key, long delta) {
-        return template.opsForValue().increment(key, -delta);
-    }
+    public long decrement(String key, long delta) { return template.opsForValue().increment(key, -delta); }
 
     //================================Map=================================
 
@@ -310,7 +328,7 @@ public class RedisUtil {
      *
      * @return 值
      */
-    public Object hget(String key, String item) { return template.opsForHash().get(key, item); }
+    public Object hashGet(String key, String item) { return template.opsForHash().get(key, item); }
 
     /**
      * 获取hashKey对应的所有键值
@@ -319,7 +337,7 @@ public class RedisUtil {
      *
      * @return 对应的多个键值
      */
-    public Map<Object, Object> hmget(String key) { return template.opsForHash().entries(key); }
+    public Map<Object, Object> hashEntries(String key) { return template.opsForHash().entries(key); }
 
     /**
      * HashSet
@@ -329,7 +347,7 @@ public class RedisUtil {
      *
      * @return true 成功 false 失败
      */
-    public boolean hmset(String key, Map<String, Object> map) {
+    public boolean hashPutAll(String key, Map<String, Object> map) {
         try {
             template.opsForHash().putAll(key, map);
             return true;
@@ -348,7 +366,7 @@ public class RedisUtil {
      *
      * @return true成功 false失败
      */
-    public boolean hmset(String key, Map<String, Object> map, long time) {
+    public boolean hashPutAll(String key, Map<String, Object> map, long time) {
         try {
             template.opsForHash().putAll(key, map);
             if (time > 0) {
@@ -370,7 +388,7 @@ public class RedisUtil {
      *
      * @return true 成功 false失败
      */
-    public boolean hset(String key, String item, Object value) {
+    public boolean hashPut(String key, String item, Object value) {
         try {
             template.opsForHash().put(key, item, value);
             return true;
@@ -390,7 +408,7 @@ public class RedisUtil {
      *
      * @return true 成功 false失败
      */
-    public boolean hset(String key, String item, Object value, long time) {
+    public boolean hashPut(String key, String item, Object value, long time) {
         try {
             template.opsForHash().put(key, item, value);
             if (time > 0) {
@@ -424,30 +442,30 @@ public class RedisUtil {
     /**
      * hash递增 如果不存在,就会创建一个 并把新增后的值返回
      *
-     * @param key  键
-     * @param item 项
-     * @param by   要增加几(大于0)
+     * @param key   键
+     * @param item  项
+     * @param delta 增量(大于0)
      *
      * @return double
      */
-    public double hincrement(String key, String item, double by) {
-        return template.opsForHash().increment(key, item, by);
+    public double hashIncrement(String key, String item, double delta) {
+        return template.opsForHash().increment(key, item, delta);
     }
 
     /**
      * hash递减
      *
-     * @param key  键
-     * @param item 项
-     * @param by   要减少记(小于0)
+     * @param key   键
+     * @param item  项
+     * @param delta 增量(小于0)
      *
      * @return double
      */
-    public double hdecrement(String key, String item, double by) {
-        return template.opsForHash().increment(key, item, -by);
+    public double hashDecrement(String key, String item, double delta) {
+        return template.opsForHash().increment(key, item, -delta);
     }
 
-    //============================set=============================
+    // ============================ set =============================
 
     /**
      * 根据key获取Set中的所有值
@@ -456,7 +474,7 @@ public class RedisUtil {
      *
      * @return Set
      */
-    public Set<Object> setGet(String key) {
+    public Set<Object> collectGet(String key) {
         try {
             return template.opsForSet().members(key);
         } catch (Exception e) {
@@ -473,7 +491,7 @@ public class RedisUtil {
      *
      * @return true 存在 false不存在
      */
-    public boolean setHasKey(String key, Object value) {
+    public boolean collectHasKey(String key, Object value) {
         try {
             return template.opsForSet().isMember(key, value);
         } catch (Exception e) {
@@ -490,7 +508,7 @@ public class RedisUtil {
      *
      * @return 成功个数
      */
-    public long setAdd(String key, Object... values) {
+    public long collectAdd(String key, Object... values) {
         try {
             return template.opsForSet().add(key, values);
         } catch (Exception e) {
@@ -508,7 +526,7 @@ public class RedisUtil {
      *
      * @return 成功个数
      */
-    public long setAdd(String key, long time, Object... values) {
+    public long collectAdd(String key, long time, Object... values) {
         try {
             Long count = template.opsForSet().add(key, values);
             if (time > 0) {
@@ -528,7 +546,7 @@ public class RedisUtil {
      *
      * @return long
      */
-    public long setSize(String key) {
+    public long collectSize(String key) {
         try {
             return template.opsForSet().size(key);
         } catch (Exception e) {
@@ -545,7 +563,7 @@ public class RedisUtil {
      *
      * @return 移除的个数
      */
-    public long setRemove(String key, Object... values) {
+    public long collectRemove(String key, Object... values) {
         try {
             Long count = template.opsForSet().remove(key, values);
             return count;

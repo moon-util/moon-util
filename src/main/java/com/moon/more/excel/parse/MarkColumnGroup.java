@@ -7,30 +7,11 @@ import com.moon.more.excel.SheetFactory;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-
-import static com.moon.core.util.CollectUtil.toArrayOfEmpty;
 
 /**
  * @author benshaoye
  */
-public class MarkColumnGroup implements MarkRenderer, Renderer {
-
-    private final MarkRenderer[] columns;
-
-    private final MarkColumn rootIndexer;
-
-    private final DetailRoot root;
-
-    /**
-     * 标记{@link #columns}中是否有索引字段
-     * <p>
-     * 用于提升性能，避免每次都循环
-     *
-     * @see CoreParser#transform(PropertiesGroup, IntAccessor)
-     */
-    @SuppressWarnings("all")
-    private final boolean indexed;
+public class MarkColumnGroup<T extends MarkColumn> extends AbstractMarkGroup implements MarkRenderer, Renderer {
 
     /**
      * @param columns
@@ -43,13 +24,8 @@ public class MarkColumnGroup implements MarkRenderer, Renderer {
      */
     @SuppressWarnings("all")
     public MarkColumnGroup(
-        List<MarkColumn> columns, MarkColumn rootIndexer, DetailRoot root, boolean indexed
-    ) {
-        this.columns = toArrayOfEmpty(columns, MarkColumn[]::new, EMPTY);
-        this.rootIndexer = rootIndexer;
-        this.indexed = indexed;
-        this.root = Objects.requireNonNull(root);
-    }
+        List<T> columns, T rootIndexer, DetailRoot root, boolean indexed
+    ) { super(columns, rootIndexer, root, indexed); }
 
     @Override
     public final void renderHead(SheetFactory sheetFactory) {
@@ -122,6 +98,7 @@ public class MarkColumnGroup implements MarkRenderer, Renderer {
     @Override
     public void resetAll() {
         if (isIndexed()) {
+            MarkColumn rootIndexer = getRootIndexer();
             if (rootIndexer != null) {
                 rootIndexer.resetAll();
             }
@@ -130,16 +107,4 @@ public class MarkColumnGroup implements MarkRenderer, Renderer {
             }
         }
     }
-
-    /*
-     * ~~~~~ getters ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     */
-
-    MarkRenderer[] getColumns() { return columns; }
-
-    public boolean isIndexed() { return indexed; }
-
-    public DetailRoot getRoot() { return root; }
-
-    MarkColumn getRootIndexer() { return rootIndexer; }
 }
