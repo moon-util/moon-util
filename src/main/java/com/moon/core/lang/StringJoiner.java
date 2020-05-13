@@ -146,7 +146,7 @@ public class StringJoiner
     private final String stringify(Object item) { return stringifier.apply(item); }
 
     private final <T> T isAllowNull(T item) {
-        return requireNonNull ? (item == null ? ThrowUtil.runtime(null) : item) : item;
+        return requireNonNull ? (item == null ? ThrowUtil.unchecked(null) : item) : item;
     }
 
     private <T> StringJoiner ifChecked(T val, Consumer<T> consumer) {

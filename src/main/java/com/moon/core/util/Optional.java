@@ -80,7 +80,7 @@ public interface Optional<T> extends Optionally {
      *
      * @return
      */
-    default T get() { return isPresent() ? getOrNull() : ThrowUtil.runtime(null); }
+    default T get() { return isPresent() ? getOrNull() : ThrowUtil.unchecked(null); }
 
     /**
      * 返回值或使用默认值

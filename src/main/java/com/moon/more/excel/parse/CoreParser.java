@@ -58,7 +58,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
     @SuppressWarnings({"rawtypes"})
     private Renderer transform(PropertiesGroup group, final IntAccessor accessor) {
         if (group.isIterated()) {
-            return transformIterated(group, accessor);
+            return transformCollect(group, accessor);
         } else {
             return transformDefault(group, accessor);
         }

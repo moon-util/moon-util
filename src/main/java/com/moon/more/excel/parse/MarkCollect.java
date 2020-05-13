@@ -10,8 +10,11 @@ import com.moon.more.excel.SheetFactory;
  */
 public class MarkCollect extends MarkColumn {
 
+    private final IterateStrategy strategy;
+
     private MarkCollect(int offset, Property property, MarkCollectGroup group) {
         super(offset, property, group);
+        this.strategy = IterateFactory.getIterateStrategy(this);
     }
 
     /**
