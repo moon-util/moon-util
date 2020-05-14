@@ -131,9 +131,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return this;
     }
 
-    private Renderer parse(Class targetClass) {
-        return SheetUtil.parseRenderer(targetClass);
-    }
+    private Renderer parse(Class targetClass) { return SheetUtil.parseRenderer(targetClass); }
 
     interface HeadExecutor {
 

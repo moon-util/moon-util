@@ -59,7 +59,7 @@ public final class WebUtil {
      *
      * @see HandlerMethod#getBeanType()
      */
-    public static boolean isConfirmResponseBody(Method method) {
+    public static boolean isConfirmedResponseBody(Method method) {
         if (ResponseEntity.class.isAssignableFrom(method.getReturnType())) {
             return true;
         }
@@ -102,9 +102,7 @@ public final class WebUtil {
      *
      * @return Cookie 值
      */
-    public static String getCookieValue(String name) {
-        return CookieUtil.getValue(getRequest(), name);
-    }
+    public static String getCookieValue(String name) { return CookieUtil.getValue(getRequest(), name); }
 
     /**
      * 获取请求请求头的值
@@ -188,8 +186,7 @@ public final class WebUtil {
      * 获取 session 属性
      *
      * @param name 属性名
-     *
-     * @return 属性值
+     * @param data 属性值
      */
     public static void setSessionAttr(String name, Object data) { getSession(true).setAttribute(name, data); }
 
@@ -201,6 +198,28 @@ public final class WebUtil {
     public static ServletContext getServletContext() {
         HttpServletRequest request = getRequest();
         return request == null ? null : request.getServletContext();
+    }
+
+    /**
+     * 获取全局属性
+     *
+     * @param name 属性名
+     *
+     * @return 属性值
+     */
+    public static Object getApplicationAttr(String name) {
+        return getServletContext().getAttribute(name);
+    }
+
+
+    /**
+     * 获取 session 属性
+     *
+     * @param name 属性名
+     * @param data 属性值
+     */
+    public static void setApplicationAttr(String name, Object data) {
+        getServletContext().setAttribute(name, data);
     }
 
     /**

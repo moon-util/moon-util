@@ -44,7 +44,7 @@ class CoreParserTestTest extends ParseUtil {
             List<Middle> middleList = new ArrayList<>();
             this.middleList = middleList;
             for (int i = 0; i < RandomUtil.nextInt(5, 10); i++) {
-                middleList.add(new Middle());
+                middleList.add(new Middle(i));
             }
         }
     }
@@ -55,18 +55,20 @@ class CoreParserTestTest extends ParseUtil {
         private List<String> names;
 
         @TableColumnFlatten
-        private Bottom bottom = new Bottom();
+        private Bottom bottom;
 
         @TableColumn
         private String value = "Value: 12";
 
         List<Bottom> bottomList;
 
-        public Middle() {
+        public Middle(int index) {
+            this.bottom = new Bottom(index);
+            Class cls = getClass();
             List<String> names = new ArrayList<>();
             this.names = names;
             for (int i = 0; i < RandomUtil.nextInt(5, 10); i++) {
-                names.add("【" + (i + 1) + "】Name is: " + RandomStringUtil.nextLetter(4, 6));
+                names.add("【" + (i + 1) + "】Name is: " + cls.getSimpleName() + RandomStringUtil.nextUpper(2));
             }
         }
     }
@@ -74,20 +76,24 @@ class CoreParserTestTest extends ParseUtil {
     public static class Bottom {
 
         @TableColumn
-        String name = "Name: 张三";
+        String name;
 
         @TableColumn
         int age = 24;
 
         // @TableColumn
         List<String> values;
+
+        public Bottom(int index) {
+            this.name = (index + 1) + "Bottom: 张三";
+        }
     }
 
     @Test
     void testDoParseAsCol4Middle() throws Exception {
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderBody(new Middle());
+                tableFactory.renderBody(new Middle(0));
             });
         }).write2Filepath("D:/test.xlsx");
     }

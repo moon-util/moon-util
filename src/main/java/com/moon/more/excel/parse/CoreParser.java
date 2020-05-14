@@ -56,7 +56,10 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
 
 
     @SuppressWarnings({"rawtypes"})
-    private Renderer transform(PropertiesGroup group, final IntAccessor accessor) {
+    private MarkColumnGroup transform(PropertiesGroup group, final IntAccessor accessor) {
+        if (group == null) {
+            return null;
+        }
         if (group.isIterated()) {
             return transformCollect(group, accessor);
         } else {
@@ -72,7 +75,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         boolean indexed = false;
         MarkColumn rootIndexer = null;
         if (group.rootProperty != null) {
-            rootIndexer = MarkColumn.of(accessor.get(), group.rootProperty, null);
+            rootIndexer = MarkColumn.column(accessor.get(), group.rootProperty, null);
             accessor.increment();
             indexed = true;
         }
@@ -87,7 +90,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
                 indexed = true;
             }
             final int referenceOffset = accessor.get();
-            current = MarkCollect.of(offset, prop, transformCollect(prop.getGroup(), accessor));
+            current = MarkCollect.collect(offset, prop, transform(prop.getGroup(), accessor));
             if (prop.isIterated()) {
                 collectAt = (MarkCollect) current;
             } else {
@@ -101,41 +104,6 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
     }
 
     @SuppressWarnings({"rawtypes"})
-    private MarkIteratedGroup transformIterated(PropertiesGroup group, final IntAccessor accessor) {
-        if (group == null) {
-            return null;
-        }
-        boolean indexed = false;
-        MarkColumn rootIndexer = null;
-        if (group.rootProperty != null) {
-            rootIndexer = MarkColumn.of(accessor.get(), group.rootProperty, null);
-            accessor.increment();
-            indexed = true;
-        }
-        MarkIterated iteratedAt = null, current;
-        List<MarkIterated> columns = new ArrayList<>();
-        for (Object column : group.getColumns()) {
-            Property prop = (Property) column;
-            final int offset = accessor.get();
-            if (prop.hasIndexer()) {
-                accessor.increment();
-                indexed = true;
-            }
-            final int referenceOffset = accessor.get();
-            current = MarkIterated.of(offset, prop, transformIterated(prop.getGroup(), accessor));
-            if (prop.isIterated()) {
-                iteratedAt = current;
-            } else {
-                columns.add(current);
-            }
-            if (accessor.isEq(referenceOffset)) {
-                accessor.increment();
-            }
-        }
-        return new MarkIteratedGroup(columns, iteratedAt, rootIndexer, group.root, indexed);
-    }
-
-    @SuppressWarnings({"rawtypes"})
     private MarkColumnGroup transformDefault(PropertiesGroup group, final IntAccessor accessor) {
         if (group == null) {
             return null;
@@ -143,7 +111,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         boolean indexed = false;
         MarkColumn rootIndexer = null;
         if (group.rootProperty != null) {
-            rootIndexer = MarkColumn.of(accessor.get(), group.rootProperty, null);
+            rootIndexer = MarkColumn.column(accessor.get(), group.rootProperty, null);
             accessor.increment();
             indexed = true;
         }
@@ -156,7 +124,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
                 indexed = true;
             }
             final int referenceOffset = accessor.get();
-            columns.add(MarkColumn.of(offset, prop, transformDefault(prop.getGroup(), accessor)));
+            columns.add(MarkColumn.column(offset, prop, transformDefault(prop.getGroup(), accessor)));
             if (accessor.isEq(referenceOffset)) {
                 accessor.increment();
             }

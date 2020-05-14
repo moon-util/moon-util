@@ -17,7 +17,7 @@ interface MarkRenderer {
         NONE;
 
         @Override
-        public void renderRecord(MarkExecutor c, SheetFactory sf, RowFactory rf, Object d) { }
+        public void renderRecord(MarkTask c, SheetFactory sf, RowFactory rf, Object d) { }
 
         @Override
         public void resetAll() { }
@@ -26,12 +26,12 @@ interface MarkRenderer {
     /**
      * 渲染一行数据
      *
-     * @param container
+     * @param task
      * @param sheetFactory
      * @param factory
      * @param data
      */
-    void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data);
+    void renderRecord(MarkTask task, SheetFactory sheetFactory, RowFactory factory, Object data);
 
     /**
      * 重置

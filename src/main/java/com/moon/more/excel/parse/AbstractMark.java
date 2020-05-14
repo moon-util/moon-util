@@ -92,10 +92,12 @@ abstract class AbstractMark<G extends MarkRenderer> extends AbstractSupporter {
     @SuppressWarnings({"rawtypes"})
     protected Class getPropertyType() { return type; }
 
+    protected String getPropertyName() { return name; }
+
     /**
      * 这里可能会报NPE，但由于是不同实现下才调，所以没有加 null 判断
      *
-     * @see #renderRecord(MarkExecutor, SheetFactory, RowFactory, Object)
+     * @see #renderRecord(MarkTask, SheetFactory, RowFactory, Object)
      */
     @SuppressWarnings("all")
     protected int nextIndex() { return getIndexer().getAndIncrement(getTableIndexer().step()); }

@@ -24,7 +24,7 @@ public class MarkColumn extends AbstractMark<MarkColumnGroup> implements MarkRen
      * @see CoreParser#transform(PropertiesGroup, IntAccessor)
      */
     @SuppressWarnings("all")
-    static MarkColumn of(int offset, Property property, MarkColumnGroup group) {
+    static MarkColumn column(int offset, Property property, MarkColumnGroup group) {
         if (property.isOnlyIndexer()) {
             return new OnlyIndexedColumn(offset, property, group);
         } else if (property.hasIndexer()) {
@@ -35,11 +35,11 @@ public class MarkColumn extends AbstractMark<MarkColumnGroup> implements MarkRen
     }
 
     @Override
-    public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+    public void renderRecord(MarkTask task, SheetFactory sheetFactory, RowFactory factory, Object data) {
         MarkRenderer childrenGroup = getGroup();
         Evaluator evaluator = getEvaluator();
         if (childrenGroup != null) {
-            childrenGroup.renderRecord(container, sheetFactory, factory, evaluator.getPropertyValue(data));
+            childrenGroup.renderRecord(task, sheetFactory, factory, evaluator.getPropertyValue(data));
         } else {
             evaluator.eval(factory.index(getOffset()), data);
         }
@@ -60,7 +60,7 @@ public class MarkColumn extends AbstractMark<MarkColumnGroup> implements MarkRen
         public OnlyIndexedColumn(int offset, Property property, MarkColumnGroup group) { super(offset, property, group); }
 
         @Override
-        public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        public void renderRecord(MarkTask container, SheetFactory sheetFactory, RowFactory factory, Object data) {
             factory.index(getOffset()).val(nextIndex());
         }
     }
@@ -70,7 +70,7 @@ public class MarkColumn extends AbstractMark<MarkColumnGroup> implements MarkRen
         public IndexedColumn(int offset, Property property, MarkColumnGroup group) { super(offset, property, group); }
 
         @Override
-        public void renderRecord(MarkExecutor container, SheetFactory sheetFactory, RowFactory factory, Object data) {
+        public void renderRecord(MarkTask container, SheetFactory sheetFactory, RowFactory factory, Object data) {
             final int offset = this.getOffset();
             Evaluator evaluator = getEvaluator();
             MarkRenderer childrenGroup = getGroup();

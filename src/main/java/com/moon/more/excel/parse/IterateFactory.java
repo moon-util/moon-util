@@ -39,61 +39,43 @@ class IterateFactory {
     }
 
     @SuppressWarnings({"rawtypes"})
-    enum ArrayIterateStrategy implements IterateStrategy {
+    private enum ArrayIterateStrategy implements IterateStrategy {
         /** 数组 */
         ARRAY_OBJECT(Object[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((Object[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((Object[]) data); }
         },
         ARRAY_BOOLEAN(boolean[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((boolean[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((boolean[]) data); }
         },
         ARRAY_CHARS(char[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((char[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((char[]) data); }
         },
         ARRAY_BYTE(byte[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((byte[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((byte[]) data); }
         },
         ARRAY_SHORT(short[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((short[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((short[]) data); }
         },
         ARRAY_INT(int[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((int[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((int[]) data); }
         },
         ARRAY_LONG(long[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((long[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((long[]) data); }
         },
         ARRAY_FLOAT(float[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((float[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((float[]) data); }
         },
         ARRAY_DOUBLE(double[].class) {
             @Override
-            public Iterator iterator(Object data) {
-                return IteratorUtil.of((double[]) data);
-            }
+            public Iterator iterator(Object data) { return IteratorUtil.of((double[]) data); }
         },
         ;
 
@@ -122,7 +104,7 @@ class IterateFactory {
     }
 
     @SuppressWarnings({"all"})
-    enum NoneIterateStrategy implements IterateStrategy {
+    private enum NoneIterateStrategy implements IterateStrategy {
         NONE;
 
         @Override
@@ -136,13 +118,11 @@ class IterateFactory {
     }
 
     @SuppressWarnings({"rawtypes"})
-    enum MapIterateStrategy implements IterateStrategy {
+    private enum MapIterateStrategy implements IterateStrategy {
         /** map */
         MAP(Map.class) {
             @Override
-            public Iterator iterator(Object data) {
-                return ((Map) data).values().iterator();
-            }
+            public Iterator iterator(Object data) { return ((Map) data).values().iterator(); }
         },
         ;
 
@@ -154,9 +134,7 @@ class IterateFactory {
         public Class getTopClass() { return topClass; }
 
         @Override
-        public Iterator iterator(Object data) {
-            return ((Map) data).values().iterator();
-        }
+        public Iterator iterator(Object data) { return ((Map) data).values().iterator(); }
 
         private final static MapIterateStrategy[] VALUES = values();
 
@@ -164,20 +142,16 @@ class IterateFactory {
     }
 
     @SuppressWarnings({"rawtypes"})
-    enum CollectIterateStrategy implements IterateStrategy {
+    private enum CollectIterateStrategy implements IterateStrategy {
         /** 集合 */
         ITERATE(Iterable.class) {
             @Override
-            public Iterator iterator(Object data) {
-                return ((Iterable) data).iterator();
-            }
+            public Iterator iterator(Object data) { return ((Iterable) data).iterator(); }
         },
         /** 迭代器 */
         ITERATOR(Iterator.class) {
             @Override
-            public Iterator iterator(Object data) {
-                return (Iterator) data;
-            }
+            public Iterator iterator(Object data) { return (Iterator) data; }
         },
         ;
 
