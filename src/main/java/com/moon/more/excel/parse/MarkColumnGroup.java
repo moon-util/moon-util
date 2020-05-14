@@ -38,7 +38,7 @@ public class MarkColumnGroup<T extends MarkColumn> extends AbstractMarkGroup imp
      * @param first        如果不为 null，则 firstItem 是 iterator 迭代出的第一项
      */
     @Override
-    public final void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
+    public void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
         resetAll();
         int offsetRow = getRoot().getOffset();
         if (first != null) {

@@ -50,6 +50,10 @@ public class MarkCollect extends MarkColumn {
     ) {
         IterateStrategy strategy = getStrategy();
         final Evaluator evaluator = getEvaluator();
+        if (data == null) {
+            task.run(sheetFactory.row());
+        }
+
         Object propertyObject = evaluator.getPropertyValue(data);
         if (propertyObject == null) {
             task.run(sheetFactory.row());
@@ -59,18 +63,20 @@ public class MarkCollect extends MarkColumn {
             int index = 0;
             int cellIndex = getOffset();
             if (group == null) {
-                while (iterator.hasNext()) {
+                for (; iterator.hasNext(); index++) {
                     RowFactory rowFactory = sheetFactory.row();
                     Object iteratedObject = iterator.next();
                     task.run(rowFactory);
                     evaluator.evalOnOriginal(rowFactory.index(cellIndex), iteratedObject);
-                    index++;
                 }
             } else {
-                while (iterator.hasNext()) {
+                for (; iterator.hasNext(); index++) {
                     Object iteratedObject = iterator.next();
-                    group.renderRecord(task, sheetFactory, factory, iteratedObject);
-                    index++;
+                    if (iteratedObject == null) {
+                        task.run(sheetFactory.row());
+                    } else {
+                        group.renderRecord(task, sheetFactory, factory, iteratedObject);
+                    }
                 }
             }
             if (index < 1) {
@@ -110,7 +116,6 @@ public class MarkCollect extends MarkColumn {
             if (childrenGroup != null) {
                 childrenGroup.renderRecord(container, sheetFactory, factory, evaluator.getPropertyValue(data));
             } else {
-
                 evaluator.eval(factory.index(offset + 1), data);
             }
         }

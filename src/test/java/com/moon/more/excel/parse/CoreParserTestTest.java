@@ -6,6 +6,7 @@ import com.moon.core.util.RandomUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnFlatten;
+import lombok.ToString;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -155,5 +156,100 @@ class CoreParserTestTest extends ParseUtil {
 
         copied = list.toArray(empty);
         assertArrayEquals(values, copied);
+    }
+
+    @Test
+    void testExportBody() {
+        ExcelUtil.xlsx().sheet(sheetFactory -> {
+            sheetFactory.table(tableFactory -> {
+                tableFactory
+                    .renderBody(new TestExportBody("admin"), new TestExportBody("user"), new TestExportBody("default"),
+                        new TestExportBody("test"));
+            });
+        }).write2Filepath("D:/test.xlsx");
+    }
+
+    public static class TestExportBody {
+
+        @TableColumn
+        private String username = "admin";
+        @TableColumn
+        private String password = "123456";
+        @TableColumn
+        private List<Integer> scores;
+
+        public TestExportBody(String name) {
+            this.username = name;
+            this.scores = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                scores.add(i + 1);
+            }
+        }
+    }
+
+    @Test
+    void testExportBody2() {
+        ExcelUtil.xlsx().sheet(sheetFactory -> {
+            sheetFactory.table(tableFactory -> {
+                tableFactory.renderBody(new TestExportBody2("test2"));
+            });
+        }).write2Filepath("D:/test.xlsx");
+    }
+
+    public static class TestExportBody2 {
+
+        @TableColumn
+        private String username = "admin";
+        @TableColumn
+        private String password = "123456";
+        @TableColumnFlatten
+        private List<TestExportBody3> scores;
+
+        public TestExportBody2(String name) {
+            this.username = name;
+            this.scores = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                scores.add(new TestExportBody3("admin3" + RandomStringUtil.nextUpper(2) + (i + 1)));
+            }
+        }
+    }
+
+    public static class TestExportBody3 {
+
+        @TableColumn
+        private String username = "admin";
+        @TableColumn
+        private String password = "123456";
+        @TableColumnFlatten
+        private List<TestExportBody4> scores;
+
+        public TestExportBody3(String name) {
+            this.username = name;
+            this.scores = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                scores.add(new TestExportBody4("Body4" + RandomStringUtil.nextLower(2) + (i + 1)));
+            }
+            scores.add(null);
+        }
+    }
+
+    @ToString
+    public static class TestExportBody4 {
+
+        @TableColumn
+        private String username = "admin";
+        @TableColumn
+        private String password = "123456";
+        @TableColumn
+        private List<Integer> scores;
+
+        public TestExportBody4(String name) {
+            this.username = name;
+            this.scores = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                scores.add(i + 1);
+            }
+            scores.add(null);
+        }
     }
 }

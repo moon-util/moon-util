@@ -49,8 +49,8 @@ class PropertyGet extends Property {
         final Transfer4Get transfer;
 
         PropEvaluator(PropertyGetter getter, Transfer4Get transfer) {
-            this.getter = getter;
             this.transfer = transfer;
+            this.getter = getter;
         }
 
         @Override
