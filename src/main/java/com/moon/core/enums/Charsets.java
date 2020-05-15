@@ -3,11 +3,12 @@ package com.moon.core.enums;
 import com.moon.core.lang.StringUtil;
 
 import java.nio.charset.Charset;
+import java.util.function.Supplier;
 
 /**
  * @author benshaoye
  */
-public enum Charsets {
+public enum Charsets implements Supplier<Charset> {
     /**
      * 北美、西欧、拉丁美洲、加勒比海、加拿大、非洲
      */
@@ -78,15 +79,12 @@ public enum Charsets {
 
     Charsets() { }
 
-    public String getText() {
-        return StringUtil.replace(name(), '_', '-');
-    }
+    public String getText() { return StringUtil.replace(name(), '_', '-'); }
 
-    public Charset charset() {
-        return forName(getText());
-    }
+    public Charset charset() { return forName(getText()); }
 
-    public static Charset forName(String name) {
-        return Charset.forName(name);
-    }
+    public static Charset forName(String name) { return Charset.forName(name); }
+
+    @Override
+    public Charset get() { return charset(); }
 }

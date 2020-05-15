@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * @author benshaoye
  */
 public enum Maps implements Supplier<Map>,
-    IntFunction<Map>, Function<Map, Map> {
+                            IntFunction<Map>, Function<Map, Map> {
 
     /**
      * HashMap（散列表） 是开发中使用最频繁的数据结构之一，它是基于对象的 hash 值实现的高速 key-value 映射存储结构
@@ -30,21 +30,16 @@ public enum Maps implements Supplier<Map>,
      * @see Cloneable
      * @see java.io.Serializable
      */
+    @SuppressWarnings("all")
     HashMap(HashMap.class) {
         @Override
-        public Map get() {
-            return new HashMap();
-        }
+        public Map get() { return new HashMap(); }
 
         @Override
-        public Map apply(int value) {
-            return new HashMap(value);
-        }
+        public Map apply(int value) { return new HashMap(value); }
 
         @Override
-        public Map apply(Map map) {
-            return new HashMap(map);
-        }
+        public Map apply(Map map) { return new HashMap(map); }
     },
 
     /**
@@ -58,19 +53,13 @@ public enum Maps implements Supplier<Map>,
      */
     LinkedHashMap(LinkedHashMap.class) {
         @Override
-        public Map get() {
-            return new LinkedHashMap();
-        }
+        public Map get() { return new LinkedHashMap(); }
 
         @Override
-        public Map apply(int value) {
-            return new LinkedHashMap();
-        }
+        public Map apply(int value) { return new LinkedHashMap(); }
 
         @Override
-        public Map apply(Map map) {
-            return new LinkedHashMap(map);
-        }
+        public Map apply(Map map) { return new LinkedHashMap(map); }
     },
 
     /**
@@ -83,19 +72,13 @@ public enum Maps implements Supplier<Map>,
      */
     Hashtable(Hashtable.class) {
         @Override
-        public Map get() {
-            return new Hashtable();
-        }
+        public Map get() { return new Hashtable(); }
 
         @Override
-        public Map apply(int value) {
-            return new Hashtable(value);
-        }
+        public Map apply(int value) { return new Hashtable(value); }
 
         @Override
-        public Map apply(Map map) {
-            return new Hashtable(map);
-        }
+        public Map apply(Map map) { return new Hashtable(map); }
     },
 
     /**
@@ -109,14 +92,10 @@ public enum Maps implements Supplier<Map>,
      */
     Properties(Properties.class) {
         @Override
-        public Map get() {
-            return new Properties();
-        }
+        public Map get() { return new Properties(); }
 
         @Override
-        public Map apply(int value) {
-            return new Properties();
-        }
+        public Map apply(int value) { return new Properties(); }
 
         @Override
         public Map apply(Map map) {
@@ -139,19 +118,13 @@ public enum Maps implements Supplier<Map>,
      */
     TreeMap(TreeMap.class) {
         @Override
-        public Map get() {
-            return new TreeMap();
-        }
+        public Map get() { return new TreeMap(); }
 
         @Override
-        public Map apply(int value) {
-            return new TreeMap();
-        }
+        public Map apply(int value) { return new TreeMap(); }
 
         @Override
-        public Map apply(Map map) {
-            return new TreeMap(map);
-        }
+        public Map apply(Map map) { return new TreeMap(map); }
     },
 
     /**
@@ -164,19 +137,13 @@ public enum Maps implements Supplier<Map>,
      */
     IdentityHashMap(IdentityHashMap.class) {
         @Override
-        public Map get() {
-            return new IdentityHashMap();
-        }
+        public Map get() { return new IdentityHashMap(); }
 
         @Override
-        public Map apply(int value) {
-            return new IdentityHashMap(value);
-        }
+        public Map apply(int value) { return new IdentityHashMap(value); }
 
         @Override
-        public Map apply(Map map) {
-            return new IdentityHashMap(map);
-        }
+        public Map apply(Map map) { return new IdentityHashMap(map); }
     },
 
     /**
@@ -187,19 +154,13 @@ public enum Maps implements Supplier<Map>,
      */
     WeakHashMap(WeakHashMap.class) {
         @Override
-        public Map get() {
-            return new WeakHashMap();
-        }
+        public Map get() { return new WeakHashMap(); }
 
         @Override
-        public Map apply(int value) {
-            return new WeakHashMap(value);
-        }
+        public Map apply(int value) { return new WeakHashMap(value); }
 
         @Override
-        public Map apply(Map map) {
-            return new WeakHashMap(map);
-        }
+        public Map apply(Map map) { return new WeakHashMap(map); }
     },
 
     /**
@@ -212,19 +173,13 @@ public enum Maps implements Supplier<Map>,
      */
     ConcurrentHashMap(ConcurrentHashMap.class) {
         @Override
-        public Map get() {
-            return new ConcurrentHashMap();
-        }
+        public Map get() { return new ConcurrentHashMap(); }
 
         @Override
-        public Map apply(int value) {
-            return new ConcurrentHashMap(value);
-        }
+        public Map apply(int value) { return new ConcurrentHashMap(value); }
 
         @Override
-        public Map apply(Map map) {
-            return new ConcurrentHashMap(map);
-        }
+        public Map apply(Map map) { return new ConcurrentHashMap(map); }
     };
 
     private final Class type;
@@ -233,11 +188,7 @@ public enum Maps implements Supplier<Map>,
         final static HashMap<Class, Maps> CACHE = new HashMap();
     }
 
-    Maps(Class type) {
-        CtorCached.CACHE.put(this.type = type, this);
-    }
+    Maps(Class type) { CtorCached.CACHE.put(this.type = type, this); }
 
-    public Class type() {
-        return type;
-    }
+    public Class type() { return type; }
 }

@@ -17,13 +17,12 @@ final class SupportUtil {
     private final static String COL_NAME = "@" + TableColumn.class.getSimpleName();
 
     private final static String FLAT_NAME = "@" + TableColumnFlatten.class.getSimpleName();
-    private final static String LISTABLE = "@" + TableListable.class.getSimpleName();
 
-    private final static String NOT_ALLOWED = COL_NAME + " & " + FLAT_NAME + " 不能用于同一字段: {}: \n\t\t[ " +
+    private final static String NOT_ALLOWED = COL_NAME + " & " + FLAT_NAME + " 不能用于同一字段: {} (包括对应的 getter | setter): \n\t\t[ " +
 
-        COL_NAME + " ] 用于普通数据字段（int、double、String、BigDecimal）；\n\t\t[ " +
+        COL_NAME + " ] 用于普通数据字段（int、double、String、BigDecimal 等；注解在复合字段上将视为 String 最终调用 toString() 方法）；\n\t\t[ " +
 
-        FLAT_NAME + " ] 用于复合字段（里面有普通字段组成）。\n\n";
+        FLAT_NAME + " ] 用于复合字段（里面由普通字段组成）。\n\n";
 
     private static String getNotAllowed(String prop) { return NOT_ALLOWED.replace("{}", prop); }
 
@@ -57,13 +56,8 @@ final class SupportUtil {
                 if (property == null) {
                     property = defined;
                 } else {
-                    throw new IllegalStateException("一个类最多只能有一个字段可迭代(展开字段内部包含可迭代字段也视为可迭代)" +
-                        ";\n " +
-                        property.getDeclaringClass() +
-                        ": [" +
-                        toErrMsg(property) +
-                        toErrMsg(defined) +
-                        "\n ]\n");
+                    throw new IllegalStateException("一个类最多只能有一个字段可迭代(展开字段内部包含可迭代字段也视为可迭代)" + ";\n " + property.getDeclaringClass() + ": [" + toErrMsg(
+                        property) + toErrMsg(defined) + "\n ]\n");
                 }
             }
         }
@@ -72,6 +66,6 @@ final class SupportUtil {
     private static String toErrMsg(Property prop) {
         return "\n  ~ " + prop.getPropertyType().getSimpleName() + " " +
 
-            prop.name + ": " + (prop.isIterated() ? "自身可迭代;" : "内部包含可迭代字段;");
+            prop.name + ": " + (prop.isIterated() ? "可迭代字段;" : "后代包含可迭代字段;");
     }
 }

@@ -38,6 +38,4 @@ class DetailRoot {
     public int getOffset() { return offset; }
 
     public boolean isAnnotatedOnClass() { return annotatedOnClass; }
-
-    public HeadSortEnum getSortStrategy() { return HeadSortEnum.getSortStrategy(getPriority()); }
 }

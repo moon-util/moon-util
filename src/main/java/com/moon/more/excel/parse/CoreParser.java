@@ -50,7 +50,8 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
 
     @SuppressWarnings({"rawtypes"})
     protected Renderer doParseAsCol(Class type) {
-        Renderer renderer = transform(doParse(type), IntAccessor.of());
+        PropertiesGroup group = doParse(type);
+        Renderer renderer = transform(group, IntAccessor.of());
         return renderer;
     }
 

@@ -40,17 +40,6 @@ class PropGetterParsedTestTest {
         private String schoolName = "北大（" + RandomUtil.nextInt(5) + "）中";
     }
 
-    @Test
-    void testGenerateDetailExcel() {
-        PropertiesGroupGet get = ParseUtil.parseGetter(EmployeeDetail.class);
-        System.out.println();
-        get.forEach(definedGet -> {
-            System.out.println(definedGet.getName());
-            System.out.println(definedGet.getPropertyType());
-            System.out.println(ArrayUtil.stringify(definedGet.getHeadLabels()));
-        });
-    }
-
 
     @Test
     void testEmployeeDetailExport() throws Exception {
@@ -58,14 +47,6 @@ class PropGetterParsedTestTest {
         for (int i = 0; i < 10; i++) {
             details.add(new EmployeeDetail());
         }
-        PropertiesGroupGet detailGet = ParseUtil.parseGetter(EmployeeDetail.class);
-        // details.forEach(emp -> {
-        //     StringBuilder data = new StringBuilder();
-        //     detailGet.forEach(get -> {
-        //         data.append(get.getName()).append(": ").append(get.getValue(emp)).append("; ");
-        //     });
-        //     System.out.println(data);
-        // });
     }
 
     @Test

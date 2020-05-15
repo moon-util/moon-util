@@ -113,12 +113,6 @@ class PropertyGet extends Property {
         public TableIndexer getIndexer() { return indexer; }
 
         @Override
-        public String[] getHeadLabels() { return null; }
-
-        @Override
-        public String getHeadLabelAsIndexer() { return getIndexer().value(); }
-
-        @Override
         PropertyGetter getPropertyGetter() {
             return data -> IntAccessor.of(getIndexer().startingAt());
         }

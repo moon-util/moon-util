@@ -35,7 +35,6 @@ class HeaderTestTest {
     @Test
     void testParseHeadIfPriorityOrder() {
         PropertiesGroup<PropertyGet> getter = ParseUtil.parseGetter(UserDetails.class);
-        Assertions.assertEquals(3, getter.getMaxRowsLength());
     }
 
     public static class BasicInfo {

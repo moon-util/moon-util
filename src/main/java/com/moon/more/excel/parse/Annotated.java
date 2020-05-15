@@ -47,17 +47,7 @@ class Annotated<M extends Member> {
         this.iterated = AbstractSupporter.isSetColumn(propertyType);
     }
 
-    public String[] getHeadLabels() {
-        return flatten == null ? (column == null ? null : column.value()) : flatten.value();
-    }
-
-    public String getHeadLabelAsIndexer() { return getIndexer().value(); }
-
     boolean isAnnotated() { return column != null || flatten != null || indexer != null; }
-
-    boolean isDefined() { return getFlatten() != null || getColumn() != null; }
-
-    boolean isIndexer() { return getIndexer() != null; }
 
     public String getName() { return name; }
 

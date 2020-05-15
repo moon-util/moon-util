@@ -59,6 +59,7 @@ public enum Collects
      * @see AbstractCollection
      * @see AbstractList
      */
+    @SuppressWarnings("all")
     ArrayList(ArrayList.class) {
         @Override
         public ArrayList get() { return new ArrayList(); }
@@ -142,6 +143,7 @@ public enum Collects
      * LinkedList 并未继承此类，但可实现此功能
      * @see Stack
      */
+    @SuppressWarnings("all")
     LinkedList(LinkedList.class) {
         @Override
         public LinkedList get() { return new LinkedList(); }
@@ -263,6 +265,7 @@ public enum Collects
      * @see Cloneable
      * @see java.io.Serializable
      */
+    @SuppressWarnings("all")
     HashSet(HashSet.class) {
         @Override
         public HashSet get() { return new HashSet(); }

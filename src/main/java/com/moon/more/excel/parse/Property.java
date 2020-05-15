@@ -19,7 +19,7 @@ import java.util.function.Function;
  */
 abstract class Property implements Serializable, HeadSortable {
 
-    private final static String[] EMPTY = {};
+    // private final static String[] EMPTY = {};
 
     protected final String name;
 
@@ -27,7 +27,7 @@ abstract class Property implements Serializable, HeadSortable {
 
     protected Annotated<Field> atField;
 
-    protected PropertiesGroup group;
+    // protected PropertiesGroup group;
 
     protected Property(String name, Annotated<Method> atMethod) {
         this.atMethod = atMethod;
@@ -58,18 +58,12 @@ abstract class Property implements Serializable, HeadSortable {
 
     public boolean isChildrenIterated() {
         PropertiesGroup group = getGroup();
-        return group != null && group.isIterated();
+        return group != null && (group.isIterated() || group.isChildrenIterated());
     }
 
     /*
      * getters
      */
-
-    private String[] otherwiseLabels;
-
-    public String[] getOtherwiseLabels() {
-        return otherwiseLabels == null ? (otherwiseLabels = new String[]{getName()}) : otherwiseLabels;
-    }
 
     Method getAtMethod() { return atMethod == null ? null : atMethod.getMember(); }
 
@@ -91,21 +85,6 @@ abstract class Property implements Serializable, HeadSortable {
     @SafeVarargs
     protected static <T> boolean isEmpty(T... arr) { return arr == null || arr.length == 0; }
 
-    protected String[] defaultLabelsIfEmpty(String[] labels) { return isEmpty(labels) ? getOtherwiseLabels() : labels; }
-
-    protected static String[] ensureNonNull(String[] labels) { return labels == null ? EMPTY : labels; }
-
-    public String[] getHeadLabels() {
-        String[] labels = gotIfNonNull(Annotated::getHeadLabels);
-        return isDataFlatten() ? ensureNonNull(labels) : defaultLabelsIfEmpty(labels);
-    }
-
-    public int getRowsLength() {
-        int length = getHeadLabels().length;
-        PropertiesGroup group = getGroup();
-        return group == null ? length : length + group.getMaxRowsLength();
-    }
-
     @Override
     public String getName() { return name; }
 
@@ -115,8 +94,6 @@ abstract class Property implements Serializable, HeadSortable {
         TableColumn column = getColumn();
         return flat == null ? column.order() : flat.order();
     }
-
-    public String getHeadLabelAsIndexer() { return gotIfNonNull(Annotated::getHeadLabelAsIndexer); }
 
     public TableListable getListable() { return gotIfNonNull(Annotated::getListable); }
 
@@ -134,9 +111,7 @@ abstract class Property implements Serializable, HeadSortable {
 
     public Class getActualClass() { return gotIfNonNull(Annotated::getActualClass); }
 
-    public Class getDeclaringClass() {
-        return gotIfNonNull(annotated -> annotated.getMember().getDeclaringClass());
-    }
+    public Class getDeclaringClass() { return gotIfNonNull(annotated -> annotated.getMember().getDeclaringClass()); }
 
     public Evaluator getEvaluator() { throw new UnsupportedOperationException(); }
 
