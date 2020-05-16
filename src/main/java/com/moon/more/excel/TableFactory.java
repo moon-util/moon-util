@@ -5,6 +5,7 @@ import com.moon.more.excel.annotation.*;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -74,6 +75,44 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return data == null ? this : renderBody(IteratorUtil.of(data), targetClass);
     }
 
+    public TableFactory renderCollectBody(Object collect) {
+        if (collect == null) {
+            return this;
+        }
+        if (collect instanceof Iterable) {
+            return renderBody((Iterable) collect);
+        }
+        if (collect instanceof Object[]) {
+            return renderBody((Object[]) collect);
+        }
+        if (collect instanceof Iterator) {
+            return renderBody((Iterator) collect);
+        }
+        if (collect instanceof Stream) {
+            return renderBody((Stream) collect);
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    public TableFactory renderCollectBody(Object collect, Class targetClass) {
+        if (collect == null) {
+            return this;
+        }
+        if (collect instanceof Iterable) {
+            return renderBody((Iterable) collect, targetClass);
+        }
+        if (collect instanceof Object[]) {
+            return renderBody((Object[]) collect, targetClass);
+        }
+        if (collect instanceof Iterator) {
+            return renderBody((Iterator) collect, targetClass);
+        }
+        if (collect instanceof Stream) {
+            return renderBody((Stream) collect, targetClass);
+        }
+        throw new UnsupportedOperationException();
+    }
+
     public <T> TableFactory renderList(Iterator<T> iterator) { return renderList(iterator, null); }
 
     public <T> TableFactory renderList(Iterator<T> iterator, Class<T> targetClass) {
@@ -100,6 +139,44 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
 
     public <T> TableFactory renderList(Class targetClass, T... data) {
         return data == null ? this : renderList(IteratorUtil.of(data), targetClass);
+    }
+
+    public TableFactory renderCollectList(Object collect) {
+        if (collect == null) {
+            return this;
+        }
+        if (collect instanceof Iterable) {
+            return renderList((Iterable) collect);
+        }
+        if (collect instanceof Object[]) {
+            return renderList((Object[]) collect);
+        }
+        if (collect instanceof Iterator) {
+            return renderList((Iterator) collect);
+        }
+        if (collect instanceof Stream) {
+            return renderList((Stream) collect);
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    public TableFactory renderCollectList(Object collect, Class targetClass) {
+        if (collect == null) {
+            return this;
+        }
+        if (collect instanceof Iterable) {
+            return renderList((Iterable) collect, targetClass);
+        }
+        if (collect instanceof Object[]) {
+            return renderList((Object[]) collect, targetClass);
+        }
+        if (collect instanceof Iterator) {
+            return renderList((Iterator) collect, targetClass);
+        }
+        if (collect instanceof Stream) {
+            return renderList((Stream) collect, targetClass);
+        }
+        throw new UnsupportedOperationException();
     }
 
     /*
