@@ -5,8 +5,5 @@ package com.moon.more.excel.parse;
  */
 public class MarkCollectTest {
 
-    public MarkCollectTest() {
-    }
 
-    
 }

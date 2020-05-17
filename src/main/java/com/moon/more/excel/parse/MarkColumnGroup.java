@@ -24,7 +24,7 @@ public class MarkColumnGroup<T extends MarkColumn> extends AbstractMarkGroup imp
      */
     @SuppressWarnings("all")
     public MarkColumnGroup(
-        List<T> columns, T rootIndexer, DetailRoot root, boolean indexed
+        List<T> columns, T rootIndexer, RowRecord root, boolean indexed
     ) { super(columns, rootIndexer, root, indexed); }
 
     @Override

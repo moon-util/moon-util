@@ -1,6 +1,7 @@
 package com.moon.more.excel.parse;
 
 import com.moon.core.lang.StringJoiner;
+import com.moon.core.util.Assert;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnFlatten;
 import com.moon.more.excel.annotation.TableIndexer;
@@ -174,48 +175,9 @@ abstract class AbstractSupporter {
         SUPPORTS.add(Character.class);
     }
 
-    static Class getActual(Type genericPropType, Class propType) {
-        if (propType.isArray()) {
-            Class type = propType.getComponentType();
-            if (isSetColumn(type)) {
-                throw new UnsupportedOperationException("不支持集合数组: " + type.toString());
-            }
-            return type;
-        }
-        if (isIterable(propType)) {
-            return toActualCls(getActual(genericPropType));
-        }
-        if (isMap(propType)) {
-            return toActualCls(getActual(genericPropType, 1));
-        }
-        if (isIterator(propType)) {
-            return toActualCls(getActual(genericPropType));
-        }
-        return propType;
-    }
-
-    private static Class toActualCls(Type type) {
-        if (type instanceof Class) {
-            return (Class) type;
-        } else if (type instanceof ParameterizedType) {
-            ParameterizedType pType = (ParameterizedType) type;
-            Type rawType = pType.getRawType();
-            if (rawType instanceof Class) {
-                return getActual(type, (Class) rawType);
-            }
-        } else if (type == null) {
-            return null;
-        }
-        throw new UnsupportedOperationException(type.toString());
-    }
-
-    private  static Type getActual(Type type) { return getActual(type, 0); }
-
-    private static Type getActual(Type type, int index) {
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pType = (ParameterizedType) type;
-            return pType.getActualTypeArguments()[index];
-        }
-        return null;
+    static Class requireGetActualClass(ParameterizedType parameterizedType, int index) {
+        Type type = parameterizedType.getActualTypeArguments()[index];
+        Assert.requireTrue(type instanceof Class);
+        return (Class) type;
     }
 }

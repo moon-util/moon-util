@@ -36,7 +36,7 @@ public class Classes {
 
         @Override
         public PropertiesGroup parsed(
-            List list, DetailRoot root, PropertyGet rootProperty
+            List list, RowRecord root, PropertyGet rootProperty
         ) { return PropertiesGroup.ofGetter(list, root, rootProperty); }
     }
 
@@ -68,7 +68,7 @@ public class Classes {
 
         @Override
         public PropertiesGroup parsed(
-            List list, DetailRoot root, PropertySet rootProperty
+            List list, RowRecord root, PropertySet rootProperty
         ) { return PropertiesGroup.ofSetter(list, root, rootProperty); }
     }
 }

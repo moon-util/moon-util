@@ -19,15 +19,11 @@ import java.util.function.Function;
  */
 abstract class Property implements Serializable, HeadSortable {
 
-    // private final static String[] EMPTY = {};
-
     protected final String name;
 
     protected final Annotated<Method> atMethod;
 
     protected Annotated<Field> atField;
-
-    // protected PropertiesGroup group;
 
     protected Property(String name, Annotated<Method> atMethod) {
         this.atMethod = atMethod;

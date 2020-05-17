@@ -14,7 +14,7 @@ public class MarkCollectGroup extends MarkColumnGroup {
     private final MarkCollect collectAt;
 
     public MarkCollectGroup(
-        List<MarkColumn> columns, MarkCollect collectAt, MarkColumn rootIndexer, DetailRoot root, boolean indexed
+        List<MarkColumn> columns, MarkCollect collectAt, MarkColumn rootIndexer, RowRecord root, boolean indexed
     ) {
         super(columns, rootIndexer, root, indexed);
         this.collectAt = collectAt;

@@ -124,11 +124,11 @@ public final class Assert {
     public static boolean requireTrue(Object value) { return requireTrue(value, none()); }
 
     public static boolean requireTrue(boolean value, String message) {
-        return value ? throwIllegal(message == null ? "true" : message) : true;
+        return value ? true : throwIllegal(message == null ? "true" : message);
     }
 
     public static boolean requireTrue(Object value, String message) {
-        return TRUE.equals(value) ? throwIllegal(message == null ? "true" : message) : true;
+        return TRUE.equals(value) ? true : throwIllegal(message == null ? "true" : message);
     }
 
     public static boolean requireTrue(boolean value, Supplier<String> supplier) {
@@ -168,8 +168,8 @@ public final class Assert {
     }
 
     public static <T> T equals(T actual, Object expected, String message) {
-        return actual != null && actual.equals(expected) ? actual : throwIllegal(message == null ? format(
-            "Expected: %s, Actual: %s", expected, actual) : message);
+        return actual != null && actual.equals(expected) ? actual
+            : throwIllegal(message == null ? format("Expected: %s, Actual: %s", expected, actual) : message);
     }
 
     public static <T> T equals(T actual, Object expected, Supplier<String> supplier) {
@@ -189,8 +189,7 @@ public final class Assert {
     }
 
     public static int eq(int actual, int expected, Supplier<String> supplier) {
-        return supplier == null ? eq(actual,
-            expected) : actual == expected ? actual : throwIllegal(supplier.get());
+        return supplier == null ? eq(actual, expected) : actual == expected ? actual : throwIllegal(supplier.get());
     }
 
     public static long eq(long actual, long expected) {
@@ -202,8 +201,7 @@ public final class Assert {
     }
 
     public static long eq(long actual, long expected, Supplier<String> supplier) {
-        return supplier == null ? eq(actual,
-            expected) : actual == expected ? actual : throwIllegal(supplier.get());
+        return supplier == null ? eq(actual, expected) : actual == expected ? actual : throwIllegal(supplier.get());
     }
 
     public static double eq(double actual, double expected) {
@@ -215,8 +213,7 @@ public final class Assert {
     }
 
     public static double eq(double actual, double expected, Supplier<String> supplier) {
-        return supplier == null ? eq(actual,
-            expected) : actual == expected ? actual : throwIllegal(supplier.get());
+        return supplier == null ? eq(actual, expected) : actual == expected ? actual : throwIllegal(supplier.get());
     }
 
     /*

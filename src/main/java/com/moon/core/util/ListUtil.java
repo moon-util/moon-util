@@ -5,6 +5,7 @@ import com.moon.core.lang.ThrowUtil;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 /**
  * @author benshaoye
@@ -25,6 +26,14 @@ public final class ListUtil extends CollectUtil {
 
     public static <T> ArrayList<T> newArrayList(int initCapacity) { return new ArrayList<>(initCapacity); }
 
+    public static <T> ArrayList<T> newArrayList(int capacity, IntFunction<T> getter) {
+        ArrayList<T> list = newArrayList(capacity);
+        for (int i = 0; i < capacity; i++) {
+            list.add(getter.apply(i));
+        }
+        return list;
+    }
+
     public static <T> ArrayList<T> newArrayList(T value) { return add(newArrayList(), value); }
 
     public static <T> ArrayList<T> newArrayList(T value1, T value2) { return add(newArrayList(value1), value2); }
@@ -40,8 +49,9 @@ public final class ListUtil extends CollectUtil {
     }
 
     public static <T> ArrayList<T> newArrayList(Iterable<T> iterable) {
-        return iterable == null ? newArrayList() : (iterable instanceof Collection ? new ArrayList(
-            (Collection) iterable) : addAll(newArrayList(), iterable));
+        return iterable == null ? newArrayList()
+            : (iterable instanceof Collection ? new ArrayList((Collection) iterable)
+                : addAll(newArrayList(), iterable));
     }
 
     /*
@@ -49,6 +59,14 @@ public final class ListUtil extends CollectUtil {
      * of linked valuesList
      * ---------------------------------------------------------------------------------
      */
+
+    public static <T> LinkedList<T> newLinkedList(int capacity, IntFunction<T> getter) {
+        LinkedList<T> list = newLinkedList();
+        for (int i = 0; i < capacity; i++) {
+            list.add(getter.apply(i));
+        }
+        return list;
+    }
 
     public static <T> LinkedList<T> newLinkedList() { return new LinkedList<>(); }
 
@@ -67,8 +85,9 @@ public final class ListUtil extends CollectUtil {
     }
 
     public static <T> LinkedList<T> newLinkedList(Iterable<T> iterable) {
-        return iterable == null ? newLinkedList() : (iterable instanceof Collection ? new LinkedList(
-            (Collection) iterable) : addAll(newLinkedList(), iterable));
+        return iterable == null ? newLinkedList()
+            : (iterable instanceof Collection ? new LinkedList((Collection) iterable)
+                : addAll(newLinkedList(), iterable));
     }
 
     public static <S, T> List<T> mapAsList(Collection<S> src, Function<? super S, T> mapper) {
@@ -386,10 +405,10 @@ public final class ListUtil extends CollectUtil {
     /**
      * 增加 ArrayList 容量，避免频繁扩容
      *
-     * @param list list
+     * @param list     list
      * @param needSize 目标容量
-     * @param <E> 元素类型
-     * @param <L> list 类型
+     * @param <E>      元素类型
+     * @param <L>      list 类型
      *
      * @return 扩容后的 list
      */
