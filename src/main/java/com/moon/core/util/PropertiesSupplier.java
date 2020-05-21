@@ -1,13 +1,13 @@
 package com.moon.core.util;
 
-import com.moon.core.lang.IntUtil;
+import com.moon.core.enums.Const;
 import com.moon.core.lang.LongUtil;
 import com.moon.core.lang.StringUtil;
 
 import java.util.function.Function;
 
 import static com.moon.core.lang.IntUtil.defaultIfInvalid;
-import static com.moon.core.lang.StringUtil.emptyIfNullString;
+import static com.moon.core.lang.StringUtil.defaultIfNullString;
 import static com.moon.core.lang.StringUtil.trimToNull;
 
 /**
@@ -43,7 +43,7 @@ public interface PropertiesSupplier<V> {
      *
      * @return
      */
-    default String getOrEmpty(String key) { return emptyIfNullString(getString(key)); }
+    default String getOrEmpty(String key) { return defaultIfNullString(getString(key), Const.EMPTY); }
 
     /**
      * 返回一个字符串或 null

@@ -211,30 +211,6 @@ class StringUtilTestTest {
         assertEquals(concat, "123   abcdnull123   abcdnull123   abcdnull");
     }
 
-    @Test
-    void testConcatSkipNulls() {
-        String concat = StringUtil.concatSkipNulls(testForConcats);
-        assertEquals(concat, "123   abcd123   abcd123   abcd");
-    }
-
-    @Test
-    void testConcatSkipBlanks() {
-        String concat = StringUtil.concatSkipBlanks(testForConcats);
-        assertEquals(concat, "123abcd123abcd123abcd");
-    }
-
-    @Test
-    void testConcatSkipEmpties() {
-        String concat = StringUtil.concatSkipEmpties(testForConcats);
-        assertEquals(concat, "123   abcd123   abcd123   abcd");
-    }
-
-    @Test
-    void testConcatUseForNulls() {
-        String concat = StringUtil.concatUseForNulls("狼", testForConcats);
-        assertEquals(concat, "123   abcd狼123   abcd狼123   abcd狼");
-    }
-
     /*
      * ---------------------------------------------------------------------
      * REQUIRES

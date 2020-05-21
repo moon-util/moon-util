@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
+import java.util.function.Supplier;
 
 import static com.moon.core.enums.Const.NULL_STR;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -106,19 +107,19 @@ public final class StringUtil {
      */
     public static String concat(CharSequence... css) { return concatHandler(Predicates.TRUE, css); }
 
-    public static String concatSkipNulls(CharSequence... css) { return concatHandler(Predicates.isNotNull, css); }
-
-    public static String concatSkipBlanks(CharSequence... css) { return concatHandler(cs -> isNotBlank(cs), css); }
-
-    public static String concatSkipEmpties(CharSequence... css) { return concatHandler(cs -> isNotEmpty(cs), css); }
-
-    public static String concatUseForNulls(CharSequence nullVal, CharSequence... css) {
-        return concatWithTransformer(str -> (str == null ? nullVal : str), css);
+    public static <T, S extends CharSequence> String concatWithTransformer(Function<T, S> transformer, T... objects) {
+        final int length = objects == null ? 0 : objects.length;
+        if (length > 0) {
+            StringBuilder builder = new StringBuilder(length * Const.DEFAULT_LENGTH);
+            for (int i = 0; i < length; i++) { builder.append(transformer.apply(objects[i])); }
+            return builder.toString();
+        }
+        return EMPTY;
     }
 
     /*
      * -------------------------------------------------------------------
-     * assertions
+     * tests
      * -------------------------------------------------------------------
      */
 
@@ -253,16 +254,14 @@ public final class StringUtil {
         }
     }
 
-    public final static boolean isAllLetter(CharSequence cs) { return isAllMatched(cs, curr -> isLetter(curr)); }
-
-    public final static boolean isAllUpperCase(CharSequence cs) {
-        return isAllMatched(cs, curr -> Character.isUpperCase(curr));
-    }
-
-    public final static boolean isAllLowerCase(CharSequence cs) {
-        return isAllMatched(cs, curr -> Character.isLowerCase(curr));
-    }
-
+    /**
+     * 字符串内所有字符是否都符合条件
+     *
+     * @param cs     待测字符串
+     * @param tester 依次接受 cs 中的字符为参数，返回是否符合条件
+     *
+     * @return 全部都符合条件返回 true
+     */
     public final static boolean isAllMatched(CharSequence cs, IntPredicate tester) {
         final int length = length(cs);
         if (length == 0) { return false; }
@@ -275,16 +274,15 @@ public final class StringUtil {
         return true;
     }
 
-    public final static boolean isAnyLetter(CharSequence cs) { return isAnyMatched(cs, curr -> isLetter(curr)); }
 
-    public final static boolean isAnyUpperCase(CharSequence cs) {
-        return isAnyMatched(cs, curr -> Character.isUpperCase(curr));
-    }
-
-    public final static boolean isAnyLowerCase(CharSequence cs) {
-        return isAnyMatched(cs, curr -> Character.isLowerCase(curr));
-    }
-
+    /**
+     * 字符串内所有字符是否都符合条件
+     *
+     * @param cs     待测字符串
+     * @param tester 依次接受 cs 中的字符为参数，返回是否符合条件
+     *
+     * @return 至少有一个符号条件返回 true
+     */
     public final static boolean isAnyMatched(CharSequence cs, IntPredicate tester) {
         final int length = length(cs);
         if (length == 0) { return false; }
@@ -339,10 +337,6 @@ public final class StringUtil {
 
     public static String emptyIfNull(String str) { return str == null ? EMPTY : str; }
 
-    public static StringBuffer emptyIfNull(StringBuffer str) { return str == null ? new StringBuffer() : str; }
-
-    public static StringBuilder emptyIfNull(StringBuilder str) { return str == null ? new StringBuilder() : str; }
-
     public static <T extends CharSequence> T nullIfEmpty(T cs) { return isEmpty(cs) ? null : cs; }
 
     public static <T> T defaultIfNull(T cs, T defaultValue) { return cs == null ? defaultValue : cs; }
@@ -354,23 +348,6 @@ public final class StringUtil {
     public static <T extends CharSequence> T defaultIfBlank(T cs, T defaultValue) {
         return isBlank(cs) ? defaultValue : cs;
     }
-
-    public static <T extends CharSequence> T defaultIfEquals(T cs, T testString, T defaultValue) {
-        return equals(cs, testString) ? defaultValue : cs;
-    }
-
-    public static <T extends CharSequence> T defaultIfNotEquals(T cs, T testString, T defaultValue) {
-        return equals(cs, testString) ? cs : defaultValue;
-    }
-
-    public static <T extends CharSequence> T defaultIfContains(T cs, T searchString, T defaultValue) {
-        return contains(cs, searchString) ? defaultValue : cs;
-    }
-
-    public static <T extends CharSequence> T defaultIfNotContains(T cs, T searchString, T defaultValue) {
-        return contains(cs, searchString) ? cs : defaultValue;
-    }
-
 
     /**
      * 以下几个方法主要是针对 JavaScript
@@ -390,13 +367,15 @@ public final class StringUtil {
         return isUndefined(cs) ? defaultValue : cs;
     }
 
-    public static <T extends CharSequence> T nullIfNullString(T cs) { return defaultIfNullString(cs, null); }
+    public static <T> T elseIfNull(T cs, Supplier<T> elseBuilder) { return cs == null ? elseBuilder.get() : cs; }
 
-    public static String emptyIfNullString(String cs) { return defaultIfNullString(cs, EMPTY); }
+    public static <T extends CharSequence> T elseIfEmpty(T cs, Supplier<T> elseBuilder) {
+        return isEmpty(cs) ? elseBuilder.get() : cs;
+    }
 
-    public static <T extends CharSequence> T nullIfUndefined(T cs) { return defaultIfUndefined(cs, null); }
-
-    public static String emptyIfUndefined(String cs) { return defaultIfUndefined(cs, EMPTY); }
+    public static <T extends CharSequence> T elseIfBlank(T cs, Supplier<T> elseBuilder) {
+        return isBlank(cs) ? elseBuilder.get() : cs;
+    }
 
     public static <T extends CharSequence> boolean contains(T cs, T search) {
         if (equals(cs, search)) {
@@ -439,22 +418,6 @@ public final class StringUtil {
 
     /*
      * -------------------------------------------------------------------
-     * map
-     * -------------------------------------------------------------------
-     */
-
-    public static <T, S extends CharSequence> String concatWithTransformer(Function<T, S> transformer, T... objects) {
-        final int length = objects == null ? 0 : objects.length;
-        if (length > 0) {
-            StringBuilder builder = new StringBuilder(length * Const.DEFAULT_LENGTH);
-            for (int i = 0; i < length; i++) { builder.append(transformer.apply(objects[i])); }
-            return builder.toString();
-        }
-        return EMPTY;
-    }
-
-    /*
-     * -------------------------------------------------------------------
      * toString
      * -------------------------------------------------------------------
      */
@@ -483,13 +446,13 @@ public final class StringUtil {
         return builder;
     }
 
-    public static String stringify(Object value) { return toStringOrDefault(value, null); }
-
     public static String toStringOrEmpty(Object value) { return toStringOrDefault(value, Const.EMPTY); }
 
     public static String toStringOrDefault(Object value, String defaultValue) {
         return value == null ? defaultValue : value.toString();
     }
+
+    public static String stringify(Object value) { return toStringOrDefault(value, null); }
 
     /*
      * -------------------------------------------------------------------
