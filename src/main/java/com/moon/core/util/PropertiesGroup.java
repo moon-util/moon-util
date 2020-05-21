@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static com.moon.core.lang.StringUtil.stringifyOrNull;
+import static com.moon.core.lang.StringUtil.stringify;
 import static com.moon.core.lang.ThrowUtil.unsupported;
 import static java.util.Collections.EMPTY_SET;
 
@@ -215,7 +215,7 @@ public class PropertiesGroup extends HashMap<String, Object> implements Properti
         return isHasDefault() ? getDefault() : null;
     }
 
-    public String getString(String... keys) { return stringifyOrNull(getByKeys(keys)); }
+    public String getString(String... keys) { return stringify(getByKeys(keys)); }
 
     public <T> T getAndTransform(Function<String, T> transformer, String... keys) {
         return transformer.apply(getString(keys));

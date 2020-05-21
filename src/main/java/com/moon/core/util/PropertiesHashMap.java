@@ -2,7 +2,7 @@ package com.moon.core.util;
 
 import java.util.Map;
 
-import static com.moon.core.lang.StringUtil.stringifyOrNull;
+import static com.moon.core.lang.StringUtil.stringify;
 
 /**
  * @author benshaoye
@@ -24,7 +24,7 @@ public class PropertiesHashMap extends StringKeyHashMap<String> {
     public final static PropertiesHashMap fromObjectMap(Map map) {
         if (map == null) { return new PropertiesHashMap(); }
         PropertiesHashMap props = new PropertiesHashMap(map.size());
-        map.forEach((key, value) -> props.put(stringifyOrNull(key), stringifyOrNull(value)));
+        map.forEach((key, value) -> props.put(stringify(key), stringify(value)));
         return props;
     }
 }

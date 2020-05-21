@@ -40,7 +40,9 @@ public class StringSupport {
         return false;
     }
 
-    public static boolean regionMatches(CharSequence cs, boolean ignoreCase, int thisStart, CharSequence substring, int start, int length) {
+    public static boolean regionMatches(
+        CharSequence cs, boolean ignoreCase, int thisStart, CharSequence substring, int start, int length
+    ) {
         if (cs instanceof String && substring instanceof String) {
             return ((String) cs).regionMatches(ignoreCase, thisStart, (String) substring, start, length);
         } else {
@@ -56,7 +58,8 @@ public class StringSupport {
                         return false;
                     }
 
-                    if (Character.toUpperCase(c1) != Character.toUpperCase(c2) && Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
+                    if (Character.toUpperCase(c1) != Character.toUpperCase(c2) && Character.toLowerCase(c1) != Character
+                        .toLowerCase(c2)) {
                         return false;
                     }
                 }
@@ -83,9 +86,7 @@ public class StringSupport {
     }
 
     public static char[] getChars(String str, int start, int end, char[] chars, int begin) {
-        final int len1 = end - start,
-            len2 = chars == null ? 0 : chars.length,
-            total = begin + len1;
+        final int len1 = end - start, len2 = chars == null ? 0 : chars.length, total = begin + len1;
         if (total > len2) {
             char[] newArr = new char[total << 1];
             if (chars != null) {
@@ -103,9 +104,26 @@ public class StringSupport {
         return getChars(str, 0, str.length(), chars, begin);
     }
 
-    public static <T> T format0(IntBiFunction<char[], T> function, char[] template, Object... values) {
+    public static <R> R formatBuilder(IntBiFunction<char[], R> function, char[] template, Object... values) {
+        return formatBuilder(function, false, template, values);
+    }
+
+    public static <R> R formatBuilder(
+        IntBiFunction<char[], R> function, String placeholder, char[] template, Object... values
+    ) { return formatBuilder(function, placeholder.toCharArray(), false, template, values); }
+
+    public static <R> R formatBuilder(
+        IntBiFunction<char[], R> function, boolean appendIfOverflow, char[] template, Object... values
+    ) { return formatBuilder(function, MARK, appendIfOverflow, template, values); }
+
+    public static <R> R formatBuilder(
+        IntBiFunction<char[], R> function,
+        final char[] marks,
+        boolean appendIfOverflow,
+        char[] template,
+        Object... values
+    ) {
         template = template == null ? EMPTY : template;
-        final char[] marks = MARK;
 
         final int valuesLen = values.length;
         final int tempLen = template.length;
@@ -122,14 +140,16 @@ public class StringSupport {
         do {
             currIndex = CharUtil.indexOf(template, marks, currIndex);
             if (currIndex < 0) {
-                currIndex = tempLen;
-                chars = copyOfRangeTo(template, lastIndex, tempLen, chars, charIndex, chars.length, true);
-                charIndex = currIndex - lastIndex + charIndex;
+                if (appendIfOverflow) {
+                    currIndex = tempLen;
+                    chars = copyOfRangeTo(template, lastIndex, tempLen, chars, charIndex, chars.length, true);
+                    charIndex = currIndex - lastIndex + charIndex;
 
-                for (; valueIndex < valuesLen; valueIndex++) {
-                    temp = String.valueOf(values[valueIndex]);
-                    chars = setString(chars, charIndex, temp);
-                    charIndex += temp.length();
+                    for (; valueIndex < valuesLen; valueIndex++) {
+                        temp = String.valueOf(values[valueIndex]);
+                        chars = setString(chars, charIndex, temp);
+                        charIndex += temp.length();
+                    }
                 }
                 return function.apply(charIndex, chars);
             } else {
@@ -149,13 +169,8 @@ public class StringSupport {
     }
 
     private static char[] copyOfRangeTo(
-        Object chars,
-        int fromIndex,
-        int toIndex,
-        char[] to,
-        int distPos,
-        int toLen,
-        boolean newIfNeed) {
+        Object chars, int fromIndex, int toIndex, char[] to, int distPos, int toLen, boolean newIfNeed
+    ) {
 
         if (newIfNeed) {
             to = to == null ? new char[0] : to;
@@ -176,7 +191,7 @@ public class StringSupport {
         return to;
     }
 
-    public static <T> T format0(IntBiFunction<char[], T> function, String template, Object... values) {
-        return format0(function, template == null ? EMPTY : template.toCharArray(), values);
+    public static <T> T formatBuilder(IntBiFunction<char[], T> function, String template, Object... values) {
+        return formatBuilder(function, template == null ? EMPTY : template.toCharArray(), values);
     }
 }

@@ -94,7 +94,7 @@ public class PackageScanner extends HashSet<String> {
 
         DefaultFileVisitor(List<String> result, Path basePath) {
             this.result = result;
-            this.packageName = StringUtil.stringifyOrEmpty(basePath);
+            this.packageName = StringUtil.toStringOrEmpty(basePath);
         }
 
         @Override

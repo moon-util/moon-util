@@ -4,8 +4,8 @@ import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Const;
 import com.moon.core.enums.Predicates;
 import com.moon.core.lang.support.StringSupport;
+import com.moon.core.util.function.IntBiFunction;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -14,6 +14,7 @@ import java.util.function.IntPredicate;
 import static com.moon.core.enums.Const.NULL_STR;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.support.StringSupport.concatHandler;
+import static com.moon.core.lang.support.StringSupport.formatBuilder;
 import static java.lang.Character.*;
 
 /**
@@ -22,9 +23,7 @@ import static java.lang.Character.*;
  */
 public final class StringUtil {
 
-    private StringUtil() {
-        noInstanceError();
-    }
+    private StringUtil() { noInstanceError(); }
 
     public final static String EMPTY = "";
     private final static char[] EMPTY_CHARS = Arrays2.CHARS.empty();
@@ -224,8 +223,8 @@ public final class StringUtil {
      * StringUtil.isUndefined(null)         === true
      * StringUtil.isUndefined("null")       === true
      * StringUtil.isUndefined("undefined")  === true
+     * StringUtil.isUndefined("")           === true
      * <p>
-     * StringUtil.isUndefined("")           === false
      * StringUtil.isUndefined(" ")          === false
      * StringUtil.isUndefined("a")          === false
      * StringUtil.isUndefined("abc")        === false
@@ -247,15 +246,8 @@ public final class StringUtil {
             case 4:
                 return cs.charAt(0) == 'n' && cs.charAt(1) == 'u' && cs.charAt(2) == 'l' && cs.charAt(3) == 'l';
             case 9:
-                return cs.charAt(0) == 'u' &&
-                    cs.charAt(1) == 'n' &&
-                    cs.charAt(2) == 'd' &&
-                    cs.charAt(3) == 'e' &&
-                    cs.charAt(4) == 'f' &&
-                    cs.charAt(5) == 'i' &&
-                    cs.charAt(6) == 'n' &&
-                    cs.charAt(7) == 'e' &&
-                    cs.charAt(8) == 'd';
+                return cs.charAt(0) == 'u' && cs.charAt(1) == 'n' && cs.charAt(2) == 'd' && cs.charAt(3) == 'e' && cs.charAt(
+                    4) == 'f' && cs.charAt(5) == 'i' && cs.charAt(6) == 'n' && cs.charAt(7) == 'e' && cs.charAt(8) == 'd';
             default:
                 return false;
         }
@@ -283,14 +275,14 @@ public final class StringUtil {
         return true;
     }
 
-    public final static boolean isAnyLetter(CharSequence cs) { return isAllMatched(cs, curr -> isLetter(curr)); }
+    public final static boolean isAnyLetter(CharSequence cs) { return isAnyMatched(cs, curr -> isLetter(curr)); }
 
     public final static boolean isAnyUpperCase(CharSequence cs) {
-        return isAllMatched(cs, curr -> Character.isUpperCase(curr));
+        return isAnyMatched(cs, curr -> Character.isUpperCase(curr));
     }
 
     public final static boolean isAnyLowerCase(CharSequence cs) {
-        return isAllMatched(cs, curr -> Character.isLowerCase(curr));
+        return isAnyMatched(cs, curr -> Character.isLowerCase(curr));
     }
 
     public final static boolean isAnyMatched(CharSequence cs, IntPredicate tester) {
@@ -298,7 +290,7 @@ public final class StringUtil {
         if (length == 0) { return false; }
         String source = cs.toString();
         for (int i = 0; i < length; i++) {
-            if (!tester.test(source.charAt(i))) {
+            if (tester.test(source.charAt(i))) {
                 return true;
             }
         }
@@ -467,7 +459,7 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static String toString(Object value) { return stringifyOrDefault(value, NULL_STR); }
+    public static String toString(Object value) { return toStringOrDefault(value, NULL_STR); }
 
     public static final String toString(char[] chars) {
         return chars == null ? NULL_STR : new String(chars, 0, chars.length);
@@ -491,11 +483,11 @@ public final class StringUtil {
         return builder;
     }
 
-    public static String stringifyOrNull(Object value) { return stringifyOrDefault(value, null); }
+    public static String stringify(Object value) { return toStringOrDefault(value, null); }
 
-    public static String stringifyOrEmpty(Object value) { return stringifyOrDefault(value, Const.EMPTY); }
+    public static String toStringOrEmpty(Object value) { return toStringOrDefault(value, Const.EMPTY); }
 
-    public static String stringifyOrDefault(Object value, String defaultValue) {
+    public static String toStringOrDefault(Object value, String defaultValue) {
         return value == null ? defaultValue : value.toString();
     }
 
@@ -675,24 +667,30 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static final char[] formatToChars(String template, Object... values) {
-        return StringSupport.format0((end, chars) -> Arrays.copyOfRange(chars, 0, end), template, values);
+    public static final String format(String template, Object... values) { return format(false, template, values); }
+
+    @SuppressWarnings("all")
+    public static final String format(boolean appendIfValuesOverflow, String template, Object... values) {
+        return formatBuilder((end, chars) -> new String(chars, 0, end),//
+            appendIfValuesOverflow, toCharArray(template), values);
     }
 
-    public static final StringBuilder formatToBuilder(String template, Object... values) {
-        return StringSupport.format0((end, chars) -> toBuilder(chars, 0, end), template, values);
-    }
+    public static final <C extends CharSequence, R> R format(
+        IntBiFunction<char[], R> returningBuilder, C template, Object... values
+    ) { return formatBuilder(returningBuilder, toCharArray(template), values); }
 
-    public static final StringBuffer formatToBuffer(String template, Object... values) {
-        return StringSupport.format0((end, chars) -> toBuffer(chars, 0, end), template, values);
-    }
-
-    public static final String format(String template, Object... values) {
-        return StringSupport.format0((end, chars) -> new String(chars, 0, end), template, values);
-    }
-
-    public static final StringBuilder format(StringBuilder builder, Object... values) {
-        return StringSupport.format0((end, chars) -> toBuilder(chars, 0, end), toCharArray(builder), values);
+    public static final <C extends CharSequence, R> R format(
+        IntBiFunction<char[], R> returningBuilder,
+        String placeholder,
+        boolean appendIfValuesOverflow,
+        C template,
+        Object... values
+    ) {
+        return formatBuilder(returningBuilder,
+            toCharArray(placeholder),
+            appendIfValuesOverflow,
+            toCharArray(template),
+            values);
     }
 
     /*
@@ -883,7 +881,7 @@ public final class StringUtil {
         return res.toString();
     }
 
-    public final static int charCodeAt(String str, int index) { return str.charAt(index); }
+    public final static int codePointAt(String str, int index) { return str.charAt(index); }
 
     /*
      * -------------------------------------------------------------------
@@ -1011,11 +1009,9 @@ public final class StringUtil {
         return str.substring(index + search.length());
     }
 
-    public static String substringBetween(String str, String search) {
-        return substringBetween(str, search, search);
-    }
+    public static String substrBetween(String str, String search) { return substrBetween(str, search, search); }
 
-    public static String substringBetween(String str, String open, String close) {
+    public static String substrBetween(String str, String open, String close) {
         if (str == null || open == null || close == null) {
             return null;
         }
@@ -1135,4 +1131,10 @@ public final class StringUtil {
         int index = str.lastIndexOf(search);
         return index < 0 ? str : str.substring(index);
     }
+
+    /*
+    split
+
+    todo splitter
+     */
 }

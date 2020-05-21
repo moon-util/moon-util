@@ -154,13 +154,15 @@ class StringUtilTestTest {
     void testFormat() {
         String template = "name: {}, age: {}, sex: {}";
         StringBuilder builder = new StringBuilder(template);
-        String ret = StringUtil.format(builder, "zhangsan", 20, '男', 45).toString();
-        System.out.println(ret);
 
         System.out.println(StringUtil.format(template, "zhangsan", 20, '男', 45, '男', 45));
         System.out.println(StringUtil.format(template, "zhangsan", 20));
         String tpl = null;
         System.out.println(StringUtil.format(tpl, "zhangsan", 20));
+
+        assertEquals("name: zhangsan, age: 20, sex: 男", StringUtil.format(template, "zhangsan", 20, '男', 45, '男', 45));
+        assertEquals("name: zhangsan, age: 20, sex: 男45男45",
+            StringUtil.format(true, template, "zhangsan", 20, '男', 45, '男', 45));
     }
 
     @Test
@@ -290,7 +292,7 @@ class StringUtilTestTest {
         assertTrue(StringUtil.isUndefined("null"));
         assertTrue(StringUtil.isUndefined("undefined"));
 
-        assertFalse(StringUtil.isUndefined(""));
+        assertTrue(StringUtil.isUndefined(""));
         assertFalse(StringUtil.isUndefined(" "));
         assertFalse(StringUtil.isUndefined("a"));
         assertFalse(StringUtil.isUndefined("abc"));
@@ -608,26 +610,7 @@ class StringUtilTestTest {
 
     @Test
     void testUnicode() {
-        String str = " 4E00-9FA5\n" +
-            "      4E00-9FA5\n" +
-            "      4E00-9FA5\n" +
-            "      20000-2A6D6\n" +
-            "      2A700-2B734\n" +
-            "      2B740-2B81D\n" +
-            "      2B820-2CEA1\n" +
-            "      2CEB0-2EBE0\n" +
-            "      2F00-2FD5\n" +
-            "      2E80-2EF3\n" +
-            "      F900-FAD9\n" +
-            "      2F800-2FA1D\n" +
-            "      E815-E86F\n" +
-            "      E400-E5E8\n" +
-            "      E600-E6CF\n" +
-            "      31C0-31E3\n" +
-            "      2FF0-2FFB\n" +
-            "      3105-312F\n" +
-            "      31A0-31BA\n" +
-            "      3007";
+        String str = " 4E00-9FA5\n" + "      4E00-9FA5\n" + "      4E00-9FA5\n" + "      20000-2A6D6\n" + "      2A700-2B734\n" + "      2B740-2B81D\n" + "      2B820-2CEA1\n" + "      2CEB0-2EBE0\n" + "      2F00-2FD5\n" + "      2E80-2EF3\n" + "      F900-FAD9\n" + "      2F800-2FA1D\n" + "      E815-E86F\n" + "      E400-E5E8\n" + "      E600-E6CF\n" + "      31C0-31E3\n" + "      2FF0-2FFB\n" + "      3105-312F\n" + "      31A0-31BA\n" + "      3007";
 
         String[] strings = str.split("\\n");
         IteratorUtil.forEach(strings, s -> {
