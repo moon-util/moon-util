@@ -16,7 +16,7 @@ abstract class AbstractMarkGroup<T extends MarkColumn> {
 
     private final T rootIndexer;
 
-    private final DetailRoot root;
+    private final RowRecord root;
 
     /**
      * 标记{@link #columns}中是否有索引字段
@@ -39,19 +39,19 @@ abstract class AbstractMarkGroup<T extends MarkColumn> {
      */
     @SuppressWarnings("all")
     protected AbstractMarkGroup(
-        List<T> columns, T rootIndexer, DetailRoot root, boolean indexed
+        List<T> columns, T rootIndexer, RowRecord root, boolean indexed
     ) {
         this.columns = toArrayOfEmpty(columns, MarkColumn[]::new, MarkRenderer.EMPTY);
+        this.root = Objects.requireNonNull(root);
         this.rootIndexer = rootIndexer;
         this.indexed = indexed;
-        this.root = Objects.requireNonNull(root);
     }
 
     public MarkRenderer[] getColumns() { return columns; }
 
     public T getRootIndexer() { return rootIndexer; }
 
-    public DetailRoot getRoot() { return root; }
+    public RowRecord getRoot() { return root; }
 
     public boolean isIndexed() { return indexed; }
 }

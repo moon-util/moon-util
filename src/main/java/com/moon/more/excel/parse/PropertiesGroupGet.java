@@ -8,6 +8,6 @@ import java.util.List;
 class PropertiesGroupGet extends PropertiesGroup<PropertyGet> {
 
     public PropertiesGroupGet(
-        List<PropertyGet> getters, DetailRoot root, PropertyGet rootProperty
+        List<PropertyGet> getters, RowRecord root, PropertyGet rootProperty
     ) { super(getters, root, rootProperty); }
 }

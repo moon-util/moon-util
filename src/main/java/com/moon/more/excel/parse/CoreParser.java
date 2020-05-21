@@ -1,8 +1,6 @@
 package com.moon.more.excel.parse;
 
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.core.util.Assert;
-import com.moon.core.util.FilterUtil;
 import com.moon.more.excel.Renderer;
 import com.moon.more.excel.annotation.TableColumnFlatten;
 import com.moon.more.excel.annotation.TableIndexer;
@@ -11,10 +9,7 @@ import com.moon.more.excel.annotation.TableRecord;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,7 +56,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         if (group == null) {
             return null;
         }
-        if (group.isIterated()) {
+        if (group.isIterated() || group.isChildrenIterated()) {
             return transformCollect(group, accessor);
         } else {
             return transformDefault(group, accessor);
@@ -70,9 +65,6 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
 
     @SuppressWarnings("all")
     private MarkCollectGroup transformCollect(PropertiesGroup group, final IntAccessor accessor) {
-        if (group == null) {
-            return null;
-        }
         boolean indexed = false;
         MarkColumn rootIndexer = null;
         if (group.rootProperty != null) {
@@ -106,9 +98,6 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
 
     @SuppressWarnings({"rawtypes"})
     private MarkColumnGroup transformDefault(PropertiesGroup group, final IntAccessor accessor) {
-        if (group == null) {
-            return null;
-        }
         boolean indexed = false;
         MarkColumn rootIndexer = null;
         if (group.rootProperty != null) {
@@ -125,7 +114,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
                 indexed = true;
             }
             final int referenceOffset = accessor.get();
-            columns.add(MarkColumn.column(offset, prop, transformDefault(prop.getGroup(), accessor)));
+            columns.add(MarkColumn.column(offset, prop, transform(prop.getGroup(), accessor)));
             if (accessor.isEq(referenceOffset)) {
                 accessor.increment();
             }
@@ -189,21 +178,39 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
 
     @SuppressWarnings({"rawtypes"})
     static Class getActualClass(AnnotatedElement elem, Type genericType, Class propertyCls, String propName) {
-        TableColumnFlatten flatten = obtainFlatten(elem);
-        if (flatten != null) {
-            Class actualTpe = flatten.targetClass();
-            if (actualTpe == Void.class) {
-                actualTpe = getActual(genericType, propertyCls);
-            }
-            if (actualTpe == null || isSetColumn(actualTpe)) {
-                throw new IllegalStateException("未知集合目标(泛型)类型: [" + propName + "] " + elem);
-            }
-            return actualTpe;
-        } else if (isSetColumn(propertyCls)) {
-            Class actualTpe = getActual(genericType, propertyCls);
-            return actualTpe == propertyCls ? null : actualTpe;
+        TableColumnFlatten flatten = obtain(elem, TableColumnFlatten.class);
+        if (flatten != null && flatten.targetClass() != TableColumnFlatten.UNSPECIFIED) {
+            return flatten.targetClass();
         }
-        return null;
+        if (isCollect(propertyCls)) {
+            requireParameterizedType(genericType, propName);
+            ParameterizedType type = (ParameterizedType) genericType;
+            Class cls = requireGetActualClass(type, 0);
+            return requireNormalClass(cls, propName);
+        } else if (isArray(propertyCls)) {
+            Class cls = propertyCls.getComponentType();
+            return requireNormalClass(cls, propName);
+        } else if (isMap(propertyCls)) {
+            requireParameterizedType(genericType, propName);
+            ParameterizedType type = (ParameterizedType) genericType;
+            Class cls = requireGetActualClass(type, 1);
+            return requireNormalClass(cls, propName);
+        } else {
+            return propertyCls;
+        }
+    }
+
+    private static Class requireNormalClass(Class cls, String propertyName) {
+        if (isSetColumn(cls)) {
+            throw new UnsupportedOperationException("字段【" + propertyName + "】不支持泛型类型: " + cls.toString());
+        }
+        return cls;
+    }
+
+    private static void requireParameterizedType(Type type, String propertyName) {
+        if (!(type instanceof ParameterizedType)) {
+            throw new UnsupportedOperationException("字段【" + propertyName + "】未知泛型类型:");
+        }
     }
 
     @SuppressWarnings({"rawtypes"})
@@ -236,9 +243,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
                 }
             }
         } else {
-            columns = unAnnotated.values()
-                .stream()
-                .filter(info -> isBasic(info.getPropertyType()))
+            columns = unAnnotated.values().stream().filter(info -> isBasic(info.getPropertyType()))
                 .collect(Collectors.toList());
         }
 
@@ -248,7 +253,7 @@ abstract class CoreParser<T extends Property> extends AbstractSupporter {
         }
 
         SupportUtil.requireNotDuplicatedListable(columns);
-        DetailRoot root = DetailRoot.of(obtain(type, TableRecord.class));
+        RowRecord root = RowRecord.of(obtain(type, TableRecord.class));
         return creator.parsed(columns, root, rootIndexer);
     }
 }

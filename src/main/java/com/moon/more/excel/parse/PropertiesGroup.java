@@ -3,7 +3,6 @@ package com.moon.more.excel.parse;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static com.moon.more.excel.parse.SupportUtil.dftIfNull;
 import static java.util.Collections.emptyList;
@@ -14,13 +13,13 @@ import static java.util.Collections.emptyList;
 abstract class PropertiesGroup<T extends Property> implements Serializable {
 
     protected final List<T> columns;
-    protected final DetailRoot root;
+    protected final RowRecord root;
     protected final T rootProperty;
     protected final boolean iterated;
     protected final boolean childrenHasIterated;
 
-    PropertiesGroup(List<T> columns, DetailRoot root, T rootProperty) {
-        this.root = root == null ? DetailRoot.DEFAULT : root;
+    PropertiesGroup(List<T> columns, RowRecord root, T rootProperty) {
+        this.root = root == null ? RowRecord.DEFAULT : root;
         this.columns = columns;
         this.rootProperty = rootProperty;
 
@@ -58,12 +57,12 @@ abstract class PropertiesGroup<T extends Property> implements Serializable {
     public boolean isChildrenIterated() { return childrenHasIterated; }
 
     static PropertiesGroup<PropertyGet> ofGetter(
-        List<PropertyGet> getters, DetailRoot root,//
+        List<PropertyGet> getters, RowRecord root,//
         PropertyGet rootProperty
     ) { return new PropertiesGroupGet(getters, root, rootProperty); }
 
     static PropertiesGroup<PropertySet> ofSetter(
-        List<PropertySet> setters, DetailRoot root,//
+        List<PropertySet> setters, RowRecord root,//
         PropertySet rootProperty
     ) { return new PropertiesGroupSet(setters, root, rootProperty); }
 }

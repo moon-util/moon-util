@@ -40,4 +40,9 @@ public @interface TableColumnFlatten {
      * @return 目标类
      */
     Class<?> targetClass() default Void.class;
+
+    /**
+     * 未指定目标类
+     */
+    Class UNSPECIFIED = Void.class;
 }
