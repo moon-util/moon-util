@@ -6,8 +6,17 @@ import com.moon.core.enums.EnumDescriptor;
  * @author benshaoye
  */
 public enum Protocol implements EnumDescriptor {
+    /**
+     * http 协议
+     */
     HTTP("http:"),
+    /**
+     * https 协议
+     */
     HTTPS("https:"),
+    /**
+     * ftp 协议
+     */
     FTP("ftp:"),
     ;
 
@@ -23,8 +32,8 @@ public enum Protocol implements EnumDescriptor {
 
     public static boolean matchProtocolWith(String url) {
         Protocol[] protocols = values();
-        for (int i = 0; i < protocols.length; i++) {
-            if (protocols[i].isProtocolWith(url)) {
+        for (Protocol value : protocols) {
+            if (value.isProtocolWith(url)) {
                 return true;
             }
         }
@@ -32,7 +41,5 @@ public enum Protocol implements EnumDescriptor {
     }
 
     @Override
-    public String getText() {
-        return protocol;
-    }
+    public String getText() { return protocol; }
 }

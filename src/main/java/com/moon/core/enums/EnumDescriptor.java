@@ -10,14 +10,14 @@ public interface EnumDescriptor extends NameGetter {
     /**
      * 枚举信息
      *
-     * @return
+     * @return 枚举信息
      */
     String getText();
 
     /**
      * 枚举名字
      *
-     * @return
+     * @return 枚举名字
      *
      * @see Enum#name()
      */
@@ -28,7 +28,7 @@ public interface EnumDescriptor extends NameGetter {
      * <p>
      * 与{@link #name()}相同
      *
-     * @return
+     * @return 枚举名字
      *
      * @see com.moon.more.model.IdName
      * @see com.moon.more.model.KeyValue

@@ -9,11 +9,11 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author benshaoye
  */
-public final class InternetUtil {
+public final class NetworkUtil {
 
-    private InternetUtil() { noInstanceError(); }
+    private NetworkUtil() { noInstanceError(); }
 
-    public final static InetAddress getLocalhost() {
+    public static InetAddress getLocalhost() {
         try {
             return InetAddress.getLocalHost();
         } catch (UnknownHostException e) {

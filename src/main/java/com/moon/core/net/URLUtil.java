@@ -27,7 +27,7 @@ public final class URLUtil {
      *
      * @return url instance
      */
-    public static URL ofOrigin(String url) {
+    public static URL url(String url) {
         return LangUtil.apply(url, URL::new);
     }
 
@@ -50,15 +50,15 @@ public final class URLUtil {
         int index = url.indexOf(root);
         if (Protocol.matchProtocolWith(url)) {
             if (index >= 0 && index < endIndex) {
-                return ofOrigin(url);
+                return url(url);
             } else {
                 return ThrowUtil.runtime("no protocol: " + url);
             }
         } else {
             if (index == 0) {
-                return ofOrigin(protocol + url);
+                return url(protocol + url);
             } else if (index < 0) {
-                return ofOrigin(StringUtil.concat(protocol, root, url));
+                return url(StringUtil.concat(protocol, root, url));
             }
             return ThrowUtil.runtime("no protocol: " + url);
         }
