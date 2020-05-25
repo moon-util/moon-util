@@ -663,4 +663,75 @@ class StringUtilTestTest {
     @Test
     void testReplaceFirst() {
     }
+
+    @Test
+    void testConcatAllMatched() throws Exception {
+    }
+
+    @Test
+    void testIsAllMatched() throws Exception {
+    }
+
+    @Test
+    void testIsAnyMatched() throws Exception {
+    }
+
+    @Test
+    void testElseIfNull() throws Exception {
+    }
+
+    @Test
+    void testElseIfEmpty() throws Exception {
+    }
+
+    @Test
+    void testElseIfBlank() throws Exception {
+    }
+
+    @Test
+    void testToStringOrEmpty() throws Exception {
+    }
+
+    @Test
+    void testToStringOrDefault() throws Exception {
+    }
+
+    @Test
+    void testStringify() throws Exception {
+    }
+
+    @Test
+    void testUncapitalize() throws Exception {
+    }
+
+    @Test
+    void testCodePointAt() throws Exception {
+    }
+
+    @Test
+    void testCharAt() throws Exception {
+    }
+
+    @Test
+    void testSubstrBetween() throws Exception {
+    }
+
+    @Test
+    void testTestSubstrBetween() throws Exception {
+    }
+
+    @Test
+    void testDiscardAfter() throws Exception {
+    }
+
+    @Test
+    void testDiscardAfterLast() throws Exception {
+        assertEquals(StringUtil.discardBeforeLast(null, "123456789"), "");
+        assertEquals(StringUtil.discardBeforeLast("", "123456789"), "");
+        assertEquals(StringUtil.discardBeforeLast("sdfgvsdfbsdfb", ""), "");
+        assertEquals(StringUtil.discardBeforeLast("12354235", null), "");
+        assertEquals(StringUtil.discardBeforeLast("12345", "6"), "");
+        assertEquals(StringUtil.discardBeforeLast("12345", "23"), "2345");
+        assertEquals(StringUtil.discardBeforeLast("1234235", "23"), "235");
+    }
 }

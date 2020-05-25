@@ -2,7 +2,6 @@ package com.moon.core.util;
 
 import com.moon.core.enums.Const;
 import com.moon.core.lang.LongUtil;
-import com.moon.core.lang.StringUtil;
 
 import java.util.function.Function;
 

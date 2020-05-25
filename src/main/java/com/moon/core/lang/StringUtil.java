@@ -7,10 +7,7 @@ import com.moon.core.lang.support.StringSupport;
 import com.moon.core.util.function.IntBiFunction;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.IntPredicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static com.moon.core.enums.Const.NULL_STR;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -105,7 +102,11 @@ public final class StringUtil {
      *
      * @return 连接后的字符串
      */
-    public static String concat(CharSequence... css) { return concatHandler(Predicates.TRUE, css); }
+    public static String concat(CharSequence... css) { return concatAllMatched(Predicates.TRUE, css); }
+
+    public static String concatAllMatched(Predicate<CharSequence> predicate, CharSequence... css) {
+        return concatHandler(predicate, css);
+    }
 
     public static <T, S extends CharSequence> String concatWithTransformer(Function<T, S> transformer, T... objects) {
         final int length = objects == null ? 0 : objects.length;
@@ -134,16 +135,18 @@ public final class StringUtil {
 
     /**
      * string is null、""(EMPTY string)
-     * <p>
+     * <P>
+     * <pre>
      * StringUtil.isEmpty(null)         === true
      * StringUtil.isEmpty("")           === true
-     * <p>
+     *
      * StringUtil.isEmpty("null")       === false
      * StringUtil.isEmpty("undefined")  === false
      * StringUtil.isEmpty(" ")          === false
      * StringUtil.isEmpty("a")          === false
      * StringUtil.isEmpty("abc")        === false
      * StringUtil.isEmpty(" a b c ")    === false
+     * </pre>
      *
      * @param string 待测字符串
      *
@@ -433,14 +436,12 @@ public final class StringUtil {
     }
 
     public static final StringBuilder toBuilder(char[] chars, int from, int to) {
-        StringSupport.checkIndexesBetween(from, to, chars.length);
         StringBuilder builder = new StringBuilder(to - from);
         builder.append(chars, from, to);
         return builder;
     }
 
     public static final StringBuffer toBuffer(char[] chars, int from, int to) {
-        StringSupport.checkIndexesBetween(from, to, chars.length);
         StringBuffer builder = new StringBuffer(to - from);
         builder.append(chars, from, to);
         return builder;
@@ -630,18 +631,62 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
+    /**
+     * 格式化内容
+     *
+     * @param template 含有占位符的模板，默认占位符为：{}
+     * @param values   每个占位符对应的值，
+     *                 如果值的数量超过占位符数量，超出部分将被舍弃，{@link #format(boolean, String, Object...)}
+     *                 每个值用{@link String#valueOf(Object)}取字符串
+     *
+     * @return 替换完成后的字符串
+     */
     public static final String format(String template, Object... values) { return format(false, template, values); }
 
+    /**
+     * 格式化字符串
+     *
+     * @param appendIfValuesOverflow 如果值的数量超过占位符数量，超出部分是否统一追加到字符串末尾，{@link #format(String, Object...)}
+     * @param template               含有占位符的模板，默认占位符为：{}
+     * @param values                 每个占位符对应的值，
+     *                               每个值用{@link String#valueOf(Object)}取字符串
+     *
+     * @return
+     */
     @SuppressWarnings("all")
     public static final String format(boolean appendIfValuesOverflow, String template, Object... values) {
         return formatBuilder((end, chars) -> new String(chars, 0, end),//
             appendIfValuesOverflow, toCharArray(template), values);
     }
 
+    /**
+     * 格式化字符串
+     *
+     * @param returningBuilder 自定义返回类型，接受两个参数：（包含所有内容的字符数组最后一个有值索引，包含所有内容的字符数组）
+     * @param template         模板字符串
+     * @param values           模板字符串中所有值的数组
+     * @param <C>              模板类型
+     * @param <R>              返回类型
+     *
+     * @return 自定义返回类型
+     */
     public static final <C extends CharSequence, R> R format(
         IntBiFunction<char[], R> returningBuilder, C template, Object... values
     ) { return formatBuilder(returningBuilder, toCharArray(template), values); }
 
+    /**
+     * 格式化字符串
+     *
+     * @param returningBuilder       自定义返回类型，接受两个参数：（包含所有内容的字符数组最后一个有值索引，包含所有内容的字符数组）
+     * @param placeholder            自定义占位符
+     * @param appendIfValuesOverflow 如果值的数量超过占位符数量，超出部分是否统一追加到字符串末尾
+     * @param template               模板字符串
+     * @param values                 模板字符串中所有值的数组
+     * @param <C>                    模板类型
+     * @param <R>                    返回类型
+     *
+     * @return 自定义返回类型
+     */
     public static final <C extends CharSequence, R> R format(
         IntBiFunction<char[], R> returningBuilder,
         String placeholder,
@@ -662,8 +707,23 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
+    /**
+     * 将{@link CharSequence}转为字符数组
+     *
+     * @param cs CharSequence 序列
+     *
+     * @return 字符数组
+     */
     public static final char[] toCharArray(CharSequence cs) { return toCharArray(cs, false); }
 
+    /**
+     * 将{@link CharSequence}转为字符数组
+     *
+     * @param cs          CharSequence 序列
+     * @param emptyIfNull 如果 cs == null，返回 null 或者 new char[0]
+     *
+     * @return 字符数组
+     */
     public static final char[] toCharArray(CharSequence cs, boolean emptyIfNull) {
         return cs == null ? (emptyIfNull ? EMPTY_CHARS : null) : cs.toString().toCharArray();
     }
@@ -771,7 +831,7 @@ public final class StringUtil {
     public final static String underscore(String str) { return camelcaseToHyphen(str, '_'); }
 
     /**
-     * 驼峰转连字符号，可自定义连字符号和是否拆分连接连续大写字母
+     * 驼峰转连字符号
      * <p>
      * "oneOnlyWhitespace"      ====    "one-only-whitespace"
      * "StringUtilTestTest"     ====    "string-util-test-test"
@@ -786,7 +846,7 @@ public final class StringUtil {
     public final static String camelcaseToHyphen(String str) { return camelcaseToHyphen(str, '-'); }
 
     /**
-     * 驼峰转连字符
+     * 驼峰转连字符，可自定义连字符号
      *
      * @param hyphen 自定义连字符号
      * @param str    字符串
@@ -798,7 +858,7 @@ public final class StringUtil {
     }
 
     /**
-     * 驼峰转连字符
+     * 驼峰转连字符，可自定义连字符号和是否拆分连接连续大写字母
      * <p>
      * camelcaseToHyphen(null, ',')                             ====   null
      * camelcaseToHyphen("", ',')                               ====   ""
@@ -989,11 +1049,36 @@ public final class StringUtil {
         return str.substring(start + open.length(), end);
     }
 
+    public static String substr(String str, int from) {
+        return isEmpty(str) ? EMPTY : str.substring(from);
+    }
+
+    public static String substr(String str, int from, int charsCount) {
+        return isEmpty(str) ? EMPTY : str.substring(from, from + charsCount);
+    }
+
+    public static String slice(String str, int from) {
+        return isEmpty(str) ? EMPTY : str.substring(from);
+    }
+
+    public static String slice(String str, int from, int to) {
+        if (isEmpty(str)) {
+            return EMPTY;
+        }
+        int length = str.length();
+        if (to < 0) {
+
+        }
+        throw new UnsupportedOperationException();
+    }
+
     /*
     discard indexOf 和 lastIndexOf 小于 0 的情况有待商榷
      */
 
     /**
+     * 删除最后一个匹字符串之后的内容
+     * <p>
      * StringUtil.discardAfter(null, *)      = null
      * StringUtil.discardAfter("", *)        = ""
      * StringUtil.discardAfter(*, "")        = ""
@@ -1008,7 +1093,7 @@ public final class StringUtil {
      */
     public static String discardAfter(String str, String search) {
         if (isEmpty(str)) {
-            return str;
+            return EMPTY;
         }
         if (isEmpty(search)) {
             return EMPTY;
@@ -1021,12 +1106,15 @@ public final class StringUtil {
     }
 
     /**
-     * StringUtil.discardAfterLast(null, *)      = null
-     * StringUtil.discardAfterLast("", *)        = ""
-     * StringUtil.discardAfterLast(*, "")        = *
-     * StringUtil.discardAfterLast(*, null)      = *
-     * StringUtil.discardAfterLast("12345", "6") = "12345"
-     * StringUtil.discardAfterLast("12345", "23") = "123"
+     * 删除最后一个匹配字符之后的内容
+     * <p>
+     * StringUtil.discardAfterLast(null, *)         = ""
+     * StringUtil.discardAfterLast("", *)           = ""
+     * StringUtil.discardAfterLast(*, "")           = *
+     * StringUtil.discardAfterLast(*, null)         = *
+     * StringUtil.discardAfterLast("12345", "6")    = "12345"
+     * StringUtil.discardAfterLast("12345", "23")   = "123"
+     * StringUtil.discardAfterLast("1234235", "23") = "123423"
      *
      * @param str
      * @param search
@@ -1035,7 +1123,7 @@ public final class StringUtil {
      */
     public static String discardAfterLast(String str, String search) {
         if (isEmpty(str)) {
-            return str;
+            return EMPTY;
         }
         if (isEmpty(search)) {
             return str;
@@ -1048,21 +1136,24 @@ public final class StringUtil {
     }
 
     /**
-     * StringUtil.discardBefore(null, *)      = null
-     * StringUtil.discardBefore("", *)        = ""
-     * StringUtil.discardBefore(*, "")        = *
-     * StringUtil.discardBefore(*, null)      = *
-     * StringUtil.discardBefore("12345", "6") = "12345"
-     * StringUtil.discardBefore("12345", "23") = "2345"
+     * 删除第一个匹配字符串之前的内容
+     * <p>
+     * StringUtil.discardBefore(null, *)         = ""
+     * StringUtil.discardBefore("", *)           = ""
+     * StringUtil.discardBefore(*, "")           = *
+     * StringUtil.discardBefore(*, null)         = *
+     * StringUtil.discardBefore("12345", "6")    = "12345"
+     * StringUtil.discardBefore("12345", "23")   = "2345"
+     * StringUtil.discardBefore("1234235", "23") = "234235"
      *
-     * @param str
-     * @param search
+     * @param str    目标字符串
+     * @param search 待匹配字符串
      *
-     * @return
+     * @return 处理完成的字符串
      */
     public static String discardBefore(String str, String search) {
         if (isEmpty(str)) {
-            return str;
+            return EMPTY;
         }
         if (isEmpty(search)) {
             return str;
@@ -1072,27 +1163,27 @@ public final class StringUtil {
     }
 
     /**
-     * StringUtil.discardBeforeLast(null, *)      = *
-     * StringUtil.discardBeforeLast("", *)        = *
-     * StringUtil.discardBeforeLast(*, "")        = ""
-     * StringUtil.discardBeforeLast(*, null)      = ""
-     * StringUtil.discardBeforeLast("12345", "6") = "12345"
-     * StringUtil.discardBeforeLast("12345", "23") = "2345"
+     * 删除最后一个匹配字符串之前的内容
+     * <p>
+     * StringUtil.discardBeforeLast(null, *)         = ""
+     * StringUtil.discardBeforeLast("", *)           = ""
+     * StringUtil.discardBeforeLast(*, "")           = ""
+     * StringUtil.discardBeforeLast(*, null)         = ""
+     * StringUtil.discardBeforeLast("12345", "6")    = ""
+     * StringUtil.discardBeforeLast("12345", "23")   = "2345"
+     * StringUtil.discardBeforeLast("1234235", "23") = "235"
      *
-     * @param str
-     * @param search
+     * @param str    目标字符串
+     * @param search 待匹配字符串
      *
-     * @return
+     * @return 处理完成的字符串
      */
     public static String discardBeforeLast(String str, String search) {
-        if (isEmpty(str)) {
-            return str;
-        }
-        if (isEmpty(search)) {
+        if (isEmpty(str) || isEmpty(search)) {
             return EMPTY;
         }
         int index = str.lastIndexOf(search);
-        return index < 0 ? str : str.substring(index);
+        return index < 0 ? EMPTY : str.substring(index);
     }
 
     /*
