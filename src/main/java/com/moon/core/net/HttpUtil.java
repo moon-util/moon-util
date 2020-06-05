@@ -14,7 +14,7 @@ public final class HttpUtil {
 
     private HttpUtil() { ThrowUtil.noInstanceError(); }
 
-    public static HttpConnector get(String url) {
-        return null;
+    public static HttpConnector connector(String url) {
+        return new HttpConnector(url);
     }
 }

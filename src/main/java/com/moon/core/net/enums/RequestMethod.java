@@ -1,9 +1,12 @@
 package com.moon.core.net.enums;
 
+import com.moon.core.enums.EnumDescriptor;
+
 /**
  * @author benshaoye
  */
-public enum RequestMethod {
+@SuppressWarnings("all")
+public enum RequestMethod implements EnumDescriptor {
     GET,
     HEAD,
     POST,
@@ -13,4 +16,7 @@ public enum RequestMethod {
     OPTIONS,
     TRACE,
     ;
+
+    @Override
+    public String getText() { return name(); }
 }
