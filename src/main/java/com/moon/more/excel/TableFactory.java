@@ -2,6 +2,7 @@ package com.moon.more.excel;
 
 import com.moon.core.util.IteratorUtil;
 import com.moon.more.excel.annotation.*;
+import com.moon.more.excel.table.ParseUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Iterator;
@@ -40,10 +41,23 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
 
     public Sheet getSheet() { return sheet; }
 
+    /**
+     * 渲染表头
+     *
+     * @param targetClass 目标类
+     *
+     * @return this
+     */
     public TableFactory renderHead(Class targetClass) {
         HEAD_RENDERER.doTask(parse(targetClass));
         return this;
     }
+
+    /*
+     * -----------------------------------------------------------------------------------
+     * 渲染数据
+     * -----------------------------------------------------------------------------------
+     */
 
     public <T> TableFactory renderBody(Iterator<T> iterator) { return renderBody(iterator, null); }
 
@@ -51,9 +65,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return renderAll(iterator, targetClass, EMPTY);
     }
 
-    public <T> TableFactory renderBody(Iterable<T> iterable) {
-        return renderBody(iterable.iterator());
-    }
+    public <T> TableFactory renderBody(Iterable<T> iterable) { return renderBody(iterable.iterator()); }
 
     public <T> TableFactory renderBody(Iterable<T> iterable, Class<T> targetClass) {
         return renderBody(iterable.iterator(), targetClass);
@@ -112,6 +124,12 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         }
         throw new UnsupportedOperationException();
     }
+
+    /*
+     * -----------------------------------------------------------------------------------
+     * 渲染表头和数据
+     * -----------------------------------------------------------------------------------
+     */
 
     public <T> TableFactory renderList(Iterator<T> iterator) { return renderList(iterator, null); }
 
@@ -190,25 +208,28 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     ) {
         SheetFactory factory = end();
         Renderer renderer = null;
-        Object firstItem = null;
+        Object first = null;
         if (targetClass == null) {
             if (iterator.hasNext()) {
                 T data = iterator.next();
                 renderer = parse(data.getClass());
                 beforeRenderBody.doTask(renderer);
-                firstItem = data;
+                first = data;
             }
         } else {
             renderer = parse(targetClass);
             beforeRenderBody.doTask(renderer);
         }
         if (renderer != null) {
-            renderer.renderBody(factory, iterator, firstItem);
+            renderer.renderBody(factory, iterator, first);
         }
         return this;
     }
 
-    private Renderer parse(Class targetClass) { return SheetUtil.parseRenderer(targetClass); }
+    private Renderer parse(Class targetClass) {
+        return TableUtil.parse(targetClass);
+        // return SheetUtil.parseRenderer(targetClass);
+    }
 
     interface HeadExecutor {
 
