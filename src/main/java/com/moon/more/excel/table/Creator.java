@@ -10,8 +10,4 @@ import java.lang.reflect.Method;
 interface Creator<T> {
 
     Method getMethod(PropertyDescriptor descriptor);
-
-    Operation getOperation(Method method);
-
-    Operation getOperation(Field field);
 }

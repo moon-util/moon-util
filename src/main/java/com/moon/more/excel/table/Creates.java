@@ -28,16 +28,6 @@ final class Creates {
         public Method getMethod(PropertyDescriptor descriptor) {
             return descriptor.getReadMethod();
         }
-
-        @Override
-        public Operation getOperation(Method method) {
-            return null;
-        }
-
-        @Override
-        public Operation getOperation(Field field) {
-            return null;
-        }
     }
 
     /*
@@ -53,16 +43,6 @@ final class Creates {
         @Override
         public Method getMethod(PropertyDescriptor descriptor) {
             return descriptor.getWriteMethod();
-        }
-
-        @Override
-        public Operation getOperation(Method method) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Operation getOperation(Field field) {
-            throw new UnsupportedOperationException();
         }
     }
 

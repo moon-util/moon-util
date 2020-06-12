@@ -17,7 +17,7 @@ final class TableRenderer implements Renderer {
     private final TableCol[] columns;
 
     TableRenderer(TableCol[] columns) {
-        this.columns = columns == null ? EMPTY : Arrays.copyOf(columns, columns.length);
+        this.columns = columns == null ? EMPTY : columns;
     }
 
     @Override
@@ -38,15 +38,11 @@ final class TableRenderer implements Renderer {
         }
     }
 
-    public void renderRecord(TableCol[] columns, SheetFactory sheetFactory, Object record) {
+    private void renderRecord(TableCol[] columns, SheetFactory sheetFactory, Object record) {
         RowFactory row = sheetFactory.row();
         int length = columns.length;
-        TableCol column;
         for (int i = 0; i < length; i++) {
-            row.index(i);
-            column = columns[i];
-            column.render(row.index(i), record);
+            columns[i].render(row.index(i), record);
         }
-
     }
 }

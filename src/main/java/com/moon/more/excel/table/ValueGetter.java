@@ -23,7 +23,7 @@ abstract class ValueGetter implements PropertyControl {
     private static PropertyControl of(Method method) { return newGetter(method); }
 
     @Override
-    public final Object controlValue(Object data) { return getter.controlValue(data); }
+    public final Object control(Object data) { return getter.control(data); }
 
     private static boolean isPublic(Member member) { return Modifier.isPublic(member.getModifiers()); }
 
@@ -39,7 +39,7 @@ abstract class ValueGetter implements PropertyControl {
         PubFieldGetter(Field field) { this.field = field; }
 
         @Override
-        public Object controlValue(Object data) {
+        public Object control(Object data) {
             Field field = this.field;
             try {
                 return field.get(data);
@@ -63,7 +63,7 @@ abstract class ValueGetter implements PropertyControl {
         DftFieldGetter(Field field) { this.field = field; }
 
         @Override
-        public Object controlValue(Object data) {
+        public Object control(Object data) {
             Field field = this.field;
             try {
                 field.setAccessible(true);
@@ -90,7 +90,7 @@ abstract class ValueGetter implements PropertyControl {
         PubMethodGetter(Method getter) {this.getter = getter;}
 
         @Override
-        public Object controlValue(Object data) {
+        public Object control(Object data) {
             try {
                 return getter.invoke(data);
             } catch (RuntimeException | Error exeception) {
@@ -108,7 +108,7 @@ abstract class ValueGetter implements PropertyControl {
         DftMethodGetter(Method getter) {this.getter = getter;}
 
         @Override
-        public Object controlValue(Object data) {
+        public Object control(Object data) {
             try {
                 getter.setAccessible(true);
                 Object val = getter.invoke(data);

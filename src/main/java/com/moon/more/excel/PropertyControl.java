@@ -1,9 +1,16 @@
 package com.moon.more.excel;
 
 /**
+ * 属性控件（这个名字是不是有点...）
+ *
  * @author benshaoye
  */
 public interface PropertyControl {
 
-    Object controlValue(Object data);
+    /**
+     * 操作一个对象和一个值
+     * @param data
+     * @return
+     */
+    Object control(Object data);
 }

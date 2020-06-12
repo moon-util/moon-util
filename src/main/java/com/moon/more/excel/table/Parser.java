@@ -1,5 +1,6 @@
 package com.moon.more.excel.table;
 
+import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.Renderer;
 
 import java.beans.BeanInfo;
@@ -57,12 +58,18 @@ public class Parser<T extends Marked> {
 
     private TableRenderer toResultByUnAnnotated(Map<String, Attribute> unAnnotated) {
         Set<Map.Entry<String, Attribute>> attrEntrySet = unAnnotated.entrySet();
+        TableCol[] columns = new TableCol[attrEntrySet.size()];
+
+        int index = 0;
         for (Map.Entry<String, Attribute> attrEntry : attrEntrySet) {
             Attribute attr = attrEntry.getValue();
             String name = attrEntry.getKey();
 
+            String[] titles = {name};
+            PropertyControl control = attr.getValueGetter();
+            columns[index++] = new TableCol(titles, control);
         }
-        return null;
+        return new TableRenderer(columns);
     }
 
     private void parseDescriptors(Class type, Map annotated, Map unAnnotated) throws IntrospectionException {
@@ -82,12 +89,10 @@ public class Parser<T extends Marked> {
     }
 
     private MarkMethod toMarked(Method method, String name, Class type) {
-        return new MarkMethod(name, type, method, getCreator());
+        return new MarkMethod(name, type, method);
     }
 
-    private MarkField toMarked(Field field) {
-        return new MarkField(field, getCreator());
-    }
+    private MarkField toMarked(Field field) { return new MarkField(field); }
 
     private void parseFields(Class type, Map annotated, Map unAnnotated) {
         while (type != null && type != Object.class) {
@@ -99,14 +104,17 @@ public class Parser<T extends Marked> {
         }
     }
 
-    private Map<String, Attribute> mergeAttr(Map<String, T> annotatedAtM, Map<String, T> annotatedAtF) {
+    private Map<String, Attribute> mergeAttr(Map<String, T> atMethod, Map<String, T> atField) {
         Map<String, Attribute> annotatedMap = new LinkedHashMap<>();
-        for (Map.Entry<String, T> entry : annotatedAtM.entrySet()) {
+        for (Map.Entry<String, T> entry : atMethod.entrySet()) {
             String name = entry.getKey();
             Marked method = entry.getValue();
-            Marked field = annotatedAtF.get(name);
+            Marked field = atField.remove(name);
             Attribute attr = new Attribute(method, field);
             annotatedMap.put(name, attr);
+        }
+        for (Map.Entry<String, T> entry : atField.entrySet()) {
+            annotatedMap.put(entry.getKey(), new Attribute(null, entry.getValue()));
         }
         return annotatedMap;
     }
