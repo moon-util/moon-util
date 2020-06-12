@@ -123,6 +123,83 @@ public final class SetUtil extends CollectUtil {
         return collect instanceof List ? (Set<T>) collect : newHashSet(collect);
     }
 
+    /*
+     * ---------------------------------------------------------------------------------
+     * keepers
+     * ---------------------------------------------------------------------------------
+     */
+
+    /**
+     * 如果集合是空集合（null 或 size() == 0）这返回 null
+     *
+     * @param set set
+     * @param <T> set 元素类型
+     *
+     * @return null set if is an empty set or null
+     */
+    public static <T> Set<T> nullIfEmpty(Set<T> set) { return isEmpty(set) ? null : set; }
+
+    /**
+     * 如果 valuesSet 是 null 则创建一个新的 ArrayList 返回
+     *
+     * @param set set
+     * @param <T> set 元素类型
+     *
+     * @return empty set if null
+     */
+    public static <T> Set<T> emptyIfNull(Set<T> set) { return isEmpty(set) ? empty() : set; }
+
+    /**
+     * 确保返回集合不为 null
+     *
+     * @param set set
+     * @param <T> set 元素类型
+     *
+     * @return empty ArrayList if null
+     *
+     * @see #newHashSetIfNull(Set)
+     */
+    public static <T> Set<T> newIfNull(Set<T> set) { return newHashSetIfNull(set); }
+
+    /**
+     * 确保返回集合不为 null
+     *
+     * @param set set
+     * @param <T> set 元素类型
+     *
+     * @return empty HashSet if null
+     */
+    public static <T> Set<T> newHashSetIfNull(Set<T> set) { return set == null ? newHashSet() : set; }
+
+    /**
+     * 确保返回集合不为 null
+     *
+     * @param set set
+     * @param <T> set 元素类型
+     *
+     * @return empty LinkedHashSet if null
+     */
+    public static <T> Set<T> newLinkedHashSetIfNull(Set<T> set) { return set == null ? newLinkedHashSet() : set; }
+
+    /**
+     * 确保返回集合不为 null
+     *
+     * @param set set
+     * @param <T> set 元素类型
+     *
+     * @return empty TreeSet if null
+     */
+    public static <T> Set<T> newTreeSetIfNull(Set<T> set) { return set == null ? newTreeSet() : set; }
+
+    /**
+     * 连接多个集合，返回新集合
+     *
+     * @param set  基础集合
+     * @param sets 待连接集合
+     * @param <T>  集合数据类型
+     *
+     * @return 连接后的集合
+     */
     public static <T> Set<T> concat(Set<T> set, Set<T>... sets) { return (Set) concat0(set, sets); }
 
     public static <T> T requireGet(Set<T> set, int index) { return get(set, index); }

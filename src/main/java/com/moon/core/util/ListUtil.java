@@ -49,9 +49,9 @@ public final class ListUtil extends CollectUtil {
     }
 
     public static <T> ArrayList<T> newArrayList(Iterable<T> iterable) {
-        return iterable == null ? newArrayList()
-            : (iterable instanceof Collection ? new ArrayList((Collection) iterable)
-                : addAll(newArrayList(), iterable));
+        return iterable == null ? newArrayList() : (iterable instanceof Collection ? new ArrayList((Collection) iterable) : addAll(
+            newArrayList(),
+            iterable));
     }
 
     /*
@@ -85,9 +85,9 @@ public final class ListUtil extends CollectUtil {
     }
 
     public static <T> LinkedList<T> newLinkedList(Iterable<T> iterable) {
-        return iterable == null ? newLinkedList()
-            : (iterable instanceof Collection ? new LinkedList((Collection) iterable)
-                : addAll(newLinkedList(), iterable));
+        return iterable == null ? newLinkedList() : (iterable instanceof Collection ? new LinkedList((Collection) iterable) : addAll(
+            newLinkedList(),
+            iterable));
     }
 
     public static <S, T> List<T> mapAsList(Collection<S> src, Function<? super S, T> mapper) {
@@ -109,7 +109,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @return null list if is an empty list or null
      */
-    public static <T> List<T> nullIfEmpty(List<T> list) { return list == null ? null : list.size() == 0 ? null : list; }
+    public static <T> List<T> nullIfEmpty(List<T> list) { return isEmpty(list) ? null : list; }
 
     /**
      * 如果 valuesList 是 null 则创建一个新的 ArrayList 返回
@@ -119,7 +119,43 @@ public final class ListUtil extends CollectUtil {
      *
      * @return empty list if null
      */
-    public static <T> List<T> emptyIfNull(List<T> list) { return list == null || list.size() == 0 ? empty() : list; }
+    public static <T> List<T> emptyIfNull(List<T> list) { return isEmpty(list) ? empty() : list; }
+
+    /**
+     * 确保返回集合不为 null
+     *
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return empty ArrayList if null
+     *
+     * @see #newArrayListIfNull(List)
+     */
+    public static <T> List<T> newIfNull(List<T> list) { return newArrayListIfNull(list); }
+
+    /**
+     * 确保返回集合不为 null
+     *
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return empty LinkedList if null
+     */
+    public static <T> List<T> newArrayListIfNull(List<T> list) {
+        return list == null ? newArrayList() : list;
+    }
+
+    /**
+     * 确保返回集合不为 null
+     *
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return empty ArrayList if null
+     */
+    public static <T> List<T> newLinkedListIfNull(List<T> list) {
+        return list == null ? newLinkedList() : list;
+    }
 
     /**
      * 获取 valuesList 第一项，任何非法情况下都返回 null
@@ -255,15 +291,47 @@ public final class ListUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
+    /**
+     * 获取并删除第一项，不存在返回 null
+     *
+     * @param list 集合
+     * @param <T>  集合数据类型
+     *
+     * @return 集合第一项或 null
+     */
     public static <T> T nullableShift(List<T> list) { return size(list) > 0 ? list.remove(0) : null; }
 
+    /**
+     * 获取并删除第一项，不存在抛出异常
+     *
+     * @param list 集合
+     * @param <T>  集合数据类型
+     *
+     * @return 集合第一项或抛出异常
+     */
     public static <T> T requireShift(List<T> list) { return list.remove(0); }
 
+    /**
+     * 获取并删除最后一项，不存在返回 null
+     *
+     * @param list 集合
+     * @param <T>  集合数据类型
+     *
+     * @return 集合最后一项或 null
+     */
     public static <T> T nullablePop(List<T> list) {
         int size = size(list);
         return size > 0 ? list.remove(size - 1) : null;
     }
 
+    /**
+     * 获取并删除最后一项，不存在抛出异常
+     *
+     * @param list 集合
+     * @param <T>  集合数据类型
+     *
+     * @return 集合最后一项或抛出异常
+     */
     public static <T> T requirePop(List<T> list) { return list.remove(size(list) - 1); }
 
     /*
@@ -343,6 +411,15 @@ public final class ListUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
+    /**
+     * 连接多个集合，返回新集合
+     *
+     * @param list  基础集合
+     * @param lists 待连接集合
+     * @param <T>   集合数据类型
+     *
+     * @return 连接后的集合
+     */
     public static <T> List<T> concat(List<T> list, List<T>... lists) { return (List) concat0(list, lists); }
 
     /**
