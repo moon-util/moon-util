@@ -2,11 +2,9 @@ package com.moon.more.excel;
 
 import com.moon.core.util.IteratorUtil;
 import com.moon.more.excel.annotation.*;
-import com.moon.more.excel.table.ParseUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -228,7 +226,6 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
 
     private Renderer parse(Class targetClass) {
         return TableUtil.parse(targetClass);
-        // return SheetUtil.parseRenderer(targetClass);
     }
 
     interface HeadExecutor {

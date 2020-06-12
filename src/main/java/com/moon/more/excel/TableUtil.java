@@ -1,15 +1,17 @@
 package com.moon.more.excel;
 
-import com.moon.more.excel.table.ParseUtil;
+import com.moon.more.excel.table.TableParser;
 
 /**
  * @author benshaoye
  */
-class TableUtil extends ParseUtil {
-
-    public TableUtil() { }
+class TableUtil extends TableParser {
 
     static Renderer parse(Class targetClass) {
-        return doParseConfiguration(targetClass);
+        try {
+            return parseConfiguration(targetClass);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

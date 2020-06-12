@@ -1,6 +1,6 @@
-package com.moon.more.excel.parse;
+package com.moon.more.excel.table;
 
-import com.moon.more.excel.PropertyGetter;
+import com.moon.more.excel.PropertyControl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -10,36 +10,36 @@ import java.lang.reflect.Modifier;
 /**
  * @author benshaoye
  */
-abstract class ValueGetter implements PropertyGetter {
+abstract class ValueGetter implements PropertyControl {
 
-    private final PropertyGetter getter;
+    private final PropertyControl getter;
 
-    protected ValueGetter(PropertyGetter getter) { this.getter = getter; }
+    protected ValueGetter(PropertyControl getter) { this.getter = getter; }
 
-    static PropertyGetter of(Method method, Field field) { return method == null ? of(field) : of(method); }
+    static PropertyControl of(Method method, Field field) { return method == null ? of(field) : of(method); }
 
-    private static PropertyGetter of(Field field) { return newGetter(field); }
+    private static PropertyControl of(Field field) { return newGetter(field); }
 
-    private static PropertyGetter of(Method method) { return newGetter(method); }
+    private static PropertyControl of(Method method) { return newGetter(method); }
 
     @Override
-    public final Object getValue(Object data) { return getter.getValue(data); }
+    public final Object controlValue(Object data) { return getter.controlValue(data); }
 
     private static boolean isPublic(Member member) { return Modifier.isPublic(member.getModifiers()); }
 
-    private static PropertyGetter newGetter(Field field) {
+    private static PropertyControl newGetter(Field field) {
         return isPublic(field) ? new PubFieldGetter(field) : new DftFieldGetter(field);
     }
 
     @SuppressWarnings("all")
-    private static class PubFieldGetter implements PropertyGetter {
+    private static class PubFieldGetter implements PropertyControl {
 
         private final Field field;
 
         PubFieldGetter(Field field) { this.field = field; }
 
         @Override
-        public Object getValue(Object data) {
+        public Object controlValue(Object data) {
             Field field = this.field;
             try {
                 return field.get(data);
@@ -56,14 +56,14 @@ abstract class ValueGetter implements PropertyGetter {
     }
 
     @SuppressWarnings("all")
-    private static class DftFieldGetter implements PropertyGetter {
+    private static class DftFieldGetter implements PropertyControl {
 
         private final Field field;
 
         DftFieldGetter(Field field) { this.field = field; }
 
         @Override
-        public Object getValue(Object data) {
+        public Object controlValue(Object data) {
             Field field = this.field;
             try {
                 field.setAccessible(true);
@@ -79,18 +79,18 @@ abstract class ValueGetter implements PropertyGetter {
         }
     }
 
-    private static PropertyGetter newGetter(Method method) {
+    private static PropertyControl newGetter(Method method) {
         return isPublic(method) ? new PubMethodGetter(method) : new DftMethodGetter(method);
     }
 
-    private static class PubMethodGetter implements PropertyGetter {
+    private static class PubMethodGetter implements PropertyControl {
 
         private final Method getter;
 
         PubMethodGetter(Method getter) {this.getter = getter;}
 
         @Override
-        public Object getValue(Object data) {
+        public Object controlValue(Object data) {
             try {
                 return getter.invoke(data);
             } catch (RuntimeException | Error exeception) {
@@ -101,14 +101,14 @@ abstract class ValueGetter implements PropertyGetter {
         }
     }
 
-    private static class DftMethodGetter implements PropertyGetter {
+    private static class DftMethodGetter implements PropertyControl {
 
         private final Method getter;
 
         DftMethodGetter(Method getter) {this.getter = getter;}
 
         @Override
-        public Object getValue(Object data) {
+        public Object controlValue(Object data) {
             try {
                 getter.setAccessible(true);
                 Object val = getter.invoke(data);

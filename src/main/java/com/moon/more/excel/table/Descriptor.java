@@ -1,21 +1,21 @@
-package com.moon.more.excel.parse;
+package com.moon.more.excel.table;
 
 /**
  * @author benshaoye
  */
-interface HeadSortable {
+interface Descriptor {
 
     /**
-     * 名称
+     * 属性名
      *
      * @return
      */
     String getName();
 
     /**
-     * 序号
+     * 字段数据类型
      *
      * @return
      */
-    int getOrder();
+    Class getPropertyType();
 }
