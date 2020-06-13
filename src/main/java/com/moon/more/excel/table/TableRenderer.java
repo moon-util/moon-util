@@ -15,14 +15,29 @@ final class TableRenderer implements Renderer {
     private final static TableCol[] EMPTY = new TableCol[0];
 
     private final TableCol[] columns;
+    private final int minTitleRowsCount;
 
     TableRenderer(TableCol[] columns) {
         this.columns = columns == null ? EMPTY : columns;
+
+        int minTitleRowCount = 0;
+        for (TableCol column : columns) {
+            minTitleRowCount = Math.max(column.getTitles().length, minTitleRowCount);
+        }
+        this.minTitleRowsCount = minTitleRowCount;
     }
 
     @Override
     public void renderHead(SheetFactory sheetFactory) {
-
+        int count = this.minTitleRowsCount;
+        TableCol[] cols = this.columns;
+        int length = cols.length;
+        for (int rowIdx = 0; rowIdx < count; rowIdx++) {
+            RowFactory factory = sheetFactory.row();
+            for (int colIdx = 0; colIdx < length; colIdx++) {
+                cols[colIdx].renderHead(factory.index(colIdx), rowIdx);
+            }
+        }
     }
 
     @Override

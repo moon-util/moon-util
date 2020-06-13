@@ -22,14 +22,7 @@ public final class ClassUtil {
 
     static {
         final Class[] PRIMITIVE_CLASSES = {
-            boolean.class,
-            byte.class,
-            char.class,
-            short.class,
-            int.class,
-            long.class,
-            float.class,
-            double.class
+            boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class
         }, WRAPPER_CLASSES = {
             Boolean.class,
             Byte.class,
@@ -118,5 +111,15 @@ public final class ClassUtil {
             throw new IllegalArgumentException(String.valueOf(type));
         }
         return type;
+    }
+
+    public static <T> T newInstance(Class<T> targetClass) {
+        try {
+            return targetClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException("Can not new instance of: " + targetClass, e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Can not access class of: " + targetClass, e);
+        }
     }
 }

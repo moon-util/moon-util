@@ -1,25 +1,41 @@
 package com.moon.more.excel.table;
 
-import com.moon.core.lang.StringUtil;
+import com.moon.core.lang.ObjectUtil;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 
 /**
  * @author benshaoye
  */
-final class TableCol {
+class TableCol {
 
     private final String[] titles;
+    private final int titlesCount;
     private final PropertyControl control;
+    private final Transformer transform;
 
-    TableCol(String[] titles, PropertyControl control) {
-        this.control = control;
-        this.titles = titles;
+    TableCol(Attribute attr) {
+        this.transform = ObjectUtil.defaultIfNull(attr.getTransformForGet(), TransformForGet.DEFAULT);
+        this.titlesCount = attr.getTitles().length;
+        this.control = attr.getValueGetter();
+        this.titles = attr.getTitles();
+    }
+
+    protected PropertyControl getControl() { return control; }
+
+    protected Transformer getTransform() { return transform; }
+
+    private String indexOfTitle(int idx) {
+        return idx < titlesCount ? getTitles()[idx] : null;
+    }
+
+    public String[] getTitles() { return titles; }
+
+    void renderHead(CellFactory factory, int rowIdx) {
+        factory.val(indexOfTitle(rowIdx));
     }
 
     void render(CellFactory factory, Object data) {
-        Object value = control.control(data);
-        String str = StringUtil.stringify(value);
-        factory.val(str);
+        transform.doTransform(factory, control.control(data));
     }
 }

@@ -69,9 +69,9 @@ public class FinalAccessor<T> implements Supplier<T> {
         return value;
     }
 
-    public <EX extends Throwable> T getOrThrow(Supplier<EX> supplier) {
+    public <EX extends Throwable> T getOrThrow(Supplier<EX> supplier) throws EX {
         if (isAbsent()) {
-            throw new IllegalArgumentException(supplier.get());
+            throw supplier.get();
         }
         return value;
     }

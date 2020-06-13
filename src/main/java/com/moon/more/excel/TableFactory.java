@@ -86,22 +86,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     }
 
     public TableFactory renderCollectBody(Object collect) {
-        if (collect == null) {
-            return this;
-        }
-        if (collect instanceof Iterable) {
-            return renderBody((Iterable) collect);
-        }
-        if (collect instanceof Object[]) {
-            return renderBody((Object[]) collect);
-        }
-        if (collect instanceof Iterator) {
-            return renderBody((Iterator) collect);
-        }
-        if (collect instanceof Stream) {
-            return renderBody((Stream) collect);
-        }
-        throw new UnsupportedOperationException();
+        return renderCollectBody(collect, null);
     }
 
     public TableFactory renderCollectBody(Object collect, Class targetClass) {
@@ -120,7 +105,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         if (collect instanceof Stream) {
             return renderBody((Stream) collect, targetClass);
         }
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("不支持集合类型：" + collect.getClass());
     }
 
     /*
@@ -158,22 +143,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     }
 
     public TableFactory renderCollectList(Object collect) {
-        if (collect == null) {
-            return this;
-        }
-        if (collect instanceof Iterable) {
-            return renderList((Iterable) collect);
-        }
-        if (collect instanceof Object[]) {
-            return renderList((Object[]) collect);
-        }
-        if (collect instanceof Iterator) {
-            return renderList((Iterator) collect);
-        }
-        if (collect instanceof Stream) {
-            return renderList((Stream) collect);
-        }
-        throw new UnsupportedOperationException();
+        return renderCollectList(collect, null);
     }
 
     public TableFactory renderCollectList(Object collect, Class targetClass) {
@@ -192,7 +162,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         if (collect instanceof Stream) {
             return renderList((Stream) collect, targetClass);
         }
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("不支持集合类型：" + collect.getClass());
     }
 
     /*

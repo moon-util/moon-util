@@ -1,11 +1,16 @@
 package com.moon.more.excel.table;
 
-import com.moon.more.excel.CellFactory;
-
 /**
  * @author benshaoye
  */
-public interface Operation {
+public interface Operation<T> {
 
-    void operate(CellFactory factory, Object data);
+    /**
+     * 创建实例
+     *
+     * @param thisObject
+     *
+     * @return
+     */
+    T newInstance(Object thisObject);
 }

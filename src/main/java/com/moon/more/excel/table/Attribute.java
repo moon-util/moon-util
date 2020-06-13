@@ -1,10 +1,11 @@
 package com.moon.more.excel.table;
 
+import com.moon.core.lang.ArrayUtil;
 import com.moon.more.excel.PropertyControl;
+import com.moon.more.excel.annotation.TableColumn;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -20,12 +21,16 @@ class Attribute implements Descriptor {
         this.onField = onField;
     }
 
-    private final <T> T obtain(Function<Marked, T> getter) {
+    private final <T> T obtainOrNull(Function<Marked, T> getter) {
         Marked marked = this.onMethod;
         if (marked != null) {
             return getter.apply(marked);
         }
-        return getter.apply(this.onField);
+        marked = this.onField;
+        if (marked != null) {
+            return getter.apply(this.onField);
+        }
+        return null;
     }
 
     public PropertyControl getValueGetter() {
@@ -34,13 +39,28 @@ class Attribute implements Descriptor {
         return ValueGetter.of(method, field);
     }
 
+    public TransformForGet getTransformForGet(){
+        return TransformForGet.findOrDefault(getPropertyType());
+    }
+
+    @Override
+    public String[] getTitles() {
+        String[] titles = obtainOrNull(m -> m.getTitles());
+        return titles == null ? ArrayUtil.toArray(getName()) : titles;
+    }
+
     @Override
     public String getName() {
-        return obtain(m -> m.getName());
+        return obtainOrNull(m -> m.getName());
     }
 
     @Override
     public Class getPropertyType() {
-        return obtain(m -> m.getPropertyType());
+        return obtainOrNull(m -> m.getPropertyType());
+    }
+
+    @Override
+    public TableColumn getTableColumn() {
+        return obtainOrNull(m -> m.getTableColumn());
     }
 }

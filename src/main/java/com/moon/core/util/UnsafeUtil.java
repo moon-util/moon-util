@@ -44,4 +44,24 @@ public final class UnsafeUtil {
     public static Optional<Unsafe> get() { return UNSAFE0; }
 
     public static Unsafe getUnsafe() { return get().get(); }
+
+    public static <T> T nullableNewInstance(Class<T> type) {
+        Optional<Unsafe> optional = get();
+        if (optional.isPresent()) {
+            try {
+                return (T) optional.get().allocateInstance(type);
+            } catch (InstantiationException e) {
+                throw new IllegalStateException("Can not new instance of: " + type, e);
+            }
+        }
+        return null;
+    }
+
+    public static <T> T requiredNewInstance(Class<T> type) {
+        try {
+            return (T) getUnsafe().allocateInstance(type);
+        } catch (InstantiationException e) {
+            throw new IllegalStateException("Can not new instance of: " + type, e);
+        }
+    }
 }

@@ -19,7 +19,7 @@ abstract class Marked<T extends Member> implements Descriptor {
     private final String name;
     private final Class type;
     private final T member;
-    private final TableColumn annoCol;
+    private final TableColumn annotationCol;
 
     protected Marked(String name, Class type, T member) {
         this.member = Objects.requireNonNull(member);
@@ -27,16 +27,20 @@ abstract class Marked<T extends Member> implements Descriptor {
         this.name = Objects.requireNonNull(name);
 
         AnnotatedElement elem = (AnnotatedElement) member;
-        this.annoCol = obtain(elem, TableColumn.class);
+        this.annotationCol = obtain(elem, TableColumn.class);
     }
 
-    public boolean isAnnotatedCol() {
-        return annoCol != null;
-    }
+    public boolean isAnnotatedCol() { return annotationCol != null; }
 
     public T getMember() { return member; }
 
-    // protected abstract Operation getOperation();
+    @Override
+    public TableColumn getTableColumn() { return annotationCol; }
+
+    @Override
+    public String[] getTitles() {
+        return isAnnotatedCol() ? annotationCol.value() : null;
+    }
 
     @Override
     public String getName() { return name; }

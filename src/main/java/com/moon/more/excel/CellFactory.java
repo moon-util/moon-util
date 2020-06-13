@@ -437,6 +437,16 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
         return this;
     }
 
+    /**
+     * 设置空值
+     *
+     * @return 当前 CellFactory
+     */
+    public CellFactory valBlank() {
+        getCell().setBlank();
+        return this;
+    }
+
     /*
      * ~~~~~~~~ 读取或使用单元格值 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
