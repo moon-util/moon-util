@@ -4,6 +4,7 @@ import com.moon.core.lang.ArrayUtil;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.annotation.TableColumn;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.function.Function;
@@ -39,7 +40,7 @@ class Attribute implements Descriptor {
         return ValueGetter.of(method, field);
     }
 
-    public TransformForGet getTransformForGet(){
+    public TransformForGet getTransformOrDefault() {
         return TransformForGet.findOrDefault(getPropertyType());
     }
 
@@ -57,6 +58,11 @@ class Attribute implements Descriptor {
     @Override
     public Class getPropertyType() {
         return obtainOrNull(m -> m.getPropertyType());
+    }
+
+    @Override
+    public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+        return (T) obtainOrNull(m -> m.getAnnotation(annotationType));
     }
 
     @Override

@@ -252,21 +252,35 @@ public final class ExcelUtil extends LoadUtil {
      * @return sheet
      */
     public static Sheet merge(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
-        sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
+        sheet.addMergedRegion(range(firstRow, lastRow, firstCol, lastCol));
         return sheet;
     }
 
     /**
-     * 区域
+     * 合并单元格
      *
-     * @param firstRow y
-     * @param firstCol x
+     * @param firstRow 开始行号，从 0 开始
+     * @param firstCol 开始列号，从 0 开始
      * @param rowspan  count of rows
      * @param colspan  count of columns
      *
      * @return CellRangeAddress
      */
     public static CellRangeAddress region(int firstRow, int firstCol, int rowspan, int colspan) {
-        return new CellRangeAddress(firstRow, firstCol + rowspan - 1, firstCol, firstCol + colspan - 1);
+        return range(firstRow, firstRow + rowspan - 1, firstCol, firstCol + colspan - 1);
+    }
+
+    /**
+     * 合并单元格
+     *
+     * @param firstRow 开始行
+     * @param lastRow  结束行
+     * @param firstCol 开始列
+     * @param lastCol  结束列
+     *
+     * @return CellRangeAddress
+     */
+    public static CellRangeAddress range(int firstRow, int lastRow, int firstCol, int lastCol) {
+        return new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
     }
 }

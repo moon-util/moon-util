@@ -1,10 +1,10 @@
 package com.moon.core.util;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.moon.core.util.function.TableConsumer;
+
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Collections.EMPTY_SET;
@@ -18,15 +18,21 @@ public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
 
     protected transient Supplier<Map<X, Map<Y, Z>>> containerCreator;
 
-    protected transient Supplier<Map<Y, Z>> rowCreator;
+    protected transient Function<Object, Map<Y, Z>> rowCreator;
 
-    public TableImpl() { this(HashMap::new); }
+    public TableImpl() { this(x -> new HashMap<>()); }
 
-    public TableImpl(Supplier<Map<Y, Z>> rowCreator) { this(HashMap::new, rowCreator); }
+    public TableImpl(Function<Object, Map<Y, Z>> rowCreator) { this(HashMap::new, rowCreator); }
 
-    public TableImpl(Supplier<Map<X, Map<Y, Z>>> containerCreator, Supplier<Map<Y, Z>> rowCreator) {
+    public TableImpl(Supplier<Map<X, Map<Y, Z>>> containerCreator, Function<Object, Map<Y, Z>> rowCreator) {
         this.containerCreator = containerCreator;
         this.rowCreator = rowCreator;
+    }
+
+    public static <X, Y, Z> TableImpl<X, Y, Z> newHashTable() { return new TableImpl<>(); }
+
+    public static <X, Y, Z> TableImpl<X, Y, Z> newLinkedHashTable() {
+        return new TableImpl<>(() -> new LinkedHashMap<>(), x -> new LinkedHashMap<>());
     }
 
     private Map ensureTable() {
@@ -42,7 +48,7 @@ public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
         Map<X, Map<Y, Z>> table = this.ensureTable();
         Map row = table.get(x);
         if (row == null) {
-            row = rowCreator.get();
+            row = rowCreator.apply(x);
             table.put((X) x, row);
         }
         return row;
@@ -91,7 +97,7 @@ public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
                     if (inputRow == null) {
                         present.put(x, null);
                     } else {
-                        row = rowCreator.get();
+                        row = rowCreator.apply(x);
                         row.putAll(inputRow);
                         present.put(x, row);
                     }
@@ -143,6 +149,18 @@ public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
     public Set<Map.Entry<X, Map<Y, Z>>> rowsEntrySet() { return table == null ? EMPTY_SET : table.entrySet(); }
 
     @Override
+    public void forEach(TableConsumer<X, Y, Z> consumer) {
+        Set<Map.Entry<X, Map<Y, Z>>> entries = rowsEntrySet();
+        for (Map.Entry<X, Map<Y, Z>> entry : entries) {
+            Map<Y, Z> row = entry.getValue();
+            X x = entry.getKey();
+            if (row != null) {
+                row.forEach((key, value) -> consumer.accept(x, key, value));
+            }
+        }
+    }
+
+    @Override
     public void clear() { this.table = null; }
 
     @Override
@@ -158,9 +176,10 @@ public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
     public int size() { return obtainSize(0, TableImpl::sum); }
 
     public TableImpl<X, Y, Z> sandbox(
-        Supplier<Map<Y, Z>> rowCreator, Consumer<? super TableImpl<? extends X, ? extends Y, ? extends Z>> consumer
+        Function<Object, Map<Y, Z>> rowCreator,
+        Consumer<? super TableImpl<? extends X, ? extends Y, ? extends Z>> consumer
     ) {
-        Supplier supplier = this.rowCreator;
+        Function supplier = this.rowCreator;
         this.rowCreator = rowCreator;
         consumer.accept(this);
         this.rowCreator = supplier;

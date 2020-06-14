@@ -1,8 +1,9 @@
 package com.moon.more.excel.table;
 
 import com.moon.more.excel.Renderer;
-import com.moon.more.excel.annotation.TableColumn;
-import com.moon.more.excel.annotation.TableColumnTransformer;
+import com.moon.more.excel.annotation.DefaultValue;
+import com.moon.more.excel.annotation.FieldTransform;
+import com.moon.more.excel.annotation.FieldTransformer;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -11,6 +12,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -53,30 +55,27 @@ public class Parser<T extends Marked> {
 
     private static TableRenderer toResultByAnnotated(Map<String, Attribute> annotated) {
         return mapAttrs(annotated, attr -> {
-            TableColumn column = attr.getTableColumn();
-            String defaultVal = column.defaultValue();
-            Class transformer = column.transformBy();
-
-            if (transformer != TableColumnTransformer.class) {
-                return transformerToTableCol(attr);
-            } else if (!"".equals(defaultVal)) {
-                return new TableColDefaultVal(attr);
+            DefaultValue defaulter = attr.getAnnotation(DefaultValue.class);
+            FieldTransform transformer = attr.getAnnotation(FieldTransform.class);
+            if (transformer != null) {
+                return transformerToTableCol(attr, transformer);
+            } else if (defaulter != null) {
+                return new TableColDefaultVal(attr, defaulter);
             }
 
             return new TableCol(attr);
         });
     }
 
-    private static TableCol transformerToTableCol(Attribute attr) {
-        TableColumn column = attr.getTableColumn();
-        Class transformer = column.transformBy();
+    private static TableCol transformerToTableCol(Attribute attr, FieldTransform transformer) {
+        Class transformerCls = transformer.value();
 
-        checkValidImplClass(transformer);
+        checkValidImplClass(transformerCls);
 
-        if (isExpectCached(transformer)) {
-            return new TableColTransformEvery(attr, transformer);
+        if (isExpectCached(transformerCls)) {
+            return new TableColTransformEvery(attr, transformerCls);
         } else {
-            return new TableColTransformCached(attr, transformer);
+            return new TableColTransformCached(attr, transformerCls);
         }
     }
 
@@ -89,8 +88,8 @@ public class Parser<T extends Marked> {
         if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
             throw new IllegalStateException("指定类「" + type + "」不能使接口或抽象类");
         }
-        if (!TableColumnTransformer.class.isAssignableFrom(type)) {
-            throw new IllegalStateException("指定类「" + type + "」应该是「" + TableColumnTransformer.class + "」的实现类");
+        if (!FieldTransformer.class.isAssignableFrom(type)) {
+            throw new IllegalStateException("指定类「" + type + "」应该是「" + FieldTransformer.class + "」的实现类");
         }
     }
 
@@ -108,6 +107,7 @@ public class Parser<T extends Marked> {
         for (Map.Entry<String, Attribute> attrEntry : attrEntrySet) {
             columns[index++] = transformer.apply(attrEntry.getValue());
         }
+        Arrays.sort(columns, TableCol::compareTo);
         return new TableRenderer(columns);
     }
 
@@ -151,8 +151,7 @@ public class Parser<T extends Marked> {
             String name = entry.getKey();
             Marked field = entry.getValue();
             Marked method = atMethod.remove(name);
-            Attribute attr = new Attribute(method, field);
-            annotatedMap.put(name, attr);
+            annotatedMap.put(name, new Attribute(method, field));
         }
         for (Map.Entry<String, T> entry : atMethod.entrySet()) {
             annotatedMap.put(entry.getKey(), new Attribute(entry.getValue(), null));

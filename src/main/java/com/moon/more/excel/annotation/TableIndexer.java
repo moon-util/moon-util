@@ -10,21 +10,28 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableColumn {
+public @interface TableIndexer {
 
     /**
-     * 列标题，可设置合并标题
+     * 序号标题；
      * <p>
-     * 默认字段名首字母大写，如：name -&gt; Name；age -&gt; Age
+     * 序号列依附于普通列存在，表示插入到普通列前面
      *
-     * @return 列标题
+     * @return 标题名称
      */
-    String[] value() default {};
+    String value() default "#";
 
     /**
-     * 排序顺序
+     * 索引开始序号
      *
-     * @return 顺序号
+     * @return 序号值
      */
-    int order() default 0;
+    int startingAt() default 1;
+
+    /**
+     * 每次索引增长数量
+     *
+     * @return 数值
+     */
+    int step() default 1;
 }

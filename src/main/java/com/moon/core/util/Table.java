@@ -1,8 +1,11 @@
 package com.moon.core.util;
 
+import com.moon.core.util.function.TableConsumer;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * @author benshaoye
@@ -114,6 +117,13 @@ public interface Table<X, Y, Z> {
      * @return 所有行数据，X 轴 ——> 行数据
      */
     Set<Map.Entry<X, Map<Y, Z>>> rowsEntrySet();
+
+    /**
+     * 遍历行列处理每一个值
+     *
+     * @param consumer 处理器
+     */
+    void forEach(TableConsumer<X, Y, Z> consumer);
 
     /**
      * 清空

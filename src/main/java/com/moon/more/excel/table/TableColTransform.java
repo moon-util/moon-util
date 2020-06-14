@@ -1,6 +1,6 @@
 package com.moon.more.excel.table;
 
-import com.moon.more.excel.annotation.TableColumnTransformer;
+import com.moon.more.excel.annotation.FieldTransformer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -13,7 +13,7 @@ abstract class TableColTransform extends TableCol{
 
     private final Transformer transformer;
 
-    TableColTransform(Attribute attr,Class<TableColumnTransformer> transformerCls) {
+    TableColTransform(Attribute attr,Class<FieldTransformer> transformerCls) {
         super(attr);
 
         Transformer transformer;

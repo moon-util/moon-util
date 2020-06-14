@@ -2,8 +2,7 @@ package com.moon.more.excel;
 
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomUtil;
-import com.moon.more.excel.annotation.TableColumn;
-import com.moon.more.excel.annotation.TableColumnTransformer;
+import com.moon.more.excel.annotation.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -34,7 +33,7 @@ class TableFactoryTestTest {
             sheetFactory.table(tableFactory -> {
                 List<Emp> list = ListUtil.newArrayList(new Emp(), new Emp(), new Emp());
 
-                tableFactory.renderBody(list);
+                tableFactory.renderList(list);
             });
         }).write2Filepath("/Users/moonsky/test1.xlsx");
     }
@@ -44,6 +43,7 @@ class TableFactoryTestTest {
         @TableColumn({"基本信息", "姓名"})
         private String name = "张三";
 
+        @DefaultValue(value = "100", defaultFor = DefaultStrategy.POSITIVE)
         @TableColumn({"基本信息", "年龄"})
         private int age = RandomUtil.nextInt(22, 28);
 
@@ -58,22 +58,25 @@ class TableFactoryTestTest {
             return "北京大学";
         }
 
-        @TableColumn(value = {"成绩"}, defaultValue = "60")
+        @DefaultValue("60")
+        @TableColumn(value = {"成绩"})
         public String getDefaultValue() {
             return null;
         }
 
-        @TableColumn(value = {"交通工具"}, transformBy = TypeTransformer.class)
+        @FieldTransform(TypeTransformer.class)
+        @TableColumn(value = {"交通工具"})
         public String getType() {
             return null;
         }
 
-        @TableColumn(value = {"性别"}, transformBy = SexTransformer.class)
+        @FieldTransform(SexTransformer.class)
+        @TableColumn(value = {"性别"})
         public String getSex() {
             return null;
         }
 
-         class SexTransformer implements TableColumnTransformer {
+        public class SexTransformer implements FieldTransformer {
 
             @Override
             public Object transform(Object fieldValue) {
@@ -85,7 +88,7 @@ class TableFactoryTestTest {
         }
     }
 
-    public static class TypeTransformer implements TableColumnTransformer {
+    public static class TypeTransformer implements FieldTransformer {
 
         @Override
         public Object transform(Object fieldValue) {

@@ -2,17 +2,17 @@ package com.moon.more.excel.table;
 
 import com.moon.core.lang.ClassUtil;
 import com.moon.more.excel.CellFactory;
-import com.moon.more.excel.annotation.TableColumnTransformer;
+import com.moon.more.excel.annotation.FieldTransformer;
 
 /**
  * @author benshaoye
  */
 final class TableColTransformCached extends TableColTransform {
 
-    private final TableColumnTransformer colTransformer;
+    private final FieldTransformer colTransformer;
 
     TableColTransformCached(
-        Attribute attr, Class<TableColumnTransformer> transformerCls
+        Attribute attr, Class<FieldTransformer> transformerCls
     ) {
         super(attr, transformerCls);
         this.colTransformer = ClassUtil.newInstance(transformerCls);

@@ -1,8 +1,7 @@
 package com.moon.more.excel.table;
 
-import com.moon.core.lang.ClassUtil;
 import com.moon.more.excel.CellFactory;
-import com.moon.more.excel.annotation.TableColumnTransformer;
+import com.moon.more.excel.annotation.FieldTransformer;
 
 import java.lang.reflect.Constructor;
 
@@ -11,11 +10,11 @@ import java.lang.reflect.Constructor;
  */
 final class TableColTransformEvery extends TableColTransform {
 
-    private final Constructor<TableColumnTransformer> constructor;
+    private final Constructor<FieldTransformer> constructor;
     private final Class transformerCls;
 
     TableColTransformEvery(
-        Attribute attr, Class<TableColumnTransformer> transformerCls
+        Attribute attr, Class<FieldTransformer> transformerCls
     ) {
         super(attr, transformerCls);
 
@@ -28,7 +27,7 @@ final class TableColTransformEvery extends TableColTransform {
         this.transformerCls = transformerCls;
     }
 
-    private TableColumnTransformer getFieldTransformer(Object data) {
+    private FieldTransformer getFieldTransformer(Object data) {
         try {
             // todo 构造器不同访问权限导致的不能构造实例问题
             return constructor.newInstance(data);

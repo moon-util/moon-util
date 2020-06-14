@@ -1,21 +1,24 @@
 package com.moon.more.excel.table;
 
-import com.moon.core.lang.ObjectUtil;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
+
+import java.util.List;
 
 /**
  * @author benshaoye
  */
-class TableCol {
+class TableCol implements Comparable<TableCol> {
 
     private final String[] titles;
     private final int titlesCount;
+    private final int order;
     private final PropertyControl control;
     private final Transformer transform;
 
     TableCol(Attribute attr) {
-        this.transform = ObjectUtil.defaultIfNull(attr.getTransformForGet(), TransformForGet.DEFAULT);
+        this.transform = attr.getTransformOrDefault();
+        this.order = attr.getTableColumn().order();
         this.titlesCount = attr.getTitles().length;
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
@@ -25,17 +28,38 @@ class TableCol {
 
     protected Transformer getTransform() { return transform; }
 
-    private String indexOfTitle(int idx) {
-        return idx < titlesCount ? getTitles()[idx] : null;
+    void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
+        rowTitles.add(getEnsureTitleAtIdx(rowIdx));
     }
 
-    public String[] getTitles() { return titles; }
-
-    void renderHead(CellFactory factory, int rowIdx) {
-        factory.val(indexOfTitle(rowIdx));
+    /**
+     * 为了用计算的方式获取指定行的标题
+     * <p>
+     * ensure： 确保，一定会返回非空值，不足的自动用最后一个标题补上
+     *
+     * @param rowIdx
+     *
+     * @return
+     */
+    private String getEnsureTitleAtIdx(int rowIdx) {
+        return getTitles()[rowIdx < titlesCount ? rowIdx : titlesCount - 1];
     }
+
+    /**
+     * 这里单独写成一个获取 length 的方法是为了后面支持 ColumnGroup 时用计算的方式获取最大长度
+     *
+     * @return
+     */
+    int getTitlesLength() { return getTitles().length; }
+
+    private String[] getTitles() { return titles; }
 
     void render(CellFactory factory, Object data) {
         transform.doTransform(factory, control.control(data));
+    }
+
+    @Override
+    public int compareTo(TableCol o) {
+        return this.order - o.order;
     }
 }

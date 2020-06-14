@@ -12,7 +12,7 @@ import java.util.stream.Stream;
  *
  * @author benshaoye
  * @see TableColumn 标记一个字段
- * @see TableColumnFlatten 标记一个实体字段
+ * @see TableColumnGroup 标记一个实体字段
  * @see TableRecord 标记一个实体
  * @see TableListable 标记一个列表字段，一个实体里最多只能有一列可迭代
  * @see TableIndexer 标记一列索引
