@@ -1,6 +1,7 @@
 package com.moon.more.excel.table;
 
 import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnGroup;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -23,17 +24,18 @@ abstract class Marked<T extends Member> implements Descriptor {
     private final String name;
     private final Class type;
     private final T member;
-    private final TableColumn annotationCol;
+    private final TableColumn annotationColumn;
+    private final TableColumnGroup annotationGroup;
 
     protected Marked(String name, Class type, T member) {
         this.member = Objects.requireNonNull(member);
         this.type = Objects.requireNonNull(type);
         this.name = Objects.requireNonNull(name);
 
-        this.annotationCol = obtain(member, TableColumn.class);
+        this.annotationColumn = obtain(member, TableColumn.class);
+        this.annotationGroup = obtain(member, TableColumnGroup.class);
+        Assert.notDuplicated(this);
     }
-
-    public boolean isAnnotatedCol() { return annotationCol != null; }
 
     public T getMember() { return member; }
 
@@ -43,11 +45,20 @@ abstract class Marked<T extends Member> implements Descriptor {
     }
 
     @Override
-    public TableColumn getTableColumn() { return annotationCol; }
+    public TableColumn getTableColumn() { return annotationColumn; }
+
+    @Override
+    public TableColumnGroup getTableColumnGroup() { return annotationGroup; }
 
     @Override
     public String[] getTitles() {
-        return isAnnotatedCol() ? annotationCol.value() : null;
+        if (isAnnotatedColumn()) {
+            return getTableColumn().value();
+        }
+        if (isAnnotatedGroup()) {
+            return getTableColumnGroup().value();
+        }
+        return null;
     }
 
     @Override

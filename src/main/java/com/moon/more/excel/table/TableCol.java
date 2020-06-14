@@ -18,7 +18,7 @@ class TableCol implements Comparable<TableCol> {
 
     TableCol(Attribute attr) {
         this.transform = attr.getTransformOrDefault();
-        this.order = attr.getTableColumn().order();
+        this.order = attr.getOrder();
         this.titlesCount = attr.getTitles().length;
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
@@ -42,7 +42,11 @@ class TableCol implements Comparable<TableCol> {
      * @return
      */
     private String getEnsureTitleAtIdx(int rowIdx) {
-        return getTitles()[rowIdx < titlesCount ? rowIdx : titlesCount - 1];
+        int index = rowIdx < titlesCount ? rowIdx : titlesCount - 1;
+        if (index > -1 && index < getHeaderRowsCount()) {
+            return getTitles()[index];
+        }
+        return null;
     }
 
     /**
@@ -50,9 +54,9 @@ class TableCol implements Comparable<TableCol> {
      *
      * @return
      */
-    int getTitlesLength() { return getTitles().length; }
+    int getHeaderRowsCount() { return getTitles().length; }
 
-    private String[] getTitles() { return titles; }
+    String[] getTitles() { return titles; }
 
     void render(CellFactory factory, Object data) {
         transform.doTransform(factory, control.control(data));

@@ -3,6 +3,7 @@ package com.moon.more.excel.table;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnGroup;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -12,7 +13,7 @@ import java.util.function.Function;
 /**
  * @author benshaoye
  */
-class Attribute implements Descriptor {
+final class Attribute implements Descriptor {
 
     private final Marked onField;
     private final Marked onMethod;
@@ -20,6 +21,7 @@ class Attribute implements Descriptor {
     Attribute(Marked onMethod, Marked onField) {
         this.onMethod = onMethod;
         this.onField = onField;
+        Assert.notDuplicated(this);
     }
 
     private final <T> T obtainOrNull(Function<Marked, T> getter) {
@@ -68,5 +70,22 @@ class Attribute implements Descriptor {
     @Override
     public TableColumn getTableColumn() {
         return obtainOrNull(m -> m.getTableColumn());
+    }
+
+    @Override
+    public TableColumnGroup getTableColumnGroup() {
+        return obtainOrNull(m -> m.getTableColumnGroup());
+    }
+
+    public int getOrder(){
+        TableColumn column = getTableColumn();
+        if (column != null) {
+            return column.order();
+        }
+        TableColumnGroup group = getTableColumnGroup();
+        if (group != null) {
+            return group.order();
+        }
+        return 0;
     }
 }
