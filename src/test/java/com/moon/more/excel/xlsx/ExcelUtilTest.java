@@ -1,10 +1,12 @@
 package com.moon.more.excel.xlsx;
 
+import com.moon.core.enums.SystemProps;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -74,7 +76,7 @@ class ExcelUtilTest {
 
     public static class Score {
 
-        @TableColumnGroup({"语文"})
+        @TableColumnGroup()
         private ScoreCompare chinese = new ScoreCompare();
 
         @TableColumnGroup({"数学"})
@@ -162,6 +164,12 @@ class ExcelUtilTest {
     @ValueSource(strings = "D:/")
     void testExportMultiExcelOnWindows(String dir) throws Exception {
         doExportMultiExcel(dir);
+    }
+
+    @Test
+    @ValueSource(strings = "D:/")
+    void testExportMultiExcelOnMax() throws Exception {
+        doExportMultiExcel(SystemProps.user_home.get());
     }
 
     void doExportMultiExcel(String dir) throws Exception {

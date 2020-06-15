@@ -1,7 +1,6 @@
 package com.moon.more.excel.table;
 
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.core.util.CollectUtil;
 import com.moon.more.excel.Renderer;
 import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.SheetFactory;
@@ -51,18 +50,14 @@ final class TableRenderer implements Renderer {
      *
      * @return 如果存在表头，返回表头列数，否则返回 0
      */
-    int getHeaderColsCount() {
-        if (getHeaderRowsCount() < 1) {
-            return 0;
-        } else {
-            return CollectUtil.size(tableHeadCells[0]);
-        }
+    final int getHeaderColsCount() {
+        return this.columns.length;
     }
 
     final void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
         int rowsCount = getHeaderRowsCount();
         if (rowsCount < 1) {
-            int length = this.columns.length;
+            int length = getHeaderColsCount();
             for (int i = 0; i < length; i++) {
                 rowTitles.add(null);
             }

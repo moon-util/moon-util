@@ -1,7 +1,6 @@
 package com.moon.more.excel.table;
 
 import com.moon.core.lang.JoinerUtil;
-import com.moon.core.lang.ObjectUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
@@ -62,7 +61,7 @@ class TableCol implements Comparable<TableCol> {
      *
      * @return
      */
-    final String getEnsureTitleAtIdx(int rowIdx) {
+    private final String getEnsureTitleAtIdx(int rowIdx) {
         int length = getHeaderRowsLength();
         int index = rowIdx < length ? rowIdx : length - 1;
         if (index > -1 && index < length) {
