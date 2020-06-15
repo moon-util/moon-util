@@ -287,9 +287,9 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return
      *
      * @see TableColumn at field or method
-     * @see TableColumnFlatten at field or method
-     * @see TableListable at field or method if present {@link TableColumn} or {@link TableColumnFlatten}
-     * @see TableIndexer at field or method if present {@link TableColumn} or {@link TableColumnFlatten}
+     * @see TableColumnGroup at field or method
+     * @see TableListable at field or method if present {@link TableColumn} or {@link TableColumnGroup}
+     * @see TableIndexer at field or method if present {@link TableColumn} or {@link TableColumnGroup}
      * @see TableRecord at type
      */
     public SheetFactory table(Consumer<TableFactory> consumer) {

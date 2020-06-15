@@ -75,8 +75,10 @@ class TableParserTestTest {
 
         @TableColumn({"语文"})
         private String chinese;
+
         @TableColumn({"数学"})
         private String math;
+
         @TableColumn({"英语"})
         private String english;
     }

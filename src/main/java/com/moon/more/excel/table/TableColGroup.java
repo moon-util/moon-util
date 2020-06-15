@@ -20,6 +20,15 @@ class TableColGroup extends TableCol {
     @Override
     int getHeaderRowsCount() { return super.getHeaderRowsCount() + child.getHeaderRowsCount(); }
 
+    // @Override
+    // String getEnsureTitleAtIdx(int rowIdx) {
+    //     int superCount = super.getHeaderRowsCount();
+    //     if (rowIdx < superCount) {
+    //         return super.getEnsureTitleAtIdx(rowIdx);
+    //     }
+    //     return null;
+    // }
+
     @Override
     void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
         appendTitles4Offset(rowTitles, rowIdx);

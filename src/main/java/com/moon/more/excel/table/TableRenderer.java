@@ -64,7 +64,8 @@ final class TableRenderer implements Renderer {
         if (rowIdx < rowsCount) {
             rowTitles.addAll(tableHeadCells[rowIdx]);
         } else {
-            rowTitles.addAll(tableHeadCells[rowsCount - 1]);
+            int index = rowsCount - 1;
+            rowTitles.addAll(tableHeadCells[index]);
         }
     }
 

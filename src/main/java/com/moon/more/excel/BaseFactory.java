@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFactory> {
+abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFactory> {
 
     protected final static boolean DFT_APPEND_TYPE = true;
     /**

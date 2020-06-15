@@ -36,9 +36,33 @@ enum TransformForGet implements Transformer {
         boolean test(Object data) { return data instanceof Boolean; }
 
         @Override
+        boolean test(Class propertyType) {
+            return propertyType == boolean.class || propertyType == Boolean.class;
+        }
+
+        @Override
         public void doTransform(CellFactory factory, Object value) {
             if (value != null) {
                 factory.val((Boolean) value);
+            }
+        }
+    },
+    /**
+     * 数字
+     */
+    DOUBLE(Double.class, double.class) {
+        @Override
+        public boolean test(Object data) { return data instanceof Double; }
+
+        @Override
+        boolean test(Class propertyType) {
+            return propertyType == double.class || propertyType == Double.class;
+        }
+
+        @Override
+        public void doTransform(CellFactory factory, Object value) {
+            if (value != null) {
+                factory.val((Double) value);
             }
         }
     },
@@ -56,20 +80,14 @@ enum TransformForGet implements Transformer {
         public boolean test(Object data) { return data instanceof CharSequence; }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
-            if (value != null) {
-                factory.val(value.toString());
-            }
+        boolean test(Class propertyType) {
+            return CharSequence.class.isAssignableFrom(propertyType);
         }
-    },
-    DOUBLE(Double.class, double.class) {
-        @Override
-        public boolean test(Object data) { return data instanceof Double; }
 
         @Override
         public void doTransform(CellFactory factory, Object value) {
             if (value != null) {
-                factory.val((Double) value);
+                factory.val(value.toString());
             }
         }
     },
@@ -94,6 +112,11 @@ enum TransformForGet implements Transformer {
         public boolean test(Object data) { return data instanceof Number; }
 
         @Override
+        boolean test(Class propertyType) {
+            return Number.class.isAssignableFrom(propertyType);
+        }
+
+        @Override
         public void doTransform(CellFactory factory, Object value) {
             if (value instanceof Number) {
                 factory.val(((Number) value).doubleValue());
@@ -108,6 +131,11 @@ enum TransformForGet implements Transformer {
     DATE(Date.class, Time.class, Timestamp.class, java.sql.Date.class) {
         @Override
         public boolean test(Object data) { return data instanceof Date; }
+
+        @Override
+        boolean test(Class propertyType) {
+            return Date.class.isAssignableFrom(propertyType);
+        }
 
         @Override
         public void doTransform(CellFactory factory, Object value) {
@@ -126,6 +154,11 @@ enum TransformForGet implements Transformer {
         public boolean test(Object data) { return data instanceof Calendar; }
 
         @Override
+        boolean test(Class propertyType) {
+            return Calendar.class.isAssignableFrom(propertyType);
+        }
+
+        @Override
         public void doTransform(CellFactory factory, Object value) {
             if (value instanceof Number) {
                 factory.val((Calendar) value);
@@ -141,6 +174,11 @@ enum TransformForGet implements Transformer {
         boolean test(Object data) { return data instanceof LocalTime; }
 
         @Override
+        boolean test(Class propertyType) {
+            return LocalTime.class.isAssignableFrom(propertyType);
+        }
+
+        @Override
         public void doTransform(CellFactory factory, Object value) {
             if (value != null) {
                 factory.val(((LocalTime) value).format(formatter));
@@ -152,6 +190,11 @@ enum TransformForGet implements Transformer {
         boolean test(Object data) { return data instanceof LocalDate; }
 
         @Override
+        boolean test(Class propertyType) {
+            return LocalDate.class.isAssignableFrom(propertyType);
+        }
+
+        @Override
         public void doTransform(CellFactory factory, Object value) {
             factory.val((LocalDate) value);
         }
@@ -159,6 +202,11 @@ enum TransformForGet implements Transformer {
     LOCAL_DATE_TIME(LocalDateTime.class) {
         @Override
         boolean test(Object data) { return data instanceof LocalDateTime; }
+
+        @Override
+        boolean test(Class propertyType) {
+            return LocalDateTime.class.isAssignableFrom(propertyType);
+        }
 
         @Override
         public void doTransform(CellFactory factory, Object value) {
@@ -173,6 +221,9 @@ enum TransformForGet implements Transformer {
         public boolean test(Object data) { return data == null; }
 
         @Override
+        boolean test(Class propertyType) { return false; }
+
+        @Override
         public void doTransform(CellFactory factory, Object data) {
             factory.getCell().setBlank();
         }
@@ -183,6 +234,9 @@ enum TransformForGet implements Transformer {
     DEFAULT() {
         @Override
         boolean test(Object data) { return true; }
+
+        @Override
+        boolean test(Class propertyType) { return true; }
 
         @Override
         public void doTransform(CellFactory factory, Object data) {
@@ -208,8 +262,17 @@ enum TransformForGet implements Transformer {
 
     public static TransformForGet findOrDefault(Class propertyType) {
         TransformForGet transfer = Cached.SUPPORTS.get(propertyType);
+        if (transfer == null) {
+            for (TransformForGet value : values()) {
+                if (value.test(propertyType)) {
+                    return value;
+                }
+            }
+        }
         return transfer == null ? DEFAULT : transfer;
     }
 
     abstract boolean test(Object data);
+
+    abstract boolean test(Class propertyType);
 }

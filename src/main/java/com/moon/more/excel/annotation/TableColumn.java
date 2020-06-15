@@ -34,4 +34,11 @@ public @interface TableColumn {
      * @return 偏移量
      */
     int offset() default 0;
+
+    /**
+     * 表头是否“通列偏移”，而不只是最后一级偏移
+     *
+     * @return true: 通列偏移; false: 只偏移最后一级
+     */
+    boolean offsetOnFull() default false;
 }

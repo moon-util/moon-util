@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-class CellStyleProxy implements BiConsumer<Cell, CellRangeAddress>, Consumer<Row> {
+final class CellStyleProxy implements BiConsumer<Cell, CellRangeAddress>, Consumer<Row> {
 
     private final CellStyle style;
     private final BorderStyle tBorder;

@@ -195,9 +195,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return this;
     }
 
-    private Renderer parse(Class targetClass) {
-        return TableUtil.parse(targetClass);
-    }
+    private Renderer parse(Class targetClass) { return TableUtil.parse(targetClass); }
 
     /**
      * 这实际上只是个代理

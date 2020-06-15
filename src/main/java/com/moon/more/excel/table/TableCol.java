@@ -13,6 +13,7 @@ import java.util.List;
 class TableCol implements Comparable<TableCol> {
 
     private final String[] titles;
+    private final boolean offsetOnFull;
     private final int offset;
     private final int order;
     private final PropertyControl control;
@@ -23,6 +24,7 @@ class TableCol implements Comparable<TableCol> {
         this.transform = attr.getTransformOrDefault();
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
+        this.offsetOnFull = attr.getOffsetOnFull();
         this.offset = attr.getOffset();
         this.order = attr.getOrder();
     }
@@ -32,7 +34,10 @@ class TableCol implements Comparable<TableCol> {
     protected Transformer getTransform() { return transform; }
 
     final void appendTitles4Offset(List<String> rowTitles, int rowIdx) {
-        String thisTitle = rowIdx + 1 < getHeaderRowsCount() ? getEnsureTitleAtIdx(rowIdx) : null;
+        String thisTitle = null;
+        if (!offsetOnFull && rowIdx + 1 < getHeaderRowsCount()) {
+            thisTitle = getEnsureTitleAtIdx(rowIdx);
+        }
         for (int i = 0; i < offset; i++) {
             rowTitles.add(thisTitle);
         }
@@ -53,23 +58,25 @@ class TableCol implements Comparable<TableCol> {
      * @return
      */
     final String getEnsureTitleAtIdx(int rowIdx) {
-        int titlesCount = getHeaderRowsCount();
-        int index = rowIdx < titlesCount ? rowIdx : titlesCount - 1;
-        if (index > -1 && index < titlesCount) {
+        int length = getHeaderRowsLength();
+        int index = rowIdx < length ? rowIdx : length - 1;
+        if (index > -1 && index < length) {
             return getTitles()[index];
         }
-        // TODO 注解不能使用 null 值，null 值以后可用于特殊用途，比如偏移
+        // 注解不能使用 null 值，故这里将null 值用于特殊用途，比如计算偏移量
         return null;
     }
+
+    final int getHeaderRowsLength() { return getTitles().length; }
 
     /**
      * 这里单独写成一个获取 length 的方法是为了后面支持 ColumnGroup 时用计算的方式获取最大长度
      *
      * @return
      */
-    int getHeaderRowsCount() { return getTitles().length; }
+    int getHeaderRowsCount() { return getHeaderRowsLength(); }
 
-    private String[] getTitles() { return titles; }
+    private final String[] getTitles() { return titles; }
 
     final CellFactory toCellFactory(RowFactory rowFactory, IntAccessor indexer) {
         indexer.increment(offset);
@@ -82,10 +89,10 @@ class TableCol implements Comparable<TableCol> {
 
     void render(IntAccessor indexer, RowFactory factory, Object data) {
         if (data == null) {
+            skip(indexer);
+        } else {
             CellFactory cellFactory = toCellFactory(factory, indexer);
             transform.doTransform(cellFactory, control.control(data));
-        } else {
-            skip(indexer);
         }
     }
 

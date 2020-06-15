@@ -101,6 +101,18 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
         return 0;
     }
 
+    public boolean getOffsetOnFull() {
+        TableColumn column = getTableColumn();
+        if (column != null) {
+            return column.offsetOnFull();
+        }
+        TableColumnGroup group = getTableColumnGroup();
+        if (group != null) {
+            return group.offsetOnFull();
+        }
+        return false;
+    }
+
     @Override
     public int compareTo(Attribute o) { return this.getOrder() - o.getOrder(); }
 }
