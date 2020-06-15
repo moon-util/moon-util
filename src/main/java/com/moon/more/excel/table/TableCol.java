@@ -1,5 +1,8 @@
 package com.moon.more.excel.table;
 
+import com.moon.core.lang.JoinerUtil;
+import com.moon.core.lang.ObjectUtil;
+import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
@@ -12,6 +15,7 @@ import java.util.List;
  */
 class TableCol implements Comparable<TableCol> {
 
+    private final String name;
     private final String[] titles;
     private final boolean offsetOnFull;
     private final int offset;
@@ -27,6 +31,7 @@ class TableCol implements Comparable<TableCol> {
         this.offsetOnFull = attr.getOffsetOnFull();
         this.offset = attr.getOffset();
         this.order = attr.getOrder();
+        this.name = attr.getName();
     }
 
     protected PropertyControl getControl() { return control; }
@@ -83,9 +88,7 @@ class TableCol implements Comparable<TableCol> {
         return rowFactory.index(indexer.getAndIncrement());
     }
 
-    private final void skip(IntAccessor indexer) {
-        indexer.increment(offset + 1);
-    }
+    private final void skip(IntAccessor indexer) { indexer.increment(offset + 1); }
 
     void render(IntAccessor indexer, RowFactory factory, Object data) {
         if (data == null) {
@@ -98,4 +101,12 @@ class TableCol implements Comparable<TableCol> {
 
     @Override
     public final int compareTo(TableCol o) { return this.order - o.order; }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("TableCol: ");
+        sb.append(name).append("; Titles: ");
+        sb.append(StringUtil.defaultIfEmpty(JoinerUtil.join(getTitles()), "<空>"));
+        return sb.toString();
+    }
 }

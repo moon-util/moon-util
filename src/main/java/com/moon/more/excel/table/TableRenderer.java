@@ -61,7 +61,12 @@ final class TableRenderer implements Renderer {
 
     final void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
         int rowsCount = getHeaderRowsCount();
-        if (rowIdx < rowsCount) {
+        if (rowsCount < 1) {
+            int length = this.columns.length;
+            for (int i = 0; i < length; i++) {
+                rowTitles.add(null);
+            }
+        } else if (rowIdx < rowsCount) {
             rowTitles.addAll(tableHeadCells[rowIdx]);
         } else {
             int index = rowsCount - 1;

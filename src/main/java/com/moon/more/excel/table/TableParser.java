@@ -10,6 +10,7 @@ public class TableParser {
     private final static Parser GETTER = new Parser(Creates.GETTER);
 
     protected final static Renderer parseConfiguration(Class targetClass) {
-        return GETTER.doParseConfiguration(targetClass);
+        Renderer renderer = GETTER.doParseConfiguration(targetClass);
+        return renderer;
     }
 }
