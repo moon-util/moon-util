@@ -1,5 +1,7 @@
 package com.moon.more.excel.table;
 
+import com.moon.more.excel.annotation.DefaultValue;
+import com.moon.more.excel.annotation.FieldTransform;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
 
@@ -7,6 +9,10 @@ import com.moon.more.excel.annotation.TableColumnGroup;
  * @author benshaoye
  */
 final class Assert {
+
+    private final static String DFT_VAL = "@" + DefaultValue.class.getSimpleName();
+
+    private final static String TRANSFORM = "@" + FieldTransform.class.getSimpleName();
 
     private final static String COLUMN_NAME = "@" + TableColumn.class.getSimpleName();
 
@@ -18,8 +24,9 @@ final class Assert {
 
         GROUP_NAME + " ] 用于实体字段（里面由普通字段组成）。\n\n";
 
+    private final static String NOT_SUPPORT = "暂不支持 " + DFT_VAL + " 和 " + TRANSFORM +
 
-    private static String getNotAllowed(String prop) { return NOT_ALLOWED.replace("{}", prop); }
+        " \n\t\t为被 " + GROUP_NAME + " 注解的字段提供默认值或转换: {};";
 
     static void notDuplicated(Descriptor descriptor) {
         TableColumn column = descriptor.getTableColumn();
@@ -29,7 +36,13 @@ final class Assert {
 
     static void notDuplicated(TableColumn column, TableColumnGroup group, String propertyName) {
         if (column != null && group != null) {
-            throw new IllegalStateException(getNotAllowed(propertyName));
+            throw new IllegalStateException(NOT_ALLOWED.replace("{}", propertyName));
+        }
+    }
+
+    static void notAllowedColumnGroup(boolean hasGroup, String propertyName) {
+        if (hasGroup) {
+            throw new IllegalStateException(NOT_SUPPORT.replace("{}", propertyName));
         }
     }
 }

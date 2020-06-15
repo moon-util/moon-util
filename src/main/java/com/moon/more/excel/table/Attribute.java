@@ -13,7 +13,7 @@ import java.util.function.Function;
 /**
  * @author benshaoye
  */
-final class Attribute implements Descriptor {
+final class Attribute implements Descriptor, Comparable<Attribute> {
 
     private final Marked onField;
     private final Marked onMethod;
@@ -77,7 +77,7 @@ final class Attribute implements Descriptor {
         return obtainOrNull(m -> m.getTableColumnGroup());
     }
 
-    public int getOrder(){
+    public int getOrder() {
         TableColumn column = getTableColumn();
         if (column != null) {
             return column.order();
@@ -88,4 +88,19 @@ final class Attribute implements Descriptor {
         }
         return 0;
     }
+
+    public int getOffset() {
+        TableColumn column = getTableColumn();
+        if (column != null) {
+            return column.offset();
+        }
+        TableColumnGroup group = getTableColumnGroup();
+        if (group != null) {
+            return group.offset();
+        }
+        return 0;
+    }
+
+    @Override
+    public int compareTo(Attribute o) { return this.getOrder() - o.getOrder(); }
 }

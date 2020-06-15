@@ -1,7 +1,8 @@
 package com.moon.more.excel.table;
 
 import com.moon.core.lang.ClassUtil;
-import com.moon.more.excel.CellFactory;
+import com.moon.core.lang.ref.IntAccessor;
+import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.annotation.FieldTransformer;
 
 /**
@@ -12,16 +13,17 @@ final class TableColTransformCached extends TableColTransform {
     private final FieldTransformer colTransformer;
 
     TableColTransformCached(
-        Attribute attr, Class<FieldTransformer> transformerCls
+        AttrConfig config, Class<FieldTransformer> transformerCls
     ) {
-        super(attr, transformerCls);
+        super(config, transformerCls);
         this.colTransformer = ClassUtil.newInstance(transformerCls);
     }
 
     @Override
-    void render(CellFactory factory, Object data) {
+    void render(IntAccessor indexer, RowFactory factory, Object data) {
+        // TODO 暂不支持数据为 null 的情况
         Object value = getControl().control(data);
         Object cellVal = colTransformer.transform(value);
-        getTransform().doTransform(factory, cellVal);
+        getTransform().doTransform(toCellFactory(factory, indexer), cellVal);
     }
 }

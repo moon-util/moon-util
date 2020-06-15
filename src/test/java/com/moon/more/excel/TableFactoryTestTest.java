@@ -33,7 +33,7 @@ class TableFactoryTestTest {
             sheetFactory.table(tableFactory -> {
                 List<Emp> list = ListUtil.newArrayList(new Emp(), new Emp(), new Emp());
 
-                tableFactory.renderList(list);
+                tableFactory.renderAll(list);
             });
         }).write2Filepath("/Users/moonsky/test1.xlsx");
     }
@@ -103,7 +103,7 @@ class TableFactoryTestTest {
             sheetFactory.table(tableFactory -> {
                 List<User> list = ListUtil.newArrayList(new User(), new User(), new User());
 
-                tableFactory.renderList(list);
+                tableFactory.renderAll(list);
             });
         }).write2Filepath("/Users/moonsky/test1.xlsx");
     }

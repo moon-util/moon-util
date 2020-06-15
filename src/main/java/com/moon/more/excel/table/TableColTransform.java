@@ -8,13 +8,13 @@ import java.lang.reflect.Type;
 /**
  * @author benshaoye
  */
-abstract class TableColTransform extends TableCol{
+abstract class TableColTransform extends TableCol {
 
 
     private final Transformer transformer;
 
-    TableColTransform(Attribute attr,Class<FieldTransformer> transformerCls) {
-        super(attr);
+    TableColTransform(AttrConfig config, Class<FieldTransformer> transformerCls) {
+        super(config);
 
         Transformer transformer;
         Type superType = transformerCls.getGenericSuperclass();

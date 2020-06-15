@@ -1,6 +1,6 @@
 package com.moon.more.excel.table;
 
-import com.moon.core.lang.ArrayUtil;
+import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.CollectUtil;
 import com.moon.more.excel.Renderer;
 import com.moon.more.excel.RowFactory;
@@ -10,8 +10,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.moon.more.excel.table.HeadUtil.collectRegionAddresses;
-import static com.moon.more.excel.table.HeadUtil.collectTableHead;
+import static com.moon.more.excel.table.HeadUtil.*;
 
 /**
  * @author benshaoye
@@ -26,30 +25,41 @@ final class TableRenderer implements Renderer {
 
     TableRenderer(TableCol[] columns) {
         this.columns = columns == null ? EMPTY : columns;
-
-        int maxTitleRowCount = 0;
-        for (TableCol column : columns) {
-            maxTitleRowCount = Math.max(column.getHeaderRowsCount(), maxTitleRowCount);
-        }
-
+        // 计算表头行数
+        int maxTitleRowCount = calculateHeaderRowCount(columns);
         // 获取所有表头单元格
         List<String>[] tableHead = collectTableHead(columns, maxTitleRowCount);
-        // 计算所有表头合并单元格
+        // 计算表头合并的单元格
         RegionCell[] merges = collectRegionAddresses(tableHead);
 
         this.tableHeadCells = tableHead;
         this.merges = merges;
     }
 
+    /**
+     * 获取表头行数
+     *
+     * @return 行数或 0
+     */
     int getHeaderRowsCount() {
-        return tableHeadCells.length;
+        Object[] cells = this.tableHeadCells;
+        return cells == null ? 0 : cells.length;
     }
 
+    /**
+     * 内部方法，获取表头列数
+     *
+     * @return 如果存在表头，返回表头列数，否则返回 0
+     */
     int getHeaderColsCount() {
-        return ArrayUtil.isEmpty(tableHeadCells) ? 0 : CollectUtil.size(tableHeadCells[0]);
+        if (getHeaderRowsCount() < 1) {
+            return 0;
+        } else {
+            return CollectUtil.size(tableHeadCells[0]);
+        }
     }
 
-    void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
+    final void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
         int rowsCount = getHeaderRowsCount();
         if (rowIdx < rowsCount) {
             rowTitles.addAll(tableHeadCells[rowIdx]);
@@ -58,6 +68,11 @@ final class TableRenderer implements Renderer {
         }
     }
 
+    /**
+     * 渲染表头
+     *
+     * @param sheetFactory sheet 渲染器
+     */
     @Override
     public void renderHead(SheetFactory sheetFactory) {
         // 渲染表头
@@ -77,24 +92,45 @@ final class TableRenderer implements Renderer {
         }
     }
 
+    /**
+     * 渲染一条数据
+     *
+     * @param sheetFactory sheet 渲染器
+     * @param iterator     数据集合，
+     *                     如果存在第一项（first != null），集合中从第一项开始迭代
+     *                     否则从第二项开始迭代
+     * @param first        第一项数据（有些数据类型不能获取到第一条数据，所以要单独传第一条数据）
+     */
     @Override
     public void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
-        TableCol[] columns = this.columns;
+        IntAccessor indexer = IntAccessor.of();
         if (first != null) {
-            renderRecord(columns, sheetFactory, first);
+            indexer.set(0);
+            renderRecord(indexer, sheetFactory, first);
         }
         if (iterator != null) {
             while (iterator.hasNext()) {
-                renderRecord(columns, sheetFactory, iterator.next());
+                indexer.set(0);
+                renderRecord(indexer, sheetFactory, iterator.next());
             }
         }
     }
 
-    private void renderRecord(TableCol[] columns, SheetFactory sheetFactory, Object record) {
+    /**
+     * 渲染一条记录
+     *
+     * @param sheetFactory 如参
+     * @param record       集合中的一条数据
+     */
+    private void renderRecord(IntAccessor indexer, SheetFactory sheetFactory, Object record) {
         RowFactory row = sheetFactory.row();
+        doRenderRow(indexer, row, record);
+    }
+
+    final void doRenderRow(IntAccessor indexer, RowFactory rowFactory, Object entityData) {
         int length = columns.length;
         for (int i = 0; i < length; i++) {
-            columns[i].render(row.index(i), record);
+            columns[i].render(indexer, rowFactory, entityData);
         }
     }
 }

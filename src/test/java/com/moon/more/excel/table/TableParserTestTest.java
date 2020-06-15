@@ -8,7 +8,13 @@ import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -16,8 +22,21 @@ import java.util.List;
  */
 class TableParserTestTest {
 
-    @Test
-    void testParseHasGroup() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = "D:/")
+    @EnabledOnOs(OS.WINDOWS)
+    void testParseHasGroupOnWindows(String dir) throws Exception {
+        testParseHasGroup(dir);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = "/Users/moonsky")
+    @EnabledOnOs({OS.MAC})
+    void testParseHasGroupOnMac(String dir) throws Exception {
+        testParseHasGroup(dir);
+    }
+
+    void testParseHasGroup(String dir) throws Exception {
         // TableParser.parseConfiguration(Employee.class);
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
@@ -32,13 +51,13 @@ class TableParserTestTest {
 
                 tableFactory.renderHead(Employee.class);
             });
-        }).write2Filepath("/Users/moonsky/group-header.xlsx");
+        }).write2File(new File(dir, "group-header.xlsx"));
 
     }
 
     public static class Employee {
 
-        @TableColumn(value = {"部门"}, order = 1)
+        @TableColumn(value = {"部门"}, order = 1, offset = 2)
         private String department;
 
         private EmpBasicInfo basicInfo;
@@ -84,8 +103,21 @@ class TableParserTestTest {
         private Score score;
     }
 
-    @Test
-    void testExportStudentScore() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = "D:/")
+    @EnabledOnOs(OS.WINDOWS)
+    void testExportStudentScoreOnWindows(String dir) throws Exception {
+        testExportStudentScore(dir);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = "/Users/moonsky")
+    @EnabledOnOs({OS.MAC})
+    void testExportStudentScoreOnMac(String dir) throws Exception {
+        testExportStudentScore(dir);
+    }
+
+    void testExportStudentScore(String dir) throws Exception {
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
                 List<Student> students = ListUtil.newArrayList(new Student(),
@@ -97,9 +129,9 @@ class TableParserTestTest {
                     new Student(),
                     new Student());
 
-                tableFactory.renderList(students);
+                tableFactory.renderAll(students);
             });
-        }).write2Filepath("/Users/moonsky/score.xlsx");
+        }).write2File(new File(dir, "score.xlsx"));
     }
 
     public static class Student {
@@ -119,7 +151,7 @@ class TableParserTestTest {
         @TableColumn({"成绩", "语文"})
         private int chineseScore = RandomUtil.nextInt(60, 95);
 
-        @TableColumn({"成绩", "英语"})
+        @TableColumn(value = {"成绩", "英语"}, offset = 1)
         private int englishScore = RandomUtil.nextInt(60, 95);
 
         @TableColumn({"成绩", "数学"})
@@ -131,7 +163,7 @@ class TableParserTestTest {
         @TableColumn({"成绩", "滑雪"})
         private int skiScore = RandomUtil.nextInt(60, 95);
 
-        @TableColumn({"总分"})
+        @TableColumn(value = {"总分"}, offset = 2)
         public int getTotalScore() {
             return IntUtil.sum(chineseScore, englishScore, mathScore, physicalScore, skiScore);
         }

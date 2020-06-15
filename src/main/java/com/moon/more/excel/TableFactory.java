@@ -1,7 +1,10 @@
 package com.moon.more.excel;
 
 import com.moon.core.util.IteratorUtil;
-import com.moon.more.excel.annotation.*;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnGroup;
+import com.moon.more.excel.annotation.TableIndexer;
+import com.moon.more.excel.annotation.TableRecord;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Iterator;
@@ -14,16 +17,16 @@ import java.util.stream.Stream;
  * @see TableColumn 标记一个字段
  * @see TableColumnGroup 标记一个实体字段
  * @see TableRecord 标记一个实体
- * @see TableListable 标记一个列表字段，一个实体里最多只能有一列可迭代
+ * * @see TableListable 标记一个列表字段，一个实体里最多只能有一列可迭代
  * @see TableIndexer 标记一列索引
  */
 public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory> {
 
-    private final HeadExecutor HEAD_RENDERER
+    private final HeadRenderer HEAD_RENDERER
 
         = renderer -> renderer.renderHead(end());
 
-    private final HeadExecutor EMPTY = r -> {};
+    private final HeadRenderer EMPTY = r -> {};
 
     /**
      * 当前正在操作的 sheet 表
@@ -47,7 +50,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      * @return this
      */
     public TableFactory renderHead(Class targetClass) {
-        HEAD_RENDERER.doTask(parse(targetClass));
+        HEAD_RENDERER.render(parse(targetClass));
         return this;
     }
 
@@ -60,7 +63,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     public <T> TableFactory renderBody(Iterator<T> iterator) { return renderBody(iterator, null); }
 
     public <T> TableFactory renderBody(Iterator<T> iterator, Class<T> targetClass) {
-        return renderAll(iterator, targetClass, EMPTY);
+        return doRenderData(iterator, targetClass, EMPTY);
     }
 
     public <T> TableFactory renderBody(Iterable<T> iterable) { return renderBody(iterable.iterator()); }
@@ -114,53 +117,51 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      * -----------------------------------------------------------------------------------
      */
 
-    public <T> TableFactory renderList(Iterator<T> iterator) { return renderList(iterator, null); }
+    public <T> TableFactory renderAll(Iterator<T> iterator) { return renderAll(iterator, null); }
 
-    public <T> TableFactory renderList(Iterator<T> iterator, Class<T> targetClass) {
-        return renderAll(iterator, targetClass, HEAD_RENDERER);
+    public <T> TableFactory renderAll(Iterator<T> iterator, Class<T> targetClass) {
+        return doRenderData(iterator, targetClass, HEAD_RENDERER);
     }
 
-    public <T> TableFactory renderList(Iterable<T> iterable) { return renderList(iterable.iterator()); }
+    public <T> TableFactory renderAll(Iterable<T> iterable) { return renderAll(iterable.iterator()); }
 
-    public <T> TableFactory renderList(Iterable<T> iterable, Class<T> targetClass) {
-        return renderList(iterable.iterator(), targetClass);
+    public <T> TableFactory renderAll(Iterable<T> iterable, Class<T> targetClass) {
+        return renderAll(iterable.iterator(), targetClass);
     }
 
-    public <T> TableFactory renderList(Stream<T> stream) { return renderList(stream.iterator()); }
+    public <T> TableFactory renderAll(Stream<T> stream) { return renderAll(stream.iterator()); }
 
-    public <T> TableFactory renderList(Stream<T> stream, Class<T> targetClass) {
-        return renderList(stream.iterator(), targetClass);
+    public <T> TableFactory renderAll(Stream<T> stream, Class<T> targetClass) {
+        return renderAll(stream.iterator(), targetClass);
     }
 
-    public <T> TableFactory renderList(T... data) {
-        return data == null ? this : renderList(data.getClass().getComponentType(), data);
+    public <T> TableFactory renderAll(T... data) {
+        return data == null ? this : renderAll(data.getClass().getComponentType(), data);
     }
 
-    public <T> TableFactory renderList(T[] data, Class targetClass) { return renderList(targetClass, data); }
+    public <T> TableFactory renderAll(T[] data, Class targetClass) { return renderAll(targetClass, data); }
 
-    public <T> TableFactory renderList(Class targetClass, T... data) {
-        return data == null ? this : renderList(IteratorUtil.of(data), targetClass);
+    public <T> TableFactory renderAll(Class targetClass, T... data) {
+        return data == null ? this : renderAll(IteratorUtil.of(data), targetClass);
     }
 
-    public TableFactory renderCollectList(Object collect) {
-        return renderCollectList(collect, null);
-    }
+    public TableFactory renderCollectAll(Object collect) { return renderCollectAll(collect, null); }
 
-    public TableFactory renderCollectList(Object collect, Class targetClass) {
+    public TableFactory renderCollectAll(Object collect, Class targetClass) {
         if (collect == null) {
             return this;
         }
         if (collect instanceof Iterable) {
-            return renderList((Iterable) collect, targetClass);
+            return renderAll((Iterable) collect, targetClass);
         }
         if (collect instanceof Object[]) {
-            return renderList((Object[]) collect, targetClass);
+            return renderAll((Object[]) collect, targetClass);
         }
         if (collect instanceof Iterator) {
-            return renderList((Iterator) collect, targetClass);
+            return renderAll((Iterator) collect, targetClass);
         }
         if (collect instanceof Stream) {
-            return renderList((Stream) collect, targetClass);
+            return renderAll((Stream) collect, targetClass);
         }
         throw new UnsupportedOperationException("不支持集合类型：" + collect.getClass());
     }
@@ -171,8 +172,8 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
 
     protected SheetFactory end() { return getParentFactory(); }
 
-    private <T> TableFactory renderAll(
-        Iterator<T> iterator, Class<T> targetClass, HeadExecutor beforeRenderBody
+    private <T> TableFactory doRenderData(
+        Iterator<T> iterator, Class<T> targetClass, HeadRenderer headRenderer
     ) {
         SheetFactory factory = end();
         Renderer renderer = null;
@@ -181,12 +182,12 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
             if (iterator.hasNext()) {
                 T data = iterator.next();
                 renderer = parse(data.getClass());
-                beforeRenderBody.doTask(renderer);
+                headRenderer.render(renderer);
                 first = data;
             }
         } else {
             renderer = parse(targetClass);
-            beforeRenderBody.doTask(renderer);
+            headRenderer.render(renderer);
         }
         if (renderer != null) {
             renderer.renderBody(factory, iterator, first);
@@ -198,13 +199,16 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return TableUtil.parse(targetClass);
     }
 
-    interface HeadExecutor {
+    /**
+     * 这实际上只是个代理
+     */
+    interface HeadRenderer {
 
         /**
-         * 执行
+         * 渲染表头
          *
-         * @param renderer
+         * @param renderer 实际执行的渲染器
          */
-        void doTask(Renderer renderer);
+        void render(Renderer renderer);
     }
 }

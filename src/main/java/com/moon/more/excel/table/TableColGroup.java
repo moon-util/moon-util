@@ -1,5 +1,8 @@
 package com.moon.more.excel.table;
 
+import com.moon.core.lang.ref.IntAccessor;
+import com.moon.more.excel.RowFactory;
+
 import java.util.List;
 
 /**
@@ -9,18 +12,17 @@ class TableColGroup extends TableCol {
 
     private final TableRenderer child;
 
-    TableColGroup(Attribute attr, TableRenderer child) {
-        super(attr);
+    TableColGroup(AttrConfig config, TableRenderer child) {
+        super(config);
         this.child = child;
     }
 
     @Override
-    int getHeaderRowsCount() {
-        return super.getHeaderRowsCount() + child.getHeaderRowsCount();
-    }
+    int getHeaderRowsCount() { return super.getHeaderRowsCount() + child.getHeaderRowsCount(); }
 
     @Override
     void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
+        appendTitles4Offset(rowTitles, rowIdx);
         int superRowsCount = super.getHeaderRowsCount();
         if (rowIdx < superRowsCount) {
             int colsCount = child.getHeaderColsCount();
@@ -30,5 +32,12 @@ class TableColGroup extends TableCol {
         } else {
             child.appendTitlesAtRowIdx(rowTitles, rowIdx - superRowsCount);
         }
+    }
+
+    @Override
+    void render(IntAccessor indexer, RowFactory factory, Object data) {
+        // todo render group
+        Object entityData = getControl().control(data);
+        child.doRenderRow(indexer, factory, entityData);
     }
 }

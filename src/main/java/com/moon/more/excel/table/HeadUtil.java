@@ -5,14 +5,39 @@ import com.moon.core.util.TableImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author benshaoye
  */
 final class HeadUtil {
 
+    /**
+     * 计算表头最大行数
+     *
+     * @param columns {@link ParserUtil#mapAttrs(Map, Function)}
+     *
+     * @return 行数
+     */
+    static int calculateHeaderRowCount(TableCol[] columns) {
+        int maxTitleRowCount = 0;
+        for (TableCol column : columns) {
+            maxTitleRowCount = Math.max(column.getHeaderRowsCount(), maxTitleRowCount);
+        }
+        return maxTitleRowCount;
+    }
 
+    /**
+     * 计算表头，结果呈一个矩阵，可能包含相邻位置值相同的情况
+     *
+     * @param columns     {@link ParserUtil#mapAttrs(Map, Function)}
+     * @param maxRowCount {@link #calculateHeaderRowCount(TableCol[])}
+     *
+     * @return 表头矩阵
+     *
+     * @see TableRenderer
+     */
     static List<String>[] collectTableHead(TableCol[] columns, int maxRowCount) {
         List<String>[] tableHead = new List[maxRowCount];
         for (int i = 0; i < maxRowCount; i++) {
@@ -25,6 +50,17 @@ final class HeadUtil {
         return tableHead;
     }
 
+    /**
+     * 计算合并的单元格信息，返回值中每个{@link RegionCell}包含的信息为至少
+     * <p>
+     * 包含两个单元格的信息
+     *
+     * @param tableHead {@link #collectTableHead(TableCol[], int)}
+     *
+     * @return 计算后的合并单元格信息
+     *
+     * @see TableRenderer
+     */
     static RegionCell[] collectRegionAddresses(List<String>[] tableHead) {
         int maxLength = tableHead.length;
         Table<Integer, Integer, HeadRegionCell> table = TableImpl.newLinkedHashTable();
@@ -93,8 +129,21 @@ final class HeadUtil {
 
         boolean isSingleCell() { return rowspan == 1 && colspan == 1; }
 
-        boolean isTitleEquals(String otherTitle) { return Objects.equals(title, otherTitle); }
+        boolean isTitleEquals(String otherTitle) {
+            if (title != null && otherTitle != null) {
+                return title.equals(otherTitle);
+            }
+            return false;
+            // return Objects.equals(title, otherTitle);
+        }
 
+        /**
+         * 如果两个单元格相似（标题一致），则合并
+         *
+         * @param otherTitle 期望标题
+         *
+         * @return 是否合并完成
+         */
         boolean increaseColspanIfTitleEquals(String otherTitle) {
             boolean equals = isTitleEquals(otherTitle);
             if (equals) {
@@ -103,6 +152,13 @@ final class HeadUtil {
             return equals;
         }
 
+        /**
+         * 如果两个单元格“相似”（标题一致，合并列一致），则合并
+         *
+         * @param cell 目标单元格
+         *
+         * @return 是否合并完成
+         */
         boolean increaseRowspanIfLikeCell(HeadRegionCell cell) {
             boolean equals = this.colspan == cell.colspan && isTitleEquals(cell.title);
             if (equals) {
@@ -113,9 +169,7 @@ final class HeadUtil {
 
         public int getColIdx() { return colIdx; }
 
-        RegionCell toRegionCell() {
-            return new RegionCell(rowIdx, colIdx, rowspan, colspan);
-        }
+        RegionCell toRegionCell() { return new RegionCell(rowIdx, colIdx, rowspan, colspan); }
     }
 }
 

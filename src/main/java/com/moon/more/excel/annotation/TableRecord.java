@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 /**
  * @author benshaoye
  */
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableRecord {}

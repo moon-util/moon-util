@@ -3,10 +3,7 @@ package com.moon.more.excel.table;
 import com.moon.more.excel.annotation.FieldTransformer;
 
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -35,22 +32,24 @@ final class ParserUtil {
     /**
      * 转换 Attribute 为具体执行类
      *
-     * @param attributeMap {@link #mergeAttr(Map, Map)}
+     * @param attributeMap {@link #merge2Attr(Map, Map)}
      * @param transformer  like name
      *
      * @return Renderer，最终用于渲染 Table 的类型
      */
     static TableRenderer mapAttrs(
-        Map<String, Attribute> attributeMap, Function<Attribute, TableCol> transformer
+        Map<String, Attribute> attributeMap, Function<AttrConfig, TableCol> transformer
     ) {
-        Set<Map.Entry<String, Attribute>> attrEntrySet = attributeMap.entrySet();
-        TableCol[] columns = new TableCol[attrEntrySet.size()];
+        Collection<Attribute> attributes = attributeMap.values();
+        TableCol[] columns = new TableCol[attributes.size()];
+        List<Attribute> list = new ArrayList<>(attributes);
+        Collections.sort(list, Attribute::compareTo);
+        AttrConfig config = new AttrConfig();
 
-        int index = 0;
-        for (Map.Entry<String, Attribute> attrEntry : attrEntrySet) {
-            columns[index++] = transformer.apply(attrEntry.getValue());
+        for (int i = 0, size = list.size(); i < size; i++) {
+            config.setAttribute(list.get(i), i);
+            columns[i] = transformer.apply(config);
         }
-        Arrays.sort(columns, TableCol::compareTo);
         return new TableRenderer(columns);
     }
 
@@ -72,7 +71,7 @@ final class ParserUtil {
      *
      * @return 合并后的 attributes，key 是字段名
      */
-    static <T extends Marked> Map<String, Attribute> mergeAttr(
+    static <T extends Marked> Map<String, Attribute> merge2Attr(
         Map<String, T> atMethod, Map<String, T> atField
     ) {
         Map<String, Attribute> annotatedMap = new LinkedHashMap<>();

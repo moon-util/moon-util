@@ -33,8 +33,8 @@ public class Parser<T extends Marked> {
             parseDescriptors(type, annotatedAtM, unAnnotatedAtM);
             parseFields(type, annotatedAtF, unAnnotatedAtF);
 
-            Map<String, Attribute> annotated = ParserUtil.mergeAttr(annotatedAtM, annotatedAtF);
-            Map<String, Attribute> unAnnotated = ParserUtil.mergeAttr(unAnnotatedAtM, unAnnotatedAtF);
+            Map<String, Attribute> annotated = ParserUtil.merge2Attr(annotatedAtM, annotatedAtF);
+            Map<String, Attribute> unAnnotated = ParserUtil.merge2Attr(unAnnotatedAtM, unAnnotatedAtF);
 
             return toRendererResult(annotated, unAnnotated);
         } catch (RuntimeException ex) {
@@ -49,33 +49,36 @@ public class Parser<T extends Marked> {
     ) { return annotated.isEmpty() ? toResultByUnAnnotated(unAnnotated) : toResultByAnnotated(annotated); }
 
     private TableRenderer toResultByAnnotated(Map<String, Attribute> annotated) {
-        return ParserUtil.mapAttrs(annotated, attr -> {
+        return ParserUtil.mapAttrs(annotated, config -> {
+            Attribute attr = config.getAttribute();
             DefaultValue defaulter = attr.getAnnotation(DefaultValue.class);
             FieldTransform transformer = attr.getAnnotation(FieldTransform.class);
             if (transformer != null) {
-                return transformerToTableCol(attr, transformer);
+                Assert.notAllowedColumnGroup(attr.isAnnotatedGroup(), attr.getName());
+                return transformerToTableCol(config, transformer);
             } else if (defaulter != null) {
-                return new TableColDefaultVal(attr, defaulter);
+                Assert.notAllowedColumnGroup(attr.isAnnotatedGroup(), attr.getName());
+                return new TableColDefaultVal(config, defaulter);
             }
 
             if (attr.isAnnotatedGroup()) {
                 Class targetClass = attr.getPropertyType();
                 TableRenderer renderer = doParseConfiguration(targetClass);
-                return new TableColGroup(attr, renderer);
+                return new TableColGroup(config, renderer);
             }
-            return new TableCol(attr);
+            return new TableCol(config);
         });
     }
 
-    private static TableCol transformerToTableCol(Attribute attr, FieldTransform transformer) {
+    private static TableCol transformerToTableCol(AttrConfig config, FieldTransform transformer) {
         Class transformerCls = transformer.value();
 
         ParserUtil.checkValidImplClass(transformerCls);
 
         if (isExpectCached(transformerCls)) {
-            return new TableColTransformEvery(attr, transformerCls);
+            return new TableColTransformEvery(config, transformerCls);
         } else {
-            return new TableColTransformCached(attr, transformerCls);
+            return new TableColTransformCached(config, transformerCls);
         }
     }
 

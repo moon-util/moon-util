@@ -1,6 +1,7 @@
 package com.moon.more.excel.table;
 
-import com.moon.more.excel.CellFactory;
+import com.moon.core.lang.ref.IntAccessor;
+import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.annotation.FieldTransformer;
 
 import java.lang.reflect.Constructor;
@@ -14,9 +15,9 @@ final class TableColTransformEvery extends TableColTransform {
     private final Class transformerCls;
 
     TableColTransformEvery(
-        Attribute attr, Class<FieldTransformer> transformerCls
+        AttrConfig config, Class<FieldTransformer> transformerCls
     ) {
-        super(attr, transformerCls);
+        super(config, transformerCls);
 
         Class declareCls = transformerCls.getDeclaringClass();
         try {
@@ -37,10 +38,11 @@ final class TableColTransformEvery extends TableColTransform {
     }
 
     @Override
-    void render(CellFactory factory, Object data) {
+    void render(IntAccessor indexer, RowFactory factory, Object data) {
         Object value = getControl().control(data);
+        // TODO 暂不支持数据为 null 的情况
         // todo TableColumnTransformer 返回值和原生字段类型不一致问题, 重写 getTransform()
         Object cellVal = getFieldTransformer(data).transform(value);
-        getTransform().doTransform(factory, cellVal);
+        getTransform().doTransform(toCellFactory(factory, indexer), cellVal);
     }
 }

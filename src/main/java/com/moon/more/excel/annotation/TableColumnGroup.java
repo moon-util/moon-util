@@ -27,4 +27,11 @@ public @interface TableColumnGroup {
      * @return 顺序号
      */
     int order() default 0;
+
+    /**
+     * 偏移
+     *
+     * @return 偏移量
+     */
+    int offset() default 0;
 }
