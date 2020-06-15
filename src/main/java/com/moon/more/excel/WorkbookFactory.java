@@ -108,21 +108,21 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
      *
      * @param path 将要写出的目标文件路径
      */
-    public void write2Filepath(String path) { write2Path(Paths.get(path)); }
+    public void write(String path) { write(Paths.get(path)); }
 
     /**
      * 将 Excel 写入到指定文件
      *
      * @param file 将要写出的目标文件
      */
-    public void write2File(File file) { write2Path(file.toPath()); }
+    public void write(File file) { write(file.toPath()); }
 
     /**
      * 将 Excel 写入到指定位置
      *
      * @param path 将要写出的目标路径
      */
-    public void write2Path(Path path) {
+    public void write(Path path) {
         OutputStream out = null;
         try {
             if (!Files.exists(path)) {

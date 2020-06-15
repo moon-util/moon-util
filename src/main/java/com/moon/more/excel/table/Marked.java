@@ -13,6 +13,8 @@ import java.util.Objects;
  */
 abstract class Marked<T extends Member> implements Descriptor {
 
+    private final static short[] DEFAULT_HEIGHT_ARR = {};
+
     private static <T extends Annotation> T obtain(Member m, Class<T> type) {
         return obtain((AnnotatedElement) m, type);
     }
@@ -59,6 +61,11 @@ abstract class Marked<T extends Member> implements Descriptor {
             return getTableColumnGroup().value();
         }
         return null;
+    }
+
+    @Override
+    public short[] getHeadHeightArr() {
+        return isAnnotatedColumn() ? getTableColumn().rowsHeight4Head() : DEFAULT_HEIGHT_ARR;
     }
 
     @Override

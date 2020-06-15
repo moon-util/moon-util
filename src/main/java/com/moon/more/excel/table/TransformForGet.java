@@ -26,7 +26,7 @@ import static java.util.Collections.unmodifiableSet;
 /**
  * @author benshaoye
  */
-enum TransformForGet implements Transformer {
+enum TransformForGet implements GetTransformer {
 
     /**
      * 真假

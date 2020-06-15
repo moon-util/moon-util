@@ -11,12 +11,12 @@ import java.lang.reflect.Type;
 abstract class TableColTransform extends TableCol {
 
 
-    private final Transformer transformer;
+    private final GetTransformer transformer;
 
     TableColTransform(AttrConfig config, Class<FieldTransformer> transformerCls) {
         super(config);
 
-        Transformer transformer;
+        GetTransformer transformer;
         Type superType = transformerCls.getGenericSuperclass();
         if (superType instanceof ParameterizedType) {
             ParameterizedType type = (ParameterizedType) superType;
@@ -33,5 +33,5 @@ abstract class TableColTransform extends TableCol {
     }
 
     @Override
-    protected Transformer getTransform() { return transformer; }
+    protected GetTransformer getTransform() { return transformer; }
 }

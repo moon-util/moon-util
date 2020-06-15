@@ -179,6 +179,6 @@ class ExcelUtilTest {
                 members.add(new Member());
             }
             tableFactory.renderAll(members);
-        })).write2File(new File(dir, "member-score.xlsx"));
+        })).write(new File(dir, "member-score.xlsx"));
     }
 }

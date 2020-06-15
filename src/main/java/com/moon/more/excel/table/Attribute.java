@@ -53,6 +53,11 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     }
 
     @Override
+    public short[] getHeadHeightArr() {
+        return obtainOrNull(m -> m.getHeadHeightArr());
+    }
+
+    @Override
     public String getName() {
         return obtainOrNull(m -> m.getName());
     }
@@ -101,14 +106,14 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
         return 0;
     }
 
-    public boolean getOffsetOnFull() {
+    public boolean getOffsetAll() {
         TableColumn column = getTableColumn();
         if (column != null) {
-            return column.offsetOnFull();
+            return column.offsetAll4Head();
         }
         TableColumnGroup group = getTableColumnGroup();
         if (group != null) {
-            return group.offsetOnFull();
+            return group.offsetAll4Head();
         }
         return false;
     }

@@ -14,20 +14,24 @@ import java.util.List;
  */
 class TableCol implements Comparable<TableCol> {
 
+    final static short DEFAULT_HEIGHT = -1;
+
     private final String name;
     private final String[] titles;
-    private final boolean offsetOnFull;
+    private final short[] rowsHeight4Head;
+    private final boolean offsetAll;
     private final int offset;
     private final int order;
     private final PropertyControl control;
-    private final Transformer transform;
+    private final GetTransformer transform;
 
     TableCol(AttrConfig config) {
         Attribute attr = config.getAttribute();
         this.transform = attr.getTransformOrDefault();
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
-        this.offsetOnFull = attr.getOffsetOnFull();
+        this.rowsHeight4Head = attr.getHeadHeightArr();
+        this.offsetAll = attr.getOffsetAll();
         this.offset = attr.getOffset();
         this.order = attr.getOrder();
         this.name = attr.getName();
@@ -35,19 +39,19 @@ class TableCol implements Comparable<TableCol> {
 
     protected PropertyControl getControl() { return control; }
 
-    protected Transformer getTransform() { return transform; }
+    protected GetTransformer getTransform() { return transform; }
 
-    final void appendTitles4Offset(List<String> rowTitles, int rowIdx) {
-        String thisTitle = null;
-        if (!offsetOnFull && rowIdx + 1 < getHeaderRowsCount()) {
-            thisTitle = getEnsureTitleAtIdx(rowIdx);
+    final void appendTitles4Offset(List<HeadCell> rowTitles, int rowIdx) {
+        HeadCell thisCell = null;
+        if (!offsetAll && rowIdx + 1 < getHeaderRowsCount()) {
+            thisCell = getEnsureTitleAtIdx(rowIdx);
         }
         for (int i = 0; i < offset; i++) {
-            rowTitles.add(thisTitle);
+            rowTitles.add(thisCell);
         }
     }
 
-    void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
+    void appendTitlesAtRowIdx(List<HeadCell> rowTitles, int rowIdx) {
         appendTitles4Offset(rowTitles, rowIdx);
         rowTitles.add(getEnsureTitleAtIdx(rowIdx));
     }
@@ -61,14 +65,18 @@ class TableCol implements Comparable<TableCol> {
      *
      * @return
      */
-    private final String getEnsureTitleAtIdx(int rowIdx) {
+    private final HeadCell getEnsureTitleAtIdx(int rowIdx) {
+        // 表头标题
         int length = getHeaderRowsLength();
         int index = rowIdx < length ? rowIdx : length - 1;
-        if (index > -1 && index < length) {
-            return getTitles()[index];
-        }
+        String title = index > -1 && index < length ? getTitles()[index] : null;
+        // 表头行高
+        short[] values = this.rowsHeight4Head;
+        int count = values.length;
+        int heightIdx = rowIdx < count ? rowIdx : count - 1;
+        short height = heightIdx > -1 && heightIdx < count ? values[heightIdx] : DEFAULT_HEIGHT;
         // 注解不能使用 null 值，故这里将null 值用于特殊用途，比如计算偏移量
-        return null;
+        return title != null || height > -1 ? new HeadCell(title, height) : null;
     }
 
     final int getHeaderRowsLength() { return getTitles().length; }

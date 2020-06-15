@@ -21,6 +21,33 @@ public @interface TableColumn {
      */
     String[] value() default {};
 
+    short[] rowsHeight4Head() default {};
+
+    /**
+     * -1 代表不设置
+     * <p>
+     * 如果{@ode width}大于等于 255*256 代表自动宽度，如：{@link Integer#MAX_VALUE}
+     * <p>
+     * 与{@link #autoWidth()}任一符合自动宽度条件都将设置为自动宽度
+     *
+     * @return 列宽度
+     *
+     * @see org.apache.poi.ss.usermodel.Sheet#setColumnWidth(int, int)
+     * @see org.apache.poi.ss.usermodel.Sheet#autoSizeColumn(int, boolean)
+     */
+    int width() default -1;
+
+    /**
+     * 当前列是否设置自动宽度
+     * <p>
+     * 与{@link #width()}任一符合自动宽度条件都将设置为自动宽度
+     *
+     * @return 是否自动宽度
+     *
+     * @see org.apache.poi.ss.usermodel.Sheet#autoSizeColumn(int, boolean)
+     */
+    boolean autoWidth() default false;
+
     /**
      * 排序顺序
      *
@@ -29,7 +56,7 @@ public @interface TableColumn {
     int order() default 0;
 
     /**
-     * 偏移
+     * 偏移，多级表头默认只有最后一级偏移，其他的会填充
      *
      * @return 偏移量
      */
@@ -40,5 +67,5 @@ public @interface TableColumn {
      *
      * @return true: 通列偏移; false: 只偏移最后一级
      */
-    boolean offsetOnFull() default false;
+    boolean offsetAll4Head() default false;
 }

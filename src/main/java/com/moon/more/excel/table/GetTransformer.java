@@ -5,7 +5,7 @@ import com.moon.more.excel.CellFactory;
 /**
  * @author benshaoye
  */
-interface Transformer {
+interface GetTransformer {
 
     /**
      * 设置单元格值

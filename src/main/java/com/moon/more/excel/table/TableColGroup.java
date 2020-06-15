@@ -30,7 +30,7 @@ class TableColGroup extends TableCol {
     // }
 
     @Override
-    void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
+    void appendTitlesAtRowIdx(List<HeadCell> rowTitles, int rowIdx) {
         appendTitles4Offset(rowTitles, rowIdx);
         int superRowsCount = super.getHeaderRowsCount();
         if (rowIdx < superRowsCount) {

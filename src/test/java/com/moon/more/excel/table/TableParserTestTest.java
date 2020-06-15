@@ -1,14 +1,11 @@
 package com.moon.more.excel.table;
 
 import com.moon.core.lang.IntUtil;
-import com.moon.core.lang.StringUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,7 +48,7 @@ class TableParserTestTest {
 
                 tableFactory.renderHead(Employee.class);
             });
-        }).write2File(new File(dir, "group-header.xlsx"));
+        }).write(new File(dir, "group-header.xlsx"));
 
     }
 
@@ -133,7 +130,7 @@ class TableParserTestTest {
 
                 tableFactory.renderAll(students);
             });
-        }).write2File(new File(dir, "score.xlsx"));
+        }).write(new File(dir, "score.xlsx"));
     }
 
     public static class Student {

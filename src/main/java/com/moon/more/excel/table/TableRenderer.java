@@ -18,7 +18,7 @@ final class TableRenderer implements Renderer {
 
     private final static TableCol[] EMPTY = new TableCol[0];
 
-    private final List<String>[] tableHeadCells;
+    private final List<HeadCell>[] tableHeadCells;
     private final RegionCell[] merges;
     private final TableCol[] columns;
 
@@ -26,8 +26,8 @@ final class TableRenderer implements Renderer {
         this.columns = columns == null ? EMPTY : columns;
         // 计算表头行数
         int maxTitleRowCount = calculateHeaderRowCount(columns);
-        // 获取所有表头单元格
-        List<String>[] tableHead = collectTableHead(columns, maxTitleRowCount);
+        // 获取所有表头单元格配置信息
+        List<HeadCell>[] tableHead = collectTableHead(columns, maxTitleRowCount);
         // 计算表头合并的单元格
         RegionCell[] merges = collectRegionAddresses(tableHead);
 
@@ -54,7 +54,7 @@ final class TableRenderer implements Renderer {
         return this.columns.length;
     }
 
-    final void appendTitlesAtRowIdx(List<String> rowTitles, int rowIdx) {
+    final void appendTitlesAtRowIdx(List<HeadCell> rowTitles, int rowIdx) {
         int rowsCount = getHeaderRowsCount();
         if (rowsCount < 1) {
             int length = getHeaderColsCount();
@@ -69,6 +69,18 @@ final class TableRenderer implements Renderer {
         }
     }
 
+    private void maxHeight(RowFactory factory, List<HeadCell> cells) {
+        short height = -1;
+        if (cells != null) {
+            for (HeadCell cell : cells) {
+                height = cell != null && cell.getHeight() > height ? cell.getHeight() : height;
+            }
+        }
+        if (height > -1) {
+            factory.height(height);
+        }
+    }
+
     /**
      * 渲染表头
      *
@@ -77,12 +89,14 @@ final class TableRenderer implements Renderer {
     @Override
     public void renderHead(SheetFactory sheetFactory) {
         // 渲染表头
-        List<String>[] tableHeadRows = this.tableHeadCells;
-        for (List<String> tableHeadRow : tableHeadRows) {
+        List<HeadCell>[] tableHeadRows = this.tableHeadCells;
+        for (int i = 0; i < tableHeadRows.length; i++) {
+            List<HeadCell> thisRow = tableHeadRows[i];
             RowFactory factory = sheetFactory.row();
-            for (String title : tableHeadRow) {
-                factory.next(title);
+            for (HeadCell thisHeadCell : thisRow) {
+                factory.next(thisHeadCell == null ? null : thisHeadCell.getTitle());
             }
+            maxHeight(factory, thisRow);
         }
 
         // 合并表头单元格

@@ -15,7 +15,7 @@ public @interface TableColumnGroup {
     /**
      * 列标题，列标题默认为一个数组，相邻单元格相同的话会自动合并单元格
      * <p>
-     * 但如果设置了偏移，会影响合并的最终结果，参考：{@link #offset()}, {@link #offsetOnFull()}
+     * 但如果设置了偏移，会影响合并的最终结果，参考：{@link #offset()}, {@link #offsetAll4Head()}
      * <p>
      * 默认字段名首字母大写，如：name -&gt; Name；age -&gt; Age
      *
@@ -42,5 +42,5 @@ public @interface TableColumnGroup {
      *
      * @return true: 通列偏移; false: 只偏移最后一级
      */
-    boolean offsetOnFull() default false;
+    boolean offsetAll4Head() default false;
 }

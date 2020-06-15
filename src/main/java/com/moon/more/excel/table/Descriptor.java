@@ -27,6 +27,13 @@ interface Descriptor {
     String[] getTitles();
 
     /**
+     * 获取声明的表头行高
+     *
+     * @return 行高数组
+     */
+    short[] getHeadHeightArr();
+
+    /**
      * 字段数据类型
      *
      * @return 字段类

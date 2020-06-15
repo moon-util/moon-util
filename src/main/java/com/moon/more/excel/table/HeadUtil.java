@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author benshaoye
@@ -38,10 +39,10 @@ final class HeadUtil {
      *
      * @see TableRenderer
      */
-    static List<String>[] collectTableHead(TableCol[] columns, int maxRowCount) {
-        List<String>[] tableHead = new List[maxRowCount];
+    static List<HeadCell>[] collectTableHead(TableCol[] columns, int maxRowCount) {
+        List<HeadCell>[] tableHead = new List[maxRowCount];
         for (int i = 0; i < maxRowCount; i++) {
-            List<String> titleRow = new ArrayList<>();
+            List<HeadCell> titleRow = new ArrayList<>();
             for (TableCol column : columns) {
                 column.appendTitlesAtRowIdx(titleRow, i);
             }
@@ -50,18 +51,27 @@ final class HeadUtil {
         return tableHead;
     }
 
+    private static List<String>[] transformTableHead(List<HeadCell>[] columns) {
+        List<String>[] result = new List[columns.length];
+        for (int i = 0; i < columns.length; i++) {
+            result[i] = columns[i].stream().map(c -> c == null ? null : c.getTitle()).collect(Collectors.toList());
+        }
+        return result;
+    }
+
     /**
      * 计算合并的单元格信息，返回值中每个{@link RegionCell}包含的信息为至少
      * <p>
      * 包含两个单元格的信息
      *
-     * @param tableHead {@link #collectTableHead(TableCol[], int)}
+     * @param columns {@link #collectTableHead(TableCol[], int)}
      *
      * @return 计算后的合并单元格信息
      *
      * @see TableRenderer
      */
-    static RegionCell[] collectRegionAddresses(List<String>[] tableHead) {
+    static RegionCell[] collectRegionAddresses(List<HeadCell>[] columns) {
+        List<String>[] tableHead = transformTableHead(columns);
         int maxLength = tableHead.length;
         Table<Integer, Integer, HeadRegionCell> table = TableImpl.newLinkedHashTable();
         for (int rowIdx = 0; rowIdx < maxLength; rowIdx++) {

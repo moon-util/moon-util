@@ -75,7 +75,7 @@ class ExcelUtilTestTest {
                 rowFactory.cell(cellFactory -> cellFactory.val("女性"));
                 rowFactory.cell(1, 1, -1).val(0).comment("今天是个好日子");
             });
-        }).finish().write2Filepath("D:/test.xlsx");
+        }).finish().write("D:/test.xlsx");
         // excelFactory.shee
     }
 
@@ -99,7 +99,7 @@ class ExcelUtilTestTest {
                 rowFactory.cell(2, 2).val("值").styleAs("header");
                 rowFactory.cell().active();
             });
-        }).finish().write2Filepath("D:/test.xlsx");
+        }).finish().write("D:/test.xlsx");
     }
 
     @Test
@@ -111,7 +111,7 @@ class ExcelUtilTestTest {
                     rowFactory.next("电脑" + i);
                 }
             });
-        }).write2Filepath("D:/test001.xlsx");
+        }).write("D:/test001.xlsx");
     }
 
     @Test
@@ -136,7 +136,7 @@ class ExcelUtilTestTest {
                     }
                 });
             }
-        }).write2Filepath("D:/test002.xlsx");
+        }).write("D:/test002.xlsx");
     }
 
     @Test

@@ -35,7 +35,7 @@ class TableFactoryTestTest {
 
                 tableFactory.renderAll(list);
             });
-        }).write2Filepath("/Users/moonsky/test1.xlsx");
+        }).write("/Users/moonsky/test1.xlsx");
     }
 
     public static class User {
@@ -105,6 +105,6 @@ class TableFactoryTestTest {
 
                 tableFactory.renderAll(list);
             });
-        }).write2Filepath("/Users/moonsky/test1.xlsx");
+        }).write("/Users/moonsky/test1.xlsx");
     }
 }
