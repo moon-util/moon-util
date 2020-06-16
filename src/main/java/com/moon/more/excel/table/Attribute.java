@@ -111,14 +111,14 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
         return 0;
     }
 
-    public boolean getOffsetAll() {
+    public boolean getOffsetOnlyLast() {
         TableColumn column = getTableColumn();
         if (column != null) {
-            return column.offsetAll4Head();
+            return column.offsetOnlyLast();
         }
         TableColumnGroup group = getTableColumnGroup();
         if (group != null) {
-            return group.offsetAll4Head();
+            return group.offsetOnlyLast();
         }
         return false;
     }

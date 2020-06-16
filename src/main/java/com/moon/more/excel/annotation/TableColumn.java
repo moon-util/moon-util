@@ -61,9 +61,9 @@ public @interface TableColumn {
     int offset() default 0;
 
     /**
-     * 表头是否“通列偏移”，而不只是最后一级偏移
+     * 表头是否只偏移最后一级，默认表头所有列均会偏移
      *
-     * @return true: 通列偏移; false: 只偏移最后一级
+     * @return true: 只偏移最后一级; false: 通列偏移
      */
-    boolean offsetAll4Head() default false;
+    boolean offsetOnlyLast() default false;
 }

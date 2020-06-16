@@ -95,7 +95,7 @@ class ExcelUtilTest {
         private ScoreCompare score2 = new ScoreCompare();
 
         // @TableColumn
-        @TableColumn(value = {"上次", "总分"}, offset = 1, offsetAll4Head = true)
+        @TableColumn(value = {"上次", "总分"}, offset = 1, offsetOnlyLast = true)
         public int getPrevTotal() {
             return toTotal(ScoreCompare::getPrev);
         }

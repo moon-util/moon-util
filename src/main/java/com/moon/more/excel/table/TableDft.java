@@ -54,14 +54,14 @@ final class TableDft {
                 Constructor<? extends Predicate> constructor = tester.getConstructor();
                 return new TableDftOnly<>(config, defaultSetter, defaultVal, always, constructor.newInstance());
             } catch (Exception e) {
-                throw new IllegalStateException("类：" + tester + " 应该包含一个有效的公共无参构造方法", e);
+                throw new IllegalStateException("类：" + tester + " 应包含一个有效的公共无参构造方法", e);
             }
         } else if (tester.getDeclaringClass() == config.getTargetClass()) {
             try {
                 Constructor<? extends Predicate> constructor = tester.getConstructor(config.getTargetClass());
                 return new TableDftEach<>(config, defaultSetter, defaultVal, always, constructor);
             } catch (Exception e) {
-                throw new IllegalStateException("类：" + tester + " 应该包含一个有效的公共无参构造方法", e);
+                throw new IllegalStateException("类：" + tester + " 应包含一个有效的公共无参构造方法", e);
             }
         } else {
             throw new IllegalStateException("无法创建对象：" + tester);

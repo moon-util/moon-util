@@ -6,7 +6,6 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.RowFactory;
-import com.moon.more.excel.annotation.TableIndexer;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ class TableCol implements Comparable<TableCol> {
     private final String name;
     private final String[] titles;
     private final short[] rowsHeight4Head;
-    private final boolean offsetAll;
+    private final boolean offsetOnlyLast;
     // 列宽，如果当前是实体组合列，则为 null
     private final Integer width;
     private final int offset;
@@ -35,7 +34,7 @@ class TableCol implements Comparable<TableCol> {
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
         this.rowsHeight4Head = attr.getHeadHeightArr();
-        this.offsetAll = attr.getOffsetAll();
+        this.offsetOnlyLast = attr.getOffsetOnlyLast();
         this.offset = attr.getOffset();
         this.order = attr.getOrder();
         this.name = attr.getName();
@@ -48,7 +47,7 @@ class TableCol implements Comparable<TableCol> {
 
     final void appendTitles4Offset(List<HeadCell> rowTitles, int rowIdx) {
         HeadCell thisCell = null;
-        if (!offsetAll && rowIdx + 1 < getHeaderRowsCount()) {
+        if (offsetOnlyLast && rowIdx + 1 < getHeaderRowsCount()) {
             thisCell = getEnsureHeadCellAtIdx(rowIdx);
         }
         for (int i = 0; i < offset; i++) {
