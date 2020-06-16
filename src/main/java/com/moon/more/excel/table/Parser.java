@@ -51,15 +51,6 @@ public class Parser<T extends Marked> {
     private TableRenderer toResultByAnnotated(Map<String, Attribute> annotated) {
         return ParserUtil.mapAttrs(annotated, config -> {
             Attribute attr = config.getAttribute();
-            DefaultValue defaulter = attr.getAnnotation(DefaultValue.class);
-            FieldTransform transformer = attr.getAnnotation(FieldTransform.class);
-            if (transformer != null) {
-                Assert.notAllowedColumnGroup(attr.isAnnotatedGroup(), attr.getName());
-                return transformerToTableCol(config, transformer);
-            } else if (defaulter != null) {
-                Assert.notAllowedColumnGroup(attr.isAnnotatedGroup(), attr.getName());
-                return new TableColDefaultVal(config, defaulter);
-            }
 
             if (attr.isAnnotatedGroup()) {
                 Class targetClass = attr.getPropertyType();
@@ -68,18 +59,6 @@ public class Parser<T extends Marked> {
             }
             return new TableCol(config);
         });
-    }
-
-    private static TableCol transformerToTableCol(AttrConfig config, FieldTransform transformer) {
-        Class transformerCls = transformer.value();
-
-        ParserUtil.checkValidImplClass(transformerCls);
-
-        if (isExpectCached(transformerCls)) {
-            return new TableColTransformEvery(config, transformerCls);
-        } else {
-            return new TableColTransformCached(config, transformerCls);
-        }
     }
 
     private static boolean isExpectCached(Class type) {

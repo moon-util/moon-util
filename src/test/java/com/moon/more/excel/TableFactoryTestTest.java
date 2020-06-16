@@ -43,7 +43,7 @@ class TableFactoryTestTest {
         @TableColumn({"基本信息", "姓名"})
         private String name = "张三";
 
-        @DefaultValue(value = "100", defaultFor = DefaultStrategy.POSITIVE)
+        @DefaultValue(value = "100")
         @TableColumn({"基本信息", "年龄"})
         private int age = RandomUtil.nextInt(22, 28);
 

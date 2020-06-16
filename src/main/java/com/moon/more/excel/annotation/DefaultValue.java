@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.Predicate;
 
 /**
  * @author benshaoye
@@ -11,7 +12,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DefaultValue {
-
 
     /**
      * 默认值
@@ -21,19 +21,46 @@ public @interface DefaultValue {
     String value() default "";
 
     /**
-     * 什么情况下设置默认值{@link #value()}
-     * <pre>
-     * 1. 针对字符串还有:
-     * 1.1. null 或空字符串: {@link DefaultStrategy#EMPTY}
-     * 1.2. null 、空字符串或空白字符串: {@link DefaultStrategy#BLANK}
-     * 2. 针对数字还有:
-     * 2.1. 值为 0: {@link DefaultStrategy#ZERO}；
-     * 2.2. 负数: {@link DefaultStrategy#NEGATIVE}
-     * 2.3. 正数: {@link DefaultStrategy#POSITIVE}
-     * </pre>
-     * 基本数据类型不可能为 null，所以用在基本数据类型上时需要注意这点
+     * 在什么情况下采用默认值
      *
-     * @return 默认字段值设置策略
+     * @return 策略
      */
-    DefaultStrategy defaultFor() default DefaultStrategy.NULL;
+    Strategy defaultFor() default Strategy.NULL;
+
+    /**
+     * 在什么情况下采用默认值，同{@link #defaultFor()}
+     * <p>
+     * 但设置了{@link #testBy()}就不会执行{@link #defaultFor()}
+     *
+     * @return Predicate 实现类，接收参数为读取到的字段值
+     */
+    Class<? extends Predicate> testBy() default Predicate.class;
+
+    enum Strategy implements Predicate {
+        /**
+         * null
+         */
+        NULL {
+            @Override
+            public boolean test(Object o) { return o == null; }
+        },
+        /**
+         * 用字符串的方式检查对象是否是空字符串
+         */
+        EMPTY {
+            @Override
+            public boolean test(Object o) { return o == null || o.toString().length() == 0; }
+        },
+        /**
+         * 用字符串的方式检查对象是否是空白字符串
+         */
+        BLANK {
+            @Override
+            public boolean test(Object o) {
+                if (o == null) { return true; }
+                String s = o.toString();
+                return s.length() == 0 || s.trim().length() == 0;
+            }
+        }
+    }
 }
