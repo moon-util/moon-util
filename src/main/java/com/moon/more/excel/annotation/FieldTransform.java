@@ -21,7 +21,7 @@ public @interface FieldTransform {
     /**
      * 自定义检测策略，这个是为了满足更多情况默认值或字段值转换设计的，比如隐藏敏感信息等；
      * <p>
-     * 优先级高于{@link DefaultValue#defaultFor()}，故当字段设置了这个，上面的默认值设置就无效
+     * 优先级高于{@link DefaultValue#when()}，故当字段设置了这个，上面的默认值设置就无效
      * <p>
      * 如果自定义了{@link FieldTransform}，将始终按照指定的类型检测和执行，
      * 返回值类型只能在以下类型中一种（建议使用 java 中的泛型明确指定返回值类型）：
@@ -34,7 +34,6 @@ public @interface FieldTransform {
      * 7. LocalDateTime（或{@link LocalDateTime}的子类，对应{@link Cell}类型为『日期』
      * 8. LocalDate（或{@link LocalDate}的子类，对应{@link Cell}类型为『日期』
      * <p>
-     *
      *
      * <pre>
      *     public class Employee {

@@ -11,21 +11,25 @@ import java.util.function.Function;
  */
 final class ParserUtil {
 
+    static boolean isExpectCached(Class type) {
+        return !type.isMemberClass() || Modifier.isStatic(type.getModifiers());
+    }
+
     /**
      * 检测必须是普通可实例化的类，不能是接口抽象类
      *
      * @param type {@link FieldTransformer}的实现类
      */
-    static void checkValidImplClass(Class type) {
+    static void checkValidImplClass(Class type, Class expectSuperClass) {
         int modifiers = type.getModifiers();
         if (!Modifier.isPublic(modifiers)) {
-            throw new IllegalStateException("指定类「" + type + "」应该是公共类（public）");
+            throw new IllegalStateException("指定类「" + type + "」应该是普通公共类（public）");
         }
         if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
-            throw new IllegalStateException("指定类「" + type + "」不能使接口或抽象类");
+            throw new IllegalStateException("指定类「" + type + "」不能是接口或抽象类");
         }
         if (!FieldTransformer.class.isAssignableFrom(type)) {
-            throw new IllegalStateException("指定类「" + type + "」应该是「" + FieldTransformer.class + "」的实现类");
+            throw new IllegalStateException("指定类「" + type + "」应该是「" + expectSuperClass + "」的实现类");
         }
     }
 
@@ -33,18 +37,19 @@ final class ParserUtil {
      * 转换 Attribute 为具体执行类
      *
      * @param attributeMap {@link #merge2Attr(Map, Map)}
+     * @param targetClass  被解析的类
      * @param transformer  like name
      *
      * @return Renderer，最终用于渲染 Table 的类型
      */
     static TableRenderer mapAttrs(
-        Map<String, Attribute> attributeMap, Function<AttrConfig, TableCol> transformer
+        Class targetClass, Map<String, Attribute> attributeMap, Function<AttrConfig, TableCol> transformer
     ) {
         Collection<Attribute> attributes = attributeMap.values();
         TableCol[] columns = new TableCol[attributes.size()];
         List<Attribute> list = new ArrayList<>(attributes);
         Collections.sort(list, Attribute::compareTo);
-        AttrConfig config = new AttrConfig();
+        AttrConfig config = new AttrConfig(targetClass);
 
         for (int i = 0, size = list.size(); i < size; i++) {
             config.setAttribute(list.get(i), i);

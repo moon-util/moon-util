@@ -4,10 +4,9 @@ import com.moon.core.enums.SystemProps;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.more.excel.ExcelUtil;
+import com.moon.more.excel.annotation.DefaultNumber;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.junit.jupiter.api.Test;
@@ -42,35 +41,35 @@ class ExcelUtilTest {
 
     public static class BasicInfo {
 
-        @TableColumn
-        // @TableColumn({"姓名"})
+        // @TableColumn
+        @TableColumn({"姓名"})
         private String name = "张三";
 
-        @TableColumn
-        // @TableColumn({"年龄"})
+        // @TableColumn
+        @TableColumn({"年龄"})
         private int age = nextInt(18, 25);
 
-        @TableColumn
-        // @TableColumn({"性别"})
+        // @TableColumn
+        @TableColumn({"性别"})
         private String sex = nextBoolean() ? "男" : "女";
 
-        @TableColumn
-        // @TableColumn({"居住地址"})
+        // @TableColumn
+        @TableColumn({"居住地址"})
         private String address = ADDRESS.get(nextInt(0, ADDRESS.size()));
 
-        @TableColumn
-        // @TableColumn({"邮政编码"})
+        // @TableColumn
+        @TableColumn({"邮政编码"})
         private String zip = RandomStringUtil.nextDigit(6);
     }
 
     public static class ScoreCompare {
 
-        @TableColumn
-        // @TableColumn({"上次得分"})
+        // @TableColumn
+        @TableColumn({"上次得分"})
         private int prev = nextInt(59, 95);
 
-        @TableColumn
-        // @TableColumn({"此次得分"})
+        // @TableColumn
+        @TableColumn({"此次得分"})
         private int curr = nextInt(59, 95);
 
         public int getPrev() { return prev; }
@@ -80,7 +79,7 @@ class ExcelUtilTest {
 
     public static class Score {
 
-        @TableColumnGroup()
+        @TableColumnGroup("语文")
         private ScoreCompare chinese = new ScoreCompare();
 
         @TableColumnGroup(value = {"数学"})
@@ -95,20 +94,20 @@ class ExcelUtilTest {
         @TableColumnGroup({"化学"})
         private ScoreCompare score2 = new ScoreCompare();
 
-        @TableColumn
-        // @TableColumn(value = {"上次", "总分"}, offset = 1, offsetOnFull = true)
+        // @TableColumn
+        @TableColumn(value = {"上次", "总分"}, offset = 1, offsetAll4Head = true)
         public int getPrevTotal() {
             return toTotal(ScoreCompare::getPrev);
         }
 
-        @TableColumn
-        // @TableColumn(value = {"此次总分"}, order = 2)
+        // @TableColumn
+        @TableColumn(value = {"此次总分"}, order = 2)
         public int getThisTotal() {
             return toTotal(ScoreCompare::getCurr);
         }
 
-        @TableColumn
-        // @TableColumn(order = 1, offset = 1)
+        // @TableColumn
+        @TableColumn(value = "分数变化", order = 1, offset = 1)
         public int getDiffTotal() {
             return getThisTotal() - getPrevTotal();
         }
@@ -124,21 +123,27 @@ class ExcelUtilTest {
         // @TableColumn({"基本工资"})
         private int basicSalary = nextInt(5000, 10000);
 
-        @TableColumn
-        // @TableColumn({"岗位工资"})
+        // @TableColumn
+        @TableColumn({"岗位工资"})
         private int jobSalary = nextInt(500, 1000);
 
-        @TableColumn
-        // @TableColumn({"业务补贴"})
-        private int businexx = nextInt(200, 800);
+        // @TableColumn
+        @TableColumn({"业务补贴"})
+        private int business = nextInt(200, 800);
 
-        @TableColumn
-        // @TableColumn({"健康补贴"})
+        // @TableColumn
+        @TableColumn({"健康补贴"})
         private int health = nextInt(200, 800);
 
-        @TableColumn
-        // @TableColumn({"交通补贴"})
+        // @TableColumn
+        @TableColumn({"交通补贴"})
         private int traffic = nextInt(200, 800);
+
+        @DefaultNumber(value = 0, when = {DefaultNumber.Strategy.NULL, DefaultNumber.Strategy.NEGATIVE})
+        @TableColumn({"应发合计"})
+        public Integer getSalary() {
+            return null;
+        }
     }
 
     public static class Member {
@@ -150,8 +155,8 @@ class ExcelUtilTest {
         @TableColumnGroup({"基本信息"})
         private BasicInfo info = new BasicInfo();
 
-        @TableColumn
-        // @TableColumn({"基本信息", "身体状况"})
+        // @TableColumn
+        @TableColumn({"基本信息", "身体状况"})
         private String status = nextBoolean() ? "健康" : "其他";
 
         @TableColumnGroup({"得分情况"})

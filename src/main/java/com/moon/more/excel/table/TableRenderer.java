@@ -102,8 +102,8 @@ final class TableRenderer implements Renderer {
         for (int i = 0; i < tableHeadRows.length; i++) {
             List<HeadCell> thisRow = tableHeadRows[i];
             RowFactory factory = sheetFactory.row();
-            for (HeadCell thisHeadCell : thisRow) {
-                factory.next(thisHeadCell.getTitle());
+            for (HeadCell cell : thisRow) {
+                factory.next(cell == null ? null : cell.getTitle());
             }
             maxHeight(factory, thisRow);
         }

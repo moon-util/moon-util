@@ -16,6 +16,8 @@ public @interface TableIndexer {
      * 序号标题；
      * <p>
      * 序号列依附于普通列存在，表示插入到普通列前面
+     * <p>
+     * 索引列的标题名称与所在列最末级标题同级，并自动继承所在列的"高级"标题
      *
      * @return 标题名称
      */
@@ -34,4 +36,11 @@ public @interface TableIndexer {
      * @return 数值
      */
     int step() default 1;
+
+    /**
+     * 默认在所在列前面，当{@link #ending()}为{@code true}时，放在所在列后面
+     *
+     * @return true | false
+     */
+    boolean ending() default false;
 }

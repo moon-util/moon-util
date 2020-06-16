@@ -109,7 +109,9 @@ final class HeadUtil {
     static RegionCell[] collectRegionAddressByCell(List<HeadCell>[] tableHeadCell) {
         List<String>[] result = new List[tableHeadCell.length];
         for (int i = 0; i < tableHeadCell.length; i++) {
-            result[i] = tableHeadCell[i].stream().map(HeadCell::getTitle).collect(Collectors.toList());
+            result[i] = tableHeadCell[i].stream().map(cell -> {
+                return cell == null ? null : cell.getTitle();
+            }).collect(Collectors.toList());
         }
         return collectRegionAddresses(result);
     }

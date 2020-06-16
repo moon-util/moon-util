@@ -6,6 +6,7 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.RowFactory;
+import com.moon.more.excel.annotation.TableIndexer;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ class TableCol implements Comparable<TableCol> {
 
     TableCol(AttrConfig config) {
         Attribute attr = config.getAttribute();
+        // attr.getAnnotation(TableIndexer.class);
         this.transform = attr.getTransformOrDefault();
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
@@ -117,7 +119,9 @@ class TableCol implements Comparable<TableCol> {
         return rowFactory.index(indexer.getAndIncrement());
     }
 
-    private final void skip(IntAccessor indexer) { indexer.increment(offset + 1); }
+    final void skip(IntAccessor indexer) {
+        indexer.increment(offset + 1);
+    }
 
     void render(IntAccessor indexer, RowFactory factory, Object data) {
         if (data == null) {
