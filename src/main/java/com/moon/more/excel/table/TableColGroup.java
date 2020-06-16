@@ -20,26 +20,22 @@ class TableColGroup extends TableCol {
     @Override
     int getHeaderRowsCount() { return super.getHeaderRowsCount() + child.getHeaderRowsCount(); }
 
-    // @Override
-    // String getEnsureTitleAtIdx(int rowIdx) {
-    //     int superCount = super.getHeaderRowsCount();
-    //     if (rowIdx < superCount) {
-    //         return super.getEnsureTitleAtIdx(rowIdx);
-    //     }
-    //     return null;
-    // }
+    @Override
+    void appendColumnWidth(List<Integer> columnsWidth) {
+        child.appendColumnWidth(columnsWidth);
+    }
 
     @Override
     void appendTitlesAtRowIdx(List<HeadCell> rowTitles, int rowIdx) {
         appendTitles4Offset(rowTitles, rowIdx);
-        int superRowsCount = super.getHeaderRowsCount();
-        if (rowIdx < superRowsCount) {
+        int superRowsLength = super.getHeaderRowsLength();
+        if (rowIdx < superRowsLength) {
             int colsCount = child.getHeaderColsCount();
             for (int i = 0; i < colsCount; i++) {
                 super.appendTitlesAtRowIdx(rowTitles, rowIdx);
             }
         } else {
-            child.appendTitlesAtRowIdx(rowTitles, rowIdx - superRowsCount);
+            child.appendTitlesAtRowIdx(rowTitles, rowIdx - superRowsLength);
         }
     }
 

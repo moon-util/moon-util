@@ -20,6 +20,8 @@ class TableCol implements Comparable<TableCol> {
     private final String[] titles;
     private final short[] rowsHeight4Head;
     private final boolean offsetAll;
+    // 列宽，如果当前是实体组合列，则为 null
+    private final Integer width;
     private final int offset;
     private final int order;
     private final PropertyControl control;
@@ -35,6 +37,7 @@ class TableCol implements Comparable<TableCol> {
         this.offset = attr.getOffset();
         this.order = attr.getOrder();
         this.name = attr.getName();
+        this.width = attr.getColumnWidth();
     }
 
     protected PropertyControl getControl() { return control; }
@@ -44,16 +47,38 @@ class TableCol implements Comparable<TableCol> {
     final void appendTitles4Offset(List<HeadCell> rowTitles, int rowIdx) {
         HeadCell thisCell = null;
         if (!offsetAll && rowIdx + 1 < getHeaderRowsCount()) {
-            thisCell = getEnsureTitleAtIdx(rowIdx);
+            thisCell = getEnsureHeadCellAtIdx(rowIdx);
         }
         for (int i = 0; i < offset; i++) {
             rowTitles.add(thisCell);
         }
     }
 
+    void appendColumnWidth(List<Integer> columnsWidth) {
+        int dftWidth = DEFAULT_HEIGHT;
+        for (int i = 0; i < offset; i++) {
+            columnsWidth.add(dftWidth);
+        }
+        columnsWidth.add(width == null ? dftWidth : width);
+    }
+
     void appendTitlesAtRowIdx(List<HeadCell> rowTitles, int rowIdx) {
         appendTitles4Offset(rowTitles, rowIdx);
-        rowTitles.add(getEnsureTitleAtIdx(rowIdx));
+        rowTitles.add(getEnsureHeadCellAtIdx(rowIdx));
+    }
+
+    private final HeadCell getEnsureHeadCellAtIdx(int rowIdx) {
+        String title = getEnsureTitleAtIdx(rowIdx);
+        short height = getEnsureHeadRowHeightAtIdx(rowIdx);
+        return new HeadCell(title, height);
+    }
+
+    private final short getEnsureHeadRowHeightAtIdx(int rowIdx) {
+        // 表头行高
+        short[] values = this.rowsHeight4Head;
+        int count = values.length;
+        int heightIdx = rowIdx < count ? rowIdx : count - 1;
+        return inArrRange(heightIdx, count) ? values[heightIdx] : DEFAULT_HEIGHT;
     }
 
     /**
@@ -65,18 +90,15 @@ class TableCol implements Comparable<TableCol> {
      *
      * @return
      */
-    private final HeadCell getEnsureTitleAtIdx(int rowIdx) {
+    private final String getEnsureTitleAtIdx(int rowIdx) {
         // 表头标题
         int length = getHeaderRowsLength();
         int index = rowIdx < length ? rowIdx : length - 1;
-        String title = index > -1 && index < length ? getTitles()[index] : null;
-        // 表头行高
-        short[] values = this.rowsHeight4Head;
-        int count = values.length;
-        int heightIdx = rowIdx < count ? rowIdx : count - 1;
-        short height = heightIdx > -1 && heightIdx < count ? values[heightIdx] : DEFAULT_HEIGHT;
-        // 注解不能使用 null 值，故这里将null 值用于特殊用途，比如计算偏移量
-        return title != null || height > -1 ? new HeadCell(title, height) : null;
+        return inArrRange(index, length) ? getTitles()[index] : null;
+    }
+
+    private static boolean inArrRange(int index, int length) {
+        return index > -1 && index < length;
     }
 
     final int getHeaderRowsLength() { return getTitles().length; }

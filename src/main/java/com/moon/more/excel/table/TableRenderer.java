@@ -19,6 +19,7 @@ final class TableRenderer implements Renderer {
     private final static TableCol[] EMPTY = new TableCol[0];
 
     private final List<HeadCell>[] tableHeadCells;
+    private final Integer[] columnsWidth;
     private final RegionCell[] merges;
     private final TableCol[] columns;
 
@@ -28,10 +29,13 @@ final class TableRenderer implements Renderer {
         int maxTitleRowCount = calculateHeaderRowCount(columns);
         // 获取所有表头单元格配置信息
         List<HeadCell>[] tableHead = collectTableHead(columns, maxTitleRowCount);
+
+        Integer[] columnsWidth = collectColumnsWidth(columns);
         // 计算表头合并的单元格
-        RegionCell[] merges = collectRegionAddresses(tableHead);
+        RegionCell[] merges = collectRegionAddressByCell(tableHead);
 
         this.tableHeadCells = tableHead;
+        this.columnsWidth = columnsWidth;
         this.merges = merges;
     }
 
@@ -50,8 +54,13 @@ final class TableRenderer implements Renderer {
      *
      * @return 如果存在表头，返回表头列数，否则返回 0
      */
-    final int getHeaderColsCount() {
-        return this.columns.length;
+    final int getHeaderColsCount() { return this.columns.length; }
+
+    void appendColumnWidth(List<Integer> columnsWidth) {
+        Integer[] widthArr = this.columnsWidth;
+        for (Integer width : widthArr) {
+            columnsWidth.add(width == null ? -1 : width);
+        }
     }
 
     final void appendTitlesAtRowIdx(List<HeadCell> rowTitles, int rowIdx) {
@@ -59,7 +68,7 @@ final class TableRenderer implements Renderer {
         if (rowsCount < 1) {
             int length = getHeaderColsCount();
             for (int i = 0; i < length; i++) {
-                rowTitles.add(null);
+                rowTitles.add(new HeadCell());
             }
         } else if (rowIdx < rowsCount) {
             rowTitles.addAll(tableHeadCells[rowIdx]);
@@ -70,14 +79,14 @@ final class TableRenderer implements Renderer {
     }
 
     private void maxHeight(RowFactory factory, List<HeadCell> cells) {
-        short height = -1;
+        short finalHeight = -1;
         if (cells != null) {
             for (HeadCell cell : cells) {
-                height = cell != null && cell.getHeight() > height ? cell.getHeight() : height;
+                finalHeight = cell != null && cell.getHeight() > finalHeight ? cell.getHeight() : finalHeight;
             }
         }
-        if (height > -1) {
-            factory.height(height);
+        if (finalHeight > -1) {
+            factory.height(finalHeight);
         }
     }
 
@@ -94,7 +103,7 @@ final class TableRenderer implements Renderer {
             List<HeadCell> thisRow = tableHeadRows[i];
             RowFactory factory = sheetFactory.row();
             for (HeadCell thisHeadCell : thisRow) {
-                factory.next(thisHeadCell == null ? null : thisHeadCell.getTitle());
+                factory.next(thisHeadCell.getTitle());
             }
             maxHeight(factory, thisRow);
         }
@@ -105,6 +114,9 @@ final class TableRenderer implements Renderer {
         for (RegionCell merge : merges) {
             sheet.addMergedRegion(merge.region());
         }
+
+        // 设置表头宽度
+        sheetFactory.setColumnsWidthBegin(0, this.columnsWidth);
     }
 
     /**
@@ -139,7 +151,9 @@ final class TableRenderer implements Renderer {
      */
     private void renderRecord(IntAccessor indexer, SheetFactory sheetFactory, Object record) {
         RowFactory row = sheetFactory.row();
+
         doRenderRow(indexer, row, record);
+        row.style("header");
     }
 
     final void doRenderRow(IntAccessor indexer, RowFactory rowFactory, Object entityData) {

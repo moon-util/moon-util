@@ -11,6 +11,8 @@ final class HeadCell {
 
     private final short height;
 
+    public HeadCell() { this(null, (short) -1); }
+
     HeadCell(String title, short height) {
         this.title = title;
         this.height = height;

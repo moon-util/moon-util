@@ -6,6 +6,10 @@ import com.moon.core.util.RandomStringUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Color;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -79,7 +83,7 @@ class ExcelUtilTest {
         @TableColumnGroup()
         private ScoreCompare chinese = new ScoreCompare();
 
-        @TableColumnGroup({"数学"})
+        @TableColumnGroup(value = {"数学"})
         private ScoreCompare math = new ScoreCompare();
 
         @TableColumnGroup({"英语"})
@@ -116,7 +120,7 @@ class ExcelUtilTest {
 
     public static class FeeDetail {
 
-        @TableColumn
+        @TableColumn(value = "基本工资", rowsHeight4Head = 800, width = Integer.MAX_VALUE)
         // @TableColumn({"基本工资"})
         private int basicSalary = nextInt(5000, 10000);
 
@@ -139,8 +143,8 @@ class ExcelUtilTest {
 
     public static class Member {
 
-        @TableColumn
-        // @TableColumn({"部门"})
+        // @TableColumn
+        @TableColumn(value = {"部门"})
         private String department = "市场部";
 
         @TableColumnGroup({"基本信息"})
@@ -153,7 +157,7 @@ class ExcelUtilTest {
         @TableColumnGroup({"得分情况"})
         private Score score = new Score();
 
-        @TableColumnGroup({"应发项目"})
+        @TableColumnGroup(value = {"应发项目"}, rowsHeight4Head = {400, 800})
         private FeeDetail detail;
 
         public Member() { this.detail = nextBoolean() ? new FeeDetail() : null; }
@@ -167,18 +171,23 @@ class ExcelUtilTest {
     }
 
     @Test
-    @ValueSource(strings = "D:/")
     void testExportMultiExcelOnMax() throws Exception {
         doExportMultiExcel(SystemProps.user_home.get());
     }
 
     void doExportMultiExcel(String dir) throws Exception {
-        ExcelUtil.xlsx().sheet(sheetFactory -> sheetFactory.table(tableFactory -> {
-            List<Member> members = ListUtil.newArrayList();
-            for (int i = 0; i < 12; i++) {
-                members.add(new Member());
-            }
-            tableFactory.renderAll(members);
-        })).write(new File(dir, "member-score.xlsx"));
+        ExcelUtil.xlsx().sheet(sheetFactory -> {
+            sheetFactory.definitionStyle("header", style -> {
+                style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+                style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            });
+            sheetFactory.table(tableFactory -> {
+                List<Member> members = ListUtil.newArrayList();
+                for (int i = 0; i < 12; i++) {
+                    members.add(new Member());
+                }
+                tableFactory.renderAll(members);
+            });
+        }).write(new File(dir, "member-score.xlsx"));
     }
 }

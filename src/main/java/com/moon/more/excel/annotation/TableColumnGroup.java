@@ -24,6 +24,21 @@ public @interface TableColumnGroup {
     String[] value() default {};
 
     /**
+     * 表头行高，
+     * <p>
+     * 数量和位置与表头标题{@link #value()}对应，
+     * <p>
+     * 不足的自动用<code>-1（不设置）</code>补上，
+     * <p>
+     * 超出部分将被忽略；
+     * <p>
+     * 只有设置了标题的位置才能设置行高，否则就忽略
+     *
+     * @return 表头行高，
+     */
+    short[] rowsHeight4Head() default {};
+
+    /**
      * 排序顺序，顺序号会影响列所渲染的位置，相同顺序号按字段声明顺序排序
      *
      * @return 顺序号

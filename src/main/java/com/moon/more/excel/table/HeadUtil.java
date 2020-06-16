@@ -1,5 +1,6 @@
 package com.moon.more.excel.table;
 
+import com.moon.core.util.ListUtil;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
 
@@ -51,27 +52,30 @@ final class HeadUtil {
         return tableHead;
     }
 
-    private static List<String>[] transformTableHead(List<HeadCell>[] columns) {
-        List<String>[] result = new List[columns.length];
-        for (int i = 0; i < columns.length; i++) {
-            result[i] = columns[i].stream().map(c -> c == null ? null : c.getTitle()).collect(Collectors.toList());
+    static Integer[] collectColumnsWidth(TableCol[] columns) {
+        List<Integer> widthList = new ArrayList<>();
+        for (TableCol column : columns) {
+            column.appendColumnWidth(widthList);
         }
-        return result;
+        int size = widthList.size();
+        Integer[] widthArr = new Integer[size];
+        for (int i = 0; i < size; i++) {
+            Integer width = widthList.get(i);
+            widthArr[i] = width == null || width < 0 ? null : width;
+        }
+        return widthArr;
     }
 
     /**
-     * 计算合并的单元格信息，返回值中每个{@link RegionCell}包含的信息为至少
-     * <p>
-     * 包含两个单元格的信息
+     * 计算合并的单元格信息，返回值中每个{@link RegionCell}的信息至少合并两个单元格
      *
-     * @param columns {@link #collectTableHead(TableCol[], int)}
+     * @param tableHead {@link #collectTableHead(TableCol[], int)}
      *
      * @return 计算后的合并单元格信息
      *
      * @see TableRenderer
      */
-    static RegionCell[] collectRegionAddresses(List<HeadCell>[] columns) {
-        List<String>[] tableHead = transformTableHead(columns);
+    static RegionCell[] collectRegionAddresses(List<String>[] tableHead) {
         int maxLength = tableHead.length;
         Table<Integer, Integer, HeadRegionCell> table = TableImpl.newLinkedHashTable();
         for (int rowIdx = 0; rowIdx < maxLength; rowIdx++) {
@@ -100,6 +104,14 @@ final class HeadUtil {
         });
 
         return list.toArray(new RegionCell[list.size()]);
+    }
+
+    static RegionCell[] collectRegionAddressByCell(List<HeadCell>[] tableHeadCell) {
+        List<String>[] result = new List[tableHeadCell.length];
+        for (int i = 0; i < tableHeadCell.length; i++) {
+            result[i] = tableHeadCell[i].stream().map(HeadCell::getTitle).collect(Collectors.toList());
+        }
+        return collectRegionAddresses(result);
     }
 
     private static void mergeOrPutTableHeadCell(
@@ -144,7 +156,6 @@ final class HeadUtil {
                 return title.equals(otherTitle);
             }
             return false;
-            // return Objects.equals(title, otherTitle);
         }
 
         /**

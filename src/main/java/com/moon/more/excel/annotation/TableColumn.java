@@ -21,14 +21,23 @@ public @interface TableColumn {
      */
     String[] value() default {};
 
+    /**
+     * 表头行高，
+     * <p>
+     * 数量和位置与表头标题{@link #value()}对应，
+     * 不足的自动用<code>-1（不设置）</code>补上，
+     * 超出部分自动忽略；
+     * <p>
+     * 只有设置了标题的位置才能设置行高，否则就忽略
+     *
+     * @return
+     */
     short[] rowsHeight4Head() default {};
 
     /**
      * -1 代表不设置
      * <p>
      * 如果{@ode width}大于等于 255*256 代表自动宽度，如：{@link Integer#MAX_VALUE}
-     * <p>
-     * 与{@link #autoWidth()}任一符合自动宽度条件都将设置为自动宽度
      *
      * @return 列宽度
      *
@@ -36,17 +45,6 @@ public @interface TableColumn {
      * @see org.apache.poi.ss.usermodel.Sheet#autoSizeColumn(int, boolean)
      */
     int width() default -1;
-
-    /**
-     * 当前列是否设置自动宽度
-     * <p>
-     * 与{@link #width()}任一符合自动宽度条件都将设置为自动宽度
-     *
-     * @return 是否自动宽度
-     *
-     * @see org.apache.poi.ss.usermodel.Sheet#autoSizeColumn(int, boolean)
-     */
-    boolean autoWidth() default false;
 
     /**
      * 排序顺序

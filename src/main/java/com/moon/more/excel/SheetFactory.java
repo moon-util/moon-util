@@ -1,6 +1,9 @@
 package com.moon.more.excel;
 
-import com.moon.more.excel.annotation.*;
+import com.moon.more.excel.annotation.TableColumn;
+import com.moon.more.excel.annotation.TableColumnGroup;
+import com.moon.more.excel.annotation.TableIndexer;
+import com.moon.more.excel.annotation.TableRecord;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -14,6 +17,10 @@ import java.util.function.Consumer;
  */
 public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFactory> {
 
+    /**
+     * @see Sheet#setColumnWidth(int, int)
+     */
+    private final static int MAX_WIDTH = 255 * 256;
     /**
      * row 工厂
      */
@@ -133,13 +140,32 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return 当前 SheetFactory
      */
     public SheetFactory setColumnsWidth(Integer... widths) {
+        return setColumnsWidthBegin(0, widths);
+    }
+
+    /**
+     * 按索引给各列设置指定宽度
+     *
+     * @param startIdx 起始列号
+     * @param widths   每个值代表当前索引列的宽度，null 为不设置
+     *
+     * @return 当前 SheetFactory
+     */
+    public SheetFactory setColumnsWidthBegin(int startIdx, Integer[] widths) {
         int len = widths == null ? 0 : widths.length;
         if (len > 0) {
+            int max = MAX_WIDTH;
             Integer columnWidth;
             Sheet sheet = getSheet();
             for (int i = 0; i < len; i++) {
                 if ((columnWidth = widths[i]) != null) {
-                    sheet.setColumnWidth(i, columnWidth);
+                    int index = i + startIdx;
+                    int width = columnWidth;
+                    if (width < max) {
+                        sheet.setColumnWidth(index, width);
+                    } else {
+                        sheet.autoSizeColumn(index);
+                    }
                 }
             }
         }

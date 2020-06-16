@@ -58,6 +58,11 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     }
 
     @Override
+    public Integer getColumnWidth() {
+        return obtainOrNull(m -> m.getColumnWidth());
+    }
+
+    @Override
     public String getName() {
         return obtainOrNull(m -> m.getName());
     }

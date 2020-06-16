@@ -34,6 +34,13 @@ interface Descriptor {
     short[] getHeadHeightArr();
 
     /**
+     * 获取列宽
+     *
+     * @return 列宽
+     */
+    Integer getColumnWidth();
+
+    /**
      * 字段数据类型
      *
      * @return 字段类

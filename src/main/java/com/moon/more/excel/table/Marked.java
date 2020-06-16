@@ -65,7 +65,18 @@ abstract class Marked<T extends Member> implements Descriptor {
 
     @Override
     public short[] getHeadHeightArr() {
-        return isAnnotatedColumn() ? getTableColumn().rowsHeight4Head() : DEFAULT_HEIGHT_ARR;
+        if (isAnnotatedColumn()) {
+            return getTableColumn().rowsHeight4Head();
+        }
+        if (isAnnotatedGroup()) {
+            return getTableColumnGroup().rowsHeight4Head();
+        }
+        return DEFAULT_HEIGHT_ARR;
+    }
+
+    @Override
+    public Integer getColumnWidth() {
+        return isAnnotatedColumn() ? getTableColumn().width() : null;
     }
 
     @Override
