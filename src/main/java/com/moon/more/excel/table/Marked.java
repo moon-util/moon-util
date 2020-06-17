@@ -13,15 +13,15 @@ import java.util.Objects;
  */
 abstract class Marked<T extends Member> implements Descriptor {
 
-    private final static short[] DEFAULT_HEIGHT_ARR = {};
+    protected final static <M extends AnnotatedElement, T extends Annotation> T obtain(M m, Class<T> type) {
+        return m.getAnnotation(type);
+    }
 
-    private static <T extends Annotation> T obtain(Member m, Class<T> type) {
+    protected final static <T extends Annotation> T obtain(Member m, Class<T> type) {
         return obtain((AnnotatedElement) m, type);
     }
 
-    private static <M extends AnnotatedElement, T extends Annotation> T obtain(M m, Class<T> type) {
-        return m.getAnnotation(type);
-    }
+    private final static short[] DEFAULT_HEIGHT_ARR = {};
 
     private final String name;
     private final Class type;
@@ -54,30 +54,16 @@ abstract class Marked<T extends Member> implements Descriptor {
 
     @Override
     public String[] getTitles() {
-        if (isAnnotatedColumn()) {
-            return getTableColumn().value();
-        }
-        if (isAnnotatedGroup()) {
-            return getTableColumnGroup().value();
-        }
-        return null;
+        return getOrDefault(col -> col.value(), grp -> grp.value(), null);
     }
 
     @Override
     public short[] getHeadHeightArr() {
-        if (isAnnotatedColumn()) {
-            return getTableColumn().rowsHeight4Head();
-        }
-        if (isAnnotatedGroup()) {
-            return getTableColumnGroup().rowsHeight4Head();
-        }
-        return DEFAULT_HEIGHT_ARR;
+        return getOrDefault(col -> col.rowsHeight4Head(), grp -> grp.rowsHeight4Head(), DEFAULT_HEIGHT_ARR);
     }
 
     @Override
-    public Integer getColumnWidth() {
-        return isAnnotatedColumn() ? getTableColumn().width() : null;
-    }
+    public Integer getColumnWidth() { return isAnnotatedColumn() ? getTableColumn().width() : null; }
 
     @Override
     public String getName() { return name; }

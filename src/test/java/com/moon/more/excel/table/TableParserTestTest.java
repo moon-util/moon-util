@@ -6,7 +6,6 @@ import com.moon.core.util.RandomUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
-import com.moon.more.excel.annotation.TableColumnOffset;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,8 +54,8 @@ class TableParserTestTest {
 
     public static class Employee {
 
-        @TableColumnOffset(2)
-        @TableColumn(value = {"部门"}, order = 1)
+        // @TableColumnOffset(2)
+        @TableColumn(value = {"部门"}, order = 1, offset = 1)
         private String department;
 
         private EmpBasicInfo basicInfo;
@@ -152,8 +151,8 @@ class TableParserTestTest {
         @TableColumn({"成绩", "语文"})
         private int chineseScore = RandomUtil.nextInt(60, 95);
 
-        @TableColumnOffset(1)
-        @TableColumn(value = {"成绩", "英语"})
+        // @TableColumnOffset(1)
+        @TableColumn(value = {"成绩", "英语"}, offset = 1)
         private int englishScore = RandomUtil.nextInt(60, 95);
 
         @TableColumn({"成绩", "数学"})
@@ -165,8 +164,8 @@ class TableParserTestTest {
         @TableColumn({"成绩", "滑雪"})
         private int skiScore = RandomUtil.nextInt(60, 95);
 
-        @TableColumnOffset(2)
-        @TableColumn(value = {"总分"})
+        // @TableColumnOffset(2)
+        @TableColumn(value = {"总分"}, offset = 2)
         public int getTotalScore() {
             return IntUtil.sum(chineseScore, englishScore, mathScore, physicalScore, skiScore);
         }

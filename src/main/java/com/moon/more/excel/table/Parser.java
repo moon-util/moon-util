@@ -69,9 +69,6 @@ public class Parser<T extends Marked> {
         return ParserUtil.mapAttrs(type, annotated, config -> {
             StyleUtil.parsePropertyStyle(config);
             Attribute attr = config.getAttribute();
-            System.out.println(attr.getName());
-            System.out.println("List: " + attr.getAnnotation(DefinitionStyle.List.class));
-            System.out.println("CSS : " + attr.getAnnotation(DefinitionStyle.class));
             Class targetClass = attr.getPropertyType();
 
             if (attr.isAnnotatedGroup()) {

@@ -24,30 +24,13 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
         Assert.notDuplicated(this);
     }
 
-    private final <T> T obtainOrNull(Function<Marked, T> getter) {
-        Marked marked = this.onMethod;
-        if (marked != null) {
-            return getter.apply(marked);
-        }
-        marked = this.onField;
-        if (marked != null) {
-            return getter.apply(this.onField);
-        }
-        return null;
+    private final <T> T obtainOrNull(Marked marked, Function<Marked, T> getter) {
+        return marked == null ? null : getter.apply(marked);
     }
 
-    private final <T> T obtainOrDefault(
-        Function<TableColumn, T> getter0, Function<TableColumnGroup, T> getter1, T dft
-    ) {
-        TableColumn column = getTableColumn();
-        if (column != null) {
-            return getter0.apply(column);
-        }
-        TableColumnGroup group = getTableColumnGroup();
-        if (group != null) {
-            return getter1.apply(group);
-        }
-        return dft;
+    private final <T> T obtainOrNull(Function<Marked, T> getter) {
+        T value = obtainOrNull(onMethod, getter);
+        return value == null ? obtainOrNull(onField, getter) : value;
     }
 
     public PropertyControl getValueGetter() {
@@ -73,7 +56,8 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
 
     @Override
     public Integer getColumnWidth() {
-        return obtainOrNull(m -> m.getColumnWidth());
+        TableColumn column = getTableColumn();
+        return column == null ? null : column.width();
     }
 
     @Override
@@ -102,7 +86,7 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     }
 
     public int getOrder() {
-        return obtainOrDefault(TableColumn::order, TableColumnGroup::order, 0);
+        return getOrDefault(TableColumn::order, TableColumnGroup::order, 0);
     }
 
     @Override

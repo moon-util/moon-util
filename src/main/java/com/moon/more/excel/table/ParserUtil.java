@@ -11,6 +11,10 @@ import java.util.function.Function;
  */
 final class ParserUtil {
 
+    static final <T> T obtainOrNull(Marked marked, Function<Marked, T> getter) {
+        return marked == null ? null : getter.apply(marked);
+    }
+
     static boolean isExpectCached(Class type) {
         return !type.isMemberClass() || Modifier.isStatic(type.getModifiers());
     }

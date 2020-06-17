@@ -52,4 +52,13 @@ public @interface TableColumn {
      * @return 顺序号
      */
     int order() default 0;
+
+    /**
+     * 单元格偏移
+     *
+     * @return 偏移量
+     */
+    int offset() default 0;
+
+    // int offsetHeadRows() default 1;
 }

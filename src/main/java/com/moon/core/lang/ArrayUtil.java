@@ -3,8 +3,7 @@ package com.moon.core.lang;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
+import java.util.function.*;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -548,5 +547,35 @@ public final class ArrayUtil {
         T arr = creator.apply(length);
         System.arraycopy(value, 0, arr, 0, length);
         return arr;
+    }
+
+    /*
+     * 属性求和
+     */
+
+    public static <T> int sum(T[] arr, ToIntFunction<T> getter) {
+        int length = length(arr), total = 0;
+        for (int i = 0; i < length; i++) {
+            total += getter.applyAsInt(arr[i]);
+        }
+        return total;
+    }
+
+    public static <T> long sumAsLong(T[] arr, ToLongFunction<T> getter) {
+        int length = length(arr);
+        long total = 0;
+        for (int i = 0; i < length; i++) {
+            total += getter.applyAsLong(arr[i]);
+        }
+        return total;
+    }
+
+    public static <T> double sumAsDouble(T[] arr, ToDoubleFunction<T> getter) {
+        int length = length(arr);
+        double total = 0;
+        for (int i = 0; i < length; i++) {
+            total += getter.applyAsDouble(arr[i]);
+        }
+        return total;
     }
 }

@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableColumnOffset {
+@interface TableColumnOffset {
 
     /**
      * 偏移
@@ -34,7 +34,9 @@ public @interface TableColumnOffset {
     int headerRows() default Integer.MAX_VALUE;
 
     /**
-     * 用空白是否用空白单元格填充偏移的单元格（设置行样式的时候不同情况会有影响）
+     * 用空白是否用空白单元格填充偏移的单元格
+     * <p>
+     * 通常情况没必要，但如果设置了行样式可能会有影响）
      *
      * @return true: 用空白单元格填充; false: 直接跳过
      */

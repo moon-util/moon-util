@@ -15,7 +15,7 @@ public @interface TableColumnGroup {
     /**
      * 列标题，列标题默认为一个数组，相邻单元格相同的话会自动合并单元格
      * <p>
-     * 但如果设置了偏移，会影响合并的最终结果，参考：{@link #offset()}, {@link #offsetOnlyLast()}
+     * 但如果设置了偏移，会影响合并的最终结果，参考：{@link #offset()}
      * <p>
      * 默认字段名首字母大写，如：name -&gt; Name；age -&gt; Age
      *
@@ -44,4 +44,11 @@ public @interface TableColumnGroup {
      * @return 顺序号
      */
     int order() default 0;
+
+    /**
+     * 单元格偏移
+     *
+     * @return 偏移量
+     */
+    int offset() default 0;
 }

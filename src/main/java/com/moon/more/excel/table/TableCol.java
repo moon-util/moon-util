@@ -6,7 +6,6 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.RowFactory;
-import com.moon.more.excel.annotation.TableColumnOffset;
 
 import java.util.List;
 
@@ -15,12 +14,14 @@ import java.util.List;
  */
 class TableCol implements Comparable<TableCol> {
 
+    private final static int MAX = Integer.MAX_VALUE / 2;
+
     final static short DEFAULT_HEIGHT = -1;
 
     private final String name;
     private final String[] titles;
     private final short[] rowsHeight4Head;
-    private final boolean offsetOnlyLast;
+    private final int offsetHeadRowsCnt;
     // 列宽，如果当前是实体组合列，则为 null
     private final Integer width;
     private final int offset;
@@ -36,37 +37,32 @@ class TableCol implements Comparable<TableCol> {
         this.titles = attr.getTitles();
         this.rowsHeight4Head = attr.getHeadHeightArr();
 
-
         this.order = attr.getOrder();
         this.name = attr.getName();
         this.width = attr.getColumnWidth();
 
-        // this.offsetOnlyLast = attr.getOffsetOnlyLast();
-        TableColumnOffset offset = attr.getAnnotation(TableColumnOffset.class);
-        if (offset == null) {
-            this.offset = 0;
-            this.offsetOnlyLast = false;
-            this.fillSkipped = false;
-        } else {
-            this.offset = offset.value();
-            this.offsetOnlyLast = false;
-            this.fillSkipped = offset.fillSkipped();
-        }
+        this.offset = attr.getOffsetVal();
+        this.offsetHeadRowsCnt = Math.min(attr.getOffsetHeadRows(), MAX);
+        this.fillSkipped = attr.getOffsetFillSkipped();
     }
 
     protected PropertyControl getControl() { return control; }
 
     protected GetTransformer getTransform() { return transform; }
 
+    public final int getOffset() { return offset; }
+
     final void appendTitles4Offset(List<HeadCell> rowTitles, int rowIdx) {
         HeadCell thisCell = null;
-        if (offsetOnlyLast && rowIdx + 1 < getHeaderRowsCount()) {
+        if (rowIdx + offsetHeadRowsCnt < getHeaderRowsCount()) {
             thisCell = getEnsureHeadCellAtIdx(rowIdx);
         }
         for (int i = 0; i < offset; i++) {
             rowTitles.add(thisCell);
         }
     }
+
+    int getCrossColsCount() { return offset + 1; }
 
     void appendColumnWidth(List<Integer> columnsWidth) {
         int dftWidth = DEFAULT_HEIGHT;

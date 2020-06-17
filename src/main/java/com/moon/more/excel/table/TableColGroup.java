@@ -18,6 +18,11 @@ class TableColGroup extends TableCol {
     }
 
     @Override
+    int getCrossColsCount() {
+        return child.getHeaderColsCount();
+    }
+
+    @Override
     int getHeaderRowsCount() { return super.getHeaderRowsCount() + child.getHeaderRowsCount(); }
 
     @Override
@@ -31,7 +36,9 @@ class TableColGroup extends TableCol {
         int superRowsLength = super.getHeaderRowsLength();
         if (rowIdx < superRowsLength) {
             int colsCount = child.getHeaderColsCount();
-            for (int i = 0; i < colsCount; i++) {
+            // int offsetVal = child.getTotalOffsetVal();
+            int count = colsCount;
+            for (int i = 0; i < count; i++) {
                 super.appendTitlesAtRowIdx(rowTitles, rowIdx);
             }
         } else {

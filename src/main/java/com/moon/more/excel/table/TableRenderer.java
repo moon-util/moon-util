@@ -54,7 +54,14 @@ final class TableRenderer implements Renderer {
      *
      * @return 如果存在表头，返回表头列数，否则返回 0
      */
-    final int getHeaderColsCount() { return this.columns.length; }
+    final int getHeaderColsCount() {
+        TableCol[] cols = this.columns;
+        int columnsCount = 0;
+        for (TableCol col : cols) {
+            columnsCount += col.getCrossColsCount();
+        }
+        return columnsCount;
+    }
 
     void appendColumnWidth(List<Integer> columnsWidth) {
         Integer[] widthArr = this.columnsWidth;

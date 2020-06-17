@@ -4,6 +4,7 @@ import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
 
 import java.lang.annotation.Annotation;
+import java.util.function.Function;
 
 /**
  * 字段描述器
@@ -70,6 +71,55 @@ interface Descriptor {
      * @return TableColumnGroup
      */
     TableColumnGroup getTableColumnGroup();
+
+
+    // /**
+    //  * 获取偏移注解
+    //  *
+    //  * @return TableColumnOffset
+    //  */
+    // default TableColumnOffset getOffsetMarked() { return getAnnotation(TableColumnOffset.class); }
+
+    default <T> T getOrDefault(
+        Function<TableColumn, T> getter0, Function<TableColumnGroup, T> getter1, T dft
+    ) {
+        TableColumn column = getTableColumn();
+        if (column != null) {
+            return getter0.apply(column);
+        }
+        TableColumnGroup group = getTableColumnGroup();
+        if (group != null) {
+            return getter1.apply(group);
+        }
+        return dft;
+    }
+
+    /**
+     * 偏移量
+     *
+     * @return 偏移的值
+     */
+    default int getOffsetVal() {
+        return getOrDefault(col -> col.offset(), grp -> grp.offset(), 0);
+    }
+
+    /**
+     * 表头行偏移参与偏移的行数
+     * <p>
+     * 任何大于等于表头行数的值代表所有行都便宜；
+     * <p>
+     * 小于表头行数的值代表倒数 n 行参与偏移
+     *
+     * @return
+     */
+    default int getOffsetHeadRows() { return Integer.MAX_VALUE; }
+
+    /**
+     * 是否填充
+     *
+     * @return 偏移单元格
+     */
+    default boolean getOffsetFillSkipped() { return false; }
 
     /**
      * 是否是组合列
