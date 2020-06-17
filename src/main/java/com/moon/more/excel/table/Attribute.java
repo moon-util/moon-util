@@ -36,6 +36,20 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
         return null;
     }
 
+    private final <T> T obtainOrDefault(
+        Function<TableColumn, T> getter0, Function<TableColumnGroup, T> getter1, T dft
+    ) {
+        TableColumn column = getTableColumn();
+        if (column != null) {
+            return getter0.apply(column);
+        }
+        TableColumnGroup group = getTableColumnGroup();
+        if (group != null) {
+            return getter1.apply(group);
+        }
+        return dft;
+    }
+
     public PropertyControl getValueGetter() {
         Method method = this.onMethod == null ? null : (Method) this.onMethod.getMember();
         Field field = this.onField == null ? null : (Field) this.onField.getMember();
@@ -88,39 +102,7 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     }
 
     public int getOrder() {
-        TableColumn column = getTableColumn();
-        if (column != null) {
-            return column.order();
-        }
-        TableColumnGroup group = getTableColumnGroup();
-        if (group != null) {
-            return group.order();
-        }
-        return 0;
-    }
-
-    public int getOffset() {
-        TableColumn column = getTableColumn();
-        if (column != null) {
-            return column.offset();
-        }
-        TableColumnGroup group = getTableColumnGroup();
-        if (group != null) {
-            return group.offset();
-        }
-        return 0;
-    }
-
-    public boolean getOffsetOnlyLast() {
-        TableColumn column = getTableColumn();
-        if (column != null) {
-            return column.offsetOnlyLast();
-        }
-        TableColumnGroup group = getTableColumnGroup();
-        if (group != null) {
-            return group.offsetOnlyLast();
-        }
-        return false;
+        return obtainOrDefault(TableColumn::order, TableColumnGroup::order, 0);
     }
 
     @Override

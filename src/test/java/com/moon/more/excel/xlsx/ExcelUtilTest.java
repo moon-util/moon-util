@@ -95,8 +95,9 @@ class ExcelUtilTest {
         @TableColumnGroup({"化学"})
         private ScoreCompare score2 = new ScoreCompare();
 
+        @TableColumnOffset(1)
         // @TableColumn
-        @TableColumn(value = {"上次", "总分"}, offset = 1)
+        @TableColumn(value = {"上次", "总分"})
         public int getPrevTotal() {
             return toTotal(ScoreCompare::getPrev);
         }
@@ -107,8 +108,9 @@ class ExcelUtilTest {
             return toTotal(ScoreCompare::getCurr);
         }
 
+        @TableColumnOffset(1)
         // @TableColumn
-        @TableColumn(value = "分数变化", order = 1, offset = 1)
+        @TableColumn(value = "分数变化", order = 1)
         public int getDiffTotal() {
             return getThisTotal() - getPrevTotal();
         }

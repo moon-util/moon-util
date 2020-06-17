@@ -44,18 +44,4 @@ public @interface TableColumnGroup {
      * @return 顺序号
      */
     int order() default 0;
-
-    /**
-     * 偏移
-     *
-     * @return 偏移量
-     */
-    int offset() default 0;
-
-    /**
-     * 表头是否只偏移最后一级，默认表头所有列均会偏移
-     *
-     * @return true: 只偏移最后一级; false: 通列偏移
-     */
-    boolean offsetOnlyLast() default false;
 }

@@ -6,6 +6,7 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.RowFactory;
+import com.moon.more.excel.annotation.TableColumnOffset;
 
 import java.util.List;
 
@@ -26,19 +27,31 @@ class TableCol implements Comparable<TableCol> {
     private final int order;
     private final PropertyControl control;
     private final GetTransformer transform;
+    private final boolean fillSkipped;
 
     TableCol(AttrConfig config) {
         Attribute attr = config.getAttribute();
-        // attr.getAnnotation(TableIndexer.class);
         this.transform = attr.getTransformOrDefault();
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
         this.rowsHeight4Head = attr.getHeadHeightArr();
-        this.offsetOnlyLast = attr.getOffsetOnlyLast();
-        this.offset = attr.getOffset();
+
+
         this.order = attr.getOrder();
         this.name = attr.getName();
         this.width = attr.getColumnWidth();
+
+        // this.offsetOnlyLast = attr.getOffsetOnlyLast();
+        TableColumnOffset offset = attr.getAnnotation(TableColumnOffset.class);
+        if (offset == null) {
+            this.offset = 0;
+            this.offsetOnlyLast = false;
+            this.fillSkipped = false;
+        } else {
+            this.offset = offset.value();
+            this.offsetOnlyLast = false;
+            this.fillSkipped = offset.fillSkipped();
+        }
     }
 
     protected PropertyControl getControl() { return control; }
@@ -113,18 +126,33 @@ class TableCol implements Comparable<TableCol> {
 
     private final String[] getTitles() { return titles; }
 
-    final CellFactory toCellFactory(RowFactory rowFactory, IntAccessor indexer) {
+    private final void doOffsetCells(RowFactory factory, IntAccessor indexer) {
+        int offset = this.offset;
+        if (fillSkipped) {
+            int start = indexer.get();
+            for (int i = 0; i < offset; i++) {
+                factory.index(i + start);
+            }
+        }
         indexer.increment(offset);
+    }
+
+    final CellFactory toCellFactory(RowFactory rowFactory, IntAccessor indexer) {
+        doOffsetCells(rowFactory, indexer);
         return rowFactory.index(indexer.getAndIncrement());
     }
 
-    final void skip(IntAccessor indexer) {
-        indexer.increment(offset + 1);
+    final void skip(RowFactory factory, IntAccessor indexer) {
+        if (fillSkipped) {
+            toCellFactory(factory, indexer);
+        } else {
+            indexer.increment(offset + 1);
+        }
     }
 
     void render(IntAccessor indexer, RowFactory factory, Object data) {
         if (data == null) {
-            skip(indexer);
+            skip(factory, indexer);
         } else {
             CellFactory cellFactory = toCellFactory(factory, indexer);
             transform.doTransform(cellFactory, control.control(data));

@@ -31,7 +31,7 @@ final class TableDftOnly<T> extends TableCol {
                 CellFactory factory = toCellFactory(rowFactory, indexer);
                 transformer.doTransform(factory, defaultVal);
             } else {
-                skip(indexer);
+                skip(rowFactory, indexer);
             }
         } else {
             CellFactory factory = toCellFactory(rowFactory, indexer);
