@@ -46,7 +46,7 @@ public @interface DefaultNumber {
      * <p>
      * 但设置了{@link #testBy()}就不会执行{@link #when()}
      *
-     * @return Predicate 实现类，接收参数为读取到的字段值
+     * @return Predicate 实现类，接收参数为读取到的字段值，如果是基本数据类型传入的是对应包装类
      */
     Class<? extends Predicate> testBy() default Predicate.class;
 

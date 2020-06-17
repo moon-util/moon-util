@@ -23,9 +23,7 @@ final class AttrConfig {
 
     public Class getTargetClass() { return targetClass; }
 
-    Attribute getAttribute() {
-        return attribute;
-    }
+    Attribute getAttribute() { return attribute; }
 
     @Override
     public String toString() {

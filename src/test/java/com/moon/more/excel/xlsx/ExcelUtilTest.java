@@ -4,9 +4,7 @@ import com.moon.core.enums.SystemProps;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.more.excel.ExcelUtil;
-import com.moon.more.excel.annotation.DefaultNumber;
-import com.moon.more.excel.annotation.TableColumn;
-import com.moon.more.excel.annotation.TableColumnGroup;
+import com.moon.more.excel.annotation.*;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.junit.jupiter.api.Test;
@@ -91,11 +89,14 @@ class ExcelUtilTest {
         @TableColumnGroup(value = {"物理"})
         private ScoreCompare score1 = new ScoreCompare();
 
+        @DefinitionStyle(wrapText = true)
+        @DefinitionStyle(wrapText = true)
+        @ReferenceStyle
         @TableColumnGroup({"化学"})
         private ScoreCompare score2 = new ScoreCompare();
 
         // @TableColumn
-        @TableColumn(value = {"上次", "总分"}, offset = 1, offsetOnlyLast = true)
+        @TableColumn(value = {"上次", "总分"}, offset = 1)
         public int getPrevTotal() {
             return toTotal(ScoreCompare::getPrev);
         }

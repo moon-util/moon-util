@@ -5,7 +5,10 @@ import org.apache.poi.ss.usermodel.*;
 import java.lang.annotation.*;
 
 /**
- * 定义样式
+ * 定义样式;
+ * <p>
+ * 由于样式采用的是定义 + 使用这种声明式设置，不必要求一定要注解在指定字段上才起效
+ * 样式可以定义在任何有效列（被{@link TableColumn}或{@link TableColumnGroup}注解的列）或当前实体的类上
  *
  * @author benshaoye
  * @see CellStyle
@@ -19,10 +22,29 @@ public @interface DefinitionStyle {
      * 唯一类名
      * <p>
      * 类名可以是空字符串
+     * <p>
+     * 1. 注解在字段或{@code getter}上没有指定{@code classname}，
+     * 默认作用于当前字段，且不会注册到作用域内;
+     * 2. 注解在类上，需要主动指定类名（不指定也行，怎么设置就怎么用）
+     * <p>
+     * 说明：注解在字段或{@code getter}上，并且没有主动指定{@code classname}和{@link ReferenceStyle}
+     * 那么，这个定义默认会作用于当前列数据
      *
      * @return 类名
      */
     String classname() default "";
+
+    /**
+     * 自定义样式创建器，这个具有更高的优先级
+     * <p>
+     * 设置了自定义样式类，其他属性均会被忽略
+     *
+     * @return 自定义类
+     *
+     * @see CellStyleBuilder 自定义样式;{@link CellStyle}
+     * @see CellStyleFontBuilder 自定义样式和字体;{@link Font}
+     */
+    Class<? extends CellStyleBuilder> createBy() default CellStyleBuilder.class;
 
     /**
      * 继承自另外一个样式{@link #classname()}
@@ -36,18 +58,6 @@ public @interface DefinitionStyle {
      * @see CellStyle#cloneStyleFrom(CellStyle)
      */
     String extendBy() default "";
-
-    /**
-     * 自定义样式创建器，这个具有更高的优先级
-     * <p>
-     * 设置了自定义样式类，其他属性均会被忽略
-     *
-     * @return 自定义类
-     *
-     * @see CellStyleBuilder 自定义样式;{@link CellStyle}
-     * @see CellStyleFontBuilder 自定义样式和字体;{@link Font}
-     */
-    Class<? extends CellStyleBuilder> createBy() default CellStyleBuilder.class;
 
     /**
      * 前景色色值
@@ -89,6 +99,13 @@ public @interface DefinitionStyle {
      * @return default LEFT
      */
     HorizontalAlignment align() default HorizontalAlignment.LEFT;
+
+    /**
+     * 是否换行
+     *
+     * @return true: 允许换行
+     */
+    boolean wrapText() default false;
 
     /**
      * top, right, bottom, left
