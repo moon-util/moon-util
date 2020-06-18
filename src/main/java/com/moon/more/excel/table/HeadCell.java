@@ -7,20 +7,29 @@ import java.util.Objects;
  */
 final class HeadCell {
 
+    final static HeadCell EMPTY = new HeadCell();
+
     private final String title;
 
     private final short height;
 
-    public HeadCell() { this(null, (short) -1); }
+    private final boolean offsetFilled;
 
-    HeadCell(String title, short height) {
-        this.title = title;
+    private HeadCell() { this(null, (short) -1); }
+
+    HeadCell(String title, short height) { this(title, height, false); }
+
+    HeadCell(String title, short height, boolean offsetFilled) {
+        this.offsetFilled = offsetFilled;
         this.height = height;
+        this.title = title;
     }
 
-    public String getTitle() { return title; }
+    final static String getTitleOfNull(HeadCell cell) { return cell == null ? null : cell.title; }
 
     public short getHeight() { return height; }
+
+    public boolean isOffsetFilled() { return offsetFilled; }
 
     @Override
     public boolean equals(Object o) {

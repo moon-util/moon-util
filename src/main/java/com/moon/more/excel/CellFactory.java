@@ -349,6 +349,18 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
         return this;
     }
 
+    /**
+     * TODO
+     *
+     * @param rowspan
+     * @param colspan
+     *
+     * @return
+     */
+    private CellFactory merge(int rowspan, int colspan) {
+        return this;
+    }
+
     /*
      * ~~~~~~~~ 设置单元格值 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */

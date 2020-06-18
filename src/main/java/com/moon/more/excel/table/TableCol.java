@@ -50,10 +50,8 @@ class TableCol implements Comparable<TableCol> {
 
     protected GetTransformer getTransform() { return transform; }
 
-    public final int getOffset() { return offset; }
-
     final void appendTitles4Offset(List<HeadCell> rowTitles, int rowIdx) {
-        HeadCell thisCell = null;
+        HeadCell thisCell = HeadCell.EMPTY;
         if (rowIdx + offsetHeadRowsCnt < getHeaderRowsCount()) {
             thisCell = getEnsureHeadCellAtIdx(rowIdx);
         }
@@ -78,12 +76,10 @@ class TableCol implements Comparable<TableCol> {
     }
 
     private final HeadCell getEnsureHeadCellAtIdx(int rowIdx) {
-        String title = getEnsureTitleAtIdx(rowIdx);
-        short height = getEnsureHeadRowHeightAtIdx(rowIdx);
-        return new HeadCell(title, height);
+        return new HeadCell(titleAtIdx(rowIdx), rowHeightAtIdx(rowIdx), fillSkipped);
     }
 
-    private final short getEnsureHeadRowHeightAtIdx(int rowIdx) {
+    private final short rowHeightAtIdx(int rowIdx) {
         // 表头行高
         short[] values = this.rowsHeight4Head;
         int count = values.length;
@@ -100,7 +96,7 @@ class TableCol implements Comparable<TableCol> {
      *
      * @return
      */
-    private final String getEnsureTitleAtIdx(int rowIdx) {
+    private final String titleAtIdx(int rowIdx) {
         // 表头标题
         int length = getHeaderRowsLength();
         int index = rowIdx < length ? rowIdx : length - 1;

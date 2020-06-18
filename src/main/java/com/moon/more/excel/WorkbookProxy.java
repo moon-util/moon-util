@@ -241,15 +241,6 @@ public final class WorkbookProxy {
 
     private Row createRow(int index, boolean appendCell) { return setRow(sheet.createRow(index), appendCell); }
 
-    // Row createRow(int index) { return createRow(index, DEFAULT_APPEND_DATA); }
-
-    // Row useRow(int index, boolean appendCell) {
-    //     this.indexOfRow = index;
-    //     return setRow(sheet.getRow(index), appendCell);
-    // }
-
-    // Row useRow(int index) { return useRow(index, DEFAULT_APPEND_DATA); }
-
     Row useOrCreateRow(int index, boolean appendCell) {
         Row row = sheet.getRow(index);
         if (row == null) {
@@ -307,13 +298,49 @@ public final class WorkbookProxy {
         return nCellIdx;
     }
 
+    private MergedResult isMergedRegion(Sheet sheet, int row, int column) {
+        int sheetMergeCount = sheet.getNumMergedRegions();
+        for (int i = 0; i < sheetMergeCount; i++) {
+            CellRangeAddress range = sheet.getMergedRegion(i);
+            int firstColumn = range.getFirstColumn();
+            int lastColumn = range.getLastColumn();
+            int firstRow = range.getFirstRow();
+            int lastRow = range.getLastRow();
+            if (row >= firstRow && row <= lastRow) {
+                if (column >= firstColumn && column <= lastColumn) {
+                    return null;
+                }
+            }
+        }
+        return UNMERGED;
+    }
+
+    private final static MergedResult UNMERGED = new MergedResult(false, -1, -1, -1, -1, -1);
+
+    private static class MergedResult {
+
+        private final boolean merged;
+        private final int addressIdx;
+        private final int rowIdx;
+        private final int colIdx;
+        private final int rowspan;
+        private final int colspan;
+
+        private MergedResult(
+            boolean merged, int addressIdx, int rowIdx, int colIdx, int rowspan, int colspan
+        ) {
+            this.merged = merged;
+            this.addressIdx = addressIdx;
+            this.rowIdx = rowIdx;
+            this.colIdx = colIdx;
+            this.rowspan = rowspan;
+            this.colspan = colspan;
+        }
+    }
+
     Cell setCell(Cell cell) { return this.cell = cell; }
 
-    // Cell getCell() { return cell; }
-
     CellRangeAddress getRegion() { return mergedOnCell.get(); }
-
-    // Cell useCell(int index) { return setCell(row.getCell(index)); }
 
     private Cell createCell(int index) { return setCell(row.createCell(index)); }
 

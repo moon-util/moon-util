@@ -27,7 +27,7 @@ public @interface DefinitionStyle {
      * 默认作用于当前字段，且不会注册到作用域内;
      * 2. 注解在类上，需要主动指定类名（不指定也行，怎么设置就怎么用）
      * <p>
-     * 说明：注解在字段或{@code getter}上，并且没有主动指定{@code classname}和{@link ReferenceStyle}
+     * 说明：注解在字段或{@code getter}上，并且没有主动指定{@code classname}和{@link UseStyleOnRow}
      * 那么，这个定义默认会作用于当前列数据
      *
      * @return 类名

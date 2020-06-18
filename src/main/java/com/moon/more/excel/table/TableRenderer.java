@@ -19,24 +19,24 @@ final class TableRenderer implements Renderer {
     private final static TableCol[] EMPTY = new TableCol[0];
 
     private final List<HeadCell>[] tableHeadCells;
+    private final List<HeaderCell>[] headerCells;
     private final Integer[] columnsWidth;
-    private final RegionCell[] merges;
     private final TableCol[] columns;
 
     TableRenderer(TableCol[] columns) {
         this.columns = columns == null ? EMPTY : columns;
         // 计算表头行数
-        int maxTitleRowCount = calculateHeaderRowCount(columns);
+        int maxTitleRowCount = maxHeaderRowNum(columns);
         // 获取所有表头单元格配置信息
         List<HeadCell>[] tableHead = collectTableHead(columns, maxTitleRowCount);
-
+        // 列宽
         Integer[] columnsWidth = collectColumnsWidth(columns);
         // 计算表头合并的单元格
-        RegionCell[] merges = collectRegionAddressByCell(tableHead);
+        List<HeaderCell>[] headerCells = collectHeaderCells(tableHead);
 
+        this.headerCells = headerCells;
         this.tableHeadCells = tableHead;
         this.columnsWidth = columnsWidth;
-        this.merges = merges;
     }
 
     /**
@@ -45,7 +45,7 @@ final class TableRenderer implements Renderer {
      * @return 行数或 0
      */
     int getHeaderRowsCount() {
-        Object[] cells = this.tableHeadCells;
+        Object[] cells = this.headerCells;
         return cells == null ? 0 : cells.length;
     }
 
@@ -75,7 +75,7 @@ final class TableRenderer implements Renderer {
         if (rowsCount < 1) {
             int length = getHeaderColsCount();
             for (int i = 0; i < length; i++) {
-                rowTitles.add(new HeadCell());
+                rowTitles.add(HeadCell.EMPTY);
             }
         } else if (rowIdx < rowsCount) {
             rowTitles.addAll(tableHeadCells[rowIdx]);
@@ -85,11 +85,15 @@ final class TableRenderer implements Renderer {
         }
     }
 
-    private void maxHeight(RowFactory factory, List<HeadCell> cells) {
+    private short maxHeight(HeaderCell cell, short otherHeight) {
+        return cell != null && cell.getHeight() > otherHeight ? cell.getHeight() : otherHeight;
+    }
+
+    private void maxHeight(RowFactory factory, List<HeaderCell> cells) {
         short finalHeight = -1;
         if (cells != null) {
-            for (HeadCell cell : cells) {
-                finalHeight = cell != null && cell.getHeight() > finalHeight ? cell.getHeight() : finalHeight;
+            for (HeaderCell cell : cells) {
+                finalHeight = maxHeight(cell, finalHeight);
             }
         }
         if (finalHeight > -1) {
@@ -104,25 +108,26 @@ final class TableRenderer implements Renderer {
      */
     @Override
     public void renderHead(SheetFactory sheetFactory) {
-        // 渲染表头
-        List<HeadCell>[] tableHeadRows = this.tableHeadCells;
-        for (int i = 0; i < tableHeadRows.length; i++) {
-            List<HeadCell> thisRow = tableHeadRows[i];
-            RowFactory factory = sheetFactory.row();
-            for (HeadCell cell : thisRow) {
-                factory.next(cell == null ? null : cell.getTitle());
-            }
-            maxHeight(factory, thisRow);
-        }
-
-        // 合并表头单元格
         Sheet sheet = sheetFactory.getSheet();
-        RegionCell[] merges = this.merges;
-        for (RegionCell merge : merges) {
-            sheet.addMergedRegion(merge.region());
+        List<HeaderCell>[] headerCells = this.headerCells;
+        for (List<HeaderCell> rowCells : headerCells) {
+            RowFactory factory = sheetFactory.row();
+            for (HeaderCell cell : rowCells) {
+                // 设置表头标题
+                if (cell.isOffsetCell()) {
+                    if (cell.isFillSkipped()) {
+                        factory.nextCell();
+                    }
+                } else {
+                    factory.next(cell.getValue());
+                }
+                // 合并表头单元格
+                cell.merge(sheet);
+            }
+            maxHeight(factory, rowCells);
         }
 
-        // 设置表头宽度
+        // 设置列宽
         sheetFactory.setColumnsWidthBegin(0, this.columnsWidth);
     }
 

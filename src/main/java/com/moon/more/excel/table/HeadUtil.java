@@ -1,6 +1,5 @@
 package com.moon.more.excel.table;
 
-import com.moon.core.util.ListUtil;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
 
@@ -8,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import static com.moon.more.excel.table.HeadCell.getTitleOfNull;
 
 /**
  * @author benshaoye
@@ -22,7 +22,7 @@ final class HeadUtil {
      *
      * @return 行数
      */
-    static int calculateHeaderRowCount(TableCol[] columns) {
+    static int maxHeaderRowNum(TableCol[] columns) {
         int maxTitleRowCount = 0;
         for (TableCol column : columns) {
             maxTitleRowCount = Math.max(column.getHeaderRowsCount(), maxTitleRowCount);
@@ -34,7 +34,7 @@ final class HeadUtil {
      * 计算表头，结果呈一个矩阵，可能包含相邻位置值相同的情况
      *
      * @param columns     {@link ParserUtil#mapAttrs(Map, Function)}
-     * @param maxRowCount {@link #calculateHeaderRowCount(TableCol[])}
+     * @param maxRowCount {@link #maxHeaderRowNum(TableCol[])}
      *
      * @return 表头矩阵
      *
@@ -66,8 +66,20 @@ final class HeadUtil {
         return widthArr;
     }
 
+    static List<HeaderCell>[] collectHeaderCells(List<HeadCell>[] collected) {
+        Table<Integer, Integer, TableHeaderCell> table = collectRegionAddresses(collected);
+        List<HeaderCell>[] headerCells = new List[table.sizeOfRows()];
+        for (int i = 0; i < headerCells.length; i++) {
+            List<HeaderCell> row = new ArrayList<>();
+            Map<Integer, TableHeaderCell> cols = table.get(i);
+            cols.forEach((idx, cell) -> row.add(cell));
+            headerCells[i] = row;
+        }
+        return headerCells;
+    }
+
     /**
-     * 计算合并的单元格信息，返回值中每个{@link RegionCell}的信息至少合并两个单元格
+     * 计算合并的单元格信息，返回值中每个{@link TableCell}的信息至少合并两个单元格
      *
      * @param tableHead {@link #collectTableHead(TableCol[], int)}
      *
@@ -75,83 +87,64 @@ final class HeadUtil {
      *
      * @see TableRenderer
      */
-    static RegionCell[] collectRegionAddresses(List<String>[] tableHead) {
+    private static Table collectRegionAddresses(List<HeadCell>[] tableHead) {
         int maxLength = tableHead.length;
-        Table<Integer, Integer, HeadRegionCell> table = TableImpl.newLinkedHashTable();
+        Table<Integer, Integer, TableHeaderCell> table = TableImpl.newLinkedHashTable();
         for (int rowIdx = 0; rowIdx < maxLength; rowIdx++) {
-            List<String> rowTitles = tableHead[rowIdx];
+            List<HeadCell> rowTitles = tableHead[rowIdx];
 
-            HeadRegionCell cell = null;
+            TableHeaderCell previousCell = null, headerCell;
             for (int colIdx = 0; colIdx < rowTitles.size(); colIdx++) {
-                String thisColTitle = rowTitles.get(colIdx);
-                if (cell == null) {
-                    cell = new HeadRegionCell(thisColTitle, rowIdx, colIdx);
-                } else if (!cell.increaseColspanIfTitleEquals(thisColTitle)) {
-                    mergeOrPutTableHeadCell(table, rowIdx, cell);
-                    cell = new HeadRegionCell(thisColTitle, rowIdx, colIdx);
+                HeadCell thisCell = rowTitles.get(colIdx);
+                String thisTitle = getTitleOfNull(thisCell);
+                headerCell = new TableHeaderCell(thisCell, rowIdx, colIdx);
+                table.put(rowIdx, colIdx, headerCell);
+                if (previousCell == null) {
+                    previousCell = headerCell;
+                } else if (!previousCell.mergeColsIfTitleEquals(thisTitle)) {
+                    mergeRowsIfLikeCell(table, previousCell);
+                    previousCell = headerCell;
                 }
             }
-            if (cell != null) {
-                mergeOrPutTableHeadCell(table, rowIdx, cell);
+            if (previousCell != null) {
+                mergeRowsIfLikeCell(table, previousCell);
             }
         }
-
-        List<RegionCell> list = new ArrayList<>();
-        table.forEach((x, y, cell) -> {
-            if (!cell.isSingleCell()) {
-                list.add(cell.toRegionCell());
-            }
-        });
-
-        return list.toArray(new RegionCell[list.size()]);
+        return table;
     }
 
-    static RegionCell[] collectRegionAddressByCell(List<HeadCell>[] tableHeadCell) {
-        List<String>[] result = new List[tableHeadCell.length];
-        for (int i = 0; i < tableHeadCell.length; i++) {
-            result[i] = tableHeadCell[i].stream().map(cell -> {
-                return cell == null ? null : cell.getTitle();
-            }).collect(Collectors.toList());
-        }
-        return collectRegionAddresses(result);
-    }
-
-    private static void mergeOrPutTableHeadCell(
-        Table<Integer, Integer, HeadRegionCell> table, int rowIdx, HeadRegionCell cell
+    private static void mergeRowsIfLikeCell(
+        Table<Integer, Integer, TableHeaderCell> table, TableHeaderCell cell
     ) {
-        int expectColIdx = cell.getColIdx();
-        boolean mergedRows = false;
-        for (int prevRowIdx = rowIdx - 1; prevRowIdx >= 0; ) {
-            HeadRegionCell prevRowDef = table.get(prevRowIdx, expectColIdx);
-            if (prevRowDef == null) {
-                prevRowIdx--;
-            } else {
-                mergedRows = prevRowDef.increaseRowspanIfLikeCell(cell);
+        int colIdx = cell.getColIdx();
+        int maxRowNum = cell.getRowIdx() + 1;
+        for (int rowIdx = 0; rowIdx < maxRowNum; rowIdx++) {
+            TableHeaderCell prevRowCell = table.get(rowIdx, colIdx);
+            if (prevRowCell != cell && prevRowCell.mergeRowsIfLikeCell(cell)) {
                 break;
             }
         }
-        if (!mergedRows) {
-            table.put(rowIdx, expectColIdx, cell);
-        }
     }
 
-    private final static class HeadRegionCell {
+    private final static class TableHeaderCell extends HeaderCell {
 
+        private final boolean fillSkipped;
         private final String title;
+        private final short height;
         private final int rowIdx;
         private final int colIdx;
         private int rowspan;
         private int colspan;
 
-        HeadRegionCell(String title, int rowIdx, int colIdx) {
-            this.title = title;
+        TableHeaderCell(HeadCell targetCell, int rowIdx, int colIdx) {
+            this.title = HeadCell.getTitleOfNull(targetCell);
+            this.fillSkipped = targetCell.isOffsetFilled();
+            this.height = targetCell.getHeight();
             this.rowIdx = rowIdx;
             this.colIdx = colIdx;
             this.rowspan = 1;
             this.colspan = 1;
         }
-
-        boolean isSingleCell() { return rowspan == 1 && colspan == 1; }
 
         boolean isTitleEquals(String otherTitle) {
             if (title != null && otherTitle != null) {
@@ -163,12 +156,12 @@ final class HeadUtil {
         /**
          * 如果两个单元格相似（标题一致），则合并
          *
-         * @param otherTitle 期望标题
+         * @param thisTitle 期望标题
          *
          * @return 是否合并完成
          */
-        boolean increaseColspanIfTitleEquals(String otherTitle) {
-            boolean equals = isTitleEquals(otherTitle);
+        boolean mergeColsIfTitleEquals(String thisTitle) {
+            boolean equals = isTitleEquals(thisTitle);
             if (equals) {
                 this.colspan++;
             }
@@ -182,17 +175,37 @@ final class HeadUtil {
          *
          * @return 是否合并完成
          */
-        boolean increaseRowspanIfLikeCell(HeadRegionCell cell) {
-            boolean equals = this.colspan == cell.colspan && isTitleEquals(cell.title);
+        boolean mergeRowsIfLikeCell(TableCell cell) {
+            boolean equals = this.colspan == cell.getColspan() && isTitleEquals(cell.getValue());
             if (equals) {
                 this.rowspan++;
             }
             return equals;
         }
 
+        @Override
         public int getColIdx() { return colIdx; }
 
-        RegionCell toRegionCell() { return new RegionCell(rowIdx, colIdx, rowspan, colspan); }
+        @Override
+        public String getValue() { return title; }
+
+        @Override
+        public int getRowIdx() { return rowIdx; }
+
+        @Override
+        public int getRowspan() { return rowspan; }
+
+        @Override
+        public int getColspan() { return colspan; }
+
+        @Override
+        public short getHeight() { return height; }
+
+        @Override
+        final boolean isOffsetCell() { return getValue() == null; }
+
+        @Override
+        final boolean isFillSkipped() { return fillSkipped; }
     }
 }
 

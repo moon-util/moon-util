@@ -119,7 +119,7 @@ interface Descriptor {
      *
      * @return 偏移单元格
      */
-    default boolean getOffsetFillSkipped() { return false; }
+    default boolean getOffsetFillSkipped() { return true; }
 
     /**
      * 是否是组合列
