@@ -39,10 +39,4 @@ final class Assert {
             throw new IllegalStateException(NOT_ALLOWED.replace("{}", propertyName));
         }
     }
-
-    static void notAllowedColumnGroup(boolean hasGroup, String propertyName) {
-        if (hasGroup) {
-            throw new IllegalStateException(NOT_SUPPORT.replace("{}", propertyName));
-        }
-    }
 }

@@ -399,7 +399,20 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      * @return 单元格操作器
      */
     public CellFactory index(int index) {
-        factory.setCell(proxy.useOrCreateCell(index, true));
+        factory.setCell(proxy.useOrCreateCell(index));
+        return factory;
+    }
+
+    /**
+     * 在指定位置使用或创建单元格
+     *
+     * @param index  单元格位置
+     * @param create 是否直接创建，而不是优先使用已存在的单元格
+     *
+     * @return 单元格操作器
+     */
+    public CellFactory index(int index, boolean create) {
+        factory.setCell(proxy.useOrCreateCell(index, create));
         return factory;
     }
 
@@ -413,7 +426,22 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      * @return 当前 RowFactory
      */
     public RowFactory index(int index, Consumer<CellFactory> consumer) {
-        factory.setCell(proxy.useOrCreateCell(index, true));
+        factory.setCell(proxy.useOrCreateCell(index));
+        consumer.accept(factory);
+        return this;
+    }
+
+    /**
+     * 在指定位置使用或创建单元格
+     *
+     * @param index    单元格位置
+     * @param create   是否直接创建，而不是优先使用已存在的单元格
+     * @param consumer 操作器
+     *
+     * @return 当前 RowFactory
+     */
+    public RowFactory index(int index, boolean create, Consumer<CellFactory> consumer) {
+        factory.setCell(proxy.useOrCreateCell(index, create));
         consumer.accept(factory);
         return this;
     }

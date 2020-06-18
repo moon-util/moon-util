@@ -116,15 +116,15 @@ final class TableRenderer implements Renderer {
                 // 设置表头标题
                 if (cell.isOffsetCell()) {
                     if (cell.isFillSkipped()) {
-                        factory.nextCell();
+                        factory.index(cell.getColIdx());
                     }
                 } else {
-                    factory.next(cell.getValue());
+                    factory.index(cell.getColIdx()).val(cell.getValue());
                 }
                 // 合并表头单元格
                 cell.merge(sheet);
             }
-            maxHeight(factory, rowCells);
+            // maxHeight(factory, rowCells);
         }
 
         // 设置列宽

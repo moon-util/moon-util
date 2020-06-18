@@ -51,4 +51,12 @@ public @interface TableColumnGroup {
      * @return 偏移量
      */
     int offset() default 0;
+
+    /**
+     * 标题参与偏移的行数, 当{@code offsetHeadRows}大于等于表头行数时，
+     * 所有标题行都偏移，否则只偏移倒数{@code offsetHeadRows}行
+     *
+     * @return 表头偏移行数
+     */
+    int offsetHeadRows() default Integer.MAX_VALUE;
 }

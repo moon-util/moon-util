@@ -89,28 +89,25 @@ class ExcelUtilTest {
         @TableColumnGroup(value = {"物理"})
         private ScoreCompare score1 = new ScoreCompare();
 
-        // @DefinitionStyle(wrapText = true)
-        // @DefinitionStyle(wrapText = true)
-        // @ReferenceStyle
         @TableColumnGroup({"化学"})
         private ScoreCompare score2 = new ScoreCompare();
 
         // @TableColumnOffset(1)
         // @TableColumn
-        @TableColumn(value = {"上次", "总分"}, offset = 0)
+        @TableColumn(value = {"分数统计", "上次总分"}, offset = 0)
         public int getPrevTotal() {
             return toTotal(ScoreCompare::getPrev);
         }
 
         // @TableColumn
-        @TableColumn(value = {"此次总分"}, order = 0)
+        @TableColumn(value = {"分数统计", "此次总分"}, order = 0)
         public int getThisTotal() {
             return toTotal(ScoreCompare::getCurr);
         }
 
         // @TableColumnOffset(1)
         // @TableColumn
-        @TableColumn(value = "分数变化", order = 1, offset = 2)
+        @TableColumn(value = {"分数统计", "分数变化"}, order = 1, offset = 2,offsetHeadRows = 1)
         public int getDiffTotal() {
             return getThisTotal() - getPrevTotal();
         }
@@ -163,7 +160,7 @@ class ExcelUtilTest {
         private String status = nextBoolean() ? "健康" : "其他";
 
         @DefaultValue("<空>")
-        @TableColumn(value = {"值","纸质","侄子","侄子的侄子"}, offset = 2)
+        @TableColumn(value = {"值", "纸质", "侄子", "侄子的侄子"}, offset = 2)
         private String value;
 
         @TableColumnGroup({"得分情况"})

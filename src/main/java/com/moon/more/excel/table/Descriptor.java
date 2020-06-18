@@ -72,14 +72,16 @@ interface Descriptor {
      */
     TableColumnGroup getTableColumnGroup();
 
-
-    // /**
-    //  * 获取偏移注解
-    //  *
-    //  * @return TableColumnOffset
-    //  */
-    // default TableColumnOffset getOffsetMarked() { return getAnnotation(TableColumnOffset.class); }
-
+    /**
+     * 读取值，不存在的话返回默认值
+     *
+     * @param getter0 TableColumn getter
+     * @param getter1 TableColumnGroup getter
+     * @param dft     默认值
+     * @param <T>     返回值类型
+     *
+     * @return 获取的值
+     */
     default <T> T getOrDefault(
         Function<TableColumn, T> getter0, Function<TableColumnGroup, T> getter1, T dft
     ) {
@@ -112,7 +114,11 @@ interface Descriptor {
      *
      * @return
      */
-    default int getOffsetHeadRows() { return Integer.MAX_VALUE; }
+    default int getOffsetHeadRows() {
+        return getOrDefault(col -> col.offsetHeadRows(),
+
+            grp -> grp.offsetHeadRows(), Integer.MAX_VALUE);
+    }
 
     /**
      * 是否填充
