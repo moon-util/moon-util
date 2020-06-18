@@ -7,7 +7,7 @@
   <groupId>com.github.moon-util</groupId>
   <artifactId>moon-util</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.30</version>
+  <version>0.0.31</version>
 
   <name>moon-util</name>
   <description>a java tool library</description>
