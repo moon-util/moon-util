@@ -105,7 +105,7 @@ public class Parser<T extends Marked> {
                 continue;
             }
 
-            MarkMethod marked = toMarked(method, descriptor.getName(), descriptor.getPropertyType());
+            Marked marked = toMarked(method, descriptor.getName(), descriptor.getPropertyType());
             ParserUtil.putMarked(marked, annotated, unAnnotated);
         }
     }
@@ -120,9 +120,9 @@ public class Parser<T extends Marked> {
         }
     }
 
-    private static MarkMethod toMarked(Method method, String name, Class type) {
-        return new MarkMethod(name, type, method);
+    private static Marked toMarked(Method method, String name, Class type) {
+        return Marked.of(name, type, method);
     }
 
-    private static MarkField toMarked(Field field) { return new MarkField(field); }
+    private static Marked toMarked(Field field) { return Marked.of(field); }
 }

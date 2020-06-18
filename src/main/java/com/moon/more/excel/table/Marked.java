@@ -5,13 +5,15 @@ import com.moon.more.excel.annotation.TableColumnGroup;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
  * @author benshaoye
  */
-abstract class Marked<T extends Member> implements Descriptor {
+final class Marked<T extends Member> implements Descriptor {
 
     protected final static <M extends AnnotatedElement, T extends Annotation> T obtain(M m, Class<T> type) {
         return m.getAnnotation(type);
@@ -19,6 +21,14 @@ abstract class Marked<T extends Member> implements Descriptor {
 
     protected final static <T extends Annotation> T obtain(Member m, Class<T> type) {
         return obtain((AnnotatedElement) m, type);
+    }
+
+    static Marked of(Field field) {
+        return of(field.getName(), field.getType(), field);
+    }
+
+    static Marked of(String name, Class type, Member member) {
+        return new Marked(name, type, member);
     }
 
     private final static short[] DEFAULT_HEIGHT_ARR = {};

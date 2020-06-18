@@ -36,7 +36,6 @@ class TableColGroup extends TableCol {
         int superRowsLength = super.getHeaderRowsLength();
         if (rowIdx < superRowsLength) {
             int colsCount = child.getHeaderColsCount();
-            // int offsetVal = child.getTotalOffsetVal();
             int count = colsCount;
             for (int i = 0; i < count; i++) {
                 super.appendTitlesAtRowIdx(rowTitles, rowIdx);
@@ -48,7 +47,6 @@ class TableColGroup extends TableCol {
 
     @Override
     void render(IntAccessor indexer, RowFactory factory, Object data) {
-        // todo render group
         Object entityData = getControl().control(data);
         child.doRenderRow(indexer, factory, entityData);
     }

@@ -52,7 +52,7 @@ class ExcelUtilTest {
         private String sex = nextBoolean() ? "男" : "女";
 
         // @TableColumn
-        @TableColumn({"居住地址"})
+        @TableColumn(value = {"居住地址"},width = 4000)
         private String address = ADDRESS.get(nextInt(0, ADDRESS.size()));
 
         // @TableColumn
@@ -119,12 +119,12 @@ class ExcelUtilTest {
 
     public static class FeeDetail {
 
-        @TableColumn(value = "基本工资", rowsHeight4Head = 800, width = Integer.MAX_VALUE)
+        @TableColumn(value = "基本工资", rowsHeight4Head = 800, width = 0)
         // @TableColumn({"基本工资"})
         private int basicSalary = nextInt(5000, 10000);
 
         // @TableColumn
-        @TableColumn({"岗位工资"})
+        @TableColumn(value = {"岗位工资"})
         private int jobSalary = nextInt(500, 1000);
 
         // @TableColumn

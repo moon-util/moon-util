@@ -24,11 +24,11 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
         Assert.notDuplicated(this);
     }
 
-    private final <T> T obtainOrNull(Marked marked, Function<Marked, T> getter) {
+    private <T> T obtainOrNull(Marked marked, Function<Marked, T> getter) {
         return marked == null ? null : getter.apply(marked);
     }
 
-    private final <T> T obtainOrNull(Function<Marked, T> getter) {
+    private <T> T obtainOrNull(Function<Marked, T> getter) {
         T value = obtainOrNull(onMethod, getter);
         return value == null ? obtainOrNull(onField, getter) : value;
     }

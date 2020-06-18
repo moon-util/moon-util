@@ -18,7 +18,7 @@ final class HeadUtil {
     /**
      * 计算表头最大行数
      *
-     * @param columns {@link ParserUtil#mapAttrs(Map, Function)}
+     * @param columns {@link ParserUtil#mapAttrs(Class, Map, Function)}
      *
      * @return 行数
      */
@@ -33,7 +33,7 @@ final class HeadUtil {
     /**
      * 计算表头，结果呈一个矩阵，可能包含相邻位置值相同的情况
      *
-     * @param columns     {@link ParserUtil#mapAttrs(Map, Function)}
+     * @param columns     {@link ParserUtil#mapAttrs(Class, Map, Function)}
      * @param maxRowCount {@link #maxHeaderRowNum(TableCol[])}
      *
      * @return 表头矩阵
@@ -120,7 +120,7 @@ final class HeadUtil {
         int maxRowNum = cell.getRowIdx() + 1;
         for (int rowIdx = 0; rowIdx < maxRowNum; rowIdx++) {
             TableHeaderCell prevRowCell = table.get(rowIdx, colIdx);
-            if (prevRowCell != cell && prevRowCell.mergeRowsIfLikeCell(cell)) {
+            if (prevRowCell.mergeRowsIfLikeCell(cell)) {
                 break;
             }
         }
@@ -171,12 +171,16 @@ final class HeadUtil {
         /**
          * 如果两个单元格“相似”（标题一致，合并列一致），则合并
          *
-         * @param cell 目标单元格
+         * @param that 目标单元格
          *
          * @return 是否合并完成
          */
-        boolean mergeRowsIfLikeCell(TableCell cell) {
-            boolean equals = this.colspan == cell.getColspan() && isTitleEquals(cell.getValue());
+        boolean mergeRowsIfLikeCell(TableCell that) {
+            boolean equals = this != that
+
+                && this.colspan == that.getColspan()
+
+                && isTitleEquals(that.getValue());
             if (equals) {
                 this.rowspan++;
             }
@@ -202,10 +206,10 @@ final class HeadUtil {
         public short getHeight() { return height; }
 
         @Override
-        final boolean isOffsetCell() { return getValue() == null; }
+        boolean isOffsetCell() { return getValue() == null; }
 
         @Override
-        final boolean isFillSkipped() { return fillSkipped; }
+        boolean isFillSkipped() { return fillSkipped; }
     }
 }
 

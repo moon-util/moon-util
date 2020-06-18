@@ -139,9 +139,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory setColumnsWidth(Integer... widths) {
-        return setColumnsWidthBegin(0, widths);
-    }
+    public SheetFactory setColumnsWidth(Integer... widths) { return setColumnsWidthBegin(0, widths); }
 
     /**
      * 按索引给各列设置指定宽度
@@ -161,10 +159,12 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
                 if ((columnWidth = widths[i]) != null) {
                     int index = i + startIdx;
                     int width = columnWidth;
-                    if (width < max) {
-                        sheet.setColumnWidth(index, width);
-                    } else {
-                        sheet.autoSizeColumn(index);
+                    if (width > -1) {
+                        if (width < max) {
+                            sheet.setColumnWidth(index, width);
+                        } else {
+                            sheet.autoSizeColumn(index);
+                        }
                     }
                 }
             }
