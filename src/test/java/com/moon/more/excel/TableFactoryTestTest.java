@@ -3,6 +3,7 @@ package com.moon.more.excel;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.more.excel.annotation.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -28,6 +29,7 @@ class TableFactoryTestTest {
     }
 
     @Test
+    @Disabled
     void testRenderBody() throws Exception {
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
@@ -97,6 +99,7 @@ class TableFactoryTestTest {
     }
 
     @Test
+    @Disabled
     void testRenderList() throws Exception {
         String str = "今天真美丽";
         ExcelUtil.xlsx().sheet(sheetFactory -> {

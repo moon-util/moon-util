@@ -138,8 +138,4 @@ class ExcelUtilTestTest {
             }
         }).write("D:/test002.xlsx");
     }
-
-    @Test
-    void testName() throws Exception {
-    }
 }
