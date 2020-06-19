@@ -59,7 +59,7 @@ final class ParserUtil {
 
         for (int i = 0, size = list.size(); i < size; i++) {
             Attribute attr = list.get(i);
-            styleMap.putAll(StyleUtil.toStyleMap(attr));
+            styleMap.putAll(StyleUtil.toStyleMap(targetClass, attr));
             config.setAttribute(list.get(i), i);
             columns[i] = transformer.apply(config);
         }

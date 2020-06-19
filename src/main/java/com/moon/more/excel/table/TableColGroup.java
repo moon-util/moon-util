@@ -10,19 +10,22 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-class TableColGroup extends TableCol {
+final class TableColGroup extends TableCol {
 
+    private final Class targetClass;
     private final TableRenderer child;
 
     TableColGroup(AttrConfig config, TableRenderer child) {
         super(config);
         this.child = child;
+        this.targetClass = config.getTargetClass();
     }
 
     @Override
-    int getCrossColsCount() {
-        return child.getHeaderColsCount();
-    }
+    int getDepth() { return child.getDepth() + 1; }
+
+    @Override
+    int getCrossColsCount() { return child.getHeaderColsCount(); }
 
     @Override
     int getHeaderRowsCount() { return super.getHeaderRowsCount() + child.getHeaderRowsCount(); }
@@ -30,9 +33,7 @@ class TableColGroup extends TableCol {
     @Override
     void collectStyleMap(
         Map<Class, Map<String, StyleBuilder>> definitions, Map sourceMap
-    ) {
-        child.collectStyleMap(definitions, sourceMap);
-    }
+    ) { child.collectStyleMap(definitions, sourceMap); }
 
     @Override
     void appendColumnWidth(List<Integer> columnsWidth) {
@@ -56,7 +57,7 @@ class TableColGroup extends TableCol {
 
     @Override
     void render(TableProxy proxy) {
-        proxy.startLocalDataNode(getControl());
+        proxy.startLocalDataNode(getControl(), targetClass);
         child.doRenderRow(proxy);
         proxy.closeLocalDataNode();
     }

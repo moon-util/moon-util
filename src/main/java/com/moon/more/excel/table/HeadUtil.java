@@ -32,14 +32,13 @@ final class HeadUtil {
         return maxTitleRowCount;
     }
 
-    static Map<Class, Map<String, StyleBuilder>> collectStyleMap(TableCol[] columns, Map thisStyleMap) {
-        Map<Class, Map<String, StyleBuilder>> definitions = MapUtil.newHashMap();
-
-        for (TableCol column : columns) {
-            column.collectStyleMap(definitions, thisStyleMap);
+    static int groupDepth(TableCol[] cols) {
+        int depth = 0;
+        for (int i = 0; i < cols.length; i++) {
+            TableCol col = cols[i];
+            depth = Math.max(col.getDepth(), depth);
         }
-
-        return definitions;
+        return depth;
     }
 
     /**

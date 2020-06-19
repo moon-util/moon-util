@@ -27,6 +27,7 @@ final class TableRenderer implements Renderer {
     private final List<HeaderCell>[] headerCells;
     private final Integer[] columnsWidth;
     private final TableCol[] columns;
+    private final int depth;
 
     TableRenderer(Class targetClass, Map styleMap, TableCol[] columns) {
         this.columns = columns == null ? EMPTY : columns;
@@ -39,13 +40,16 @@ final class TableRenderer implements Renderer {
         // 计算表头合并的单元格
         List<HeaderCell>[] headerCells = collectHeaderCells(tableHead);
 
-        this.definitions = HeadUtil.collectStyleMap(columns, styleMap);
+        this.depth = HeadUtil.groupDepth(columns);
+        this.definitions = StyleUtil.collectStyleMap(columns, styleMap);
 
         this.targetClass = targetClass;
         this.headerCells = headerCells;
         this.tableHeadCells = tableHead;
         this.columnsWidth = columnsWidth;
     }
+
+    public int getDepth() { return depth; }
 
     public Class getTargetClass() { return targetClass; }
 
@@ -79,10 +83,11 @@ final class TableRenderer implements Renderer {
         Map<Class, Map<String, StyleBuilder>> thisDef = this.definitions;
         for (Map.Entry<Class, Map<String, StyleBuilder>> classMapEntry : thisDef.entrySet()) {
             Map<String, StyleBuilder> builderMap = classMapEntry.getValue();
-            Class targetClass = classMapEntry.getKey();
             Map newMap = new HashMap(sourceMap);
             newMap.putAll(builderMap);
-            definitions.put(targetClass, newMap);
+            if (!newMap.isEmpty()) {
+                definitions.put(classMapEntry.getKey(), newMap);
+            }
         }
     }
 
@@ -182,7 +187,7 @@ final class TableRenderer implements Renderer {
     }
 
     private void doRenderBody1(SheetFactory sheetFactory, Iterator iterator, Object first) {
-        TableProxy proxy = new TableProxy(sheetFactory);
+        TableProxy proxy = new TableProxy(sheetFactory, definitions, depth);
         if (first != null) {
             renderRecord(proxy, first);
         }
@@ -194,7 +199,7 @@ final class TableRenderer implements Renderer {
     }
 
     private void renderRecord(TableProxy proxy, Object data) {
-        proxy.setRowData(data);
+        proxy.setRowData(data, targetClass);
         proxy.nextRow();
         doRenderRow(proxy);
     }

@@ -21,6 +21,7 @@ class TableCol implements Comparable<TableCol> {
     final static short DEFAULT_HEIGHT = -1;
 
     private final String name;
+    private final String defaultClassname;
     private final String[] titles;
     private final short[] rowsHeight4Head;
     private final int offsetHeadRowsCnt;
@@ -46,6 +47,7 @@ class TableCol implements Comparable<TableCol> {
         this.offset = attr.getOffsetVal();
         this.offsetHeadRowsCnt = Math.min(attr.getOffsetHeadRows(), MAX);
         this.fillSkipped = attr.getOffsetFillSkipped();
+        this.defaultClassname = StyleUtil.classname(config.getTargetClass(), name);
     }
 
     protected final PropertyControl getControl() { return control; }
@@ -55,6 +57,8 @@ class TableCol implements Comparable<TableCol> {
     protected final int getOffset() { return offset; }
 
     protected final boolean isFillSkipped() { return fillSkipped; }
+
+    int getDepth() { return 1; }
 
     /*
      * 收集样式

@@ -1,16 +1,14 @@
 package com.moon.more.excel.table;
 
 import com.moon.core.lang.ClassUtil;
+import com.moon.core.lang.StringUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
 import com.moon.more.excel.annotation.DefinitionStyle;
 import com.moon.more.excel.annotation.StyleBuilder;
 import org.apache.poi.ss.usermodel.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static com.moon.core.lang.StringUtil.defaultIfEmpty;
@@ -20,22 +18,48 @@ import static com.moon.core.lang.StringUtil.defaultIfEmpty;
  */
 final class StyleUtil {
 
+    final static Map defaultMap = Collections.emptyMap();
+
     final static String EMPTY = "";
+
+    static Map<Class, Map<String, StyleBuilder>> collectStyleMap(TableCol[] columns, Map thisStyleMap) {
+        Map<Class, Map<String, StyleBuilder>> definitions = MapUtil.newHashMap();
+
+        for (TableCol column : columns) {
+            column.collectStyleMap(definitions, thisStyleMap);
+        }
+
+        return returningMap(definitions);
+    }
+
+    static String classname(Class type, String propertyName) {
+        return StringUtil.concat(type.getSimpleName(), "#", propertyName);
+    }
 
     static Map<String, StyleBuilder> toStyleMap(Class<?> type) {
         return parsePropertyStyle(EMPTY, type.getAnnotationsByType(DefinitionStyle.class));
     }
 
-    static Map<String, StyleBuilder> toStyleMap(Attribute attr) {
+    static Map<String, StyleBuilder> toStyleMap(Class type, Attribute attr) {
         DefinitionStyle.List list = attr.getAnnotation(DefinitionStyle.List.class);
         DefinitionStyle style = attr.getAnnotation(DefinitionStyle.class);
+        String defaultName = classname(type, attr.getName());
+        Map resultMap = null;
         if (style != null) {
             DefinitionStyle[] styles = {style};
-            return parsePropertyStyle(attr.getName(), styles);
+            resultMap = parsePropertyStyle(defaultName, styles);
         } else if (list != null) {
-            return parsePropertyStyle(attr.getName(), list.value());
+            resultMap = parsePropertyStyle(defaultName, list.value());
         }
-        return MapUtil.newHashMap();
+        return returningMap(resultMap);
+    }
+
+    static Map getScopedMapOrEmpty(Map<?, Map> definitions, Class type) {
+        return definitions.getOrDefault(type, defaultMap);
+    }
+
+    private static Map returningMap(Map resultMap) {
+        return MapUtil.isEmpty(resultMap) ? defaultMap : resultMap;
     }
 
     private static Map<String, StyleBuilder> parsePropertyStyle(String dftName, DefinitionStyle... styles) {
