@@ -4,10 +4,13 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.Renderer;
 import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.SheetFactory;
+import com.moon.more.excel.annotation.StyleBuilder;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static com.moon.more.excel.table.HeadUtil.*;
 
@@ -18,12 +21,14 @@ final class TableRenderer implements Renderer {
 
     private final static TableCol[] EMPTY = new TableCol[0];
 
+    private final Map<Class, Map<String, StyleBuilder>> definitions;
+    private final Class targetClass;
     private final List<HeadCell>[] tableHeadCells;
     private final List<HeaderCell>[] headerCells;
     private final Integer[] columnsWidth;
     private final TableCol[] columns;
 
-    TableRenderer(TableCol[] columns) {
+    TableRenderer(Class targetClass, Map styleMap, TableCol[] columns) {
         this.columns = columns == null ? EMPTY : columns;
         // 计算表头行数
         int maxTitleRowCount = maxHeaderRowNum(columns);
@@ -34,10 +39,15 @@ final class TableRenderer implements Renderer {
         // 计算表头合并的单元格
         List<HeaderCell>[] headerCells = collectHeaderCells(tableHead);
 
+        this.definitions = HeadUtil.collectStyleMap(columns, styleMap);
+
+        this.targetClass = targetClass;
         this.headerCells = headerCells;
         this.tableHeadCells = tableHead;
         this.columnsWidth = columnsWidth;
     }
+
+    public Class getTargetClass() { return targetClass; }
 
     /**
      * 获取表头行数
@@ -61,6 +71,19 @@ final class TableRenderer implements Renderer {
             columnsCount += col.getCrossColsCount();
         }
         return columnsCount;
+    }
+
+    void collectStyleMap(
+        Map<Class, Map<String, StyleBuilder>> definitions, Map sourceMap
+    ) {
+        Map<Class, Map<String, StyleBuilder>> thisDef = this.definitions;
+        for (Map.Entry<Class, Map<String, StyleBuilder>> classMapEntry : thisDef.entrySet()) {
+            Map<String, StyleBuilder> builderMap = classMapEntry.getValue();
+            Class targetClass = classMapEntry.getKey();
+            Map newMap = new HashMap(sourceMap);
+            newMap.putAll(builderMap);
+            definitions.put(targetClass, newMap);
+        }
     }
 
     void appendColumnWidth(List<Integer> columnsWidth) {
@@ -142,6 +165,10 @@ final class TableRenderer implements Renderer {
      */
     @Override
     public void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
+        doRenderBody1(sheetFactory, iterator, first);
+    }
+
+    private void doRenderBody0(SheetFactory sheetFactory, Iterator iterator, Object first) {
         IntAccessor indexer = IntAccessor.of();
         if (first != null) {
             indexer.set(0);
@@ -149,10 +176,27 @@ final class TableRenderer implements Renderer {
         }
         if (iterator != null) {
             while (iterator.hasNext()) {
-                indexer.set(0);
                 renderRecord(indexer, sheetFactory, iterator.next());
             }
         }
+    }
+
+    private void doRenderBody1(SheetFactory sheetFactory, Iterator iterator, Object first) {
+        TableProxy proxy = new TableProxy(sheetFactory);
+        if (first != null) {
+            renderRecord(proxy, first);
+        }
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                renderRecord(proxy, iterator.next());
+            }
+        }
+    }
+
+    private void renderRecord(TableProxy proxy, Object data) {
+        proxy.setRowData(data);
+        proxy.nextRow();
+        doRenderRow(proxy);
     }
 
     /**
@@ -163,9 +207,15 @@ final class TableRenderer implements Renderer {
      */
     private void renderRecord(IntAccessor indexer, SheetFactory sheetFactory, Object record) {
         RowFactory row = sheetFactory.row();
-
         doRenderRow(indexer, row, record);
         row.style("header");
+    }
+
+    final void doRenderRow(TableProxy proxy) {
+        int length = columns.length;
+        for (int i = 0; i < length; i++) {
+            columns[i].render(proxy);
+        }
     }
 
     final void doRenderRow(IntAccessor indexer, RowFactory rowFactory, Object entityData) {

@@ -6,8 +6,10 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.RowFactory;
+import com.moon.more.excel.annotation.StyleBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author benshaoye
@@ -46,21 +48,23 @@ class TableCol implements Comparable<TableCol> {
         this.fillSkipped = attr.getOffsetFillSkipped();
     }
 
-    protected PropertyControl getControl() { return control; }
+    protected final PropertyControl getControl() { return control; }
 
-    protected GetTransformer getTransform() { return transform; }
+    protected final GetTransformer getTransform() { return transform; }
 
-    final void appendTitles4Offset(List<HeadCell> rowTitles, int rowIdx) {
-        HeadCell thisCell = HeadCell.EMPTY;
-        if (rowIdx + offsetHeadRowsCnt < getHeaderRowsCount()) {
-            thisCell = getEnsureHeadCellAtIdx(rowIdx);
-        }
-        for (int i = 0; i < offset; i++) {
-            rowTitles.add(thisCell);
-        }
-    }
+    protected final int getOffset() { return offset; }
 
-    int getCrossColsCount() { return offset + 1; }
+    protected final boolean isFillSkipped() { return fillSkipped; }
+
+    /*
+     * 收集样式
+     */
+
+    void collectStyleMap(Map<Class, Map<String, StyleBuilder>> definitions, Map sourceMap) {}
+
+    /*
+     * 列宽
+     */
 
     void appendColumnWidth(List<Integer> columnsWidth) {
         int dftWidth = DEFAULT_HEIGHT;
@@ -70,12 +74,26 @@ class TableCol implements Comparable<TableCol> {
         columnsWidth.add(width == null ? dftWidth : width);
     }
 
+    /*
+     * 表头标题
+     */
+
     void appendTitlesAtRowIdx(List<HeadCell> rowTitles, int rowIdx) {
         appendTitles4Offset(rowTitles, rowIdx);
-        rowTitles.add(getEnsureHeadCellAtIdx(rowIdx));
+        rowTitles.add(headCellAtIdx(rowIdx));
     }
 
-    private final HeadCell getEnsureHeadCellAtIdx(int rowIdx) {
+    final void appendTitles4Offset(List<HeadCell> rowTitles, int rowIdx) {
+        HeadCell thisCell = HeadCell.EMPTY;
+        if (rowIdx + offsetHeadRowsCnt < getHeaderRowsCount()) {
+            thisCell = headCellAtIdx(rowIdx);
+        }
+        for (int i = 0; i < offset; i++) {
+            rowTitles.add(thisCell);
+        }
+    }
+
+    private final HeadCell headCellAtIdx(int rowIdx) {
         return new HeadCell(titleAtIdx(rowIdx), rowHeightAtIdx(rowIdx), fillSkipped);
     }
 
@@ -84,40 +102,51 @@ class TableCol implements Comparable<TableCol> {
         short[] values = this.rowsHeight4Head;
         int count = values.length;
         int heightIdx = rowIdx < count ? rowIdx : count - 1;
-        return inArrRange(heightIdx, count) ? values[heightIdx] : DEFAULT_HEIGHT;
+        return inRange(heightIdx, count) ? values[heightIdx] : DEFAULT_HEIGHT;
     }
 
-    /**
-     * 为了用计算的方式获取指定行的标题
-     * <p>
-     * ensure： 确保，一定会返回非空值，不足的自动用最后一个标题补上
-     *
-     * @param rowIdx
-     *
-     * @return
-     */
     private final String titleAtIdx(int rowIdx) {
         // 表头标题
         int length = getHeaderRowsLength();
         int index = rowIdx < length ? rowIdx : length - 1;
-        return inArrRange(index, length) ? getTitles()[index] : null;
+        return inRange(index, length) ? titles[index] : null;
     }
 
-    private static boolean inArrRange(int index, int length) {
-        return index > -1 && index < length;
-    }
+    private static boolean inRange(int index, int length) { return index > -1 && index < length; }
 
-    final int getHeaderRowsLength() { return getTitles().length; }
+    /*
+     * 行列数计算
+     */
 
     /**
+     * 自身表头所占行数
+     *
+     * @return
+     */
+    final int getHeaderRowsLength() { return titles.length; }
+
+    /**
+     * 整“列”表头所占行数
+     * <p>
      * 这里单独写成一个获取 length 的方法是为了后面支持 ColumnGroup 时用计算的方式获取最大长度
      *
      * @return
      */
     int getHeaderRowsCount() { return getHeaderRowsLength(); }
 
-    private final String[] getTitles() { return titles; }
+    /**
+     * 横跨单元格列数
+     *
+     * @return
+     */
+    int getCrossColsCount() { return offset + 1; }
 
+    /**
+     * 执行偏移
+     *
+     * @param factory
+     * @param indexer
+     */
     private final void doOffsetCells(RowFactory factory, IntAccessor indexer) {
         int offset = this.offset;
         if (fillSkipped) {
@@ -129,16 +158,41 @@ class TableCol implements Comparable<TableCol> {
         indexer.increment(offset);
     }
 
-    final CellFactory toCellFactory(RowFactory rowFactory, IntAccessor indexer) {
+    /**
+     * 当前单元格实际有意义位置的单元格
+     *
+     * @param rowFactory
+     * @param indexer
+     *
+     * @return
+     */
+    final CellFactory indexedCell(RowFactory rowFactory, IntAccessor indexer) {
         doOffsetCells(rowFactory, indexer);
         return rowFactory.index(indexer.getAndIncrement());
     }
 
+    /**
+     * 跳过当前单元格（用在数据 null 时）
+     *
+     * @param factory
+     * @param indexer
+     */
     final void skip(RowFactory factory, IntAccessor indexer) {
         if (fillSkipped) {
-            toCellFactory(factory, indexer);
+            indexedCell(factory, indexer);
         } else {
             indexer.increment(offset + 1);
+        }
+    }
+
+    void render(TableProxy proxy) {
+        if (proxy.isSkipped()) {
+            proxy.skip(getOffset(), isFillSkipped());
+        } else {
+            // proxy.renderThisCell(offset, fillSkipped, getControl(), getTransform());
+            CellFactory cellFactory = proxy.indexedCell(getOffset(), isFillSkipped());
+            Object thisData = proxy.getThisData(getControl());
+            transform.doTransform(cellFactory, thisData);
         }
     }
 
@@ -146,7 +200,7 @@ class TableCol implements Comparable<TableCol> {
         if (data == null) {
             skip(factory, indexer);
         } else {
-            CellFactory cellFactory = toCellFactory(factory, indexer);
+            CellFactory cellFactory = indexedCell(factory, indexer);
             transform.doTransform(cellFactory, control.control(data));
         }
     }
@@ -158,7 +212,7 @@ class TableCol implements Comparable<TableCol> {
     public String toString() {
         final StringBuilder sb = new StringBuilder("TableCol: ");
         sb.append(name).append("; Titles: ");
-        sb.append(StringUtil.defaultIfEmpty(JoinerUtil.join(getTitles()), "<空>"));
+        sb.append(StringUtil.defaultIfEmpty(JoinerUtil.join(titles), "<空>"));
         return sb.toString();
     }
 }

@@ -43,4 +43,11 @@ public @interface TableIndexer {
      * @return true | false
      */
     boolean ending() default false;
+
+    /**
+     * 集合字段是否全局计数
+     *
+     * @return true: 全局计数
+     */
+    boolean joinGlobal() default false;
 }

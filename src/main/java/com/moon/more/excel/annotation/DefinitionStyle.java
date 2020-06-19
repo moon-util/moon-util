@@ -41,10 +41,10 @@ public @interface DefinitionStyle {
      *
      * @return 自定义类
      *
-     * @see CellStyleBuilder 自定义样式;{@link CellStyle}
-     * @see CellStyleFontBuilder 自定义样式和字体;{@link Font}
+     * @see StyleBuilder 自定义样式;{@link CellStyle}
+     * @see StyleFontBuilder 自定义样式和字体;{@link Font}
      */
-    Class<? extends CellStyleBuilder> createBy() default CellStyleBuilder.class;
+    Class<? extends StyleBuilder> createBy() default StyleBuilder.class;
 
     /**
      * 继承自另外一个样式{@link #classname()}
@@ -60,6 +60,15 @@ public @interface DefinitionStyle {
     String extendBy() default "";
 
     /**
+     * 引用字体
+     *
+     * @return
+     *
+     * @see DefinitionFont#id()
+     */
+    String refFontId() default "";
+
+    /**
      * 前景色色值
      * <p>
      * POI 中实际上前景色是背景色，背景色是什么？不知道
@@ -67,8 +76,9 @@ public @interface DefinitionStyle {
      * @return 色值
      *
      * @see IndexedColors
+     * @see CellStyle#setFillForegroundColor(short)
      */
-    short fillForegroundColor() default -1;
+    short foregroundColor() default -1;
 
     /**
      * 背景色色值
@@ -76,8 +86,9 @@ public @interface DefinitionStyle {
      * @return 色值
      *
      * @see IndexedColors
+     * @see CellStyle#setFillBackgroundColor(short)
      */
-    short fillBackgroundColor() default -1;
+    short backgroundColor() default -1;
 
     /**
      * 填充模式

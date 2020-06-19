@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public interface CellStyleBuilder extends Consumer<CellStyle> {
+public interface StyleBuilder extends Consumer<CellStyle> {
 
     /**
      * 自定义样式设置

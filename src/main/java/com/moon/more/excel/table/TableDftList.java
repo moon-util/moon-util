@@ -35,16 +35,36 @@ final class TableDftList<T> extends TableCol {
     }
 
     @Override
+    void render(TableProxy proxy) {
+        if (proxy.isSkipped()) {
+            if (always) {
+                CellFactory factory = proxy.indexedCell(getOffset(), isFillSkipped());
+                transformer.doTransform(factory, defaultVal);
+            } else {
+                proxy.skip(getOffset(), isFillSkipped());
+            }
+        } else {
+            CellFactory factory = proxy.indexedCell(getOffset(), isFillSkipped());
+            Object thisData = proxy.getThisData(getControl());
+            if (test(thisData)) {
+                transformer.doTransform(factory, defaultVal);
+            } else {
+                getTransform().doTransform(factory, thisData);
+            }
+        }
+    }
+
+    @Override
     final void render(IntAccessor indexer, RowFactory rowFactory, Object data) {
         if (data == null) {
             if (always) {
-                CellFactory factory = toCellFactory(rowFactory, indexer);
+                CellFactory factory = indexedCell(rowFactory, indexer);
                 transformer.doTransform(factory, defaultVal);
             } else {
                 skip(rowFactory, indexer);
             }
         } else {
-            CellFactory factory = toCellFactory(rowFactory, indexer);
+            CellFactory factory = indexedCell(rowFactory, indexer);
             Object propertyValue = getControl().control(data);
             if (test(propertyValue)) {
                 transformer.doTransform(factory, defaultVal);

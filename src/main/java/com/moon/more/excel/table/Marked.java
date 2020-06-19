@@ -3,6 +3,7 @@ package com.moon.more.excel.table;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
 
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -23,12 +24,10 @@ final class Marked<T extends Member> implements Descriptor {
         return obtain((AnnotatedElement) m, type);
     }
 
-    static Marked of(Field field) {
-        return of(field.getName(), field.getType(), field);
-    }
+    static Marked of(Field field) { return new Marked(field.getName(), field.getType(), field); }
 
-    static Marked of(String name, Class type, Member member) {
-        return new Marked(name, type, member);
+    static Marked of(PropertyDescriptor descriptor, Method method) {
+        return new Marked(descriptor.getName(), descriptor.getPropertyType(), method);
     }
 
     private final static short[] DEFAULT_HEIGHT_ARR = {};

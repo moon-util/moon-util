@@ -2,8 +2,10 @@ package com.moon.more.excel.table;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.RowFactory;
+import com.moon.more.excel.annotation.StyleBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author benshaoye
@@ -26,6 +28,13 @@ class TableColGroup extends TableCol {
     int getHeaderRowsCount() { return super.getHeaderRowsCount() + child.getHeaderRowsCount(); }
 
     @Override
+    void collectStyleMap(
+        Map<Class, Map<String, StyleBuilder>> definitions, Map sourceMap
+    ) {
+        child.collectStyleMap(definitions, sourceMap);
+    }
+
+    @Override
     void appendColumnWidth(List<Integer> columnsWidth) {
         child.appendColumnWidth(columnsWidth);
     }
@@ -43,6 +52,13 @@ class TableColGroup extends TableCol {
         } else {
             child.appendTitlesAtRowIdx(rowTitles, rowIdx - superRowsLength);
         }
+    }
+
+    @Override
+    void render(TableProxy proxy) {
+        proxy.startLocalDataNode(getControl());
+        child.doRenderRow(proxy);
+        proxy.closeLocalDataNode();
     }
 
     @Override

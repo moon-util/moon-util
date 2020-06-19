@@ -1,7 +1,9 @@
 package com.moon.more.excel.table;
 
+import com.moon.core.util.MapUtil;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
+import com.moon.more.excel.annotation.StyleBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,16 @@ final class HeadUtil {
             maxTitleRowCount = Math.max(column.getHeaderRowsCount(), maxTitleRowCount);
         }
         return maxTitleRowCount;
+    }
+
+    static Map<Class, Map<String, StyleBuilder>> collectStyleMap(TableCol[] columns, Map thisStyleMap) {
+        Map<Class, Map<String, StyleBuilder>> definitions = MapUtil.newHashMap();
+
+        for (TableCol column : columns) {
+            column.collectStyleMap(definitions, thisStyleMap);
+        }
+
+        return definitions;
     }
 
     /**

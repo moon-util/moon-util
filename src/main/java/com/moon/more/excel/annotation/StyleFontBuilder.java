@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 /**
  * @author benshaoye
  */
-public interface CellStyleFontBuilder extends CellStyleBuilder, BiConsumer<CellStyle, Font> {
+public interface StyleFontBuilder extends StyleBuilder, BiConsumer<CellStyle, Font> {
 
     /**
      * 自定义样式和字体

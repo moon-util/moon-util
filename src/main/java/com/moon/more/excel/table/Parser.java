@@ -2,7 +2,6 @@ package com.moon.more.excel.table;
 
 import com.moon.more.excel.annotation.DefaultNumber;
 import com.moon.more.excel.annotation.DefaultValue;
-import com.moon.more.excel.annotation.DefinitionStyle;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -10,19 +9,25 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author benshaoye
  */
-public class Parser<T extends Marked> {
+final class Parser<T extends Marked> {
 
     private final Creator creator;
 
     private final static Set<Class> NUMBER_CLASSES = new HashSet<>();
+
+    private final static Map<Class, TableRenderer> parsed = new WeakHashMap<>();
+
+    final static TableRenderer cache(Class type, TableRenderer renderer) {
+        parsed.put(type, renderer);
+        return renderer;
+    }
+
+    private final static synchronized TableRenderer getCached(Class type) { return parsed.get(type); }
 
     static {
         NUMBER_CLASSES.add(byte.class);
@@ -42,6 +47,11 @@ public class Parser<T extends Marked> {
     protected Creator getCreator() { return creator; }
 
     protected TableRenderer doParseConfiguration(Class type) {
+        TableRenderer renderer = getCached(type);
+        if (renderer != null) {
+            return renderer;
+        }
+
         try {
             Map<String, T> annotatedAtM = new LinkedHashMap<>();
             Map<String, T> unAnnotatedAtM = new LinkedHashMap<>();
@@ -53,7 +63,7 @@ public class Parser<T extends Marked> {
             Map<String, Attribute> annotated = ParserUtil.merge2Attr(annotatedAtM, annotatedAtF);
             Map<String, Attribute> unAnnotated = ParserUtil.merge2Attr(unAnnotatedAtM, unAnnotatedAtF);
 
-            return toRendererResult(type, annotated, unAnnotated);
+            return toRendererResultAndCache(type, annotated, unAnnotated);
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -61,13 +71,20 @@ public class Parser<T extends Marked> {
         }
     }
 
-    private TableRenderer toRendererResult(
+    private TableRenderer toRendererResultAndCache(
         Class type, Map<String, Attribute> annotated, Map<String, Attribute> unAnnotated
-    ) { return annotated.isEmpty() ? toResultByUnAnnotated(type, unAnnotated) : toResultByAnnotated(type, annotated); }
+    ) {
+        TableRenderer renderer;
+        if (annotated.isEmpty()) {
+            renderer = toResultByUnAnnotated(type, unAnnotated);
+        } else {
+            renderer = toResultByAnnotated(type, annotated);
+        }
+        return cache(type, renderer);
+    }
 
     private TableRenderer toResultByAnnotated(Class type, Map<String, Attribute> annotated) {
         return ParserUtil.mapAttrs(type, annotated, config -> {
-            StyleUtil.parsePropertyStyle(config);
             Attribute attr = config.getAttribute();
             Class targetClass = attr.getPropertyType();
 
@@ -105,7 +122,7 @@ public class Parser<T extends Marked> {
                 continue;
             }
 
-            Marked marked = toMarked(method, descriptor.getName(), descriptor.getPropertyType());
+            Marked marked = Marked.of(descriptor, method);
             ParserUtil.putMarked(marked, annotated, unAnnotated);
         }
     }
@@ -114,15 +131,9 @@ public class Parser<T extends Marked> {
         while (type != null && type != Object.class) {
             Field[] fields = type.getDeclaredFields();
             for (Field field : fields) {
-                ParserUtil.putMarked(toMarked(field), annotated, unAnnotated);
+                ParserUtil.putMarked(Marked.of(field), annotated, unAnnotated);
             }
             type = type.getSuperclass();
         }
     }
-
-    private static Marked toMarked(Method method, String name, Class type) {
-        return Marked.of(name, type, method);
-    }
-
-    private static Marked toMarked(Field field) { return Marked.of(field); }
 }

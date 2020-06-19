@@ -55,11 +55,16 @@ final class ParserUtil {
         Collections.sort(list, Attribute::compareTo);
         AttrConfig config = new AttrConfig(targetClass);
 
+        Map styleMap = StyleUtil.toStyleMap(targetClass);
+
         for (int i = 0, size = list.size(); i < size; i++) {
+            Attribute attr = list.get(i);
+            styleMap.putAll(StyleUtil.toStyleMap(attr));
             config.setAttribute(list.get(i), i);
             columns[i] = transformer.apply(config);
         }
-        return new TableRenderer(columns);
+
+        return new TableRenderer(targetClass, styleMap, columns);
     }
 
     static void putMarked(Marked marked, Map annotated, Map unAnnotated) {
