@@ -7,6 +7,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -223,6 +224,19 @@ public final class ExcelUtil extends LoadUtil {
             default:
                 return null;
         }
+    }
+
+    /**
+     * 获取单元格的值，并转换
+     *
+     * @param cell      单元格
+     * @param converter 转换器
+     * @param <T>       返回值类型
+     *
+     * @return 返回转换后的值
+     */
+    public static <T> T getValue(Cell cell, Function<Object, ? extends T> converter) {
+        return converter.apply(getValue(cell));
     }
 
     /**

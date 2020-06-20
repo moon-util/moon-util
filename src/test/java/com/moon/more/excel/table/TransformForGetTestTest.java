@@ -2,9 +2,6 @@ package com.moon.more.excel.table;
 
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.lang.reflect.ModifierUtil;
-import com.moon.core.util.UnsafeUtil;
-import com.moon.more.excel.TableFactory;
-import com.moon.more.excel.WorkbookProxy;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +13,7 @@ class TransformForGetTestTest {
 
     @Test
     void testFindOrDefault() throws Exception {
-        TransformForGet defaults = TransformForGet.DEFAULT;
+        TransferForGet defaults = TransferForGet.DEFAULT;
         defaults.test(null);
     }
 

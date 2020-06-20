@@ -5,9 +5,13 @@ import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.more.excel.ExcelUtil;
 import com.moon.more.excel.annotation.*;
+import com.moon.more.excel.annotation.defaults.DefaultNumber;
+import com.moon.more.excel.annotation.defaults.DefaultValue;
+import com.moon.more.excel.annotation.format.DateTimePattern;
+import com.moon.more.excel.annotation.format.NumberPattern;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.junit.jupiter.api.Disabled;
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -15,7 +19,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
@@ -64,6 +70,7 @@ class ExcelUtilTest {
     public static class ScoreCompare {
 
         // @TableColumn
+        @NumberPattern(value = "$##.00",minIntDigit = 4,minFractionDigit = 4)
         @TableColumn({"上次得分"})
         private int prev = nextInt(59, 95);
 
@@ -152,6 +159,12 @@ class ExcelUtilTest {
         // @TableColumn
         @TableColumn(value = {"部门"})
         private String department = "市场部";
+
+        @DateTimePattern("yyyy-MM-dd")
+        // @TableColumn("导出日期")
+        private DateTime datetime = DateTime.now();
+        // private Date now = new Date();
+        // private LocalDateTime time = LocalDateTime.now();
 
         @TableColumnGroup({"基本信息"})
         private BasicInfo info = new BasicInfo();

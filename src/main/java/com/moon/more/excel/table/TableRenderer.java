@@ -1,10 +1,11 @@
 package com.moon.more.excel.table;
 
 import com.moon.core.lang.ref.IntAccessor;
+import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.Renderer;
 import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.SheetFactory;
-import com.moon.more.excel.annotation.StyleBuilder;
+import com.moon.more.excel.annotation.style.StyleBuilder;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.HashMap;
@@ -126,6 +127,26 @@ final class TableRenderer implements Renderer {
         }
         if (finalHeight > -1) {
             factory.height(finalHeight);
+        }
+    }
+
+    @Override
+    public void captionWith(SheetFactory factory, String caption, String classname, int height) {
+        int colspan;
+        List<HeaderCell>[] cells = this.headerCells;
+        if (cells.length > 0) {
+            colspan = cells[0].size();
+        } else {
+            colspan = getHeaderColsCount();
+        }
+
+        RowFactory rowFactory = factory.row();
+        CellFactory cellFactory = rowFactory.cell(1, colspan).val(caption);
+        if (classname != null) {
+            cellFactory.styleAs(classname);
+        }
+        if (height > -1) {
+            rowFactory.height(height);
         }
     }
 

@@ -6,7 +6,7 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.RowFactory;
-import com.moon.more.excel.annotation.StyleBuilder;
+import com.moon.more.excel.annotation.style.StyleBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -30,19 +30,20 @@ class TableCol implements Comparable<TableCol> {
     private final int offset;
     private final int order;
     private final PropertyControl control;
-    private final GetTransformer transform;
     private final boolean fillSkipped;
+    private final CellSetter setter;
 
     TableCol(AttrConfig config) {
         Attribute attr = config.getAttribute();
-        this.transform = attr.getTransformOrDefault();
         this.control = attr.getValueGetter();
         this.titles = attr.getTitles();
         this.rowsHeight4Head = attr.getHeadHeightArr();
 
-        this.order = attr.getOrder();
         this.name = attr.getName();
+        this.order = attr.getOrder();
         this.width = attr.getColumnWidth();
+
+        this.setter = CellSetter.of(attr);
 
         this.offset = attr.getOffsetVal();
         this.offsetHeadRowsCnt = Math.min(attr.getOffsetHeadRows(), MAX);
@@ -51,8 +52,6 @@ class TableCol implements Comparable<TableCol> {
     }
 
     protected final PropertyControl getControl() { return control; }
-
-    protected final GetTransformer getTransform() { return transform; }
 
     protected final int getOffset() { return offset; }
 
@@ -189,14 +188,17 @@ class TableCol implements Comparable<TableCol> {
         }
     }
 
+    final void setNormalVal(CellFactory factory, Object value) {
+        setter.set(factory, value);
+    }
+
     void render(TableProxy proxy) {
         if (proxy.isSkipped()) {
             proxy.skip(getOffset(), isFillSkipped());
         } else {
-            // proxy.renderThisCell(offset, fillSkipped, getControl(), getTransform());
             CellFactory cellFactory = proxy.indexedCell(getOffset(), isFillSkipped());
             Object thisData = proxy.getThisData(getControl());
-            transform.doTransform(cellFactory, thisData);
+            setNormalVal(cellFactory, thisData);
         }
     }
 
@@ -205,7 +207,7 @@ class TableCol implements Comparable<TableCol> {
             skip(factory, indexer);
         } else {
             CellFactory cellFactory = indexedCell(factory, indexer);
-            transform.doTransform(cellFactory, control.control(data));
+            setNormalVal(cellFactory, control.control(data));
         }
     }
 

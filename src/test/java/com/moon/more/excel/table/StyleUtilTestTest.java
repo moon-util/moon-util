@@ -1,7 +1,6 @@
 package com.moon.more.excel.table;
 
-import com.moon.more.excel.annotation.DefinitionStyle;
-import org.junit.jupiter.api.Assertions;
+import com.moon.more.excel.annotation.style.DefinitionStyle;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

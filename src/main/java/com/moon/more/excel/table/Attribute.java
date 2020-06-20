@@ -39,8 +39,8 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
         return ValueGetter.of(method, field);
     }
 
-    public TransformForGet getTransformOrDefault() {
-        return TransformForGet.findOrDefault(getPropertyType());
+    public TransferForGet getTransformOrDefault() {
+        return TransferForGet.findOrDefault(getPropertyType());
     }
 
     @Override
@@ -57,7 +57,7 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     @Override
     public Integer getColumnWidth() {
         TableColumn column = getTableColumn();
-        return column == null ? null : column.width();
+        return column == null ? null : column.width() < 0 ? null : column.width();
     }
 
     @Override

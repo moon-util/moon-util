@@ -5,7 +5,7 @@ import com.moon.more.excel.CellFactory;
 /**
  * @author benshaoye
  */
-interface GetTransformer {
+interface GetTransfer {
 
     /**
      * 设置单元格值
@@ -13,5 +13,5 @@ interface GetTransformer {
      * @param factory
      * @param value
      */
-    void doTransform(CellFactory factory, Object value);
+    void transfer(CellFactory factory, Object value);
 }

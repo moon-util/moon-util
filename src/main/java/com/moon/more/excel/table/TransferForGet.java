@@ -3,7 +3,6 @@ package com.moon.more.excel.table;
 import com.moon.core.lang.DoubleUtil;
 import com.moon.core.util.CalendarUtil;
 import com.moon.core.util.DateUtil;
-import com.moon.core.util.SetUtil;
 import com.moon.more.excel.CellFactory;
 import sun.util.BuddhistCalendar;
 
@@ -21,12 +20,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.concurrent.atomic.LongAdder;
 
-import static java.util.Collections.unmodifiableSet;
-
 /**
  * @author benshaoye
  */
-enum TransformForGet implements GetTransformer {
+enum TransferForGet implements GetTransfer {
 
     /**
      * 真假
@@ -41,7 +38,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             if (value != null) {
                 factory.val((Boolean) value);
             }
@@ -60,7 +57,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             if (value != null) {
                 factory.val((Double) value);
             }
@@ -85,7 +82,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             if (value != null) {
                 factory.val(value.toString());
             }
@@ -117,7 +114,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             if (value instanceof Number) {
                 factory.val(((Number) value).doubleValue());
             } else {
@@ -138,7 +135,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             if (value instanceof Number) {
                 factory.val((Date) value);
             } else {
@@ -159,7 +156,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             if (value instanceof Number) {
                 factory.val((Calendar) value);
             } else {
@@ -179,7 +176,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             if (value != null) {
                 factory.val(((LocalTime) value).format(formatter));
             }
@@ -195,7 +192,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             factory.val((LocalDate) value);
         }
     },
@@ -209,7 +206,7 @@ enum TransformForGet implements GetTransformer {
         }
 
         @Override
-        public void doTransform(CellFactory factory, Object value) {
+        public void transfer(CellFactory factory, Object value) {
             factory.val((LocalDateTime) value);
         }
     },
@@ -224,7 +221,7 @@ enum TransformForGet implements GetTransformer {
         boolean test(Class propertyType) { return false; }
 
         @Override
-        public void doTransform(CellFactory factory, Object data) {
+        public void transfer(CellFactory factory, Object data) {
             factory.getCell().setBlank();
         }
     },
@@ -239,31 +236,28 @@ enum TransformForGet implements GetTransformer {
         boolean test(Class propertyType) { return true; }
 
         @Override
-        public void doTransform(CellFactory factory, Object data) {
+        public void transfer(CellFactory factory, Object data) {
             if (data != null) {
                 factory.val(data.toString());
             }
         }
     };
 
-    private final Set<Class> supports;
-
     private static class Cached {
 
-        final static Map<Class, TransformForGet> SUPPORTS = new HashMap<>();
+        final static Map<Class, TransferForGet> SUPPORTS = new HashMap<>();
     }
 
-    TransformForGet(Class... supports) {
+    TransferForGet(Class... supports) {
         for (Class<?> support : supports) {
             Cached.SUPPORTS.put(support, this);
         }
-        this.supports = unmodifiableSet(SetUtil.toSet(supports));
     }
 
-    public static TransformForGet findOrDefault(Class propertyType) {
-        TransformForGet transfer = Cached.SUPPORTS.get(propertyType);
+    public static TransferForGet findOrDefault(Class propertyType) {
+        TransferForGet transfer = Cached.SUPPORTS.get(propertyType);
         if (transfer == null) {
-            for (TransformForGet value : values()) {
+            for (TransferForGet value : values()) {
                 if (value.test(propertyType)) {
                     return value;
                 }

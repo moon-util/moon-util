@@ -8,6 +8,26 @@ import java.util.Iterator;
 public interface Renderer {
 
     /**
+     * 设置总标题，独占一行，并合并列
+     *
+     * @param factory sheet 渲染器
+     * @param caption 标题
+     */
+    default void captionWith(SheetFactory factory, String caption) {
+        captionWith(factory, caption, null, -1);
+    }
+
+    /**
+     * 设置总标题，独占一行，并合并列
+     *
+     * @param factory   sheet 渲染器
+     * @param caption   标题
+     * @param classname 定义的样式名
+     * @param height    标题行高
+     */
+    void captionWith(SheetFactory factory, String caption, String classname, int height);
+
+    /**
      * 渲染表头
      *
      * @param sheetFactory sheet 渲染器

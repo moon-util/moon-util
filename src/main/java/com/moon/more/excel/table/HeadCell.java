@@ -25,7 +25,7 @@ final class HeadCell {
         this.title = title;
     }
 
-    final static String getTitleOfNull(HeadCell cell) { return cell == null ? null : cell.title; }
+    static String getTitleOfNull(HeadCell cell) { return cell == null ? null : cell.title; }
 
     public short getHeight() { return height; }
 

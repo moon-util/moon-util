@@ -2,7 +2,7 @@ package com.moon.more.excel.table;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.more.excel.RowFactory;
-import com.moon.more.excel.annotation.StyleBuilder;
+import com.moon.more.excel.annotation.style.StyleBuilder;
 
 import java.util.List;
 import java.util.Map;

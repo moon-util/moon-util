@@ -4,8 +4,8 @@ import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
-import com.moon.more.excel.annotation.DefinitionStyle;
-import com.moon.more.excel.annotation.StyleBuilder;
+import com.moon.more.excel.annotation.style.DefinitionStyle;
+import com.moon.more.excel.annotation.style.StyleBuilder;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.*;
@@ -55,7 +55,7 @@ final class StyleUtil {
     }
 
     static Map getScopedMapOrEmpty(Map<?, Map> definitions, Class type) {
-        return definitions.getOrDefault(type, defaultMap);
+        return definitions.isEmpty() ? defaultMap : definitions.getOrDefault(type, defaultMap);
     }
 
     private static Map returningMap(Map resultMap) {

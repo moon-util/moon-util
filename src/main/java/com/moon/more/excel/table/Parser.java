@@ -1,7 +1,7 @@
 package com.moon.more.excel.table;
 
-import com.moon.more.excel.annotation.DefaultNumber;
-import com.moon.more.excel.annotation.DefaultValue;
+import com.moon.more.excel.annotation.defaults.DefaultNumber;
+import com.moon.more.excel.annotation.defaults.DefaultValue;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -18,8 +18,6 @@ final class Parser<T extends Marked> {
 
     private final Creator creator;
 
-    private final static Set<Class> NUMBER_CLASSES = new HashSet<>();
-
     private final static Map<Class, TableRenderer> parsed = new WeakHashMap<>();
 
     final static TableRenderer cache(Class type, TableRenderer renderer) {
@@ -28,19 +26,6 @@ final class Parser<T extends Marked> {
     }
 
     private final static synchronized TableRenderer getCached(Class type) { return parsed.get(type); }
-
-    static {
-        NUMBER_CLASSES.add(byte.class);
-        NUMBER_CLASSES.add(short.class);
-        NUMBER_CLASSES.add(int.class);
-        NUMBER_CLASSES.add(long.class);
-        NUMBER_CLASSES.add(float.class);
-        NUMBER_CLASSES.add(double.class);
-    }
-
-    private final static boolean isNumberType(Class type) {
-        return Number.class.isAssignableFrom(type) || NUMBER_CLASSES.contains(type);
-    }
 
     Parser(Creator creator) { this.creator = creator; }
 
@@ -94,7 +79,7 @@ final class Parser<T extends Marked> {
             }
 
             DefaultNumber atNumber = attr.getAnnotation(DefaultNumber.class);
-            if (atNumber != null && isNumberType(targetClass)) {
+            if (atNumber != null && Assert.isNumberType(targetClass)) {
                 return TableDft.of(config, atNumber);
             }
 

@@ -5,7 +5,7 @@ import com.moon.more.excel.CellFactory;
 import com.moon.more.excel.PropertyControl;
 import com.moon.more.excel.RowFactory;
 import com.moon.more.excel.SheetFactory;
-import com.moon.more.excel.annotation.StyleBuilder;
+import com.moon.more.excel.annotation.style.StyleBuilder;
 
 import java.util.Map;
 

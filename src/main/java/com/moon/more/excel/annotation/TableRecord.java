@@ -1,5 +1,7 @@
 package com.moon.more.excel.annotation;
 
+import com.moon.more.excel.annotation.style.DefinitionStyle;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
