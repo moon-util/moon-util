@@ -35,6 +35,10 @@ public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
         return new TableImpl<>(() -> new LinkedHashMap<>(), x -> new LinkedHashMap<>());
     }
 
+    public static <X, Y, Z> TableImpl<X, Y, Z> newWeakHashTable() {
+        return new TableImpl<>(() -> new WeakHashMap<>(), x -> new WeakHashMap<>());
+    }
+
     private Map ensureTable() {
         Map<X, Map<Y, Z>> table = this.table;
         if (table == null) {
@@ -61,6 +65,9 @@ public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
 
     @Override
     public Z put(X x, Y y, Z z) { return ensureRow(x).put(y, z); }
+
+    @Override
+    public Z putIfAbsent(X x, Y y, Z z) { return ensureRow(x).putIfAbsent(y, z); }
 
     @Override
     public Z get(Object x, Object y) {

@@ -24,6 +24,17 @@ public interface Table<X, Y, Z> {
     Z put(X x, Y y, Z z);
 
     /**
+     * 指定坐标设置值
+     *
+     * @param x X轴
+     * @param y Y轴
+     * @param z 值
+     *
+     * @return 旧值或 null
+     */
+    Z putIfAbsent(X x, Y y, Z z);
+
+    /**
      * 指定坐标获取值
      *
      * @param x X轴

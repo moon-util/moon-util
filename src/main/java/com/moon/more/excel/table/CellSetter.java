@@ -7,17 +7,14 @@ import com.moon.more.excel.annotation.format.DateTimePattern;
 import com.moon.more.excel.annotation.format.NumberPattern;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
-import org.joda.time.format.DateTimeFormat;
 
 import java.text.*;
-import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.WeakHashMap;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
+import java.util.function.Supplier;
+
+import static org.joda.time.format.DateTimeFormat.forPattern;
 
 /**
  * @author benshaoye
@@ -40,17 +37,25 @@ abstract class CellSetter {
         DateTimePattern dateFmt = attr.getAnnotation(DateTimePattern.class);
         NumberPattern numberFmt = attr.getAnnotation(NumberPattern.class);
         if (numberFmt != null && Assert.isNumberType(propertyType)) {
-            return tryNumber(propertyType, numberFmt);
+            return tryNumberAndCache(numberFmt);
         }
 
         if (dateFmt != null) {
-            CellSetter setter = tryDateOrNull(propertyType, dateFmt.value());
+            CellSetter setter = tryDateOrNull(propertyType, dateFmt);
             if (setter != null) {
                 return setter;
             }
         }
 
-        return new BasicSetter(attr.getTransformOrDefault());
+        return basicSetterMap.get(attr.getTransformOrDefault());
+    }
+
+    private final static Map<GetTransfer, BasicSetter> basicSetterMap = new EnumMap(TransferForGet.class);
+
+    static {
+        for (TransferForGet value : TransferForGet.values()) {
+            basicSetterMap.put(value, new BasicSetter(value));
+        }
     }
 
     /**
@@ -61,7 +66,7 @@ abstract class CellSetter {
      */
     abstract void set(CellFactory factory, Object value);
 
-    final GetTransfer getTransformer() { return transformer; }
+    final GetTransfer getTransfer() { return transformer; }
 
     private static abstract class StringCellSetter extends CellSetter {
 
@@ -77,7 +82,12 @@ abstract class CellSetter {
             DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
             DecimalFormat format = new DecimalFormat(pattern.value(), symbols);
             format.setRoundingMode(pattern.roundingMode());
-            format.setGroupingUsed(pattern.grouped());
+
+            boolean grouping = pattern.grouping();
+            if (grouping) {
+                format.setGroupingUsed(true);
+                format.setGroupingSize(pattern.groupingSize());
+            }
 
             int count = pattern.maxIntDigit();
             if (count >= 0) {
@@ -104,21 +114,21 @@ abstract class CellSetter {
         @Override
         void set(CellFactory factory, Object value) {
             if (value != null) {
-                getTransformer().transfer(factory, format(value));
+                getTransfer().transfer(factory, format(value));
             }
         }
     }
 
     private final static Table<Class, Object, CellSetter> cached
 
-        = new TableImpl<>(() -> new WeakHashMap(), c -> new WeakHashMap());
+        = TableImpl.newWeakHashTable();
 
-    final static CellSetter get(Class propertyType, Object pattern) {
+    private static CellSetter get(Class propertyType, Object pattern) {
         return cached.get(propertyType, pattern);
     }
 
-    final static synchronized void cache(Class propertyType, Object pattern, CellSetter setter) {
-        cached.put(propertyType, pattern, setter);
+    private static synchronized void cache(Class propertyType, Object pattern, CellSetter setter) {
+        cached.putIfAbsent(propertyType, pattern, setter);
     }
 
     /*
@@ -127,11 +137,11 @@ abstract class CellSetter {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private final static CellSetter tryNumber(Class propertyType, NumberPattern pattern) {
-        CellSetter setter = get(propertyType, pattern);
+    private final static CellSetter tryNumberAndCache(NumberPattern pattern) {
+        CellSetter setter = get(Number.class, pattern);
         if (setter == null) {
             setter = new NumberSetter(pattern);
-            cache(propertyType, pattern, setter);
+            cache(Number.class, pattern, setter);
         }
         return setter;
     }
@@ -142,38 +152,33 @@ abstract class CellSetter {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private final static CellSetter tryDateOrNull(Class propertyType, String pattern) {
-        return tryOrParse4Date(propertyType, pattern);
-    }
-
-    private final static CellSetter tryOrParse4Date(Class propertyType, String pattern) {
+    private final static CellSetter tryDateOrNull(Class propertyType, DateTimePattern pattern) {
         CellSetter setter = get(propertyType, pattern);
         if (setter == null) {
-            setter = doParseDateSetter(propertyType, pattern);
-            cache(propertyType, pattern, setter);
+            setter = doParseAndCache(propertyType, pattern);
         }
         return setter;
     }
 
-    private final static CellSetter doParseDateSetter(Class propertyType, String pattern) {
-        if (typeof(ChronoLocalDateTime.class, propertyType)) {
-            return new J8LocalDateTimeSetter(pattern);
-        }
-        if (typeof(ChronoLocalDate.class, propertyType)) {
-            return new J8LocalDateSetter(pattern);
-        }
-        if (typeof(LocalTime.class, propertyType)) {
-            return new J8LocalTimeSetter(pattern);
+    private final static CellSetter doParseAndCache(Class propertyType, DateTimePattern pattern) {
+        if (typeof(TemporalAccessor.class, propertyType)) {
+            CellSetter setter = new TemporalAccessorSetter(pattern);
+            cache(TemporalAccessor.class, pattern, setter);
+            return setter;
         }
         if (Assert.isImportedJodaTime()) {
-            CellSetter setter = tryOfJoda(propertyType, pattern);
+            CellSetter setter = tryJodaAndCache(propertyType, pattern);
             if (setter != null) { return setter; }
         }
         if (typeof(Calendar.class, propertyType)) {
-            return new CalendarSetter(pattern);
+            CellSetter setter = new CalendarSetter(pattern);
+            cache(Calendar.class, pattern, setter);
+            return setter;
         }
         if (typeof(Date.class, propertyType)) {
-            return new UtilDateSetter(pattern);
+            CellSetter setter = new UtilDateSetter(pattern);
+            cache(Date.class, pattern, setter);
+            return setter;
         }
         return null;
     }
@@ -186,18 +191,20 @@ abstract class CellSetter {
 
     private abstract static class DefaultDateSetter extends StringCellSetter {
 
-        private final String pattern;
         private final ThreadLocal<DateFormat> formatter;
+        private final Supplier<DateFormat> creator;
 
-        protected DefaultDateSetter(String pattern) {
+        protected DefaultDateSetter(DateTimePattern pattern) {
+            String format = pattern.value();
+            Locale locale = pattern.locale().getLocale();
             this.formatter = new ThreadLocal<>();
-            this.pattern = pattern;
+            this.creator = () -> new SimpleDateFormat(format, locale);
         }
 
         final DateFormat getFormatter() {
             DateFormat format = formatter.get();
             if (format == null) {
-                format = new SimpleDateFormat(pattern);
+                format = creator.get();
                 formatter.set(format);
             }
             return format;
@@ -216,14 +223,14 @@ abstract class CellSetter {
         void set(CellFactory factory, Object value) {
             if (value != null) {
                 String date = getFormatter().format(toDate(value));
-                getTransformer().transfer(factory, date);
+                getTransfer().transfer(factory, date);
             }
         }
     }
 
     private final static class CalendarSetter extends DefaultDateSetter {
 
-        protected CalendarSetter(String pattern) { super(pattern); }
+        protected CalendarSetter(DateTimePattern pattern) { super(pattern); }
 
         @Override
         final Date toDate(Object value) { return ((Calendar) value).getTime(); }
@@ -231,7 +238,7 @@ abstract class CellSetter {
 
     private final static class UtilDateSetter extends DefaultDateSetter {
 
-        protected UtilDateSetter(String pattern) { super(pattern); }
+        protected UtilDateSetter(DateTimePattern pattern) { super(pattern); }
 
         @Override
         final Date toDate(Object value) { return (Date) value; }
@@ -243,12 +250,16 @@ abstract class CellSetter {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private static CellSetter tryOfJoda(Class propertyType, String pattern) {
+    private static CellSetter tryJodaAndCache(Class propertyType, DateTimePattern pattern) {
         if (typeof(ReadableInstant.class, propertyType)) {
-            return new ReadableInstantSetter(pattern);
+            CellSetter setter = new ReadableInstantSetter(pattern);
+            cache(ReadableInstant.class, pattern, setter);
+            return setter;
         }
         if (typeof(ReadablePartial.class, propertyType)) {
-            return new ReadablePartialSetter(pattern);
+            CellSetter setter = new ReadablePartialSetter(pattern);
+            cache(ReadableInstant.class, pattern, setter);
+            return setter;
         }
         return null;
     }
@@ -257,13 +268,13 @@ abstract class CellSetter {
 
         private final org.joda.time.format.DateTimeFormatter formatter;
 
-        private JodaDateSetter(String pattern) {
-            this.formatter = DateTimeFormat.forPattern(pattern);
+        private JodaDateSetter(DateTimePattern pattern) {
+            String format = pattern.value();
+            Locale locale = pattern.locale().getLocale();
+            this.formatter = forPattern(format).withLocale(locale);
         }
 
-        final org.joda.time.format.DateTimeFormatter getFormatter() {
-            return formatter;
-        }
+        final org.joda.time.format.DateTimeFormatter getFormatter() { return formatter; }
 
         /**
          * 格式化日期
@@ -277,14 +288,14 @@ abstract class CellSetter {
         @Override
         final void set(CellFactory factory, Object value) {
             if (value != null) {
-                getTransformer().transfer(factory, toFormat(value));
+                getTransfer().transfer(factory, toFormat(value));
             }
         }
     }
 
     private final static class ReadableInstantSetter extends JodaDateSetter {
 
-        private ReadableInstantSetter(String pattern) { super(pattern); }
+        private ReadableInstantSetter(DateTimePattern pattern) { super(pattern); }
 
         @Override
         String toFormat(Object value) {
@@ -294,7 +305,7 @@ abstract class CellSetter {
 
     private final static class ReadablePartialSetter extends JodaDateSetter {
 
-        private ReadablePartialSetter(String pattern) { super(pattern); }
+        private ReadablePartialSetter(DateTimePattern pattern) { super(pattern); }
 
         @Override
         String toFormat(Object value) {
@@ -308,12 +319,13 @@ abstract class CellSetter {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private abstract static class Java8DateSetter extends StringCellSetter {
+    private final static class TemporalAccessorSetter extends StringCellSetter {
 
         private final DateTimeFormatter formatter;
 
-        protected Java8DateSetter(String pattern) {
-            this.formatter = DateTimeFormatter.ofPattern(pattern);
+        protected TemporalAccessorSetter(DateTimePattern pattern) {
+            Locale locale = pattern.locale().getLocale();
+            this.formatter = DateTimeFormatter.ofPattern(pattern.value(), locale);
         }
 
         /**
@@ -324,53 +336,16 @@ abstract class CellSetter {
          *
          * @return
          */
-        abstract String toFormat(Object value, DateTimeFormatter formatter);
+        final String toFormat(Object value, DateTimeFormatter formatter) {
+            return formatter.format((TemporalAccessor) value);
+        }
 
         @Override
         final void set(CellFactory factory, Object value) {
             if (factory != null) {
                 String val = toFormat(value, formatter);
-                getTransformer().transfer(factory, val);
+                getTransfer().transfer(factory, val);
             }
-        }
-    }
-
-    /**
-     * LocalDate
-     */
-    private final static class J8LocalDateSetter extends Java8DateSetter {
-
-        protected J8LocalDateSetter(String pattern) { super(pattern); }
-
-        @Override
-        String toFormat(Object value, DateTimeFormatter formatter) {
-            return ((ChronoLocalDate) value).format(formatter);
-        }
-    }
-
-    /**
-     * LocalDateTime
-     */
-    private final static class J8LocalDateTimeSetter extends Java8DateSetter {
-
-        protected J8LocalDateTimeSetter(String pattern) { super(pattern); }
-
-        @Override
-        String toFormat(Object value, DateTimeFormatter formatter) {
-            return ((ChronoLocalDateTime) value).format(formatter);
-        }
-    }
-
-    /**
-     * LocalTime
-     */
-    private final static class J8LocalTimeSetter extends Java8DateSetter {
-
-        protected J8LocalTimeSetter(String pattern) { super(pattern); }
-
-        @Override
-        String toFormat(Object value, DateTimeFormatter formatter) {
-            return ((LocalTime) value).format(formatter);
         }
     }
 
@@ -386,7 +361,7 @@ abstract class CellSetter {
 
         @Override
         void set(CellFactory factory, Object value) {
-            getTransformer().transfer(factory, value);
+            getTransfer().transfer(factory, value);
         }
     }
 }

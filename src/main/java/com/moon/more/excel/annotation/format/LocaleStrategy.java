@@ -3,7 +3,6 @@ package com.moon.more.excel.annotation.format;
 import java.util.Locale;
 
 import static java.util.Locale.Category.FORMAT;
-import static java.util.Locale.getDefault;
 
 /**
  * @author benshaoye
@@ -13,7 +12,7 @@ public enum LocaleStrategy {
     /**
      * 默认
      */
-    DEFAULT(null),
+    DEFAULT(Locale.getDefault(FORMAT)),
 
 
     ENGLISH(Locale.ENGLISH),
@@ -83,8 +82,5 @@ public enum LocaleStrategy {
 
     LocaleStrategy(Locale locale) { this.locale = locale; }
 
-    public Locale getLocale() {
-        Locale locale = this.locale;
-        return locale == null ? getDefault(FORMAT) : locale;
-    }
+    public Locale getLocale() { return locale; }
 }

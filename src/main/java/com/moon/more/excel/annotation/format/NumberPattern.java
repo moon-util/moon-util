@@ -26,9 +26,18 @@ public @interface NumberPattern {
     /**
      * 是否分组
      *
-     * @return true: 返回结果用逗号没三围一组
+     * @return true: 返回结果用逗号每三位一组
      */
-    boolean grouped() default true;
+    boolean grouping() default true;
+
+    /**
+     * 分组大小
+     *
+     * @return 默认每三位一组
+     *
+     * @see #grouping()
+     */
+    int groupingSize() default 3;
 
     /**
      * 取整方式

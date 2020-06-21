@@ -33,4 +33,11 @@ public @interface DateTimePattern {
      * @return
      */
     String value() default "";
+
+    /**
+     * 语言
+     *
+     * @return 根据系统自动获取
+     */
+    LocaleStrategy locale() default LocaleStrategy.DEFAULT;
 }
