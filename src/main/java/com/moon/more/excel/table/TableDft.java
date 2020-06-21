@@ -11,8 +11,7 @@ import java.lang.reflect.Constructor;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static com.moon.more.excel.table.TransferForGet.DOUBLE;
-import static com.moon.more.excel.table.TransferForGet.STRING;
+import static com.moon.more.excel.table.TransferForGet.*;
 
 /**
  * @author benshaoye
@@ -22,18 +21,24 @@ abstract class TableDft extends TableCol {
     private final GetTransfer defaulter;
     private final Object defaultVal;
     private final boolean always;
+    private final boolean useSuperSetter;
 
     protected TableDft(AttrConfig config, GetTransfer transformer, Object defaultVal, boolean always) {
         super(config);
         this.always = always;
         this.defaultVal = defaultVal;
         this.defaulter = transformer;
+        this.useSuperSetter = transformer == DOUBLE || transformer == NUMBER;
     }
 
     final boolean isAlways() { return always; }
 
     final void setMatchedVal(CellFactory factory) {
-        defaulter.transfer(factory, defaultVal);
+        if (useSuperSetter) {
+            setNormalVal(factory, defaultVal);
+        } else {
+            defaulter.transfer(factory, defaultVal);
+        }
     }
 
     /**
@@ -151,9 +156,7 @@ abstract class TableDft extends TableCol {
         }
 
         @Override
-        final boolean isMatched(Object rowData, Object propertyValue) {
-            return tester.test(propertyValue);
-        }
+        final boolean isMatched(Object rowData, Object propertyValue) { return tester.test(propertyValue); }
     }
 
 
@@ -213,8 +216,6 @@ abstract class TableDft extends TableCol {
         }
 
         @Override
-        final boolean isMatched(Object rowData, Object propertyValue) {
-            return newTester(rowData).test(propertyValue);
-        }
+        final boolean isMatched(Object rowData, Object propertyValue) { return newTester(rowData).test(propertyValue); }
     }
 }

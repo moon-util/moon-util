@@ -10,7 +10,7 @@ import java.lang.reflect.Modifier;
 /**
  * @author benshaoye
  */
-abstract class ValueGetter implements PropertyControl {
+final class ValueGetter implements PropertyControl {
 
     private final PropertyControl getter;
 
@@ -32,7 +32,7 @@ abstract class ValueGetter implements PropertyControl {
     }
 
     @SuppressWarnings("all")
-    private static class PubFieldGetter implements PropertyControl {
+    private final static class PubFieldGetter implements PropertyControl {
 
         private final Field field;
 
@@ -56,7 +56,7 @@ abstract class ValueGetter implements PropertyControl {
     }
 
     @SuppressWarnings("all")
-    private static class DftFieldGetter implements PropertyControl {
+    private final static class DftFieldGetter implements PropertyControl {
 
         private final Field field;
 
@@ -83,7 +83,7 @@ abstract class ValueGetter implements PropertyControl {
         return isPublic(method) ? new PubMethodGetter(method) : new DftMethodGetter(method);
     }
 
-    private static class PubMethodGetter implements PropertyControl {
+    private final static class PubMethodGetter implements PropertyControl {
 
         private final Method getter;
 
@@ -93,15 +93,15 @@ abstract class ValueGetter implements PropertyControl {
         public Object control(Object data) {
             try {
                 return getter.invoke(data);
-            } catch (RuntimeException | Error exeception) {
-                throw exeception;
+            } catch (RuntimeException | Error exception) {
+                throw exception;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
         }
     }
 
-    private static class DftMethodGetter implements PropertyControl {
+    private final static class DftMethodGetter implements PropertyControl {
 
         private final Method getter;
 
@@ -114,8 +114,8 @@ abstract class ValueGetter implements PropertyControl {
                 Object val = getter.invoke(data);
                 getter.setAccessible(false);
                 return val;
-            } catch (RuntimeException | Error exeception) {
-                throw exeception;
+            } catch (RuntimeException | Error exception) {
+                throw exception;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
             }
