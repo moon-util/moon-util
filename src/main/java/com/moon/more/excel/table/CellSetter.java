@@ -8,10 +8,12 @@ import com.moon.more.excel.annotation.format.NumberPattern;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 
+import java.lang.annotation.Annotation;
 import java.text.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.joda.time.format.DateTimeFormat.forPattern;
@@ -23,13 +25,9 @@ abstract class CellSetter {
 
     private final GetTransfer transformer;
 
-    private static boolean typeof(Class expected, Class actual) {
-        return expected.isAssignableFrom(actual);
-    }
+    private static boolean typeof(Class expected, Class actual) { return expected.isAssignableFrom(actual); }
 
-    protected CellSetter(GetTransfer transformer) {
-        this.transformer = transformer;
-    }
+    protected CellSetter(GetTransfer transformer) { this.transformer = transformer; }
 
     static CellSetter of(Attribute attr) {
         Class propertyType = attr.getPropertyType();
@@ -112,23 +110,37 @@ abstract class CellSetter {
         String format(Object value) { return formatter.format(value); }
 
         @Override
-        void set(CellFactory factory, Object value) {
+        final void set(CellFactory factory, Object value) {
             if (value != null) {
                 getTransfer().transfer(factory, format(value));
             }
         }
     }
 
-    private final static Table<Class, Object, CellSetter> cached
+    private final static Table<Class, Annotation, CellSetter> cached
 
         = TableImpl.newWeakHashTable();
 
-    private static CellSetter get(Class propertyType, Object pattern) {
-        return cached.get(propertyType, pattern);
+    private static synchronized void cache(Class propertyType, Annotation pattern, CellSetter setter) {
+        cached.putIfAbsent(propertyType, pattern, setter);
     }
 
-    private static synchronized void cache(Class propertyType, Object pattern, CellSetter setter) {
-        cached.putIfAbsent(propertyType, pattern, setter);
+    private static <T extends Annotation> CellSetter getOrBuild(
+        Class expect, Class propertyType, T pattern, Function<T, ? extends CellSetter> builder
+    ) { return getOrBuild(typeof(expect, propertyType), propertyType, pattern, builder); }
+
+    private static <T extends Annotation> CellSetter getOrBuild(
+        boolean matched, Class propertyType, T pattern, Function<T, ? extends CellSetter> builder
+    ) {
+        CellSetter setter = null;
+        if (matched) {
+            setter = cached.get(propertyType, pattern);
+            if (setter == null) {
+                setter = builder.apply(pattern);
+                cache(propertyType, pattern, setter);
+            }
+        }
+        return setter;
     }
 
     /*
@@ -138,12 +150,7 @@ abstract class CellSetter {
      */
 
     private final static CellSetter tryNumberAndCache(NumberPattern pattern) {
-        CellSetter setter = get(Number.class, pattern);
-        if (setter == null) {
-            setter = new NumberSetter(pattern);
-            cache(Number.class, pattern, setter);
-        }
-        return setter;
+        return getOrBuild(Number.class, Number.class, pattern, NumberSetter::new);
     }
 
     /*
@@ -152,35 +159,28 @@ abstract class CellSetter {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private final static CellSetter tryDateOrNull(Class propertyType, DateTimePattern pattern) {
-        CellSetter setter = get(propertyType, pattern);
-        if (setter == null) {
-            setter = doParseAndCache(propertyType, pattern);
-        }
-        return setter;
-    }
-
-    private final static CellSetter doParseAndCache(Class propertyType, DateTimePattern pattern) {
-        if (typeof(TemporalAccessor.class, propertyType)) {
-            CellSetter setter = new TemporalAccessorSetter(pattern);
-            cache(TemporalAccessor.class, pattern, setter);
+    private final static CellSetter tryDateOrNull(Class type, DateTimePattern pattern) {
+        CellSetter setter = getOrBuild(TemporalAccessor.class, type, pattern, TemporalAccessorSetter::new);
+        if (setter != null) {
             return setter;
+        }
+        if (long.class == type || Long.class == type) {
+            if (Assert.isImportedJodaTime()) {
+                return new LongJodaTimeSetter(pattern);
+            }
+            return new LongDateSetter(pattern);
         }
         if (Assert.isImportedJodaTime()) {
-            CellSetter setter = tryJodaAndCache(propertyType, pattern);
-            if (setter != null) { return setter; }
+            setter = tryJodaAndCache(type, pattern);
+            if (setter != null) {
+                return setter;
+            }
         }
-        if (typeof(Calendar.class, propertyType)) {
-            CellSetter setter = new CalendarSetter(pattern);
-            cache(Calendar.class, pattern, setter);
+        setter = getOrBuild(Calendar.class, type, pattern, CalendarSetter::new);
+        if (setter != null) {
             return setter;
         }
-        if (typeof(Date.class, propertyType)) {
-            CellSetter setter = new UtilDateSetter(pattern);
-            cache(Date.class, pattern, setter);
-            return setter;
-        }
-        return null;
+        return getOrBuild(Date.class, type, pattern, UtilDateSetter::new);
     }
 
     /*
@@ -189,16 +189,28 @@ abstract class CellSetter {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    private final static class DateFormatBuilder implements Supplier<DateFormat> {
+
+        private final String format;
+        private final Locale locale;
+
+        DateFormatBuilder(DateTimePattern pattern) {
+            this.locale = pattern.locale().getLocale();
+            this.format = pattern.value();
+        }
+
+        @Override
+        public DateFormat get() { return new SimpleDateFormat(format, locale); }
+    }
+
     private abstract static class DefaultDateSetter extends StringCellSetter {
 
         private final ThreadLocal<DateFormat> formatter;
         private final Supplier<DateFormat> creator;
 
         protected DefaultDateSetter(DateTimePattern pattern) {
-            String format = pattern.value();
-            Locale locale = pattern.locale().getLocale();
+            this.creator = new DateFormatBuilder(pattern);
             this.formatter = new ThreadLocal<>();
-            this.creator = () -> new SimpleDateFormat(format, locale);
         }
 
         final DateFormat getFormatter() {
@@ -211,7 +223,7 @@ abstract class CellSetter {
         }
 
         /**
-         * 转换问 util 日期
+         * 转换为 util 日期
          *
          * @param value
          *
@@ -220,7 +232,7 @@ abstract class CellSetter {
         abstract Date toDate(Object value);
 
         @Override
-        void set(CellFactory factory, Object value) {
+        final void set(CellFactory factory, Object value) {
             if (value != null) {
                 String date = getFormatter().format(toDate(value));
                 getTransfer().transfer(factory, date);
@@ -244,24 +256,26 @@ abstract class CellSetter {
         final Date toDate(Object value) { return (Date) value; }
     }
 
+    private final static class LongDateSetter extends DefaultDateSetter {
+
+        protected LongDateSetter(DateTimePattern pattern) { super(pattern); }
+
+        @Override
+        final Date toDate(Object value) { return new Date((long) value); }
+    }
+
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      * joda datetime support
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    private static CellSetter tryJodaAndCache(Class propertyType, DateTimePattern pattern) {
-        if (typeof(ReadableInstant.class, propertyType)) {
-            CellSetter setter = new ReadableInstantSetter(pattern);
-            cache(ReadableInstant.class, pattern, setter);
+    private static CellSetter tryJodaAndCache(Class type, DateTimePattern pattern) {
+        CellSetter setter = getOrBuild(ReadableInstant.class, type, pattern, ReadableInstantSetter::new);
+        if (setter != null) {
             return setter;
         }
-        if (typeof(ReadablePartial.class, propertyType)) {
-            CellSetter setter = new ReadablePartialSetter(pattern);
-            cache(ReadableInstant.class, pattern, setter);
-            return setter;
-        }
-        return null;
+        return getOrBuild(ReadablePartial.class, type, pattern, ReadablePartialSetter::new);
     }
 
     private abstract static class JodaDateSetter extends StringCellSetter {
@@ -293,14 +307,20 @@ abstract class CellSetter {
         }
     }
 
+    private final static class LongJodaTimeSetter extends JodaDateSetter {
+
+        private LongJodaTimeSetter(DateTimePattern pattern) { super(pattern); }
+
+        @Override
+        String toFormat(Object value) { return getFormatter().print(((Number) value).longValue()); }
+    }
+
     private final static class ReadableInstantSetter extends JodaDateSetter {
 
         private ReadableInstantSetter(DateTimePattern pattern) { super(pattern); }
 
         @Override
-        String toFormat(Object value) {
-            return getFormatter().print((ReadableInstant) value);
-        }
+        String toFormat(Object value) { return getFormatter().print((ReadableInstant) value); }
     }
 
     private final static class ReadablePartialSetter extends JodaDateSetter {
@@ -308,9 +328,7 @@ abstract class CellSetter {
         private ReadablePartialSetter(DateTimePattern pattern) { super(pattern); }
 
         @Override
-        String toFormat(Object value) {
-            return getFormatter().print((ReadablePartial) value);
-        }
+        String toFormat(Object value) { return getFormatter().print((ReadablePartial) value); }
     }
 
     /*
@@ -328,14 +346,6 @@ abstract class CellSetter {
             this.formatter = DateTimeFormatter.ofPattern(pattern.value(), locale);
         }
 
-        /**
-         * 格式化日期
-         *
-         * @param value
-         * @param formatter
-         *
-         * @return
-         */
         final String toFormat(Object value, DateTimeFormatter formatter) {
             return formatter.format((TemporalAccessor) value);
         }
@@ -360,8 +370,6 @@ abstract class CellSetter {
         BasicSetter(GetTransfer transformer) { super(transformer); }
 
         @Override
-        void set(CellFactory factory, Object value) {
-            getTransfer().transfer(factory, value);
-        }
+        void set(CellFactory factory, Object value) { getTransfer().transfer(factory, value); }
     }
 }
