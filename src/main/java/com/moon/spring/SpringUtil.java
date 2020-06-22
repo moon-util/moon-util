@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @author benshaoye
  */
 @Component
-public final class ContextUtil implements ApplicationContextAware {
+public final class SpringUtil implements ApplicationContextAware {
 
     private static volatile ApplicationContext CTX;
 
@@ -61,7 +61,7 @@ public final class ContextUtil implements ApplicationContextAware {
             ((ConfigurableApplicationContext) CTX).refresh();
         } else {
             ConfigurableApplicationContext gblCtx;
-            ContextUtil gbl = getBean(ContextUtil.class);
+            SpringUtil gbl = getBean(SpringUtil.class);
             if ((gblCtx = gbl.context) != null) {
                 gblCtx.refresh();
             }

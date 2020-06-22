@@ -16,8 +16,17 @@ import java.util.function.Supplier;
  * @author benshaoye
  */
 enum WorkbookType implements Predicate<Workbook> {
+    /**
+     * Excel 2007
+     */
     SUPER("org.apache.poi.xssf.streaming.SXSSFWorkbook"),
+    /**
+     * Excel 2007
+     */
     XLSX("org.apache.poi.xssf.usermodel.XSSFWorkbook"),
+    /**
+     * Excel 2003
+     */
     XLS("org.apache.poi.hssf.usermodel.HSSFWorkbook", new HAnchor(), new HRich());
 
     private final Supplier<ClientAnchor> anchorCreator;

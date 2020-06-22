@@ -2,7 +2,7 @@ package com.moon.spring.jpa.identity;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.LazyAccessor;
-import com.moon.spring.ContextUtil;
+import com.moon.spring.SpringUtil;
 import com.moon.spring.MoonConst;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -23,7 +23,7 @@ public class Identifier implements IdentifierGenerator {
 
     public Identifier() {
         this.accessor = LazyAccessor.of(() -> {
-            String value = ContextUtil.getProperty(MoonConst.Data.IDENTIFIER);
+            String value = SpringUtil.getProperty(MoonConst.Data.IDENTIFIER);
             if (StringUtil.isNotBlank(value)) {
                 try {
                     return IdentifierUtil.newInstance(value);
