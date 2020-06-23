@@ -1,63 +1,64 @@
 package com.moon.core.enums;
 
 /**
- * @author 28678
+ * @author benshaoye
  */
-public interface Chars {
+public enum Chars implements EnumDescriptor {
     /**
-     * 点号、句号
+     * 点：,
      */
-    Character DOT_OBJ = Character.valueOf((char) 46);
-    /**
-     * 点号、句号
-     */
-    char dot = DOT_OBJ.charValue();
+    DOT(46),
     /**
      * 空格
      */
-    Character SPACE_OBJ = Character.valueOf((char) 32);
+    SPACE(32),
     /**
-     * 空格
+     * 百分号：%
      */
-    char space = SPACE_OBJ.charValue();
+    PERCENT(37),
     /**
-     * 下划线
+     * 下划线：_
      */
-    Character UNDERLINE_OBJ = Character.valueOf((char) 95);
+    UNDERLINE(95),
     /**
-     * 下划线
+     * 乘号：*
      */
-    char underline = UNDERLINE_OBJ.charValue();
+    MULTIPLY(42),
     /**
-     * 逗号
+     * 加号：+
      */
-    Character COMMA_OBJ = Character.valueOf((char) 44);
+    PLUS(43),
     /**
-     * 逗号
+     * 逗号：,
      */
-    char comma = COMMA_OBJ.charValue();
+    COMMA(44),
     /**
-     * 减号
+     * 减号：-
      */
-    Character MINUS_OBJ = Character.valueOf((char) 45);
+    MINUS(45),
     /**
-     * 减号
+     * 除号：/
      */
-    char minus = MINUS_OBJ.charValue();
+    DIVISION(47),
     /**
-     * 冒号
+     * 冒号：:
      */
-    Character COLON_OBJ = Character.valueOf((char) 58);
+    COLON(58),
     /**
-     * 冒号
+     * 竖线：|
      */
-    char colon = COLON_OBJ.charValue();
-    /**
-     * 竖线
-     */
-    Character VERTICAL_LINE_OBJ = Character.valueOf((char) 124);
-    /**
-     * 竖线
-     */
-    char verticalLine = VERTICAL_LINE_OBJ.charValue();
+    VERTICAL_LINE(124),
+    ;
+
+    public final char value;
+
+    Chars(int intValue) { this.value = ((char) intValue); }
+
+    public Character getObject() { return value; }
+
+    @Override
+    public String getText() { return toString(); }
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

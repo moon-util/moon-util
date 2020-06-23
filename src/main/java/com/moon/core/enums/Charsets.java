@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
-public enum Charsets implements Supplier<Charset> {
+public enum Charsets implements Supplier<Charset>, EnumDescriptor {
     /**
      * 北美、西欧、拉丁美洲、加勒比海、加拿大、非洲
      */
@@ -79,6 +79,7 @@ public enum Charsets implements Supplier<Charset> {
 
     Charsets() { }
 
+    @Override
     public String getText() { return StringUtil.replace(name(), '_', '-'); }
 
     public Charset charset() { return forName(getText()); }

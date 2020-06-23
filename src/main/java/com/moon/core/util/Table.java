@@ -5,7 +5,8 @@ import com.moon.core.util.function.TableConsumer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 /**
  * @author benshaoye
@@ -45,6 +46,52 @@ public interface Table<X, Y, Z> {
     Z get(Object x, Object y);
 
     /**
+     * 获取值，或返回默认值
+     *
+     * @param x            namespace
+     * @param y            key
+     * @param defaultValue defaultValue
+     *
+     * @return this
+     */
+    default Z getOrDefault(Object x, Object y, Z defaultValue) {
+        Z value = get(x, y);
+        return value == null ? defaultValue : value;
+    }
+
+    /**
+     * 获取值，或返回默认值
+     *
+     * @param x        namespace
+     * @param y        key
+     * @param supplier 默认值 getter
+     *
+     * @return value
+     */
+    default Z getOrElse(Object x, Object y, Supplier<Z> supplier) {
+        Z value = get(x, y);
+        return value == null ? supplier.get() : value;
+    }
+
+    /**
+     * 获取值，或计算设置后返回结果
+     *
+     * @param x       x
+     * @param y       y
+     * @param mapping 计算器
+     *
+     * @return 原映射存在值时，返回原结果，否则返回{@code mapping}的结果
+     */
+    default Z computeIfAbsent(X x, Y y, BiFunction<? super X, ? super Y, ? extends Z> mapping) {
+        Z value = get(x, y);
+        if (value == null) {
+            value = mapping.apply(x, y);
+            put(x, y, value);
+        }
+        return value;
+    }
+
+    /**
      * 指定行设置值（替换）
      *
      * @param x   X轴
@@ -74,7 +121,7 @@ public interface Table<X, Y, Z> {
     /**
      * 增量设置值
      *
-     * @param table
+     * @param table other table
      */
     void putAll(Table<? extends X, ? extends Y, ? extends Z> table);
 

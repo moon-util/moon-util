@@ -2,7 +2,7 @@ package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Const;
-import com.moon.core.enums.Predicates;
+import com.moon.core.enums.Testers;
 import com.moon.core.lang.support.StringSupport;
 import com.moon.core.util.function.IntBiFunction;
 
@@ -102,7 +102,7 @@ public final class StringUtil {
      *
      * @return 连接后的字符串
      */
-    public static String concat(CharSequence... css) { return concatAllMatched(Predicates.TRUE, css); }
+    public static String concat(CharSequence... css) { return concatAllMatched(Testers.TRUE, css); }
 
     public static String concatAllMatched(Predicate<CharSequence> predicate, CharSequence... css) {
         return concatHandler(predicate, css);

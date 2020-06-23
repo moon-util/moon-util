@@ -24,11 +24,11 @@ public final class Const {
     /**
      * ","——英文逗号
      */
-    public static final Character SEPARATOR_CHAR = Chars.comma;
+    public static final Character SEPARATOR_CHAR = Chars.COMMA.value;
     /**
      * ","——英文逗号
      */
-    public static final String SEPARATOR_STRING = Strings.comma;
+    public static final String SEPARATOR_STRING = Strings.COMMA.value;
 
     //==============================================================
     //File Separator
@@ -53,7 +53,7 @@ public final class Const {
     /**
      * EMPTY string
      */
-    public static final String EMPTY = Strings.EMPTY;
+    public static final String EMPTY = Strings.EMPTY.value;
     public static final String NULL_STR = "null";
     public static final String UNDEFINED_STR = "undefined";
 }

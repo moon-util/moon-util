@@ -40,7 +40,7 @@ class EnumUtilTestTest {
     @Test
     void testSortValues() {
         assertArrayEquals(
-            EnumUtil.sortValues(TestMultiItemsEnum.class),
+            EnumUtil.sortedValuesByName(TestMultiItemsEnum.class),
             new TestMultiItemsEnum[]{
                 TestMultiItemsEnum.FIRST,
                 TestMultiItemsEnum.SECOND,

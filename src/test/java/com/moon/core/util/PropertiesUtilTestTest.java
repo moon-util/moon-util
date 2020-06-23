@@ -1,6 +1,6 @@
 package com.moon.core.util;
 
-import com.moon.core.enums.Predicates;
+import com.moon.core.enums.Testers;
 import com.moon.core.lang.ThrowUtil;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class PropertiesUtilTestTest {
         "/test2.properties",
         "/test3.properties",
     };
-    String path = FilterUtil.requireFirst(paths, Predicates.isNotNull);
+    String path = FilterUtil.requireFirst(paths, Testers.isNull.not);
 
     @Test
     void testRefreshAll() {

@@ -9,27 +9,21 @@ public enum Maths {
      */
     MAX {
         @Override
-        public int compute(int left, int right) {
-            return left > right ? left : right;
-        }
+        public int compute(int left, int right) { return Math.max(left, right); }
     },
     /**
      * 最小值
      */
     MIN {
         @Override
-        public int compute(int left, int right) {
-            return left > right ? right : left;
-        }
+        public int compute(int left, int right) { return Math.min(left, right); }
     },
     /**
      * 平均值
      */
     AVG {
         @Override
-        public int compute(int left, int right) {
-            return (left + right) / 2;
-        }
+        public int compute(int left, int right) { return (left + right) / 2; }
     },
     ;
 

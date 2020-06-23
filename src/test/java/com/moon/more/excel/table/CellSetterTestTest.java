@@ -32,6 +32,5 @@ class CellSetterTestTest {
 
         System.out.println(formatter.print(new Date().getTime()));
 
-        LocalDateTime.ofInstant(new Instant())
     }
 }

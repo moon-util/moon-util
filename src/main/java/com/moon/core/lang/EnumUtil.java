@@ -82,7 +82,7 @@ public final class EnumUtil {
      *
      * @return 枚举值
      */
-    public static <T extends Enum<T>> T[] sortValues(Class<T> type) {
+    public static <T extends Enum<T>> T[] sortedValuesByName(Class<T> type) {
         return sortValues(type, Comparator.comparing(Enum::name));
     }
 
@@ -144,7 +144,7 @@ public final class EnumUtil {
      * @return 是否包含枚举值
      */
     public static <T extends Enum<T>> boolean contains(Class<T> enumType, String name) {
-        if (name == null) {
+        if (enumType == null || name == null) {
             return false;
         }
         try {

@@ -5,62 +5,89 @@ import com.moon.core.lang.StringUtil;
 /**
  * @author benshaoye
  */
-public interface Strings {
+public enum Strings implements EnumDescriptor {
     /**
      * 空字符串
      */
-    String EMPTY = new String();
+    EMPTY(""),
     /**
-     * 点号、句号
+     * 点：,
      */
-    String dot = String.valueOf(Chars.dot);
+    DOT,
     /**
      * 空格
      */
-    String space = String.valueOf(Chars.space);
+    SPACE,
     /**
-     * 下划线
+     * 百分号：%
      */
-    String underline = String.valueOf(Chars.underline);
+    PERCENT,
     /**
-     * 逗号
+     * 下划线：_
      */
-    String comma = String.valueOf(Chars.comma);
+    UNDERLINE,
     /**
-     * 减号
+     * 乘号：*
      */
-    String minus = String.valueOf(Chars.minus);
+    MULTIPLY,
     /**
-     * 冒号
+     * 加号：+
      */
-    String colon = String.valueOf(Chars.colon);
+    PLUS,
     /**
-     * 竖线
+     * 逗号：,
      */
-    String verticalLine = String.valueOf(Chars.verticalLine);
-
+    COMMA,
     /**
-     * 常见英文符号：键盘上能直接敲出来的英文符号
+     * 减号：-
      */
-    String symbolCache = StringUtil.distinctChars("~`!@#$%^&*()_+-={}|[]\\:\";'<>?,./");
+    MINUS,
     /**
-     * 常见中文符号：键盘上能直接敲出来的中文符号
+     * 除号：/
      */
-    String ChineseSymbols = StringUtil.distinctChars("~·！@#￥%…&*（）—+-={}|【】、：”；’《》？，。、");
+    DIVISION,
+    /**
+     * 冒号：:
+     */
+    COLON,
+    /**
+     * 竖线：|
+     */
+    VERTICAL_LINE,
+    /**
+     * 常用符号
+     */
+    SYMBOLS("~`!@#$%^&*()_+-={}|[]\\:\";'<>?,./"),
+    /**
+     * 常用中文符号
+     */
+    CHINESE_SYMBOLS("~·！@#￥%…&*（）—+-={}|【】、：”；’《》？，。、"),
     /**
      * 数字
      */
-    String numbers = "0123456789";
+    NUMBERS("0123456789"),
     /**
      * 小写字母
      */
-    String lowers = "abcdefghijklmnopqrstuvwxyz";
+    LOWERS("abcdefghijklmnopqrstuvwxyz"),
     /**
      * 大写字母
      */
-    String uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    UPPERS("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
     /**
      * 字母
      */
-    String letters = lowers + uppers;
+    LETTERS("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+    ;
+
+    public final String value;
+
+    Strings() { this(null); }
+
+    Strings(String value) {
+        this.value = value == null ? Chars.valueOf(name()).toString() : StringUtil.distinctChars(value);
+    }
+
+    @Override
+    public String getText() { return value; }
 }
