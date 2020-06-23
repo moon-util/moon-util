@@ -2,6 +2,7 @@ package com.moon.core.enums;
 
 import com.moon.core.util.PropertiesUtil;
 import com.moon.core.util.ResourceUtil;
+import com.moon.core.util.condition.Conditional;
 import com.moon.core.util.logger.LoggerUtil;
 
 import static com.moon.core.lang.StringUtil.isNotBlank;
@@ -29,8 +30,8 @@ public enum MoonProps implements PropsSupplier {
      * <p>
      * com.moon.core.util.env.EnvEnum
      *
-     * @see com.moon.core.util.env.EnvUtil
-     * @see com.moon.core.util.env.Environmental
+     * @see com.moon.core.util.condition.EnvUtil
+     * @see Conditional
      */
     moon_env_development,
     /**

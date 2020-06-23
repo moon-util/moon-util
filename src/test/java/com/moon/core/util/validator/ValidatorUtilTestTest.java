@@ -1,7 +1,10 @@
 package com.moon.core.util.validator;
 
+import com.moon.core.enums.Testers;
 import com.moon.core.util.DetectUtil;
 import com.moon.core.util.PropertiesHashMap;
+import com.moon.core.util.RandomStringUtil;
+import com.moon.core.util.RandomUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,6 +39,8 @@ class ValidatorUtilTestTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testOfIDCard18() {
+        Validator.ofNullable(null).require(Testers.isNotNull).get();
     }
 }

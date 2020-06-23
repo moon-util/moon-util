@@ -1,6 +1,6 @@
 package com.moon.core.util.function;
 
-import com.moon.core.exception.DefaultException;
+import java.util.Objects;
 
 /**
  * @author benshaoye
@@ -8,24 +8,35 @@ import com.moon.core.exception.DefaultException;
  */
 @FunctionalInterface
 public interface ThrowingSupplier<T> {
+
     /**
-     * 运行并获取值
+     * 获取值
      *
-     * @return
-     * @see Throwable
+     * @return 返回执行完的值
+     *
+     * @throws Throwable 执行过程中的异常
      */
     T get() throws Throwable;
 
     /**
-     * 应用并返回，如果异常，将包装成非检查异常抛出
+     * 获取值并返回，如果异常，将包装成非检查异常抛出
      *
-     * @return
+     * @return 返回执行完的值
      */
-    default T orWithUnchecked() {
+    default T uncheckedGet() {
         try {
             return get();
+        } catch (RuntimeException | Error e) {
+            throw e;
         } catch (Throwable t) {
-            return DefaultException.doThrow(t);
+            throw new IllegalStateException("Executor error.", t);
         }
     }
+
+    /**
+     * 返回值不能是 null
+     *
+     * @return 返回执行完的值，不能是 null
+     */
+    default T requireGet() { return Objects.requireNonNull(uncheckedGet()); }
 }

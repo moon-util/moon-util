@@ -22,16 +22,16 @@ public final class ExecutorUtil {
      * inner runner
      */
 
-    public final static ThreadPoolExecutor defaultExecutor() { return ThreadPoolSupport.singleton(); }
+    public static ThreadPoolExecutor defaultExecutor() { return ThreadPoolSupport.singleton(); }
 
-    public final static void setExecutor(ThreadPoolExecutor runner) { ThreadPoolSupport.set(runner); }
+    public static void setExecutor(ThreadPoolExecutor runner) { ThreadPoolSupport.set(runner); }
 
 
     /*
      * executes
      */
 
-    private final static void loopRun(Runnable runner, long timeInterval, boolean ignoreAbnormal) {
+    private static void loopRun(Runnable runner, long timeInterval, boolean ignoreAbnormal) {
         ThrowUtil.rejectAccessError();
         execute(new Runnable() {
             @Override
@@ -59,7 +59,7 @@ public final class ExecutorUtil {
         });
     }
 
-    private final static void loopRun(Runnable runner, boolean ignoreAbnormal) {
+    private static void loopRun(Runnable runner, boolean ignoreAbnormal) {
         ThrowUtil.rejectAccessError();
         execute(() -> {
             try {
@@ -73,41 +73,41 @@ public final class ExecutorUtil {
         });
     }
 
-    public final static void execute(Runnable runnable) { defaultExecutor().execute(runnable); }
+    public static void execute(Runnable runnable) { defaultExecutor().execute(runnable); }
 
-    public final static Future<?> submit(Runnable runnable) { return defaultExecutor().submit(runnable); }
+    public static Future<?> submit(Runnable runnable) { return defaultExecutor().submit(runnable); }
 
-    public final static <T> Future<T> submit(Callable<T> callable) { return defaultExecutor().submit(callable); }
+    public static <T> Future<T> submit(Callable<T> callable) { return defaultExecutor().submit(callable); }
 
     /*
      * 最大线程数为处理器可用核心数 2 倍
      */
 
-    public static final ThreadPoolExecutor auto() { return auto(TIMEOUT); }
+    public static ThreadPoolExecutor auto() { return auto(TIMEOUT); }
 
-    public static final ThreadPoolExecutor auto(long timeout) {
+    public static ThreadPoolExecutor auto(long timeout) {
         return new ThreadPoolExecutor(1, maxCount(),
             timeout, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>());
     }
 
-    public static final ThreadPoolExecutor auto(RejectedExecutionHandler rejected) { return auto(TIMEOUT, rejected); }
+    public static ThreadPoolExecutor auto(RejectedExecutionHandler rejected) { return auto(TIMEOUT, rejected); }
 
-    public static final ThreadPoolExecutor auto(long timeout, RejectedExecutionHandler rejected) {
+    public static ThreadPoolExecutor auto(long timeout, RejectedExecutionHandler rejected) {
         return new ThreadPoolExecutor(1, maxCount(),
             TIMEOUT, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), rejected);
     }
 
-    public static final ThreadPoolExecutor auto(ThreadFactory factory) { return auto(TIMEOUT, factory); }
+    public static ThreadPoolExecutor auto(ThreadFactory factory) { return auto(TIMEOUT, factory); }
 
-    public static final ThreadPoolExecutor auto(long timeout, ThreadFactory factory) {
+    public static ThreadPoolExecutor auto(long timeout, ThreadFactory factory) {
         return new ThreadPoolExecutor(1, maxCount(),
             TIMEOUT, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), factory);
     }
 
-    public static final ThreadPoolExecutor auto(
+    public static ThreadPoolExecutor auto(
         long timeout, ThreadFactory factory, RejectedExecutionHandler rejected) {
         return new ThreadPoolExecutor(1, maxCount(),
             timeout, TimeUnit.MILLISECONDS,
@@ -118,43 +118,43 @@ public final class ExecutorUtil {
      * threshold，指定最大任务数，最大线程数为 CPU 线程数 2 倍
      */
 
-    public static final ThreadPoolExecutor threshold(int thresholdTasks) { return threshold(thresholdTasks, TIMEOUT); }
+    public static ThreadPoolExecutor threshold(int thresholdTasks) { return threshold(thresholdTasks, TIMEOUT); }
 
-    public static final ThreadPoolExecutor threshold(int thresholdTasks, long timeout) {
+    public static ThreadPoolExecutor threshold(int thresholdTasks, long timeout) {
         return new ThreadPoolExecutor(1, maxCount(),
             timeout, TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<>(thresholdTasks));
     }
 
-    public static final ThreadPoolExecutor threshold(int thresholdTasks, ThreadFactory factory) {
+    public static ThreadPoolExecutor threshold(int thresholdTasks, ThreadFactory factory) {
         return threshold(thresholdTasks, TIMEOUT, factory);
     }
 
-    public static final ThreadPoolExecutor threshold(
+    public static ThreadPoolExecutor threshold(
         int thresholdTasks, long timeout, ThreadFactory factory) {
         return new ThreadPoolExecutor(1, maxCount(),
             timeout, TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<>(thresholdTasks), factory);
     }
 
-    public static final ThreadPoolExecutor threshold(
+    public static ThreadPoolExecutor threshold(
         int thresholdTasks, RejectedExecutionHandler rejected) {
         return threshold(thresholdTasks, TIMEOUT, rejected);
     }
 
-    public static final ThreadPoolExecutor threshold(
+    public static ThreadPoolExecutor threshold(
         int thresholdTasks, long timeout, RejectedExecutionHandler rejected) {
         return new ThreadPoolExecutor(1, maxCount(),
             timeout, TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<>(thresholdTasks), rejected);
     }
 
-    public static final ThreadPoolExecutor threshold(
+    public static ThreadPoolExecutor threshold(
         int thresholdTasks, ThreadFactory factory, RejectedExecutionHandler rejected) {
         return threshold(thresholdTasks, TIMEOUT, factory, rejected);
     }
 
-    public static final ThreadPoolExecutor threshold(
+    public static ThreadPoolExecutor threshold(
         int thresholdTasks, long timeout, ThreadFactory factory, RejectedExecutionHandler rejected) {
         return new ThreadPoolExecutor(1, maxCount(),
             timeout, TimeUnit.MILLISECONDS,

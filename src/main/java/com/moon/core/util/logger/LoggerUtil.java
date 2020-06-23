@@ -109,7 +109,7 @@ public final class LoggerUtil {
 
         public <T> T get(String name) {
             ThrowingFunction getter = accessor.get();
-            return (T) getter.orWithUnchecked(name);
+            return (T) getter.applyWithUnchecked(name);
         }
     }
 }

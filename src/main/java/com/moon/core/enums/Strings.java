@@ -88,6 +88,8 @@ public enum Strings implements EnumDescriptor {
         this.value = value == null ? Chars.valueOf(name()).toString() : StringUtil.distinctChars(value);
     }
 
+    public String getValue() { return value; }
+
     @Override
     public String getText() { return value; }
 }

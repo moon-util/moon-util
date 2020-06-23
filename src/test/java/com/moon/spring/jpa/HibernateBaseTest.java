@@ -34,7 +34,7 @@ public abstract class HibernateBaseTest extends MySQLDatabaseBaseTest implements
     }
 
     protected void initializeFactory() {
-        initializeFactory(null);
+        initializeFactory(new Class[0]);
     }
 
     protected void initializeFactory(Class... classes) {

@@ -1,4 +1,4 @@
-package com.moon.core.util.env;
+package com.moon.core.util.condition;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +15,5 @@ class EnvUtilTestTest {
         System.out.println(runtime.totalMemory());
         System.out.println(runtime.availableProcessors());
         System.out.println(System.getProperty("moon.production"));
-
-        EnvUtil.ifProd(() -> System.out.println("====================="));
-        EnvUtil.ifDev(() -> System.out.println("---------------"));
     }
 }

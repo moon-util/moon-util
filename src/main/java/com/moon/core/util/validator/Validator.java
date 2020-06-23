@@ -17,7 +17,7 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
         super(value, nullable, messages, separator, immediate);
     }
 
-    public final static <T> Validator<T> of(T value) { return new Validator<>(value); }
+    public static <T> Validator<T> of(T value) { return new Validator<>(value); }
 
-    public final static <T> Validator<T> ofNullable(T value) { return new Validator<>(value, true); }
+    public static <T> Validator<T> ofNullable(T value) { return new Validator<>(value, true); }
 }

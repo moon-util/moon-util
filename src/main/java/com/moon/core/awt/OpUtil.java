@@ -1,12 +1,12 @@
 package com.moon.core.awt;
 
 import com.moon.core.io.FileUtil;
-import com.moon.core.lang.LangUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -44,7 +44,11 @@ final class OpUtil {
      */
 
     final static BufferedImage read(String imagePath) {
-        return LangUtil.apply(imagePath, path -> ImageIO.read(new File(path)));
+        try {
+            return ImageIO.read(Paths.get(imagePath).toFile());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     final static boolean write(BufferedImage out, String type, String target) {

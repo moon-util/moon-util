@@ -1,33 +1,35 @@
 package com.moon.core.util.function;
 
-import com.moon.core.exception.DefaultException;
-
 /**
  * @author benshaoye
  * @see java.util.function.Supplier
  */
 @FunctionalInterface
 public interface ThrowingBiConsumer<T, S> {
+
     /**
-     * 消费
+     * 处理数据
      *
-     * @param value1
-     * @param value2
-     * @throws Throwable
+     * @param value1 待处理数据
+     * @param value2 待处理数据
+     *
+     * @throws Throwable 异常
      */
     void accept(T value1, S value2) throws Throwable;
 
     /**
-     * 消费，如果异常，将包装成非检查异常抛出
+     * 处理数据
      *
-     * @param value1
-     * @param value2
+     * @param value1 待处理数据
+     * @param value2 待处理数据
      */
-    default void orWithUnchecked(T value1, S value2) {
+    default void acceptWithUnchecked(T value1, S value2) {
         try {
             accept(value1, value2);
+        } catch (RuntimeException | Error e) {
+            throw e;
         } catch (Throwable t) {
-            DefaultException.doThrow(t);
+            throw new IllegalStateException("Executor error.", t);
         }
     }
 }

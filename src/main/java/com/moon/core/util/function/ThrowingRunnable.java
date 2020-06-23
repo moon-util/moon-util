@@ -1,7 +1,5 @@
 package com.moon.core.util.function;
 
-import com.moon.core.exception.DefaultException;
-
 /**
  * 区别{@link Runnable}}
  *
@@ -9,23 +7,24 @@ import com.moon.core.exception.DefaultException;
  */
 @FunctionalInterface
 public interface ThrowingRunnable {
+
     /**
      * 运行
      *
-     * @throws Throwable
+     * @throws Throwable 异常
      */
     void run() throws Throwable;
 
     /**
-     * 应用并返回，如果异常，将包装成非检查异常抛出
-     *
-     * @return
+     * 执行并返回，如果异常，将包装成非检查异常抛出
      */
-    default void orWithUnchecked() {
+    default void uncheckedRun() {
         try {
             run();
+        } catch (RuntimeException | Error e) {
+            throw e;
         } catch (Throwable t) {
-            DefaultException.doThrow(t);
+            throw new IllegalStateException("Executor error.", t);
         }
     }
 }

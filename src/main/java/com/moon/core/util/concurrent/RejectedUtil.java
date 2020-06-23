@@ -18,28 +18,28 @@ public final class RejectedUtil {
     /**
      * 拒绝并丢弃
      *
-     * @return
+     * @return RejectedExecutionHandler
      */
-    public static final RejectedExecutionHandler abort() { return new AbortPolicy(); }
+    public static RejectedExecutionHandler abort() { return new AbortPolicy(); }
 
     /**
      * 调用方自己运行
      *
-     * @return
+     * @return RejectedExecutionHandler
      */
-    public static final RejectedExecutionHandler callerRun() { return new CallerRunsPolicy(); }
+    public static RejectedExecutionHandler callerRun() { return new CallerRunsPolicy(); }
 
     /**
      * 丢弃最老任务
      *
-     * @return
+     * @return RejectedExecutionHandler
      */
-    public static final RejectedExecutionHandler discardOldest() { return new DiscardOldestPolicy(); }
+    public static RejectedExecutionHandler discardOldest() { return new DiscardOldestPolicy(); }
 
     /**
      * 丢弃
      *
-     * @return
+     * @return RejectedExecutionHandler
      */
-    public static final RejectedExecutionHandler discard() { return new DiscardPolicy(); }
+    public static RejectedExecutionHandler discard() { return new DiscardPolicy(); }
 }

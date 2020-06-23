@@ -33,16 +33,18 @@ public final class IDCard18Validator extends BaseValidator<String, IDCard18Valid
      */
     private final int gender;
 
-    public final static boolean isValid(String value) {
+    public static boolean isValid(String value) {
         if (value == null || value.length() != 18) {
             return false;
         }
         int result = 0;
         final int end = 17, mod = 11;
-        final int[] CODES = {'1', '0', 'X', '9',
-            '8', '7', '6', '5', '4', '3', '2'};
-        final int[] codes = {7, 9, 10, 5, 8, 4,
-            2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
+        final int[] cODES = {
+            '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'
+        };
+        final int[] codes = {
+            7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2
+        };
         for (int i = 0, curr; i < end; i++) {
             curr = value.charAt(i);
             if (curr < 48 || curr > 57) {
@@ -51,8 +53,7 @@ public final class IDCard18Validator extends BaseValidator<String, IDCard18Valid
             result += (curr - 48) * codes[i];
         }
         final int index = result % mod;
-        return (index >= 0 && index < mod)
-            && (value.charAt(end) == CODES[index]);
+        return index >= 0 && value.charAt(end) == cODES[index];
     }
 
     public IDCard18Validator(String value) { this(value, null, SEPARATOR, false); }
@@ -87,14 +88,14 @@ public final class IDCard18Validator extends BaseValidator<String, IDCard18Valid
     /**
      * 周岁
      *
-     * @return
+     * @return 周岁年龄
      */
     public int getAge() { return TimeUtil.toDate(birthYear, birthMonth, birthDay).until(LocalDate.now()).getYears(); }
 
     /**
      * 虚岁
      *
-     * @return
+     * @return 虚岁年龄
      */
     public int getNominalAge() { return getAge() + 1; }
 }

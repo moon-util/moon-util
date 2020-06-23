@@ -45,9 +45,21 @@ public enum Chars implements EnumDescriptor {
      */
     COLON(58),
     /**
+     * 邮箱：@
+     */
+    AT(64),
+    /**
      * 竖线：|
      */
     VERTICAL_LINE(124),
+    /**
+     * 波浪线：~
+     */
+    WAVE(126),
+    /**
+     * 有些英文名字中间的点号：·
+     */
+    MIDDLE_DOT(183),
     ;
 
     public final char value;
@@ -55,6 +67,8 @@ public enum Chars implements EnumDescriptor {
     Chars(int intValue) { this.value = ((char) intValue); }
 
     public Character getObject() { return value; }
+
+    public char getValue() { return value; }
 
     @Override
     public String getText() { return toString(); }

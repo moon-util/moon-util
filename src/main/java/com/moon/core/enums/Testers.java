@@ -50,7 +50,7 @@ public enum Testers implements Predicate, EnumDescriptor {
      */
     isNotNull {
         @Override
-        public boolean test(Object o) { return o == null; }
+        public boolean test(Object o) { return o != null; }
     },
     /**
      * 是空字符串
