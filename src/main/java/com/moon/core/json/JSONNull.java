@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import java.util.List;
 import java.util.Map;
@@ -7,6 +7,9 @@ import java.util.Map;
  * @author benshaoye
  */
 public enum JSONNull implements JSON<Object>, Comparable<JSONNull> {
+    /**
+     * null 值
+     */
     NULL;
 
     @Override
@@ -19,10 +22,10 @@ public enum JSONNull implements JSON<Object>, Comparable<JSONNull> {
     public <T> T get() { return null; }
 
     @Override
-    public JSONObject getJSONObject(Object key) { throw new UnsupportedOperationException(); }
+    public JSONObject getJsonObject(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public JSONArray getJSONArray(Object key) { throw new UnsupportedOperationException(); }
+    public JSONArray getJsonArray(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
     public int getIntValue(Object key) { return 0; }

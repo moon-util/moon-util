@@ -1,6 +1,6 @@
 package com.moon.core.util.validator;
 
-import com.moon.core.time.TimeUtil;
+import com.moon.core.time.DatetimeUtil;
 import com.moon.core.util.DateUtil;
 
 import java.time.LocalDate;
@@ -90,7 +90,7 @@ public final class IDCard18Validator extends BaseValidator<String, IDCard18Valid
      *
      * @return 周岁年龄
      */
-    public int getAge() { return TimeUtil.toDate(birthYear, birthMonth, birthDay).until(LocalDate.now()).getYears(); }
+    public int getAge() { return DatetimeUtil.toDate(birthYear, birthMonth, birthDay).until(LocalDate.now()).getYears(); }
 
     /**
      * 虚岁

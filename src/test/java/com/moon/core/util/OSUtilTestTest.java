@@ -11,47 +11,47 @@ class OSUtilTestTest {
 
     @Test
     void testIsLinux() {
-        out.println(OSUtil.isLinux());
+        out.println(OSUtil.onLinux());
     }
 
     @Test
     void testIsMacOSX() {
-        out.println(OSUtil.isMacOSX());
+        out.println(OSUtil.onMacOS());
     }
 
     @Test
     void testIsWindows() {
-        out.println(OSUtil.isWindows());
+        out.println(OSUtil.onWindows());
     }
 
     @Test
     void testIsWindowsXP() {
-        out.println(OSUtil.isWindowsXP());
+        out.println(OSUtil.onWindowsXP());
     }
 
     @Test
     void testIsWindows2003() {
-        out.println(OSUtil.isWindows2003());
+        out.println(OSUtil.onWindows2003());
     }
 
     @Test
-    void testIsWindowsVista() {
-        out.println(OSUtil.isWindowsVista());
+    void testIsWindowsVonta() {
+        out.println(OSUtil.onWindowsVista());
     }
 
     @Test
     void testIsWindowsWin7() {
-        out.println(OSUtil.isWindows7());
+        out.println(OSUtil.onWindows7());
     }
 
     @Test
     void testIsWindowsWin8() {
-        out.println(OSUtil.isWindows8());
+        out.println(OSUtil.onWindows8());
     }
 
     @Test
     void testIsWindowsWin10() {
-        out.println(OSUtil.isWindows10());
+        out.println(OSUtil.onWindows10());
     }
 
     @Test
@@ -62,23 +62,23 @@ class OSUtilTestTest {
 
     @Test
     void testWhenLinux() {
-        OSUtil.whenLinux(() -> out.println("linux"));
-        OSUtil.whenMacOSX(() -> out.println("max"));
-        OSUtil.whenWindows(() -> out.println("windows"));
+        OSUtil.ifOnLinux(() -> out.println("linux"));
+        OSUtil.ifOnMacOS(() -> out.println("max"));
+        OSUtil.ifOnWindows(() -> out.println("windows"));
     }
 
     @Test
     void testWhenMacOSX() {
-        OSUtil.whenLinux(() -> out.println("linux"));
-        OSUtil.whenMacOSX(() -> out.println("max"));
-        OSUtil.whenWindows(() -> out.println("windows"));
+        OSUtil.ifOnLinux(() -> out.println("linux"));
+        OSUtil.ifOnMacOS(() -> out.println("max"));
+        OSUtil.ifOnWindows(() -> out.println("windows"));
     }
 
     @Test
     void testWhenWindows() {
-        OSUtil.whenLinux(() -> out.println("linux"));
-        OSUtil.whenMacOSX(() -> out.println("max"));
-        OSUtil.whenWindows(() -> out.println("windows"));
+        OSUtil.ifOnLinux(() -> out.println("linux"));
+        OSUtil.ifOnMacOS(() -> out.println("max"));
+        OSUtil.ifOnWindows(() -> out.println("windows"));
     }
 
     @Test

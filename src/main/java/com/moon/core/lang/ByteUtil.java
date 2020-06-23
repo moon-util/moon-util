@@ -79,15 +79,15 @@ public final class ByteUtil {
      * StringBuilder value = new StringBuilder("  1   ");  // = 1
      * BigDecimal value = new BigDecimal("1");  // ============ 1
      * BigInteger value = new BigInteger("1");  // ============ 1
-     * Collection value = new ArrayList(){{increment(1)}};  // ====== 1（只有一项时）
-     * Collection value = new HashSet(){{increment(1)}};  // ======== 1（只有一项时）
-     * Collection value = new TreeSet(){{increment(1)}};  // ======== 1（只有一项时）
-     * Collection value = new LinkedList(){{increment(1)}};  // ===== 1（只有一项时）
+     * Collection value = new ArrayList(){{put(1)}};  // ====== 1（只有一项时）
+     * Collection value = new HashSet(){{put(1)}};  // ======== 1（只有一项时）
+     * Collection value = new TreeSet(){{put(1)}};  // ======== 1（只有一项时）
+     * Collection value = new LinkedList(){{put(1)}};  // ===== 1（只有一项时）
      * Map value = new HashMap(){{put("key", 1)}};  // ======== 1（只有一项时）
      * <p>
      * int[] value = {1, 2, 3, 4};  // ======================================= 4（大于一项时，返回 size）
      * String[] value = {"1", "1", "1", "1"};  // ============================ 4（大于一项时，返回 size）
-     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ====== 3（大于一项时，返回 size）
+     * Collection value = new ArrayList(){{put(1);put(1);put(1);}};  // ====== 3（大于一项时，返回 size）
      * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // ======= 2（大于一项时，返回 size）
      * <p>
      * Byte result = ByteUtil.toByte(value);
@@ -132,7 +132,7 @@ public final class ByteUtil {
      */
     public static byte toByteValue(Object value) {
         Byte result = toByte(value);
-        return result == null ? 0 : result.byteValue();
+        return result == null ? 0 : result;
     }
 
     public static byte avg(byte... values) {
@@ -146,8 +146,8 @@ public final class ByteUtil {
     public static Byte avg(Byte[] values) {
         byte ret = 0;
         int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
+        for (Byte value : values) {
+            ret += value;
         }
         return (byte) (ret / len);
     }
@@ -156,9 +156,8 @@ public final class ByteUtil {
         byte ret = 0;
         Byte temp;
         int count = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
+        for (Byte value : values) {
+            temp = value;
             if (temp != null) {
                 ret += temp;
                 count++;

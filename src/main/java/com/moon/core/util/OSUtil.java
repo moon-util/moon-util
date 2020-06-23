@@ -21,72 +21,53 @@ public final class OSUtil {
     private static final boolean osIsWindows = nameHas("windows");
 
     public static <T> T get(
-        Supplier<T> ifLinux,
-        Supplier<T> ifWindows,
-        Supplier<T> ifMac,
-        Supplier<T> other) {
-        return (isLinux()
-            ? ifLinux : (isWindows()
-            ? ifWindows : (isMacOSX()
-            ? ifMac : other))).get();
+        Supplier<T> ifLinux, Supplier<T> ifWindows, Supplier<T> ifMac, Supplier<T> other
+    ) {
+        return (onLinux() ? ifLinux : (onWindows() ? ifWindows : (onMacOS() ? ifMac : other))).get();
     }
 
-    public static boolean isLinux() {
-        return osIsLinux;
-    }
+    public static boolean onLinux() { return osIsLinux; }
 
-    public static void whenLinux(Executable executor) {
-        if (isLinux()) {
+    public static void ifOnLinux(Executable executor) {
+        if (onLinux()) {
             executor.execute();
         }
     }
 
-    public static boolean isMacOSX() {
+    public static boolean onMacOS() {
         return osIsMacOsX;
     }
 
-    public static void whenMacOSX(Executable executor) {
-        if (isMacOSX()) {
+    public static void ifOnMacOS(Executable executor) {
+        if (onMacOS()) {
             executor.execute();
         }
     }
 
-    public static boolean isWindows() {
+    public static boolean onWindows() {
         return osIsWindows;
     }
 
-    public static void whenWindows(Executable executor) {
-        if (isWindows()) {
+    public static void ifOnWindows(Executable executor) {
+        if (onWindows()) {
             executor.execute();
         }
     }
 
-    public static boolean isWindowsXP() {
-        return nameHas("windows xp");
-    }
+    public static boolean onWindowsXP() { return nameHas("windows xp"); }
 
-    public static boolean isWindows2003() {
-        return nameHas("windows 2003");
-    }
+    public static boolean onWindows2003() { return nameHas("windows 2003"); }
 
-    public static boolean isWindowsVista() {
-        return nameHas("windows vista");
-    }
+    public static boolean onWindowsVista() { return nameHas("windows vista"); }
 
-    public static boolean isWindows7() {
-        return nameHas("windows 7");
-    }
+    public static boolean onWindows7() { return nameHas("windows 7"); }
 
-    public static boolean isWindows8() {
-        return nameHas("windows 8");
-    }
+    public static boolean onWindows8() { return nameHas("windows 8"); }
 
-    public static boolean isWindows10() {
-        return nameHas("windows 10");
-    }
+    public static boolean onWindows10() { return nameHas("windows 10"); }
 
-    private final static boolean nameHas(String search) {
+    private static boolean nameHas(String search) {
         String name = System.getProperty("os.name");
-        return (name == null ? "" : name.toLowerCase()).indexOf(search) >= 0;
+        return (name == null ? "" : name.toLowerCase()).contains(search);
     }
 }

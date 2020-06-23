@@ -5,7 +5,7 @@ import com.moon.core.lang.LangUtil;
 import com.moon.core.lang.ref.WeakAccessor;
 import com.moon.core.lang.reflect.MethodUtil;
 import com.moon.core.util.iterator.LinesIterator;
-import com.moon.core.util.json.JSON;
+import com.moon.core.json.JSON;
 
 import java.io.File;
 import java.io.InputStream;

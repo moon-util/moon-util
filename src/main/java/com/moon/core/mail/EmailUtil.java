@@ -31,9 +31,7 @@ public final class EmailUtil {
     /**
      * 不提供 Util 的实例对象，强制调用抛出错误
      */
-    private EmailUtil() {
-        noInstanceError();
-    }
+    private EmailUtil() { noInstanceError(); }
 
     public static EmailAccount connect(String host) {
         return new EmailAccount(host);

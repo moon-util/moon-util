@@ -13,40 +13,29 @@ import java.util.function.Supplier;
  */
 public final class MacUtil {
 
-    private MacUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private MacUtil() { ThrowUtil.noInstanceError(); }
 
-    public final static String getLocalMacAddress() {
-        return LocalMac.MAC.get();
-    }
+    public static String getMacAddress() { return LocalMac.HEX.get(); }
 
-    public final static String getDecimalMacAddress() {
-        return LocalMac.DECIMAL.get();
-    }
-
+    public static String getDecimalMacAddress() { return LocalMac.DECIMAL.get(); }
 
     public enum LocalMac implements Supplier<String> {
         /**
          * 十六进制
          */
-        MAC,
+        HEX,
         /**
          * 十进制
          */
         DECIMAL {
             @Override
-            public String get() {
-                return getAddress(true);
-            }
+            public String get() { return getAddress(true); }
         };
 
         private final InetAddress address = NetworkUtil.getLocalhost();
 
         @Override
-        public String get() {
-            return getAddress(false);
-        }
+        public String get() { return getAddress(false); }
 
         byte[] getMac() {
             try {

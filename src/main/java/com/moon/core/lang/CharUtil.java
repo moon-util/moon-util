@@ -11,11 +11,11 @@ public final class CharUtil {
         noInstanceError();
     }
 
-    public static final int indexOf(final char[] src, final char[] test) {
+    public static int indexOf(final char[] src, final char[] test) {
         return indexOf(src, test, 0);
     }
 
-    public static final int indexOf(final char[] src, final char[] test, int fromIndex) {
+    public static int indexOf(final char[] src, final char[] test, int fromIndex) {
         BooleanUtil.requireFalse(fromIndex < 0);
 
         if (src == test) {
@@ -53,21 +53,21 @@ public final class CharUtil {
         return -1;
     }
 
-    public static final boolean isStartVarName(int ch) {
+    public static boolean isStartVarName(int ch) {
         return isLetter(ch) || is_(ch) || is$(ch) || isChinese(ch);
     }
 
-    public static final boolean isVarName(int ch) {
+    public static boolean isVarName(int ch) {
         return isLetterOrDigit(ch) || is_(ch) || is$(ch) || isChinese(ch);
     }
 
-    public static final boolean is_(int ch) { return isUnderscore(ch); }
+    public static boolean is_(int ch) { return isUnderscore(ch); }
 
-    public static final boolean is$(int ch) { return isDollar(ch); }
+    public static boolean is$(int ch) { return isDollar(ch); }
 
-    public static final boolean isUnderscore(int ch) { return ch == '_'; }
+    public static boolean isUnderscore(int ch) { return ch == '_'; }
 
-    public static final boolean isDollar(int ch) { return ch == '$'; }
+    public static boolean isDollar(int ch) { return ch == '$'; }
 
     /**
      * "[4e00-9fa5]"
@@ -76,9 +76,9 @@ public final class CharUtil {
      *
      * @return 是否是汉字
      */
-    public static final boolean isChinese(int ch) { return ch < 40870 && ch > 19967; }
+    public static boolean isChinese(int ch) { return ch < 40870 && ch > 19967; }
 
-    public static final boolean isLetterOrDigit(int ch) { return isDigit(ch) || isLetter(ch); }
+    public static boolean isLetterOrDigit(int ch) { return isDigit(ch) || isLetter(ch); }
 
     /**
      * A-Z,a-z
@@ -87,7 +87,7 @@ public final class CharUtil {
      *
      * @return 是否是字母
      */
-    public static final boolean isLetter(int ch) { return isLowerCase(ch) || isUpperCase(ch); }
+    public static boolean isLetter(int ch) { return isLowerCase(ch) || isUpperCase(ch); }
 
     /**
      * A-Z
@@ -96,7 +96,7 @@ public final class CharUtil {
      *
      * @return 是否是大写字母
      */
-    public static final boolean isUpperCase(int ch) { return ch > 64 && ch < 91; }
+    public static boolean isUpperCase(int ch) { return ch > 64 && ch < 91; }
 
     /**
      * a-z
@@ -105,7 +105,7 @@ public final class CharUtil {
      *
      * @return 是否是小写字母
      */
-    public static final boolean isLowerCase(int ch) { return ch > 96 && ch < 123; }
+    public static boolean isLowerCase(int ch) { return ch > 96 && ch < 123; }
 
     /**
      * 0-9
@@ -114,9 +114,9 @@ public final class CharUtil {
      *
      * @return 是否是数字
      */
-    public static final boolean isDigit(int ch) { return ch > 47 && ch < 58; }
+    public static boolean isDigit(int ch) { return ch > 47 && ch < 58; }
 
-    public static final boolean equalsIgnoreCase(int ch1, int ch2) {
+    public static boolean equalsIgnoreCase(int ch1, int ch2) {
         if (ch1 == ch2) {
             return true;
         }
@@ -129,7 +129,7 @@ public final class CharUtil {
         return false;
     }
 
-    public static final boolean isASCIICode(int ch) { return ch < 128; }
+    public static boolean isASCIICode(int ch) { return ch < 128; }
 
     public static boolean isChar(Object o) { return o != null && o.getClass() == Character.class; }
 

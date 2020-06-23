@@ -78,7 +78,7 @@ public class PackageScanner extends HashSet<String> {
 
     private static Path targetUrlToPath(URL url){
         final String target = url.getPath();
-        return Paths.get(OSUtil.isWindows() ? target.replaceFirst("/", "") : target);
+        return Paths.get(OSUtil.onWindows() ? target.replaceFirst("/", "") : target);
     }
 
     private static List<String> walkFileTree(Path path, Path basePath) throws Exception {

@@ -1,5 +1,7 @@
 package com.moon.core.util;
 
+import com.moon.core.enums.Maps;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,30 +18,28 @@ import java.util.function.Supplier;
  *
  * @author benshaoye
  */
-public class ThreadLocalMap<K, V>
-    extends ThreadLocal<Map<K, V>>
-    implements Map<K, V> {
+public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<K, V> {
 
-    private final static int DEFAULT_CAPACITY = 16;
+    private final static Supplier CONSTRUCTOR = Maps.HashMap;
 
     private final Supplier<Map<K, V>> constructor;
+
+    private Supplier<Map<K, V>> constructor() {
+        return constructor == null ? CONSTRUCTOR : constructor;
+    }
 
     private Map<K, V> getMap() {
         Map<K, V> m = get();
         if (m == null) {
-            set(m = constructor == null
-                ? new HashMap<>(DEFAULT_CAPACITY)
-                : constructor.get());
+            set(m = constructor().get());
         }
         return m;
     }
 
-    public ThreadLocalMap() {
-        this(HashMap::new);
-    }
+    public ThreadLocalMap() { this(CONSTRUCTOR); }
 
     public ThreadLocalMap(Supplier<Map<K, V>> constructor) {
-        this.constructor = constructor;
+        this.constructor = (constructor == null) ? HashMap::new : CONSTRUCTOR;
     }
 
     public ThreadLocalMap(Map<K, V> map) {

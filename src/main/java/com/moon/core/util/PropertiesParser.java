@@ -2,6 +2,7 @@ package com.moon.core.util;
 
 import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Const;
+import com.moon.core.enums.Strings;
 import com.moon.core.io.FileUtil;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.lang.IntUtil;
@@ -17,14 +18,14 @@ import static com.moon.core.lang.StringUtil.*;
  * <p>
  * 与 spring.profiles.include、spring.profiles.active 相似，解析器引入了——引入文件、活跃文件、引用分割符的概念；
  * <p>
- * 这里的 spring.profiles 即是命名空间（namespace），这个解析器也引入了同样含义的命名空间，默认是 moon，
+ * 其中 {@code spring.profiles} 就是是命名空间（namespace），这里也引入了相同意义的命名空间: moon，
  * 当然也可以自定义这个命名空间，但是这里要求命名空间必须是<strong>非空白字符串</strong>；
- * <p>
+ * <pre>
  * 在命名空间下有：
  * 三个关键的键值映射 “import”、“active”、“delimiters”；
  * 两个关键字 “name:”、“path:”；
  * 和一个符号 “:”。
- * <p>
+ * </pre>
  * 分别对应：namespace.import、namespace.active、namespace.delimiters;
  * <p>
  * 默认是：moon.import、moon.active、moon.delimiters;
@@ -99,8 +100,8 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
     private final static String DEFAULT_NAMESPACE = "moon";
     private final static String NAME = "name:";
     private final static String PATH = "path:";
-    private final static String COLON = ":";
-    private final static String DOT = ".";
+    private final static String COLON = Strings.COLON.value;
+    private final static String DOT = Strings.DOT.value;
 
     private final static String DELIMITERS_NAME = "delimiters";
     private final static String SUFFIX = ".properties";
@@ -241,7 +242,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
      * -------------------------------------------------------------------------
      */
 
-    private final PropertiesHashMap computeProps(
+    private PropertiesHashMap computeProps(
         IDelimiters delimiters, PropertiesHashMap currentProps, PropertiesHashMap... includesProps
     ) {
         PropertiesHashMap computed = new PropertiesHashMap(currentProps.size());
@@ -265,11 +266,11 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
         PropertiesHashMap[] params = new PropertiesHashMap[length + 2];
         params[index++] = computed;
         params[index++] = currentProps;
-        for (int i = 0; i < length; i++) { params[i + index] = includesProps[i]; }
+        System.arraycopy(includesProps, 0, params, 0 + index, length);
         return params;
     }
 
-    private final static String recursiveGetValue(
+    private static String recursiveGetValue(
         String key, String value, IDelimiters delimiters, PropertiesHashMap presents, PropertiesHashMap... propMaps
     ) {
         if (presents.containsKey(key)) {
@@ -286,7 +287,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
         return value;
     }
 
-    private final static String getValue(String key, PropertiesHashMap... propMaps) {
+    private static String getValue(String key, PropertiesHashMap... propMaps) {
         String value = null;
         for (PropertiesHashMap props : propMaps) {
             value = value == null ? getValue(props, key) : value;
@@ -294,7 +295,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
         return value;
     }
 
-    private final static String getValue(PropertiesHashMap map, String key) {
+    private static String getValue(PropertiesHashMap map, String key) {
         String value = map.get(key);
         return value == null && map.containsKey(key) ? Const.EMPTY : value;
     }
@@ -325,7 +326,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
      * -------------------------------------------------------------------------
      */
 
-    private final Set<PropertiesHashMap> parseIncludes(
+    private Set<PropertiesHashMap> parseIncludes(
         PropertiesHashMap props, String activePath, String activeName, IDelimiters delimiters
     ) {
         Set<PropertiesHashMap> maps = new LinkedHashSet<>(includes.size());
@@ -351,13 +352,13 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
     ) {
         String[] inputs = inputName.split(",");
         PropertiesHashMap properties = new PropertiesHashMap(16 * inputs.length);
-        for (int i = 0; i < inputs.length; i++) {
-            properties.putAll(parseInputName(inputs[i], activePath, activeName, delimiters));
+        for (String input : inputs) {
+            properties.putAll(parseInputName(input, activePath, activeName, delimiters));
         }
         return properties;
     }
 
-    private final PropertiesHashMap parseInputName(
+    private PropertiesHashMap parseInputName(
         String inputName, String activePath, String activeName, IDelimiters delimiters
     ) {
         PropertiesHashMap props = EMPTY_MAP;

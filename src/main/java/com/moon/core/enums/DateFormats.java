@@ -1,6 +1,4 @@
-package com.moon.core.text;
-
-import com.moon.core.enums.EnumDescriptor;
+package com.moon.core.enums;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -10,7 +8,7 @@ import java.util.TimeZone;
 /**
  * @author benshaoye
  */
-public enum DateFormatUtil implements EnumDescriptor {
+public enum DateFormats implements EnumDescriptor {
     /**
      * Asia/Shanghai
      */
@@ -116,20 +114,21 @@ public enum DateFormatUtil implements EnumDescriptor {
      */
     DEFAULT("") {
         @Override
-        public String getTextWithChinese() { return This.DFT.getTextWithChinese(); }
+        public String getTextAsChinese() { return This.DFT.getTextAsChinese(); }
 
         @Override
-        public String getTextWithEnglish() { return This.DFT.getTextWithEnglish(); }
+        public String getTextAsEnglish() { return This.DFT.getTextAsEnglish(); }
     },
     ;
 
     private final String textOfChinese;
 
     private static class This {
-        private static boolean isChinese = false;
-        private static DateFormatUtil DFT;
 
-        static boolean test(DateFormatUtil zone) {
+        private static boolean isChinese = false;
+        private static DateFormats DFT;
+
+        static boolean test(DateFormats zone) {
             Date date = new Date();
             String str = "yyyy-MM-dd HH:mm:ss";
             return get(str).format(date).equals(zone.with(str).format(date));
@@ -138,7 +137,7 @@ public enum DateFormatUtil implements EnumDescriptor {
         static DateFormat get(String pattern) { return new SimpleDateFormat(pattern); }
     }
 
-    DateFormatUtil(String text) {
+    DateFormats(String text) {
         this.textOfChinese = text;
         if (This.isChinese = This.isChinese || This.test(this)) {
             This.DFT = This.DFT == null ? this : This.DFT;
@@ -155,16 +154,16 @@ public enum DateFormatUtil implements EnumDescriptor {
         return format;
     }
 
-    public final static DateFormat getLocal(String pattern) { return This.get(pattern); }
+    public static DateFormat getLocal(String pattern) { return This.get(pattern); }
 
-    public TimeZone getTimeZone() { return TimeZone.getTimeZone(getTextWithEnglish()); }
+    public TimeZone getTimeZone() { return TimeZone.getTimeZone(getTextAsEnglish()); }
 
     @Override
-    public final String getText() { return This.isChinese ? getTextWithChinese() : getTextWithEnglish(); }
+    public final String getText() { return This.isChinese ? getTextAsChinese() : getTextAsEnglish(); }
 
-    public String getTextWithChinese() { return textOfChinese; }
+    public String getTextAsChinese() { return textOfChinese; }
 
-    public String getTextWithEnglish() {
+    public String getTextAsEnglish() {
         char[] chars = name().toCharArray();
         boolean isBegin = true;
         char ch;

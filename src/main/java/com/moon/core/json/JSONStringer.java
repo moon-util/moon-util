@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.util.interfaces.Stringify;

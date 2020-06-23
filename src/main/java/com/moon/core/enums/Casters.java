@@ -2,7 +2,7 @@ package com.moon.core.enums;
 
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.time.TimeUtil;
+import com.moon.core.time.DatetimeUtil;
 import com.moon.core.util.converter.TypeConverter;
 
 import java.lang.reflect.Array;
@@ -35,8 +35,8 @@ import static com.moon.core.lang.ShortUtil.toShort;
 import static com.moon.core.lang.ShortUtil.toShortValue;
 import static com.moon.core.math.BigDecimalUtil.toBigDecimal;
 import static com.moon.core.math.BigIntegerUtil.toBigInteger;
-import static com.moon.core.time.TimeUtil.toDateTime;
-import static com.moon.core.time.TimeUtil.toTime;
+import static com.moon.core.time.DatetimeUtil.toDateTime;
+import static com.moon.core.time.DatetimeUtil.toTime;
 import static com.moon.core.util.DateUtil.*;
 import static com.moon.core.util.OptionalUtil.resolveOrNull;
 import static java.util.Objects.requireNonNull;
@@ -229,7 +229,7 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
         public Object createArr(int length) { return new LocalDate[length]; }
 
         @Override
-        public Object cast(Object o) { return TimeUtil.toDate(o); }
+        public Object cast(Object o) { return DatetimeUtil.toDate(o); }
     },
     toLocalTime(LocalTime.class) {
         @Override

@@ -1,6 +1,4 @@
-package com.moon.core.util.json;
-
-import com.moon.core.util.TypeUtil;
+package com.moon.core.json;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,8 +10,12 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface JSONParse {
+public @interface JSONStringify {
     String name() default "";
 
-    Class converter() default TypeUtil.class;
+    int order() default 0;
+
+    boolean ignore() default false;
+
+    String format() default "";
 }

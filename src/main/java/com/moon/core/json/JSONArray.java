@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,7 @@ import static com.moon.core.util.TypeUtil.cast;
 /**
  * @author benshaoye
  */
-
-public class JSONArray extends ArrayList<Object>
+public final class JSONArray extends ArrayList<Object>
     implements JSON<Integer>, List<Object>, RandomAccess {
 
     private static final long serialVersionUID = 1L;
@@ -27,10 +26,10 @@ public class JSONArray extends ArrayList<Object>
     public <T> T get() { return (T) this; }
 
     @Override
-    public JSONObject getJSONObject(Integer key) { return cast().toType(get(key), JSONObject.class); }
+    public JSONObject getJsonObject(Integer key) { return cast().toType(get(key), JSONObject.class); }
 
     @Override
-    public JSONArray getJSONArray(Integer key) { return cast().toType(get(key), JSONArray.class); }
+    public JSONArray getJsonArray(Integer key) { return cast().toType(get(key), JSONArray.class); }
 
     @Override
     public int getIntValue(Integer key) { return cast().toIntValue(get(key)); }

@@ -6,21 +6,22 @@ import com.moon.core.lang.ThrowUtil;
  * @author benshaoye
  */
 public final class UnicodeUtil {
-    private UnicodeUtil() {
-        ThrowUtil.noInstanceError();
-    }
+
+    private UnicodeUtil() { ThrowUtil.noInstanceError(); }
 
     /**
      * 判断一个字符串是否是 Unicode 字符串
      *
-     * @param s
+     * @param s 待测字符串
+     *
+     * @return true: 待测字符串是 unicode 字符串
      */
     public static boolean isUnicode(String s) {
         return isFullUnicode(s) || isSimpleUnicode(s);
     }
 
     /**
-     * 判断一个字符串是否不是 Unicode 字符串
+     * 判断字符串是否不是 Unicode 字符串
      *
      * @param s
      */

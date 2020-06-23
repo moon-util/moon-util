@@ -77,27 +77,27 @@ public final class BigIntegerUtil {
     }
 
 
-    public final static boolean gt(BigInteger value1, BigInteger value2) {
+    public static boolean gt(BigInteger value1, BigInteger value2) {
         return GT.compare(value1, value2);
     }
 
-    public final static boolean lt(BigInteger value1, BigInteger value2) {
+    public static boolean lt(BigInteger value1, BigInteger value2) {
         return LT.compare(value1, value2);
     }
 
-    public final static boolean ge(BigInteger value1, BigInteger value2) {
+    public static boolean ge(BigInteger value1, BigInteger value2) {
         return GE.compare(value1, value2);
     }
 
-    public final static boolean le(BigInteger value1, BigInteger value2) {
+    public static boolean le(BigInteger value1, BigInteger value2) {
         return LE.compare(value1, value2);
     }
 
-    public final static boolean eq(BigInteger value1, BigInteger value2) {
+    public static boolean eq(BigInteger value1, BigInteger value2) {
         return EQ.compare(value1, value2);
     }
 
-    public final static boolean ne(BigInteger value1, BigInteger value2) {
+    public static boolean ne(BigInteger value1, BigInteger value2) {
         return NE.compare(value1, value2);
     }
 }

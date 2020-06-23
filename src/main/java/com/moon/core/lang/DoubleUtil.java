@@ -191,15 +191,15 @@ public final class DoubleUtil {
      * StringBuilder value = new StringBuilder("  1   ");  // == 1
      * BigDecimal value = new BigDecimal("1");  // ============= 1
      * BigInteger value = new BigInteger("1");  // ============= 1
-     * Collection value = new ArrayList(){{increment(1)}};  // ======= 1（只有一项时）
-     * Collection value = new HashSet(){{increment(1)}};  // ========= 1（只有一项时）
-     * Collection value = new TreeSet(){{increment(1)}};  // ========= 1（只有一项时）
-     * Collection value = new LinkedList(){{increment(1)}};  // ====== 1（只有一项时）
-     * Map value = new HashMap(){{put("key", 1)}};  // =============== 1（只有一项时）
+     * Collection value = new ArrayList(){{put(1)}};  // ======= 1（只有一项时）
+     * Collection value = new HashSet(){{put(1)}};  // ========= 1（只有一项时）
+     * Collection value = new TreeSet(){{put(1)}};  // ========= 1（只有一项时）
+     * Collection value = new LinkedList(){{put(1)}};  // ====== 1（只有一项时）
+     * Map value = new HashMap(){{put("key", 1)}};  // ========= 1（只有一项时）
      * <p>
      * int[] value = {1, 2, 3, 4};  // ======================================== 4（大于一项时，返回 size）
      * String[] value = {"1", "1", "1", "1"};  // ============================= 4（大于一项时，返回 size）
-     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ====== 3（大于一项时，返回 size）
+     * Collection value = new ArrayList(){{put(1);put(1);put(1);}};  // ======= 3（大于一项时，返回 size）
      * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // ======== 2（大于一项时，返回 size）
      * <p>
      * Double result = DoubleUtil.toDouble(value);
@@ -224,7 +224,7 @@ public final class DoubleUtil {
             return Double.parseDouble(value.toString().trim());
         }
         if (value instanceof Boolean) {
-            return Double.valueOf((((Boolean) value).booleanValue() ? 1 : 0));
+            return (double) ((Boolean) value ? 1 : 0);
         }
         try {
             return toDouble(SupportUtil.onlyOneItemOrSize(value));
@@ -241,7 +241,7 @@ public final class DoubleUtil {
      */
     public static double toDoubleValue(Object value) {
         Double result = toDouble(value);
-        return result == null ? 0 : result.doubleValue();
+        return result == null ? 0 : result;
     }
 
     public static double max(double... values) {

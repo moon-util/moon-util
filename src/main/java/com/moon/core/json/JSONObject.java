@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,7 +9,7 @@ import static com.moon.core.util.TypeUtil.cast;
 /**
  * @author benshaoye
  */
-public class JSONObject extends HashMap<String, Object>
+public final class JSONObject extends HashMap<String, Object>
     implements JSON<String>, Iterable<Map.Entry<String, Object>> {
 
     public JSONObject(int initialCapacity, float loadFactor) {
@@ -34,12 +34,12 @@ public class JSONObject extends HashMap<String, Object>
     }
 
     @Override
-    public JSONObject getJSONObject(String key) {
+    public JSONObject getJsonObject(String key) {
         return cast().toType(get(key), JSONObject.class);
     }
 
     @Override
-    public JSONArray getJSONArray(String key) {
+    public JSONArray getJsonArray(String key) {
         return cast().toType(get(key), JSONArray.class);
     }
 

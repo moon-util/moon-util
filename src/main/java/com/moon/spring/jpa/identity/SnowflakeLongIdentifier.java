@@ -206,7 +206,7 @@ public class SnowflakeLongIdentifier implements IdentifierGenerator {
     }
 
     static String getHostName() {
-        return OSUtil.isWindows() ? System.getenv("COMPUTERNAME") : System.getenv("HOSTNAME");
+        return OSUtil.onWindows() ? System.getenv("COMPUTERNAME") : System.getenv("HOSTNAME");
     }
 
     static int[] toCodePoints(final CharSequence str) {

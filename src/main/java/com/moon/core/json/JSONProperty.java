@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

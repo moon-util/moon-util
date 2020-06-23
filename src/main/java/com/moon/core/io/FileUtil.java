@@ -259,15 +259,15 @@ public final class FileUtil {
     }
 
     public static void writeLinesToOutput(OutputStream os, Iterator<? extends CharSequence> lines) {
-        IOUtil.autoCloseAccept(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
+        IOUtil.autoClose(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
     }
 
     public static void writeLinesToOutput(OutputStream os, Collection<? extends CharSequence> lines) {
-        IOUtil.autoCloseAccept(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
+        IOUtil.autoClose(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
     }
 
     public static void writeLinesToOutput(OutputStream os, CharSequence... lines) {
-        IOUtil.autoCloseAccept(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
+        IOUtil.autoClose(IOUtil.getWriter(os), w -> writeLinesToWriter(w, lines));
     }
 
     public static void appendLinesToFile(File existFile, Iterator<? extends CharSequence> lines) {

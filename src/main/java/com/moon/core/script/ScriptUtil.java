@@ -16,7 +16,7 @@ public final class ScriptUtil {
 
     private ScriptUtil() { noInstanceError(); }
 
-    public final static Object runJSCode(String code) {
+    public static Object runJSCode(String code) {
         try {
             return newJSEngine().eval(code);
         } catch (ScriptException e) {
@@ -24,7 +24,7 @@ public final class ScriptUtil {
         }
     }
 
-    public final static Object runJSFile(File js) {
+    public static Object runJSFile(File js) {
         try {
             return newJSEngine().eval(IOUtil.getBufferedReader(js));
         } catch (ScriptException e) {
@@ -32,5 +32,5 @@ public final class ScriptUtil {
         }
     }
 
-    public final static ScriptEngine newJSEngine() { return new ScriptEngineManager().getEngineByName("JavaScript"); }
+    public static ScriptEngine newJSEngine() { return new ScriptEngineManager().getEngineByName("JavaScript"); }
 }

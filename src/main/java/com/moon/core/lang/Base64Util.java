@@ -17,7 +17,7 @@ public final class Base64Util {
         noInstanceError();
     }
 
-    public final static String toBase64(String normal) {
+    public static String toBase64(String normal) {
         return Base64.getEncoder().encodeToString(normal.getBytes());
     }
 
@@ -25,7 +25,7 @@ public final class Base64Util {
         return new String(Base64.getDecoder().decode(base64));
     }
 
-    public final static String toBase64() {
+    public static String toBase64() {
         return ThrowUtil.rejectAccessError();
     }
 

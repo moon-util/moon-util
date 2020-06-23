@@ -17,13 +17,9 @@ public final class MapUtil {
 
     public static Map empty() {return EmptyHashMap.EMPTY_MAP;}
 
-    public static <K, V> Map<K, V> with(K key, V value) {
-        return with(key, value, newHashMap());
-    }
+    public static Map emptyIfNull(Map map) { return emptyHashMapIfNull(map); }
 
-    public static <K, V> Map<K, V> with(K key, V value, Map<K, V> map) {
-        return put(map, key, value);
-    }
+    public static <K, V> Map<K, V> with(K key, V value) { return put(null, key, value); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -59,8 +55,8 @@ public final class MapUtil {
         return putAll(putAll(newLinkedHashMap((maps.length + 1) * 16), map), maps);
     }
 
-    public static <K, V> LinkedHashMap<K, V> emptyLinkedHashMapIfNull(Map<K, V> map) {
-        return map == null ? newLinkedHashMap() : null;
+    public static <K, V> Map<K, V> emptyLinkedHashMapIfNull(Map<K, V> map) {
+        return map == null ? newLinkedHashMap() : map;
     }
 
     /*
@@ -79,8 +75,8 @@ public final class MapUtil {
         return putAll(putAll(newTreeMap((maps.length + 1) * 16), map), maps);
     }
 
-    public static <K, V> TreeMap<K, V> emptyTreeMapIfNull(Map<K, V> map) {
-        return map == null ? newTreeMap() : null;
+    public static <K, V> Map<K, V> emptyTreeMapIfNull(Map<K, V> map) {
+        return map == null ? newTreeMap() : map;
     }
 
     /*
@@ -103,8 +99,8 @@ public final class MapUtil {
         return putAll(putAll(newConcurrentMap((maps.length + 1) * 16), map), maps);
     }
 
-    public static <K, V> ConcurrentHashMap<K, V> emptyConcurrentMapIfNull(Map<K, V> map) {
-        return map == null ? newConcurrentMap() : null;
+    public static <K, V> Map<K, V> emptyConcurrentMapIfNull(Map<K, V> map) {
+        return map == null ? newConcurrentMap() : map;
     }
 
     /*
@@ -136,30 +132,41 @@ public final class MapUtil {
      */
 
     /**
-     * @param map
-     * @param key
-     * @param <T>
-     * @param <E>
+     * 获取 map 的值
+     *
+     * @param map map 对象
+     * @param key 键名
+     * @param <T> 键类型
+     * @param <E> 值类型
+     *
+     * @return 对应的值或 null
      */
     public static <T, E> E get(Map<T, E> map, T key) { return map == null ? null : map.get(key); }
 
     /**
-     * @param map
-     * @param key
+     * 获取 map 的值
+     *
+     * @param map map 对象
+     * @param key 键名
+     *
+     * @return 对应的值或 null
      */
     public static Object getByObject(Object map, Object key) { return map == null ? null : ((Map) map).get(key); }
 
     /**
-     * 返回 map
+     * 返回非空 map
      *
-     * @param map
-     * @param key
-     * @param value
-     * @param <K>
-     * @param <V>
+     * @param map   原始 map
+     * @param key   键名
+     * @param value 值
+     * @param <K>   键数据类型
+     * @param <V>   值数据类型
+     * @param <M>   Map 类型
+     *
+     * @return 非 null Map
      */
     public static <K, V, M extends Map<K, V>> M put(M map, K key, V value) {
-        map = (M) emptyHashMapIfNull(map);
+        map = (M) emptyIfNull(map);
         map.put(key, value);
         return map;
     }
@@ -168,16 +175,18 @@ public final class MapUtil {
      * 忽略类型兼容，数据一定能放进 map 里面；
      * 如果数据类型与 map 不一致，可能会导致处理返回数据的过程中出现异常；
      *
-     * @param map
-     * @param key
-     * @param value
-     * @param <K>
-     * @param <V>
-     * @param <M>
+     * @param map   map
+     * @param key   key
+     * @param value value
+     * @param <K>   key 数据类型
+     * @param <V>   value 数据类型
+     * @param <M>   map 数据类型
      *
-     * @return
+     * @return 容器 map
+     *
+     * @throws NullPointerException 如果 map 为 null
      */
-    public static <K, V, M extends Map<K, V>> M putWithObject(M map, Object key, Object value) {
+    public static <K, V, M extends Map<K, V>> M putObjectToMap(M map, Object key, Object value) {
         map.put((K) key, (V) value);
         return map;
     }
@@ -185,35 +194,55 @@ public final class MapUtil {
     /**
      * 忽略类型兼容
      *
-     * @param map
-     * @param key
-     * @param value
-     * @param <K>
-     * @param <V>
+     * @param map   map
+     * @param key   key
+     * @param value value
+     * @param <K>   key 数据类型
+     * @param <V>   value 数据类型
      *
-     * @return
+     * @return 容器 map
+     *
+     * @throws NullPointerException 如果 map 为 null
      */
-    public static <K, V> Map<K, V> putToObject(Object map, Object key, Object value) {
-        return putWithObject((Map) map, key, value);
+    public static <K, V> Map<K, V> putToObjectMap(Object map, Object key, Object value) {
+        return putObjectToMap((Map) map, key, value);
     }
 
     /**
      * 忽略类型兼容，elements 里面的数据一定能放进 map；
      * 如果 elements 数据类型与 map 不一致，可能会导致处理返回数据的过程中出现异常；
      *
-     * @param map
-     * @param elements
-     * @param <K>
-     * @param <V>
+     * @param map      结果容器map
+     * @param elements 待处理 map 集合
+     * @param <K>      键数据类型
+     * @param <V>      值数据类型
+     * @param <M>      map 集合类型
+     *
+     * @return 容器 map 集合
+     *
+     * @throws NullPointerException 如果 map 为 null
      */
     public static <K, V, M extends Map<K, V>> M putAll(M map, Map elements) {
         map.putAll(elements);
         return map;
     }
 
+    /**
+     * 合并多个 map
+     *
+     * @param map  结果容器map
+     * @param maps 待处理 map 集合
+     * @param <K>  键数据类型
+     * @param <V>  值数据类型
+     * @param <M>  map 集合类型
+     *
+     * @return 容器 map 集合
+     *
+     * @throws NullPointerException 如果 map 为 null
+     */
     public static <K, V, M extends Map<K, V>> M putAll(M map, Map<? extends K, ? extends V>... maps) {
-        for (int i = 0; i < maps.length; i++) {
-            map.putAll(maps[i]);
+        for (Map<? extends K, ? extends V> value : maps) {
+            map.putAll(value);
         }
         return map;
     }
@@ -275,7 +304,7 @@ public final class MapUtil {
     }
 
     public static <K> boolean getBooleanValue(Map<K, ?> map, K key) {
-        return map == null ? false : cast().toBooleanValue(map.get(key));
+        return map != null && cast().toBooleanValue(map.get(key));
     }
 
     public static <K> Double getDouble(Map<K, ?> map, K key) {
@@ -335,7 +364,7 @@ public final class MapUtil {
     public static <K> char getOrDefault(Map<K, ?> map, K key, char defaultVal) {
         Object value;
         return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Character ? ((Character) value).charValue() : defaultVal);
+            : ((value = map.get(key)) instanceof Character ? (Character) value : defaultVal);
     }
 
     public static <K> double getOrDefault(Map<K, ?> map, K key, double defaultVal) {

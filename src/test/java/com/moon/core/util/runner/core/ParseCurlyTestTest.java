@@ -1,7 +1,6 @@
 package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.core.util.Console;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
 import org.junit.jupiter.api.Test;

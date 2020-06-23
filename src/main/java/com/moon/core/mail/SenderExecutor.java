@@ -1,6 +1,7 @@
 package com.moon.core.mail;
 
 import com.moon.core.util.CPUUtil;
+import com.moon.core.util.concurrent.RejectedUtil;
 
 import javax.mail.MessagingException;
 import javax.mail.Transport;
@@ -22,7 +23,7 @@ public class SenderExecutor {
         BlockingQueue queue = new ArrayBlockingQueue(queueSize);
 
         executor = new ThreadPoolExecutor(core, max, timeout, TimeUnit.MILLISECONDS, queue,
-            Executors.defaultThreadFactory(), new ThreadPoolExecutor.CallerRunsPolicy());
+            Executors.defaultThreadFactory(), RejectedUtil.callerRun());
         executor.allowsCoreThreadTimeOut();
     }
 

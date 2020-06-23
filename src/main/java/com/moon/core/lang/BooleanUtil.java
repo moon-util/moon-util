@@ -20,26 +20,26 @@ public final class BooleanUtil {
         if (value) {
             return true;
         }
-        return ThrowUtil.runtime(Boolean.FALSE.toString());
+        throw new IllegalArgumentException(Boolean.FALSE.toString());
     }
 
     public static boolean requireTrue(boolean value, String message) {
         if (value) {
             return true;
         }
-        return ThrowUtil.runtime(message);
+        throw new IllegalArgumentException(message);
     }
 
     public static boolean requireFalse(boolean value) {
         if (value) {
-            return ThrowUtil.runtime(Boolean.TRUE.toString());
+            throw new IllegalArgumentException(Boolean.TRUE.toString());
         }
         return false;
     }
 
     public static boolean requireFalse(boolean value, String message) {
         if (value) {
-            return ThrowUtil.runtime(message);
+            throw new IllegalArgumentException(message);
         }
         return false;
     }
@@ -50,7 +50,7 @@ public final class BooleanUtil {
      * --------------------------------------------------------------
      */
 
-    public static boolean toPrimitive(Boolean value) { return value != null ? value.booleanValue() : false; }
+    public static boolean toPrimitive(Boolean value) { return value != null && value; }
 
     public static Boolean toObject(Boolean value) { return value; }
 

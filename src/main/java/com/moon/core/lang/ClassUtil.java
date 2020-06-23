@@ -86,9 +86,9 @@ public final class ClassUtil {
      *
      * @param clazz
      */
-    public final static Class toWrapperClass(Class clazz) { return PRIMITIVE_TO_WRAPPER_MAP.get(clazz); }
+    public static Class toWrapperClass(Class clazz) { return PRIMITIVE_TO_WRAPPER_MAP.get(clazz); }
 
-    public final static Class toPrimitiveClass(Class clazz) { return WRAPPER_TO_PRIMITIVE_MAP.get(clazz); }
+    public static Class toPrimitiveClass(Class clazz) { return WRAPPER_TO_PRIMITIVE_MAP.get(clazz); }
 
     public static Class forName(String className) {
         try {

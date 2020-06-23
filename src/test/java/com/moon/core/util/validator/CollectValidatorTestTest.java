@@ -1,7 +1,6 @@
 package com.moon.core.util.validator;
 
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.util.Console;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
@@ -65,10 +64,10 @@ class CollectValidatorTestTest {
         final int sex = (certNo.charAt(16) - 48) % 2;
         if ((sex == 0 && age > 43) || (sex == 1 && age > 53)) {
             assertTrue(checkCertNoAgeDiffGender(certNo));
-            Console.out.println("对不起，您的年龄（男53岁及以上，女43岁及以上）不符合条件。certNo：{}，sex：{}，age：{}", certNo, sex, age);
+            // System.out.println("对不起，您的年龄（男53岁及以上，女43岁及以上）不符合条件。certNo：{}，sex：{}，age：{}", certNo, sex, age);
         } else {
             assertFalse(checkCertNoAgeDiffGender(certNo));
-            Console.out.println("成功：{}", certNo);
+            // System.out.println("成功：{}", certNo);
         }
     }
 

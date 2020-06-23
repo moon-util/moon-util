@@ -18,18 +18,18 @@ public final class ResourceUtil {
      *
      * @param sourcePath
      */
-    public static final boolean resourceExists(String sourcePath) { return ResourceSupport.resourceExists(sourcePath); }
+    public static boolean resourceExists(String sourcePath) { return ResourceSupport.resourceExists(sourcePath); }
 
     /**
      * 读取系统资源文件或者本地文件的输入流
      *
      * @param sourcePath
      */
-    public static final InputStream getResourceAsInputStream(String sourcePath) {
+    public static InputStream getResourceAsInputStream(String sourcePath) {
         return ResourceSupport.getResourceAsStream(sourcePath);
     }
 
-    public static final void ifResourceExists(String path, Consumer<InputStream> consumer) {
+    public static void ifResourceExists(String path, Consumer<InputStream> consumer) {
         InputStream stream = ResourceSupport.getResourceAsStreamOrNull(path);
         if (stream != null) {
             consumer.accept(stream);

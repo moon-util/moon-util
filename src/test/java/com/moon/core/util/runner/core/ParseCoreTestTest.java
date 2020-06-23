@@ -3,11 +3,8 @@ package com.moon.core.util.runner.core;
 import com.moon.core.io.FileUtil;
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.util.Console;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.runner.RunnerUtil;
-import org.junit.Ignore;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -247,7 +244,7 @@ class ParseCoreTestTest {
         handler = ParseCore.parse("!['1111111111111']");
         assertTrue((Boolean) handler.run(data));
 
-        MapUtil.putToObject(data, true, "age");
+        MapUtil.putToObjectMap(data, true, "age");
 
         handler = ParseCore.parse("(!['1111111111111']+([20].name[1][fieldName].doubleValue() + '123')).length()");
         assertEquals(handler.run(data), 11);

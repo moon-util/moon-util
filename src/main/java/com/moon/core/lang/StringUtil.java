@@ -108,16 +108,6 @@ public final class StringUtil {
         return concatHandler(predicate, css);
     }
 
-    public static <T, S extends CharSequence> String concatWithTransformer(Function<T, S> transformer, T... objects) {
-        final int length = objects == null ? 0 : objects.length;
-        if (length > 0) {
-            StringBuilder builder = new StringBuilder(length * Const.DEFAULT_LENGTH);
-            for (int i = 0; i < length; i++) { builder.append(transformer.apply(objects[i])); }
-            return builder.toString();
-        }
-        return EMPTY;
-    }
-
     /*
      * -------------------------------------------------------------------
      * tests
@@ -135,7 +125,7 @@ public final class StringUtil {
 
     /**
      * string is null、""(EMPTY string)
-     * <P>
+     * <p>
      * <pre>
      * StringUtil.isEmpty(null)         === true
      * StringUtil.isEmpty("")           === true
@@ -250,8 +240,15 @@ public final class StringUtil {
             case 4:
                 return cs.charAt(0) == 'n' && cs.charAt(1) == 'u' && cs.charAt(2) == 'l' && cs.charAt(3) == 'l';
             case 9:
-                return cs.charAt(0) == 'u' && cs.charAt(1) == 'n' && cs.charAt(2) == 'd' && cs.charAt(3) == 'e' && cs.charAt(
-                    4) == 'f' && cs.charAt(5) == 'i' && cs.charAt(6) == 'n' && cs.charAt(7) == 'e' && cs.charAt(8) == 'd';
+                return cs.charAt(0) == 'u' &&
+                    cs.charAt(1) == 'n' &&
+                    cs.charAt(2) == 'd' &&
+                    cs.charAt(3) == 'e' &&
+                    cs.charAt(4) == 'f' &&
+                    cs.charAt(5) == 'i' &&
+                    cs.charAt(6) == 'n' &&
+                    cs.charAt(7) == 'e' &&
+                    cs.charAt(8) == 'd';
             default:
                 return false;
         }
@@ -385,10 +382,9 @@ public final class StringUtil {
             return true;
         } else if (cs != null && search == null) {
             return false;
-        } else if (cs.toString().indexOf(search.toString()) < 0) {
-            return false;
+        } else {
+            return cs.toString().contains(search.toString());
         }
-        return true;
     }
 
     /*
@@ -427,21 +423,21 @@ public final class StringUtil {
 
     public static String toString(Object value) { return toStringOrDefault(value, NULL_STR); }
 
-    public static final String toString(char[] chars) {
+    public static String toString(char[] chars) {
         return chars == null ? NULL_STR : new String(chars, 0, chars.length);
     }
 
-    public static final String toString(char[] chars, int from, int end) {
+    public static String toString(char[] chars, int from, int end) {
         return chars == null ? NULL_STR : new String(chars, from, end);
     }
 
-    public static final StringBuilder toBuilder(char[] chars, int from, int to) {
+    public static StringBuilder toBuilder(char[] chars, int from, int to) {
         StringBuilder builder = new StringBuilder(to - from);
         builder.append(chars, from, to);
         return builder;
     }
 
-    public static final StringBuffer toBuffer(char[] chars, int from, int to) {
+    public static StringBuffer toBuffer(char[] chars, int from, int to) {
         StringBuffer builder = new StringBuffer(to - from);
         builder.append(chars, from, to);
         return builder;
@@ -566,7 +562,7 @@ public final class StringUtil {
      *
      * @return 操作成功后的字符串
      */
-    public final static String onlyWhitespace(String str) {
+    public static String onlyWhitespace(String str) {
         char[] chars = toCharArray(str), value = Arrays2.CHARS.empty();
         boolean isNotWhitespace = true;
         int i = 0, idx = 0, len = chars.length;
@@ -586,7 +582,7 @@ public final class StringUtil {
         return SupportUtil.toStr(value, idx);
     }
 
-    public final static String sortChars(String str) {
+    public static String sortChars(String str) {
         return str == null ? null : new String(ArrayUtil.sort(str.toCharArray()));
     }
 
@@ -597,7 +593,7 @@ public final class StringUtil {
      *
      * @param sourceString
      */
-    public static final String distinctChars(String sourceString) {
+    public static String distinctChars(String sourceString) {
         if (sourceString != null) {
             int len = sourceString.length();
             if (len == 0) {
@@ -641,7 +637,7 @@ public final class StringUtil {
      *
      * @return 替换完成后的字符串
      */
-    public static final String format(String template, Object... values) { return format(false, template, values); }
+    public static String format(String template, Object... values) { return format(false, template, values); }
 
     /**
      * 格式化字符串
@@ -654,7 +650,7 @@ public final class StringUtil {
      * @return
      */
     @SuppressWarnings("all")
-    public static final String format(boolean appendIfValuesOverflow, String template, Object... values) {
+    public static String format(boolean appendIfValuesOverflow, String template, Object... values) {
         return formatBuilder((end, chars) -> new String(chars, 0, end),//
             appendIfValuesOverflow, toCharArray(template), values);
     }
@@ -670,7 +666,7 @@ public final class StringUtil {
      *
      * @return 自定义返回类型
      */
-    public static final <C extends CharSequence, R> R format(
+    public static <C extends CharSequence, R> R format(
         IntBiFunction<char[], R> returningBuilder, C template, Object... values
     ) { return formatBuilder(returningBuilder, toCharArray(template), values); }
 
@@ -687,17 +683,14 @@ public final class StringUtil {
      *
      * @return 自定义返回类型
      */
-    public static final <C extends CharSequence, R> R format(
+    public static <C extends CharSequence, R> R format(
         IntBiFunction<char[], R> returningBuilder,
         String placeholder,
         boolean appendIfValuesOverflow,
         C template,
         Object... values
     ) {
-        return formatBuilder(returningBuilder,
-            toCharArray(placeholder),
-            appendIfValuesOverflow,
-            toCharArray(template),
+        return formatBuilder(returningBuilder, toCharArray(placeholder), appendIfValuesOverflow, toCharArray(template),
             values);
     }
 
@@ -714,7 +707,7 @@ public final class StringUtil {
      *
      * @return 字符数组
      */
-    public static final char[] toCharArray(CharSequence cs) { return toCharArray(cs, false); }
+    public static char[] toCharArray(CharSequence cs) { return toCharArray(cs, false); }
 
     /**
      * 将{@link CharSequence}转为字符数组
@@ -724,7 +717,7 @@ public final class StringUtil {
      *
      * @return 字符数组
      */
-    public static final char[] toCharArray(CharSequence cs, boolean emptyIfNull) {
+    public static char[] toCharArray(CharSequence cs, boolean emptyIfNull) {
         return cs == null ? (emptyIfNull ? EMPTY_CHARS : null) : cs.toString().toCharArray();
     }
 
@@ -747,7 +740,7 @@ public final class StringUtil {
      *
      * @return 首字母大写后的字符串
      */
-    public static final String capitalize(String str) {
+    public static String capitalize(String str) {
         int len = str == null ? 0 : str.length();
         if (len == 0) { return str; }
         char ch = str.charAt(0);
@@ -767,7 +760,7 @@ public final class StringUtil {
      *
      * @return 首字母小写后的字符串
      */
-    public static final String uncapitalize(String str) {
+    public static String uncapitalize(String str) {
         int len = length(str);
         if (len == 0) { return str; }
         char ch = str.charAt(0);
@@ -787,7 +780,7 @@ public final class StringUtil {
      *
      * @return 转换后的字符串
      */
-    public final static String camelcase(String str) { return camelcase(str, false); }
+    public static String camelcase(String str) { return camelcase(str, false); }
 
     /**
      * 连字符号转驼峰
@@ -797,7 +790,7 @@ public final class StringUtil {
      *
      * @return 转换后的字符串
      */
-    public final static String camelcase(String str, boolean firstToUpper) {
+    public static String camelcase(String str, boolean firstToUpper) {
         final int len = str == null ? 0 : str.length();
         if (len == 0) { return str; }
         char curr;
@@ -828,7 +821,7 @@ public final class StringUtil {
      *
      * @return 转换后的字符串
      */
-    public final static String underscore(String str) { return camelcaseToHyphen(str, '_'); }
+    public static String underscore(String str) { return camelcaseToHyphen(str, '_'); }
 
     /**
      * 驼峰转连字符号
@@ -843,7 +836,7 @@ public final class StringUtil {
      *
      * @return 转换后的字符串
      */
-    public final static String camelcaseToHyphen(String str) { return camelcaseToHyphen(str, '-'); }
+    public static String camelcaseToHyphen(String str) { return camelcaseToHyphen(str, '-'); }
 
     /**
      * 驼峰转连字符，可自定义连字符号
@@ -853,7 +846,7 @@ public final class StringUtil {
      *
      * @return 转换后的字符串
      */
-    public final static String camelcaseToHyphen(String str, char hyphen) {
+    public static String camelcaseToHyphen(String str, char hyphen) {
         return camelcaseToHyphen(str, hyphen, true);
     }
 
@@ -874,7 +867,7 @@ public final class StringUtil {
      *
      * @return 转换后的字符串
      */
-    public final static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {
+    public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {
         final int len = length(str);
         if (len == 0) { return str; }
         boolean prevIsUpper = false, currIsUpper;
@@ -904,7 +897,7 @@ public final class StringUtil {
         return res.toString();
     }
 
-    public final static int codePointAt(String str, int index) { return str.charAt(index); }
+    public static int codePointAt(String str, int index) { return str.charAt(index); }
 
     /*
      * -------------------------------------------------------------------
@@ -912,11 +905,11 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public final static String replace(String str, char old, char now) {
+    public static String replace(String str, char old, char now) {
         return str == null ? null : str.replace(old, now);
     }
 
-    public final static String replaceFirst(String src, String old, String now) { return src.replaceFirst(old, now); }
+    public static String replaceFirst(String src, String old, String now) { return src.replaceFirst(old, now); }
 
     public static char charAt(CharSequence str, int index) {
         int length = str.length();

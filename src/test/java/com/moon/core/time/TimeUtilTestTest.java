@@ -21,7 +21,7 @@ class TimeUtilTestTest {
         final int dayValue = 20;
         LocalDate date = LocalDate.of(yearValue, monthValue, dayValue);
         IntAccessor interDate = IntAccessor.of();
-        TimeUtil.forEachYears(date, date.plusYears(3), (year, localDate) -> {
+        DatetimeUtil.forEachYears(date, date.plusYears(3), (year, localDate) -> {
             assertEquals(year, interDate.get() + yearValue);
             assertEquals(localDate, LocalDate.of(yearValue + interDate.getAndIncrement(), monthValue, dayValue));
             return true;
@@ -78,7 +78,7 @@ class TimeUtilTestTest {
         final int secondValue = 20;
         LocalTime time = LocalTime.of(hourValue, minuteValue, secondValue);
         IntAccessor interTime = IntAccessor.of();
-        TimeUtil.forEachHours(time, time.plusHours(3), (hour, localTime) -> {
+        DatetimeUtil.forEachHours(time, time.plusHours(3), (hour, localTime) -> {
             System.out.println(localTime);
             return true;
         });

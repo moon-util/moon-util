@@ -37,7 +37,7 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static InputStream getResourceAsStream(String path) {
+    public static InputStream getResourceAsStream(String path) {
         return ResourceUtil.getResourceAsInputStream(path);
     }
 
@@ -63,19 +63,19 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static BufferedWriter getBufferedWriter(OutputStream os, Charset charset) {
+    public static BufferedWriter getBufferedWriter(OutputStream os, Charset charset) {
         return new BufferedWriter(getWriter(os, charset));
     }
 
-    public final static BufferedWriter getBufferedWriter(OutputStream os, String charset) {
+    public static BufferedWriter getBufferedWriter(OutputStream os, String charset) {
         return getBufferedWriter(os, Charset.forName(charset));
     }
 
-    public final static BufferedWriter getBufferedWriter(OutputStream os) {
+    public static BufferedWriter getBufferedWriter(OutputStream os) {
         return getBufferedWriter(os, UTF_8.charset());
     }
 
-    public final static BufferedWriter getBufferedWriter(Writer writer) {
+    public static BufferedWriter getBufferedWriter(Writer writer) {
         if (writer instanceof BufferedWriter) {
             return (BufferedWriter) writer;
         } else {
@@ -83,7 +83,7 @@ public final class IOUtil {
         }
     }
 
-    public final static BufferedWriter getBufferedWriter(File file) { return getBufferedWriter(getWriter(file)); }
+    public static BufferedWriter getBufferedWriter(File file) { return getBufferedWriter(getWriter(file)); }
 
     /*
      * -----------------------------------------------------------------------
@@ -91,17 +91,17 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static Writer getWriter(OutputStream os, Charset charset) {
+    public static Writer getWriter(OutputStream os, Charset charset) {
         return getBufferedWriter(new OutputStreamWriter(os, charset));
     }
 
-    public final static Writer getWriter(OutputStream os, String charset) {
+    public static Writer getWriter(OutputStream os, String charset) {
         return getWriter(os, Charset.forName(charset));
     }
 
-    public final static Writer getWriter(OutputStream os) { return getWriter(os, UTF_8.charset()); }
+    public static Writer getWriter(OutputStream os) { return getWriter(os, UTF_8.charset()); }
 
-    public final static Writer getWriter(File file) {
+    public static Writer getWriter(File file) {
         try {
             return new FileWriter(file);
         } catch (IOException e) {
@@ -115,19 +115,19 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static BufferedReader getBufferedReader(InputStream is, Charset charset) {
+    public static BufferedReader getBufferedReader(InputStream is, Charset charset) {
         return new BufferedReader(getReader(is, charset));
     }
 
-    public final static BufferedReader getBufferedReader(InputStream is, String charset) {
+    public static BufferedReader getBufferedReader(InputStream is, String charset) {
         return getBufferedReader(is, Charset.forName(charset));
     }
 
-    public final static BufferedReader getBufferedReader(InputStream is) {
+    public static BufferedReader getBufferedReader(InputStream is) {
         return getBufferedReader(is, UTF_8.charset());
     }
 
-    public final static BufferedReader getBufferedReader(Reader reader) {
+    public static BufferedReader getBufferedReader(Reader reader) {
         if (reader instanceof BufferedReader) {
             return (BufferedReader) reader;
         } else {
@@ -135,7 +135,7 @@ public final class IOUtil {
         }
     }
 
-    public final static BufferedReader getBufferedReader(File file) { return getBufferedReader(getReader(file)); }
+    public static BufferedReader getBufferedReader(File file) { return getBufferedReader(getReader(file)); }
 
     /*
      * -----------------------------------------------------------------------
@@ -143,15 +143,15 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static Reader getReader(InputStream is, Charset charset) { return new InputStreamReader(is, charset); }
+    public static Reader getReader(InputStream is, Charset charset) { return new InputStreamReader(is, charset); }
 
-    public final static Reader getReader(InputStream is, String charset) {
+    public static Reader getReader(InputStream is, String charset) {
         return getReader(is, Charset.forName(charset));
     }
 
-    public final static Reader getReader(InputStream is) { return getReader(is, UTF_8.charset()); }
+    public static Reader getReader(InputStream is) { return getReader(is, UTF_8.charset()); }
 
-    public final static Reader getReader(File file) {
+    public static Reader getReader(File file) {
         try {
             return new FileReader(file);
         } catch (FileNotFoundException e) {
@@ -159,15 +159,15 @@ public final class IOUtil {
         }
     }
 
-    public final static BufferedReader getResourceAsReader(String path, Charset charset) {
+    public static BufferedReader getResourceAsReader(String path, Charset charset) {
         return getBufferedReader(getResourceAsStream(path), charset);
     }
 
-    public final static Reader getResourceAsReader(String path, String charset) {
+    public static Reader getResourceAsReader(String path, String charset) {
         return getResourceAsReader(path, Charset.forName(charset));
     }
 
-    public final static Reader getResourceAsReader(String path) { return getResourceAsReader(path, UTF_8.charset()); }
+    public static Reader getResourceAsReader(String path) { return getResourceAsReader(path, UTF_8.charset()); }
 
     /*
      * -----------------------------------------------------------------------
@@ -175,9 +175,9 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static String toString(File file) { return toString(getBufferedReader(file)); }
+    public static String toString(File file) { return toString(getBufferedReader(file)); }
 
-    public final static String toString(Reader reader) {
+    public static String toString(Reader reader) {
         try (StringWriter writer = new StringWriter()) {
             copy(reader, writer);
             return writer.toString();
@@ -186,21 +186,21 @@ public final class IOUtil {
         }
     }
 
-    public final static String toString(InputStream in, Charset charset) {
+    public static String toString(InputStream in, Charset charset) {
         return toString(getBufferedReader(in, charset));
     }
 
-    public final static String toString(InputStream in, String charset) {
+    public static String toString(InputStream in, String charset) {
         return toString(getBufferedReader(in, charset));
     }
 
-    public final static String toString(InputStream in) { return toString(in, UTF_8.charset()); }
+    public static String toString(InputStream in) { return toString(in, UTF_8.charset()); }
 
-    public final static String toString(URL url) { return toString(url, UTF_8.charset()); }
+    public static String toString(URL url) { return toString(url, UTF_8.charset()); }
 
-    public final static String toString(URL url, String charset) { return toString(url, Charset.forName(charset)); }
+    public static String toString(URL url, String charset) { return toString(url, Charset.forName(charset)); }
 
-    public final static String toString(URL url, Charset charset) {
+    public static String toString(URL url, Charset charset) {
         try (InputStream is = url.openStream()) {
             return toString(is, charset);
         } catch (IOException e) {
@@ -276,14 +276,14 @@ public final class IOUtil {
 
     public static long copy(InputStream is, StringBuffer sb) { return copy(getBufferedReader(is), sb); }
 
-    public final static int copy(Reader reader, StringBuilder sb) {
-        final int len = sb.length();
+    public static int copy(Reader reader, StringBuilder sb) {
+        int len = sb.length();
         forEachLines(reader, sb::append);
         return sb.length() - len;
     }
 
-    public final static int copy(Reader reader, StringBuffer sb) {
-        final int len = sb.length();
+    public static int copy(Reader reader, StringBuffer sb) {
+        int len = sb.length();
         forEachLines(reader, sb::append);
         return sb.length() - len;
     }
@@ -296,7 +296,7 @@ public final class IOUtil {
      *
      * @return 写入字节数
      */
-    public final static int copy(CharSequence cs, Writer writer) {
+    public static int copy(CharSequence cs, Writer writer) {
         int len = cs == null ? 0 : cs.length();
         if (len > 0) {
             Objects.requireNonNull(writer);
@@ -315,7 +315,7 @@ public final class IOUtil {
      *
      * @return 写出字符数
      */
-    public final static int copy(CharSequence cs, OutputStream os) {
+    public static int copy(CharSequence cs, OutputStream os) {
         int len = cs == null ? 0 : cs.length();
         if (len > 0) {
             write(os, cs.toString().getBytes());
@@ -332,7 +332,7 @@ public final class IOUtil {
      *
      * @return 写出字节数
      */
-    public final static int copy(CharSequence cs, OutputStream os, String charset) {
+    public static int copy(CharSequence cs, OutputStream os, String charset) {
         int len = cs == null ? 0 : cs.length();
         if (len > 0) {
             try {
@@ -353,7 +353,7 @@ public final class IOUtil {
      *
      * @return 写出字节数
      */
-    public final static int copy(CharSequence cs, OutputStream os, Charset charset) {
+    public static int copy(CharSequence cs, OutputStream os, Charset charset) {
         int len = cs == null ? 0 : cs.length();
         if (len > 0) {
             write(os, cs.toString().getBytes(charset));
@@ -367,7 +367,7 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static int read(InputStream is, byte[] bytes, int start, int max) {
+    public static int read(InputStream is, byte[] bytes, int start, int max) {
         try {
             return is.read(bytes, start, max);
         } catch (IOException e) {
@@ -375,9 +375,9 @@ public final class IOUtil {
         }
     }
 
-    public final static int read(InputStream is, byte[] bytes) { return read(is, bytes, 0, bytes.length); }
+    public static int read(InputStream is, byte[] bytes) { return read(is, bytes, 0, bytes.length); }
 
-    public final static int read(Reader reader, char[] chars, int start, int max) {
+    public static int read(Reader reader, char[] chars, int start, int max) {
         try {
             return reader.read(chars, start, max);
         } catch (IOException e) {
@@ -385,7 +385,7 @@ public final class IOUtil {
         }
     }
 
-    public final static int read(Reader reader, char[] chars) { return read(reader, chars, 0, chars.length); }
+    public static int read(Reader reader, char[] chars) { return read(reader, chars, 0, chars.length); }
 
     /*
      * -----------------------------------------------------------------------
@@ -393,7 +393,7 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public final static void write(OutputStream os, byte[] bytes, int start, int limit) {
+    public static void write(OutputStream os, byte[] bytes, int start, int limit) {
         try {
             os.write(bytes, start, limit);
         } catch (IOException e) {
@@ -401,9 +401,9 @@ public final class IOUtil {
         }
     }
 
-    public final static void write(OutputStream os, byte[] bytes) { write(os, bytes, 0, bytes.length); }
+    public static void write(OutputStream os, byte[] bytes) { write(os, bytes, 0, bytes.length); }
 
-    public final static void write(Writer writer, char[] chars, int start, int limit) {
+    public static void write(Writer writer, char[] chars, int start, int limit) {
         try {
             writer.write(chars, start, limit);
         } catch (IOException e) {
@@ -417,7 +417,7 @@ public final class IOUtil {
      * @param writer writer
      * @param chars  字符
      */
-    public final static void write(Writer writer, char[] chars) { write(writer, chars, 0, chars.length); }
+    public static void write(Writer writer, char[] chars) { write(writer, chars, 0, chars.length); }
 
     /*
      * -----------------------------------------------------------------------
@@ -425,19 +425,19 @@ public final class IOUtil {
      * -----------------------------------------------------------------------
      */
 
-    public static void autoCloseAccept(Reader reader, ThrowingConsumer<? super Reader> consumer) {
+    public static void autoClose(Reader reader, ThrowingConsumer<? super Reader> consumer) {
         autoCloseHandle(reader, consumer);
     }
 
-    public static void autoCloseAccept(Writer writer, ThrowingConsumer<? super Writer> consumer) {
+    public static void autoClose(Writer writer, ThrowingConsumer<? super Writer> consumer) {
         autoCloseHandle(writer, consumer);
     }
 
-    public static void autoCloseAccept(InputStream is, ThrowingConsumer<? super InputStream> consumer) {
+    public static void autoClose(InputStream is, ThrowingConsumer<? super InputStream> consumer) {
         autoCloseHandle(is, consumer);
     }
 
-    public static void autoCloseAccept(OutputStream os, ThrowingConsumer<? super OutputStream> consumer) {
+    public static void autoClose(OutputStream os, ThrowingConsumer<? super OutputStream> consumer) {
         autoCloseHandle(os, consumer);
     }
 
@@ -547,6 +547,9 @@ public final class IOUtil {
     }
 
     public enum Closer {
+        /**
+         * 关闭
+         */
         VALUE;
 
         public Closer close(AutoCloseable close) { return closeCloseable(close); }
@@ -580,7 +583,7 @@ public final class IOUtil {
     }
 
     public static <T> T deserializeAs(byte[] bytes, Class<T> type) {
-        Object deserialized = deserialize(bytes);
-        return deserialized == null ? null : type.cast(deserialized);
+        Object deserialize = deserialize(bytes);
+        return deserialize == null ? null : type.cast(deserialize);
     }
 }

@@ -1,6 +1,5 @@
 package com.moon.core.security;
 
-import com.moon.core.util.Console;
 import org.junit.jupiter.api.Test;
 
 /**

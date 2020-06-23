@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import java.util.List;
 import java.util.Map;
@@ -56,12 +56,12 @@ public final class JSONString implements JSON<Object>,
     }
 
     @Override
-    public JSONObject getJSONObject(Object key) {
+    public JSONObject getJsonObject(Object key) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public JSONArray getJSONArray(Object key) {
+    public JSONArray getJsonArray(Object key) {
         throw new UnsupportedOperationException();
     }
 
@@ -118,9 +118,6 @@ public final class JSONString implements JSON<Object>,
                 (thisData == null || thatData == null
                     ? false
                     : thisData.equals(thatData));
-        }
-        if (obj instanceof String) {
-            return data.equals(obj);
         }
         return false;
     }

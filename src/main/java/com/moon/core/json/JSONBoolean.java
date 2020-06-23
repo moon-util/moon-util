@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import java.util.List;
 import java.util.Map;
@@ -6,10 +6,14 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public enum JSONBoolean implements JSON<Object>,
-    Comparable<JSONBoolean> {
-
+public enum JSONBoolean implements JSON<Object>, Comparable<JSONBoolean> {
+    /**
+     * true
+     */
     TRUE(true),
+    /**
+     * false
+     */
     FALSE(false);
 
     final Boolean value;
@@ -23,13 +27,14 @@ public enum JSONBoolean implements JSON<Object>,
     public List<Object> getList(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T get() { return (T) value; }
 
     @Override
-    public JSONObject getJSONObject(Object key) { throw new UnsupportedOperationException(); }
+    public JSONObject getJsonObject(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
-    public JSONArray getJSONArray(Object key) { throw new UnsupportedOperationException(); }
+    public JSONArray getJsonArray(Object key) { throw new UnsupportedOperationException(); }
 
     @Override
     public int getIntValue(Object key) { throw new UnsupportedOperationException(); }

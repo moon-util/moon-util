@@ -1,6 +1,5 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.Console;
 import com.moon.core.util.IteratorUtil;
 import org.junit.jupiter.api.Test;
 

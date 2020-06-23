@@ -1,8 +1,6 @@
 package com.moon.core.lang.reflect;
 
-import com.moon.core.util.Console;
 import com.moon.core.util.IteratorUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;

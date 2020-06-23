@@ -69,8 +69,8 @@ class ParseDelimitersTestTest {
         assertTrue(handler instanceof AsGetter);
         assertEquals(handler.run(data), "本草纲目好的  123  电脑 17 456");
 
-        MapUtil.putToObject(data, "name", "就问你嗨不嗨");
-        MapUtil.putToObject(data, "true", "你是不是傻");
+        MapUtil.putToObjectMap(data, "name", "就问你嗨不嗨");
+        MapUtil.putToObjectMap(data, "true", "你是不是傻");
 
         assertEquals(handler.run(data), "本草纲目好的  123  电脑 17 就问你嗨不嗨");
         assertEquals(handler1.run(data), "本草纲目好的  123你是不是傻  电脑 17 就问你嗨不嗨");
@@ -118,9 +118,9 @@ class ParseDelimitersTestTest {
         assertTrue(handler instanceof AsGetter);
         assertEquals(handler.run(data), "本草纲目好的  123  电脑 17 456");
 
-        MapUtil.putToObject(data, "name", "就问你嗨不嗨");
-        MapUtil.putToObject(data, "true", "你是不是傻");
-        MapUtil.putToObject(data, true, "回长沙");
+        MapUtil.putToObjectMap(data, "name", "就问你嗨不嗨");
+        MapUtil.putToObjectMap(data, "true", "你是不是傻");
+        MapUtil.putToObjectMap(data, true, "回长沙");
 
         assertEquals(handler.run(data), "本草纲目好的  123  电脑 17 就问你嗨不嗨");
         assertEquals(handler1.run(data), "本草纲目好的  123你是不是傻  电脑 17 就问你嗨不嗨");

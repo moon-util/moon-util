@@ -1,4 +1,4 @@
-package com.moon.core.util.json;
+package com.moon.core.json;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
@@ -364,12 +364,8 @@ final class JSONParser {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(source);
-    }
+    public int hashCode() { return Objects.hashCode(source); }
 
     @Override
-    public String toString() {
-        return Objects.toString(source);
-    }
+    public String toString() { return Objects.toString(source); }
 }

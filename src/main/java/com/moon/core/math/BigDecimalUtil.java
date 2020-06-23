@@ -80,27 +80,27 @@ public final class BigDecimalUtil {
         }
     }
 
-    public final static boolean gt(BigDecimal value1, BigDecimal value2) {
+    public static boolean gt(BigDecimal value1, BigDecimal value2) {
         return GT.compare(value1, value2);
     }
 
-    public final static boolean lt(BigDecimal value1, BigDecimal value2) {
+    public static boolean lt(BigDecimal value1, BigDecimal value2) {
         return LT.compare(value1, value2);
     }
 
-    public final static boolean ge(BigDecimal value1, BigDecimal value2) {
+    public static boolean ge(BigDecimal value1, BigDecimal value2) {
         return GE.compare(value1, value2);
     }
 
-    public final static boolean le(BigDecimal value1, BigDecimal value2) {
+    public static boolean le(BigDecimal value1, BigDecimal value2) {
         return LE.compare(value1, value2);
     }
 
-    public final static boolean eq(BigDecimal value1, BigDecimal value2) {
+    public static boolean eq(BigDecimal value1, BigDecimal value2) {
         return EQ.compare(value1, value2);
     }
 
-    public final static boolean ne(BigDecimal value1, BigDecimal value2) {
+    public static boolean ne(BigDecimal value1, BigDecimal value2) {
         return NE.compare(value1, value2);
     }
 }

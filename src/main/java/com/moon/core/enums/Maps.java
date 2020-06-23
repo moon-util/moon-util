@@ -33,7 +33,7 @@ public enum Maps implements Supplier<Map>,
     @SuppressWarnings("all")
     HashMap(HashMap.class) {
         @Override
-        public Map get() { return new HashMap(); }
+        public Map get() { return new HashMap(16); }
 
         @Override
         public Map apply(int value) { return new HashMap(value); }

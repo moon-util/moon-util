@@ -14,9 +14,9 @@ public final class ArrayUtil {
 
     private ArrayUtil() { noInstanceError(); }
 
-    public final static <T> T[] toArray(T... values) { return values; }
+    public static <T> T[] toArray(T... values) { return values; }
 
-    private final static <T> T ifNonNull(T value, Consumer<T> consumer) {
+    private static <T> T ifNonNull(T value, Consumer<T> consumer) {
         if (value != null) { consumer.accept(value); }
         return value;
     }
@@ -40,23 +40,21 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
-    public static <T> T[] as(T... values) { return values; }
+    public static char[] toArray(char... values) { return values; }
 
-    public static char[] as(char... values) { return values; }
+    public static byte[] toArray(byte... values) { return values; }
 
-    public static byte[] as(byte... values) { return values; }
+    public static short[] toArray(short... values) { return values; }
 
-    public static short[] as(short... values) { return values; }
+    public static int[] toArray(int... values) { return values; }
 
-    public static int[] as(int... values) { return values; }
+    public static long[] toArray(long... values) { return values; }
 
-    public static long[] as(long... values) { return values; }
+    public static float[] toArray(float... values) { return values; }
 
-    public static float[] as(float... values) { return values; }
+    public static double[] toArray(double... values) { return values; }
 
-    public static double[] as(double... values) { return values; }
-
-    public static boolean[] as(boolean... values) { return values; }
+    public static boolean[] toArray(boolean... values) { return values; }
 
     /*
      * ----------------------------------------------------------------
@@ -193,7 +191,7 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
-    public final static Class getArrayType(Class componentType) {
+    public static Class getArrayType(Class componentType) {
         return Array.newInstance(componentType, 0).getClass();
     }
 
@@ -221,6 +219,7 @@ public final class ArrayUtil {
 
     public static int length(char[] arr) { return arr == null ? 0 : arr.length; }
 
+    @SafeVarargs
     public static <T> boolean isEmpty(T... arr) { return length(arr) == 0; }
 
     public static boolean isEmpty(double... arr) { return length(arr) == 0; }
@@ -239,6 +238,7 @@ public final class ArrayUtil {
 
     public static boolean isEmpty(boolean... arr) { return length(arr) == 0; }
 
+    @SafeVarargs
     public static <T> boolean isNotEmpty(T... arr) { return isEmpty(arr); }
 
     public static boolean isNotEmpty(double... arr) { return isEmpty(arr); }
