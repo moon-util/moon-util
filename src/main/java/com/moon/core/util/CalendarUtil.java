@@ -35,8 +35,16 @@ public class CalendarUtil {
     public final static String yyyy_MM_dd = "yyyy-MM-dd";
     public final static String yyyy_MM = "yyyy-MM";
     public final static String yyyy = "yyyy";
+    public final static String HH_mm_ss = "HH:mm:ss";
+    public final static String HH_mm = "HH:mm";
 
-    private final static String PATTERN = yyyy_MM_dd_HH_mm_ss;
+    public final static String DATE_PATTERN = yyyy_MM_dd;
+
+    public final static String MONTH_PATTERN = yyyy_MM;
+
+    public final static String TIME_PATTERN = HH_mm_ss;
+
+    public final static String PATTERN = yyyy_MM_dd_HH_mm_ss;
 
     private final static String[] PATTERNS = {
         yyyy, yyyy_MM, yyyy_MM_dd, yyyy_MM_dd_HH, yyyy_MM_dd_HH_mm, yyyy_MM_dd_HH_mm_ss, yyyy_MM_dd_HH_mm_ss_SSS,
@@ -57,28 +65,22 @@ public class CalendarUtil {
     public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, current()); }
 
     public final static boolean isSameDay(Calendar value, Calendar other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other);
+        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
+            value) == getDayOfMonth(other);
     }
 
     public final static boolean isSameTime(Calendar value, Calendar other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other) &&
-            getHour(value) == getHour(other) &&
-            getMinute(value) == getMinute(other) &&
-            getSecond(value) == getSecond(other);
+        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
+            value) == getDayOfMonth(other) && getHour(value) == getHour(other) && getMinute(value) == getMinute(other) && getSecond(
+            value) == getSecond(other);
     }
 
     public final static boolean isBefore(Calendar value, Calendar other) {
-        return value == null ? false : value.getTimeInMillis() < other.getTimeInMillis();
+        return value != null && value.getTimeInMillis() < other.getTimeInMillis();
     }
 
     public final static boolean isAfter(Calendar value, Calendar other) {
-        return value == null ? false : value.getTimeInMillis() > other.getTimeInMillis();
+        return value != null && value.getTimeInMillis() > other.getTimeInMillis();
     }
 
     public final static boolean isBeforeNow(Calendar value) { return isBefore(value, current()); }
@@ -96,6 +98,8 @@ public class CalendarUtil {
     public final static int nowMonth() { return getMonth(current()); }
 
     public final static int nowDayOfMonth() { return getDayOfMonth(current()); }
+
+    public final static int nowDayOfYear() { return getDayOfYear(current()); }
 
     public final static int nowHour() { return getHour(current()); }
 
@@ -256,6 +260,8 @@ public class CalendarUtil {
 
     public final static int getDayOfMonth(Calendar value) { return get(value, DAY_OF_MONTH); }
 
+    public final static int getDayOfYear(Calendar value) { return get(value, DAY_OF_YEAR); }
+
     public final static int getHour(Calendar value) { return get(value, HOUR_OF_DAY); }
 
     public final static int getMinute(Calendar value) { return get(value, MINUTE); }
@@ -342,7 +348,7 @@ public class CalendarUtil {
         int idx = 0;
         if (strLen > idx) {
 
-            List<String> fieldsValue = new ArrayList();
+            List<String> fieldsValue = new ArrayList<>();
             StringBuilder sb = new StringBuilder();
             char ch;
             boolean moreBlank = false;
@@ -369,7 +375,7 @@ public class CalendarUtil {
             }
             int length = PARSE_FIELD_OF_CALENDAR.length;
 
-            length = size > length ? length : size;
+            length = Math.min(size, length);
             Calendar calendar = getInstance();
             calendar.clear();
 
@@ -401,7 +407,7 @@ public class CalendarUtil {
         if (values == null) { return null; }
         int size = values.length;
         int length = PARSE_FIELD_OF_CALENDAR.length;
-        size = size > length ? length : size;
+        size = Math.min(size, length);
         Calendar calendar = getInstance();
         calendar.clear();
         int i = 0;
@@ -431,7 +437,11 @@ public class CalendarUtil {
     public final static Calendar toCalendar(Date date) { return date == null ? null : toCalendar(date.getTime()); }
 
     public final static Calendar toCalendar(LocalDate date, LocalTime time) {
-        return toCalendar(date.getYear(), date.getDayOfMonth(), date.getDayOfMonth(), time.getHour(), time.getMinute(),
+        return toCalendar(date.getYear(),
+            date.getDayOfMonth(),
+            date.getDayOfMonth(),
+            time.getHour(),
+            time.getMinute(),
             time.getSecond());
     }
 
@@ -444,8 +454,12 @@ public class CalendarUtil {
     }
 
     public final static Calendar toCalendar(LocalDateTime date) {
-        return date == null ? null : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
-            date.getHour(), date.getMinute(), date.getSecond());
+        return date == null ? null : toCalendar(date.getYear(),
+            date.getMonthValue(),
+            date.getDayOfMonth(),
+            date.getHour(),
+            date.getMinute(),
+            date.getSecond());
     }
 
     public final static Calendar toCalendar(int... values) {

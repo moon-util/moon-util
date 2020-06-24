@@ -1,8 +1,7 @@
 package com.moon.core.enums;
 
-import java.io.File;
-
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.util.CalendarUtil.*;
 
 /**
  * @author benshaoye
@@ -13,47 +12,40 @@ public final class Const {
 
     public static final int ZERO = 0;
     public static final int ONE = 1;
+    public static final int MINUS_ONE = -1;
+    public static final int DEFAULT_SIZE = 16;
 
     public static final boolean TRUE = true;
     public static final boolean FALSE = false;
 
-    public static final String TRUE_STR = String.valueOf(TRUE);
-    public static final String FALSE_STR = String.valueOf(FALSE);
 
-    public static final int ERROR_NUMBER = -1;
     /**
      * ","——英文逗号
      */
-    public static final Character SEPARATOR_CHAR = Chars.COMMA.value;
-    /**
-     * ","——英文逗号
-     */
-    public static final String SEPARATOR_STRING = Strings.COMMA.value;
+    public static final char CHAR_COMMMA = Chars.COMMA.value;
+    public static final char CHAR_MINUS = Chars.MINUS.value;
 
-    //==============================================================
-    //File Separator
-    //==============================================================
-
-    public static final char SYS_FileSeparator_Char = File.separatorChar;
-    public static final String SYS_FileSeparator = File.separator;
-
-    public static final char WIN_FileSeparator_Char = Character.valueOf((char) 92);
-    public static final String WIN_FileSeparator = String.valueOf((char) 92);
-    /**
-     * '/'
-     */
-    public static final char App_FileSeparatorChar = (char) 47;
-    /**
-     * "/"
-     */
-    public static final String App_FileSeparator = String.valueOf(App_FileSeparatorChar);
-
-    public static final int WIN_FILE_INVALID_CHAR = 65279;
-    public static final int DEFAULT_LENGTH = 16;
     /**
      * EMPTY string
      */
     public static final String EMPTY = Strings.EMPTY.value;
-    public static final String NULL_STR = "null";
-    public static final String UNDEFINED_STR = "undefined";
+    public static final String STR_TRUE = String.valueOf(TRUE);
+    public static final String STR_FALSE = String.valueOf(FALSE);
+    public static final String STR_UNDEFINED = "undefined";
+    public static final String STR_NULL = "null";
+    public static final String STR_EMPTY = EMPTY;
+    /**
+     * ","——英文逗号
+     */
+    public static final String STR_COMMA = Strings.COMMA.value;
+
+    public final static String DATE_PATTERN = yyyy_MM_dd;
+
+    public final static String MONTH_PATTERN = yyyy_MM;
+
+    public final static String TIME_PATTERN = HH_mm_ss;
+
+    public final static String PATTERN = yyyy_MM_dd_HH_mm_ss;
+
+    public static final int WIN_FILE_INVALID_CHAR = 65279;
 }

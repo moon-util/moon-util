@@ -128,13 +128,9 @@ public final class IntUtil {
     }
 
 
-    public static boolean isInt(Object o) {
-        return o instanceof Integer;
-    }
+    public static boolean isInt(Object o) { return o instanceof Integer; }
 
-    public static boolean matchInt(CharSequence o) {
-        return DetectUtil.isInteger(String.valueOf(o));
-    }
+    public static boolean matchInt(CharSequence o) { return DetectUtil.isInteger(String.valueOf(o)); }
 
     /*
      * -------------------------------------------------------------------------------------------
@@ -142,25 +138,15 @@ public final class IntUtil {
      * -------------------------------------------------------------------------------------------
      */
 
-    public static int toIntValue(Boolean bool) {
-        return toIntValue(bool != null && bool.booleanValue());
-    }
+    public static int toIntValue(Boolean bool) { return toIntValue(bool != null && bool); }
 
-    public static int toIntValue(long value) {
-        return (int) value;
-    }
+    public static int toIntValue(long value) { return (int) value; }
 
-    public static int toIntValue(float value) {
-        return (int) value;
-    }
+    public static int toIntValue(float value) { return (int) value; }
 
-    public static int toIntValue(double value) {
-        return (int) value;
-    }
+    public static int toIntValue(double value) { return (int) value; }
 
-    public static int toIntValue(boolean value) {
-        return value ? 1 : 0;
-    }
+    public static int toIntValue(boolean value) { return value ? 1 : 0; }
 
     public static int toIntValue(CharSequence cs) {
         if (cs == null) {

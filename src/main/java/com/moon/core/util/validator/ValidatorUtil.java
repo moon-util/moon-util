@@ -9,6 +9,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 public final class ValidatorUtil {
+
     private ValidatorUtil() { noInstanceError(); }
 
     public static <T> Validator<T> of(T value) {return Validator.of(value);}
@@ -21,5 +22,5 @@ public final class ValidatorUtil {
         return MapValidator.of(collect);
     }
 
-    public static IDCard18Validator ofIDCard18(String value) {return IDCard18Validator.of(value);}
+    public static ResidentID18Validator ofResidentID18(String value) {return ResidentID18Validator.of(value);}
 }

@@ -51,7 +51,7 @@ public class StringJoiner
     public StringJoiner(CharSequence delimiter) { this(delimiter, null, null); }
 
     public StringJoiner(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
-        this(defaultStringifier(), prefix, delimiter, suffix, Const.NULL_STR, false, prefix);
+        this(defaultStringifier(), prefix, delimiter, suffix, Const.STR_NULL, false, prefix);
     }
 
     private StringJoiner(

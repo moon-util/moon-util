@@ -1,10 +1,10 @@
 package com.moon.more.model;
 
 import com.moon.core.enums.EnumDescriptor;
-import com.moon.more.model.getter.KeyGetter;
-import com.moon.more.model.getter.ValueGetter;
 import com.moon.core.util.interfaces.KeySupplier;
 import com.moon.core.util.interfaces.ValueSupplier;
+import com.moon.more.model.getter.KeyGetter;
+import com.moon.more.model.getter.ValueGetter;
 
 import java.util.Objects;
 
@@ -16,8 +16,7 @@ public final class KeyValue implements ValueSupplier<String>, KeySupplier<String
     private String key;
     private String value;
 
-    public KeyValue() {
-    }
+    public KeyValue() { }
 
     public static KeyValue of() {return new KeyValue();}
 

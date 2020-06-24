@@ -43,9 +43,7 @@ public final class DatetimeUtil {
     }
 
     public static LocalDateTime toDateTime(Calendar calendar) {
-        return LocalDateTime
-            .of(calendar.get(YEAR), calendar.get(MONTH), calendar.get(DAY_OF_MONTH), calendar.get(HOUR_OF_DAY),
-                calendar.get(MINUTE), calendar.get(SECOND), calendar.get(MILLISECOND));
+        return LocalDateTime.of(toDate(calendar), toTime(calendar));
     }
 
     public static LocalDate toDate(Date date) {

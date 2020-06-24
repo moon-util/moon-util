@@ -7,9 +7,12 @@ import com.moon.core.lang.support.StringSupport;
 import com.moon.core.util.function.IntBiFunction;
 
 import java.util.Objects;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-import static com.moon.core.enums.Const.NULL_STR;
+import static com.moon.core.enums.Const.STR_NULL;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.support.StringSupport.concatHandler;
 import static com.moon.core.lang.support.StringSupport.formatBuilder;
@@ -240,15 +243,8 @@ public final class StringUtil {
             case 4:
                 return cs.charAt(0) == 'n' && cs.charAt(1) == 'u' && cs.charAt(2) == 'l' && cs.charAt(3) == 'l';
             case 9:
-                return cs.charAt(0) == 'u' &&
-                    cs.charAt(1) == 'n' &&
-                    cs.charAt(2) == 'd' &&
-                    cs.charAt(3) == 'e' &&
-                    cs.charAt(4) == 'f' &&
-                    cs.charAt(5) == 'i' &&
-                    cs.charAt(6) == 'n' &&
-                    cs.charAt(7) == 'e' &&
-                    cs.charAt(8) == 'd';
+                return cs.charAt(0) == 'u' && cs.charAt(1) == 'n' && cs.charAt(2) == 'd' && cs.charAt(3) == 'e' && cs.charAt(
+                    4) == 'f' && cs.charAt(5) == 'i' && cs.charAt(6) == 'n' && cs.charAt(7) == 'e' && cs.charAt(8) == 'd';
             default:
                 return false;
         }
@@ -265,9 +261,8 @@ public final class StringUtil {
     public final static boolean isAllMatched(CharSequence cs, IntPredicate tester) {
         final int length = length(cs);
         if (length == 0) { return false; }
-        String source = cs.toString();
         for (int i = 0; i < length; i++) {
-            if (!tester.test(source.charAt(i))) {
+            if (!tester.test(cs.charAt(i))) {
                 return false;
             }
         }
@@ -421,14 +416,14 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static String toString(Object value) { return toStringOrDefault(value, NULL_STR); }
+    public static String toString(Object value) { return toStringOrDefault(value, STR_NULL); }
 
     public static String toString(char[] chars) {
-        return chars == null ? NULL_STR : new String(chars, 0, chars.length);
+        return chars == null ? STR_NULL : new String(chars, 0, chars.length);
     }
 
     public static String toString(char[] chars, int from, int end) {
-        return chars == null ? NULL_STR : new String(chars, from, end);
+        return chars == null ? STR_NULL : new String(chars, from, end);
     }
 
     public static StringBuilder toBuilder(char[] chars, int from, int to) {
@@ -515,44 +510,56 @@ public final class StringUtil {
      */
 
     /**
-     * 删除{@link String}、{@link StringBuilder}、{@link StringBuffer}中的空白字符
-     * 不支持其他类型{@link CharSequence}
+     * 删除字符串中空白字符
      *
-     * @param cs  待测字符串
-     * @param <T> 字符串类型
+     * @param str 待处理字符串
      *
-     * @return 删除所有空白字符后的字符串
-     *
-     * @see IllegalArgumentException can not support except types in String、StringBuilder、StringBuffer
+     * @return 删除所有空白字符后的字符串；如果 str == null，返回 null
      */
-    public static <T extends CharSequence> T deleteWhitespaces(T cs) {
-        if (cs != null) {
-            int length = cs.length(), curr = 0;
-            char[] chars;
-            if (length > 0) {
-                char ch;
-                int i = 0;
-                chars = new char[length];
-                for (; i < length; i++) {
-                    if (!Character.isWhitespace(ch = cs.charAt(i)) && ch != 65279) {
-                        chars[curr++] = ch;
-                    }
-                }
-            } else {
-                chars = Arrays2.CHARS.empty();
-            }
-            if (cs instanceof String) {
-                return (T) (curr == 0 ? EMPTY : String.valueOf(chars, 0, curr));
-            }
-            if (cs instanceof StringBuilder) {
-                return (T) new StringBuilder(curr).append(chars, 0, curr);
-            }
-            if (cs instanceof StringBuffer) {
-                return (T) new StringBuffer(curr).append(chars, 0, curr);
-            }
-            throw new IllegalArgumentException(cs.toString());
+    public static String deleteWhitespaces(CharSequence str) { return deleteChars(str, Character::isWhitespace); }
+
+    /**
+     * 删除符合条件的字符
+     *
+     * @param str    待处理字符串
+     * @param tester 检测规则
+     *
+     * @return 返回删除符合条件后的字符串；如果 str == null，返回 null
+     */
+    public static String deleteChars(CharSequence str, IntPredicate tester) {
+        return deleteChars(str, tester, (end, chars) -> String.valueOf(chars, 0, end));
+    }
+
+    /**
+     * 删除符合条件的字符，自定义返回值类型
+     *
+     * @param str     待处理字符串
+     * @param tester  检测规则
+     * @param builder 自定义返回类型，接收参数：(字符数组最后一个有效位置 endIndex，字符数组 chars)
+     * @param <C>     字符串类型
+     * @param <R>     返回值字符串类型
+     *
+     * @return builder 的返回值；如果 str == null，返回 null
+     */
+    public static <C extends CharSequence, R extends CharSequence> R deleteChars(
+        C str, IntPredicate tester, IntBiFunction<char[], ? extends R> builder
+    ) {
+        if (str == null) {
+            return null;
         }
-        return null;
+        int len = str.length();
+        if (len == 0) {
+            return builder.apply(0, Arrays2.CHARS.empty());
+        }
+        char ch;
+        int endIdx = 0, i = 0;
+        char[] chars = new char[len];
+        for (; i < len; i++) {
+            if (!tester.test(ch = str.charAt(i))) {
+                chars[endIdx++] = ch;
+            }
+        }
+        return builder.apply(endIdx, chars);
     }
 
     /**
@@ -591,7 +598,9 @@ public final class StringUtil {
      * <p>
      * 返回字符串中字符顺序为源字符串中首次出现顺序
      *
-     * @param sourceString
+     * @param sourceString 可能包含重复字符的字符串
+     *
+     * @return 去掉字符串中重复字符后的新字符串
      */
     public static String distinctChars(String sourceString) {
         if (sourceString != null) {
@@ -647,7 +656,7 @@ public final class StringUtil {
      * @param values                 每个占位符对应的值，
      *                               每个值用{@link String#valueOf(Object)}取字符串
      *
-     * @return
+     * @return 替换完成后的字符串
      */
     @SuppressWarnings("all")
     public static String format(boolean appendIfValuesOverflow, String template, Object... values) {
@@ -690,7 +699,10 @@ public final class StringUtil {
         C template,
         Object... values
     ) {
-        return formatBuilder(returningBuilder, toCharArray(placeholder), appendIfValuesOverflow, toCharArray(template),
+        return formatBuilder(returningBuilder,
+            toCharArray(placeholder),
+            appendIfValuesOverflow,
+            toCharArray(template),
             values);
     }
 
@@ -785,12 +797,12 @@ public final class StringUtil {
     /**
      * 连字符号转驼峰
      *
-     * @param str          字符串
-     * @param firstToUpper 第一个字母是否大写
+     * @param str             字符串
+     * @param capitalizeFirst 第一个字母是否大写
      *
      * @return 转换后的字符串
      */
-    public static String camelcase(String str, boolean firstToUpper) {
+    public static String camelcase(String str, boolean capitalizeFirst) {
         final int len = str == null ? 0 : str.length();
         if (len == 0) { return str; }
         char curr;
@@ -799,7 +811,7 @@ public final class StringUtil {
         boolean isCamel = false, isLetter;
         for (; index < len; index++) {
             if (isLetter = isLetterOrDigit(curr = str.charAt(index))) {
-                curr = (firstToUpper && count == 0) || isCamel ? toUpperCase(curr) : toLowerCase(curr);
+                curr = (capitalizeFirst && count == 0) || isCamel ? toUpperCase(curr) : toLowerCase(curr);
                 chars[count++] = curr;
             } else if (index == 0) {
                 isCamel = count != 0;
@@ -863,7 +875,7 @@ public final class StringUtil {
      *
      * @param str             字符串
      * @param hyphen          自定义连字符号
-     * @param continuousSplit 自定义连续大写字母是否拆分连接
+     * @param continuousSplit 连续大写字母是否拆分连接
      *
      * @return 转换后的字符串
      */
@@ -897,7 +909,44 @@ public final class StringUtil {
         return res.toString();
     }
 
+    /**
+     * 指定位置的字符编码
+     *
+     * @param str   字符串
+     * @param index 位置
+     *
+     * @return 指定位置字符编码
+     *
+     * @throws NullPointerException            str == null
+     * @throws StringIndexOutOfBoundsException index 超出字符串范围
+     */
     public static int codePointAt(String str, int index) { return str.charAt(index); }
+
+    /**
+     * 指定位置的字符编码
+     *
+     * @param str      字符串
+     * @param index    位置
+     * @param tolerant 宽容模式
+     *
+     * @return 指定位置字符编码
+     *
+     * @throws NullPointerException            str is empty
+     * @throws StringIndexOutOfBoundsException 当采取非宽容模式，并且 index 超出字符串范围时
+     */
+    public static int codePointAt(String str, int index, boolean tolerant) {
+        if (tolerant) {
+            return codePointAt(str, index);
+        }
+        int length = str == null ? 0 : str.length();
+        if (length == 0) {
+            throw new NullPointerException("Can not got char value at index of: " + index);
+        }
+        if (index < 0 || index >= length) {
+            index = index % length + length;
+        }
+        return str.charAt(index);
+    }
 
     /*
      * -------------------------------------------------------------------
@@ -905,12 +954,40 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
+    /**
+     * 替换字符
+     *
+     * @param str 目标字符串
+     * @param old 搜索的字符
+     * @param now 替换的字符
+     *
+     * @return 替换后的子串；如果 str == null，则返回 null
+     */
     public static String replace(String str, char old, char now) {
         return str == null ? null : str.replace(old, now);
     }
 
-    public static String replaceFirst(String src, String old, String now) { return src.replaceFirst(old, now); }
+    /**
+     * 替换第一个匹配子串
+     *
+     * @param src 目标字符串
+     * @param old 搜索子串
+     * @param now 替换子串
+     *
+     * @return 替换后的子串；如果 str == null，则返回 null
+     */
+    public static String replaceFirst(
+        String src, String old, String now
+    ) { return src == null ? null : src.replaceFirst(old, now); }
 
+    /**
+     * 指定位置字符，主要是支持负值索引
+     *
+     * @param str   目标字符串
+     * @param index 字符索引位置
+     *
+     * @return 索引位置的字符
+     */
     public static char charAt(CharSequence str, int index) {
         int length = str.length();
         if (index < 0) {
@@ -1025,8 +1102,25 @@ public final class StringUtil {
         return str.substring(index + search.length());
     }
 
-    public static String substrBetween(String str, String search) { return substrBetween(str, search, search); }
+    /**
+     * 截取以{@code tag}包裹的第一个子字符串
+     *
+     * @param str 原字符串
+     * @param tag 包裹标签
+     *
+     * @return 子字符串
+     */
+    public static String substrBetween(String str, String tag) { return substrBetween(str, tag, tag); }
 
+    /**
+     * 截取字符串之间的第一个子串
+     *
+     * @param str   原字符串
+     * @param open  起始字符串
+     * @param close 结束字符串
+     *
+     * @return 起始字符串和结束字符串之间的子串；任意不符合截取条件的情况返回 null
+     */
     public static String substrBetween(String str, String open, String close) {
         if (str == null || open == null || close == null) {
             return null;
@@ -1042,27 +1136,116 @@ public final class StringUtil {
         return str.substring(start + open.length(), end);
     }
 
+    /**
+     * 从字符串中截取子串
+     *
+     * @param str  源字符串
+     * @param from 起始位置
+     *
+     * @return 返回从起始位置之后的子字符串
+     *
+     * @throws StringIndexOutOfBoundsException 起始位置超过字符串长度范围时抛出索引异常
+     * @see String#substring(int) 实现方式
+     * @see #slice(String, int) 强调"片段"
+     */
     public static String substr(String str, int from) {
         return isEmpty(str) ? EMPTY : str.substring(from);
     }
 
+    /**
+     * 从字符串中截取子串
+     *
+     * @param str        源字符串
+     * @param from       起始位置
+     * @param charsCount 截取字符个数
+     *
+     * @return 返回从起始位置之后 {@code charsCount} 个字符组成的子字符串
+     *
+     * @throws StringIndexOutOfBoundsException 子串范围超长时抛出异常
+     */
     public static String substr(String str, int from, int charsCount) {
-        return isEmpty(str) ? EMPTY : str.substring(from, from + charsCount);
+        return substr(str, from, charsCount, false);
     }
 
+    /**
+     * 从字符串中截取子串
+     *
+     * @param str        源字符串
+     * @param from       起始位置
+     * @param charsCount 截取字符个数
+     * @param tolerant   宽容模式
+     *
+     * @return 返回从起始位置之后 {@code charsCount} 个字符组成的子字符串
+     *
+     * @throws StringIndexOutOfBoundsException 当采取非宽容模式（tolerant == false），子串范围超长时抛出异常
+     */
+    public static String substr(String str, int from, int charsCount, boolean tolerant) {
+        if (isEmpty(str)) {
+            return EMPTY;
+        }
+        int end = from + charsCount;
+        if (tolerant) {
+            int length = str.length();
+            if (from >= length) {
+                return EMPTY;
+            }
+            if (end >= length) {
+                end = length;
+            }
+        }
+        return str.substring(from, end);
+    }
+
+    /**
+     * 截取字符串片段，
+     * <p>
+     * 字符串片段参考 js 实现，总是以“宽容模式”处理，并支持负值索引
+     *
+     * @param str  源字符串
+     * @param from 起始位置
+     *
+     * @return 返回从起始位置之后的字符串片段
+     *
+     * @see String#substring(int) 实现方式
+     * @see #substr(String, int) 强调"子串"
+     */
     public static String slice(String str, int from) {
-        return isEmpty(str) ? EMPTY : str.substring(from);
+        return (isEmpty(str) || from >= str.length()) ? EMPTY : str.substring(from);
     }
 
+    /**
+     * 截取字符串片段，
+     * <p>
+     * 字符串片段参考 js 规则，总是以“宽容模式”处理，并支持负值索引
+     *
+     * @param str  源字符串
+     * @param from 起始位置
+     * @param to   结束位置
+     *
+     * @return 返回从起始位置和结束位置之间的子串
+     */
     public static String slice(String str, int from, int to) {
         if (isEmpty(str)) {
             return EMPTY;
         }
         int length = str.length();
-        if (to < 0) {
-
+        if (from >= length) {
+            return EMPTY;
         }
-        throw new UnsupportedOperationException();
+        if (from < 0) {
+            from = from % length + length;
+        }
+        if (to >= length) {
+            to = length;
+        }
+        if (to < 0) {
+            to = to % length + length;
+        }
+        if (to > from) {
+            return str.substring(from, to);
+        } else {
+            return EMPTY;
+        }
     }
 
     /*
@@ -1070,7 +1253,7 @@ public final class StringUtil {
      */
 
     /**
-     * 删除最后一个匹字符串之后的内容
+     * 丢弃最后一个匹字符串之后的内容
      * <p>
      * StringUtil.discardAfter(null, *)      = null
      * StringUtil.discardAfter("", *)        = ""
@@ -1099,7 +1282,7 @@ public final class StringUtil {
     }
 
     /**
-     * 删除最后一个匹配字符之后的内容
+     * 丢弃最后一个匹配字符之后的内容
      * <p>
      * StringUtil.discardAfterLast(null, *)         = ""
      * StringUtil.discardAfterLast("", *)           = ""
@@ -1129,7 +1312,7 @@ public final class StringUtil {
     }
 
     /**
-     * 删除第一个匹配字符串之前的内容
+     * 丢弃第一个匹配字符串之前的内容
      * <p>
      * StringUtil.discardBefore(null, *)         = ""
      * StringUtil.discardBefore("", *)           = ""
@@ -1156,7 +1339,7 @@ public final class StringUtil {
     }
 
     /**
-     * 删除最后一个匹配字符串之前的内容
+     * 丢弃最后一个匹配字符串之前的内容
      * <p>
      * StringUtil.discardBeforeLast(null, *)         = ""
      * StringUtil.discardBeforeLast("", *)           = ""

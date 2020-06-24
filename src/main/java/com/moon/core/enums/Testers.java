@@ -7,6 +7,7 @@ import java.util.function.Predicate;
  * 一系列检查函数，这个可作为参数传递，而不只是静态方法调用
  *
  * @author benshaoye
+ * @see Patterns 检查字符串是否匹配规则
  */
 @SuppressWarnings("rawtypes")
 public enum Testers implements Predicate, EnumDescriptor {
@@ -164,6 +165,20 @@ public enum Testers implements Predicate, EnumDescriptor {
         @Override
         public boolean test(Object o) { return o instanceof Number && ((Number) o).doubleValue() == 0; }
     },
+    /**
+     * 负数
+     */
+    isNegative {
+        @Override
+        public boolean test(Object o) { return o instanceof Number && ((Number) o).intValue() < 0; }
+    },
+    /**
+     * 正数
+     */
+    isPositive {
+        @Override
+        public boolean test(Object o) { return o instanceof Number && ((Number) o).intValue() > 0; }
+    },
     ;
 
     private static class CachedIsEmpty {
@@ -180,6 +195,74 @@ public enum Testers implements Predicate, EnumDescriptor {
         }
     }
 
+    /**
+     * 枚举信息
+     *
+     * @return 枚举信息
+     */
     @Override
     public String getText() { return name(); }
+
+    /**
+     * 返回断言函数，用来检查一个值是否小于 value
+     *
+     * @param value 期望值
+     *
+     * @return 断言函数
+     */
+    public static Predicate lt(double value) { return o -> isNum(o) && ((Number) o).doubleValue() < value; }
+
+    /**
+     * 返回断言函数，用来检查一个值是否小于或等于 value
+     *
+     * @param value 期望值
+     *
+     * @return 断言函数
+     */
+    public static Predicate le(double value) { return o -> isNum(o) && ((Number) o).doubleValue() <= value; }
+
+    /**
+     * 返回断言函数，用来检查一个值是否大于 value
+     *
+     * @param value 期望值
+     *
+     * @return 断言函数
+     */
+    public static Predicate gt(double value) { return o -> isNum(o) && ((Number) o).doubleValue() > value; }
+
+    /**
+     * 返回断言函数，用来检查一个值是否大于或等于 value
+     *
+     * @param value 期望值
+     *
+     * @return 断言函数
+     */
+    public static Predicate ge(double value) { return o -> isNum(o) && ((Number) o).doubleValue() >= value; }
+
+    /**
+     * 返回断言函数，用来检查一个值是否等于 value
+     *
+     * @param value 期望值
+     *
+     * @return 断言函数
+     */
+    public static Predicate eq(double value) { return o -> isNum(o) && ((Number) o).doubleValue() == value; }
+
+    /**
+     * 返回断言函数，用来检查一个值是否不等于 value
+     *
+     * @param value 期望值
+     *
+     * @return 断言函数
+     */
+    public static Predicate not(double value) { return o -> isNum(o) && ((Number) o).doubleValue() != value; }
+
+    /**
+     * 判断对象是否是{@link Number}
+     *
+     * @param o 待测对象
+     *
+     * @return true: 是数字；否则返回 false
+     */
+    private static boolean isNum(Object o) { return o instanceof Number; }
 }

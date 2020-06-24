@@ -7,13 +7,15 @@ import java.util.function.BiConsumer;
 /**
  * @author benshaoye
  */
-interface IGroupValidator<M extends Map<K, C>, C extends Collection<E>, K, E, IMPL>
+interface IGroupValidator<M extends Map<K, C>, C extends Collection<E>, K, E, IMPL extends IGroupValidator<M, C, K, E, IMPL>>
     extends IKeyedValidator<M, K, C, IMPL> {
+
     /**
      * 匹配验证每一项
      *
-     * @param consumer
-     * @return
+     * @param consumer 单项验证器
+     *
+     * @return 当前验证对象
      */
-    IMPL requireForEach(BiConsumer<? super K, CollectValidator<C, E>> consumer);
+    IMPL forEach(BiConsumer<? super K, CollectValidator<C, E>> consumer);
 }

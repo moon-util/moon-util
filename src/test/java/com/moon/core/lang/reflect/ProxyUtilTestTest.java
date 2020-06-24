@@ -28,10 +28,12 @@ class ProxyUtilTestTest {
             return ret;
         });
 
-        out.println(supplier.getValue());;
+        out.println(supplier.getValue());
+        ;
     }
 
     interface Getter<T> extends ValueSupplier<String> {
+
         T get();
     }
 
@@ -90,7 +92,8 @@ class ProxyUtilTestTest {
         System.out.println(student.get());
         Class[] interfaces = {Getter.class};
         Object o = Proxy.newProxyInstance(getClass().getClassLoader(),
-            interfaces, new StudentInvocationHandler(student));
+            interfaces,
+            new StudentInvocationHandler(student));
         Getter getter = (Getter) o;
         Object res = getter.get();
         System.out.println("===================================  " + res);
@@ -100,7 +103,8 @@ class ProxyUtilTestTest {
         Student student = new Student();
         Class[] interfaces = {Getter.class};
         Object o = Proxy.newProxyInstance(getClass().getClassLoader(),
-            interfaces, new StudentInvocationHandler(student));
+            interfaces,
+            new StudentInvocationHandler(student));
         Getter getter = (Getter) o;
         return getter;
     }
@@ -168,12 +172,16 @@ class ProxyUtilTestTest {
             String name = StringUtil.replace(value, '_', '$');
             name = StringUtil.replace(name, '/', '_');
             String out = "/**\n * " + value + "\n */\n";
-            out += name.toUpperCase()+",";
-            String now = "{\n@Override\npublic DateFormat with(String pattern){\n" +
-                "return withTimeZone(pattern, \"" + value + "\");\n" +
-                "}\n},";
+            out += name.toUpperCase() + ",";
+            String now = "{\n@Override\npublic DateFormat with(String pattern){\n" + "return withTimeZone(pattern, \"" + value + "\");\n" + "}\n},";
             System.out.println(out);
         });
+    }
+
+    @Test
+    void testName() throws Exception {
+        out.println(((char) 48));
+        out.println(0x00000001);
     }
 
     @Test
@@ -187,60 +195,60 @@ class ProxyUtilTestTest {
 
         final int count = 100000000;
         out.println("==============================");
-//        out.time("cglib:{}ms");
+        //        out.time("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-//        out.timeNext("jdk:{}ms");
+        //        out.timeNext("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-//        out.timeNext("java:{}ms");
+        //        out.timeNext("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-//        out.timeEnd();
+        //        out.timeEnd();
         out.println("==============================");
-//        out.time("jdk:{}ms");
+        //        out.time("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-//        out.timeNext("java:{}ms");
+        //        out.timeNext("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-//        out.timeNext("cglib:{}ms");
+        //        out.timeNext("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-//        out.timeEnd();
+        //        out.timeEnd();
         out.println("==============================");
-//        out.time("cglib:{}ms");
+        //        out.time("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-//        out.timeNext("java:{}ms");
+        //        out.timeNext("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-//        out.timeNext("jdk:{}ms");
+        //        out.timeNext("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-//        out.timeEnd();
+        //        out.timeEnd();
         out.println("==============================");
-//        out.time("java:{}ms");
+        //        out.time("java:{}ms");
         for (int i = 0; i < count; i++) {
             getter3.get();
         }
-//        out.timeNext("jdk:{}ms");
+        //        out.timeNext("jdk:{}ms");
         for (int i = 0; i < count; i++) {
             getter2.get();
         }
-//        out.timeNext("cglib:{}ms");
+        //        out.timeNext("cglib:{}ms");
         for (int i = 0; i < count; i++) {
             getter1.get();
         }
-//        out.timeEnd();
+        //        out.timeEnd();
     }
 }

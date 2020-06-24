@@ -1,7 +1,9 @@
 package com.moon.core.lang;
 
+import com.moon.core.enums.Testers;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.RandomStringUtil;
+import com.moon.core.util.validator.Validator;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -632,8 +634,8 @@ class StringUtilTestTest {
 
     @Test
     void testConcatWithTransformer() {
-        assertEquals(StringUtil.concatWithTransformer(str -> str.toString()), "");
-        assertEquals(StringUtil.concatWithTransformer(str -> str.toString(), 1, 2, 3), "123");
+        // assertEquals(StringUtil.concatWithTransformer(str -> str.toString()), "");
+        // assertEquals(StringUtil.concatWithTransformer(str -> str.toString(), 1, 2, 3), "123");
     }
 
     @Test
@@ -733,5 +735,44 @@ class StringUtilTestTest {
         assertEquals(StringUtil.discardBeforeLast("12345", "6"), "");
         assertEquals(StringUtil.discardBeforeLast("12345", "23"), "2345");
         assertEquals(StringUtil.discardBeforeLast("1234235", "23"), "235");
+    }
+
+    @Test
+    void testDeleteChars() throws Exception {
+    }
+
+    @Test
+    void testTestDeleteChars() throws Exception {
+    }
+
+    @Test
+    void testSubstr() throws Exception {
+        String str = "0123456789";
+        assertEquals("123456789", StringUtil.substr(str, 1));
+        assertEquals("12345678", StringUtil.substr(str, 1, 8));
+        assertThrows(StringIndexOutOfBoundsException.class, () -> {
+            StringUtil.substr(str, 1, 10);
+        });
+        assertEquals("123456789", StringUtil.substr(str, 1, 10, true));
+        assertEquals("", StringUtil.substr(str, 10, 10, true));
+    }
+
+    @Test
+    void testTestSubstr() throws Exception {
+    }
+
+    @Test
+    void testTestSubstr1() throws Exception {
+        Validator<String> validator = Validator.of("123456");
+        // validator.require(Testers.isNotNull,"").when();
+    }
+
+    @Test
+    void testSlice() throws Exception {
+        String str = "0123456789";
+        assertEquals("56789", StringUtil.slice(str, 5));
+        assertEquals("56789", StringUtil.slice(str, 5, 15));
+        assertEquals("2", StringUtil.slice("123", 1, -1));
+        assertEquals("2", StringUtil.slice("123", -2, -1));
     }
 }

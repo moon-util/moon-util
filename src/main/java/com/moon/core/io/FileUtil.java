@@ -452,12 +452,15 @@ public final class FileUtil {
      * -----------------------------------------------------------------------
      */
 
+    public static final char WIN_FileSeparator_Char = (char) 92;
+    public static final char App_FileSeparatorChar = (char) 47;
+
     public final static String formatPath(String filePath) {
         if (filePath != null) {
             int index = 0;
             char[] chars = null;
-            char WIN = Const.WIN_FileSeparator_Char;
-            char DFT = Const.App_FileSeparatorChar;
+            char WIN = WIN_FileSeparator_Char;
+            char DFT = App_FileSeparatorChar;
             for (int i = 0, len = filePath.length(); i < len; i++) {
                 char ch = filePath.charAt(i);
                 chars = SupportUtil.setChar(chars, index++, ch == WIN ? DFT : ch);

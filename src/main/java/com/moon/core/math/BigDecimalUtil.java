@@ -13,13 +13,9 @@ import static com.moon.core.lang.ThrowUtil.runtime;
  * @author benshaoye
  */
 public final class BigDecimalUtil {
-    private BigDecimalUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private BigDecimalUtil() { ThrowUtil.noInstanceError(); }
 
-    public static BigDecimal valueOf(String value) {
-        return new BigDecimal(value);
-    }
+    public static BigDecimal valueOf(String value) { return new BigDecimal(value); }
 
     public static BigDecimal valueOf(int value) {
         return value == 0 ? BigDecimal.ZERO : (value == 1 ? BigDecimal.ONE : BigDecimal.valueOf(value));
@@ -41,25 +37,15 @@ public final class BigDecimalUtil {
         }
     }
 
-    public static BigDecimal nullIfInvalid(String numeric) {
-        return defaultIfInvalid(numeric, null);
-    }
+    public static BigDecimal nullIfInvalid(String numeric) { return defaultIfInvalid(numeric, null); }
 
-    public static BigDecimal zeroIfInvalid(String numeric) {
-        return defaultIfInvalid(numeric, BigDecimal.ZERO);
-    }
+    public static BigDecimal zeroIfInvalid(String numeric) { return defaultIfInvalid(numeric, BigDecimal.ZERO); }
 
-    public static BigDecimal oneIfInvalid(String numeric) {
-        return defaultIfInvalid(numeric, BigDecimal.ONE);
-    }
+    public static BigDecimal oneIfInvalid(String numeric) { return defaultIfInvalid(numeric, BigDecimal.ONE); }
 
-    public static BigDecimal zeroIfNull(BigDecimal number) {
-        return number == null ? BigDecimal.ZERO : number;
-    }
+    public static BigDecimal zeroIfNull(BigDecimal number) { return number == null ? BigDecimal.ZERO : number; }
 
-    public static BigDecimal oneIfNull(BigDecimal number) {
-        return number == null ? BigDecimal.ONE : number;
-    }
+    public static BigDecimal oneIfNull(BigDecimal number) { return number == null ? BigDecimal.ONE : number; }
 
     public static BigDecimal toBigDecimal(Object value) {
         if (value == null) {

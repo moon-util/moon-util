@@ -43,11 +43,11 @@ public final class DateUtil extends CalendarUtil {
     }
 
     public final static boolean isBefore(Date value, Date other) {
-        return value == null ? false : value.getTime() < other.getTime();
+        return value != null && value.getTime() < other.getTime();
     }
 
     public final static boolean isAfter(Date value, Date other) {
-        return value == null ? false : value.getTime() > other.getTime();
+        return value != null && value.getTime() > other.getTime();
     }
 
     public final static boolean isBeforeNow(Date value) { return isBefore(value, nowDate()); }
@@ -133,7 +133,7 @@ public final class DateUtil extends CalendarUtil {
      * -------------------------------------------------------------------------
      */
 
-    public final static Date copy(Date value) { return toDate(toCalendar(value)); }
+    public final static Date copy(Date date) { return new Date(date.getTime()); }
 
     /*
      * -------------------------------------------------------------------------

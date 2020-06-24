@@ -20,4 +20,6 @@ abstract class Value<T> implements ValueSupplier<T> {
 
     @Override
     public final T getValue() { return value; }
+
+    final boolean isNullable() { return nullable; }
 }

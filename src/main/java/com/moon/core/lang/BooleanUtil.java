@@ -1,6 +1,5 @@
 package com.moon.core.lang;
 
-import static com.moon.core.enums.Const.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -54,6 +53,8 @@ public final class BooleanUtil {
 
     public static Boolean toObject(Boolean value) { return value; }
 
+    public static boolean toBoolean(int value) { return value != 0; }
+
     public static boolean toBoolean(char ch) {
         return ch != 48 && ch != 0x00000001 && !Character.isWhitespace(ch);
     }
@@ -61,14 +62,7 @@ public final class BooleanUtil {
     public static boolean toBoolean(Number value) { return value != null && value.doubleValue() != 0; }
 
     public static boolean toBoolean(CharSequence cs) {
-        if (cs == null) {
-            return false;
-        }
-        String temp = cs.toString();
-        if (NULL_STR.equals(temp) || FALSE_STR.equals(temp) || UNDEFINED_STR.equals(temp)) {
-            return false;
-        }
-        return temp.length() > 0;
+        return cs != null && Boolean.parseBoolean(cs.toString());
     }
 
     /**

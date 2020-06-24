@@ -1,6 +1,6 @@
 package com.moon.core.util;
 
-import com.moon.core.util.validator.IDCard18Validator;
+import com.moon.core.util.validator.ResidentID18Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * @author benshaoye
  */
-class IDCard18ValidatorTestTest {
+class ResidentID18ValidatorTestTest {
 
     String value;
 
@@ -17,7 +17,7 @@ class IDCard18ValidatorTestTest {
     void testAgeOfDuration() {
         value = "1968-07-09 00:00:00";
         value = "37010219680709292X";
-        IDCard18Validator validator = IDCard18Validator.of(value);
+        ResidentID18Validator validator = ResidentID18Validator.of(value);
         Date date = validator.getBirthday();
         Assertions.assertEquals(DateUtil.format(date), "1968-07-09 00:00:00");
         Assertions.assertTrue(validator.isValid());
@@ -25,7 +25,7 @@ class IDCard18ValidatorTestTest {
         Assertions.assertFalse(validator.isMale());
 
         value = "02051";
-        validator = IDCard18Validator.of(value);
+        validator = ResidentID18Validator.of(value);
         Assertions.assertTrue(validator.isInvalid());
         Assertions.assertFalse(validator.isMale());
         Assertions.assertFalse(validator.isFemale());

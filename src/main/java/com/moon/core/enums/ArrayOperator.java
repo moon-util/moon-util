@@ -3,19 +3,20 @@ package com.moon.core.enums;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.function.IntBiConsumer;
-import com.moon.core.util.interfaces.IteratorSupplier;
+import com.moon.core.util.interfaces.IteratorFunction;
 import com.moon.core.util.interfaces.Stringify;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 /**
  * @author benshaoye
  */
-public interface ArrayOperator extends IteratorSupplier, Predicate, Stringify, IntFunction {
+public interface ArrayOperator extends IteratorFunction<Object, Object>, Predicate, Stringify, IntFunction {
 
     /**
      * Applies this function to the given argument.
@@ -75,7 +76,7 @@ public interface ArrayOperator extends IteratorSupplier, Predicate, Stringify, I
      * @return 数组迭代器，不可执行{@link Iterator#remove()}方法
      */
     @Override
-    default Iterator iterator(Object o) { return IteratorUtil.ofAny(o); }
+    default Iterator<Object> iterator(Object o) { return IteratorUtil.ofAny(o); }
 
     /**
      * 包装类型数组转换为基本数据类型数组

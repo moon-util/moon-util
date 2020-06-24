@@ -8,27 +8,28 @@ import java.util.function.Predicate;
 /**
  * @author benshaoye
  */
-interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator<C, IMPL> {
+interface ICollectValidator<C extends Collection<E>, E, IMPL extends ICollectValidator<C, E, IMPL>>
+    extends IValidator<C, IMPL> {
 
     /**
      * 要求至少指定数目项符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param count
-     * @param message
+     * @param count   期望最低数值
+     * @param tester  检测函数
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     IMPL requireAtLeastOf(int count, Predicate<? super E> tester, String message);
 
     /**
      * 要求最多指定数目项符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param count
-     * @param message
+     * @param count   期望最高数值
+     * @param tester  检测函数
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     IMPL requireAtMostOf(int count, Predicate<? super E> tester, String message);
 
@@ -47,19 +48,19 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求所有项都符合验证
      *
-     * @param tester
+     * @param tester 检测函数
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireEvery(Predicate<? super E> tester) { return requireEvery(tester, "requireEvery"); }
 
     /**
      * 要求所有项都符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param message
+     * @param tester  检测函数
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireEvery(Predicate<? super E> tester, String message) {
         return requireAtLeastOf(CollectUtil.size(getValue()), tester, message);
@@ -68,9 +69,9 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求至少一项符合验证
      *
-     * @param tester
+     * @param tester 检测函数
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireAtLeast1(Predicate<? super E> tester) {
         return requireAtLeast1(tester, "requireAtLeast1");
@@ -79,10 +80,10 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求至少一项符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param message
+     * @param tester  检测函数
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireAtLeast1(Predicate<? super E> tester, String message) {
         return requireAtLeastOf(1, tester, message);
@@ -91,10 +92,10 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求至少指定数目项符合验证
      *
-     * @param tester
-     * @param count
+     * @param tester 检测函数
+     * @param count  期望符合条件元素数量下限
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireAtLeastOf(int count, Predicate<? super E> tester) {
         return requireAtLeastOf(count, tester, "requireAtLeastCountOf");
@@ -109,19 +110,19 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求所有项都不符合验证
      *
-     * @param tester
+     * @param tester 检测函数
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireNone(Predicate<? super E> tester) { return requireNone(tester, "requireNone"); }
 
     /**
      * 要求所有项都不符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param message
+     * @param tester  检测函数
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireNone(Predicate<? super E> tester, String message) {
         return requireAtMostOf(0, tester, message);
@@ -130,19 +131,19 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求最多一项符合验证
      *
-     * @param tester
+     * @param tester 检测函数
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireAtMost1(Predicate<? super E> tester) { return requireAtMost1(tester, "requireAtMost1"); }
 
     /**
      * 要求最多一项符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param message
+     * @param tester  检测函数
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireAtMost1(Predicate<? super E> tester, String message) {
         return requireAtMostOf(1, tester, message);
@@ -151,10 +152,10 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求最多指定数目项符合验证
      *
-     * @param tester
-     * @param count
+     * @param tester 检测函数
+     * @param count  期望符合条件数量上限
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireAtMostOf(int count, Predicate<? super E> tester) {
         return requireAtMostOf(count, tester, "requireAtMostCountOf");
@@ -169,29 +170,29 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求包含唯一项符合验证
      *
-     * @param tester
+     * @param tester 检测函数
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireOnly(Predicate<? super E> tester) { return requireOnly(tester, "requireOnly"); }
 
     /**
      * 要求包含唯一项符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param message
+     * @param tester  检测函数
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireOnly(Predicate<? super E> tester, String message) { return requireCountOf(1, tester, message); }
 
     /**
      * 要求包含指定数目项符合验证
      *
-     * @param tester
-     * @param count
+     * @param tester 检测函数
+     * @param count  期望符合条件数量
      *
-     * @return
+     * @return 当前验证对象
      */
     default IMPL requireCountOf(int count, Predicate<? super E> tester) {
         return requireCountOf(count, tester, "requireCountOf");
@@ -200,11 +201,11 @@ interface ICollectValidator<C extends Collection<E>, E, IMPL> extends IValidator
     /**
      * 要求包含指定数目项符合验证，使用指定错误信息
      *
-     * @param tester
-     * @param count
-     * @param message
+     * @param tester  检测函数
+     * @param count   期望符合条件数量
+     * @param message 错误消息
      *
-     * @return
+     * @return 当前验证对象
      */
     IMPL requireCountOf(int count, Predicate<? super E> tester, String message);
 }
