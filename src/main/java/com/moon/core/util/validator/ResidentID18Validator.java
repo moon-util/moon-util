@@ -1,6 +1,6 @@
 package com.moon.core.util.validator;
 
-import com.moon.core.time.DatetimeUtil;
+import com.moon.core.time.DateTimeUtil;
 import com.moon.core.util.DateUtil;
 
 import java.time.LocalDate;
@@ -93,7 +93,7 @@ public final class ResidentID18Validator extends BaseValidator<String, ResidentI
      * @return 周岁年龄
      */
     public int getAge() {
-        return DatetimeUtil.toDate(birthYear, birthMonth, birthDay).until(LocalDate.now()).getYears();
+        return DateTimeUtil.toDate(birthYear, birthMonth, birthDay).until(LocalDate.now()).getYears();
     }
 
     /**

@@ -13,7 +13,7 @@ public final class DependencyUtil {
         "{indentAll}{indent}{indent}<groupId>%s</groupId>\n" +
         "{indentAll}{indent}{indent}<artifactId>%s</artifactId>\n" +
         "{indentAll}{indent}{indent}<version>%s</version>\n" +
-        "{indentAll}{indent}</dependency>\n";
+        "{indentAll}{indent}</dependency>";
 
 
     private DependencyUtil() { ThrowUtil.noInstanceError(); }
@@ -50,7 +50,7 @@ public final class DependencyUtil {
     public static String dependencyXmlNode(
         String groupId, String artifactId, String version, int indent, int indentAll
     ) {
-        version = version == null ? " version? " : version;
+        version = StringUtil.defaultIfEmpty(version, " version? ");
         return String.format(TEMPLATE, groupId, artifactId, version)
             .replaceAll("\\{indentAll\\}", StringUtil.repeat(" ", indentAll))
             .replaceAll("\\{indent\\}", StringUtil.repeat(" ", indent));

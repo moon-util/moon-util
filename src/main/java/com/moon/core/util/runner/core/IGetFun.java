@@ -2,7 +2,7 @@ package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.DoubleUtil;
 import com.moon.core.lang.IntUtil;
-import com.moon.core.time.DatetimeUtil;
+import com.moon.core.time.DateTimeUtil;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
@@ -235,7 +235,7 @@ class IGetFun {
             public Object apply() { return System.currentTimeMillis(); }
 
             @Override
-            public Object apply(Object o) { return DatetimeUtil.toDateTime(o); }
+            public Object apply(Object o) { return DateTimeUtil.toDateTime(o); }
 
             @Override
             public Object apply(Object o, Object o1) { return this.apply(); }

@@ -3,7 +3,9 @@ package com.moon.core.enums;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import static com.moon.core.util.FilterUtil.requireFind;
@@ -140,26 +142,28 @@ public enum DateFormats implements EnumDescriptor {
         static DateFormat get(String pattern) { return new SimpleDateFormat(pattern); }
     }
 
-    DateFormats(String text) { this.CHINESE_TEXT = text; }
+    DateFormats(String text) {
+
+        this.CHINESE_TEXT = text;
+    }
 
     public final DateFormat of(String pattern) { return with(pattern); }
 
     public final DateFormat with(String pattern) {
-        DateFormat format = getLocal(pattern);
+        DateFormat format = getDateFormat(pattern);
         if (this != DEFAULT) {
             format.setTimeZone(getTimeZone());
         }
         return format;
     }
 
-    /**
-     * 获取本地时区日期格式化器
-     *
-     * @param pattern 日期模式
-     *
-     * @return 本地时区日期格式化器
-     */
-    public static DateFormat getLocal(String pattern) { return This.get(pattern); }
+    public final DateTimeFormatter getFormatter(String pattern) {
+        return DateTimeFormatter.ofPattern(pattern);
+    }
+
+    public final DateTimeFormatter getFormatter(String pattern, Locale locale) {
+        return DateTimeFormatter.ofPattern(pattern, locale);
+    }
 
     /**
      * 获取时区
@@ -215,5 +219,18 @@ public enum DateFormats implements EnumDescriptor {
             }
         }
         return new String(chars);
+    }
+
+    /**
+     * 获取本地时区日期格式化器
+     *
+     * @param pattern 日期模式
+     *
+     * @return 本地时区日期格式化器
+     */
+    public static DateFormat getDateFormat(String pattern) { return This.get(pattern); }
+
+    public static DateTimeFormatter getDateFormatter(String pattern) {
+        return DateTimeFormatter.ofPattern(pattern);
     }
 }

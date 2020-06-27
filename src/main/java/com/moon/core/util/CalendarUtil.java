@@ -101,13 +101,13 @@ public class CalendarUtil {
 
     public final static int nowDayOfYear() { return getDayOfYear(current()); }
 
-    public final static int nowHour() { return getHour(current()); }
+    public final static int nowHours() { return getHour(current()); }
 
-    public final static int nowMinute() { return getMinute(current()); }
+    public final static int nowMinutes() { return getMinute(current()); }
 
-    public final static int nowSecond() { return getSecond(current()); }
+    public final static int nowSeconds() { return getSecond(current()); }
 
-    public final static int nowMillisecond() { return getMillisecond(current()); }
+    public final static int nowMilliseconds() { return getMillisecond(current()); }
 
     public final static Calendar nowCalendar() { return current(); }
 
@@ -471,11 +471,11 @@ public class CalendarUtil {
             case 0:
                 return calendar;
             case 1:
-                calendar.set(YEAR, values[i++]);
+                calendar.set(YEAR, values[i]);
                 break;
             case 2:
                 calendar.set(YEAR, values[i++]);
-                calendar.set(MONTH, values[i++] - 1);
+                calendar.set(MONTH, values[i] - 1);
                 break;
             case 3:
                 calendar.set(values[i++], values[i++] - 1, values[i++]);

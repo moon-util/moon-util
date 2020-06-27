@@ -1,6 +1,6 @@
 package com.moon.more.util;
 
-import com.moon.core.util.DependencyUtil;
+import com.moon.core.enums.Dependencies;
 import com.moon.core.util.ValidateUtil;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -13,6 +13,8 @@ import javax.validation.bootstrap.ProviderSpecificBootstrap;
 import java.util.Set;
 
 /**
+ * Hibernate 验证器
+ *
  * @author benshaoye
  */
 public final class ValidationUtil extends ValidateUtil {
@@ -20,10 +22,10 @@ public final class ValidationUtil extends ValidateUtil {
     private ValidationUtil() { }
 
     private static Validator getValidator() {
-        return HibernateValidator6_1_18.FACTORY.getValidator();
+        return HibernateValidator6_1_18.getValidator();
     }
 
-    public static <T> Object validate(T data, Class... groups) {
+    public static <T> Set<ConstraintViolation<T>> validate(T data, Class... groups) {
         return getValidator().validate(data, groups);
     }
 }
@@ -31,10 +33,10 @@ public final class ValidationUtil extends ValidateUtil {
 @SuppressWarnings("all")
 class HibernateValidator6_1_18 {
 
-    final static ValidatorFactory FACTORY;
+    private final static Validator VALIDATOR;
 
     static {
-        ValidatorFactory factory = null;
+        Validator validator = null;
         try {
             ProviderSpecificBootstrap<HibernateValidatorConfiguration> bootstrap =
 
@@ -42,20 +44,26 @@ class HibernateValidator6_1_18 {
 
             HibernateValidatorConfiguration configuration = bootstrap.configure();
 
-            factory = configuration.buildValidatorFactory();
+            ValidatorFactory factory = configuration.buildValidatorFactory();
+            validator = factory.getValidator();
         } catch (Throwable e) {
             // TODO 请确保正确引入了 hibernate-validator 相关依赖
-            DepUtil.checkJavaxElDependency(e);
+            Dependencies.HIBERNATE_VALIDATOR.throwException();
         }
-        FACTORY = factory;
+        VALIDATOR = validator;
     }
+
+    public static Validator getValidator() { return VALIDATOR; }
 }
 
+/*
 class DepUtil {
 
     final static String ValidationEx = "javax.validation.ValidationException";
 
+    @SuppressWarnings("all")
     static void checkJavaxElDependency(Throwable e) {
+        Dependencies.HIBERNATE_VALIDATOR.throwException();
         Throwable cause = e.getCause();
         if (cause instanceof NoClassDefFoundError) {
             String causeMessage = cause.getMessage();
@@ -89,3 +97,4 @@ class DepUtil {
         return String.format(error, dependency, DependencyUtil.dependencyXmlNode(dependency, 4, 4));
     }
 }
+ */

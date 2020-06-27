@@ -208,6 +208,10 @@ public final class IntUtil {
      * -------------------------------------------------------------------------------------------
      */
 
+    public static int[] toInts(int... values) { return values; }
+
+    public static int[] toIntValues(int... values) { return values; }
+
     public static int max(int... values) {
         int len = values.length;
         int ret = values[0];

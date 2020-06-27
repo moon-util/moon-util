@@ -150,7 +150,7 @@ public final class DateUtil extends CalendarUtil {
         try {
             return patten.parse(dateString);
         } catch (ParseException | NullPointerException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException(dateString, e);
         }
     }
 
