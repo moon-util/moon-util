@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static java.lang.Integer.valueOf;
+import static java.lang.Integer.parseInt;
 
 /**
  * @author benshaoye
@@ -56,18 +56,20 @@ public final class ResidentID18Validator extends BaseValidator<String, ResidentI
         return index >= 0 && value.charAt(end) == CODES[index];
     }
 
-    public ResidentID18Validator(String value) { this(value, null, SEPARATOR, false); }
+    public ResidentID18Validator(CharSequence value) {
+        this(value == null ? "" : value.toString(), null, SEPARATOR, false);
+    }
 
     private ResidentID18Validator(String value, List<String> messages, String separator, boolean immediate) {
-        super(value == null ? "" : value, false, messages, separator, immediate);
+        super(value, false, messages, separator, immediate);
         boolean isValid = require(ResidentID18Validator::isValid, null).isValid();
-        this.birthYear = isValid ? valueOf(value.substring(6, 10)) : INVALID_ITEM_VALUE;
-        this.birthMonth = isValid ? valueOf(value.substring(10, 12)) : INVALID_ITEM_VALUE;
-        this.birthDay = isValid ? valueOf(value.substring(12, 14)) : INVALID_ITEM_VALUE;
+        this.birthYear = isValid ? parseInt(value.substring(6, 10)) : INVALID_ITEM_VALUE;
+        this.birthMonth = isValid ? parseInt(value.substring(10, 12)) : INVALID_ITEM_VALUE;
+        this.birthDay = isValid ? parseInt(value.substring(12, 14)) : INVALID_ITEM_VALUE;
         this.gender = isValid ? (value.charAt(16) - 48) % 2 : INVALID_ITEM_VALUE;
     }
 
-    public static ResidentID18Validator of(String value) { return new ResidentID18Validator(value); }
+    public static ResidentID18Validator of(CharSequence value) { return new ResidentID18Validator(value); }
 
     public Date getBirthday() { return DateUtil.toDate(birthYear, birthMonth, birthDay, 0, 0, 0); }
 
@@ -90,7 +92,9 @@ public final class ResidentID18Validator extends BaseValidator<String, ResidentI
      *
      * @return 周岁年龄
      */
-    public int getAge() { return DatetimeUtil.toDate(birthYear, birthMonth, birthDay).until(LocalDate.now()).getYears(); }
+    public int getAge() {
+        return DatetimeUtil.toDate(birthYear, birthMonth, birthDay).until(LocalDate.now()).getYears();
+    }
 
     /**
      * 虚岁

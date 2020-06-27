@@ -16,8 +16,8 @@ class DateFormatsTestTest {
         for (DateFormats value : DateFormats.values()) {
             System.out.println(value.getText());
             System.out.println(value.of(pattern).format(date));
-            System.out.println(value.getTextAsChinese());
-            System.out.println(value.getTextAsEnglish());
+            System.out.println(value.getChineseText());
+            System.out.println(value.getEnglishText());
         }
     }
 }

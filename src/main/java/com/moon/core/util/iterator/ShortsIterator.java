@@ -16,6 +16,10 @@ public class ShortsIterator
         this.array = array;
     }
 
+    public static Iterator<Short> of(short... values) {
+        return values == null ? EMPTY : new ShortsIterator(values);
+    }
+
     @Override
     public boolean hasNext() { return this.index < this.length; }
 

@@ -14,36 +14,27 @@ import static com.moon.core.util.IteratorUtil.of;
  * @author benshaoye
  */
 public enum Arrays2 implements ArrayOperator {
+    /**
+     * 普通数组
+     */
     OBJECTS(new Object[0]) {
         @Override
-        public Object apply(int value) {
-            return new Object[value];
-        }
+        public Object apply(int value) { return new Object[value]; }
 
         @Override
-        public Object[] to(Object o) {
-            return (Object[]) o;
-        }
+        public Object[] to(Object o) { return (Object[]) o; }
 
         @Override
-        public Iterator iterator(Object o) {
-            return of(to(o));
-        }
+        public Iterator iterator(Object o) { return of(to(o)); }
 
         @Override
-        public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
-        }
+        public String stringify(Object o) { return join(to(o), getJoinOn()); }
 
         @Override
-        public boolean test(Object data) {
-            return data instanceof Object[];
-        }
+        public boolean test(Object data) { return data instanceof Object[]; }
 
         @Override
-        public Object get(Object arr, int index) {
-            return to(arr)[index];
-        }
+        public Object get(Object arr, int index) { return to(arr)[index]; }
 
         @Override
         public Object set(Object arr, int index, Object value) {
@@ -54,14 +45,10 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public Object[] create(int length) {
-            return new Object[length];
-        }
+        public Object[] create(int length) { return new Object[length]; }
 
         @Override
-        public int length(Object arr) {
-            return to(arr).length;
-        }
+        public int length(Object arr) { return to(arr).length; }
 
         @Override
         public void forEach(Object arr, IntBiConsumer consumer) {
@@ -95,34 +82,22 @@ public enum Arrays2 implements ArrayOperator {
     },
     STRINGS(new String[0]) {
         @Override
-        public Object apply(int value) {
-            return new String[value];
-        }
+        public Object apply(int value) { return new String[value]; }
 
         @Override
-        public String[] to(Object o) {
-            return (String[]) o;
-        }
+        public String[] to(Object o) { return (String[]) o; }
 
         @Override
-        public Iterator iterator(Object o) {
-            return of(to(o));
-        }
+        public Iterator iterator(Object o) { return of(to(o)); }
 
         @Override
-        public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
-        }
+        public String stringify(Object o) { return join(to(o), getJoinOn()); }
 
         @Override
-        public boolean test(Object data) {
-            return data instanceof String[];
-        }
+        public boolean test(Object data) { return data instanceof String[]; }
 
         @Override
-        public Object get(Object arr, int index) {
-            return to(arr)[index];
-        }
+        public Object get(Object arr, int index) { return to(arr)[index]; }
 
         @Override
         public String set(Object arr, int index, Object value) {
@@ -133,14 +108,10 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public String[] create(int length) {
-            return new String[length];
-        }
+        public String[] create(int length) { return new String[length]; }
 
         @Override
-        public int length(Object arr) {
-            return to(arr).length;
-        }
+        public int length(Object arr) { return to(arr).length; }
 
         @Override
         public void forEach(Object arr, IntBiConsumer consumer) {
@@ -174,14 +145,10 @@ public enum Arrays2 implements ArrayOperator {
     },
     BOOLEANS(new boolean[0]) {
         @Override
-        public Object apply(int value) {
-            return new boolean[value];
-        }
+        public Object apply(int value) { return new boolean[value]; }
 
         @Override
-        public boolean[] to(Object o) {
-            return (boolean[]) o;
-        }
+        public boolean[] to(Object o) { return (boolean[]) o; }
 
         @Override
         public Boolean[] toObjects(Object arr) {
@@ -199,16 +166,12 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public boolean[] toPrimitives(Object arr) {
-            if (arr == null) {
-                return null;
-            }
+            if (arr == null) { return null; }
             Boolean[] old = (Boolean[]) arr;
             final int len = old.length;
-            boolean[] values = new boolean[len];
-            for (int i = 0; i < len; i++) {
-                values[i] = old[i];
-            }
-            return values;
+            boolean[] now = new boolean[len];
+            System.arraycopy(arr, 0, now, 0, len);
+            return now;
         }
 
         @Override
@@ -218,7 +181,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
+            return join(to(o), getJoinOn());
         }
 
         @Override
@@ -268,7 +231,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            if (((Boolean) item).booleanValue()) {
+            if ((Boolean) item) {
                 for (int i = 0; i < len; i++) {
                     if (data[i]) {
                         return true;
@@ -297,15 +260,10 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public Double[] toObjects(Object arr) {
-            if (arr == null) {
-                return null;
-            }
-            double[] old = to(arr);
-            final int len = old.length;
+            if (arr == null) { return null; }
+            final int len = length(arr);
             Double[] now = new Double[len];
-            for (int i = 0; i < len; i++) {
-                now[i] = old[i];
-            }
+            System.arraycopy(arr, 0, now, 0, len);
             return now;
         }
 
@@ -330,7 +288,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
+            return join(to(o), getJoinOn());
         }
 
         @Override
@@ -353,9 +311,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public double[] create(int length) {
-            return new double[length];
-        }
+        public double[] create(int length) { return new double[length]; }
 
         @Override
         public int length(Object arr) {
@@ -372,7 +328,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public boolean contains(Object arr, Object item) {
-            if (arr == null || item == null || !(item instanceof Double)) {
+            if (arr == null || !(item instanceof Double)) {
                 return false;
             }
             double[] data = to(arr);
@@ -380,7 +336,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            double value = ((Double) item).doubleValue();
+            double value = (Double) item;
             for (int i = 0; i < len; i++) {
                 if (data[i] == value) {
                     return true;
@@ -405,12 +361,9 @@ public enum Arrays2 implements ArrayOperator {
             if (arr == null) {
                 return null;
             }
-            float[] old = to(arr);
-            final int len = old.length;
+            final int len = to(arr).length;
             Float[] now = new Float[len];
-            for (int i = 0; i < len; i++) {
-                now[i] = old[i];
-            }
+            System.arraycopy(arr, 0, now, 0, len);
             return now;
         }
 
@@ -435,7 +388,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
+            return join(to(o), getJoinOn());
         }
 
         @Override
@@ -477,7 +430,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public boolean contains(Object arr, Object item) {
-            if (arr == null || item == null || !(item instanceof Float)) {
+            if (arr == null || !(item instanceof Float)) {
                 return false;
             }
             float[] data = to(arr);
@@ -485,7 +438,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            float value = ((Float) item).floatValue();
+            float value = (Float) item;
             for (int i = 0; i < len; i++) {
                 if (data[i] == value) {
                     return true;
@@ -507,15 +460,11 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public Long[] toObjects(Object arr) {
-            if (arr == null) {
-                return null;
-            }
+            if (arr == null) { return null; }
             long[] old = to(arr);
             final int len = old.length;
             Long[] now = new Long[len];
-            for (int i = 0; i < len; i++) {
-                now[i] = old[i];
-            }
+            System.arraycopy(arr, 0, now, 0, len);
             return now;
         }
 
@@ -540,7 +489,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
+            return join(to(o), getJoinOn());
         }
 
         @Override
@@ -582,7 +531,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public boolean contains(Object arr, Object item) {
-            if (arr == null || item == null || !(item instanceof Long)) {
+            if (arr == null || !(item instanceof Long)) {
                 return false;
             }
             long[] data = to(arr);
@@ -590,7 +539,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            long value = ((Long) item).longValue();
+            long value = (Long) item;
             for (int i = 0; i < len; i++) {
                 if (data[i] == value) {
                     return true;
@@ -612,15 +561,11 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public Integer[] toObjects(Object arr) {
-            if (arr == null) {
-                return null;
-            }
+            if (arr == null) { return null; }
             int[] old = to(arr);
             final int len = old.length;
             Integer[] now = new Integer[len];
-            for (int i = 0; i < len; i++) {
-                now[i] = old[i];
-            }
+            System.arraycopy(arr, 0, now, 0, len);
             return now;
         }
 
@@ -645,7 +590,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
+            return join(to(o), getJoinOn());
         }
 
         @Override
@@ -687,7 +632,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public boolean contains(Object arr, Object item) {
-            if (arr == null || item == null || !(item instanceof Integer)) {
+            if (arr == null || !(item instanceof Integer)) {
                 return false;
             }
             int[] data = to(arr);
@@ -695,7 +640,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            int value = ((Integer) item).intValue();
+            int value = (Integer) item;
             for (int i = 0; i < len; i++) {
                 if (data[i] == value) {
                     return true;
@@ -717,15 +662,11 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public Short[] toObjects(Object arr) {
-            if (arr == null) {
-                return null;
-            }
+            if (arr == null) { return null; }
             short[] old = to(arr);
             final int len = old.length;
             Short[] now = new Short[len];
-            for (int i = 0; i < len; i++) {
-                now[i] = old[i];
-            }
+            System.arraycopy(arr, 0, now, 0, len);
             return now;
         }
 
@@ -750,7 +691,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
+            return join(to(o), getJoinOn());
         }
 
         @Override
@@ -792,7 +733,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public boolean contains(Object arr, Object item) {
-            if (arr == null || item == null || !(item instanceof Short)) {
+            if (arr == null || !(item instanceof Short)) {
                 return false;
             }
             short[] data = to(arr);
@@ -800,7 +741,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            int value = ((Short) item).shortValue();
+            int value = (Short) item;
             for (int i = 0; i < len; i++) {
                 if (data[i] == value) {
                     return true;
@@ -828,9 +769,7 @@ public enum Arrays2 implements ArrayOperator {
             byte[] old = to(arr);
             final int len = old.length;
             Byte[] now = new Byte[len];
-            for (int i = 0; i < len; i++) {
-                now[i] = old[i];
-            }
+            System.arraycopy(arr, 0, now, 0, len);
             return now;
         }
 
@@ -855,7 +794,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public String stringify(Object o) {
-            return join(to(o), Const.EMPTY);
+            return join(to(o), getJoinOn());
         }
 
         @Override
@@ -897,7 +836,7 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public boolean contains(Object arr, Object item) {
-            if (arr == null || item == null || !(item instanceof Byte)) {
+            if (arr == null || !(item instanceof Byte)) {
                 return false;
             }
             byte[] data = to(arr);
@@ -905,7 +844,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            int value = ((Byte) item).byteValue();
+            int value = (Byte) item;
             for (int i = 0; i < len; i++) {
                 if (data[i] == value) {
                     return true;
@@ -927,15 +866,11 @@ public enum Arrays2 implements ArrayOperator {
 
         @Override
         public Character[] toObjects(Object arr) {
-            if (arr == null) {
-                return null;
-            }
+            if (arr == null) { return null; }
             char[] old = to(arr);
             final int len = old.length;
             Character[] now = new Character[len];
-            for (int i = 0; i < len; i++) {
-                now[i] = old[i];
-            }
+            System.arraycopy(arr, 0, now, 0, len);
             return now;
         }
 
@@ -978,7 +913,7 @@ public enum Arrays2 implements ArrayOperator {
             BooleanUtil.requireTrue(value instanceof Character);
             char[] data = to(arr);
             char old = data[index];
-            data[index] = ((Character) value).charValue();
+            data[index] = (Character) value;
             return old;
         }
 
@@ -1010,7 +945,7 @@ public enum Arrays2 implements ArrayOperator {
             if (len == 0) {
                 return false;
             }
-            char value = ((Character) item).charValue();
+            char value = (Character) item;
             for (int i = 0; i < len; i++) {
                 if (data[i] == value) {
                     return true;
@@ -1021,6 +956,7 @@ public enum Arrays2 implements ArrayOperator {
     };
 
     static class Cached {
+
         final static HashMap<Class, ArrayOperator> CACHE = new HashMap<>();
     }
 
@@ -1032,6 +968,8 @@ public enum Arrays2 implements ArrayOperator {
     }
 
     abstract <T> T to(Object o);
+
+    private final static String getJoinOn() { return Const.EMPTY; }
 
     @Override
     public <T> T empty() {

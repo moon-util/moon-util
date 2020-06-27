@@ -1,5 +1,7 @@
 package com.moon.core.lang;
 
+import java.util.Objects;
+
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -53,11 +55,11 @@ public final class CharUtil {
         return -1;
     }
 
-    public static boolean isStartVarName(int ch) {
+    public static boolean isVarStarting(int ch) {
         return isLetter(ch) || is_(ch) || is$(ch) || isChinese(ch);
     }
 
-    public static boolean isVarName(int ch) {
+    public static boolean isVar(int ch) {
         return isLetterOrDigit(ch) || is_(ch) || is$(ch) || isChinese(ch);
     }
 
@@ -142,12 +144,9 @@ public final class CharUtil {
     public static char toCharValue(double value) { return (char) value; }
 
     public static char toCharValue(CharSequence cs) {
-        if (cs == null) {
-            throw new IllegalArgumentException(String.format("Can not cast to char of: %s", cs));
-        }
-        String temp = cs.toString();
-        if (temp.length() == 1) {
-            return temp.charAt(0);
+        Objects.requireNonNull(cs, "Can not cast to char from a null value.");
+        if (cs.length() == 1) {
+            return cs.charAt(0);
         }
         throw new IllegalArgumentException(String.format("Can not cast to char of: %s", cs));
     }

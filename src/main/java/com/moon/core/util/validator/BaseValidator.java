@@ -2,6 +2,7 @@ package com.moon.core.util.validator;
 
 import com.moon.core.lang.JoinerUtil;
 import com.moon.core.lang.StringUtil;
+import com.moon.core.util.RequireValidateException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      */
     final IMPL createMsg(String message) {
         if (immediate) {
-            throw new IllegalArgumentException(message);
+            throw new RequireValidateException(message);
         } else {
             ensureMessages().add(message);
         }
@@ -245,14 +246,14 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      *
      * @return 符合验证规则的原对象
      *
-     * @throws IllegalArgumentException 如果验证不通过，抛出这个异常，异常内容为所有验证不通过规则的内容
+     * @throws RequireValidateException 如果验证不通过，抛出这个异常，异常内容为所有验证不通过规则的内容
      */
     @Override
     public final T get() {
         if (isValid()) {
             return value;
         }
-        throw new IllegalArgumentException(getMessage());
+        throw new RequireValidateException(getMessage());
     }
 
     /**
@@ -262,13 +263,13 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      *
      * @return 符合验证规则的原对象
      *
-     * @throws IllegalArgumentException 如果验证不通过，抛出异常
+     * @throws RequireValidateException 如果验证不通过，抛出异常
      */
     public final T get(String errorMessage) {
         if (isValid()) {
             return value;
         }
-        throw new IllegalArgumentException(errorMessage);
+        throw new RequireValidateException(errorMessage);
     }
 
     /**

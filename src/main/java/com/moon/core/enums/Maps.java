@@ -2,6 +2,7 @@ package com.moon.core.enums;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
@@ -9,8 +10,7 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
-public enum Maps implements Supplier<Map>,
-                            IntFunction<Map>, Function<Map, Map> {
+public enum Maps implements Supplier<Map>, IntFunction<Map>, Function<Map, Map> {
 
     /**
      * HashMap（散列表） 是开发中使用最频繁的数据结构之一，它是基于对象的 hash 值实现的高速 key-value 映射存储结构
@@ -30,8 +30,7 @@ public enum Maps implements Supplier<Map>,
      * @see Cloneable
      * @see java.io.Serializable
      */
-    @SuppressWarnings("all")
-    HashMap(HashMap.class) {
+    @SuppressWarnings("all") HashMaps(HashMap.class) {
         @Override
         public Map get() { return new HashMap(16); }
 
@@ -51,7 +50,7 @@ public enum Maps implements Supplier<Map>,
      * @see Cloneable
      * @see java.io.Serializable
      */
-    LinkedHashMap(LinkedHashMap.class) {
+    LinkedHashMaps(LinkedHashMap.class) {
         @Override
         public Map get() { return new LinkedHashMap(); }
 
@@ -70,7 +69,7 @@ public enum Maps implements Supplier<Map>,
      * @see Cloneable
      * @see java.io.Serializable
      */
-    Hashtable(Hashtable.class) {
+    Hashtables(Hashtable.class) {
         @Override
         public Map get() { return new Hashtable(); }
 
@@ -90,7 +89,7 @@ public enum Maps implements Supplier<Map>,
      * @see java.io.Serializable
      * @see Hashtable
      */
-    Properties(Properties.class) {
+    Propertiess(Properties.class) {
         @Override
         public Map get() { return new Properties(); }
 
@@ -116,7 +115,7 @@ public enum Maps implements Supplier<Map>,
      * @see Cloneable
      * @see java.io.Serializable
      */
-    TreeMap(TreeMap.class) {
+    TreeMaps(TreeMap.class) {
         @Override
         public Map get() { return new TreeMap(); }
 
@@ -135,7 +134,7 @@ public enum Maps implements Supplier<Map>,
      * @see Cloneable
      * @see java.io.Serializable
      */
-    IdentityHashMap(IdentityHashMap.class) {
+    IdentityHashMaps(IdentityHashMap.class) {
         @Override
         public Map get() { return new IdentityHashMap(); }
 
@@ -152,7 +151,7 @@ public enum Maps implements Supplier<Map>,
      * @see Map
      * @see AbstractMap
      */
-    WeakHashMap(WeakHashMap.class) {
+    WeakHashMaps(WeakHashMap.class) {
         @Override
         public Map get() { return new WeakHashMap(); }
 
@@ -171,7 +170,7 @@ public enum Maps implements Supplier<Map>,
      * @see java.util.concurrent.ConcurrentMap
      * @see java.io.Serializable
      */
-    ConcurrentHashMap(ConcurrentHashMap.class) {
+    ConcurrentHashMaps(ConcurrentHashMap.class) {
         @Override
         public Map get() { return new ConcurrentHashMap(); }
 
@@ -180,11 +179,28 @@ public enum Maps implements Supplier<Map>,
 
         @Override
         public Map apply(Map map) { return new ConcurrentHashMap(map); }
+    },
+    ConcurrentSkipListMaps(ConcurrentSkipListMap.class) {
+        @Override
+        public Map get() {
+            return new ConcurrentSkipListMap();
+        }
+
+        @Override
+        public Map apply(int value) {
+            return new ConcurrentSkipListMap();
+        }
+
+        @Override
+        public Map apply(Map map) {
+            return new ConcurrentSkipListMap(map);
+        }
     };
 
     private final Class type;
 
     static final class CtorCached {
+
         final static HashMap<Class, Maps> CACHE = new HashMap();
     }
 

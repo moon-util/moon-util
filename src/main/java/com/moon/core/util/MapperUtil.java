@@ -26,9 +26,9 @@ public final class MapperUtil {
      * ---------------------------------------------------------------------------
      */
 
-    public final static Map<String, Object> toMap(Object bean) { return toMap(bean, new HashMap(16)); }
+    public static Map<String, Object> toMap(Object bean) { return toMap(bean, new HashMap(16)); }
 
-    public final static Map<String, Object> toMap(Object bean, Map result) {
+    public static Map<String, Object> toMap(Object bean, Map result) {
         if (bean != null) {
             getFieldDescriptorsMap(bean.getClass()).forEach((name, d) ->
                 result.put(name, d.getValueIfPresent(bean, true)));
@@ -36,19 +36,19 @@ public final class MapperUtil {
         return result;
     }
 
-    public final static <T> T toInstance(Map<String, ?> data, Class<T> type) {
+    public static <T> T toInstance(Map<String, ?> data, Class<T> type) {
         return overrideImpl(data, newInstance(type, true), type);
     }
 
-    public final static <T, E> T toInstance(E data, Class<T> type) {
+    public static <T, E> T toInstance(E data, Class<T> type) {
         return override(data, newInstance(type, true));
     }
 
-    public final static <T> T override(Map<String, ?> data, T bean) {
+    public static <T> T override(Map<String, ?> data, T bean) {
         return overrideImpl(data, bean, (Class<T>) bean.getClass());
     }
 
-    public final static <T, E> E override(T t, E e) {
+    public static <T, E> E override(T t, E e) {
         final Class targetType = e.getClass();
 
         getFieldDescriptorsMap(t.getClass()).forEach((name, srcDesc) -> {
@@ -65,7 +65,7 @@ public final class MapperUtil {
      * ---------------------------------------------------------------------------
      */
 
-    public final static <T> List<Map<String, Object>> forEachToMap(Collection<T> beanList) {
+    public static <T> List<Map<String, Object>> forEachToMap(Collection<T> beanList) {
         List<Map<String, Object>> result = new ArrayList<>(CollectUtil.size(beanList));
         IteratorUtil.forEach(beanList, item -> result.add(toMap(item)));
         return result;
@@ -79,23 +79,23 @@ public final class MapperUtil {
      * @param <T> 泛型
      * @return 转换后的数据集合
      */
-    public final static <T> List<T> forEachToInstance(Collection<Map<String, Object>> dataList, Class<T> type) {
+    public static <T> List<T> forEachToInstance(Collection<Map<String, Object>> dataList, Class<T> type) {
         List<T> result = new ArrayList<>(CollectUtil.size(dataList));
         IteratorUtil.forEach(dataList, itemMap -> result.add(toInstance(itemMap, type)));
         return result;
     }
 
-    public final static <T, E> List<T> forEachToOther(Collection<E> dataList, Class<T> type) {
+    public static <T, E> List<T> forEachToOther(Collection<E> dataList, Class<T> type) {
         List<T> result = new ArrayList<>(CollectUtil.size(dataList));
         IteratorUtil.forEach(dataList, item -> result.add(toInstance(item, type)));
         return result;
     }
 
-    private final static Object mapper(Class type) {
+    private static Object mapper(Class type) {
         return ThrowUtil.rejectAccessError();
     }
 
-    private final static Object mapper(Class type, TypeCaster converter) {
+    private static Object mapper(Class type, TypeCaster converter) {
         return ThrowUtil.rejectAccessError();
     }
 
@@ -105,7 +105,7 @@ public final class MapperUtil {
      * ---------------------------------------------------------------------------
      */
 
-    private final static <T> T overrideImpl(Map<String, ?> data, T bean, Class<T> type) {
+    private static <T> T overrideImpl(Map<String, ?> data, T bean, Class<T> type) {
         getFieldDescriptorsMap(type).forEach((name, desc) ->
             desc.setValueIfPresent(bean, data.get(name), true));
         return bean;

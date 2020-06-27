@@ -5,15 +5,18 @@ import java.util.Iterator;
 /**
  * @author benshaoye
  */
-public class ObjectsIterator<T>
-    extends BaseArrayIterator
-    implements Iterator<T> {
+public class ObjectsIterator<T> extends BaseArrayIterator implements Iterator<T> {
 
     private final T[] array;
 
     public ObjectsIterator(T[] array) {
         super(array == null ? 0 : array.length);
         this.array = array;
+    }
+
+    @SafeVarargs
+    public static <T> Iterator<T> of(T... values) {
+        return values == null ? EMPTY : new ObjectsIterator<>(values);
     }
 
     @Override

@@ -8,7 +8,7 @@ import com.moon.core.lang.ThrowUtil;
 public final class DetectUtil {
     private DetectUtil() { ThrowUtil.noInstanceError(); }
 
-    public static boolean isChinese(String str) {
+    private static boolean isChinese(String str) {
         final int length = str == null ? 0 : str.length();
         if (length == 0) {
             return false;
@@ -41,7 +41,7 @@ public final class DetectUtil {
      *
      * @param string
      */
-    public static boolean isNumeric(String string) {
+    private static boolean isNumeric(String string) {
         int len = string == null ? 0 : (string = string.trim()).length();
         if (len > 0) {
             for (int i = 0, ch; i < len; i++) {
@@ -54,40 +54,4 @@ public final class DetectUtil {
         }
         return false;
     }
-
-    private final static int CODE_ZERO = 48;
-    private final static int CODE_PREV_ZERO = 47;
-    private final static int CODE_NINE = 57;
-    private final static int CODE_NEXT_NINE = 58;
-    private final static int CODE_MINUS = 45;
-
-    /**
-     * 是否是一个整数（包括正整数和负整数，只支持十进制数）
-     *
-     * @param string
-     */
-    public static boolean isInteger(String string) {
-        int len = string == null ? 0 : (string = string.trim()).length();
-        if (len > 0) {
-            int i = 0;
-
-            char ch = string.charAt(i++);
-            if (ch > CODE_NINE || ch < CODE_ZERO) {
-                if (ch != CODE_MINUS || len == i) {
-                    return false;
-                }
-            }
-
-            while (i < len) {
-                ch = string.charAt(i++);
-                if (ch > CODE_NINE || ch < CODE_ZERO) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-
 }

@@ -111,24 +111,24 @@ public interface ArrayOperator extends IteratorFunction<Object, Object>, Predica
     /**
      * 指定默认值
      *
-     * @param arr   数组
-     * @param empty 空数组
-     * @param <T>   泛型类型
+     * @param arr           数组
+     * @param defaultIfNull 默认值
+     * @param <T>           泛型类型
      *
      * @return 返回值
      */
-    default <T> T defaultIfNull(Object arr, T empty) { return arr == null ? empty : (T) arr; }
+    default <T> T defaultIfNull(Object arr, T defaultIfNull) { return arr == null ? defaultIfNull : (T) arr; }
 
     /**
      * 指定默认值
      *
-     * @param arr   数组
-     * @param empty 空数组
-     * @param <T>   泛型类型
+     * @param arr            数组
+     * @param defaultIfEmpty 默认值
+     * @param <T>            泛型类型
      *
      * @return 返回值
      */
-    default <T> T defaultIfEmpty(Object arr, T empty) { return isEmpty(arr) ? empty : (T) arr; }
+    default <T> T defaultIfEmpty(Object arr, T defaultIfEmpty) { return isEmpty(arr) ? defaultIfEmpty : (T) arr; }
 
     /**
      * 或者数组指定索引项

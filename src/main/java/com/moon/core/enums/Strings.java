@@ -67,17 +67,17 @@ public enum Strings implements EnumDescriptor {
      */
     NUMBERS("0123456789"),
     /**
-     * 小写字母
-     */
-    LOWERS("abcdefghijklmnopqrstuvwxyz"),
-    /**
      * 大写字母
      */
     UPPERS("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
     /**
+     * 小写字母
+     */
+    LOWERS("abcdefghijklmnopqrstuvwxyz"),
+    /**
      * 字母
      */
-    LETTERS("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+    LETTERS("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"),
     ;
 
     public final String value;
@@ -92,4 +92,16 @@ public enum Strings implements EnumDescriptor {
 
     @Override
     public String getText() { return value; }
+
+    public static char[] toCharArray(Strings...items){
+        int length = items == null ? 0 : items.length;
+        if (length == 0) {
+            return Arrays2.CHARS.empty();
+        }
+        String[] strings = new String[length];
+        for (int i = 0; i < length; i++) {
+            strings[i] = items[i].value;
+        }
+        return StringUtil.concat(strings).toCharArray();
+    }
 }

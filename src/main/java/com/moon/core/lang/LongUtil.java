@@ -1,12 +1,15 @@
 package com.moon.core.lang;
 
+import com.moon.core.enums.Arrays2;
 import com.moon.core.exception.NumberException;
 import com.moon.core.util.DateUtil;
-import com.moon.core.util.DetectUtil;
+import com.moon.core.util.TestUtil;
 
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.moon.core.lang.IntUtil.DIGITS;
+import static com.moon.core.lang.IntUtil.TEN;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.lang.String.format;
 
@@ -14,6 +17,7 @@ import static java.lang.String.format;
  * @author benshaoye
  */
 public final class LongUtil {
+
     private LongUtil() {
         noInstanceError();
     }
@@ -94,6 +98,7 @@ public final class LongUtil {
      * @param value
      * @param min
      * @param max
+     *
      * @return
      */
     public static long requireInRange(long value, long min, long max) {
@@ -114,6 +119,7 @@ public final class LongUtil {
      * @param value
      * @param min
      * @param max
+     *
      * @return
      */
     public static long requireBetween(long value, long min, long max) {
@@ -137,6 +143,7 @@ public final class LongUtil {
      *
      * @param cs
      * @param defaultVal
+     *
      * @return
      */
     public static long defaultIfInvalid(CharSequence cs, long defaultVal) {
@@ -149,17 +156,15 @@ public final class LongUtil {
 
     public static boolean isLong(Object o) { return o != null && o.getClass() == Long.class; }
 
-    public static boolean matchLong(Object o) { return DetectUtil.isNumber(String.valueOf(o)); }
+    public static boolean matchLong(Object o) { return TestUtil.isIntegerValue(String.valueOf(o)); }
 
-    public static Long toLong(Boolean bool) { return bool == null ? null : Long.valueOf((bool ? 1 : 0)); }
+    public static Long toLong(Boolean bool) { return bool == null ? null : (long) (bool ? 1 : 0); }
 
     public static Long toLong(Character value) { return value == null ? null : Long.valueOf(value); }
 
     public static Long toLong(Byte value) { return value == null ? null : value.longValue(); }
 
     public static Long toLong(Short value) { return value == null ? null : value.longValue(); }
-
-    public static Long toLong(Long value) { return value == null ? null : value.longValue(); }
 
     public static Long toLong(Float value) { return value == null ? null : value.longValue(); }
 
@@ -192,21 +197,23 @@ public final class LongUtil {
      * StringBuilder value = new StringBuilder("  1   ");  // == 1
      * BigDecimal value = new BigDecimal("1");  // ============= 1
      * BigInteger value = new BigInteger("1");  // ============= 1
-     * Collection value = new ArrayList(){{increment(1)}};  // ======= 1（只有一项时）
-     * Collection value = new HashSet(){{increment(1)}};  // ========= 1（只有一项时）
-     * Collection value = new TreeSet(){{increment(1)}};  // ========= 1（只有一项时）
-     * Collection value = new LinkedList(){{increment(1)}};  // ====== 1（只有一项时）
-     * Map value = new HashMap(){{put("key", 1)}};  // =============== 1（只有一项时）
+     * Collection value = new ArrayList(){{put(1)}};  // ======= 1（只有一项时）
+     * Collection value = new HashSet(){{put(1)}};  // ========= 1（只有一项时）
+     * Collection value = new TreeSet(){{put(1)}};  // ========= 1（只有一项时）
+     * Collection value = new LinkedList(){{put(1)}};  // ====== 1（只有一项时）
+     * Map value = new HashMap(){{put("key", 1)}};  // ========= 1（只有一项时）
      * <p>
      * int[] value = {1, 2, 3, 4};  // ======================================== 4（大于一项时，返回 size）
      * String[] value = {"1", "1", "1", "1"};  // ============================= 4（大于一项时，返回 size）
-     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ======= 3（大于一项时，返回 size）
+     * Collection value = new ArrayList(){{put(1);put(1);put(1);}};  // ======= 3（大于一项时，返回 size）
      * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // ======== 2（大于一项时，返回 size）
      * <p>
      * Long result = LongUtil.toLong(value);
      *
      * @param object
+     *
      * @return
+     *
      * @see IntUtil#toIntValue(Object)
      */
     public static Long toLong(Object object) {
@@ -232,7 +239,7 @@ public final class LongUtil {
             }
         }
         if (object instanceof Boolean) {
-            return Long.valueOf((boolean) object ? 1 : 0);
+            return (long) ((boolean) object ? 1 : 0);
         }
         if (object instanceof Date) {
             return ((Date) object).getTime();
@@ -244,19 +251,21 @@ public final class LongUtil {
             Object firstItem = SupportUtil.onlyOneItemOrSize(object);
             return toLong(firstItem);
         } catch (Exception e) {
-            throw new IllegalArgumentException(format("Can not cast to int of: %s", String.valueOf(object)), e);
+            throw new IllegalArgumentException(format("Can not cast to int of: %s", object), e);
         }
     }
 
     /**
      * @param value
+     *
      * @return
+     *
      * @see IntUtil#toIntValue(Object)
      * @see #toLongValue(Object)
      */
     public static long toLongValue(Object value) {
         Long result = toLong(value);
-        return result == null ? 0 : result.longValue();
+        return result == null ? 0 : result;
     }
 
     public static long avg(long... values) {
@@ -267,66 +276,11 @@ public final class LongUtil {
         return ret / len;
     }
 
-    public static Long avg(Long... values) {
-        long ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret / len;
-    }
-
-    public static Long avgIgnoreNull(Long... values) {
-        long ret = 0;
-        Long temp;
-        int count = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-                count++;
-            }
-        }
-        return ret / count;
-    }
-
     public static long sum(long... values) {
         long ret = 0;
         int len = values.length;
         for (int i = 0; i < len; i++) {
             ret += values[i];
-        }
-        return ret;
-    }
-
-    public static Long sum(Long[] values) {
-        long ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret;
-    }
-
-    public static Long sumIgnoreNull(Long... values) {
-        long ret = 0;
-        Long temp;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-            }
-        }
-        return ret;
-    }
-
-    public static Long multiply(Long[] values) {
-        long ret = 1;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret *= values[i];
         }
         return ret;
     }
@@ -340,49 +294,12 @@ public final class LongUtil {
         return ret;
     }
 
-    public static Long multiplyIgnoreNull(Long... values) {
-        long ret = 1;
-        int len = values.length;
-        Long tmp;
-        for (int i = 0; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null) {
-                ret *= tmp;
-            }
-        }
-        return ret;
-    }
-
     public static long max(long... values) {
         int len = values.length;
         long ret = values[0];
         for (int i = 1; i < len; i++) {
             if (values[i] > ret) {
                 ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Long max(Long[] values) {
-        int len = values.length;
-        long ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] > ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Long maxIgnoreNull(Long... values) {
-        int len = values.length;
-        long ret = values[0];
-        Long tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp > ret) {
-                ret = tmp;
             }
         }
         return ret;
@@ -399,27 +316,64 @@ public final class LongUtil {
         return ret;
     }
 
-    public static Long min(Long[] values) {
-        int len = values.length;
-        long ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] < ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
+    public static Long toObjectArr(long... values) {
+        return Arrays2.LONGS.toObjects(values);
     }
 
-    public static Long minIgnoreNull(Long... values) {
-        int len = values.length;
-        long ret = values[0];
-        Long tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp < ret) {
-                ret = tmp;
-            }
+    public static long[] toPrimitiveArr(long defaultIfNull, Long... values) {
+        int length = values == null ? 0 : values.length;
+        if (length == 0) { return Arrays2.LONGS.empty(); }
+        long[] result = new long[length];
+        for (int i = 0; i < length; i++) {
+            result[i] = values[i] == null ? defaultIfNull : values[i];
         }
-        return ret;
+        return result;
+    }
+
+    /**
+     * 进制转换：支持十进制至 2 ~ 62 进制的转换
+     * （Copied from jdk 1.8: {@link Long#toString(long, int)}）
+     * <p>
+     * {@code Long}仅支持 36 进制转换，这里扩展到 62 进制
+     *
+     * @param value 待转换的十进制长整型数
+     * @param radix 进制
+     *
+     * @return 转换后的字符串
+     *
+     * @see IntUtil#toString(int, int) 整形进制转换
+     */
+    @SuppressWarnings("all")
+    public static String toString(long value, int radix) {
+        if (radix < Character.MIN_RADIX) {
+            radix = TEN;
+        }
+        if (radix > DIGITS.length) {
+            radix = DIGITS.length;
+        }
+        if (radix == TEN) {
+            return Long.toString(value);
+        }
+        int maxLen = radix < TEN ? 65 : 20;
+
+        char[] buf = new char[maxLen];
+        int charPos = maxLen - 1;
+        boolean negative = (value < 0);
+
+        if (!negative) {
+            value = -value;
+        }
+
+        while (value <= -radix) {
+            buf[charPos--] = DIGITS[(int) (-(value % radix))];
+            value = value / radix;
+        }
+        buf[charPos] = DIGITS[(int) (-value)];
+
+        if (negative) {
+            buf[--charPos] = '-';
+        }
+
+        return new String(buf, charPos, (maxLen - charPos));
     }
 }

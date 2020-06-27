@@ -1,6 +1,6 @@
 package com.moon.more.excel.xlsx;
 
-import com.moon.core.enums.SystemProps;
+import com.moon.core.enums.Systems;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.more.excel.ExcelUtil;
@@ -19,9 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
@@ -195,7 +193,7 @@ class ExcelUtilTest {
 
     @Test
     void testExportMultiExcelOnMax() throws Exception {
-        doExportMultiExcel(SystemProps.user_home.get());
+        doExportMultiExcel(Systems.user_home.get());
     }
 
     void doExportMultiExcel(String dir) throws Exception {

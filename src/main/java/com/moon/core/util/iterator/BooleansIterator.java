@@ -16,6 +16,10 @@ public class BooleansIterator
         this.array = array;
     }
 
+    public static Iterator<Boolean> of(boolean... values) {
+        return values == null ? EMPTY : new BooleansIterator(values);
+    }
+
     @Override
     public boolean hasNext() { return this.index < this.length; }
 

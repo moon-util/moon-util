@@ -16,6 +16,10 @@ public class LongsIterator
         this.array = array;
     }
 
+    public static Iterator<Long> of(long... values) {
+        return values == null ? EMPTY : new LongsIterator(values);
+    }
+
     @Override
     public boolean hasNext() { return this.index < this.length; }
 

@@ -3,13 +3,14 @@ package com.moon.core.enums;
 /**
  * @author benshaoye
  */
-public enum SystemProps implements PropsSupplier {
-
+public enum Systems implements PropsSupplier {
+    /**
+     * cpu 型号
+     */
     sun_cpu_isalist,
     sun_desktop,
     sun_io_unicode_encoding,
     sun_cpu_endian,
-    idea_test_cyclic_buffer_size,
     java_vendor_url_bug,
     file_separator,
     java_vendor,
@@ -65,7 +66,7 @@ public enum SystemProps implements PropsSupplier {
 
     private final String key;
 
-    SystemProps() { key = name().replace('_', '.'); }
+    Systems() { key = name().replace('_', '.'); }
 
     @Override
     public String key() { return key; }

@@ -37,6 +37,19 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
         return new CollectValidator<>(collect, true);
     }
 
+    @Override
+    @SuppressWarnings("all")
+    public CollectValidator<C, E> forEach(Consumer<Validator<E>> itemValidator) {
+        C collect = getValue();
+        if (collect != null) {
+            for (E item : collect) {
+                itemValidator.accept(new Validator<>(item, isNullable(),//
+                    ensureMessages(), getSeparator(), isImmediate()));
+            }
+        }
+        return current();
+    }
+
     /*
      * -----------------------------------------------------
      * requires
@@ -89,10 +102,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
 
     public final <O> GroupValidator<Map<O, Collection<E>>, O, Collection<E>, E> groupBy(Function<? super E, O> grouper) {
-        return new GroupValidator<>(GroupUtil.groupBy(value, grouper),
-            isNullable(),
-            ensureMessages(),
-            getSeparator(),
+        return new GroupValidator<>(GroupUtil.groupBy(value, grouper), isNullable(), ensureMessages(), getSeparator(),
             isImmediate());
     }
 

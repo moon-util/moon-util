@@ -10,11 +10,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author benshaoye
  */
 public final class IDUtil {
-    private IDUtil() {
-        noInstanceError();
-    }
+    private IDUtil() { noInstanceError(); }
 
-    public static String uuid() {
-        return UUID.randomUUID().toString();
-    }
+    public static String uuid() { return UUID.randomUUID().toString(); }
 }

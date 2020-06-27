@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  */
 public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<K, V> {
 
-    private final static Supplier CONSTRUCTOR = Maps.HashMap;
+    private final static Supplier CONSTRUCTOR = Maps.HashMaps;
 
     private final Supplier<Map<K, V>> constructor;
 
@@ -39,7 +39,7 @@ public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<
     public ThreadLocalMap() { this(CONSTRUCTOR); }
 
     public ThreadLocalMap(Supplier<Map<K, V>> constructor) {
-        this.constructor = (constructor == null) ? HashMap::new : CONSTRUCTOR;
+        this.constructor = (constructor == null) ? CONSTRUCTOR : constructor;
     }
 
     public ThreadLocalMap(Map<K, V> map) {

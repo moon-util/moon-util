@@ -28,9 +28,6 @@ class ListUtilTestTest {
 
     @Test
     void testNullIfEmpty() {
-        assertNull(ListUtil.nullIfEmpty(null));
-        assertNull(ListUtil.nullIfEmpty(new ArrayList()));
-        assertNull(ListUtil.nullIfEmpty(new LinkedList<>()));
     }
 
     @Test

@@ -13,10 +13,6 @@ public final class StackTraceUtil {
         ThrowUtil.noInstanceError();
     }
 
-    public final static String toString(StackTraceElement elem) {
-        return String.format("%s#%s(%d)", elem.getClassName(), elem.getMethodName(), elem.getLineNumber());
-    }
-
     // ============================= methods =============================================================
 
     /**
@@ -24,37 +20,7 @@ public final class StackTraceUtil {
      *
      * @return 栈信息
      */
-    public static StackTraceElement getCallerTrace() {
-        return traces(0);
-    }
-
-    /**
-     * 获取调用位置类名
-     *
-     * @return 调用位置类名
-     */
-    public static String getCallerTypeName() {
-        return getCallerTrace().getClassName();
-    }
-
-    /**
-     * 获取调用位置方法名
-     *
-     * @return 调用位置方法名
-     */
-    public static String getCallerMethodName() {
-        return toMethodString(getCallerTrace());
-    }
-
-    /**
-     * 获取调用位置全名
-     *
-     * @return 调用位置全名
-     */
-    public static String getCallerFullName() {
-        StackTraceElement el = getCallerTrace();
-        return new StringBuilder(85).append(el.getClassName()).append('.').append(el.getMethodName()).toString();
-    }
+    public static StackTraceElement getCallerTrace() { return traces(0); }
 
     /**
      * 获取调用位置上一个调用方法的栈信息

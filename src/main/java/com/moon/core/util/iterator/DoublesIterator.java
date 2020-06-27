@@ -16,6 +16,10 @@ public class DoublesIterator
         this.array = array;
     }
 
+    public static Iterator<Double> of(double... values) {
+        return values == null ? EMPTY : new DoublesIterator(values);
+    }
+
     @Override
     public boolean hasNext() { return this.index < this.length; }
 

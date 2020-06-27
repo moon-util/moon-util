@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.LongAdder;
 /**
  * @author benshaoye
  */
-public enum Converters {
+enum Converters {
     /**
      * to string
      */
@@ -52,25 +52,9 @@ public enum Converters {
 
         @Override
         Class<?>[] fromSupports() {
-            return toArr(Byte.class,
-                byte.class,
-                Short.class,
-                short.class,
-                Integer.class,
-                int.class,
-                Long.class,
-                long.class,
-                Float.class,
-                float.class,
-                Double.class,
-                double.class,
-                Number.class,
-                BigInteger.class,
-                BigDecimal.class,
-                AtomicLong.class,
-                AtomicInteger.class,
-                LongAdder.class,
-                DoubleAdder.class);
+            return toArr(Byte.class, byte.class, Short.class, short.class, Integer.class, int.class, Long.class,
+                long.class, Float.class, float.class, Double.class, double.class, Number.class, BigInteger.class,
+                BigDecimal.class, AtomicLong.class, AtomicInteger.class, LongAdder.class, DoubleAdder.class);
         }
 
         @Override

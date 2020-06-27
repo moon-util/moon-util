@@ -16,6 +16,10 @@ public class IntsIterator
         this.array = array;
     }
 
+    public static Iterator<Integer> of(int... values) {
+        return values == null ? EMPTY : new IntsIterator(values);
+    }
+
     @Override
     public boolean hasNext() { return this.index < this.length; }
 

@@ -3,6 +3,7 @@ package com.moon.core.util.validator;
 import com.moon.core.util.CollectUtil;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -10,6 +11,8 @@ import java.util.function.Predicate;
  */
 interface ICollectValidator<C extends Collection<E>, E, IMPL extends ICollectValidator<C, E, IMPL>>
     extends IValidator<C, IMPL> {
+
+    IMPL forEach(Consumer<Validator<E>> itemValidator);
 
     /**
      * 要求至少指定数目项符合验证，使用指定错误信息

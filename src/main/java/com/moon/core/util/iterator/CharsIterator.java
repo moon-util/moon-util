@@ -20,6 +20,14 @@ public class CharsIterator
         this.array = array;
     }
 
+    public static Iterator<Character> of(CharSequence sequence) {
+        return sequence == null ? EMPTY : new CharsIterator(sequence);
+    }
+
+    public static Iterator<Character> of(char... values) {
+        return values == null ? EMPTY : new CharsIterator(values);
+    }
+
     @Override
     public boolean hasNext() { return this.index < this.length; }
 

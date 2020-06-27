@@ -1,10 +1,12 @@
 package com.moon.core.lang;
 
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author benshaoye
@@ -25,19 +27,29 @@ public class ClassUtilTest {
 
     @org.junit.Test
     public void testGetAllInterfaces() {
-        System.out.println(ClassUtil.getAllInterfaces(Class1.class));
-        List<Class> list = ClassUtil.getAllInterfaces(ArrayList.class);
-        System.out.println(list);
+        Set<Class> interfaces = ClassUtil.getAllInterfaces(Class1.class);
+        Assertions.assertTrue(interfaces.contains(Interface0.class));
+        Assertions.assertTrue(interfaces.contains(Interface1.class));
+        interfaces = ClassUtil.getAllInterfaces(Class0.class);
+        Assertions.assertTrue(interfaces.contains(Interface0.class));
+        Assertions.assertTrue(interfaces.contains(Interface1.class));
+
+        System.out.println(ClassUtil.getAllSuperclasses(Class1.class));
+
+        interfaces = ClassUtil.getAllInterfaces(List.class);
+        System.out.println(interfaces);
     }
 
     @org.junit.Test
     public void testGetAllSuperclasses() {
         ClassUtil.WRAPPER_TO_PRIMITIVE_MAP.forEach((key,value)->{
-            System.out.println(key);
-            System.out.println(value);
+            // System.out.println(key);
+            // System.out.println(value);
             Assertions.assertFalse(key.isAssignableFrom(value));
             Assertions.assertFalse(value.isAssignableFrom(key));
         });
+
+        // System.out.println(ClassUtil.getAllSuperclasses(List.class));
     }
 
     @org.junit.Test

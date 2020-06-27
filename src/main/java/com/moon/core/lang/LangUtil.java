@@ -5,8 +5,10 @@ import com.moon.core.util.function.*;
 
 import java.util.function.Supplier;
 
-import static com.moon.core.lang.ThrowUtil.runtime;
+import static com.moon.core.lang.IntUtil.DIGITS;
+import static com.moon.core.lang.IntUtil.TEN;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.lang.ThrowUtil.runtime;
 
 /**
  * @author benshaoye

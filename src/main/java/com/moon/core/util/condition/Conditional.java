@@ -3,15 +3,13 @@ package com.moon.core.util.condition;
 import com.moon.core.util.function.ThrowingRunnable;
 import com.moon.core.util.function.ThrowingSupplier;
 
-import java.util.function.BooleanSupplier;
-
 /**
  * 条件执行
  *
  * @author benshaoye
  */
 @FunctionalInterface
-public interface Conditional extends BooleanSupplier {
+public interface Conditional {
 
     /**
      * 返回是否符合条件
@@ -33,6 +31,8 @@ public interface Conditional extends BooleanSupplier {
 
     /**
      * 不符合条件时执行
+     *
+     * @param executor 不符合条件时执行
      */
     default void runIfUnmatched(ThrowingRunnable executor) {
         if (!isMatched()) {
@@ -49,7 +49,7 @@ public interface Conditional extends BooleanSupplier {
      *
      * @return T 类型的值
      */
-    default <T> T orDefault(ThrowingSupplier<T> supplier, T defaultValue) {
+    default <T> T getOrDefault(ThrowingSupplier<T> supplier, T defaultValue) {
         return isMatched() ? supplier.uncheckedGet() : defaultValue;
     }
 
@@ -62,7 +62,7 @@ public interface Conditional extends BooleanSupplier {
      *
      * @return T 类型的值
      */
-    default <T> T orElse(ThrowingSupplier<T> supplier, ThrowingSupplier<T> defaultSupplier) {
+    default <T> T getOrElse(ThrowingSupplier<T> supplier, ThrowingSupplier<T> defaultSupplier) {
         return isMatched() ? supplier.uncheckedGet() : defaultSupplier.uncheckedGet();
     }
 
@@ -74,15 +74,7 @@ public interface Conditional extends BooleanSupplier {
      *
      * @return T 类型的值
      */
-    default <T> T orNull(ThrowingSupplier<T> supplier) {
+    default <T> T getOrNull(ThrowingSupplier<T> supplier) {
         return isMatched() ? supplier.uncheckedGet() : null;
     }
-
-    /**
-     * Gets a result.
-     *
-     * @return a result
-     */
-    @Override
-    default boolean getAsBoolean() { return isMatched(); }
 }

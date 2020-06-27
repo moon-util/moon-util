@@ -20,15 +20,15 @@ public class FilterUtilTest {
             "aaaaaa",
         };
 
-        assertEquals("aaaa", FilterUtil.requireFirst(strings, str -> str.length() > 3));
-        assertEquals("aaaaaa", FilterUtil.requireLast(strings, str -> str.length() > 3));
+        assertEquals("aaaa", FilterUtil.requireFind(strings, str -> str.length() > 3));
+        assertEquals("aaaaaa", FilterUtil.requireFind(strings, str -> str.length() > 3));
         
         assertThrows(Exception.class, () ->
-            FilterUtil.requireFirst(strings, String::isEmpty));
+            FilterUtil.requireFind(strings, String::isEmpty));
         assertThrows(Exception.class, () ->
-            FilterUtil.requireLast(strings, String::isEmpty));
+            FilterUtil.requireFind(strings, String::isEmpty));
         
-        assertNull(FilterUtil.nullableFirst(strings, String::isEmpty));
+        assertNull(FilterUtil.nullableFind(strings, String::isEmpty));
     }
 
     @Test

@@ -10,10 +10,6 @@ class MoonPropsTestTest {
 
     @Test
     void testGetName() {
-        EnumUtil.valuesList(MoonProps.class).forEach(prop -> {
-            System.out.println(prop.toString() + '\t' + prop.getName() + '\t'
-                + prop.key() + '\t' + prop.value() + '\t' + (prop.value() == null));
-        });
     }
 
     @Test

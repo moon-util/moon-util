@@ -55,10 +55,10 @@ public final class IteratorUtil {
     /**
      * 集合反序迭代器
      *
-     * @param collect
-     * @param <T>
+     * @param collect 集合
+     * @param <T>     集合项数据类型
      *
-     * @return
+     * @return 倒序迭代器
      */
     public static <T> Iterator<T> ofReverse(Collection<? extends T> collect) { return ReverseIterator.of(collect); }
 
@@ -70,70 +70,87 @@ public final class IteratorUtil {
      */
 
     /**
-     * 获取一个遍历指定类型数组的迭代器
+     * 数组迭代器
      *
-     * @param values
-     * @param <T>
+     * @param values 数组
+     * @param <T>    数组项数据类型
+     *
+     * @return 迭代器
      */
-    public static <T> Iterator<T> of(T... values) { return values == null ? EMPTY : new ObjectsIterator<>(values); }
+    @SafeVarargs
+    public static <T> Iterator<T> of(T... values) { return ObjectsIterator.of(values); }
 
     /**
      * 获取 byte[] 类型数组的迭代器
      *
-     * @param values
+     * @param values byte 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Byte> of(byte... values) { return values == null ? EMPTY : new BytesIterator(values); }
+    public static Iterator<Byte> of(byte... values) { return BytesIterator.of(values); }
 
     /**
      * 获取 short[] 类型数组的迭代器
      *
-     * @param values
+     * @param values short 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Short> of(short... values) { return values == null ? EMPTY : new ShortsIterator(values); }
+    public static Iterator<Short> of(short... values) { return ShortsIterator.of(values); }
 
     /**
      * 获取 char[] 类型数组的迭代器
      *
-     * @param values
+     * @param values char 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Character> of(char... values) { return values == null ? EMPTY : new CharsIterator(values); }
+    public static Iterator<Character> of(char... values) { return CharsIterator.of(values); }
 
     /**
      * 获取 int[] 类型数组的迭代器
      *
-     * @param values
+     * @param values int 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Integer> of(int... values) { return values == null ? EMPTY : new IntsIterator(values); }
+    public static Iterator<Integer> of(int... values) { return IntsIterator.of(values); }
 
     /**
      * 获取 long[] 类型数组的迭代器
      *
-     * @param values
+     * @param values long 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Long> of(long... values) { return values == null ? EMPTY : new LongsIterator(values); }
+    public static Iterator<Long> of(long... values) { return LongsIterator.of(values); }
 
     /**
      * 获取 float[] 类型数组的迭代器
      *
-     * @param values
+     * @param values float 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Float> of(float... values) { return values == null ? EMPTY : new FloatsIterator(values); }
+    public static Iterator<Float> of(float... values) { return FloatsIterator.of(values); }
 
     /**
      * 获取 double[] 类型数组的迭代器
      *
-     * @param values
+     * @param values double 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Double> of(double... values) { return values == null ? EMPTY : new DoublesIterator(values); }
+    public static Iterator<Double> of(double... values) { return DoublesIterator.of(values); }
 
     /**
      * 获取 boolean[] 类型数组的迭代器
      *
-     * @param values
+     * @param values boolean 数组
+     *
+     * @return 迭代器
      */
-    public static Iterator<Boolean> of(boolean... values) {
-        return values == null ? EMPTY : new BooleansIterator(values);
-    }
+    public static Iterator<Boolean> of(boolean... values) { return BooleansIterator.of(values); }
 
     /*
      * ----------------------------------------------------------------------------
@@ -144,11 +161,11 @@ public final class IteratorUtil {
     /**
      * 返回字符串的字符迭代器
      *
-     * @param value
+     * @param value 字符串
+     *
+     * @return 迭代器
      */
-    public static Iterator<Character> ofChars(CharSequence value) {
-        return value == null ? EMPTY : new CharsIterator(value);
-    }
+    public static Iterator<Character> ofChars(CharSequence value) { return CharsIterator.of(value); }
 
     /*
      * ----------------------------------------------------------------------------
@@ -165,6 +182,8 @@ public final class IteratorUtil {
 
     /**
      * 从 Reader 中每次读取一行文本
+     * <p>
+     * 不会自动关闭流
      *
      * @param reader
      *
@@ -174,6 +193,8 @@ public final class IteratorUtil {
 
     /**
      * 从 InputStream 中按默认字符编码（UTF-8）格式每次读取一行文本
+     * <p>
+     * 不会自动关闭流
      *
      * @param is
      *
@@ -183,6 +204,8 @@ public final class IteratorUtil {
 
     /**
      * 从 InputStream 中按 charset 格式每次读取一行文本
+     * <p>
+     * 不会自动关闭流
      *
      * @param is
      * @param charset
@@ -195,6 +218,8 @@ public final class IteratorUtil {
 
     /**
      * 从 InputStream 中按 charset 格式每次读取一行文本
+     * <p>
+     * 不会自动关闭流
      *
      * @param is
      * @param charset
@@ -206,7 +231,9 @@ public final class IteratorUtil {
     }
 
     /**
-     * 获取一个文本文件读取迭代器，可用于常用的txt、json、xml等文本文件读取； 迭代器每次返回一行数据，直到文本结尾，对象会自动关闭文件流
+     * 获取一个文本文件读取迭代器，可用于常用的txt、json、xml等文本文件读取；
+     * <p>
+     * 迭代器每次返回一行数据，直到文本结尾，对象会自动关闭文件流
      *
      * @param file
      */
@@ -282,26 +309,6 @@ public final class IteratorUtil {
     public static <T> Iterator<T> of(Iterator<T> iterator) { return iterator == null ? EMPTY : iterator; }
 
     /**
-     * 返回 List 集合的迭代器
-     *
-     * @param list
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> Iterator<T> of(List<T> list) { return list == null ? EMPTY : list.iterator(); }
-
-    /**
-     * 返回 Collection 集合的迭代器
-     *
-     * @param c
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> Iterator<T> of(Collection<T> c) { return c == null ? EMPTY : c.iterator(); }
-
-    /**
      * 返回 Iterable 集合的迭代器
      *
      * @param iterable
@@ -364,14 +371,7 @@ public final class IteratorUtil {
         Class type = value.getClass();
         if (type.isEnum()) { return of(type); }
         if (type.isArray()) {
-            if (value instanceof Object[]) { return of((Object[]) value); }
-            if (value instanceof int[]) { return of((int[]) value); }
-            if (value instanceof long[]) { return of((long[]) value); }
-            if (value instanceof double[]) { return of((double[]) value); }
-            if (value instanceof byte[]) { return of((byte[]) value); }
-            if (value instanceof char[]) { return of((char[]) value); }
-            if (value instanceof short[]) { return of((short[]) value); }
-            if (value instanceof boolean[]) { return of((boolean[]) value); }
+            return Arrays2.getOrObjects(value).iterator(value);
         }
         if (value instanceof CharSequence) { return ofChars((CharSequence) value); }
         if (value instanceof Enumeration) { return of((Enumeration) value); }
@@ -397,7 +397,7 @@ public final class IteratorUtil {
      * ----------------------------------------------------------------------------
      */
 
-    public final static void forEachAny(Object data, IntBiConsumer consumer) {
+    public static void forEachAny(Object data, IntBiConsumer consumer) {
         if (data instanceof Iterable) {
             forEach((Iterable) data, consumer);
         } else if (data instanceof Map) {
@@ -412,6 +412,8 @@ public final class IteratorUtil {
             Class type = data.getClass();
             if (type.isArray()) {
                 Arrays2.getOrObjects(data).forEach(data, consumer);
+            } else if (type.isEnum()) {
+                forEach(type, consumer);
             } else {
                 forEachFields(data, consumer);
             }
@@ -424,7 +426,7 @@ public final class IteratorUtil {
      * ----------------------------------------------------------------------------
      */
 
-    public final static void forEachFields(Object bean, IntBiConsumer consumer) {
+    public static void forEachFields(Object bean, IntBiConsumer consumer) {
         if (bean != null) {
             IntAccessor indexer = IntAccessor.of();
             BeanInfoUtil.getFieldDescriptorsMap(bean.getClass()).forEach(
@@ -646,32 +648,6 @@ public final class IteratorUtil {
      */
 
     /**
-     * 遍历
-     *
-     * @param consumer 处理对象
-     * @param list
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> void forEach(List<T> list, Consumer<? super T> consumer) {
-        if (list != null) { list.forEach(consumer); }
-    }
-
-    /**
-     * 遍历 Collection
-     *
-     * @param consumer 处理对象
-     * @param c
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> void forEach(Collection<T> c, Consumer<? super T> consumer) {
-        if (c != null) { c.forEach(consumer); }
-    }
-
-    /**
      * 遍历 Iterable
      *
      * @param consumer 处理对象
@@ -805,6 +781,10 @@ public final class IteratorUtil {
         ofLines(filename).forEachRemaining(consumer);
     }
 
+    public static void forEachLines(Reader reader, Consumer<String> consumer) {
+        ofLines(reader).forEachRemaining(consumer);
+    }
+
     /**
      * 文件流读取和处理
      *
@@ -825,10 +805,6 @@ public final class IteratorUtil {
      */
     public static void forEach(File file, byte[] buffer, IntConsumer consumer) {
         forEach(getInputStream(file), buffer, consumer);
-    }
-
-    public static void forEachLines(Reader reader, Consumer<String> consumer) {
-        ofLines(reader).forEachRemaining(consumer);
     }
 
     public static void forEach(Reader reader, char[] buffer, Consumer<Integer> consumer) {
@@ -964,9 +940,7 @@ public final class IteratorUtil {
 
     public static <K, E, C extends Collection<E>> Map<K, Collection<E>> groupBy(
         C collect, Function<? super E, ? extends K> function
-    ) {
-        return GroupUtil.groupBy(collect, function);
-    }
+    ) { return GroupUtil.groupBy(collect, function); }
 
     public static <K, E, C extends Collection<E>, CR extends Collection<E>>
 
@@ -1035,17 +1009,17 @@ public final class IteratorUtil {
      */
 
     public static <E, T, L extends List<E>> List<T> map(L list, Function<? super E, T> function) {
-        final IntFunction supplier = Collects.getAsDeduceOrDefault(list, Collects.ArrayList);
+        final IntFunction supplier = Collects.deduceOrDefault(list, Collects.ArrayLists);
         return (List) mapTo(list, function, supplier);
     }
 
     public static <E, T, S extends Set<E>> Set<T> map(S set, Function<? super E, T> function) {
-        final IntFunction supplier = Collects.getAsDeduceOrDefault(set, Collects.HashSet);
+        final IntFunction supplier = Collects.deduceOrDefault(set, Collects.HashSets);
         return (Set) mapTo(set, function, supplier);
     }
 
     public static <E, T, C extends Collection<E>> Collection<T> map(C collect, Function<? super E, T> function) {
-        final IntFunction supplier = Collects.getAsDeduce(collect);
+        final IntFunction supplier = Collects.deduceOrDefault(collect, Collects.ArrayLists);
         return mapTo(collect, function, supplier);
     }
 

@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @author benshaoye
  */
@@ -26,7 +28,7 @@ public final class ListUtil extends CollectUtil {
 
     public static <T> ArrayList<T> newArrayList(int initCapacity) { return new ArrayList<>(initCapacity); }
 
-    public static <T> ArrayList<T> newArrayList(int capacity, IntFunction<T> getter) {
+    public static <T> ArrayList<T> newArrayList(int capacity, IntFunction<? extends T> getter) {
         ArrayList<T> list = newArrayList(capacity);
         for (int i = 0; i < capacity; i++) {
             list.add(getter.apply(i));
@@ -44,11 +46,11 @@ public final class ListUtil extends CollectUtil {
 
     public static <T> ArrayList<T> newArrayList(T... values) { return addAll(newArrayList(values.length), values); }
 
-    public static <T> ArrayList<T> newArrayList(Collection<T> collect) {
+    public static <T> ArrayList<T> newArrayList(Collection<? extends T> collect) {
         return collect == null ? newArrayList() : new ArrayList<>(collect);
     }
 
-    public static <T> ArrayList<T> newArrayList(Iterable<T> iterable) {
+    public static <T> ArrayList<T> newArrayList(Iterable<? extends T> iterable) {
         return iterable == null ? newArrayList() : (iterable instanceof Collection ? new ArrayList((Collection) iterable) : addAll(
             newArrayList(),
             iterable));
@@ -78,19 +80,20 @@ public final class ListUtil extends CollectUtil {
         return add(newLinkedList(value1, value2), value3);
     }
 
+    @SafeVarargs
     public static <T> LinkedList<T> newLinkedList(T... values) { return addAll(newLinkedList(), values); }
 
-    public static <T> LinkedList<T> newLinkedList(Collection<T> collect) {
+    public static <T> LinkedList<T> newLinkedList(Collection<? extends T> collect) {
         return collect == null ? newLinkedList() : new LinkedList<>(collect);
     }
 
-    public static <T> LinkedList<T> newLinkedList(Iterable<T> iterable) {
+    public static <T> LinkedList<T> newLinkedList(Iterable<? extends T> iterable) {
         return iterable == null ? newLinkedList() : (iterable instanceof Collection ? new LinkedList((Collection) iterable) : addAll(
             newLinkedList(),
             iterable));
     }
 
-    public static <S, T> List<T> mapAsList(Collection<S> src, Function<? super S, T> mapper) {
+    public static <S, T> List<T> mapAsList(Collection<? extends S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);
         return collect instanceof List ? (List<T>) collect : newArrayList(collect);
     }
@@ -100,16 +103,6 @@ public final class ListUtil extends CollectUtil {
      * keepers
      * ---------------------------------------------------------------------------------
      */
-
-    /**
-     * 如果集合是空集合（null 或 size() == 0）这返回 null
-     *
-     * @param list list
-     * @param <T>  list 元素类型
-     *
-     * @return null list if is an empty list or null
-     */
-    public static <T> List<T> nullIfEmpty(List<T> list) { return isEmpty(list) ? null : list; }
 
     /**
      * 如果 valuesList 是 null 则创建一个新的 ArrayList 返回
@@ -192,7 +185,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @return list 第一个元素
      */
-    public static <T> T requireGetFirst(List<T> list, String errorMessage) { return requireGet(list, 0, errorMessage); }
+    public static <T> T requireGetFirst(List<? extends T> list, String errorMessage) { return requireGet(list, 0, errorMessage); }
 
     /**
      * 获取 valuesList 最后一项，任何非法情况下都返回 null
@@ -202,7 +195,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @return list 第一个元素
      */
-    public static <T> T nullableGetLast(List<T> list) {
+    public static <T> T nullableGetLast(List<? extends T> list) {
         if (list != null) {
             int size = list.size();
             return size > 0 ? list.get(size - 1) : null;
@@ -222,7 +215,7 @@ public final class ListUtil extends CollectUtil {
      * @see IndexOutOfBoundsException
      * @see NullPointerException
      */
-    public static <T> T requireGetLast(List<T> list) { return requireGet(list, (list.size() - 1)); }
+    public static <T> T requireGetLast(List<? extends T> list) { return requireGet(list, (list.size() - 1)); }
 
     /**
      * 获取 valuesList 最后一项，任何非法情况下都将抛出特定异常
@@ -233,9 +226,9 @@ public final class ListUtil extends CollectUtil {
      *
      * @return list 第一个元素
      */
-    public static <T> T requireGetLast(List<T> list, String errorMessage) {
+    public static <T> T requireGetLast(List<? extends T> list, String errorMessage) {
         T item = get(requireNotEmpty(list, errorMessage), list.size() - 1);
-        return Objects.requireNonNull(item, errorMessage);
+        return requireNonNull(item, errorMessage);
     }
 
     /**
@@ -247,7 +240,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @return list 第 index 元素
      */
-    public static <T> T nullableGet(List<T> list, int index) {
+    public static <T> T nullableGet(List<? extends T> list, int index) {
         if (list != null || index < 0) {
             int size = list.size();
             return index < size ? list.get(index) : null;
@@ -268,7 +261,7 @@ public final class ListUtil extends CollectUtil {
      * @see IndexOutOfBoundsException
      * @see NullPointerException
      */
-    public static <T> T requireGet(List<T> list, int index) { return Objects.requireNonNull(get(list, index)); }
+    public static <T> T requireGet(List<? extends T> list, int index) { return requireNonNull(get(list, index)); }
 
     /**
      * 获取 valuesList 第 index 项，任何非法情况下都将抛出特定异常
@@ -280,9 +273,9 @@ public final class ListUtil extends CollectUtil {
      *
      * @return 第 index 个元素
      */
-    public static <T> T requireGet(List<T> list, int index, String errorMessage) {
+    public static <T> T requireGet(List<? extends T> list, int index, String errorMessage) {
         T item = get(requireNotEmpty(list, errorMessage), index);
-        return Objects.requireNonNull(item, errorMessage);
+        return requireNonNull(item, errorMessage);
     }
 
     /*
@@ -299,7 +292,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @return 集合第一项或 null
      */
-    public static <T> T nullableShift(List<T> list) { return size(list) > 0 ? list.remove(0) : null; }
+    public static <T> T nullableShift(List<? extends T> list) { return size(list) > 0 ? list.remove(0) : null; }
 
     /**
      * 获取并删除第一项，不存在抛出异常
@@ -462,7 +455,7 @@ public final class ListUtil extends CollectUtil {
                 T item = iterator.next();
                 if (map.containsKey(item)) {
                     if (repeated == null) {
-                        Collects collect = Collects.getAsDeduceOrDefault(list, Collects.ArrayList);
+                        Collects collect = Collects.deduceOrDefault(list, Collects.ArrayLists);
                         try {
                             repeated = (List) collect.apply(size);
                         } catch (Throwable e) {

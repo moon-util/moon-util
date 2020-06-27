@@ -5,15 +5,17 @@ import java.util.Iterator;
 /**
  * @author benshaoye
  */
-public class BytesIterator
-    extends BaseArrayIterator
-    implements Iterator<Byte> {
+public class BytesIterator extends BaseArrayIterator implements Iterator<Byte> {
 
     private final byte[] array;
 
     public BytesIterator(byte[] array) {
         super(array == null ? 0 : array.length);
         this.array = array;
+    }
+
+    public static Iterator<Byte> of(byte... values) {
+        return values == null ? EMPTY : new BytesIterator(values);
     }
 
     @Override

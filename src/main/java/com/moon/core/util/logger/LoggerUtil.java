@@ -50,7 +50,7 @@ public final class LoggerUtil {
 
         private final static synchronized Creator setCreator(LoggerType c) {
             if (creator == null || settingMessage == null) {
-                String trace = StackTraceUtil.toString(getPrevTraceOfSteps(2));
+                String trace = getPrevTraceOfSteps(2).toString();
                 trace = String.format("Created by: %s", trace);
                 creator = c.getCreator();
                 settingMessage = trace;
@@ -101,7 +101,7 @@ public final class LoggerUtil {
         ThrowingFunction getCreator() {
             Class targetClass = ClassUtil.forName(className);
             List<Method> ms = getPublicStaticMethods(targetClass, methodName, String.class);
-            Method creator = FilterUtil.requireFirst(ms, m -> m != null);
+            Method creator = FilterUtil.requireFind(ms, m -> m != null);
             return name -> creator.invoke(null, name);
         }
 

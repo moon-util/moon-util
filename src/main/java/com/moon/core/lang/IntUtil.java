@@ -1,9 +1,10 @@
 package com.moon.core.lang;
 
 import com.moon.core.exception.NumberException;
-import com.moon.core.util.DetectUtil;
 
+import static com.moon.core.enums.Strings.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.util.TestUtil.isIntegerValue;
 import static java.lang.String.format;
 
 /**
@@ -130,7 +131,7 @@ public final class IntUtil {
 
     public static boolean isInt(Object o) { return o instanceof Integer; }
 
-    public static boolean matchInt(CharSequence o) { return DetectUtil.isInteger(String.valueOf(o)); }
+    public static boolean matchInt(CharSequence o) { return isIntegerValue(String.valueOf(o)); }
 
     /*
      * -------------------------------------------------------------------------------------------
@@ -336,5 +337,55 @@ public final class IntUtil {
         } catch (Exception e) {
             throw new IllegalArgumentException(format("Can not cast to int of: %s", o), e);
         }
+    }
+
+    final static char[] DIGITS = toCharArray(NUMBERS, UPPERS, LOWERS);
+
+    final static int TEN = 10;
+
+    /**
+     * 进制转换：支持十进制至 2 ~ 62 进制的转换
+     * （Copied from jdk 1.8: {@link Integer#toString(int, int)}）
+     * <p>
+     * {@code Integer}仅支持 36 进制转换，这里扩展到 62 进制
+     *
+     * @param value 待转换的十进制整型数
+     * @param radix 进制
+     *
+     * @return 转换后的字符串
+     *
+     * @see LongUtil#toString(long, int) 长整形进制转换
+     */
+    public static String toString(int value, int radix) {
+        if (radix < Character.MIN_RADIX) {
+            radix = TEN;
+        }
+        if (radix > DIGITS.length) {
+            radix = DIGITS.length;
+        }
+        if (radix == TEN) {
+            return Integer.toString(value);
+        }
+        int maxLen = radix < TEN ? 33 : 11;
+
+        char[] buf = new char[maxLen];
+        boolean negative = (value < 0);
+        int charPos = maxLen - 1;
+
+        if (!negative) {
+            value = -value;
+        }
+
+        while (value <= -radix) {
+            buf[charPos--] = DIGITS[-(value % radix)];
+            value = value / radix;
+        }
+        buf[charPos] = DIGITS[-value];
+
+        if (negative) {
+            buf[--charPos] = '-';
+        }
+
+        return new String(buf, charPos, (maxLen - charPos));
     }
 }

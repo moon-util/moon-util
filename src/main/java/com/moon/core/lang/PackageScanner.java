@@ -11,6 +11,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.*;
 
+import static com.moon.core.util.FilterUtil.nullableFind;
+import static java.nio.file.spi.FileSystemProvider.installedProviders;
+
 /**
  * 包扫描器
  *
@@ -76,7 +79,7 @@ public class PackageScanner extends HashSet<String> {
         return Collections.EMPTY_LIST;
     }
 
-    private static Path targetUrlToPath(URL url){
+    private static Path targetUrlToPath(URL url) {
         final String target = url.getPath();
         return Paths.get(OSUtil.onWindows() ? target.replaceFirst("/", "") : target);
     }
@@ -118,7 +121,6 @@ public class PackageScanner extends HashSet<String> {
     }
 
     private static FileSystemProvider getZipFSProvider() {
-        return FilterUtil
-            .nullableFirst(FileSystemProvider.installedProviders(), provider -> "jar".equals(provider.getScheme()));
+        return nullableFind(installedProviders(), provider -> "jar".equals(provider.getScheme()));
     }
 }

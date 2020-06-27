@@ -9,6 +9,7 @@ class StackTraceUtilTestTest {
 
     @Test
     void testGetCallerTrace() {
+        System.out.println(StackTraceUtil.getCallerTrace());
     }
 
     @Test

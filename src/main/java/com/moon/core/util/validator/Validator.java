@@ -118,7 +118,7 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
      *
      * @param tester 验证函数
      *
-     * @return 当前 IValidator 对象
+     * @return 当前 Validator 对象
      */
     @Override
     public Validator<T> require(Predicate<? super T> tester) { return super.require(tester); }

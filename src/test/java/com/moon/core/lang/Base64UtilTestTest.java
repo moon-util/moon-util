@@ -3,6 +3,7 @@ package com.moon.core.lang;
 import com.moon.core.util.IteratorUtil;
 import org.junit.jupiter.api.Test;
 
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,5 +97,9 @@ class Base64UtilTestTest {
             String desc = item.substring(start, end);
             String name = item.substring(end);
         });
+    }
+
+    @Test
+    void testName() {
     }
 }

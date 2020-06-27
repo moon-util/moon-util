@@ -2,10 +2,7 @@ package com.moon.core.util;
 
 import com.moon.core.enums.Collects;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -15,6 +12,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author benshaoye
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public final class FilterUtil {
 
     private FilterUtil() { noInstanceError(); }
@@ -26,231 +24,117 @@ public final class FilterUtil {
      */
 
     /**
-     * 找出符合条件的第一项，没有匹配项抛出异常
+     * 在数组中查找符合条件的第一项
      *
-     * @param ts     数组
-     * @param tester 匹配器
-     * @param <T>    目标类型
+     * @param arr    查找范围数组
+     * @param tester 匹配条件
+     * @param <T>    数组单项数据类型
      *
-     * @return 匹配的第一个元素
-     *
-     * @See NullPointerException 找不到符合条件的元素
+     * @return 返回 optional
      */
-    public static <T> T requireFirst(T[] ts, Predicate<? super T> tester) {
-        for (int i = 0, len = ts.length; i < len; i++) {
-            if (tester.test(ts[i])) {
-                return ts[i];
-            }
-        }
-        throw new NullPointerException();
-    }
-
-    public static <T> T requireLast(T[] ts, Predicate<? super T> tester) {
-        for (int i = ts.length - 1; i > -1; i--) {
-            if (tester.test(ts[i])) {
-                return ts[i];
-            }
-        }
-        throw new NullPointerException();
+    public static <T> Optional<T> findAsOptional(T[] arr, Predicate<? super T> tester) {
+        return Optional.ofNullable(nullableFind(arr, tester));
     }
 
     /**
-     * 找出符合条件的第一项，任何情况导致找不到匹配项都返回 null
+     * 在集合中查找符合条件的第一项
      *
-     * @param ts     数组
-     * @param tester 匹配器
-     * @param <T>    目标类型
+     * @param iterable 查找范围集合
+     * @param tester   匹配条件
+     * @param <T>      集合单项数据类型
      *
-     * @return 匹配的第一个元素 或 null
+     * @return 返回 optional
      */
-    public static <T> T nullableFirst(T[] ts, Predicate<? super T> tester) {
-        if (ts != null) {
-            for (int i = 0, len = ts.length; i < len; i++) {
-                if (tester.test(ts[i])) {
-                    return ts[i];
-                }
-            }
-        }
-        return null;
-    }
-
-    public static <T> T nullableLast(T[] ts, Predicate<? super T> tester) {
-        if (ts != null) {
-            for (int i = ts.length - 1; i > -1; i--) {
-                if (tester.test(ts[i])) {
-                    return ts[i];
-                }
-            }
-        }
-        return null;
+    public static <T> Optional<T> findAsOptional(Iterable<T> iterable, Predicate<? super T> tester) {
+        return Optional.ofNullable(nullableFind(iterable, tester));
     }
 
     /**
-     * 找出符合条件的第一项，没有匹配项抛出异常
+     * 在数组中查找符合条件的第一项
      *
-     * @param collect
-     * @param tester
-     * @param <T>
+     * @param arr    查找范围数组
+     * @param tester 匹配条件
+     * @param <T>    数组单项数据类型
      *
-     * @return
+     * @return 如果数据中存在符合条件的数据，则返回对应数据；否则返回 null
      */
-    public static <T> T requireFirst(Iterable<T> collect, Predicate<? super T> tester) {
-        for (T item : collect) {
+    public static <T> T nullableFind(T[] arr, Predicate<? super T> tester) {
+        if (arr == null) {
+            return null;
+        }
+        for (T item : arr) {
             if (tester.test(item)) {
                 return item;
             }
         }
-        throw new NullPointerException();
-    }
-
-    /**
-     * 找出符合条件的第一项，任何情况导致找不到匹配项都返回 null
-     *
-     * @param collect
-     * @param tester
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> T nullableFirst(Iterable<T> collect, Predicate<? super T> tester) {
-        if (collect != null) {
-            for (T item : collect) {
-                if (tester.test(item)) {
-                    return item;
-                }
-            }
-        }
         return null;
     }
 
     /**
-     * 找出符合条件的第一项，没有匹配项抛出异常
+     * 在集合中查找符合条件的第一项
      *
-     * @param iterator
-     * @param tester
-     * @param <T>
+     * @param iterable 查找范围集合
+     * @param tester   匹配条件
+     * @param <T>      集合单项数据类型
      *
-     * @return
+     * @return 如果集合中存在符合条件的数据，则返回对应数据；否则返回 null
      */
-    public static <T> T requireFirst(Iterator<T> iterator, Predicate<? super T> tester) {
-        while (iterator.hasNext()) {
-            T item = iterator.next();
+    public static <T> T nullableFind(Iterable<T> iterable, Predicate<? super T> tester) {
+        if (iterable == null) {
+            return null;
+        }
+        for (T item : iterable) {
             if (tester.test(item)) {
                 return item;
             }
         }
-        throw new NullPointerException();
-    }
-
-    /**
-     * 找出符合条件的第一项，任何情况导致找不到匹配项都返回 null
-     *
-     * @param iterator
-     * @param tester
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> T nullableFirst(Iterator<T> iterator, Predicate<? super T> tester) {
-        if (iterator != null) {
-            while (iterator.hasNext()) {
-                T item = iterator.next();
-                if (tester.test(item)) {
-                    return item;
-                }
-            }
-        }
         return null;
     }
 
-    /*
-     * --------------------------------------------------------------
-     * match
-     * --------------------------------------------------------------
-     */
-
     /**
-     * 测试数组中至少有一项符合匹配
+     * 在数组中查找符合条件的数据，要求必须存在，否则抛出异常
      *
-     * @param ts
-     * @param tester
-     * @param <T>
+     * @param arr    查找范围数组
+     * @param tester 匹配条件
+     * @param <T>    集合单项数据类型
      *
-     * @return
+     * @return 如果数组中存在符合条件的数据，则返回第一个匹配数据；否则抛出异常
+     *
+     * @throws IllegalArgumentException 当数组中不存在符合条件的数据时抛出异常
      */
-    public static <T> boolean matchAny(T[] ts, Predicate<? super T> tester) {
-        if (ts != null) {
-            for (T item : ts) {
-                if (tester.test(item)) {
-                    return true;
-                }
+    public static <T> T requireFind(T[] arr, Predicate<? super T> tester) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Can not find matches item");
+        }
+        for (T item : arr) {
+            if (tester.test(item)) {
+                return item;
             }
         }
-        return false;
+        throw new IllegalArgumentException("Can not find matches item");
     }
 
     /**
-     * 测试集合中至少有一项符合匹配
+     * 在集合中查找符合条件的数据，要求必须存在，否则抛出异常
      *
-     * @param iterable
-     * @param tester
-     * @param <T>
+     * @param iterable 查找范围集合
+     * @param tester   匹配条件
+     * @param <T>      集合单项数据类型
      *
-     * @return
+     * @return 如果集合中存在符合条件的数据，则返回第一个匹配数据；否则抛出异常
+     *
+     * @throws IllegalArgumentException 当集合中不存在符合条件的数据时抛出异常
      */
-    public static <T> boolean matchAny(Iterable<T> iterable, Predicate<? super T> tester) {
-        if (iterable != null) {
-            for (T item : iterable) {
-                if (tester.test(item)) {
-                    return true;
-                }
+    public static <T> T requireFind(Iterable<T> iterable, Predicate<? super T> tester) {
+        if (iterable == null) {
+            throw new IllegalArgumentException("Can not find matches item");
+        }
+        for (T item : iterable) {
+            if (tester.test(item)) {
+                return item;
             }
         }
-        return false;
-    }
-
-    /**
-     * 测试数组中所有项符合匹配
-     *
-     * @param ts
-     * @param tester
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> boolean matchAll(T[] ts, Predicate<? super T> tester) {
-        if (ts == null) {
-            return false;
-        } else {
-            for (T item : ts) {
-                if (!tester.test(item)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
-     * 测试集合中所有项符合匹配
-     *
-     * @param iterable
-     * @param tester
-     * @param <T>
-     *
-     * @return
-     */
-    public static <T> boolean matchAll(Iterable<T> iterable, Predicate<? super T> tester) {
-        if (iterable != null) {
-            for (T item : iterable) {
-                if (!tester.test(item)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+        throw new IllegalArgumentException("Can not find matches item");
     }
 
     /*
@@ -259,7 +143,32 @@ public final class FilterUtil {
      * --------------------------------------------------------------
      */
 
-    public final static <E, C extends Collection<? super E>> C filter(
+    /**
+     * 从数组中过滤出符合条件的数据项，并以{@link ArrayList}形式返回
+     *
+     * @param es     数组
+     * @param tester 匹配条件
+     * @param <E>    数组单项数据类型
+     *
+     * @return 返回数组中符合条件的所有项集合，确保返回结果不为 null（至少是个空集合）
+     */
+    public static <E> ArrayList<E> filter(E[] es, Predicate<? super E> tester) {
+        return filter(es, tester, new ArrayList<>());
+    }
+
+
+    /**
+     * 从数组中过滤出符合条件的数据项，并以{@link ArrayList}形式返回
+     *
+     * @param es     数组
+     * @param tester 匹配条件
+     * @param <E>    数组单项数据类型
+     *
+     * @return 返回数组中符合条件的所有项集合
+     *
+     * @throws NullPointerException tester 或 container 为 null 的话，可能抛出 NPE
+     */
+    public static <E, C extends Collection<? super E>> C filter(
         E[] es, Predicate<? super E> tester, C container
     ) {
         if (es != null) {
@@ -273,84 +182,148 @@ public final class FilterUtil {
     }
 
     /**
-     * 按条件 tester 过滤出集合 valuesList 中的匹配项
+     * 按条件 tester 过滤出集合 list 中的所有匹配项，以 List 形式返回
      *
-     * @param list
-     * @param tester
-     * @param <E>
-     * @param <L>
+     * @param list   过滤范围集合
+     * @param tester 过滤规则
+     * @param <E>    集合项数据类型
      *
-     * @return
+     * @return 符合过滤规则的数据集合
      */
-    public static <E, L extends List<E>> List<E> filter(L list, Predicate<? super E> tester) {
-        final Supplier supplier = Collects.getOrDefault(list, Collects.ArrayList);
+    public static <E> List<E> filter(List<E> list, Predicate<? super E> tester) {
+        final Supplier supplier = Collects.getOrDefault(list, Collects.ArrayLists);
         return (List) filter(list, tester, supplier);
     }
 
-    public static <E, L extends List<E>> List<E> multiplyFilter(L list, Predicate<? super E>... testers) {
-        final Supplier supplier = Collects.getOrDefault(list, Collects.HashSet);
-        return (List) multiplyFilterTo(list, supplier, testers);
+    /**
+     * 按条件 tester 过滤出集合 list 中的所有匹配项，以 List 形式返回
+     *
+     * @param list    过滤范围集合
+     * @param testers 过滤规则，多条件是“and”的关系
+     * @param <E>     集合项数据类型
+     *
+     * @return 符合过滤规则的数据集合
+     */
+    public static <E> List<E> filterOfAll(List<E> list, Predicate<? super E>... testers) {
+        final Supplier supplier = Collects.getOrDefault(list, Collects.HashSets);
+        return (List) filterOfAll(list, supplier, testers);
     }
 
     /**
-     * 按条件 tester 过滤出集合 set 中的匹配项
+     * 按条件 tester 过滤出集合 list 中的所有匹配项，以 List 形式返回
      *
-     * @param set
-     * @param tester
-     * @param <E>
-     * @param <S>
+     * @param list    过滤范围集合
+     * @param testers 过滤规则，多条件是“and”的关系
+     * @param <E>     集合项数据类型
      *
-     * @return
+     * @return 符合过滤规则的数据集合
      */
-    public static <E, S extends Set<E>> Set<E> filter(S set, Predicate<? super E> tester) {
-        final Supplier supplier = Collects.getOrDefault(set, Collects.HashSet);
+    public static <E> List<E> filterOfAny(List<E> list, Predicate<? super E>... testers) {
+        final Supplier supplier = Collects.getOrDefault(list, Collects.HashSets);
+        return (List) filterOfAny(list, supplier, testers);
+    }
+
+    /**
+     * 按条件 tester 过滤出集合 set 中的所有匹配项，以 Set 形式返回
+     *
+     * @param set    过滤范围集合
+     * @param tester 过滤规则
+     * @param <E>    集合项数据类型
+     *
+     * @return 符合过滤规则的数据集合
+     */
+    public static <E> Set<E> filter(Set<E> set, Predicate<? super E> tester) {
+        final Supplier supplier = Collects.getOrDefault(set, Collects.HashSets);
         return (Set) filter(set, tester, supplier);
     }
 
-    public static <E, S extends Set<E>> Set<E> multiplyFilter(S set, Predicate<? super E>... testers) {
-        final Supplier supplier = Collects.getOrDefault(set, Collects.HashSet);
-        return (Set) multiplyFilterTo(set, supplier, testers);
-    }
-
     /**
-     * 按条件 tester 过滤出集合 collect 中的匹配项
+     * 按条件 tester 过滤出集合 set 中的所有匹配项，以 Set 形式返回
      *
-     * @param collect
-     * @param tester
-     * @param resultContainerSupplier 符合过滤条件项容器构造器
-     * @param <E>
-     * @param <C>
-     * @param <CR>
+     * @param set     过滤范围集合
+     * @param testers 过滤规则，多条件是“and”的关系
+     * @param <E>     集合项数据类型
      *
-     * @return
+     * @return 符合过滤规则的数据集合
      */
-    public static <E, C extends Collection<E>, CR extends Collection<? super E>>
-
-    CR filter(C collect, Predicate<? super E> tester, Supplier<CR> resultContainerSupplier) {
-        return filter(collect, tester, resultContainerSupplier.get());
-    }
-
-    public static <E, C extends Collection<E>, CR extends Collection<? super E>>
-
-    CR multiplyFilterTo(C collect, Supplier<CR> resultContainerSupplier, Predicate<? super E>... testers) {
-        return multiplyFilterTo(collect, resultContainerSupplier.get(), testers);
+    public static <E> Set<E> filterOfAll(Set<E> set, Predicate<? super E>... testers) {
+        final Supplier supplier = Collects.getOrDefault(set, Collects.HashSets);
+        return (Set) filterOfAll(set, supplier, testers);
     }
 
     /**
-     * 按条件 tester 过滤出集合 collect 中的匹配项，添加到集合 container 并返回
+     * 按条件 tester 过滤出集合 set 中的所有匹配项，以 Set 形式返回
      *
-     * @param collect
-     * @param tester
+     * @param set     过滤范围集合
+     * @param testers 过滤规则，多条件是“and”的关系
+     * @param <E>     集合项数据类型
+     *
+     * @return 符合过滤规则的数据集合
+     */
+    public static <E> Set<E> filterOfAny(Set<E> set, Predicate<? super E>... testers) {
+        final Supplier supplier = Collects.getOrDefault(set, Collects.HashSets);
+        return (Set) filterOfAny(set, supplier, testers);
+    }
+
+    /**
+     * 按条件 tester 过滤出集合 collect 中的所有匹配项，自定义返回容器
+     *
+     * @param collect   过滤范围集合
+     * @param tester    过滤规则
+     * @param container 自定义集合容器
+     * @param <E>       集合项数据类型
+     * @param <CR>      自定义集合容器类型
+     *
+     * @return 符合过滤条件的数据集合
+     */
+    public static <E, CR extends Collection<? super E>> CR filter(
+        Collection<E> collect, Predicate<? super E> tester, Supplier<CR> container
+    ) { return filter(collect, tester, container.get()); }
+
+    /**
+     * 按条件 tester 过滤出集合 collect 中的所有匹配项，自定义返回容器
+     *
+     * @param collect   过滤范围集合
+     * @param container 自定义集合容器
+     * @param testers   过滤规则，多条件是“and”的关系
+     * @param <E>       集合项数据类型
+     * @param <CR>      自定义集合容器类型
+     *
+     * @return 符合过滤条件的数据集合
+     */
+    public static <E, CR extends Collection<? super E>> CR filterOfAll(
+        Collection<E> collect, Supplier<CR> container, Predicate<? super E>... testers
+    ) { return filterOfAll(collect, container.get(), testers); }
+
+    /**
+     * 按条件 tester 过滤出集合 collect 中的所有匹配项，自定义返回容器
+     *
+     * @param collect   过滤范围集合
+     * @param container 自定义集合容器
+     * @param testers   过滤规则，多条件是“or”的关系
+     * @param <E>       集合项数据类型
+     * @param <CR>      自定义集合容器类型
+     *
+     * @return 符合过滤条件的数据集合
+     */
+    public static <E, CR extends Collection<? super E>> CR filterOfAny(
+        Collection<E> collect, Supplier<CR> container, Predicate<? super E>... testers
+    ) { return filterOfAny(collect, container.get(), testers); }
+
+    /**
+     * 按条件 tester 过滤出集合 collect 中的匹配项，添加到集合 container 返回
+     *
+     * @param collect   过滤范围集合
+     * @param tester    自定义集合容器
      * @param container 符合过滤条件的容器
-     * @param <E>
-     * @param <C>
-     * @param <CR>
+     * @param <E>       集合项数据类型
+     * @param <CR>      自定义集合容器类型
      *
-     * @return 返回提供的容器 container
+     * @return 符合过滤条件的数据集合
      */
-    public static <E, C extends Iterable<E>, CR extends Collection<? super E>>
-
-    CR filter(C collect, Predicate<? super E> tester, CR container) {
+    public static <E, CR extends Collection<? super E>> CR filter(
+        Iterable<E> collect, Predicate<? super E> tester, CR container
+    ) {
         if (collect != null) {
             for (E item : collect) {
                 if (tester.test(item)) {
@@ -361,38 +334,74 @@ public final class FilterUtil {
         return container;
     }
 
-    public static <E, C extends Iterable<E>, CR extends Collection<? super E>>
-
-    CR multiplyFilterTo(C collect, CR container, Predicate<? super E>... testers) {
+    /**
+     * 按条件 tester 过滤出集合 collect 中的所有匹配项，自定义返回容器
+     *
+     * @param collect   过滤范围集合
+     * @param container 自定义集合容器
+     * @param testers   过滤规则，多条件是“and”的关系
+     * @param <E>       集合项数据类型
+     * @param <CR>      自定义集合容器类型
+     *
+     * @return 符合过滤条件的数据集合
+     */
+    public static <E, CR extends Collection<? super E>> CR filterOfAll(
+        Iterable<E> collect, CR container, Predicate<? super E>... testers
+    ) {
         if (collect != null) {
             int i;
-            final int len = testers.length;
-            if (len == 0) {
-                if (collect instanceof Collection) {
-                    container.addAll((Collection) collect);
-                } else {
+            final int len = testers == null ? 0 : testers.length;
+            switch (len) {
+                case 0:
+                    return CollectUtil.addAll(container, collect);
+                case 1:
+                    return filter(collect, testers[0], container);
+                default:
+                    outer:
                     for (E item : collect) {
+                        for (i = 0; i < len; i++) {
+                            if (!testers[i].test(item)) {
+                                continue outer;
+                            }
+                        }
                         container.add(item);
                     }
-                }
-                return container;
             }
-            boolean matched;
-            Predicate<? super E> tester;
-            outer:
-            for (E item : collect) {
-                matched = true;
-                inner:
-                for (i = 0; i < len; i++) {
-                    tester = testers[i];
-                    if (!tester.test(item)) {
-                        matched = false;
-                        break inner;
+        }
+        return container;
+    }
+
+    /**
+     * 按条件 tester 过滤出集合 collect 中的所有匹配项，自定义返回容器
+     *
+     * @param collect   过滤范围集合
+     * @param container 自定义集合容器
+     * @param testers   过滤规则，多条件是“or”的关系
+     * @param <E>       集合项数据类型
+     * @param <CR>      自定义集合容器类型
+     *
+     * @return 符合过滤条件的数据集合
+     */
+    public static <E, CR extends Collection<? super E>> CR filterOfAny(
+        Iterable<E> collect, CR container, Predicate<? super E>... testers
+    ) {
+        if (collect != null) {
+            int i;
+            final int len = testers == null ? 0 : testers.length;
+            switch (len) {
+                case 0:
+                    return CollectUtil.addAll(container, collect);
+                case 1:
+                    return filter(collect, testers[0], container);
+                default:
+                    for (E item : collect) {
+                        for (i = 0; i < len; i++) {
+                            if (testers[i].test(item)) {
+                                container.add(item);
+                                break;
+                            }
+                        }
                     }
-                }
-                if (matched) {
-                    container.add(item);
-                }
             }
         }
         return container;
@@ -407,10 +416,10 @@ public final class FilterUtil {
     /**
      * 遍历每一个符合条件的项
      *
-     * @param collect
-     * @param tester
-     * @param consumer
-     * @param <T>
+     * @param collect  遍历范围（集合）
+     * @param tester   匹配条件
+     * @param consumer 处理器
+     * @param <T>      集合单项数据类型
      */
     public static <T> void forEachMatched(
         Collection<T> collect, Predicate<? super T> tester, Consumer<T> consumer
@@ -427,10 +436,10 @@ public final class FilterUtil {
     /**
      * 遍历每一个符合条件的项
      *
-     * @param ts
-     * @param tester
-     * @param consumer
-     * @param <T>
+     * @param ts       遍历范围（数组）
+     * @param tester   匹配条件
+     * @param consumer 处理器
+     * @param <T>      集合单项数据类型
      */
     public static <T> void forEachMatched(
         T[] ts, Predicate<? super T> tester, Consumer<T> consumer

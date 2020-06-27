@@ -2,8 +2,11 @@ package com.moon.core.enums;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.TimeZone;
+
+import static com.moon.core.util.FilterUtil.requireFind;
 
 /**
  * @author benshaoye
@@ -112,37 +115,32 @@ public enum DateFormats implements EnumDescriptor {
     /**
      * default
      */
-    DEFAULT("") {
+    DEFAULT(null) {
         @Override
-        public String getTextAsChinese() { return This.DFT.getTextAsChinese(); }
+        public final String getChineseText() { return This.DFT.getChineseText(); }
 
         @Override
-        public String getTextAsEnglish() { return This.DFT.getTextAsEnglish(); }
+        public final String getEnglishText() { return This.DFT.getEnglishText(); }
     },
     ;
 
-    private final String textOfChinese;
+    private final String CHINESE_TEXT;
 
-    private static class This {
+    private final static class This {
 
-        private static boolean isChinese = false;
-        private static DateFormats DFT;
+        static final boolean inChina = This.isLocal(ASIA_SHANGHAI);
+        final static DateFormats DFT = requireFind(DateFormats.values(), This::isLocal);
 
-        static boolean test(DateFormats zone) {
+        static boolean isLocal(DateFormats zone) {
             Date date = new Date();
-            String str = "yyyy-MM-dd HH:mm:ss";
-            return get(str).format(date).equals(zone.with(str).format(date));
+            String zoned = zone.of(Const.PATTERN).format(date);
+            return get(Const.PATTERN).format(date).equals(zoned);
         }
 
         static DateFormat get(String pattern) { return new SimpleDateFormat(pattern); }
     }
 
-    DateFormats(String text) {
-        this.textOfChinese = text;
-        if (This.isChinese = This.isChinese || This.test(this)) {
-            This.DFT = This.DFT == null ? this : This.DFT;
-        }
-    }
+    DateFormats(String text) { this.CHINESE_TEXT = text; }
 
     public final DateFormat of(String pattern) { return with(pattern); }
 
@@ -154,16 +152,50 @@ public enum DateFormats implements EnumDescriptor {
         return format;
     }
 
+    /**
+     * 获取本地时区日期格式化器
+     *
+     * @param pattern 日期模式
+     *
+     * @return 本地时区日期格式化器
+     */
     public static DateFormat getLocal(String pattern) { return This.get(pattern); }
 
-    public TimeZone getTimeZone() { return TimeZone.getTimeZone(getTextAsEnglish()); }
+    /**
+     * 获取时区
+     *
+     * @return 时区
+     */
+    public TimeZone getTimeZone() { return TimeZone.getTimeZone(getEnglishText()); }
 
+    /**
+     * 获取时区 ID
+     *
+     * @return ZoneId
+     */
+    public ZoneId getZoneId() { return getTimeZone().toZoneId(); }
+
+    /**
+     * 获取文本描述信息
+     *
+     * @return 文本描述信息
+     */
     @Override
-    public final String getText() { return This.isChinese ? getTextAsChinese() : getTextAsEnglish(); }
+    public final String getText() { return This.inChina ? getChineseText() : getEnglishText(); }
 
-    public String getTextAsChinese() { return textOfChinese; }
+    /**
+     * 以中文方式获取文本描述
+     *
+     * @return 中文方式文本描述
+     */
+    public String getChineseText() { return CHINESE_TEXT; }
 
-    public String getTextAsEnglish() {
+    /**
+     * 以英文方式获取文本描述
+     *
+     * @return 英文方式文本描述
+     */
+    public String getEnglishText() {
         char[] chars = name().toCharArray();
         boolean isBegin = true;
         char ch;

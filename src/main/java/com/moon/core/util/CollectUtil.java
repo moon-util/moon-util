@@ -1,7 +1,5 @@
 package com.moon.core.util;
 
-import com.moon.core.lang.IntUtil;
-
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
@@ -9,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.IntFunction;
-import java.util.function.Predicate;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -20,7 +17,7 @@ public class CollectUtil extends BaseCollectUtil {
 
     protected CollectUtil() { noInstanceError(); }
 
-    public final static <E, C extends Collection<E>> int size(C collect) {
+    public final static <E> int size(Collection<E> collect) {
         return collect == null ? 0 : collect.size();
     }
 
@@ -37,17 +34,15 @@ public class CollectUtil extends BaseCollectUtil {
         return collect == null ? arrCreator.apply(0) : collect.toArray(arrCreator.apply(size(collect)));
     }
 
-    public final static <T> T[] toArrayOfEmpty(
-        Collection<? extends T> collect, IntFunction<? extends T[]> arrCreator, T[] emptyArr
-    ) {
-        return collect == null ? emptyArr : collect.toArray(arrCreator.apply(size(collect)));
-    }
+    public final static <T> T[] toArrayOrDefault(
+        Collection<? extends T> collect, IntFunction<? extends T[]> arrCreator, T[] defaultArr
+    ) { return collect == null ? defaultArr : collect.toArray(arrCreator.apply(size(collect))); }
 
-    public final static <E, C extends Collection<E>> boolean isEmpty(C collect) {
+    public final static <E> boolean isEmpty(Collection<E> collect) {
         return collect == null || collect.isEmpty();
     }
 
-    public final static <E, C extends Collection<E>> boolean isNotEmpty(C collect) { return !isEmpty(collect); }
+    public final static <E> boolean isNotEmpty(Collection<E> collect) { return !isEmpty(collect); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -55,14 +50,14 @@ public class CollectUtil extends BaseCollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public final static <E, C extends Collection<E>> C add(C collect, E element) {
+    public final static <E, C extends Collection<? super E>> C add(C collect, E element) {
         if (collect != null) {
             collect.add(element);
         }
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C add(C collect, E element1, E element2) {
+    public final static <E, C extends Collection<? super E>> C add(C collect, E element1, E element2) {
         if (collect != null) {
             collect.add(element1);
             collect.add(element2);
@@ -70,7 +65,7 @@ public class CollectUtil extends BaseCollectUtil {
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C addAll(C collect, E... elements) {
+    public final static <E, C extends Collection<? super E>> C addAll(C collect, E... elements) {
         if (collect != null && elements != null) {
             for (E element : elements) {
                 collect.add(element);
@@ -79,21 +74,25 @@ public class CollectUtil extends BaseCollectUtil {
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C addAll(C collect, Collection<E> collection) {
+    public final static <E, C extends Collection<? super E>> C addAll(C collect, Collection<? extends E> collection) {
         if (collect != null && collection != null) {
             collect.addAll(collection);
         }
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C addAll(C collect, Iterable<E> iterable) {
+    public final static <E, C extends Collection<? super E>> C addAll(C collect, Iterable<? extends E> iterable) {
         if (collect != null && iterable != null) {
-            iterable.forEach(collect::add);
+            if (iterable instanceof Collection) {
+                collect.addAll((Collection) iterable);
+            } else {
+                iterable.forEach(collect::add);
+            }
         }
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C addAll(C collect, Iterator<E> iterator) {
+    public final static <E, C extends Collection<? super E>> C addAll(C collect, Iterator<? extends E> iterator) {
         if (collect != null && iterator != null) {
             iterator.forEachRemaining(collect::add);
         }
@@ -107,14 +106,14 @@ public class CollectUtil extends BaseCollectUtil {
      */
 
 
-    public final static <E, C extends Collection<E>> C addSkipNull(C collect, E item) {
+    public final static <E, C extends Collection<? super E>> C addSkipNull(C collect, E item) {
         if (collect != null && item != null) {
             collect.add(item);
         }
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C addSkipNulls(C collect, E item1, E item2) {
+    public final static <E, C extends Collection<? super E>> C addSkipNulls(C collect, E item1, E item2) {
         if (collect != null) {
             if (item1 != null) {
                 collect.add(item1);
@@ -126,7 +125,7 @@ public class CollectUtil extends BaseCollectUtil {
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C addSkipNulls(C collect, E... items) {
+    public final static <E, C extends Collection<? super E>> C addSkipNulls(C collect, E... items) {
         if (collect != null) {
             E item;
             for (int i = 0; i < items.length; i++) {
@@ -138,7 +137,7 @@ public class CollectUtil extends BaseCollectUtil {
         return collect;
     }
 
-    public final static <E, C extends Collection<E>> C addSkipNulls(C collect, Iterable<E> iterable) {
+    public final static <E, C extends Collection<? super E>> C addSkipNulls(C collect, Iterable<? extends E> iterable) {
         if (collect != null) {
             for (E elem : iterable) {
                 if (elem != null) {
@@ -167,7 +166,7 @@ public class CollectUtil extends BaseCollectUtil {
 
     public final static <T> List<T> toList(T... items) { return ListUtil.newArrayList(items); }
 
-    public final static <E, T> T[] toTypeArray(Collection<E> collection, Class<T> componentType) {
+    public final static <E, T> T[] toArray(Collection<E> collection, Class<T> componentType) {
         int index = 0;
         Object array = Array.newInstance(componentType, collection.size());
         for (Object item : collection) {
@@ -182,19 +181,19 @@ public class CollectUtil extends BaseCollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public final static <T> boolean contains(Collection<T> collect, T item) {
+    public final static <T> boolean contains(Collection<? super T> collect, T item) {
         return collect != null && collect.contains(item);
     }
 
-    public final static <T> boolean containsAny(Collection<T> collect, T item1, T item2) {
+    public final static <T> boolean containsAny(Collection<? super T> collect, T item1, T item2) {
         return collect != null && (collect.contains(item1) || collect.contains(item2));
     }
 
-    public final static <T> boolean containsAll(Collection<T> collect, T item1, T item2) {
+    public final static <T> boolean containsAll(Collection<? super T> collect, T item1, T item2) {
         return collect != null && (collect.contains(item1) && collect.contains(item2));
     }
 
-    public final static <T> boolean containsAny(Collection<T> collect, T... items) {
+    public final static <T> boolean containsAny(Collection<? super T> collect, T... items) {
         if (collect == null) {
             return false;
         }
@@ -206,7 +205,7 @@ public class CollectUtil extends BaseCollectUtil {
         return false;
     }
 
-    public final static <T> boolean containsAll(Collection<T> collect, T... items) {
+    public final static <T> boolean containsAll(Collection<? super T> collect, T... items) {
         if (collect == null) {
             return false;
         }
@@ -234,86 +233,23 @@ public class CollectUtil extends BaseCollectUtil {
     }
 
     public final static <T> boolean containsAll(Collection<T> collect1, Collection<T> collect2) {
-        return collect1 == collect2 ? true : (collect1 != null && collect1.containsAll(collect2));
+        return collect1 == collect2 || (collect1 != null && collect1.containsAll(collect2));
     }
 
-    /*
-     * ---------------------------------------------------------------------------------
-     * matchers
-     * ---------------------------------------------------------------------------------
+    /**
+     * 要求空集合，即集合中至少有一项数据
+     *
+     * @param collect 待测集合
+     * @param message 自定义消息模板
+     * @param <C>     集合泛型类型
+     *
+     * @return 若集合中至少有一项数据时返回集合本身
+     *
+     * @throws IllegalArgumentException 若集合为 null 或长度为 0 时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参集合
      */
-
-    public final static <T> boolean matchAny(Collection<T> collect, Predicate<T> matcher) {
-        if (collect != null) {
-            for (T item : collect) {
-                if (matcher.test(item)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public final static <T> boolean matchAll(Collection<T> collect, Predicate<T> matcher) {
-        if (collect != null) {
-            for (T item : collect) {
-                if (!matcher.test(item)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /*
-     * ---------------------------------------------------------------------------------
-     * requires
-     * ---------------------------------------------------------------------------------
-     */
-
-    public final static <E, C extends Collection<E>> C requireNotEmpty(C collect) {
-        return requireNotEmpty(collect, null);
-    }
-
-    public final static <E, C extends Collection<E>> C requireNotEmpty(C collect, String errorMessage) {
-        if (isEmpty(collect)) {
-            throw new IllegalArgumentException(errorMessage);
-        }
-        return collect;
-    }
-
-    public final static <E, C extends Collection<E>> C requireSizeEq(C collect, int expectedSize) {
-        IntUtil.requireEq(size(collect), expectedSize);
-        return collect;
-    }
-
-    public final static <E, C extends Collection<E>> C requireSizeEq(C collect, int expectedSize, String errorMessage) {
-        IntUtil.requireEq(size(collect), expectedSize, errorMessage);
-        return collect;
-    }
-
-    public final static <E, C extends Collection<E>> C requireSizeGtOrEq(C collect, int expectedMinSize) {
-        IntUtil.requireGtOrEq(size(collect), expectedMinSize);
-        return collect;
-    }
-
-    public final static <E, C extends Collection<E>> C requireSizeGtOrEq(
-        C collect, int expectedMinSize, String errorMessage
-    ) {
-        IntUtil.requireGtOrEq(size(collect), expectedMinSize, errorMessage);
-        return collect;
-    }
-
-    public final static <E, C extends Collection<E>> C requireSizeLtOrEq(C collect, int expectedMaxSize) {
-        IntUtil.requireLtOrEq(size(collect), expectedMaxSize);
-        return collect;
-    }
-
-    public final static <E, C extends Collection<E>> C requireSizeLtOrEq(
-        C collect, int expectedMaxSize, String errorMessage
-    ) {
-        IntUtil.requireLtOrEq(size(collect), expectedMaxSize, errorMessage);
-        return collect;
+    static <E, C extends Collection<E>> C requireNotEmpty(C collect, String message) {
+        return ValidateUtil.requireNotEmpty(collect, message);
     }
 }

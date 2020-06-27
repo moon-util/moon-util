@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 /**
+ * 集合倒序迭代器
+ *
  * @author benshaoye
  */
 public class ReverseIterator<E> implements Iterator<E> {
@@ -16,7 +18,7 @@ public class ReverseIterator<E> implements Iterator<E> {
 
     private ReverseIterator(ListIterator<E> iterator) {this.iterator = iterator;}
 
-    public static <T> Iterator of(Collection<? extends T> collect) {
+    public static <T> Iterator<T> of(Collection<? extends T> collect) {
         return collect == null ? EmptyIterator.EMPTY : new ReverseIterator<>(collect);
     }
 

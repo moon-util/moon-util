@@ -502,7 +502,7 @@ public class CalendarUtil {
     public final static Calendar toCalendar(CharSequence value) {
         if (value == null) { return null; }
         String temp = value.toString();
-        return DetectUtil.isNumeric(temp) ? toCalendar(LongUtil.toLong(temp)) : parseToCalendar(temp);
+        return TestUtil.isDigit(temp) ? toCalendar(LongUtil.toLong(temp)) : parseToCalendar(temp);
     }
 
     public final static Calendar toCalendar(Object value) {

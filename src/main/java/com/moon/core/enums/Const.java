@@ -22,11 +22,11 @@ public final class Const {
     /**
      * ","——英文逗号
      */
-    public static final char CHAR_COMMMA = Chars.COMMA.value;
+    public static final char CHAR_COMMA = Chars.COMMA.value;
     public static final char CHAR_MINUS = Chars.MINUS.value;
 
     /**
-     * EMPTY string
+     * string
      */
     public static final String EMPTY = Strings.EMPTY.value;
     public static final String STR_TRUE = String.valueOf(TRUE);
@@ -39,11 +39,11 @@ public final class Const {
      */
     public static final String STR_COMMA = Strings.COMMA.value;
 
-    public final static String DATE_PATTERN = yyyy_MM_dd;
+    public final static String PATTERN_DATE = yyyy_MM_dd;
 
-    public final static String MONTH_PATTERN = yyyy_MM;
+    public final static String PATTERN_MONTH = yyyy_MM;
 
-    public final static String TIME_PATTERN = HH_mm_ss;
+    public final static String PATTERN_TIME = HH_mm_ss;
 
     public final static String PATTERN = yyyy_MM_dd_HH_mm_ss;
 

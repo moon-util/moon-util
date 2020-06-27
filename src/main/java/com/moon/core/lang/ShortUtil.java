@@ -1,8 +1,9 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.DetectUtil;
+import com.moon.core.enums.Arrays2;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.util.TestUtil.isIntegerValue;
 
 /**
  * @author benshaoye
@@ -18,7 +19,7 @@ public final class ShortUtil {
     }
 
     public static boolean matchFloat(Object obj) {
-        return DetectUtil.isDouble(String.valueOf(obj));
+        return isIntegerValue(String.valueOf(obj));
     }
 
     public static short toShortValue(double value) {
@@ -49,10 +50,6 @@ public final class ShortUtil {
         return value == null ? null : value.shortValue();
     }
 
-    public static Short toShort(Short value) {
-        return value == null ? null : value.shortValue();
-    }
-
     public static Short toShort(Integer value) {
         return value == null ? null : value.shortValue();
     }
@@ -66,7 +63,7 @@ public final class ShortUtil {
     }
 
     public static Short toShort(Boolean value) {
-        return value == null ? null : Short.valueOf(String.valueOf(value.booleanValue() ? 1 : 0));
+        return value == null ? null : Short.valueOf(String.valueOf(value ? 1 : 0));
     }
 
     public static Short toShort(Character value) {
@@ -98,15 +95,15 @@ public final class ShortUtil {
      * StringBuilder value = new StringBuilder("  1   ");  // == 1
      * BigDecimal value = new BigDecimal("1");  // ============= 1
      * BigInteger value = new BigInteger("1");  // ============= 1
-     * Collection value = new ArrayList(){{increment(1)}};  // ======= 1（只有一项时）
-     * Collection value = new HashSet(){{increment(1)}};  // ========= 1（只有一项时）
-     * Collection value = new TreeSet(){{increment(1)}};  // ========= 1（只有一项时）
-     * Collection value = new LinkedList(){{increment(1)}};  // ====== 1（只有一项时）
+     * Collection value = new ArrayList(){{put(1)}};  // ======= 1（只有一项时）
+     * Collection value = new HashSet(){{put(1)}};  // ========= 1（只有一项时）
+     * Collection value = new TreeSet(){{put(1)}};  // ========= 1（只有一项时）
+     * Collection value = new LinkedList(){{put(1)}};  // ====== 1（只有一项时）
      * Map value = new HashMap(){{put("key", 1)}};  // ========= 1（只有一项时）
      * <p>
      * int[] value = {1, 2, 3, 4};  // ======================================== 4（大于一项时，返回 size）
      * String[] value = {"1", "1", "1", "1"};  // ============================= 4（大于一项时，返回 size）
-     * Collection value = new ArrayList(){{increment(1);increment(1);increment(1);}};  // ======= 3（大于一项时，返回 size）
+     * Collection value = new ArrayList(){{put(1);put(1);put(1);}};  // ======= 3（大于一项时，返回 size）
      * Map value = new HashMap(){{put("key", 1);put("name", 2);}};  // ======== 2（大于一项时，返回 size）
      * <p>
      * Short result = ShortUtil.toShort(value);
@@ -132,7 +129,7 @@ public final class ShortUtil {
             return Short.parseShort(value.toString().trim());
         }
         if (value instanceof Boolean) {
-            return Short.valueOf(String.valueOf(((Boolean) value).booleanValue() ? 1 : 0));
+            return Short.valueOf(String.valueOf((Boolean) value ? 1 : 0));
         }
         try {
             return toShort(SupportUtil.onlyOneItemOrSize(value));
@@ -151,7 +148,7 @@ public final class ShortUtil {
      */
     public static short toShortValue(Object value) {
         Short result = toShort(value);
-        return result == null ? 0 : result.shortValue();
+        return result == null ? 0 : result;
     }
 
     public static short max(short... values) {
@@ -203,119 +200,17 @@ public final class ShortUtil {
         return sum;
     }
 
-    public static Short avg(Short[] values) {
-        int ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return (short) (ret / len);
+    public static Short toObjectArr(short... values) {
+        return Arrays2.FLOATS.toObjects(values);
     }
 
-    public static Short avgIgnoreNull(Short... values) {
-        int ret = 0;
-        Short temp;
-        int count = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-                count++;
-            }
+    public static short[] toPrimitiveArr(short defaultIfNull, Short... values) {
+        int length = values == null ? 0 : values.length;
+        if (length == 0) { return Arrays2.FLOATS.empty(); }
+        short[] result = new short[length];
+        for (int i = 0; i < length; i++) {
+            result[i] = values[i] == null ? defaultIfNull : values[i];
         }
-        return (short) (ret / count);
-    }
-
-    public static Short sum(Short[] values) {
-        short ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret;
-    }
-
-    public static Short sumIgnoreNull(Short... values) {
-        short ret = 0;
-        Short temp;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-            }
-        }
-        return ret;
-    }
-
-    public static Short multiply(Short[] values) {
-        short ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret *= values[i];
-        }
-        return ret;
-    }
-
-    public static Short multiplyIgnoreNull(Short... values) {
-        int ret = 1;
-        int len = values.length;
-        Short tmp;
-        for (int i = 0; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null) {
-                ret *= tmp;
-            }
-        }
-        return (short) ret;
-    }
-
-    public static Short max(Short[] values) {
-        int len = values.length;
-        short ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] > ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Short maxIgnoreNull(Short... values) {
-        int len = values.length;
-        short ret = values[0];
-        Short tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp > ret) {
-                ret = tmp;
-            }
-        }
-        return ret;
-    }
-
-    public static Short min(Short[] values) {
-        int len = values.length;
-        short ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] < ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Short minIgnoreNull(Short... values) {
-        int len = values.length;
-        short ret = values[0];
-        Short tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp < ret) {
-                ret = tmp;
-            }
-        }
-        return ret;
+        return result;
     }
 }

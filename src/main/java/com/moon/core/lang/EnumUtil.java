@@ -2,6 +2,7 @@ package com.moon.core.lang;
 
 import com.moon.core.util.DetectUtil;
 import com.moon.core.util.ListUtil;
+import com.moon.core.util.TestUtil;
 
 import java.util.*;
 
@@ -205,7 +206,7 @@ public final class EnumUtil {
             return (T) value;
         } else if (value instanceof CharSequence) {
             String name = value.toString();
-            if (DetectUtil.isNumeric(name)) {
+            if (TestUtil.isNumeric(name)) {
                 int ordinal = Integer.parseInt(name);
                 return toEnum(enumType, ordinal);
             }

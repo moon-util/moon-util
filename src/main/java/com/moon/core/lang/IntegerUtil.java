@@ -79,7 +79,7 @@ public final class IntegerUtil {
      * Collection value = new HashSet(){{put(1)}};  // ========= 1（只有一项时）
      * Collection value = new TreeSet(){{put(1)}};  // ========= 1（只有一项时）
      * Collection value = new LinkedList(){{put(1)}};  // ====== 1（只有一项时）
-     * Map value = new HashMap(){{put("key", 1)}};  // =============== 1（只有一项时）
+     * Map value = new HashMap(){{put("key", 1)}};  // ========= 1（只有一项时）
      * <p>
      * int[] value = {1, 2, 3, 4};  // ======================================== 4（大于一项时，返回 size）
      * String[] value = {"1", "1", "1", "1"};  // ============================= 4（大于一项时，返回 size）
@@ -107,123 +107,7 @@ public final class IntegerUtil {
         try {
             return IntUtil.toIntValue(SupportUtil.onlyOneItemOrSize(object));
         } catch (Exception e) {
-            return ThrowUtil.runtime(e, String.format("Can not cast to int of: {}", object));
+            return ThrowUtil.runtime(e, String.format("Can not cast to int of: %s", object));
         }
-    }
-
-    public static Integer avg(Integer... values) {
-        Integer ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret / len;
-    }
-
-    public static Integer avgIgnoreNull(Integer... values) {
-        int ret = 0;
-        Integer temp;
-        int count = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-                count++;
-            }
-        }
-        return ret / count;
-    }
-
-    public static Integer sum(Integer... values) {
-        Integer ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret;
-    }
-
-    public static Integer sumIgnoreNull(Integer... values) {
-        int ret = 0;
-        Integer temp;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-            }
-        }
-        return ret;
-    }
-
-    public static Integer multiply(Integer... values) {
-        int ret = 1;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret *= values[i];
-        }
-        return ret;
-    }
-
-    public static Integer multiplyIgnoreNull(Integer... values) {
-        int ret = 1;
-        int len = values.length;
-        Integer tmp;
-        for (int i = 0; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null) {
-                ret *= tmp;
-            }
-        }
-        return ret;
-    }
-
-    public static Integer max(Integer... values) {
-        int len = values.length;
-        int ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] > ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Integer maxIgnoreNull(Integer... values) {
-        int len = values.length;
-        int ret = values[0];
-        Integer tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp > ret) {
-                ret = tmp;
-            }
-        }
-        return ret;
-    }
-
-    public static Integer min(Integer... values) {
-        int len = values.length;
-        int ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] < ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Integer minIgnoreNull(Integer... values) {
-        int len = values.length;
-        int ret = values[0];
-        Integer tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp < ret) {
-                ret = tmp;
-            }
-        }
-        return ret;
     }
 }

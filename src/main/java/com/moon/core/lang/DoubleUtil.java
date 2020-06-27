@@ -1,15 +1,17 @@
 package com.moon.core.lang;
 
+import com.moon.core.enums.Arrays2;
 import com.moon.core.exception.NumberException;
-import com.moon.core.util.DetectUtil;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.util.TestUtil.isDoubleValue;
 import static java.lang.String.format;
 
 /**
  * @author benshaoye
  */
 public final class DoubleUtil {
+
     private DoubleUtil() {
         noInstanceError();
     }
@@ -92,6 +94,7 @@ public final class DoubleUtil {
      * @param value
      * @param min
      * @param max
+     *
      * @return
      */
     public static double requireInRange(double value, double min, double max) {
@@ -112,6 +115,7 @@ public final class DoubleUtil {
      * @param value
      * @param min
      * @param max
+     *
      * @return
      */
     public static double requireBetween(double value, double min, double max) {
@@ -130,13 +134,7 @@ public final class DoubleUtil {
         return obj != null && obj.getClass() == Double.class;
     }
 
-    public static boolean matchDouble(CharSequence obj) {
-        return DetectUtil.isDouble(String.valueOf(obj));
-    }
-
-    public static Double toDouble(double value) {
-        return Double.valueOf(value);
-    }
+    public static boolean matchDouble(CharSequence obj) { return isDoubleValue(String.valueOf(obj)); }
 
     public static Double toDouble(Byte value) {
         return value == null ? null : value.doubleValue();
@@ -158,12 +156,10 @@ public final class DoubleUtil {
         return value == null ? null : value.doubleValue();
     }
 
-    public static Double toDouble(Boolean value) {
-        return value == null ? null : Double.valueOf((value.booleanValue() ? 1 : 0));
-    }
+    public static Double toDouble(Boolean value) { return value == null ? null : (value ? 1D : 0D); }
 
     public static Double toDouble(Character value) {
-        return value == null ? null : Double.valueOf(value.charValue());
+        return value == null ? null : (double) value;
     }
 
     /**
@@ -205,7 +201,9 @@ public final class DoubleUtil {
      * Double result = DoubleUtil.toDouble(value);
      *
      * @param value
+     *
      * @return
+     *
      * @see IntUtil#toIntValue(Object)
      * @see #toDoubleValue(Object)
      */
@@ -213,7 +211,6 @@ public final class DoubleUtil {
         if (value == null) {
             return null;
         }
-
         if (value instanceof Double) {
             return (Double) value;
         }
@@ -235,7 +232,9 @@ public final class DoubleUtil {
 
     /**
      * @param value
+     *
      * @return
+     *
      * @see IntUtil#toIntValue(Object)
      * @see #toDouble(Object)
      */
@@ -293,119 +292,17 @@ public final class DoubleUtil {
         return sum;
     }
 
-    public static Double avg(Double[] values) {
-        Double ret = Double.valueOf(0);
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret / len;
+    public static Double toObjectArr(float... values) {
+        return Arrays2.FLOATS.toObjects(values);
     }
 
-    public static Double avgIgnoreNull(Double... values) {
-        int ret = 0;
-        Double temp;
-        double count = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-                count++;
-            }
+    public static double[] toPrimitiveArr(double defaultIfNull, Double... values) {
+        int length = values == null ? 0 : values.length;
+        if (length == 0) { return Arrays2.FLOATS.empty(); }
+        double[] result = new double[length];
+        for (int i = 0; i < length; i++) {
+            result[i] = values[i] == null ? defaultIfNull : values[i];
         }
-        return ret / count;
-    }
-
-    public static Double sum(Double[] values) {
-        Double ret = Double.valueOf(0);
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret;
-    }
-
-    public static Double sumIgnoreNull(Double... values) {
-        Double ret = Double.valueOf(0);
-        Double temp;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-            }
-        }
-        return ret;
-    }
-
-    public static Double multiply(Double[] values) {
-        Double ret = Double.valueOf(1);
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret *= values[i];
-        }
-        return ret;
-    }
-
-    public static Double multiplyIgnoreNull(Double... values) {
-        Double ret = Double.valueOf(1);
-        int len = values.length;
-        Double tmp;
-        for (int i = 0; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null) {
-                ret *= tmp;
-            }
-        }
-        return ret;
-    }
-
-    public static Double max(Double[] values) {
-        int len = values.length;
-        Double ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] > ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Double maxIgnoreNull(Double... values) {
-        int len = values.length;
-        Double ret = values[0];
-        Double tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp > ret) {
-                ret = tmp;
-            }
-        }
-        return ret;
-    }
-
-    public static Double min(Double[] values) {
-        int len = values.length;
-        Double ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] < ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Double minIgnoreNull(Double... values) {
-        int len = values.length;
-        Double ret = values[0];
-        Double tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp < ret) {
-                ret = tmp;
-            }
-        }
-        return ret;
+        return result;
     }
 }

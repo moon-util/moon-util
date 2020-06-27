@@ -1,13 +1,18 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.DetectUtil;
+import com.moon.core.enums.Arrays2;
 
+import static com.moon.core.lang.StringUtil.stringify;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static com.moon.core.util.TestUtil.isDoubleValue;
+import static java.lang.Float.parseFloat;
+import static java.lang.Float.valueOf;
 
 /**
  * @author benshaoye
  */
 public final class FloatUtil {
+
     private FloatUtil() {
         noInstanceError();
     }
@@ -16,16 +21,16 @@ public final class FloatUtil {
         return o != null && o.getClass() == Float.class;
     }
 
-    public static boolean matchDouble(Object o) {
-        return DetectUtil.isDouble(String.valueOf(o));
+    public static boolean matchFloat(Object o) {
+        return isDoubleValue(stringify(o));
     }
 
     public static Float toFloat(Boolean bool) {
-        return bool == null ? null : Float.valueOf((bool ? 1 : 0));
+        return bool == null ? null : (float) (bool ? 1 : 0);
     }
 
     public static Float toFloat(Character value) {
-        return value == null ? null : Float.valueOf(value);
+        return value == null ? null : valueOf(value);
     }
 
     public static Float toFloat(Byte value) {
@@ -40,16 +45,12 @@ public final class FloatUtil {
         return value == null ? null : value.floatValue();
     }
 
-    public static Float toFloat(Float value) {
-        return value == null ? null : value.floatValue();
-    }
-
     public static Float toFloat(Double value) {
         return value == null ? null : value.floatValue();
     }
 
     public static Float toFloat(CharSequence cs) {
-        return cs == null ? null : Float.parseFloat(cs.toString());
+        return cs == null ? null : parseFloat(cs.toString());
     }
 
     /**
@@ -91,7 +92,9 @@ public final class FloatUtil {
      * Float result = FloatUtil.toFloat(value);
      *
      * @param object
+     *
      * @return
+     *
      * @see IntUtil#toIntValue(Object)
      * @see #toFloatValue(Object)
      */
@@ -106,10 +109,10 @@ public final class FloatUtil {
             return ((Number) object).floatValue();
         }
         if (object instanceof CharSequence) {
-            return Float.parseFloat(object.toString().trim());
+            return parseFloat(object.toString().trim());
         }
         if (object instanceof Boolean) {
-            return Float.valueOf((boolean) object ? 1 : 0);
+            return (float) ((boolean) object ? 1 : 0);
         }
         try {
             Object firstItem = SupportUtil.onlyOneItemOrSize(object);
@@ -121,13 +124,15 @@ public final class FloatUtil {
 
     /**
      * @param value
+     *
      * @return
+     *
      * @see IntUtil#toIntValue(Object)
      * @see #toFloat(Object)
      */
     public static float toFloatValue(Object value) {
         Float result = toFloat(value);
-        return result == null ? 0 : result.floatValue();
+        return result == null ? 0 : result;
     }
 
     public static float avg(float... values) {
@@ -138,66 +143,11 @@ public final class FloatUtil {
         return ret / len;
     }
 
-    public static Float avg(Float[] values) {
-        float ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret / len;
-    }
-
-    public static Float avgIgnoreNull(Float... values) {
-        float ret = 0;
-        Float temp;
-        int count = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-                count++;
-            }
-        }
-        return ret / count;
-    }
-
     public static float sum(float... values) {
         float ret = 0;
         int len = values.length;
         for (int i = 0; i < len; i++) {
             ret += values[i];
-        }
-        return ret;
-    }
-
-    public static Float sum(Float[] values) {
-        float ret = 0;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret += values[i];
-        }
-        return ret;
-    }
-
-    public static Float sumIgnoreNull(Float... values) {
-        float ret = 0;
-        Float temp;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            temp = values[i];
-            if (temp != null) {
-                ret += temp;
-            }
-        }
-        return ret;
-    }
-
-    public static Float multiply(Float[] values) {
-        float ret = 1;
-        int len = values.length;
-        for (int i = 0; i < len; i++) {
-            ret *= values[i];
         }
         return ret;
     }
@@ -211,49 +161,12 @@ public final class FloatUtil {
         return ret;
     }
 
-    public static Float multiplyIgnoreNull(Float... values) {
-        float ret = 1;
-        int len = values.length;
-        Float tmp;
-        for (int i = 0; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null) {
-                ret *= tmp;
-            }
-        }
-        return ret;
-    }
-
     public static float max(float... values) {
         int len = values.length;
         float ret = values[0];
         for (int i = 1; i < len; i++) {
             if (values[i] > ret) {
                 ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Float max(Float[] values) {
-        int len = values.length;
-        float ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] > ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
-    }
-
-    public static Float maxIgnoreNull(Float... values) {
-        int len = values.length;
-        float ret = values[0];
-        Float tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp > ret) {
-                ret = tmp;
             }
         }
         return ret;
@@ -270,27 +183,17 @@ public final class FloatUtil {
         return ret;
     }
 
-    public static Float min(Float[] values) {
-        int len = values.length;
-        float ret = values[0];
-        for (int i = 1; i < len; i++) {
-            if (values[i] < ret) {
-                ret = values[i];
-            }
-        }
-        return ret;
+    public static Float toObjectArr(float... values) {
+        return Arrays2.FLOATS.toObjects(values);
     }
 
-    public static Float minIgnoreNull(Float... values) {
-        int len = values.length;
-        float ret = values[0];
-        Float tmp;
-        for (int i = 1; i < len; i++) {
-            tmp = values[i];
-            if (tmp != null && tmp < ret) {
-                ret = tmp;
-            }
+    public static float[] toPrimitiveArr(float defaultIfNull, Float... values) {
+        int length = values == null ? 0 : values.length;
+        if (length == 0) { return Arrays2.FLOATS.empty(); }
+        float[] result = new float[length];
+        for (int i = 0; i < length; i++) {
+            result[i] = values[i] == null ? defaultIfNull : values[i];
         }
-        return ret;
+        return result;
     }
 }

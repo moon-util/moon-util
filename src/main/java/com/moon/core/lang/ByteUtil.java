@@ -1,6 +1,6 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.DetectUtil;
+import com.moon.core.util.TestUtil;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -19,7 +19,7 @@ public final class ByteUtil {
     }
 
     public static boolean matchNumber(Object o) {
-        return DetectUtil.isNumber(String.valueOf(o));
+        return TestUtil.isGeneralNumber(String.valueOf(o));
     }
 
     public static Byte toByte(Boolean bool) {

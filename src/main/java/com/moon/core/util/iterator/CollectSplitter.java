@@ -28,6 +28,7 @@ import java.util.function.Consumer;
  * @author benshaoye
  */
 public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> {
+
     /**
      * 默认没拆分后每个集合项目个数
      */
@@ -79,6 +80,7 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      *
      * @param t
      * @param count
+     *
      * @return
      */
     public CollectSplitter split(T t, int count) {
@@ -111,7 +113,7 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
             Class type = src.getClass();
             if (length == 1) {
                 container[0] = this.src;
-            } else if ((containerSupplier = Collects.getAsSuper(type)) == null) {
+            } else if ((containerSupplier = Collects.getAsSuperOrNull(type)) == null) {
                 try {
                     this.constructor = type.getConstructor(int.class);
                 } catch (NoSuchMethodException e) {
@@ -187,10 +189,8 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
                     c = this.constructor.newInstance(count);
                 }
                 return c;
-            } catch (InstantiationException
-                | IllegalAccessException
-                | InvocationTargetException e) {
-                throw new IllegalArgumentException(e);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new IllegalStateException(e);
             }
         } else {
             return (T) containerSupplier.apply(this.count);
@@ -211,6 +211,7 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      * Returns the next element in the iteration.
      *
      * @return the next element in the iteration
+     *
      * @see NoSuchElementException if the iteration has no more cells
      */
     @Override
@@ -220,6 +221,7 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
      * 工具，返回集合 size
      *
      * @param c collection
+     *
      * @return size of collection
      */
     private int size(Collection c) { return c == null ? 0 : c.size(); }

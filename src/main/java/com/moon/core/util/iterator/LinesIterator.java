@@ -12,7 +12,7 @@ import java.util.Iterator;
 /**
  * @author benshaoye
  */
-public class LinesIterator implements Iterator<String> {
+public class LinesIterator implements Iterator<String>, Closeable {
 
     private BufferedReader reader;
     private final boolean initSuccess;
@@ -126,6 +126,11 @@ public class LinesIterator implements Iterator<String> {
      * tools
      * -------------------------------------------------------------
      */
+
+    @Override
+    public void close() {
+        this.clear();
+    }
 
     public void clear() {
         if (this.autoClose) {

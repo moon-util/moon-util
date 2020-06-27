@@ -18,7 +18,7 @@ class PropertiesUtilTestTest {
         "/test2.properties",
         "/test3.properties",
     };
-    String path = FilterUtil.requireFirst(paths, Testers.isNull.not);
+    String path = FilterUtil.requireFind(paths, Testers.isNull.not);
 
     @Test
     void testRefreshAll() {
