@@ -272,6 +272,23 @@ public final class MapUtil {
      */
 
     /**
+     * 要求指定映射必须存在非 null 值
+     *
+     * @param map map 集合
+     * @param key 映射名
+     * @param <K> Map 键数据类型
+     * @param <V> Map 值数据类型
+     *
+     * @return 指定键的返回值
+     *
+     * @throws NullPointerException 当 map == null 或 指定键对应的值不存在或者值为 null 时抛出异常
+     */
+    public static <K, V> V requireGet(Map<K, V> map, K key) {
+        Objects.requireNonNull(map);
+        return Objects.requireNonNull(map.get(key));
+    }
+
+    /**
      * 按指定类型获取 map 的值
      *
      * @param map
@@ -363,44 +380,37 @@ public final class MapUtil {
 
     public static <K> char getOrDefault(Map<K, ?> map, K key, char defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Character ? (Character) value : defaultVal);
+        return map == null ? defaultVal : ((value = map.get(key)) instanceof Character ? (Character) value : defaultVal);
     }
 
     public static <K> double getOrDefault(Map<K, ?> map, K key, double defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Number ? ((Number) value).doubleValue() : defaultVal);
+        return map == null ? defaultVal : ((value = map.get(key)) instanceof Number ? ((Number) value).doubleValue() : defaultVal);
     }
 
     public static <K> float getOrDefault(Map<K, ?> map, K key, float defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Number ? ((Number) value).floatValue() : defaultVal);
+        return map == null ? defaultVal : ((value = map.get(key)) instanceof Number ? ((Number) value).floatValue() : defaultVal);
     }
 
     public static <K> long getOrDefault(Map<K, ?> map, K key, long defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Number ? ((Number) value).longValue() : defaultVal);
+        return map == null ? defaultVal : ((value = map.get(key)) instanceof Number ? ((Number) value).longValue() : defaultVal);
     }
 
     public static <K> int getOrDefault(Map<K, ?> map, K key, int defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Number ? ((Number) value).intValue() : defaultVal);
+        return map == null ? defaultVal : ((value = map.get(key)) instanceof Number ? ((Number) value).intValue() : defaultVal);
     }
 
     public static <K> short getOrDefault(Map<K, ?> map, K key, short defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Number ? ((Number) value).shortValue() : defaultVal);
+        return map == null ? defaultVal : ((value = map.get(key)) instanceof Number ? ((Number) value).shortValue() : defaultVal);
     }
 
     public static <K> byte getOrDefault(Map<K, ?> map, K key, byte defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : ((value = map.get(key)) instanceof Number ? ((Number) value).byteValue() : defaultVal);
+        return map == null ? defaultVal : ((value = map.get(key)) instanceof Number ? ((Number) value).byteValue() : defaultVal);
     }
 
     public static <K> boolean getOrDefault(Map<K, ?> map, K key, boolean defaultVal) {
@@ -432,8 +442,7 @@ public final class MapUtil {
 
     public static <K> String getOrDefault(Map<K, ?> map, K key, String defaultVal) {
         Object value;
-        return map == null ? defaultVal
-            : (value = map.get(key)) instanceof CharSequence ? value.toString() : defaultVal;
+        return map == null ? defaultVal : (value = map.get(key)) instanceof CharSequence ? value.toString() : defaultVal;
     }
 
     public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultVal) {

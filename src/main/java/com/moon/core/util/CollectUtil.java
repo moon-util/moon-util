@@ -1,5 +1,9 @@
 package com.moon.core.util;
 
+import com.moon.core.enums.Collects;
+import com.moon.core.enums.Lists;
+import com.moon.core.enums.Sets;
+
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
@@ -157,6 +161,27 @@ public class CollectUtil extends BaseCollectUtil {
     public final static <T, O, C1 extends Collection<T>> Collection<O> map(C1 src, Function<? super T, O> function) {
         return IteratorUtil.map(src, function);
     }
+
+    /**
+     * 转换集合中的每一项，并放进另一个集合中
+     *
+     * @param src       源集合
+     * @param function  转换器
+     * @param container 返回集合容器
+     * @param <T>       源项数据类型
+     * @param <O>       转换后的项数据类型
+     * @param <C1>      源集合类型
+     * @param <CR>      返回集合类型
+     *
+     * @return container
+     *
+     * @see Collects 一些常见的集合构造器，都是 JDK 中提供的
+     * @see Lists 一些常见的 List 构造器，都是 JDK 中提供的
+     * @see Sets 一些常见的 Set 构造器，都是 JDK 中提供的
+     */
+    public final static <T, O, C1 extends Collection<T>, CR extends Collection<O>> CR map(
+        C1 src, Function<? super T, O> function, IntFunction<CR> container
+    ) { return IteratorUtil.mapTo(src, function, container); }
 
     public final static <T> Collection<T> concat(Collection<T> collect, Collection<T>... collections) {
         return concat0(collect, collections);

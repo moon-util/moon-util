@@ -40,4 +40,9 @@ public class ArrayUtilTest {
         ArrayUtil.reverse(values);
         assertEquals(JoinerUtil.join(values, ","), "8,7,6,5,4,3,2,1");
     }
+
+    @Test
+    void testSum() throws Exception {
+        int[] ints = {};
+    }
 }

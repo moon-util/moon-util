@@ -1,5 +1,7 @@
 package com.moon.core.lang;
 
+import com.moon.core.util.function.IntTableFunction;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -483,10 +485,10 @@ public final class ArrayUtil {
         Object arr, int arrLen, Object elements, int elementsLen, int fromIndex, int count, IntFunction creator
     ) {
         if (fromIndex < 0) {
-            throw new IllegalArgumentException("Invalid value of fromIndex: " + count);
+            throw new ArrayIndexOutOfBoundsException("Invalid value of fromIndex: " + count);
         }
         if (count < 0) {
-            throw new IllegalArgumentException("Invalid value of count: " + count);
+            throw new ArrayIndexOutOfBoundsException("Invalid value of count: " + count);
         }
         Object value = creator.apply(arrLen + elementsLen - count);
         System.arraycopy(arr, 0, value, 0, fromIndex);
@@ -577,5 +579,18 @@ public final class ArrayUtil {
             total += getter.applyAsDouble(arr[i]);
         }
         return total;
+    }
+
+    /*
+     reduce
+     */
+
+    public static <T, E> T reduce(E[] arr, IntTableFunction<T, E, T> reducer, T result) {
+        if (arr != null) {
+            for (int i = 0; i < arr.length; i++) {
+                result = reducer.apply(result, arr[i], i);
+            }
+        }
+        return result;
     }
 }

@@ -155,7 +155,7 @@ public class TestUtil {
      * @param minLen 最小长度（包含）
      * @param maxLen 最大长度（包含）
      *
-     * @return 当字符串长度在区间内时返回 true，否则返回 false
+     * @return 当字符串长度在区间内时返回 true，否则返回 false；空字符串默认长度为 0
      */
     public final static boolean isLengthBetween(CharSequence str, int minLen, int maxLen) {
         int length = str == null ? 0 : str.length();
@@ -241,6 +241,15 @@ public class TestUtil {
      * @return 如果检测通过，返回 true，否则返回 false
      */
     public final static boolean isIPV4(CharSequence str) { return IPV4.test(str); }
+
+    /**
+     * 是否是 IP v6 地址
+     *
+     * @param str 待测字符串
+     *
+     * @return 如果检测通过，返回 true，否则返回 false
+     */
+    public final static boolean isIPV6(CharSequence str) { return IPV6.test(str); }
 
     /**
      * 验证 11 位手机号

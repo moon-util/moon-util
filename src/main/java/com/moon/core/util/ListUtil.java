@@ -20,7 +20,7 @@ public final class ListUtil extends CollectUtil {
 
     /*
      * ---------------------------------------------------------------------------------
-     * of array valuesList
+     * of array List
      * ---------------------------------------------------------------------------------
      */
 
@@ -56,9 +56,11 @@ public final class ListUtil extends CollectUtil {
             iterable));
     }
 
+    public static <T> ArrayList<T> newArrayList(Iterator<? extends T> iterator) { return addAll(newArrayList(), iterator); }
+
     /*
      * ---------------------------------------------------------------------------------
-     * of linked valuesList
+     * of linked List
      * ---------------------------------------------------------------------------------
      */
 
@@ -92,6 +94,8 @@ public final class ListUtil extends CollectUtil {
             newLinkedList(),
             iterable));
     }
+
+    public static <T> LinkedList<T> newLinkedList(Iterator<? extends T> iterator) { return addAll(newLinkedList(), iterator); }
 
     public static <S, T> List<T> mapAsList(Collection<? extends S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);

@@ -633,6 +633,43 @@ public class ValidateUtil extends TestUtil {
     }
 
     /**
+     * 要求是 IP v6 地址
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireIPV6(C str) {
+        if (isIPV6(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid IP v4 address: " + str);
+    }
+
+    /**
+     * 要求是 IP v6 地址
+     *
+     * @param str     待测字符串
+     * @param message 自定义消息模板
+     * @param <C>     字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireIPV6(C str, String message) {
+        if (isIPV6(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
      * 要求是否符合规范的中国车牌号
      *
      * @param str 待测车牌号字符串

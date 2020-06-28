@@ -14,6 +14,14 @@ import static com.moon.core.util.JSONUtil.readJsonString;
 import static com.moon.core.util.TypeUtil.cast;
 
 /**
+ * JSON 工具类
+ * <p>
+ * 主要是 JSON 解析，解析完成的是一个{@link JSON}对象，可直接进行各种属性操作和访问
+ * <p>
+ * 注意：有些数据类型是不支持一些操作的，比如：{@code JSON.parse("true")} 解析出来的是{@link JSONBoolean}
+ * 此时作用于对象（{@link JSONObject}）或者数组（{@link JSONArray}）的方法{@link JSON#getString(Object)}等方法
+ * 是无效的，true 能执行什么方法呢？对吧，所以这样的操作只会抛出异常，
+ *
  * @author benshaoye
  */
 public interface JSON<KEY> extends Cloneable, Serializable {
@@ -32,9 +40,8 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @return
      */
     static JSON parse(String jsonText) {
-        return jsonText == null ? JSONNull.NULL
-            : new JSONParser(jsonText.startsWith("classpath:") ? readJsonString(jsonText.substring(10)) : jsonText)
-                .toJSON();
+        return jsonText == null ? JSONNull.NULL : new JSONParser(jsonText.startsWith("classpath:") ? readJsonString(
+            jsonText.substring(10)) : jsonText).toJSON();
     }
 
     /**

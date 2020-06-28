@@ -44,6 +44,8 @@ public final class SetUtil extends CollectUtil {
             iterable));
     }
 
+    public static <T> HashSet<T> newHashSet(Iterator<T> iterator) { return addAll(newHashSet(), iterator); }
+
     /*
      * ---------------------------------------------------------------------------------
      * of linked hash set
@@ -77,6 +79,8 @@ public final class SetUtil extends CollectUtil {
             newLinkedHashSet(),
             iterable));
     }
+
+    public static <T> LinkedHashSet<T> newLinkedHashSet(Iterator<T> iterator) { return addAll(newLinkedHashSet(), iterator); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -118,9 +122,11 @@ public final class SetUtil extends CollectUtil {
         return addAll(newTreeSet(comparator), values);
     }
 
+    public static <T> TreeSet<T> newTreeSet(Iterator<T> iterator) { return addAll(newTreeSet(), iterator); }
+
     public static <S, T> Set<T> mapAsSet(Collection<S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);
-        return collect instanceof List ? (Set<T>) collect : newHashSet(collect);
+        return collect instanceof Set ? (Set<T>) collect : newHashSet(collect);
     }
 
     /*

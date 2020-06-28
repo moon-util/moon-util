@@ -24,12 +24,204 @@ public final class DateTimeUtil {
 
     public static long now() { return System.currentTimeMillis(); }
 
+    /**
+     * 获取当前时间
+     *
+     * @return
+     */
     public static LocalDate nowDate() { return LocalDate.now(); }
 
+    /**
+     * 获取当前时间
+     *
+     * @return
+     */
     public static LocalTime nowTime() { return LocalTime.now(); }
 
+    /**
+     * 获取当前时间
+     *
+     * @return
+     */
     public static LocalDateTime nowDateTime() { return LocalDateTime.now(); }
-    
+
+    /**
+     * 默认当前时间，如果指定时间为 null 的话
+     *
+     * @param date 指定时间
+     *
+     * @return
+     */
+    public static LocalTime nowIfNull(LocalTime date) { return (date == null ? nowTime() : date); }
+
+    /**
+     * 默认当前时间，如果指定时间为 null 的话
+     *
+     * @param date 指定时间
+     *
+     * @return
+     */
+    public static LocalDate nowIfNull(LocalDate date) { return (date == null ? nowDate() : date); }
+
+    /**
+     * 默认当前时间，如果指定时间为 null 的话
+     *
+     * @param date 指定时间
+     *
+     * @return
+     */
+    public static LocalDateTime nowIfNull(LocalDateTime date) { return (date == null ? nowDateTime() : date); }
+
+    /**
+     * 获取年份
+     *
+     * @param date LocalDate 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDate)}
+     *
+     * @return 年份
+     */
+    public static int getYear(LocalDate date) { return nowIfNull(date).getYear(); }
+
+    /**
+     * 第几月；
+     * <p>
+     * 注在{@link Date}或{@link Calendar}中直接获取到的月份比实际的要少一月，即当前是 6 月获取到的实际是 5 月，用的时候需要手动处理；
+     * 但在 jdk8 的日期时间里不是这样的，实际是几月就是几月。
+     *
+     * @param date LocalDateTime 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDateTime)}
+     *
+     * @return 月份
+     */
+    public static int getMonthValue(LocalDate date) { return nowIfNull(date).getMonthValue(); }
+
+    /**
+     * 一月中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是 2 月的第 1 天
+     *
+     * @param date LocalDate 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDate)}
+     *
+     * @return 月中的第几天
+     */
+    public static int getDayOfMonth(LocalDate date) { return nowIfNull(date).getDayOfMonth(); }
+
+    /**
+     * 一年中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是第 32 天
+     *
+     * @param date LocalDate 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDate)}
+     *
+     * @return 年中的第几日
+     */
+    public static int getDayOfYear(LocalDate date) { return nowIfNull(date).getDayOfYear(); }
+
+    /**
+     * 获取星期
+     *
+     * @param date LocalDate 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDate)}
+     *
+     * @return 星期枚举
+     */
+    public static DayOfWeek getDayOfWeek(LocalDate date) { return nowIfNull(date).getDayOfWeek(); }
+
+    /**
+     * 获取年份
+     *
+     * @param date LocalDateTime 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDateTime)}
+     *
+     * @return 年份
+     */
+    public static int getYear(LocalDateTime date) { return nowIfNull(date).getYear(); }
+
+    /**
+     * 第几月；
+     * <p>
+     * 注在{@link Date}或{@link Calendar}中直接获取到的月份比实际的要少一月，即当前是 6 月获取到的实际是 5 月，用的时候需要手动处理；
+     * 但在 jdk8 的日期时间里不是这样的，实际是几月就是几月。
+     *
+     * @param date LocalDateTime 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDateTime)}
+     *
+     * @return 月份
+     */
+    public static int getMonthValue(LocalDateTime date) { return nowIfNull(date).getMonthValue(); }
+
+    /**
+     * 一月中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是 2 月的第 1 天
+     *
+     * @param date LocalDateTime 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDateTime)}
+     *
+     * @return 月中的第几天
+     */
+    public static int getDayOfMonth(LocalDateTime date) { return nowIfNull(date).getDayOfMonth(); }
+
+    /**
+     * 一年中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是第 32 天
+     *
+     * @param date LocalDateTime 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDateTime)}
+     *
+     * @return 年中的第几日
+     */
+    public static int getDayOfYear(LocalDateTime date) { return nowIfNull(date).getDayOfYear(); }
+
+    /**
+     * 获取星期
+     *
+     * @param date LocalDateTime 对象，如果为 null 将取当前时间；{@link #nowIfNull(LocalDateTime)}
+     *
+     * @return 星期枚举
+     */
+    public static DayOfWeek getDayOfWeek(LocalDateTime date) { return nowIfNull(date).getDayOfWeek(); }
+
+    /**
+     * 获取小时
+     *
+     * @param time
+     *
+     * @return
+     */
+    public static int getHour(LocalTime time) { return nowIfNull(time).getHour(); }
+
+    /**
+     * 获取分钟
+     *
+     * @param time
+     *
+     * @return
+     */
+    public static int getMinute(LocalTime time) { return nowIfNull(time).getMinute(); }
+
+    /**
+     * 获取秒数
+     *
+     * @param time
+     *
+     * @return
+     */
+    public static int getSecond(LocalTime time) { return nowIfNull(time).getSecond(); }
+
+    /**
+     * 获取小时
+     *
+     * @param time
+     *
+     * @return
+     */
+    public static int getHour(LocalDateTime time) { return nowIfNull(time).getHour(); }
+
+    /**
+     * 获取分钟
+     *
+     * @param time
+     *
+     * @return
+     */
+    public static int getMinute(LocalDateTime time) { return nowIfNull(time).getMinute(); }
+
+    /**
+     * 获取秒数
+     *
+     * @param time
+     *
+     * @return
+     */
+    public static int getSecond(LocalDateTime time) { return nowIfNull(time).getSecond(); }
+
     /*
      始末时间
      */
@@ -64,7 +256,7 @@ public final class DateTimeUtil {
      * @return
      */
     public static LocalDate startingOfMonth(LocalDate date) {
-        return toDate(date.getYear(), date.getMonth().getValue());
+        return toDate(date.getYear(), date.getMonthValue());
     }
 
     /**
@@ -75,7 +267,7 @@ public final class DateTimeUtil {
      * @return
      */
     public static LocalDateTime startingOfMonth(LocalDateTime datetime) {
-        return toDateTime(datetime.getYear(), datetime.getMonth().getValue());
+        return toDateTime(datetime.getYear(), datetime.getMonthValue());
     }
 
     /**
@@ -285,8 +477,10 @@ public final class DateTimeUtil {
 
     /**
      * 格式化日期，
+     *
      * @param accessor
      * @param pattern
+     *
      * @return
      */
     public static String format(TemporalAccessor accessor, String pattern) {
@@ -484,8 +678,7 @@ public final class DateTimeUtil {
         LocalDate now = LocalDate.now();
         LocalDateTime last = begin.isBefore(end) ? LocalDateTime.of(now, end) : LocalDateTime.of(now.plusDays(1), end);
         for (LocalDateTime start = LocalDateTime.of(now, begin);
-            start.isBefore(last) && consumer.apply(start.getHour(), start.toLocalTime());
-            start = start.plusHours(1)) {
+            start.isBefore(last) && consumer.apply(start.getHour(), start.toLocalTime()); start = start.plusHours(1)) {
         }
     }
 
