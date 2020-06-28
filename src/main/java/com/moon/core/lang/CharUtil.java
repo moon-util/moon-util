@@ -9,13 +9,9 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class CharUtil {
 
-    private CharUtil() {
-        noInstanceError();
-    }
+    private CharUtil() { noInstanceError(); }
 
-    public static int indexOf(final char[] src, final char[] test) {
-        return indexOf(src, test, 0);
-    }
+    public static int indexOf(final char[] src, final char[] test) { return indexOf(src, test, 0); }
 
     public static int indexOf(final char[] src, final char[] test, int fromIndex) {
         BooleanUtil.requireFalse(fromIndex < 0);
@@ -134,6 +130,19 @@ public final class CharUtil {
     public static boolean isASCIICode(int ch) { return ch < 128; }
 
     public static boolean isChar(Object o) { return o != null && o.getClass() == Character.class; }
+
+    public static int toDigitMaxAs62(int codePoint) {
+        if (isDigit(codePoint)) {
+            return codePoint - 48;
+        }
+        if (isUpperCase(codePoint)) {
+            return codePoint - 55;
+        }
+        if (isLowerCase(codePoint)) {
+            return codePoint - 61;
+        }
+        return -1;
+    }
 
     public static char toCharValue(Boolean bool) { return (char) (bool == null || !bool ? 48 : 49); }
 

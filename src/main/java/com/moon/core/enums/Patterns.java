@@ -158,7 +158,7 @@ public enum Patterns implements Predicate<CharSequence> {
      * @throws RequireValidateException 如果不能匹配抛出异常
      */
     public <C extends CharSequence> C requireMatched(C str) {
-        return requireMatched(str, "Invalid input string, expected matches of: {}, but got: {}.");
+        return requireMatched(str, "Invalid input string, require matches of: {},\n\t\t but got: {}.");
     }
 
     /**

@@ -18,9 +18,7 @@ public final class DependencyUtil {
 
     private DependencyUtil() { ThrowUtil.noInstanceError(); }
 
-    public static String dependencyXmlNode(String dependency) {
-        return dependencyXmlNode(dependency, 4);
-    }
+    public static String dependencyXmlNode(String dependency) { return dependencyXmlNode(dependency, 4); }
 
     public static String dependencyXmlNode(String dependency, int indent) {
         return dependencyXmlNode(dependency, indent, 0);

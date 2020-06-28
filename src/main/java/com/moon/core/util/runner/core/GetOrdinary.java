@@ -7,6 +7,7 @@ import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.BooleanUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
+import com.moon.core.util.ValidateUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -71,19 +72,19 @@ class GetOrdinary implements AsGetter {
         if (data instanceof Map) {
             getter = new MapGetter(key);
         } else if (data instanceof List) {
-            BooleanUtil.requireFalse(index < 0, message);
+            ValidateUtil.requireFalse(index < 0, message);
             getter = new ListGetter(index);
         } else if (data.getClass().isArray()) {
             if (index < 0 && ARR_LENGTH.equals(key)) {
                 getter = ArrayLenGetter.LENGTH;
             } else {
-                BooleanUtil.requireFalse(index < 0, message);
+                ValidateUtil.requireFalse(index < 0, message);
                 getter = new ArrayGetter(index);
             }
         } else if (data instanceof ResultSet) {
             getter = index < 0 ? new ResultLabelGetter(key) : new ResultIndexGetter(index);
         } else {
-            BooleanUtil.requireTrue(key instanceof String, message);
+            ValidateUtil.requireTrue(key instanceof String, message);
             getter = new FieldGetter(key);
         }
         this.getter = getter;
@@ -94,15 +95,13 @@ class GetOrdinary implements AsGetter {
      * Evaluates this predicate on the given argument.
      *
      * @param o the input argument
+     *
      * @return {@code true} if the input argument matches the predicate,
      * otherwise {@code false}
      */
     @Override
     public boolean test(Object o) {
-        return getter == null
-            ? resetGetter(o).test(o)
-            : getter.test(o)
-            || resetGetter(o).test(o);
+        return getter == null ? resetGetter(o).test(o) : getter.test(o) || resetGetter(o).test(o);
     }
 
     /*
@@ -112,6 +111,7 @@ class GetOrdinary implements AsGetter {
      */
 
     private static class ResultIndexGetter implements AsGetter {
+
         private final int index;
 
         private ResultIndexGetter(int index) { this.index = index; }
@@ -130,6 +130,7 @@ class GetOrdinary implements AsGetter {
     }
 
     private static class ResultLabelGetter implements AsGetter {
+
         private final String label;
 
         private ResultLabelGetter(Object label) {
@@ -151,6 +152,7 @@ class GetOrdinary implements AsGetter {
     }
 
     private static class MapGetter implements AsGetter {
+
         final Object key;
 
         MapGetter(Object key) { this.key = key; }
@@ -159,6 +161,7 @@ class GetOrdinary implements AsGetter {
          * 使用外部数据
          *
          * @param data
+         *
          * @return
          */
         @Override
@@ -168,6 +171,7 @@ class GetOrdinary implements AsGetter {
          * Evaluates this predicate on the given argument.
          *
          * @param o the input argument
+         *
          * @return {@code true} if the input argument matches the predicate,
          * otherwise {@code false}
          */
@@ -176,6 +180,7 @@ class GetOrdinary implements AsGetter {
     }
 
     private static class ListGetter implements AsGetter {
+
         final int index;
 
         ListGetter(int index) { this.index = index; }
@@ -184,6 +189,7 @@ class GetOrdinary implements AsGetter {
          * 使用外部数据
          *
          * @param data
+         *
          * @return
          */
         @Override
@@ -193,6 +199,7 @@ class GetOrdinary implements AsGetter {
          * Evaluates this predicate on the given argument.
          *
          * @param o the input argument
+         *
          * @return {@code true} if the input argument matches the predicate,
          * otherwise {@code false}
          */
@@ -208,6 +215,7 @@ class GetOrdinary implements AsGetter {
     }
 
     private static class ArrayGetter implements AsGetter {
+
         final int index;
         final String message;
         ArrayOperator getter;
@@ -221,6 +229,7 @@ class GetOrdinary implements AsGetter {
          * 使用外部数据
          *
          * @param data
+         *
          * @return
          */
         @Override
@@ -238,19 +247,18 @@ class GetOrdinary implements AsGetter {
          * Evaluates this predicate on the given argument.
          *
          * @param o the input argument
+         *
          * @return {@code true} if the input argument matches the predicate,
          * otherwise {@code false}
          */
         @Override
         public boolean test(Object o) {
-            return getter == null
-                ? reset(o).test(o)
-                : getter.test(o)
-                || reset(o).test(o);
+            return getter == null ? reset(o).test(o) : getter.test(o) || reset(o).test(o);
         }
     }
 
     private static class FieldGetter implements AsGetter {
+
         final String field;
         FieldDescriptor getter;
 
@@ -260,6 +268,7 @@ class GetOrdinary implements AsGetter {
          * 使用外部数据
          *
          * @param data
+         *
          * @return
          */
         @Override
@@ -284,15 +293,14 @@ class GetOrdinary implements AsGetter {
          * Evaluates this predicate on the given argument.
          *
          * @param o the input argument
+         *
          * @return {@code true} if the input argument matches the predicate,
          * otherwise {@code false}
          */
         @Override
         public boolean test(Object o) {
-            return getter == null
-                ? reset(o).getDeclaringClass().isInstance(o)
-                : getter.getDeclaringClass().isInstance(o)
-                || reset(o).getDeclaringClass().isInstance(o);
+            return getter == null ? reset(o).getDeclaringClass().isInstance(o) : getter.getDeclaringClass()
+                .isInstance(o) || reset(o).getDeclaringClass().isInstance(o);
         }
     }
 }

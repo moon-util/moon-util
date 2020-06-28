@@ -935,7 +935,7 @@ public final class StringUtil {
      * @throws StringIndexOutOfBoundsException 当采取非宽容模式，并且 index 超出字符串范围时
      */
     public static int codePointAt(String str, int index, boolean tolerant) {
-        if (tolerant) {
+        if (!tolerant) {
             return codePointAt(str, index);
         }
         int length = str == null ? 0 : str.length();

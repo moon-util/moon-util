@@ -1,7 +1,5 @@
 package com.moon.core.lang;
 
-import com.moon.core.exception.NumberException;
-
 import static com.moon.core.enums.Strings.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.TestUtil.isIntegerValue;
@@ -12,121 +10,7 @@ import static java.lang.String.format;
  */
 public final class IntUtil {
 
-    private IntUtil() {
-        noInstanceError();
-    }
-
-    public static int requireEq(int value, int expect) {
-        if (value == expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected: %d, Actual: %d", expect, value));
-    }
-
-    public static int requireEq(int value, int expect, String errorMsg) {
-        if (value == expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static int requireGt(int value, int expect) {
-        if (value > expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected great than %d, Actual: %d", expect, value));
-    }
-
-    public static int requireGt(int value, int expect, String errorMsg) {
-        if (value > expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static int requireLt(int value, int expect) {
-        if (value < expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected less than %d, Actual: %d", expect, value));
-    }
-
-    public static int requireLt(int value, int expect, String errorMsg) {
-        if (value < expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static int requireGtOrEq(int value, int expect) {
-        if (value >= expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected not less than %d, Actual: %d", expect, value));
-    }
-
-    public static int requireGtOrEq(int value, int expect, String errorMsg) {
-        if (value >= expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static int requireLtOrEq(int value, int expect) {
-        if (value <= expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected not great than %d, Actual: %d", expect, value));
-    }
-
-    public static int requireLtOrEq(int value, int expect, String errorMsg) {
-        if (value <= expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    /**
-     * 要求期望值在指定范围里，不包含范围边界
-     *
-     * @param value 待测值
-     * @param min   最小值
-     * @param max   最大值
-     *
-     * @return 是否在范围内
-     */
-    public static int requireInRange(int value, int min, int max) {
-        requireGt(value, min);
-        requireLt(value, max);
-        return value;
-    }
-
-    public static int requireInRange(int value, int min, int max, String errorMsg) {
-        requireGt(value, min, errorMsg);
-        requireLt(value, max, errorMsg);
-        return value;
-    }
-
-    /**
-     * 要求期望值在指定范围里，包含范围边界
-     *
-     * @param value 待测值
-     * @param min   最小值
-     * @param max   最大值
-     *
-     * @return 是否在范围内
-     */
-    public static int requireBetween(int value, int min, int max) {
-        requireGtOrEq(value, min);
-        requireLtOrEq(value, max);
-        return value;
-    }
-
-    public static int requireBetween(int value, int min, int max, String errorMsg) {
-        requireGtOrEq(value, min, errorMsg);
-        requireLtOrEq(value, max, errorMsg);
-        return value;
-    }
+    private IntUtil() { noInstanceError(); }
 
 
     public static boolean isInt(Object o) { return o instanceof Integer; }
@@ -352,6 +236,7 @@ public final class IntUtil {
      * （Copied from jdk 1.8: {@link Integer#toString(int, int)}）
      * <p>
      * {@code Integer}仅支持 36 进制转换，这里扩展到 62 进制
+     * 与{@link Integer#parseInt(String)}、{@link Integer#toString(int, int)}不兼容
      *
      * @param value 待转换的十进制整型数
      * @param radix 进制
@@ -391,5 +276,70 @@ public final class IntUtil {
         }
 
         return new String(buf, charPos, (maxLen - charPos));
+    }
+
+    /**
+     * 最大 62 进制字符串解析成十进制整数，和上面的{@link #toString(int, int)}相对应
+     * 与{@link Integer#parseInt(String, int)}、{@link Integer#toString(int, int)}不兼容
+     *
+     * @param s     待解析字符串
+     * @param radix 进制
+     *
+     * @return 解析后的整数
+     *
+     * @throws NumberFormatException 进制错误时抛出异常
+     */
+    @SuppressWarnings("all")
+    public static int parseInt(String s, int radix) throws NumberFormatException {
+        if (s == null) {
+            throw new NumberFormatException("null");
+        }
+        if (radix < 2) {
+            throw new NumberFormatException("radix " + radix + " less than 2");
+        }
+        if (radix > DIGITS.length) {
+            throw new NumberFormatException("radix " + radix + " greater than 62");
+        }
+        int result = 0;
+        boolean negative = false;
+        int i = 0, len = s.length();
+        int limit = -Integer.MAX_VALUE;
+        int multmin;
+        int digit;
+        if (len > 0) {
+            char firstChar = s.charAt(0);
+            if (firstChar < '0') {
+                // Possible leading "+" or "-"
+                if (firstChar == '-') {
+                    negative = true;
+                    limit = Integer.MIN_VALUE;
+                } else if (firstChar != '+') {
+                    throw new NumberFormatException(s);
+                }
+                if (len == 1) {
+                    // Cannot have lone "+" or "-"
+                    throw new NumberFormatException(s);
+                }
+                i++;
+            }
+            multmin = limit / radix;
+            while (i < len) {
+                digit = CharUtil.toDigitMaxAs62(s.charAt(i++));
+                if (digit < 0) {
+                    throw new NumberFormatException(s);
+                }
+                if (result < multmin) {
+                    throw new NumberFormatException(s);
+                }
+                result *= radix;
+                if (result < limit + digit) {
+                    throw new NumberFormatException(s);
+                }
+                result -= digit;
+            }
+        } else {
+            throw new NumberFormatException(s);
+        }
+        return negative ? result : -result;
     }
 }

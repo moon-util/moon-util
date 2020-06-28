@@ -1,7 +1,6 @@
 package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
-import com.moon.core.exception.NumberException;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.TestUtil;
 
@@ -18,121 +17,7 @@ import static java.lang.String.format;
  */
 public final class LongUtil {
 
-    private LongUtil() {
-        noInstanceError();
-    }
-
-    public static long requireEq(long value, long expect) {
-        if (value == expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected: %d, Actual: %d", expect, value));
-    }
-
-    public static long requireEq(long value, long expect, String errorMsg) {
-        if (value == expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static long requireGt(long value, long expect) {
-        if (value > expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected great than %d, Actual: %d", expect, value));
-    }
-
-    public static long requireGt(long value, long expect, String errorMsg) {
-        if (value > expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static long requireLt(long value, long expect) {
-        if (value < expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected less than %d, Actual: %d", expect, value));
-    }
-
-    public static long requireLt(long value, long expect, String errorMsg) {
-        if (value < expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static long requireGtOrEq(long value, long expect) {
-        if (value >= expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected not less than %d, Actual: %d", expect, value));
-    }
-
-    public static long requireGtOrEq(long value, long expect, String errorMsg) {
-        if (value >= expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static long requireLtOrEq(long value, long expect) {
-        if (value <= expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected not great than %d, Actual: %d", expect, value));
-    }
-
-    public static long requireLtOrEq(long value, long expect, String errorMsg) {
-        if (value <= expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    /**
-     * 要求期望值在指定范围里，不包含范围边界
-     *
-     * @param value
-     * @param min
-     * @param max
-     *
-     * @return
-     */
-    public static long requireInRange(long value, long min, long max) {
-        requireGt(value, min);
-        requireLt(value, max);
-        return value;
-    }
-
-    public static long requireInRange(long value, long min, long max, String errorMsg) {
-        requireGt(value, min, errorMsg);
-        requireLt(value, max, errorMsg);
-        return value;
-    }
-
-    /**
-     * 要求期望值在指定范围里，包含范围边界
-     *
-     * @param value
-     * @param min
-     * @param max
-     *
-     * @return
-     */
-    public static long requireBetween(long value, long min, long max) {
-        requireGtOrEq(value, min);
-        requireLtOrEq(value, max);
-        return value;
-    }
-
-    public static long requireBetween(long value, long min, long max, String errorMsg) {
-        requireGtOrEq(value, min, errorMsg);
-        requireLtOrEq(value, max, errorMsg);
-        return value;
-    }
+    private LongUtil() { noInstanceError(); }
 
     public static long oneIfInvalid(CharSequence cs) { return defaultIfInvalid(cs, 1); }
 
@@ -335,6 +220,7 @@ public final class LongUtil {
      * （Copied from jdk 1.8: {@link Long#toString(long, int)}）
      * <p>
      * {@code Long}仅支持 36 进制转换，这里扩展到 62 进制
+     * 与{@link Long#parseLong(String)}、{@link Long#toString(long, int)}不兼容
      *
      * @param value 待转换的十进制长整型数
      * @param radix 进制
@@ -375,5 +261,71 @@ public final class LongUtil {
         }
 
         return new String(buf, charPos, (maxLen - charPos));
+    }
+
+    /**
+     * 最大 62 进制字符串解析成十进制整数，和上面的{@link #toString(long, int)}相对应
+     * 与{@link Long#parseLong(String, int)}、{@link Long#toString(long, int)}不兼容
+     *
+     * @param s     待解析字符串
+     * @param radix 进制
+     *
+     * @return 解析后的整数
+     *
+     * @throws NumberFormatException 进制错误时抛出异常
+     */
+    @SuppressWarnings("all")
+    public static long parseLong(String s, int radix) throws NumberFormatException {
+        if (s == null) {
+            throw new NumberFormatException("null");
+        }
+        if (radix < 2) {
+            throw new NumberFormatException("radix " + radix + " less than 2");
+        }
+        if (radix > DIGITS.length) {
+            throw new NumberFormatException("radix " + radix + " greater than 62");
+        }
+
+        long result = 0;
+        boolean negative = false;
+        int i = 0, len = s.length();
+        long limit = -Long.MAX_VALUE;
+        long multmin;
+        int digit;
+
+        if (len > 0) {
+            char firstChar = s.charAt(0);
+            if (firstChar < '0') { // Possible leading "+" or "-"
+                if (firstChar == '-') {
+                    negative = true;
+                    limit = Long.MIN_VALUE;
+                } else if (firstChar != '+') { throw new NumberFormatException(s); }
+
+                if (len == 1) { // Cannot have lone "+" or "-"
+                    throw new NumberFormatException(s);
+                }
+                i++;
+            }
+            multmin = limit / radix;
+            while (i < len) {
+                // Accumulating negatively avoids surprises near MAX_VALUE
+                // digit = Character.digit(s.charAt(i++), radix);
+                digit = CharUtil.toDigitMaxAs62(s.charAt(i++));
+                if (digit < 0) {
+                    throw new NumberFormatException(s);
+                }
+                if (result < multmin) {
+                    throw new NumberFormatException(s);
+                }
+                result *= radix;
+                if (result < limit + digit) {
+                    throw new NumberFormatException(s);
+                }
+                result -= digit;
+            }
+        } else {
+            throw new NumberFormatException(s);
+        }
+        return negative ? result : -result;
     }
 }

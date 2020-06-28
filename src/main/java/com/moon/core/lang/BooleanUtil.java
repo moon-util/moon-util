@@ -16,30 +16,12 @@ public final class BooleanUtil {
      */
 
     public static boolean requireTrue(boolean value) {
-        if (value) {
-            return true;
-        }
+        if (value) { return true; }
         throw new IllegalArgumentException(Boolean.FALSE.toString());
     }
 
-    public static boolean requireTrue(boolean value, String message) {
-        if (value) {
-            return true;
-        }
-        throw new IllegalArgumentException(message);
-    }
-
     public static boolean requireFalse(boolean value) {
-        if (value) {
-            throw new IllegalArgumentException(Boolean.TRUE.toString());
-        }
-        return false;
-    }
-
-    public static boolean requireFalse(boolean value, String message) {
-        if (value) {
-            throw new IllegalArgumentException(message);
-        }
+        if (value) { throw new IllegalArgumentException(Boolean.TRUE.toString()); }
         return false;
     }
 

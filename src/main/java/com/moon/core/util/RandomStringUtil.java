@@ -1,7 +1,6 @@
 package com.moon.core.util;
 
 import com.moon.core.enums.Const;
-import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.StringUtil;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -43,8 +42,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextChinese(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextChinese(nextInt(min, max));
     }
 
@@ -74,8 +73,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextUpper(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextUpper(nextInt(min, max));
     }
 
@@ -105,8 +104,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextLower(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextLower(nextInt(min, max));
     }
 
@@ -136,8 +135,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextLetter(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextLetter(nextInt(min, max));
     }
 
@@ -167,8 +166,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextControl(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextControl(nextInt(min, max));
     }
 
@@ -198,8 +197,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextDigit(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextDigit(nextInt(min, max));
     }
 
@@ -231,8 +230,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextSymbol(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextSymbol(nextInt(min, max));
     }
 
@@ -269,8 +268,8 @@ public final class RandomStringUtil {
     }
 
     public static String next(int min, int max) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return next(nextInt(min, max));
     }
 
@@ -294,8 +293,8 @@ public final class RandomStringUtil {
     }
 
     public static String next(int min, int max, boolean lower, boolean upper, boolean digit) {
-        IntUtil.requireGtOrEq(min, 0);
-        IntUtil.requireLtOrEq(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return next(nextInt(min, max), lower, upper, digit);
     }
 
@@ -338,9 +337,7 @@ public final class RandomStringUtil {
      *
      * @return 随机字符串
      */
-    public static String random(String src, int min, int max) {
-        return random(src, nextInt(min, max));
-    }
+    public static String random(String src, int min, int max) { return random(src, nextInt(min, max)); }
 
     /**
      * 字符串乱序

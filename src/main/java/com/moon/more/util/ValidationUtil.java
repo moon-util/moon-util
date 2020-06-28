@@ -13,7 +13,7 @@ import javax.validation.bootstrap.ProviderSpecificBootstrap;
 import java.util.Set;
 
 /**
- * Hibernate 验证器
+ * Hibernate Validator 验证器
  *
  * @author benshaoye
  */
@@ -21,39 +21,89 @@ public final class ValidationUtil extends ValidateUtil {
 
     private ValidationUtil() { }
 
-    private static Validator getValidator() {
-        return HibernateValidator6_1_18.getValidator();
-    }
-
-    public static <T> Set<ConstraintViolation<T>> validate(T data, Class... groups) {
-        return getValidator().validate(data, groups);
-    }
-}
-
-@SuppressWarnings("all")
-class HibernateValidator6_1_18 {
-
-    private final static Validator VALIDATOR;
-
-    static {
-        Validator validator = null;
+    /**
+     * 验证实体类的某个字段值
+     *
+     * @param beanType   待验证的类
+     * @param fieldName  字段名称
+     * @param fieldValue 字段值
+     * @param groups     分组
+     * @param <T>        待验证的类的类型
+     *
+     * @return 如果验证通过，会返回一个空集合，否则返回的集合非空，里面包含错误信息
+     */
+    public static <T> Set<ConstraintViolation<T>> validateValue(
+        Class beanType, String fieldName, Object fieldValue, Class... groups
+    ) {
         try {
-            ProviderSpecificBootstrap<HibernateValidatorConfiguration> bootstrap =
-
-                Validation.byProvider(HibernateValidator.class);
-
-            HibernateValidatorConfiguration configuration = bootstrap.configure();
-
-            ValidatorFactory factory = configuration.buildValidatorFactory();
-            validator = factory.getValidator();
-        } catch (Throwable e) {
-            // TODO 请确保正确引入了 hibernate-validator 相关依赖
+            return HibernateValidator6_1_18.getValidator().validateValue(beanType, fieldName, fieldValue, groups);
+        } catch (Throwable throwable) {
             Dependencies.HIBERNATE_VALIDATOR.throwException();
+            throw new UnsupportedOperationException();
         }
-        VALIDATOR = validator;
     }
 
-    public static Validator getValidator() { return VALIDATOR; }
+    /**
+     * 验证对象指定字段的值
+     *
+     * @param data      待验证对象
+     * @param fieldName 字段名称
+     * @param groups    分组
+     * @param <T>       待验证对象的类型
+     *
+     * @return 如果验证通过，会返回一个空集合，否则返回的集合非空，里面包含错误信息
+     */
+    public static <T> Set<ConstraintViolation<T>> validateField(T data, String fieldName, Class... groups) {
+        try {
+            return HibernateValidator6_1_18.getValidator().validateProperty(data, fieldName, groups);
+        } catch (Throwable throwable) {
+            Dependencies.HIBERNATE_VALIDATOR.throwException();
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * 验证对象所有字段的值
+     *
+     * @param data   待验证对象
+     * @param groups 分组
+     * @param <T>    待验证对象的类型
+     *
+     * @return 如果验证通过，会返回一个空集合，否则返回的集合非空，里面包含错误信息
+     */
+    public static <T> Set<ConstraintViolation<T>> validate(T data, Class... groups) {
+        try {
+            return HibernateValidator6_1_18.getValidator().validate(data, groups);
+        } catch (Throwable throwable) {
+            Dependencies.HIBERNATE_VALIDATOR.throwException();
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @SuppressWarnings("all")
+    private static final class HibernateValidator6_1_18 {
+
+        private final static Validator VALIDATOR;
+
+        static {
+            Validator validator = null;
+            try {
+                ProviderSpecificBootstrap<HibernateValidatorConfiguration> bootstrap =
+
+                    Validation.byProvider(HibernateValidator.class);
+
+                HibernateValidatorConfiguration configuration = bootstrap.configure();
+
+                ValidatorFactory factory = configuration.buildValidatorFactory();
+                validator = factory.getValidator();
+            } catch (Throwable e) {
+                // ignore
+            }
+            VALIDATOR = validator;
+        }
+
+        public static Validator getValidator() { return VALIDATOR; }
+    }
 }
 
 /*

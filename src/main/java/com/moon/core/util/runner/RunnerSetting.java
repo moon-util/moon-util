@@ -3,6 +3,7 @@ package com.moon.core.util.runner;
 import com.moon.core.lang.BooleanUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.util.IteratorUtil;
+import com.moon.core.util.ValidateUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,9 +115,9 @@ public final class RunnerSetting implements IRunnerSetting {
 
     static String checkName(String name) {
         char curr = name.charAt(0);
-        BooleanUtil.requireTrue(SupportUtil.isVar(curr), name);
+        ValidateUtil.requireTrue(SupportUtil.isVar(curr), name);
         for (int i = 1, len = name.length(); i < len; i++) {
-            BooleanUtil.requireTrue(SupportUtil.isVar(curr = name.charAt(i)) || SupportUtil.isNum(curr), name);
+            ValidateUtil.requireTrue(SupportUtil.isVar(curr = name.charAt(i)) || SupportUtil.isNum(curr), name);
         }
         return name;
     }

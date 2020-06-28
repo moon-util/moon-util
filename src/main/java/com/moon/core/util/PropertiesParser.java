@@ -5,7 +5,6 @@ import com.moon.core.enums.Const;
 import com.moon.core.enums.Strings;
 import com.moon.core.io.FileUtil;
 import com.moon.core.lang.ArrayUtil;
-import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.interfaces.Parser;
 
@@ -412,13 +411,13 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
      */
 
     private static String activePath(String sourcePath) {
-        int end = IntUtil.requireGt(sourcePath.lastIndexOf(SUFFIX), 0);
+        int end = ValidateUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), 0);
         return sourcePath.substring(0, end);
     }
 
     private static String activeName(String sourcePath) {
         int begin = minimumWithZero(sourcePath.lastIndexOf('/'));
-        int end = IntUtil.requireGt(sourcePath.lastIndexOf(SUFFIX), begin);
+        int end = ValidateUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), begin);
         return sourcePath.substring(incrementIfPositive(begin), end);
     }
 

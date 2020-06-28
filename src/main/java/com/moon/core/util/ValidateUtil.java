@@ -92,7 +92,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当检测数据为 false 或其他值时抛出异常
      */
     public final static <T> T requireTrue(T obj) {
-        return requireTrue(obj, "Invalid data, expected 'true', but got: {}");
+        return requireTrue(obj, "Invalid data, require 'true', but got: {}");
     }
 
     /**
@@ -125,7 +125,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当检测数据为 true 或其他值时抛出异常
      */
     public final static <T> T requireFalse(T obj) {
-        return requireFalse(obj, "Invalid data, expected 'false', but got: {}");
+        return requireFalse(obj, "Invalid data, require 'false', but got: {}");
     }
 
     /**
@@ -159,7 +159,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当字符串与正则表达式不匹配时抛出异常
      */
     public final static <C extends CharSequence> C requireMatchOf(C str, String regex) {
-        return requireMatchOf(str, regex, "Invalid string: {}, expected match of: {}");
+        return requireMatchOf(str, regex, "Invalid string: {}, require match of: {}");
     }
 
     /**
@@ -193,7 +193,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当字符串与正则表达式不匹配时抛出异常
      */
     public final static <C extends CharSequence> C requireMatchOf(C str, String regex, int flags) {
-        return requireMatchOf(str, regex, flags, "Invalid string: {}, expected match of: {}");
+        return requireMatchOf(str, regex, flags, "Invalid string: {}, require match of: {}");
     }
 
     /**
@@ -227,7 +227,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当字符串与正则表达式不匹配时抛出异常
      */
     public final static <C extends CharSequence> C requireMatchOf(C str, Pattern pattern) {
-        return requireMatchOf(str, pattern, "Invalid string: {}, expected match of: {}");
+        return requireMatchOf(str, pattern, "Invalid string: {}, require match of: {}");
     }
 
     /**
@@ -297,7 +297,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当检测不通过时抛出异常
      */
     public final static <T> T requireNotNull(T obj) {
-        return requireNotNull(obj, "Invalid data, expected not null, but got null.");
+        return requireNotNull(obj, "Invalid data, require not null, but got null.");
     }
 
     /**
@@ -670,6 +670,43 @@ public class ValidateUtil extends TestUtil {
     }
 
     /**
+     * 要求是 MAC 地址
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireMacAddress(C str) {
+        if (isMacAddress(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid IP v4 address: " + str);
+    }
+
+    /**
+     * 要求是 MAC 地址
+     *
+     * @param str     待测字符串
+     * @param message 自定义消息模板
+     * @param <C>     字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireMacAddress(C str, String message) {
+        if (isMacAddress(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
      * 要求是否符合规范的中国车牌号
      *
      * @param str 待测车牌号字符串
@@ -754,7 +791,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value >= max 时
      */
     public final static int requireLtOf(int value, int max) {
-        return requireLtOf(value, max, "Invalid value: {}, expected less than: {}.");
+        return requireLtOf(value, max, "Invalid value: {}, require less than: {}.");
     }
 
     /**
@@ -786,7 +823,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value > max 时
      */
     public final static int requireLeOf(int value, int max) {
-        return requireLeOf(value, max, "Invalid value: {}, expected not great than: {}.");
+        return requireLeOf(value, max, "Invalid value: {}, require not great than: {}.");
     }
 
     /**
@@ -818,7 +855,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value <= min 时
      */
     public final static int requireGtOf(int value, int min) {
-        return requireGtOf(value, min, "Invalid value: {}, expected great than: {}.");
+        return requireGtOf(value, min, "Invalid value: {}, require great than: {}.");
     }
 
     /**
@@ -850,7 +887,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value < min 时
      */
     public final static int requireGeOf(int value, int min) {
-        return requireGeOf(value, min, "Invalid value: {}, expected not less than: {}.");
+        return requireGeOf(value, min, "Invalid value: {}, require not less than: {}.");
     }
 
     /**
@@ -882,7 +919,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value != that 时
      */
     public final static int requireEqOf(int value, int that) {
-        return requireEqOf(value, that, "Invalid value: {}, expected: {}.");
+        return requireEqOf(value, that, "Invalid value: {}, require: {}.");
     }
 
     /**
@@ -914,7 +951,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value == that 时
      */
     public final static int requireNotOf(int value, int that) {
-        return requireNotOf(value, that, "Invalid value: {}, expected not of: {}.");
+        return requireNotOf(value, that, "Invalid value: {}, require not of: {}.");
     }
 
     /**
@@ -946,7 +983,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value >= max 时
      */
     public final static long requireLtOf(long value, long max) {
-        return requireLtOf(value, max, "Invalid value: {}, expected less than: {}.");
+        return requireLtOf(value, max, "Invalid value: {}, require less than: {}.");
     }
 
     /**
@@ -978,7 +1015,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value > max 时
      */
     public final static long requireLeOf(long value, long max) {
-        return requireLeOf(value, max, "Invalid value: {}, expected not great than: {}.");
+        return requireLeOf(value, max, "Invalid value: {}, require not great than: {}.");
     }
 
     /**
@@ -1010,7 +1047,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value <= min 时
      */
     public final static long requireGtOf(long value, long min) {
-        return requireGtOf(value, min, "Invalid value: {}, expected great than: {}.");
+        return requireGtOf(value, min, "Invalid value: {}, require great than: {}.");
     }
 
     /**
@@ -1042,7 +1079,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value < min 时
      */
     public final static long requireGeOf(long value, long min) {
-        return requireGeOf(value, min, "Invalid value: {}, expected not less than: {}.");
+        return requireGeOf(value, min, "Invalid value: {}, require not less than: {}.");
     }
 
     /**
@@ -1074,7 +1111,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value != that 时
      */
     public final static long requireEqOf(long value, long that) {
-        return requireEqOf(value, that, "Invalid value: {}, expected: {}.");
+        return requireEqOf(value, that, "Invalid value: {}, require: {}.");
     }
 
     /**
@@ -1106,7 +1143,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value == that 时
      */
     public final static long requireNotOf(long value, long that) {
-        return requireNotOf(value, that, "Invalid value: {}, expected not of: {}.");
+        return requireNotOf(value, that, "Invalid value: {}, require not of: {}.");
     }
 
     /**
@@ -1138,7 +1175,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value >= max 时
      */
     public final static double requireLtOf(double value, double max) {
-        return requireLtOf(value, max, "Invalid value: {}, expected less than: {}.");
+        return requireLtOf(value, max, "Invalid value: {}, require less than: {}.");
     }
 
     /**
@@ -1170,7 +1207,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value > max 时
      */
     public final static double requireLeOf(double value, double max) {
-        return requireLeOf(value, max, "Invalid value: {}, expected not great than: {}.");
+        return requireLeOf(value, max, "Invalid value: {}, require not great than: {}.");
     }
 
     /**
@@ -1202,7 +1239,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value <= min 时
      */
     public final static double requireGtOf(double value, double min) {
-        return requireGtOf(value, min, "Invalid value: {}, expected great than: {}.");
+        return requireGtOf(value, min, "Invalid value: {}, require great than: {}.");
     }
 
     /**
@@ -1234,7 +1271,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value < min 时
      */
     public final static double requireGeOf(double value, double min) {
-        return requireGeOf(value, min, "Invalid value: {}, expected not less than: {}.");
+        return requireGeOf(value, min, "Invalid value: {}, require not less than: {}.");
     }
 
     /**
@@ -1266,7 +1303,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value != that 时
      */
     public final static double requireEqOf(double value, double that) {
-        return requireEqOf(value, that, "Invalid value: {}, expected: {}.");
+        return requireEqOf(value, that, "Invalid value: {}, require: {}.");
     }
 
     /**
@@ -1298,7 +1335,7 @@ public class ValidateUtil extends TestUtil {
      * @throws RequireValidateException 当 value == that 时
      */
     public final static double requireNotOf(double value, double that) {
-        return requireNotOf(value, that, "Invalid value: {}, expected not of: {}.");
+        return requireNotOf(value, that, "Invalid value: {}, require not of: {}.");
     }
 
     /**
@@ -1333,7 +1370,7 @@ public class ValidateUtil extends TestUtil {
         if (isEmpty(str)) {
             return str;
         }
-        throw new RequireValidateException("Invalid CharSequence, expected an empty string, but got: " + str);
+        throw new RequireValidateException("Invalid CharSequence, require an empty string, but got: " + str);
     }
 
     /**
@@ -1370,7 +1407,7 @@ public class ValidateUtil extends TestUtil {
         if (isNotEmpty(str)) {
             return str;
         }
-        throw new RequireValidateException("Invalid CharSequence, expected a not empty string, but got: " + str);
+        throw new RequireValidateException("Invalid CharSequence, require a not empty string, but got: " + str);
     }
 
     /**
@@ -1444,7 +1481,7 @@ public class ValidateUtil extends TestUtil {
         if (isNotBlank(str)) {
             return str;
         }
-        throw new RequireValidateException("Invalid CharSequence, expected not blank, but got: " + str);
+        throw new RequireValidateException("Invalid CharSequence, require not blank, but got: " + str);
     }
 
     /**
@@ -1482,7 +1519,7 @@ public class ValidateUtil extends TestUtil {
         if (isEmpty(collect)) {
             return collect;
         }
-        throw new RequireValidateException("Invalid Collection, expected an empty Collection.");
+        throw new RequireValidateException("Invalid Collection, require an empty Collection.");
     }
 
     /**
@@ -1519,7 +1556,7 @@ public class ValidateUtil extends TestUtil {
         if (isNotEmpty(collect)) {
             return collect;
         }
-        throw new RequireValidateException("Invalid Collection, expected a not empty Collection.");
+        throw new RequireValidateException("Invalid Collection, require a not empty Collection.");
     }
 
     /**
@@ -1556,7 +1593,7 @@ public class ValidateUtil extends TestUtil {
         if (isEmpty(map)) {
             return map;
         }
-        throw new RequireValidateException("Invalid Map, expected an empty 'Map'.");
+        throw new RequireValidateException("Invalid Map, require an empty 'Map'.");
     }
 
     /**
@@ -1597,7 +1634,7 @@ public class ValidateUtil extends TestUtil {
         if (isNotEmpty(map)) {
             return map;
         }
-        throw new RequireValidateException("Invalid Map, expected a not empty 'Collection'.");
+        throw new RequireValidateException("Invalid Map, require a not empty 'Collection'.");
     }
 
     /**

@@ -252,6 +252,15 @@ public class TestUtil {
     public final static boolean isIPV6(CharSequence str) { return IPV6.test(str); }
 
     /**
+     * 是否是 MAC 地址
+     *
+     * @param str 待测字符串
+     *
+     * @return 如果检测通过，返回 true，否则返回 false
+     */
+    public final static boolean isMacAddress(CharSequence str) { return MAC_ADDRESS.test(str); }
+
+    /**
      * 验证 11 位手机号
      *
      * @param str 待测字符串
