@@ -3,6 +3,9 @@ package com.moon.core.util;
 import com.moon.core.enums.Collects;
 import com.moon.core.enums.Lists;
 import com.moon.core.enums.Sets;
+import com.moon.core.lang.ArrayUtil;
+import com.moon.core.util.function.BiIntFunction;
+import com.moon.core.util.function.IntTableFunction;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -262,6 +265,69 @@ public class CollectUtil extends BaseCollectUtil {
     }
 
     /**
+     * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
+     * <pre>
+     * 1. 接受一个集合作为源数据；
+     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
+     * 3. 初始值，作为第一次传入处理器的参数
+     * </pre>
+     *
+     * @param iterable 源数据集合
+     * @param reducer  聚合函数
+     * @param result   返回结果
+     * @param <T>      返回值类型
+     * @param <E>      迭代器单项数据类型
+     *
+     * @return 返回最后一项处理完后的结果
+     *
+     * @see #reduce(Iterator, IntTableFunction, Object)
+     * @see ArrayUtil#reduce(Object[], IntTableFunction, Object)
+     * @see ArrayUtil#reduce(int, BiIntFunction, Object)
+     */
+    public final static <T, E> T reduce(
+        Iterable<? extends E> iterable, IntTableFunction<? super T, ? super E, ? extends T> reducer, T result
+    ) {
+        if (iterable != null) {
+            int index = 0;
+            for (E item : iterable) {
+                result = reducer.apply(result, item, index++);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
+     * <pre>
+     * 1. 接受一个集合作为源数据；
+     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
+     * 3. 初始值，作为第一次传入处理器的参数
+     * </pre>
+     *
+     * @param iterator 源数据集合
+     * @param reducer  聚合函数
+     * @param result   返回结果
+     * @param <T>      返回值类型
+     * @param <E>      迭代器单项数据类型
+     *
+     * @return 返回最后一项处理完后的结果
+     *
+     * @see #reduce(Iterable, IntTableFunction, Object)
+     * @see ArrayUtil#reduce(Object[], IntTableFunction, Object)
+     * @see ArrayUtil#reduce(int, BiIntFunction, Object)
+     */
+    public final static <T, E> T reduce(
+        Iterator<? extends E> iterator, IntTableFunction<? super T, ? super E, ? extends T> reducer, T result
+    ) {
+        if (iterator != null) {
+            for (int i = 0; iterator.hasNext(); i++) {
+                result = reducer.apply(result, iterator.next(), i);
+            }
+        }
+        return result;
+    }
+
+    /**
      * 要求空集合，即集合中至少有一项数据
      *
      * @param collect 待测集合
@@ -274,7 +340,7 @@ public class CollectUtil extends BaseCollectUtil {
      *                                  异常消息由调用方自定义，
      *                                  可用“{}”占位符接收入参集合
      */
-    static <E, C extends Collection<E>> C requireNotEmpty(C collect, String message) {
+    final static <E, C extends Collection<E>> C requireNotEmpty(C collect, String message) {
         return ValidateUtil.requireNotEmpty(collect, message);
     }
 }

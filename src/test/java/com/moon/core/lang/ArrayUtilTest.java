@@ -1,8 +1,10 @@
 package com.moon.core.lang;
 
+import com.moon.core.util.MapUtil;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -44,5 +46,20 @@ public class ArrayUtilTest {
     @Test
     void testSum() throws Exception {
         int[] ints = {};
+
+        Map<String, Object> resultMap = ArrayUtil.reduce(20, (map, idx) -> {
+
+            return map;
+        }, MapUtil.newHashMap());
+    }
+
+    @Test
+    void testToString() throws Exception {
+        long time = new Date().getTime();
+        System.out.println(time);
+        String str = LongUtil.toString(time, 62);
+        System.out.println(str);
+        long parsed = LongUtil.parseLong(str, 62);
+        assertEquals(time, parsed);
     }
 }

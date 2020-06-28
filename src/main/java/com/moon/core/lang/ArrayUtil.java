@@ -1,10 +1,13 @@
 package com.moon.core.lang;
 
+import com.moon.core.util.CollectUtil;
+import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.IntTableFunction;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.*;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -585,9 +588,56 @@ public final class ArrayUtil {
      reduce
      */
 
-    public static <T, E> T reduce(E[] arr, IntTableFunction<T, E, T> reducer, T result) {
+    /**
+     * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
+     * <pre>
+     * 1. 接受一个数组作为源数据；
+     * 2. 一个处理器，处理器接收两个参数（总值, 当前项），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
+     *       其中当前项也是索引，索引相对{@link #reduce(int, BiIntFunction, Object)}少一个参数
+     * 3. 初始值，作为第一次传入处理器的参数
+     * </pre>
+     *
+     * @param count   迭代次数
+     * @param reducer 聚合函数
+     * @param result  返回结果
+     * @param <T>     返回值类型
+     *
+     * @return 返回最后一项处理完后的结果
+     *
+     * @see #reduce(Object[], IntTableFunction, Object)
+     * @see CollectUtil#reduce(Iterable, IntTableFunction, Object)
+     * @see CollectUtil#reduce(Iterator, IntTableFunction, Object)
+     */
+    public static <T> T reduce(int count, BiIntFunction<? super T, ? extends T> reducer, T result) {
+        for (int i = 0; i < count; i++) {
+            result = reducer.apply(result, i);
+        }
+        return result;
+    }
+
+    /**
+     * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
+     * <pre>
+     * 1. 接受一个数组作为源数据；
+     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
+     * 3. 初始值，作为第一次传入处理器的参数
+     * </pre>
+     *
+     * @param arr     入参数组
+     * @param reducer 聚合函数
+     * @param result  返回结果
+     * @param <T>     返回值类型
+     * @param <E>     迭代器单项数据类型
+     *
+     * @return 返回最后一项处理完后的结果
+     *
+     * @see #reduce(int, BiIntFunction, Object)
+     * @see CollectUtil#reduce(Iterable, IntTableFunction, Object)
+     * @see CollectUtil#reduce(Iterator, IntTableFunction, Object)
+     */
+    public static <T, E> T reduce(E[] arr, IntTableFunction<? super T, ? super E, ? extends T> reducer, T result) {
         if (arr != null) {
-            for (int i = 0; i < arr.length; i++) {
+            for (int i = 0, len = arr.length; i < len; i++) {
                 result = reducer.apply(result, arr[i], i);
             }
         }

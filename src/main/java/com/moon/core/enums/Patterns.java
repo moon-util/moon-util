@@ -126,8 +126,6 @@ public enum Patterns implements Predicate<CharSequence> {
 
     private final Pattern pattern;
 
-    Patterns(String value) { this(of(value)); }
-
     Patterns(Pattern pattern) { this.pattern = pattern; }
 
     /**
