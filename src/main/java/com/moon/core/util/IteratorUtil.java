@@ -397,7 +397,7 @@ public final class IteratorUtil {
      * ----------------------------------------------------------------------------
      */
 
-    public static void forEachAny(Object data, IntBiConsumer consumer) {
+    public static void forEachAny(Object data, BiIntConsumer consumer) {
         if (data instanceof Iterable) {
             forEach((Iterable) data, consumer);
         } else if (data instanceof Map) {
@@ -426,7 +426,7 @@ public final class IteratorUtil {
      * ----------------------------------------------------------------------------
      */
 
-    public static void forEachFields(Object bean, IntBiConsumer consumer) {
+    public static void forEachFields(Object bean, BiIntConsumer consumer) {
         if (bean != null) {
             IntAccessor indexer = IntAccessor.of();
             BeanInfoUtil.getFieldDescriptorsMap(bean.getClass()).forEach(
@@ -596,7 +596,7 @@ public final class IteratorUtil {
      *
      * @return
      */
-    public static void forEach(long[] array, IntLongConsumer consumer) {
+    public static void forEach(long[] array, LongIntConsumer consumer) {
         for (int i = 0, length = array == null ? 0 : array.length; i < length; i++) {
             consumer.accept(array[i], i);
         }
@@ -610,7 +610,7 @@ public final class IteratorUtil {
      *
      * @return
      */
-    public static void forEach(double[] array, IntDoubleConsumer consumer) {
+    public static void forEach(double[] array, DoubleIntConsumer consumer) {
         for (int i = 0, length = array == null ? 0 : array.length; i < length; i++) {
             consumer.accept(array[i], i);
         }
@@ -624,7 +624,7 @@ public final class IteratorUtil {
      *
      * @return
      */
-    public static <T> void forEach(T[] array, IntBiConsumer<? super T> consumer) {
+    public static <T> void forEach(T[] array, BiIntConsumer<? super T> consumer) {
         for (int i = 0, length = array == null ? 0 : array.length; i < length; i++) {
             consumer.accept(array[i], i);
         }
@@ -637,7 +637,7 @@ public final class IteratorUtil {
      * @param consumer
      * @param <T>
      */
-    public static <T extends Enum<T>> void forEach(Class<T> enumType, IntBiConsumer<? super T> consumer) {
+    public static <T extends Enum<T>> void forEach(Class<T> enumType, BiIntConsumer<? super T> consumer) {
         if (enumType != null) { forEach(EnumUtil.values(enumType), consumer); }
     }
 
@@ -667,7 +667,7 @@ public final class IteratorUtil {
      * @param consumer
      * @param <T>
      */
-    public static <T> void forEach(Iterable<T> list, IntBiConsumer<? super T> consumer) {
+    public static <T> void forEach(Iterable<T> list, BiIntConsumer<? super T> consumer) {
         if (list != null) {
             int i = 0;
             for (T item : list) {
@@ -688,7 +688,7 @@ public final class IteratorUtil {
         if (iterator != null) { iterator.forEachRemaining(consumer); }
     }
 
-    public static <T> void forEach(Iterator<T> iterator, IntBiConsumer<? super T> consumer) {
+    public static <T> void forEach(Iterator<T> iterator, BiIntConsumer<? super T> consumer) {
         if (iterator != null) { for (int i = 0; iterator.hasNext(); i++) { consumer.accept(iterator.next(), i); } }
     }
 
@@ -749,7 +749,7 @@ public final class IteratorUtil {
      * @param resultSet
      * @param consumer
      */
-    public static void forEach(ResultSet resultSet, IntBiConsumer<? super ResultSet> consumer) {
+    public static void forEach(ResultSet resultSet, BiIntConsumer<? super ResultSet> consumer) {
         if (resultSet != null) { forEach(of(resultSet), consumer); }
     }
 

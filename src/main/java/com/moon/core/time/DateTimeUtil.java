@@ -3,12 +3,14 @@ package com.moon.core.time;
 import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.util.function.IntBiFunction;
+import com.moon.core.util.function.TableIntFunction;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.time.LocalDateTime.ofInstant;
@@ -82,7 +84,7 @@ public final class DateTimeUtil {
     public static int getYear(LocalDate date) { return nowIfNull(date).getYear(); }
 
     /**
-     * 第几月；
+     * 获取月份；
      * <p>
      * 注在{@link Date}或{@link Calendar}中直接获取到的月份比实际的要少一月，即当前是 6 月获取到的实际是 5 月，用的时候需要手动处理；
      * 但在 jdk8 的日期时间里不是这样的，实际是几月就是几月。
@@ -130,7 +132,7 @@ public final class DateTimeUtil {
     public static int getYear(LocalDateTime date) { return nowIfNull(date).getYear(); }
 
     /**
-     * 第几月；
+     * 获取月份；
      * <p>
      * 注在{@link Date}或{@link Calendar}中直接获取到的月份比实际的要少一月，即当前是 6 月获取到的实际是 5 月，用的时候需要手动处理；
      * 但在 jdk8 的日期时间里不是这样的，实际是几月就是几月。
@@ -655,6 +657,50 @@ public final class DateTimeUtil {
 
     /*
      * ----------------------------------------------------------------------------------
+     * reduce
+     * ----------------------------------------------------------------------------------
+     */
+
+    public static <T> T reduceYears(
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, ? extends T> reducer, T totalValue
+    ) { return reduce(begin, end, reducer, totalValue, b -> b.plusYears(1)); }
+
+    public static <T> T reduceMonths(
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, ? extends T> reducer, T totalValue
+    ) { return reduce(begin, end, reducer, totalValue, b -> b.plusMonths(1)); }
+
+    public static <T> T reduceWeeks(
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, ? extends T> reducer, T totalValue
+    ) { return reduce(begin, end, reducer, totalValue, b -> b.plusWeeks(1)); }
+
+    public static <T> T reduceDays(
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, ? extends T> reducer, T totalValue
+    ) { return reduce(begin, end, reducer, totalValue, b -> b.plusDays(1)); }
+
+    public static <T> T reduce(
+        LocalDate begin, LocalDate end,//
+        TableIntFunction<? super T, LocalDate, ? extends T> reducer,//
+        T totalValue, Function<LocalDate, LocalDate> addr
+    ) {
+        for (int i = 0; begin.isBefore(end); begin = addr.apply(begin)) {
+            totalValue = reducer.apply(totalValue, begin, i++);
+        }
+        return totalValue;
+    }
+
+    public static <T> T reduce(
+        LocalTime begin, LocalTime end,//
+        TableIntFunction<? super T, LocalTime, ? extends T> reducer,//
+        T totalValue, Function<LocalTime, LocalTime> addr
+    ) {
+        for (int i = 0; begin.isBefore(end); begin = addr.apply(begin)) {
+            totalValue = reducer.apply(totalValue, begin, i++);
+        }
+        return totalValue;
+    }
+
+    /*
+     * ----------------------------------------------------------------------------------
      * for each
      * ----------------------------------------------------------------------------------
      */
@@ -678,7 +724,8 @@ public final class DateTimeUtil {
         LocalDate now = LocalDate.now();
         LocalDateTime last = begin.isBefore(end) ? LocalDateTime.of(now, end) : LocalDateTime.of(now.plusDays(1), end);
         for (LocalDateTime start = LocalDateTime.of(now, begin);
-            start.isBefore(last) && consumer.apply(start.getHour(), start.toLocalTime()); start = start.plusHours(1)) {
+            start.isBefore(last) && consumer.apply(start.getHour(), start.toLocalTime());
+            start = start.plusHours(1)) {
         }
     }
 

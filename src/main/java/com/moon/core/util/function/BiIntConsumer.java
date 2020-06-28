@@ -4,7 +4,7 @@ package com.moon.core.util.function;
  * @author ZhangDongMin
  */
 @FunctionalInterface
-public interface IntBiConsumer<T> {
+public interface BiIntConsumer<T> {
     /**
      * valuesList handler
      *

@@ -2,7 +2,7 @@ package com.moon.core.lang;
 
 import com.moon.core.util.CollectUtil;
 import com.moon.core.util.function.BiIntFunction;
-import com.moon.core.util.function.IntTableFunction;
+import com.moon.core.util.function.TableIntFunction;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -604,9 +604,9 @@ public final class ArrayUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Object[], IntTableFunction, Object)
-     * @see CollectUtil#reduce(Iterable, IntTableFunction, Object)
-     * @see CollectUtil#reduce(Iterator, IntTableFunction, Object)
+     * @see #reduce(Object[], TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
      */
     public static <T> T reduce(int count, BiIntFunction<? super T, ? extends T> reducer, T result) {
         for (int i = 0; i < count; i++) {
@@ -632,10 +632,10 @@ public final class ArrayUtil {
      * @return 返回最后一项处理完后的结果
      *
      * @see #reduce(int, BiIntFunction, Object)
-     * @see CollectUtil#reduce(Iterable, IntTableFunction, Object)
-     * @see CollectUtil#reduce(Iterator, IntTableFunction, Object)
+     * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
      */
-    public static <T, E> T reduce(E[] arr, IntTableFunction<? super T, ? super E, ? extends T> reducer, T result) {
+    public static <T, E> T reduce(E[] arr, TableIntFunction<? super T, ? super E, ? extends T> reducer, T result) {
         if (arr != null) {
             for (int i = 0, len = arr.length; i < len; i++) {
                 result = reducer.apply(result, arr[i], i);

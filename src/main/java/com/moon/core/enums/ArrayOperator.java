@@ -2,14 +2,13 @@ package com.moon.core.enums;
 
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
-import com.moon.core.util.function.IntBiConsumer;
+import com.moon.core.util.function.BiIntConsumer;
 import com.moon.core.util.interfaces.IteratorFunction;
 import com.moon.core.util.interfaces.Stringify;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
@@ -170,7 +169,7 @@ public interface ArrayOperator extends IteratorFunction<Object, Object>, Predica
      * @param arr      数组
      * @param consumer 数组依次执行的函数
      */
-    default void forEach(Object arr, IntBiConsumer consumer) {
+    default void forEach(Object arr, BiIntConsumer consumer) {
         for (int i = 0, len = length(arr); i < len; i++) {
             consumer.accept(get(arr, i), i);
         }

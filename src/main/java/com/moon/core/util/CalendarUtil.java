@@ -65,14 +65,20 @@ public class CalendarUtil {
     public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, current()); }
 
     public final static boolean isSameDay(Calendar value, Calendar other) {
-        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
-            value) == getDayOfMonth(other);
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other);
     }
 
     public final static boolean isSameTime(Calendar value, Calendar other) {
-        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
-            value) == getDayOfMonth(other) && getHour(value) == getHour(other) && getMinute(value) == getMinute(other) && getSecond(
-            value) == getSecond(other);
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other) &&
+            getHour(value) == getHour(other) &&
+            getMinute(value) == getMinute(other) &&
+            getSecond(value) == getSecond(other);
     }
 
     public final static boolean isBefore(Calendar value, Calendar other) {
@@ -112,6 +118,17 @@ public class CalendarUtil {
     public final static Calendar nowCalendar() { return current(); }
 
     public final static long now() { return System.currentTimeMillis(); }
+
+    /**
+     * 默认当前时间，如果指定时间为 null 的话
+     *
+     * @param calendar 指定时间
+     *
+     * @return
+     */
+    public final static Calendar nowIfNull(Calendar calendar) {
+        return calendar == null ? current() : calendar;
+    }
 
     /*
      * -------------------------------------------------------------------------
@@ -254,20 +271,88 @@ public class CalendarUtil {
 
     public final static Calendar setMillisecond(Calendar value, int amount) { return set(value, MILLISECOND, amount); }
 
+    /**
+     * 获取年份
+     *
+     * @param value Calendar
+     *
+     * @return 年份
+     */
     public final static int getYear(Calendar value) { return get(value, YEAR); }
 
+    /**
+     * 获取月份；
+     * <p>
+     * 注在{@link Date}或{@link Calendar}中直接获取到的月份比实际的要少一月，即当前是 6 月获取到的实际是 5 月；
+     * 此工具类针对月份做了统一处理，是几月获取到的就是几月
+     *
+     * @param value Calendar 对象
+     *
+     * @return 月份
+     */
     public final static int getMonth(Calendar value) { return get(value, MONTH); }
 
+    /**
+     * 获取星期
+     *
+     * @param value Calendar 对象
+     *
+     * @return 星期枚举
+     */
+    public final static int getDayOfWeek(Calendar value) { return get(value, DAY_OF_WEEK); }
+
+    /**
+     * 一月中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是 2 月的第 1 天
+     *
+     * @param value Calendar 对象
+     *
+     * @return 月中的第几天
+     */
     public final static int getDayOfMonth(Calendar value) { return get(value, DAY_OF_MONTH); }
 
+    /**
+     * 一年中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是第 32 天
+     *
+     * @param value Calendar 对象
+     *
+     * @return 年中的第几日
+     */
     public final static int getDayOfYear(Calendar value) { return get(value, DAY_OF_YEAR); }
 
+    /**
+     * 获取小时
+     *
+     * @param value
+     *
+     * @return
+     */
     public final static int getHour(Calendar value) { return get(value, HOUR_OF_DAY); }
 
+    /**
+     * 获取分钟
+     *
+     * @param value
+     *
+     * @return
+     */
     public final static int getMinute(Calendar value) { return get(value, MINUTE); }
 
+    /**
+     * 获取秒数
+     *
+     * @param value
+     *
+     * @return
+     */
     public final static int getSecond(Calendar value) { return get(value, SECOND); }
 
+    /**
+     * 获取毫秒数
+     *
+     * @param value
+     *
+     * @return
+     */
     public final static int getMillisecond(Calendar value) { return get(value, MILLISECOND); }
 
     public final static Calendar set(Calendar value, int field, int amount) {
@@ -437,11 +522,7 @@ public class CalendarUtil {
     public final static Calendar toCalendar(Date date) { return date == null ? null : toCalendar(date.getTime()); }
 
     public final static Calendar toCalendar(LocalDate date, LocalTime time) {
-        return toCalendar(date.getYear(),
-            date.getDayOfMonth(),
-            date.getDayOfMonth(),
-            time.getHour(),
-            time.getMinute(),
+        return toCalendar(date.getYear(), date.getDayOfMonth(), date.getDayOfMonth(), time.getHour(), time.getMinute(),
             time.getSecond());
     }
 
@@ -454,12 +535,9 @@ public class CalendarUtil {
     }
 
     public final static Calendar toCalendar(LocalDateTime date) {
-        return date == null ? null : toCalendar(date.getYear(),
-            date.getMonthValue(),
-            date.getDayOfMonth(),
-            date.getHour(),
-            date.getMinute(),
-            date.getSecond());
+        return date == null ? null
+            : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), date.getHour(), date.getMinute(),
+                date.getSecond());
     }
 
     public final static Calendar toCalendar(int... values) {

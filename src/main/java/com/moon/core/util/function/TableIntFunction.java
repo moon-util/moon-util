@@ -4,7 +4,7 @@ package com.moon.core.util.function;
  * @author benshaoye
  */
 @FunctionalInterface
-public interface IntTableFunction<F, S, R> {
+public interface TableIntFunction<F, S, R> {
 
     /**
      * Applies this function to the given argument.

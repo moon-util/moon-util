@@ -1,6 +1,6 @@
 package com.moon.core.util;
 
-import com.moon.core.util.function.IntBiConsumer;
+import com.moon.core.util.function.BiIntConsumer;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -75,7 +75,7 @@ public final class Tuple<T> implements Iterable<T>, Serializable {
      *
      * @return 返回自身
      */
-    public Tuple<T> forEach(IntBiConsumer<? super T> consumer) {
+    public Tuple<T> forEach(BiIntConsumer<? super T> consumer) {
         IteratorUtil.forEach(elements, consumer);
         return this;
     }

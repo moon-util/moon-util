@@ -5,7 +5,7 @@ import com.moon.core.enums.Lists;
 import com.moon.core.enums.Sets;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.function.BiIntFunction;
-import com.moon.core.util.function.IntTableFunction;
+import com.moon.core.util.function.TableIntFunction;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -280,12 +280,12 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Iterator, IntTableFunction, Object)
-     * @see ArrayUtil#reduce(Object[], IntTableFunction, Object)
+     * @see #reduce(Iterator, TableIntFunction, Object)
+     * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterable<? extends E> iterable, IntTableFunction<? super T, ? super E, ? extends T> reducer, T result
+        Iterable<? extends E> iterable, TableIntFunction<? super T, ? super E, ? extends T> reducer, T result
     ) {
         if (iterable != null) {
             int index = 0;
@@ -312,12 +312,12 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Iterable, IntTableFunction, Object)
-     * @see ArrayUtil#reduce(Object[], IntTableFunction, Object)
+     * @see #reduce(Iterable, TableIntFunction, Object)
+     * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterator<? extends E> iterator, IntTableFunction<? super T, ? super E, ? extends T> reducer, T result
+        Iterator<? extends E> iterator, TableIntFunction<? super T, ? super E, ? extends T> reducer, T result
     ) {
         if (iterator != null) {
             for (int i = 0; iterator.hasNext(); i++) {

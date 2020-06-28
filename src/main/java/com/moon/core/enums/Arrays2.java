@@ -2,7 +2,7 @@ package com.moon.core.enums;
 
 import com.moon.core.lang.BooleanUtil;
 import com.moon.core.util.IteratorUtil;
-import com.moon.core.util.function.IntBiConsumer;
+import com.moon.core.util.function.BiIntConsumer;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,7 +51,7 @@ public enum Arrays2 implements ArrayOperator {
         public int length(Object arr) { return to(arr).length; }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             IteratorUtil.forEach(to(arr), consumer);
         }
 
@@ -114,7 +114,7 @@ public enum Arrays2 implements ArrayOperator {
         public int length(Object arr) { return to(arr).length; }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             IteratorUtil.forEach(to(arr), consumer);
         }
 
@@ -214,7 +214,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             boolean[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);
@@ -319,7 +319,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             double[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);
@@ -421,7 +421,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             float[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);
@@ -522,7 +522,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             long[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);
@@ -623,7 +623,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             int[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);
@@ -724,7 +724,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             short[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);
@@ -827,7 +827,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             byte[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);
@@ -928,7 +928,7 @@ public enum Arrays2 implements ArrayOperator {
         }
 
         @Override
-        public void forEach(Object arr, IntBiConsumer consumer) {
+        public void forEach(Object arr, BiIntConsumer consumer) {
             char[] array = to(arr);
             for (int i = 0, length = array.length; i < length; i++) {
                 consumer.accept(array[i], i);

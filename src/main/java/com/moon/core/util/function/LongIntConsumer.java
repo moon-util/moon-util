@@ -4,11 +4,11 @@ package com.moon.core.util.function;
  * @author ZhangDongMin
  */
 @FunctionalInterface
-public interface IntDoubleConsumer {
+public interface LongIntConsumer {
     /**
-     * double array handler
-     * @param value current items
+     * long array handler
+     * @param value current data
      * @param index current getSheet
      */
-    void accept(double value, int index);
+    void accept(long value, int index);
 }

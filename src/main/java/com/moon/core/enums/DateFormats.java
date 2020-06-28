@@ -142,10 +142,7 @@ public enum DateFormats implements EnumDescriptor {
         static DateFormat get(String pattern) { return new SimpleDateFormat(pattern); }
     }
 
-    DateFormats(String text) {
-
-        this.CHINESE_TEXT = text;
-    }
+    DateFormats(String text) { this.CHINESE_TEXT = text; }
 
     public final DateFormat of(String pattern) { return with(pattern); }
 
