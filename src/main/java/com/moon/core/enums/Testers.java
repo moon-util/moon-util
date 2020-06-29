@@ -170,14 +170,14 @@ public enum Testers implements Predicate, EnumDescriptor {
      */
     isNegative {
         @Override
-        public boolean test(Object o) { return o instanceof Number && ((Number) o).intValue() < 0; }
+        public boolean test(Object o) { return o instanceof Number && ((Number) o).doubleValue() < 0; }
     },
     /**
      * 正数
      */
     isPositive {
         @Override
-        public boolean test(Object o) { return o instanceof Number && ((Number) o).intValue() > 0; }
+        public boolean test(Object o) { return o instanceof Number && ((Number) o).doubleValue() > 0; }
     },
     ;
 

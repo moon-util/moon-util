@@ -1,5 +1,6 @@
 package com.moon.more.excel;
 
+import com.moon.core.dep.Dependencies;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -100,7 +101,13 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
     static class XlsGetter implements WorkbookBuilder {
 
         @Override
-        public Workbook get() { return new HSSFWorkbook(); }
+        public Workbook get() {
+            try {
+                return new HSSFWorkbook();
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLS.getException();
+            }
+        }
 
         @Override
         public Workbook apply(InputStream stream) {
@@ -108,6 +115,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
                 return new HSSFWorkbook(stream);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLS.getException();
             }
         }
 
@@ -119,6 +128,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
                 throw e;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLS.getException();
             }
         }
     }
@@ -126,7 +137,13 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
     static class XlsxGetter implements WorkbookBuilder {
 
         @Override
-        public Workbook get() { return new XSSFWorkbook(); }
+        public Workbook get() {
+            try {
+                return new XSSFWorkbook();
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLS.getException();
+            }
+        }
 
         @Override
         public Workbook apply(InputStream stream) {
@@ -134,6 +151,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
                 return new XSSFWorkbook(stream);
             } catch (IOException e) {
                 throw new IllegalStateException(e);
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLSX.getException();
             }
         }
 
@@ -145,6 +164,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
                 throw e;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLSX.getException();
             }
         }
     }
@@ -152,7 +173,13 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
     static class SuperGetter implements WorkbookBuilder {
 
         @Override
-        public Workbook get() { return new SXSSFWorkbook(); }
+        public Workbook get() {
+            try {
+                return new SXSSFWorkbook();
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLS.getException();
+            }
+        }
 
         @Override
         public Workbook apply(InputStream stream) {
@@ -160,6 +187,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
                 return new SXSSFWorkbook(new XSSFWorkbook(stream));
             } catch (IOException e) {
                 throw new IllegalStateException(e);
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLSX.getException();
             }
         }
 
@@ -171,6 +200,8 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
                 throw e;
             } catch (Exception e) {
                 throw new IllegalStateException(e);
+            } catch (NoClassDefFoundError e) {
+                throw Dependencies.XLSX.getException();
             }
         }
     }

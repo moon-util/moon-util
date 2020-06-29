@@ -270,6 +270,31 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>javax.persistence-api</artifactId>
+      <version>2.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>5.2.5.RELEASE</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.redisson</groupId>
+      <artifactId>redisson</artifactId>
+      <version>3.13.0</version>
+    </dependency>
+
+
+    <!-- hibernate-validator 验证需要三个依赖:
+     org.hibernate.validator:hibernate-validator
+     javax.el:javax.el-api
+     org.glassfish.web:javax.el
+     -->
+    <dependency>
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <version>6.0.18.Final</version>
@@ -285,18 +310,6 @@
       <groupId>org.glassfish.web</groupId>
       <artifactId>javax.el</artifactId>
       <version>2.2.4</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
-      <version>2.2</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <version>5.2.5.RELEASE</version>
       <optional>true</optional>
     </dependency>
   </dependencies>

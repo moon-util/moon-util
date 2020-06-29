@@ -1,6 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.enums.Patterns;
+import com.moon.core.enums.Testers;
 import com.moon.core.lang.CharUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
@@ -76,6 +77,7 @@ public class TestUtil {
      * @param pattern 表达式模式
      *
      * @return 匹配成功返回 true，否则返回 false
+     * @see Patterns
      */
     public final static boolean isMatchOf(CharSequence str, Pattern pattern) {
         return str != null && pattern != null && pattern.matcher(str).matches();
@@ -89,6 +91,8 @@ public class TestUtil {
      * @param <T>    待测数据类型
      *
      * @return 当数据符合指定条件时，返回 true，否则返回 false
+     * @see Testers
+     * @see Patterns
      */
     public final static <T> boolean isMatchOf(T data, Predicate<? super T> tester) {
         return tester != null && tester.test(data);

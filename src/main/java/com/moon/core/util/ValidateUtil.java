@@ -1,6 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.enums.Patterns;
+import com.moon.core.enums.Testers;
 import com.moon.core.util.validator.CollectValidator;
 import com.moon.core.util.validator.MapValidator;
 import com.moon.core.util.validator.ResidentID18Validator;
@@ -225,6 +226,7 @@ public class ValidateUtil extends TestUtil {
      * @return 如果匹配成功返回 true
      *
      * @throws RequireValidateException 当字符串与正则表达式不匹配时抛出异常
+     * @see Patterns
      */
     public final static <C extends CharSequence> C requireMatchOf(C str, Pattern pattern) {
         return requireMatchOf(str, pattern, "Invalid string: {}, require match of: {}");
@@ -241,6 +243,7 @@ public class ValidateUtil extends TestUtil {
      * @return 如果匹配成功返回 true
      *
      * @throws RequireValidateException 当字符串与正则表达式不匹配时抛出异常，可用占位符“{}”依次接受两个入参
+     * @see Patterns
      */
     public final static <C extends CharSequence> C requireMatchOf(C str, Pattern pattern, String message) {
         if (isMatchOf(str, pattern)) {
@@ -259,6 +262,8 @@ public class ValidateUtil extends TestUtil {
      * @return 如果匹配成功返回数据本身
      *
      * @throws RequireValidateException 当数据与判断逻辑不匹配时抛出异常
+     * @see Testers
+     * @see Patterns
      */
     public final static <T> T requireMatchOf(T data, Predicate<? super T> tester) {
         if (isMatchOf(data, tester)) {
@@ -278,6 +283,8 @@ public class ValidateUtil extends TestUtil {
      * @return 如果匹配成功返回数据本身
      *
      * @throws RequireValidateException 当数据与判断逻辑不匹配时抛出异常
+     * @see Testers
+     * @see Patterns
      */
     public final static <T> T requireMatchOf(T data, Predicate<? super T> tester, String message) {
         if (isMatchOf(data, tester)) {

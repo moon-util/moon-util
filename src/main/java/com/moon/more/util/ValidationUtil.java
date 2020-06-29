@@ -1,6 +1,6 @@
 package com.moon.more.util;
 
-import com.moon.core.enums.Dependencies;
+import com.moon.core.dep.Dependencies;
 import com.moon.core.util.ValidateUtil;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -38,8 +38,7 @@ public final class ValidationUtil extends ValidateUtil {
         try {
             return HibernateValidator6_1_18.getValidator().validateValue(beanType, fieldName, fieldValue, groups);
         } catch (Throwable throwable) {
-            Dependencies.HIBERNATE_VALIDATOR.throwException();
-            throw new UnsupportedOperationException();
+            throw Dependencies.HIBERNATE_VALIDATOR.getException();
         }
     }
 
@@ -57,8 +56,7 @@ public final class ValidationUtil extends ValidateUtil {
         try {
             return HibernateValidator6_1_18.getValidator().validateProperty(data, fieldName, groups);
         } catch (Throwable throwable) {
-            Dependencies.HIBERNATE_VALIDATOR.throwException();
-            throw new UnsupportedOperationException();
+            throw Dependencies.HIBERNATE_VALIDATOR.getException();
         }
     }
 
@@ -75,8 +73,7 @@ public final class ValidationUtil extends ValidateUtil {
         try {
             return HibernateValidator6_1_18.getValidator().validate(data, groups);
         } catch (Throwable throwable) {
-            Dependencies.HIBERNATE_VALIDATOR.throwException();
-            throw new UnsupportedOperationException();
+            throw Dependencies.HIBERNATE_VALIDATOR.getException();
         }
     }
 
