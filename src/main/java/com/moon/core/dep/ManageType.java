@@ -12,7 +12,8 @@ public enum ManageType {
         "{indentAll}{indent}{indent}<groupId>%s</groupId>\n" +//
         "{indentAll}{indent}{indent}<artifactId>%s</artifactId>\n" +//
         "{indentAll}{indent}{indent}<version>%s</version>\n" +//
-        "{indentAll}{indent}</dependency>");
+        "{indentAll}{indent}</dependency>"),
+    GRADLE("{indentAll}{indent}%s:%s:%s");
 
     public final String TEMPLATE;
 
