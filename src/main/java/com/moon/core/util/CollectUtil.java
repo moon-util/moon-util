@@ -272,11 +272,11 @@ public class CollectUtil extends BaseCollectUtil {
      * 3. 初始值，作为第一次传入处理器的参数
      * </pre>
      *
-     * @param iterable 源数据集合
-     * @param reducer  聚合函数
-     * @param result   返回结果
-     * @param <T>      返回值类型
-     * @param <E>      迭代器单项数据类型
+     * @param iterable   源数据集合
+     * @param reducer    聚合函数
+     * @param totalValue 返回结果
+     * @param <T>        返回值类型
+     * @param <E>        迭代器单项数据类型
      *
      * @return 返回最后一项处理完后的结果
      *
@@ -285,15 +285,15 @@ public class CollectUtil extends BaseCollectUtil {
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterable<? extends E> iterable, TableIntFunction<? super T, ? super E, ? extends T> reducer, T result
+        Iterable<? extends E> iterable, TableIntFunction<? super T, ? super E, ? extends T> reducer, T totalValue
     ) {
         if (iterable != null) {
             int index = 0;
             for (E item : iterable) {
-                result = reducer.apply(result, item, index++);
+                totalValue = reducer.apply(totalValue, item, index++);
             }
         }
-        return result;
+        return totalValue;
     }
 
     /**
@@ -304,11 +304,11 @@ public class CollectUtil extends BaseCollectUtil {
      * 3. 初始值，作为第一次传入处理器的参数
      * </pre>
      *
-     * @param iterator 源数据集合
-     * @param reducer  聚合函数
-     * @param result   返回结果
-     * @param <T>      返回值类型
-     * @param <E>      迭代器单项数据类型
+     * @param iterator   源数据集合
+     * @param reducer    聚合函数
+     * @param totalValue 返回结果
+     * @param <T>        返回值类型
+     * @param <E>        迭代器单项数据类型
      *
      * @return 返回最后一项处理完后的结果
      *
@@ -317,14 +317,14 @@ public class CollectUtil extends BaseCollectUtil {
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterator<? extends E> iterator, TableIntFunction<? super T, ? super E, ? extends T> reducer, T result
+        Iterator<? extends E> iterator, TableIntFunction<? super T, ? super E, ? extends T> reducer, T totalValue
     ) {
         if (iterator != null) {
             for (int i = 0; iterator.hasNext(); i++) {
-                result = reducer.apply(result, iterator.next(), i);
+                totalValue = reducer.apply(totalValue, iterator.next(), i);
             }
         }
-        return result;
+        return totalValue;
     }
 
     /**

@@ -4,6 +4,7 @@ import com.moon.core.enums.Const;
 import com.moon.core.util.DateUtil;
 import org.junit.jupiter.api.Test;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -98,6 +99,11 @@ public class DateTimeUtilTest {
 
     @Test
     void testTestGetDayOfWeek() throws Exception {
+        LocalDate now = DateTimeUtil.toDate(2020, 06, 29);
+        LocalDate startingOfWeek = DateTimeUtil.startingOfWeek(now, DayOfWeek.SATURDAY);
+        LocalDate endingOfWeek = DateTimeUtil.endingOfWeek(now, DayOfWeek.SATURDAY);
+        System.out.println(DateTimeUtil.format(startingOfWeek, "yyyy-MM-dd"));
+        System.out.println(DateTimeUtil.format(endingOfWeek, "yyyy-MM-dd"));
     }
 
     @Test
@@ -318,5 +324,177 @@ public class DateTimeUtilTest {
 
     @Test
     void testForEachSeconds() throws Exception {
+    }
+
+    @Test
+    void testIsYearEquals() throws Exception {
+    }
+
+    @Test
+    void testIsYearBefore() throws Exception {
+    }
+
+    @Test
+    void testIsYearAfter() throws Exception {
+    }
+
+    @Test
+    void testIsMonthEquals() throws Exception {
+    }
+
+    @Test
+    void testIsMonthBefore() throws Exception {
+    }
+
+    @Test
+    void testIsMonthAfter() throws Exception {
+    }
+
+    @Test
+    void testIsDateEquals() throws Exception {
+    }
+
+    @Test
+    void testIsDateBefore() throws Exception {
+    }
+
+    @Test
+    void testIsDateAfter() throws Exception {
+    }
+
+    @Test
+    void testIsHourEquals() throws Exception {
+    }
+
+    @Test
+    void testTestIsHourEquals() throws Exception {
+    }
+
+    @Test
+    void testIsHourBefore() throws Exception {
+    }
+
+    @Test
+    void testTestIsHourBefore() throws Exception {
+    }
+
+    @Test
+    void testIsHourAfter() throws Exception {
+    }
+
+    @Test
+    void testTestIsHourAfter() throws Exception {
+    }
+
+    @Test
+    void testIsMinuteEquals() throws Exception {
+    }
+
+    @Test
+    void testTestIsMinuteEquals() throws Exception {
+    }
+
+    @Test
+    void testIsMinuteBefore() throws Exception {
+    }
+
+    @Test
+    void testTestIsMinuteBefore() throws Exception {
+    }
+
+    @Test
+    void testIsMinuteAfter() throws Exception {
+    }
+
+    @Test
+    void testTestIsMinuteAfter() throws Exception {
+    }
+
+    @Test
+    void testIsSecondEquals() throws Exception {
+    }
+
+    @Test
+    void testTestIsSecondEquals() throws Exception {
+    }
+
+    @Test
+    void testIsSecondBefore() throws Exception {
+    }
+
+    @Test
+    void testTestIsSecondBefore() throws Exception {
+    }
+
+    @Test
+    void testIsSecondAfter() throws Exception {
+    }
+
+    @Test
+    void testTestIsSecondAfter() throws Exception {
+    }
+
+    @Test
+    void testGetHour() throws Exception {
+    }
+
+    @Test
+    void testGetMinute() throws Exception {
+    }
+
+    @Test
+    void testGetSecond() throws Exception {
+    }
+
+    @Test
+    void testTestGetHour() throws Exception {
+    }
+
+    @Test
+    void testTestGetMinute() throws Exception {
+    }
+
+    @Test
+    void testTestGetSecond() throws Exception {
+    }
+
+    @Test
+    void testReduceYears() throws Exception {
+    }
+
+    @Test
+    void testReduceMonths() throws Exception {
+    }
+
+    @Test
+    void testReduceWeeks() throws Exception {
+    }
+
+    @Test
+    void testReduceDays() throws Exception {
+    }
+
+    @Test
+    void testReduce() throws Exception {
+    }
+
+    @Test
+    void testTestReduce() throws Exception {
+    }
+
+    @Test
+    void testTestReduce1() throws Exception {
+    }
+
+    @Test
+    void testReduceReverse() throws Exception {
+    }
+
+    @Test
+    void testTestReduceReverse() throws Exception {
+    }
+
+    @Test
+    void testReverseReduce() throws Exception {
     }
 }

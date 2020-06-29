@@ -1,5 +1,11 @@
 package com.moon.core.lang;
 
+import com.moon.core.util.CollectUtil;
+import com.moon.core.util.function.BiIntFunction;
+import com.moon.core.util.function.TableIntFunction;
+
+import java.util.Iterator;
+
 import static com.moon.core.enums.Strings.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.TestUtil.isIntegerValue;
@@ -225,6 +231,33 @@ public final class IntUtil {
         } catch (Exception e) {
             throw new IllegalArgumentException(format("Can not cast to int of: %s", o), e);
         }
+    }
+
+    /**
+     * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
+     * <pre>
+     * 1. 接受一个数组作为源数据；
+     * 2. 一个处理器，处理器接收两个参数（总值, 当前项），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
+     *       其中当前项也是索引，索引相对{@link #reduce(int, BiIntFunction, Object)}少一个参数
+     * 3. 初始值，作为第一次传入处理器的参数
+     * </pre>
+     *
+     * @param count   迭代次数
+     * @param reducer 聚合函数
+     * @param result  返回结果
+     * @param <T>     返回值类型
+     *
+     * @return 返回最后一项处理完后的结果
+     *
+     * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
+     */
+    public static <T> T reduce(int count, BiIntFunction<? super T, ? extends T> reducer, T result) {
+        for (int i = 0; i < count; i++) {
+            result = reducer.apply(result, i);
+        }
+        return result;
     }
 
     final static char[] DIGITS = toCharArray(NUMBERS, UPPERS, LOWERS);

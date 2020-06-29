@@ -597,10 +597,10 @@ public final class ArrayUtil {
      * 3. 初始值，作为第一次传入处理器的参数
      * </pre>
      *
-     * @param count   迭代次数
-     * @param reducer 聚合函数
-     * @param result  返回结果
-     * @param <T>     返回值类型
+     * @param count      迭代次数
+     * @param reducer    聚合函数
+     * @param totalValue 返回结果
+     * @param <T>        返回值类型
      *
      * @return 返回最后一项处理完后的结果
      *
@@ -608,11 +608,8 @@ public final class ArrayUtil {
      * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
      * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
      */
-    public static <T> T reduce(int count, BiIntFunction<? super T, ? extends T> reducer, T result) {
-        for (int i = 0; i < count; i++) {
-            result = reducer.apply(result, i);
-        }
-        return result;
+    public static <T> T reduce(int count, BiIntFunction<? super T, ? extends T> reducer, T totalValue) {
+        return IntUtil.reduce(count, reducer, totalValue);
     }
 
     /**
@@ -623,11 +620,11 @@ public final class ArrayUtil {
      * 3. 初始值，作为第一次传入处理器的参数
      * </pre>
      *
-     * @param arr     入参数组
-     * @param reducer 聚合函数
-     * @param result  返回结果
-     * @param <T>     返回值类型
-     * @param <E>     迭代器单项数据类型
+     * @param arr        入参数组
+     * @param reducer    聚合函数
+     * @param totalValue 返回结果
+     * @param <T>        返回值类型
+     * @param <E>        迭代器单项数据类型
      *
      * @return 返回最后一项处理完后的结果
      *
@@ -635,12 +632,12 @@ public final class ArrayUtil {
      * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
      * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
      */
-    public static <T, E> T reduce(E[] arr, TableIntFunction<? super T, ? super E, ? extends T> reducer, T result) {
+    public static <T, E> T reduce(E[] arr, TableIntFunction<? super T, ? super E, ? extends T> reducer, T totalValue) {
         if (arr != null) {
             for (int i = 0, len = arr.length; i < len; i++) {
-                result = reducer.apply(result, arr[i], i);
+                totalValue = reducer.apply(totalValue, arr[i], i);
             }
         }
-        return result;
+        return totalValue;
     }
 }

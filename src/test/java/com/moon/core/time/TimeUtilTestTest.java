@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,15 +22,16 @@ class TimeUtilTestTest {
         final int monthValue = 2;
         final int dayValue = 20;
         LocalDate date = LocalDate.of(yearValue, monthValue, dayValue);
-        IntAccessor interDate = IntAccessor.of();
-        DateTimeUtil.forEachYears(date, date.plusYears(3), (year, localDate) -> {
-            assertEquals(year, interDate.get() + yearValue);
-            assertEquals(localDate, LocalDate.of(yearValue + interDate.getAndIncrement(), monthValue, dayValue));
-            return true;
+        LocalDate end = date.plusDays(10);
+        // DateTimeUtil.forEach(date, end, d -> d.plusDays(1), thisDate -> {
+        //     System.out.println(thisDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        // });
+        DateTimeUtil.reduce(date, end, d -> d.plusDays(1), (total, thisDate, idx) -> {
+            total.add(DateTimeUtil.format(thisDate, "yyyy-MM-dd"));
+            return total;
+        }, new ArrayList()).forEach(dateStr -> {
+            System.out.println(dateStr);
         });
-        LocalTime time = LocalTime.now();
-        time.getHour();
-        LocalDateTime dateTime = LocalDateTime.now();
     }
 
     @Test
@@ -78,10 +81,6 @@ class TimeUtilTestTest {
         final int secondValue = 20;
         LocalTime time = LocalTime.of(hourValue, minuteValue, secondValue);
         IntAccessor interTime = IntAccessor.of();
-        DateTimeUtil.forEachHours(time, time.plusHours(3), (hour, localTime) -> {
-            System.out.println(localTime);
-            return true;
-        });
     }
 
     @Test
