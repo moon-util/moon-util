@@ -6,7 +6,7 @@ import com.moon.core.util.interfaces.ValueSupplier;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class Value<T> implements ValueSupplier<T> {
 

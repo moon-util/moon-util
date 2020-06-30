@@ -3,7 +3,7 @@ package com.moon.core.util.runner.core;
 import com.moon.core.util.runner.RunnerFunction;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class IFunc {
 

@@ -1,6 +1,6 @@
 package com.moon.core.beans;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface FieldSetter {}

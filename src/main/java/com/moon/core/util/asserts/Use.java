@@ -13,7 +13,7 @@ import static com.moon.core.lang.StringUtil.format;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class Use {
     private Use() { noInstanceError(); }

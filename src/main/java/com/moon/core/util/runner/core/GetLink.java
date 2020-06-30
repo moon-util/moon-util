@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * 连接前后获取值
  *
- * @author benshaoye
+ * @author moonsky
  */
 class GetLink implements AsGetter {
     final AsValuer prevGetter;

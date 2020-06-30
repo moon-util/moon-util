@@ -3,7 +3,7 @@ package com.moon.more.model.getter;
 import com.moon.core.util.interfaces.ValueSupplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface ValueGetter extends ValueSupplier<String>, Getter {

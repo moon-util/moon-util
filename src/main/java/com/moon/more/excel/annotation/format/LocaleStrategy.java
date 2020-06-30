@@ -5,7 +5,7 @@ import java.util.Locale;
 import static java.util.Locale.Category.FORMAT;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @see java.util.Locale
  */
 public enum LocaleStrategy {

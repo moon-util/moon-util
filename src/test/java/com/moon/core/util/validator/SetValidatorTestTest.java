@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class SetValidatorTestTest {
 

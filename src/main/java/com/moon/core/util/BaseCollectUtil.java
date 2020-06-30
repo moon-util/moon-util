@@ -5,7 +5,7 @@ import com.moon.core.enums.Collects;
 import java.util.Collection;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class BaseCollectUtil {
 

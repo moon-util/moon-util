@@ -1,7 +1,7 @@
 package com.moon.core.util.function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @see java.util.function.Supplier
  */
 @FunctionalInterface

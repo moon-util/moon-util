@@ -3,7 +3,7 @@ package com.moon.core.lang.ref;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class BooleanAccessorTestTest {
 

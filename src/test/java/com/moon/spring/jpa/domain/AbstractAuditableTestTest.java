@@ -11,7 +11,7 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class AbstractAuditableTestTest {
 

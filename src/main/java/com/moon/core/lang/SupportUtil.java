@@ -14,7 +14,7 @@ import static java.lang.Character.isWhitespace;
 /**
  * 本类不推荐任何形式调用,随时可能会改
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class SupportUtil {
 

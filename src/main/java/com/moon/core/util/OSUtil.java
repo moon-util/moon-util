@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * 系统工具
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class OSUtil {
 

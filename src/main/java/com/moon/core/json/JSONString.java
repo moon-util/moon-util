@@ -7,7 +7,7 @@ import java.util.Objects;
 import static com.moon.core.util.TypeUtil.cast;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @see #hashCode() == {@link String#hashCode()}
  * @see #equals(Object) == {@link String#equals(Object)}
  */

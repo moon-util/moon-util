@@ -13,7 +13,7 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface ArrayOperator extends IteratorFunction<Object, Object>, Predicate, Stringify, IntFunction {
 

@@ -11,7 +11,7 @@ import static com.moon.core.util.ListUtil.newArrayList;
 import static java.util.stream.Collectors.toList;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class Namings {
 

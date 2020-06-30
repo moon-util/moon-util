@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * {@link com.moon.core.util.IteratorUtil#splitter(Collection, Consumer)}
  * {@link com.moon.core.util.IteratorUtil#splitter(Collection, int, Consumer)}
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> {
 

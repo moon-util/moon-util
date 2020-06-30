@@ -10,7 +10,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class RenderHeaderParserTestTest {
 

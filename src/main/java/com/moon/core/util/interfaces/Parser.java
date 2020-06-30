@@ -3,7 +3,7 @@ package com.moon.core.util.interfaces;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface Parser<T, S> {

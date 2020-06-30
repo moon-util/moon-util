@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class RedisAccessor<K, V> {
 

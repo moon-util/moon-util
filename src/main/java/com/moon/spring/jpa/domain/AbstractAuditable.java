@@ -16,7 +16,7 @@ import java.util.Objects;
  * @param <ID>        可序列化的 id 类型
  * @param <DATE_TYPE> 日期类型：Date，LocalDate，LocalDateTime 等
  *
- * @author benshaoye
+ * @author moonsky
  * @see #getCreatedBy()
  * @see #createdBy
  * @see JsonIgnore

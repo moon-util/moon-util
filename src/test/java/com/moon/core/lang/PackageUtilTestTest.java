@@ -13,7 +13,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class PackageUtilTestTest {
 

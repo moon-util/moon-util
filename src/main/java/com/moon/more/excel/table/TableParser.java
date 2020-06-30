@@ -3,7 +3,7 @@ package com.moon.more.excel.table;
 import com.moon.more.excel.Renderer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class TableParser {
 

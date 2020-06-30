@@ -1,7 +1,7 @@
 package com.moon.more.model.converter;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface EntityConverter<T> extends Converter {

@@ -3,7 +3,7 @@ package com.moon.more.excel;
 import java.util.Iterator;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Renderer {
 

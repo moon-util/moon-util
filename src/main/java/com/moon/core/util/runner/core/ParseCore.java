@@ -15,7 +15,7 @@ import static com.moon.core.util.runner.core.Constants.*;
  * 可能出现的位置：
  * 普通表达式、Map 或 List 的项、方法参数、方法执行对象
  *
- * @author benshaoye
+ * @author moonsky
  */
 class ParseCore {
 

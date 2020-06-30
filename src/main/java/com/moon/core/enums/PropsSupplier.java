@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface PropsSupplier extends EnumDescriptor, Supplier<String> {
     /**

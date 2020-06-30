@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

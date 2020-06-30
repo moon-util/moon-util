@@ -4,7 +4,7 @@ import com.moon.core.lang.EnumUtil;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class MoonPropsTestTest {
 

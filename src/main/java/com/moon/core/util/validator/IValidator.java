@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface IValidator<T, IMPL extends IValidator<T, IMPL>> {
 

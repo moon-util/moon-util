@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class JoinerUtil {
 

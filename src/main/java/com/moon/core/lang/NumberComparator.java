@@ -1,7 +1,7 @@
 package com.moon.core.lang;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum NumberComparator {
     GT {

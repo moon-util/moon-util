@@ -1,7 +1,7 @@
 package com.moon.core.util.life;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface NoneLifeChain extends BeforeLifeChain<Object>, AfterLifeChain<Object> {
 

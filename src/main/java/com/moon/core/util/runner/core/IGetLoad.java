@@ -13,7 +13,7 @@ import java.util.Set;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class IGetLoad {
 

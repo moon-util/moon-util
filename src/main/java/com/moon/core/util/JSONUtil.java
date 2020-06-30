@@ -20,7 +20,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.OptionalUtil.computeOrGet;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class JSONUtil {
 

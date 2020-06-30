@@ -8,7 +8,7 @@ import java.util.Map;
 import static com.moon.core.lang.StackTraceUtil.getSkipCallerTypeName;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class WeakMapManager implements Runnable {
 

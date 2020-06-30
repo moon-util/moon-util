@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @MappedSuperclass
 public abstract class BaseDataAuditable extends BaseAuditable implements DataRecordable<String> {

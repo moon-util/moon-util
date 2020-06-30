@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ThrowUtil {
 

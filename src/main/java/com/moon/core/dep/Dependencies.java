@@ -14,7 +14,7 @@ import java.util.function.Function;
  * <p>
  * 相对而言，这是一种比较"重"的办法，随着相关依赖的增加，可修改为从配置文件读取的方式
  *
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings("all")
 public enum Dependencies {

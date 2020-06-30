@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface StyleBuilder extends Consumer<CellStyle> {
 

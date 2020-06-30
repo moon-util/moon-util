@@ -9,7 +9,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.TypeUtil.cast;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class PropertiesUtil {
     private PropertiesUtil() { noInstanceError(); }

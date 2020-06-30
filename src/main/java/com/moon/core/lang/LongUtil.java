@@ -13,7 +13,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.lang.String.format;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class LongUtil {
 

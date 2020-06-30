@@ -5,7 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 enum Asserts implements Predicate<Executable> {
     isStatic {

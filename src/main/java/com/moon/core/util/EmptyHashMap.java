@@ -14,7 +14,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class EmptyHashMap
     extends PropertiesHashMap

@@ -5,7 +5,7 @@ import com.moon.core.util.TestUtil;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ByteUtil {
 

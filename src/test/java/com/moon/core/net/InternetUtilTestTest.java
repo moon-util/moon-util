@@ -8,7 +8,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class InternetUtilTestTest {
 

@@ -5,7 +5,7 @@ import com.moon.more.model.id.IdSupplier;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public abstract class DataAccessorImpl<ID, T extends IdSupplier<ID>> extends BaseAccessorImpl<ID, T>
     implements DataAccessor<ID, T> {

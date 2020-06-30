@@ -4,7 +4,7 @@ import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.StringUtil;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class RequireValidateException extends IllegalArgumentException {
 

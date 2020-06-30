@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, WorkbookFactory> {
 

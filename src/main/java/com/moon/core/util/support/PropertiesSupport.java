@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.String.valueOf;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class PropertiesSupport {
     private PropertiesSupport() { ThrowUtil.noInstanceError(); }

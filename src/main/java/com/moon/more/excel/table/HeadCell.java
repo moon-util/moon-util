@@ -3,7 +3,7 @@ package com.moon.more.excel.table;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class HeadCell {
 

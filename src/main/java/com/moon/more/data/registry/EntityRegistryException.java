@@ -1,7 +1,7 @@
 package com.moon.more.data.registry;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class EntityRegistryException extends RuntimeException {
 

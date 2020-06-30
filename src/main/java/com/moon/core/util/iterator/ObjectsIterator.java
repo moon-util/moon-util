@@ -3,7 +3,7 @@ package com.moon.core.util.iterator;
 import java.util.Iterator;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class ObjectsIterator<T> extends BaseArrayIterator implements Iterator<T> {
 

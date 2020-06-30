@@ -18,7 +18,7 @@ import static com.moon.core.util.runner.core.ParseUtil.isAllConst;
 /**
  * 在解析的时候就能确定具体执行方法
  *
- * @author benshaoye
+ * @author moonsky
  */
 class InvokeEnsure {
 

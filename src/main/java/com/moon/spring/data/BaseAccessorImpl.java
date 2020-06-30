@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 import static com.moon.core.lang.ClassUtil.isExtendOf;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public abstract class BaseAccessorImpl<ID, T extends IdSupplier<ID>> implements BaseAccessor<ID, T>, InitializingBean {
 

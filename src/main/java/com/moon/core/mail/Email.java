@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @see EmailUtil
  */
 public class Email implements Cloneable {

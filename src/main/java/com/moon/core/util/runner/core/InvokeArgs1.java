@@ -13,7 +13,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.reflect.MethodUtil.invoke;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class InvokeArgs1 extends InvokeAbstract {
 

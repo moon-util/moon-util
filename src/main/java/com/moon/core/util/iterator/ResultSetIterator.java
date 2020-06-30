@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class ResultSetIterator implements Iterator<ResultSet> {
 

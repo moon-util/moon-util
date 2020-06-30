@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum ImagePainter implements ImageDescriptor {
 

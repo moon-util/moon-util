@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class UUIDIdentifier implements IdentifierGenerator {
 

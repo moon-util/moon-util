@@ -7,7 +7,7 @@ import java.util.RandomAccess;
 import static com.moon.core.util.TypeUtil.cast;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class JSONArray extends ArrayList<Object>
     implements JSON<Integer>, List<Object>, RandomAccess {

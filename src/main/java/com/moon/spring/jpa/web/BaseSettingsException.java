@@ -1,7 +1,7 @@
 package com.moon.spring.jpa.web;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class BaseSettingsException extends RuntimeException{
 

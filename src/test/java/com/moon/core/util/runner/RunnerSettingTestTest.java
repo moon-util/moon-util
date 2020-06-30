@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class RunnerSettingTestTest {
 

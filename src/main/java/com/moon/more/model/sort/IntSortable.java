@@ -1,7 +1,7 @@
 package com.moon.more.model.sort;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface IntSortable extends Sortable<Integer> {

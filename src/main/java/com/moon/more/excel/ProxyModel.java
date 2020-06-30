@@ -10,7 +10,7 @@ import java.util.Map;
  * 这个类只限内部使用，所以对数据类型要求放宽了，比如要求的 classname 是 String 类型
  * 这里统一放宽为了 Object，这也是为了将来可能支持更多样式的 key
  *
- * @author benshaoye
+ * @author moonsky
  */
 class ProxyModel<FROM, R, K, B extends ProxyBuilder<FROM, R>, S extends ProxySetter<R, K>> {
 

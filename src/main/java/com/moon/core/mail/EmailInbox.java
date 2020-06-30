@@ -1,7 +1,7 @@
 package com.moon.core.mail;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class EmailInbox {
 

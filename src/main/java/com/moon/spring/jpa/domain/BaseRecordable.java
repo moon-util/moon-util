@@ -6,7 +6,7 @@ import com.moon.core.lang.StringUtil;
 import javax.persistence.MappedSuperclass;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @MappedSuperclass
 public abstract class BaseRecordable extends AbstractRecordable<String> {

@@ -3,7 +3,7 @@ package com.moon.core.lang.ref;
 import java.util.WeakHashMap;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class WeakLocation<X, Y, Z> extends DefaultLocation<X, Y, Z> {
 

@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 /**
  * 使用表格样式(用在整行的单元格上)
  *
- * @author benshaoye
+ * @author moonsky
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

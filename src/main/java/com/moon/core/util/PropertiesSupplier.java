@@ -10,7 +10,7 @@ import static com.moon.core.lang.StringUtil.defaultIfNullString;
 import static com.moon.core.lang.StringUtil.trimToNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface PropertiesSupplier<V> {
 

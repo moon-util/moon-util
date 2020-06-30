@@ -9,7 +9,7 @@ import java.net.SocketException;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class MacUtil {
 

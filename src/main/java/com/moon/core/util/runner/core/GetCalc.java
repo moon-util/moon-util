@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class GetCalc implements AsGetter {
     final AsRunner[] runners;

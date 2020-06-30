@@ -7,7 +7,7 @@ import com.moon.more.model.id.IdSupplier;
 import java.io.Serializable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Recordable<ID> extends IdOperator<ID>, IdSupplier<ID>, BaseSupporter, Cloneable, Serializable {
 

@@ -3,7 +3,7 @@ package com.moon.core.util.interfaces;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface ValueSupplier<T> {

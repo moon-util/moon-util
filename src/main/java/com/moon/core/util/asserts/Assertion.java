@@ -7,7 +7,7 @@ import java.util.Objects;
 import static com.moon.core.util.asserts.Use.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Assertion {
     INSTANCE;

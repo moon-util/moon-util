@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class PropertiesUtilTestTest {
     static String[] paths = {

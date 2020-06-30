@@ -21,7 +21,7 @@ import java.util.Date;
  * <p>
  * {@link Calendar} 等字段上，注解在其他字段上自动忽略
  *
- * @author benshaoye
+ * @author moonsky
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

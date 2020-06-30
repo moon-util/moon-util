@@ -13,7 +13,7 @@ import static com.moon.core.util.runner.core.Constants.DOUBLE;
 import static com.moon.core.util.runner.core.Constants.SINGLE;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class ParseUtil {
 

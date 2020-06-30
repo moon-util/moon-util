@@ -5,7 +5,7 @@ import com.moon.core.lang.ThrowUtil;
 import java.util.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class CompareUtil {
 

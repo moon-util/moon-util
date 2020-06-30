@@ -1,6 +1,6 @@
 package com.moon.core.util.mapper;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface BeanMapper {}

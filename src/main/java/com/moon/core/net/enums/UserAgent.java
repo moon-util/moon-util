@@ -46,7 +46,7 @@ import com.moon.core.enums.EnumDescriptor;
  * 版本信息：
  * 显示浏览器的真实版本信息，格式为：浏览器/版本信息
  *
- * @author benshaoye
+ * @author moonsky
  */
 public enum UserAgent implements EnumDescriptor {
     Chrome69("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36"),

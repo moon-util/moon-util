@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E>, E>
     extends BaseValidator<M, GroupValidator<M, K, C, E>>

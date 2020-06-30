@@ -10,7 +10,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.CPUUtil.getCoreCount;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ExecutorUtil {
 

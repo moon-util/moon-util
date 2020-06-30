@@ -1,7 +1,7 @@
 package com.moon.core.exception;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class MessageException extends RuntimeException {
     public MessageException() { }

@@ -3,7 +3,7 @@ package com.moon.more.excel.table;
 import com.moon.more.excel.CellFactory;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface GetTransfer {
 

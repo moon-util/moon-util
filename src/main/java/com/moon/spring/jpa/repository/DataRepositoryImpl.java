@@ -37,7 +37,7 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder.getPredicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @NoRepositoryBean
 public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaRepository<T, String>

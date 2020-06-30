@@ -18,7 +18,7 @@ import java.util.Date;
  * 7. LocalDateTime（或{@link LocalDateTime}的子类，对应{@link Cell}类型为『日期』
  * 8. LocalDate（或{@link LocalDate}的子类，对应{@link Cell}类型为『日期』
  *
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface FieldTransformer<F, R> {

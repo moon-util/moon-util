@@ -16,7 +16,7 @@ import java.util.Map;
 import static com.moon.more.excel.table.HeadUtil.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class TableRenderer implements Renderer {
 

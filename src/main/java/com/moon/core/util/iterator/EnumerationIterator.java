@@ -6,7 +6,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class EnumerationIterator<T> implements Iterator<T> {
 

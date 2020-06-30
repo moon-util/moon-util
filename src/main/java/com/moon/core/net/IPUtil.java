@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings("all")
 public final class IPUtil {

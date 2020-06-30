@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum StatusCode implements EnumDescriptor {
     /*

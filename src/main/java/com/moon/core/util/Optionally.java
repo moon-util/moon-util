@@ -1,7 +1,7 @@
 package com.moon.core.util;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Optionally {
     /**

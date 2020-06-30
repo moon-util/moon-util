@@ -7,7 +7,7 @@ import java.util.Map;
 import static com.moon.core.util.TypeUtil.cast;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class JSONObject extends HashMap<String, Object>
     implements JSON<String>, Iterable<Map.Entry<String, Object>> {

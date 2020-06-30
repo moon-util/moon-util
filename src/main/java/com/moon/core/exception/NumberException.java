@@ -3,7 +3,7 @@ package com.moon.core.exception;
 import static java.lang.String.format;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class NumberException extends RuntimeException {
 

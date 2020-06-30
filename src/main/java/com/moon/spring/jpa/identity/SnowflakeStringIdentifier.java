@@ -5,7 +5,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import java.io.Serializable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class SnowflakeStringIdentifier extends SnowflakeLongIdentifier {
 

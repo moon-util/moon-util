@@ -5,7 +5,7 @@ import java.util.Map;
 import static com.moon.core.lang.StringUtil.stringify;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class PropertiesHashMap extends StringKeyHashMap<String> {
 

@@ -1,7 +1,7 @@
 package com.moon.core.util.identifier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class SnowFlake {
 

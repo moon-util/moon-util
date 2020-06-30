@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class FileUtilTestTest {
 

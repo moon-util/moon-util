@@ -14,7 +14,7 @@ import static com.moon.core.lang.ThrowUtil.unsupported;
 import static java.util.Collections.EMPTY_SET;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class PropertiesGroup extends HashMap<String, Object> implements PropertiesSupplier {
 

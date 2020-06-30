@@ -1,7 +1,7 @@
 package com.moon.core.util.converter;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface Converter<T, R> {

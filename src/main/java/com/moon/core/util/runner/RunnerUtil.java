@@ -161,7 +161,7 @@ import java.util.Date;
  * <p>
  * * 默认字符串表达式分隔符：DELIMITERS = {"{{", "}}"}
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class RunnerUtil extends ParseUtil {
 

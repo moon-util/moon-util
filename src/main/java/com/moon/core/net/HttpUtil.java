@@ -3,7 +3,7 @@ package com.moon.core.net;
 import com.moon.core.lang.ThrowUtil;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class HttpUtil {
 

@@ -3,7 +3,7 @@ package com.moon.core.util.runner.core;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface AsGetter extends AsValuer, Predicate {
 

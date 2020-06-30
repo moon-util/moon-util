@@ -3,7 +3,7 @@ package com.moon.core.util.runner.core;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class ConstPriorities {
 

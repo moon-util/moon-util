@@ -3,7 +3,7 @@ package com.moon.core.net;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class InternetUtilTest {
     @Test

@@ -13,7 +13,7 @@ package com.moon.core.util.runner;
  * <p>
  * 故，自定义函数的命名空间建议全部小写
  *
- * @author benshaoye
+ * @author moonsky
  */
 public interface RunnerFunction {
     /**

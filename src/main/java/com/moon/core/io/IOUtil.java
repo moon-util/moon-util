@@ -25,7 +25,7 @@ import static com.moon.core.lang.ThrowUtil.runtime;
 import static com.moon.core.util.IteratorUtil.forEachLines;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class IOUtil {
 

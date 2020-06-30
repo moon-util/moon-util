@@ -3,7 +3,7 @@ package com.moon.more.web;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class Browser {
 

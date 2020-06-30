@@ -15,7 +15,7 @@ import static com.moon.core.util.CollectUtil.size;
 import static com.moon.core.util.IteratorUtil.forEach;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class StringJoiner
     implements Supplier<String>, ValueSupplier<String>, Appendable, CharSequence, Cloneable, Serializable {

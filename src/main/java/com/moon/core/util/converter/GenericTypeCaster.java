@@ -36,7 +36,7 @@ import static com.moon.core.util.Optional.ofNullable;
 import static com.moon.core.util.OptionalUtil.resolveOrNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class GenericTypeCaster implements TypeCaster {
 

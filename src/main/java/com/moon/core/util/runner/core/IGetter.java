@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface IGetter extends BiFunction, Predicate {
 

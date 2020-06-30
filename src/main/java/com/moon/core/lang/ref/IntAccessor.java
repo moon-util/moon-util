@@ -6,7 +6,7 @@ import java.util.function.IntSupplier;
 import java.util.function.ToIntFunction;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class IntAccessor implements IntSupplier {
 

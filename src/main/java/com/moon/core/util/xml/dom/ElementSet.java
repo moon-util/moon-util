@@ -6,7 +6,7 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class ElementSet implements AttrOperator<ElementSet> {
 

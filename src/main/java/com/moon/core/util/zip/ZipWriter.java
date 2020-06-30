@@ -18,7 +18,7 @@ import java.util.zip.ZipOutputStream;
 import static com.moon.core.io.FileUtil.formatPath;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class ZipWriter {
 

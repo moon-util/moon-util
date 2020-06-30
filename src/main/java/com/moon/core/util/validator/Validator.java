@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 /**
  * 对象多条件验证器：
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class Validator<T> extends BaseValidator<T, Validator<T>> {
 

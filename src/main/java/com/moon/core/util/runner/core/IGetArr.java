@@ -4,7 +4,7 @@ import com.moon.core.enums.ArrayOperator;
 import com.moon.core.enums.Arrays2;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class IGetArr implements IGetter {
     ArrayOperator getter;

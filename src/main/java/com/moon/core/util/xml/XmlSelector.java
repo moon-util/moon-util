@@ -1,7 +1,7 @@
 package com.moon.core.util.xml;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class XmlSelector {
 

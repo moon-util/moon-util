@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
  * size 将小于能迭代的项
  * 传入的参数是不可变的，故不能进行 reset 、increment 、remove 等操作
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class RunnerDataMap extends HashMap {
     private final Object[] dataArr;

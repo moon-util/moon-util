@@ -3,7 +3,7 @@ package com.moon.core.util.runner.core;
 import com.moon.core.util.runner.Runner;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 interface AsRunner extends Runner {

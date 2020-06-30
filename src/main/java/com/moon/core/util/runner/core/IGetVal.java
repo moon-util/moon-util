@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 enum IGetVal implements IGetter {
     MAP {

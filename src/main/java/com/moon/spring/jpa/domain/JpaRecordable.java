@@ -7,7 +7,7 @@ import javax.persistence.Transient;
 import java.io.Serializable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface JpaRecordable<ID> extends Persistable<ID>, Recordable<ID>, Cloneable, Serializable {
 

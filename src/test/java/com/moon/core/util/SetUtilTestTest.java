@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class SetUtilTestTest {
 

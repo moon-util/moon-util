@@ -20,7 +20,7 @@ import java.util.function.Predicate;
  * 当与{@link DefaultValue}注解于同一数字字段时，以{@link DefaultNumber}为准，
  * 因为{@link DefaultNumber}更具体
  *
- * @author benshaoye
+ * @author moonsky
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

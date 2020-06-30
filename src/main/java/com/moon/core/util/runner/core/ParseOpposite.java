@@ -10,7 +10,7 @@ import static com.moon.core.util.runner.core.Constants.*;
  * 负号解析：
  * 减法运算或负数都有可能
  *
- * @author benshaoye
+ * @author moonsky
  */
 final class ParseOpposite {
     private ParseOpposite() { noInstanceError(); }

@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class XmlParser {
 

@@ -1,7 +1,7 @@
 package com.moon.core.util.runner.core;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class DataObj extends DataConst {
     private DataObj(Object value) { super(value); }

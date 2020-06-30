@@ -14,7 +14,7 @@ import java.util.Map;
 import static java.lang.System.out;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class ProxyUtilTestTest {
 

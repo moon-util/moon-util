@@ -1,7 +1,7 @@
 package com.moon.more.model.id;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface IdOperator<T> extends IdSupplier<T> {
 

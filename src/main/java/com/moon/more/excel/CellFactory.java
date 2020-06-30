@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
 

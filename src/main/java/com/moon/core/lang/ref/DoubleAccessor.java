@@ -6,7 +6,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class DoubleAccessor implements DoubleSupplier {
 

@@ -18,7 +18,7 @@ import java.util.function.IntFunction;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class CollectUtil extends BaseCollectUtil {
 

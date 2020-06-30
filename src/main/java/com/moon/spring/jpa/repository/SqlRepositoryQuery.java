@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class SqlRepositoryQuery implements RepositoryQuery {
 

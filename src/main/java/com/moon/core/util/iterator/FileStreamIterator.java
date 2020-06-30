@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Iterator;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class FileStreamIterator implements Iterator {
 

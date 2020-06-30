@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface IteratorFunction<C, I> {

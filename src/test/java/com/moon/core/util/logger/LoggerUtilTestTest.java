@@ -4,7 +4,7 @@ import com.moon.core.AbstractTest;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class LoggerUtilTestTest extends AbstractTest {
 

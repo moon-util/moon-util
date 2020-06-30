@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ResponseWriter {
 

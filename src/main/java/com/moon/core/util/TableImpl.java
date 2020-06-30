@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 import static java.util.Collections.EMPTY_SET;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class TableImpl<X, Y, Z> implements Table<X, Y, Z> {
 

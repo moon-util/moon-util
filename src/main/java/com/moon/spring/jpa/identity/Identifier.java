@@ -11,7 +11,7 @@ import org.hibernate.id.IdentifierGenerator;
 import java.io.Serializable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class Identifier implements IdentifierGenerator {
 

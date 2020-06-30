@@ -3,7 +3,7 @@ package com.moon.core.enums;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class Chars2TestTest {
 

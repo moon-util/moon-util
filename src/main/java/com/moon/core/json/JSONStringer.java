@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class JSONStringer implements Stringify {
 

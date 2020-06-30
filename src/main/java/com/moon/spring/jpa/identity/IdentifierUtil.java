@@ -11,7 +11,7 @@ import java.lang.reflect.Constructor;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class IdentifierUtil {
 

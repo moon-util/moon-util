@@ -3,7 +3,7 @@ package com.moon.core.util.validator;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class GroupValidatorTestTest {
 

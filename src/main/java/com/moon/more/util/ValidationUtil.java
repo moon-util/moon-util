@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Hibernate Validator 验证器
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class ValidationUtil extends ValidateUtil {
 

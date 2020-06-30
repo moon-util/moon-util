@@ -43,7 +43,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>, TypeConverter {
 

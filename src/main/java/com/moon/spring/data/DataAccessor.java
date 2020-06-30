@@ -3,7 +3,7 @@ package com.moon.spring.data;
 import com.moon.more.model.id.IdSupplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface DataAccessor<ID, T extends IdSupplier<ID>> extends BaseAccessor<ID, T> {
 

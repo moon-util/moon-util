@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum EncryptType implements Supplier<MessageDigest> {
     MD5,

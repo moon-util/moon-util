@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class RandomStringUtilTestTest {
 

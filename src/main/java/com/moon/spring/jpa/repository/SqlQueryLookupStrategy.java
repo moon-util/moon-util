@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 import java.lang.reflect.Method;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class SqlQueryLookupStrategy implements QueryLookupStrategy {
 

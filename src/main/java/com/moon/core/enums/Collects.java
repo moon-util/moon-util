@@ -10,7 +10,7 @@ import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 import static com.moon.core.util.FilterUtil.nullableFind;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Collects
     extends Supplier<Collection>, IntFunction<Collection>, Function<Collection, Collection>, EnumDescriptor {

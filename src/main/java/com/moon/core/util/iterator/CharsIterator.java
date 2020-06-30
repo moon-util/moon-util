@@ -5,7 +5,7 @@ import com.moon.core.lang.StringUtil;
 import java.util.Iterator;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class CharsIterator
     extends BaseArrayIterator

@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class Attribute implements Descriptor, Comparable<Attribute> {
 

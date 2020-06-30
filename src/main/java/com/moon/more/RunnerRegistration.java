@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import static com.moon.core.util.ListUtil.newArrayList;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class RunnerRegistration {
 

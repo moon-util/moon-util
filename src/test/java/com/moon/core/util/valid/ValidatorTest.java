@@ -6,7 +6,7 @@ import com.moon.core.util.validator.Validator;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class ValidatorTest {
 

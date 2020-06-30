@@ -11,7 +11,7 @@ import static com.moon.core.util.life.LifeUtil.after;
 import static com.moon.core.util.life.LifeUtil.before;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public abstract class BaseServiceImpl<T extends JpaRecordable<String>> extends BaseAccessorImpl<String, T>
     implements BaseService<T> {

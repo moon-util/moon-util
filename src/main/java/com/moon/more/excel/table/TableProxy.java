@@ -12,7 +12,7 @@ import java.util.Map;
 import static com.moon.more.excel.table.StyleUtil.getScopedMapOrEmpty;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class TableProxy {
 

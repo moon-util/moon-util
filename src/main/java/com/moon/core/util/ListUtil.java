@@ -10,7 +10,7 @@ import java.util.function.IntFunction;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ListUtil extends CollectUtil {
 

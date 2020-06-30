@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class DataController<T extends JpaRecordable<String>> extends DataAccessorImpl<String, T> {
 

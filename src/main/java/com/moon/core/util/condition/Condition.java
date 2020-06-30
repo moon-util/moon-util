@@ -1,7 +1,7 @@
 package com.moon.core.util.condition;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class Condition implements Conditional {
 

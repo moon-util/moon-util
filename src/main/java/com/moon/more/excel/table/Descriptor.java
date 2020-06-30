@@ -9,7 +9,7 @@ import java.util.function.Function;
 /**
  * 字段描述器
  *
- * @author benshaoye
+ * @author moonsky
  */
 interface Descriptor {
 

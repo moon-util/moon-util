@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ResponseUtil {
 

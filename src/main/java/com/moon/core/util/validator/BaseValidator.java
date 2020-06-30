@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.function.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Value<T>
     implements Cloneable, Serializable, IValidator<T, IMPL>, Supplier<T> {

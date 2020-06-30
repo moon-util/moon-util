@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * （在写这个类的时候，尝试尽可能将注释写完整一点，但是实际完成下来，个人觉得这样效果一般，因为这样在电脑上一屏显示的内容不够多；
  * 而且这个类的逻辑简单，语义清晰，命名可读性也比较高，没必要写完整的注释，以后其他类在保证可读性基础上根据情况写）
  *
- * @author benshaoye
+ * @author moonsky
  * @see Patterns
  */
 @SuppressWarnings("all")

@@ -7,7 +7,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.more.web.RequestUtil.header;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ContentTypeUtil {
 

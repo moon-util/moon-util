@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class DataConst<T> implements AsConst {
 

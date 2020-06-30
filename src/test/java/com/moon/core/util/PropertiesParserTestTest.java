@@ -11,7 +11,7 @@ import java.util.TreeMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class PropertiesParserTestTest {
 

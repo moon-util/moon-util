@@ -38,7 +38,7 @@ import static com.moon.core.util.iterator.EmptyIterator.EMPTY;
  * <p>
  * 此时{@link Iterator#remove()}方法根据具体集合实现。
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class IteratorUtil {
 

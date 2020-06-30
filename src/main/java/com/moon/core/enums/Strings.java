@@ -3,7 +3,7 @@ package com.moon.core.enums;
 import com.moon.core.lang.StringUtil;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Strings implements EnumDescriptor {
     /**

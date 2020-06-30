@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class AbstractTest {
 

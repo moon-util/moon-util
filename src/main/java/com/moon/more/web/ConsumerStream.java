@@ -4,7 +4,7 @@ import java.io.OutputStream;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface ConsumerStream extends Consumer<OutputStream> {
 

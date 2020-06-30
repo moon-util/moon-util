@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class TableCol implements Comparable<TableCol> {
 

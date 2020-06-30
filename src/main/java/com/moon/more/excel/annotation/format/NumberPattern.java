@@ -10,7 +10,7 @@ import java.text.NumberFormat;
 /**
  * 只能注解在数字字段
  *
- * @author benshaoye
+ * @author moonsky
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

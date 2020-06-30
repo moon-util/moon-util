@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 /**
  * 注释代理
  *
- * @author benshaoye
+ * @author moonsky
  */
 class ProxyCommentModel extends ProxyModel<Sheet, Comment, Cell, ProxyCommentBuilder, ProxyCommentSetter> {
 

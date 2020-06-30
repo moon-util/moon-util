@@ -6,7 +6,7 @@ import org.apache.poi.ss.usermodel.Comment;
 /**
  * 注释设置器
  *
- * @author benshaoye
+ * @author moonsky
  */
 class ProxyCommentSetter extends ProxySetter<Comment, Cell> {
 

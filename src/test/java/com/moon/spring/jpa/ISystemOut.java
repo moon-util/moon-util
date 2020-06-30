@@ -3,7 +3,7 @@ package com.moon.spring.jpa;
 import static com.moon.core.lang.StringUtil.repeat;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface ISystemOut {
 

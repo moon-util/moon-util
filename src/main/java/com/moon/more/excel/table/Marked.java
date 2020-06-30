@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class Marked<T extends Member> implements Descriptor {
 

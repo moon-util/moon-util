@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  * <p>
  * 依赖{@link ThreadLocal}实现的当前线程 Map
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<K, V> {
 

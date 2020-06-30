@@ -12,7 +12,7 @@ import java.lang.annotation.*;
  * 由于样式采用的是定义 + 使用这种声明式设置，不必要求一定要注解在指定字段上才起效
  * 样式可以定义在任何有效列（被{@link TableColumn}或{@link TableColumnGroup}注解的列）或当前实体的类上
  *
- * @author benshaoye
+ * @author moonsky
  * @see CellStyle
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})

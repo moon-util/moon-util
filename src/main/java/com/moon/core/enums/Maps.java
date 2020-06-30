@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Maps implements Supplier<Map>, IntFunction<Map>, Function<Map, Map> {
 

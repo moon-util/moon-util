@@ -9,7 +9,7 @@ import java.util.TimeZone;
 import static java.util.Calendar.getInstance;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class DateTime extends Date implements Cloneable, Serializable {
 

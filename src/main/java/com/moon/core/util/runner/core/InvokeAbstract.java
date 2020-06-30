@@ -12,7 +12,7 @@ import static java.lang.reflect.Array.getLength;
 import static java.util.Arrays.copyOfRange;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class InvokeAbstract {
 

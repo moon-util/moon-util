@@ -3,7 +3,7 @@ package com.moon.core.util.runner.core;
 /**
  * 从数据源获取数据
  *
- * @author benshaoye
+ * @author moonsky
  */
 class GetFang implements AsGetter {
 

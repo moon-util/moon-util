@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static java.lang.System.out;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class OSUtilTestTest {
 

@@ -6,7 +6,7 @@ import com.moon.core.util.function.ThrowingSupplier;
 /**
  * 条件执行
  *
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface Conditional {

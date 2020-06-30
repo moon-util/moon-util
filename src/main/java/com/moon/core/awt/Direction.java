@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import static com.moon.core.enums.Const.ZERO;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Direction {
     VERTICAL {

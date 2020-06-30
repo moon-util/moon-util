@@ -10,7 +10,7 @@ import static com.moon.more.data.registry.LayerEnum.*;
 
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class LayerRegistry {
 

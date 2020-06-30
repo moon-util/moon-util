@@ -7,7 +7,7 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @MappedSuperclass
 public abstract class BaseAuditable extends AbstractAuditable<String, LocalDateTime> {

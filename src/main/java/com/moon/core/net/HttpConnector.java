@@ -15,7 +15,7 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class HttpConnector {
 

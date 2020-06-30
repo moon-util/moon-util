@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public final class FilterUtil {

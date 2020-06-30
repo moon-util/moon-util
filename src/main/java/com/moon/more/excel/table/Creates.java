@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class Creates {
 

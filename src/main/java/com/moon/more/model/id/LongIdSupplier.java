@@ -1,7 +1,7 @@
 package com.moon.more.model.id;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface LongIdSupplier extends IdSupplier<Long> {
 

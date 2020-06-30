@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class LinesIterator implements Iterator<String>, Closeable {
 

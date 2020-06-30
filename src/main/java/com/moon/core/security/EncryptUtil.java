@@ -4,7 +4,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.security.EncryptType.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class EncryptUtil {
 

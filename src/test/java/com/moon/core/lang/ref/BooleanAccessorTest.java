@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class BooleanAccessorTest {
 

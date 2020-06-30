@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class TableParserTestTest {
 

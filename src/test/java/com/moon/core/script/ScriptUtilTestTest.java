@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class ScriptUtilTestTest {
     Object res;

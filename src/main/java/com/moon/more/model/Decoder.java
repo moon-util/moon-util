@@ -3,7 +3,7 @@ package com.moon.more.model;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface Decoder<T, R> extends Function<T, R> {

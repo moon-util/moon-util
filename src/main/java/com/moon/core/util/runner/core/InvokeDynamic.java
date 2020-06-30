@@ -9,7 +9,7 @@ import static com.moon.core.lang.reflect.MethodUtil.invoke;
 import static com.moon.core.util.runner.core.DataNull.NULL;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class InvokeDynamic {
 

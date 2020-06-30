@@ -3,7 +3,7 @@ package com.moon.redis;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class RedisStringAccessor extends RedisAccessor<String, Object> {
 

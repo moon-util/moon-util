@@ -7,7 +7,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * identifier ID 生成器
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class IDUtil {
     private IDUtil() { noInstanceError(); }

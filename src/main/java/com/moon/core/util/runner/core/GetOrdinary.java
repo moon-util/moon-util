@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * 从输入数据中获取值
  *
- * @author benshaoye
+ * @author moonsky
  */
 class GetOrdinary implements AsGetter {
 

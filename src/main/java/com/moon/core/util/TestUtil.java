@@ -20,7 +20,7 @@ import static com.moon.core.enums.Patterns.*;
  *     <li>本类中所有方法第一个参数都是待测数据，从第二个参数开始后面的参数作为检测条件的一部分；</>
  * </ul>
  *
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings("all")
 public class TestUtil {

@@ -3,7 +3,7 @@ package com.moon.core.util;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class OptionalImpl<T> implements Optional<T> {
 

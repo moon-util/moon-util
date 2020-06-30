@@ -3,7 +3,7 @@ package com.moon.core.util.life;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class LifeUtil {
 

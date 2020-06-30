@@ -13,7 +13,7 @@ import static com.moon.core.util.life.LifeUtil.after;
 import static com.moon.core.util.life.LifeUtil.before;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends DataAccessorImpl<String, T>
     implements DataService<T> {

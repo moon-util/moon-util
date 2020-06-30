@@ -1,7 +1,7 @@
 package com.moon.core.util.life;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum NoneLifeChainEnum implements NoneLifeChain {
     DEFAULT

@@ -14,7 +14,7 @@ import static java.lang.Character.isWhitespace;
 /**
  * 正则表达式集合，用来检查字符串是否匹配规则
  *
- * @author benshaoye
+ * @author moonsky
  * @see Testers 用来检查对象是否符合要求
  */
 public enum Patterns implements Predicate<CharSequence> {

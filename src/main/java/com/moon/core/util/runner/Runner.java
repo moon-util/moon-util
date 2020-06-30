@@ -1,7 +1,7 @@
 package com.moon.core.util.runner;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface Runner {

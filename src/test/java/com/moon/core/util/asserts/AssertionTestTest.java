@@ -7,7 +7,7 @@ import static com.moon.core.util.asserts.Assertion.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class AssertionTestTest {
 

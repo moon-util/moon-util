@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class SnowflakeLongIdentifier implements IdentifierGenerator {
 

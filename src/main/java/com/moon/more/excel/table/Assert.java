@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class Assert {
 

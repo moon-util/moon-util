@@ -6,7 +6,7 @@ import com.moon.core.util.ListUtil;
 import java.util.Set;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ClassSupport {
 

@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import static com.moon.core.lang.NumberComparator.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class BigIntegerUtil {
     private BigIntegerUtil() {

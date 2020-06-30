@@ -12,7 +12,7 @@ import static com.moon.core.net.enums.Protocol.HTTP;
 import static com.moon.core.net.enums.Protocol.HTTPS;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class URLUtil {
 

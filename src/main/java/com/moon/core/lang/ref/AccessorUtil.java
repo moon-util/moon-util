@@ -5,7 +5,7 @@ import com.moon.core.lang.ThrowUtil;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class AccessorUtil {
     private AccessorUtil() { ThrowUtil.noInstanceError(); }

@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * 样式构建器
  *
- * @author benshaoye
+ * @author moonsky
  */
 class ProxyStyleBuilder extends ProxyBuilder<Workbook, CellStyleProxy> {
 

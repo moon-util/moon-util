@@ -12,7 +12,7 @@ import static com.moon.core.util.TestUtil.isIntegerValue;
 import static java.lang.String.format;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class IntUtil {
 

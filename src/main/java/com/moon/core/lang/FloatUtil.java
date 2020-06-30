@@ -9,7 +9,7 @@ import static java.lang.Float.parseFloat;
 import static java.lang.Float.valueOf;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class FloatUtil {
 

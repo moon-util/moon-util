@@ -9,7 +9,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class BooleanAccessor implements BooleanSupplier {
 

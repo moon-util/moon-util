@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @see EmailUtil
  */
 public class EmailAccount implements Cloneable {

@@ -8,7 +8,7 @@ import java.util.ListIterator;
 /**
  * 集合倒序迭代器
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class ReverseIterator<E> implements Iterator<E> {
 

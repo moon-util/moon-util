@@ -9,7 +9,7 @@ import com.moon.more.model.getter.ValueGetter;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class KeyValue implements ValueSupplier<String>, KeySupplier<String>, KeyGetter, ValueGetter {
 

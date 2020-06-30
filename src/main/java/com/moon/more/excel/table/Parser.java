@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class Parser<T extends Marked> {
 

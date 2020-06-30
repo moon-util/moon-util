@@ -3,7 +3,7 @@ package com.moon.core.util.function;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @see java.util.function.Supplier
  */
 @FunctionalInterface

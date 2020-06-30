@@ -3,7 +3,7 @@ package com.moon.core.util;
 import static java.lang.String.format;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class AssertException extends RuntimeException {
 

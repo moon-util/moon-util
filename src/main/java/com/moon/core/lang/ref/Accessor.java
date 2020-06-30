@@ -3,7 +3,7 @@ package com.moon.core.lang.ref;
 import com.moon.core.util.Optionally;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Accessor<T, IMPL extends Accessor<T, IMPL>> extends Optionally {
 

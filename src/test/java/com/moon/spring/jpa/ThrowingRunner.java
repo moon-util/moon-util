@@ -1,7 +1,7 @@
 package com.moon.spring.jpa;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface ThrowingRunner {
     void run() throws Throwable;

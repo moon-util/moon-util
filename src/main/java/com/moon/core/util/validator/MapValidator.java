@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator<M, MapValidator<M, K, V>>
     implements IKeyedValidator<M, K, V, MapValidator<M, K, V>> {

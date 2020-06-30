@@ -6,7 +6,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class UnicodeUtilTestTest {
 

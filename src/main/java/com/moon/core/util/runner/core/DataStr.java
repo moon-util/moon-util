@@ -1,7 +1,7 @@
 package com.moon.core.util.runner.core;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class DataStr extends DataConst {
     private DataStr(Object value) { super(value); }

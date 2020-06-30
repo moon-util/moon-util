@@ -3,7 +3,7 @@ package com.moon.more.model.getter;
 import com.moon.more.model.id.IdSupplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface IdGetter extends IdSupplier<String>, Getter {

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * 4. NX: 只有在 key 值不存在的时候才能 set 成功，保证只有第一个请求 key 的客户端才能获得锁；
  * 5. PX 3000: 自动过期时间
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class RedissonLockImpl {
 

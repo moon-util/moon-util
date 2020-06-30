@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @Target(ElementType.FIELD)
 public @interface JSONProperty {

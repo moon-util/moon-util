@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * 元组，参照 Python，同时根据 Java 特性提供点别的功能
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class Tuple<T> implements Iterable<T>, Serializable {
 

@@ -10,7 +10,7 @@ import com.moon.core.util.interfaces.NameSupplier;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class IdName
     implements NameSupplier<String>, IdOperator<String>,

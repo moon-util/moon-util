@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class JSONNumber extends Number
     implements JSON<Object>, Comparable<JSONNumber> {

@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import static com.moon.core.util.IteratorUtil.forEach;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public abstract class HibernateBaseTest extends MySQLDatabaseBaseTest implements ISystemOut {
 

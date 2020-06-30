@@ -4,7 +4,7 @@ import org.hibernate.boot.model.naming.*;
 import org.hibernate.boot.model.source.spi.AttributePath;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class DefaultImplicitNamingStrategy extends ImplicitNamingStrategyLegacyHbmImpl
     implements ImplicitNamingStrategy {

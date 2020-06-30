@@ -3,7 +3,7 @@ package com.moon.core.net.enums;
 import com.moon.core.enums.EnumDescriptor;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Protocol implements EnumDescriptor {
     /**

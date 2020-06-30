@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class Base64UtilTestTest {
 

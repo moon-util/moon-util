@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import static java.lang.Integer.parseInt;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ResidentID18Validator extends BaseValidator<String, ResidentID18Validator> {
 

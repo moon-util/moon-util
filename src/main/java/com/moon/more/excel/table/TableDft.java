@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 import static com.moon.more.excel.table.TransferForGet.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class TableDft extends TableCol {
 

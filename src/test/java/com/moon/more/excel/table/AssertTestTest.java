@@ -8,7 +8,7 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class AssertTestTest {
 

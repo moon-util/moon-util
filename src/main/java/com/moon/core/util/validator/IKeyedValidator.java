@@ -7,7 +7,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL extends IKeyedValidator<M, K, V, IMPL>>
     extends IValidator<M, IMPL> {

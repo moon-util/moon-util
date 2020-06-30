@@ -7,7 +7,7 @@ import com.moon.core.util.function.IntBiFunction;
 import java.util.function.Predicate;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class StringSupport {
 

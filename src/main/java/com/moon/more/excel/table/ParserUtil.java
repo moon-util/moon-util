@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class ParserUtil {
 

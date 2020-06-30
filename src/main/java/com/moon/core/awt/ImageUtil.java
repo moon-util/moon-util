@@ -12,7 +12,7 @@ import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ImageUtil {
     private ImageUtil() {

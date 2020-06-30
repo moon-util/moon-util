@@ -5,7 +5,7 @@ import com.moon.core.lang.ThrowUtil;
 import java.io.OutputStream;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ZipUtil {
     private ZipUtil() { ThrowUtil.noInstanceError(); }

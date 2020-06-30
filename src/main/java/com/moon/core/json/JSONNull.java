@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum JSONNull implements JSON<Object>, Comparable<JSONNull> {
     /**

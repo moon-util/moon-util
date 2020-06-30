@@ -8,7 +8,7 @@ import static com.moon.core.lang.SupportUtil.parseStr;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class SupportUtilTest {
 

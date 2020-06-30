@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class CollectValidatorTestTest {
 

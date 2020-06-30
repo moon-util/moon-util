@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import static com.moon.core.util.TypeUtil.cast;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class MapUtil {
 

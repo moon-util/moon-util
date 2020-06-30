@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moon.core.enums.Available;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface DataRecordable<ID> extends Recordable<ID> {
 

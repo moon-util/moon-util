@@ -14,7 +14,7 @@ import java.util.function.Predicate;
  * <p>
  * 单独注解或者与{@link TableColumnGroup}等搭配使用无效
  *
- * @author benshaoye
+ * @author moonsky
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

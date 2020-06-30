@@ -10,7 +10,7 @@ import static com.moon.core.lang.NumberComparator.*;
 import static com.moon.core.lang.ThrowUtil.runtime;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class BigDecimalUtil {
     private BigDecimalUtil() { ThrowUtil.noInstanceError(); }

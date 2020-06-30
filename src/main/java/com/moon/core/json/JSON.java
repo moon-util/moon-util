@@ -22,7 +22,7 @@ import static com.moon.core.util.TypeUtil.cast;
  * 此时作用于对象（{@link JSONObject}）或者数组（{@link JSONArray}）的方法{@link JSON#getString(Object)}等方法
  * 是无效的，true 能执行什么方法呢？对吧，所以这样的操作只会抛出异常，
  *
- * @author benshaoye
+ * @author moonsky
  */
 public interface JSON<KEY> extends Cloneable, Serializable {
 

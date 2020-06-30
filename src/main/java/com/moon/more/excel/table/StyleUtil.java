@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import static com.moon.core.lang.StringUtil.defaultIfEmpty;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class StyleUtil {
 

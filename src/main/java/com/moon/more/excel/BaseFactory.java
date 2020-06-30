@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFactory> {
 

@@ -8,7 +8,7 @@ import java.util.List;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class InvokeArgs2 extends InvokeAbstract {
 

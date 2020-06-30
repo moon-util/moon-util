@@ -26,7 +26,7 @@ import java.util.function.Supplier;
  * <p>
  * 缓存，使用完毕之后内存空间仍然可能会被释放和再次利用。
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class PhantomAccessor<T> extends BaseAccessor<T, PhantomAccessor<T>> {
 

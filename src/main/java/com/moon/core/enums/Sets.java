@@ -11,7 +11,7 @@ import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 import static com.moon.core.util.FilterUtil.nullableFind;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings("all")
 public enum Sets implements Collects,

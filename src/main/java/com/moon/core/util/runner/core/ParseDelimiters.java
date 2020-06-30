@@ -11,7 +11,7 @@ import java.util.Map;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class ParseDelimiters {
     private ParseDelimiters() { noInstanceError(); }

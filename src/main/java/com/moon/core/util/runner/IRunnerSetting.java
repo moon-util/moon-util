@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface IRunnerSetting {
 

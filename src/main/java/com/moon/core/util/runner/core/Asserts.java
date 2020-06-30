@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class Asserts {
 

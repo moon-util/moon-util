@@ -18,7 +18,7 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class Assert {
 

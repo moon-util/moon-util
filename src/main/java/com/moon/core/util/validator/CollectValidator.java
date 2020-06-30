@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  * 集合验证器：
  * 首先请参考{@link Validator}文档。CollectValidator 继承了 Validator；具备基本的对象验证功能。
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class CollectValidator<C extends Collection<E>, E> extends BaseValidator<C, CollectValidator<C, E>>
     implements ICollectValidator<C, E, CollectValidator<C, E>> {

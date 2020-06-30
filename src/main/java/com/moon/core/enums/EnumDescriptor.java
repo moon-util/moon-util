@@ -3,7 +3,7 @@ package com.moon.core.enums;
 import com.moon.more.model.getter.NameGetter;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface EnumDescriptor extends NameGetter {
 

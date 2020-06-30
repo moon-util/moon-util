@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class CellStyleProxy implements BiConsumer<Cell, CellRangeAddress>, Consumer<Row> {
 

@@ -18,7 +18,7 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings("all")
 public abstract class MySQLDatabaseBaseTest {

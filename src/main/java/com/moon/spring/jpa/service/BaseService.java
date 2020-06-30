@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings("all")
 public interface BaseService<T extends JpaRecordable<String>> extends BaseAccessor<String, T> {

@@ -13,7 +13,7 @@ import java.util.Map;
 import static com.moon.more.excel.WorkbookType.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class WorkbookProxy {
 

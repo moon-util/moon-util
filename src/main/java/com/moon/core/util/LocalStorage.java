@@ -3,7 +3,7 @@ package com.moon.core.util;
 import java.io.Serializable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class LocalStorage {
 

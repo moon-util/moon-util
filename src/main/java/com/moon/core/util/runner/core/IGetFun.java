@@ -20,7 +20,7 @@ import static java.lang.System.getProperty;
 /**
  * 内置自定义函数
  *
- * @author benshaoye
+ * @author moonsky
  */
 class IGetFun {
 

@@ -3,7 +3,7 @@ package com.moon.more.excel;
 /**
  * 属性控件（这个名字是不是有点...）
  *
- * @author benshaoye
+ * @author moonsky
  */
 public interface PropertyControl {
 

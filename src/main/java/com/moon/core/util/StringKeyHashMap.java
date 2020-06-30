@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class StringKeyHashMap<V> extends HashMap<String, V> implements PropertiesSupplier<V> {
 

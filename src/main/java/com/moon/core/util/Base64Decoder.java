@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class Base64Decoder extends Base64Coder {
 

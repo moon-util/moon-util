@@ -4,7 +4,7 @@ import com.moon.core.util.runner.RunnerSetting;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class BaseSettingsTestTest {
 

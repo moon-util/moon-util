@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class InvokeBase implements AsInvoker {
     final String methodName;

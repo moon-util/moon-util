@@ -9,7 +9,7 @@ import javax.persistence.MappedSuperclass;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @MappedSuperclass
 public abstract class BaseDataRecordable extends BaseRecordable implements DataRecordable<String> {

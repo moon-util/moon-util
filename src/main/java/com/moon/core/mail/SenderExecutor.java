@@ -9,7 +9,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.concurrent.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class SenderExecutor {
 

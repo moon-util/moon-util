@@ -14,7 +14,7 @@ import static com.moon.core.lang.reflect.ConstructorUtil.newInstance;
 /**
  * 映射器：提供实体到 Map，实体到另一个实体，实体到类，Map 到实体之间的映射
  *
- * @author benshaoye
+ * @author moonsky
  * @see com.moon.core.sql.ResultSetUtil 提供 SQL 查询结果集到实体、数组、Map 的映射
  */
 public final class MapperUtil {

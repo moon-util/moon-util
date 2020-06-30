@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 使用表格样式(用在单元格上)
  *
- * @author benshaoye
+ * @author moonsky
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

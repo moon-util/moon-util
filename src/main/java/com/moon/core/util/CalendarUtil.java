@@ -18,7 +18,7 @@ import static java.lang.Integer.parseInt;
 import static java.util.Calendar.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class CalendarUtil {
 

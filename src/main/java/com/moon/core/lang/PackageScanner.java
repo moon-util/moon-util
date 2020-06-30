@@ -17,7 +17,7 @@ import static java.nio.file.spi.FileSystemProvider.installedProviders;
 /**
  * 包扫描器
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class PackageScanner extends HashSet<String> {
 

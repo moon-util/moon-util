@@ -1,7 +1,7 @@
 package com.moon.more.model;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface Buildable<T> {

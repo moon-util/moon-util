@@ -7,7 +7,7 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 import javax.persistence.EntityManager;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class DataRepositoryFactoryBean<T extends BaseRepository<E>, E extends JpaRecordable<String>>
     extends JpaRepositoryFactoryBean<T, E, String> {

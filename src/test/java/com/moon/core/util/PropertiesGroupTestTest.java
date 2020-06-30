@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class PropertiesGroupTestTest {
 

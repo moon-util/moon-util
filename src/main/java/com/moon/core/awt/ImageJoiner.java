@@ -11,7 +11,7 @@ import java.util.List;
 import static com.moon.core.enums.Const.ZERO;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum ImageJoiner implements ImageDescriptor {
 

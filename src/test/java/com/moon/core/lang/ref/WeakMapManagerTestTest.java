@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.WeakHashMap;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class WeakMapManagerTestTest {
 

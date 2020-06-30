@@ -10,7 +10,7 @@ import static com.moon.core.lang.reflect.MethodUtil.getDeclaredMethods;
 import static com.moon.core.lang.reflect.MethodUtil.invoke;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class InvokeArgs0 extends InvokeAbstract {
 

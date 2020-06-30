@@ -88,7 +88,7 @@ import static com.moon.more.excel.ExcelType.*;
  * ```
  * </pre>
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class ExcelUtil extends LoadUtil {
 

@@ -10,7 +10,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ClassUtil {
 

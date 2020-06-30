@@ -3,7 +3,7 @@ package com.moon.more.excel;
 import com.moon.more.excel.table.TableParser;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class TableUtil extends TableParser {
 

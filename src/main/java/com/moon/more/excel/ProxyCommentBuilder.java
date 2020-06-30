@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class ProxyCommentBuilder extends ProxyBuilder<Sheet, Comment> {
 

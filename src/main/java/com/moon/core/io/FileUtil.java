@@ -17,7 +17,7 @@ import static com.moon.core.lang.LangUtil.applyBi;
 import static com.moon.core.lang.ThrowUtil.runtime;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class FileUtil {
 

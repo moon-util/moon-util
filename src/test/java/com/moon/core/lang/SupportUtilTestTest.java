@@ -8,13 +8,13 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class SupportUtilTestTest {
 
     @Test
     void testSetString() {
-        String str = "benshaoye";
+        String str = "moonsky";
         char[] chars = StringSupport.setString(null, 0, str);
         String now = new String(chars, 0, str.length());
 

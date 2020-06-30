@@ -17,7 +17,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.reflect.MethodUtil.getPublicStaticMethods;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class LoggerUtil {
 

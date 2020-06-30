@@ -5,7 +5,7 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Location<X, Y, Z> {
 

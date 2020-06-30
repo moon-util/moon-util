@@ -3,7 +3,7 @@ package com.moon.more.excel;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class ProxySetter<T, K> extends BaseProxy<K> implements Consumer<T> {
 

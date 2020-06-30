@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class CollectsCached {
 

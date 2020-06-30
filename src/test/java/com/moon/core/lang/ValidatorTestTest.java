@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class ValidatorTestTest {
 

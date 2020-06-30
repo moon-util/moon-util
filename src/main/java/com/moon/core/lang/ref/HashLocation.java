@@ -3,7 +3,7 @@ package com.moon.core.lang.ref;
 import java.util.HashMap;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class HashLocation<X, Y, Z> extends DefaultLocation<X, Y, Z> {
 

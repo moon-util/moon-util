@@ -1,6 +1,6 @@
 package com.moon.more.model.converter;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Converter {}

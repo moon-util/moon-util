@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface BaseAccessor<ID, T extends IdSupplier<ID>> extends BaseSupporter {
 

@@ -11,7 +11,7 @@ import java.util.TimeZone;
 import static com.moon.core.util.FilterUtil.requireFind;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum DateFormats implements EnumDescriptor {
     /**

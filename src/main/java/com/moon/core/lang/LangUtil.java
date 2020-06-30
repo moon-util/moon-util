@@ -11,7 +11,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.ThrowUtil.runtime;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class LangUtil {
 

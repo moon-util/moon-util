@@ -1,7 +1,7 @@
 package com.moon.core.lang;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class Compiler {
     public static void main(String[] args) {

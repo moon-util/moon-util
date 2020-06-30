@@ -21,7 +21,7 @@ import static com.moon.more.web.ResponseUtil.writer;
 import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @see org.springframework.web.util.WebUtils
  */
 public final class WebUtil {

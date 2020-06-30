@@ -9,7 +9,7 @@ import static com.moon.core.util.Base64Decoder.*;
 /**
  * Copied by jdk1.8{@link java.util.Base64}
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class Base64Util {
 

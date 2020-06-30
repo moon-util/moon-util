@@ -10,7 +10,7 @@ import java.beans.PropertyDescriptor;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class BaseParserTestTest {
 

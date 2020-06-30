@@ -1,7 +1,7 @@
 package com.moon.core.awt;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum ImageType implements ImageDescriptor {
 

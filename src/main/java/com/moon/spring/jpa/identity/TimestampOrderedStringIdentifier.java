@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class TimestampOrderedStringIdentifier implements IdentifierGenerator {
 

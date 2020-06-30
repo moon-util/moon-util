@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 /**
  * 延迟访问器
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class LazyAccessor<T> implements Supplier<T> {
 

@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Charsets implements Supplier<Charset>, EnumDescriptor {
     /**

@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.DoubleAdder;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 enum TransferForGet implements GetTransfer {
 

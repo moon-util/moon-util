@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @Deprecated
 @Target({ElementType.FIELD, ElementType.METHOD})

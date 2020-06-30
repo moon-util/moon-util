@@ -1,7 +1,7 @@
 package com.moon.core.util.runner.core;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class DataNum extends DataConst {
     private DataNum(Number value) { super(value); }

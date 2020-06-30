@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class Base64UtilTestTest {
 

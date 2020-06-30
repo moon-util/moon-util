@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import static com.moon.core.lang.ObjectUtil.defaultIfNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class BaseAccessor<T, A extends BaseAccessor<T, A>> implements Accessor<T, A>, Supplier<T> {
 

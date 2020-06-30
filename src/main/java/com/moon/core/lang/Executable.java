@@ -1,7 +1,7 @@
 package com.moon.core.lang;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface Executable {

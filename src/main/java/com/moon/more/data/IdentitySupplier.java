@@ -1,7 +1,7 @@
 package com.moon.more.data;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface IdentitySupplier<T> {
 

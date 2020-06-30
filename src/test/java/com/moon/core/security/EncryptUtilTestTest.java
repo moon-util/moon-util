@@ -3,7 +3,7 @@ package com.moon.core.security;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class EncryptUtilTestTest {
 

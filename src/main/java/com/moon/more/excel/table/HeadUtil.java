@@ -11,7 +11,7 @@ import java.util.function.Function;
 import static com.moon.more.excel.table.HeadCell.getTitleOfNull;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class HeadUtil {
 

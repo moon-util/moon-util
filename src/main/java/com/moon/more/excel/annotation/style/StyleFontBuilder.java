@@ -6,7 +6,7 @@ import org.apache.poi.ss.usermodel.Font;
 import java.util.function.BiConsumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface StyleFontBuilder extends StyleBuilder, BiConsumer<CellStyle, Font> {
 

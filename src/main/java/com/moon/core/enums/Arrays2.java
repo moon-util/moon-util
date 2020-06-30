@@ -11,7 +11,7 @@ import static com.moon.core.lang.JoinerUtil.join;
 import static com.moon.core.util.IteratorUtil.of;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum Arrays2 implements ArrayOperator {
     /**

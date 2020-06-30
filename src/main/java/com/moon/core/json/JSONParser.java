@@ -7,7 +7,7 @@ import com.moon.core.lang.ref.IntAccessor;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class JSONParser {
 

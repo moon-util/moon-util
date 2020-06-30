@@ -4,7 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 interface Creator<T> {
 

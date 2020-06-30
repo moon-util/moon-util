@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * 分组工具，用于对数组、集合和{@link Iterator}进行分组
  *
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public final class GroupUtil {

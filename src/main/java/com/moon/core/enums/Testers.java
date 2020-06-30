@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 /**
  * 一系列检查函数，这个可作为参数传递，而不只是静态方法调用
  *
- * @author benshaoye
+ * @author moonsky
  * @see Patterns 检查字符串是否匹配规则
  */
 @SuppressWarnings("rawtypes")

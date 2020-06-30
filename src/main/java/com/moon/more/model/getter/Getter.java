@@ -1,6 +1,6 @@
 package com.moon.more.model.getter;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface Getter {}

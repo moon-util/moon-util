@@ -1,7 +1,7 @@
 package com.moon.redis;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public enum ExceptionStrategy implements ExceptionHandler {
     /**

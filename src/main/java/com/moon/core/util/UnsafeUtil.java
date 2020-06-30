@@ -9,7 +9,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.util.Optional.ofNullable;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class UnsafeUtil {
 

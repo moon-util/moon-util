@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 /**
  * 针对注解的渲染工厂
  *
- * @author benshaoye
+ * @author moonsky
  * @see TableColumn 标记一个字段
  * @see TableColumnGroup 标记一个实体字段
  * @see TableRecord 标记一个实体

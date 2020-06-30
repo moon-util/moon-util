@@ -3,7 +3,7 @@ package com.moon.core.lang;
 import java.lang.reflect.Modifier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class StackTraceUtil {
 

@@ -1,7 +1,7 @@
 package com.moon.core.util.life;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface AfterLifeChain<R> {

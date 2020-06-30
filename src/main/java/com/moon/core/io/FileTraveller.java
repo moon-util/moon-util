@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 此方法支持遍历多个文件夹，然后一次性返回所有文件列表
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class FileTraveller extends ArrayList<File>
     implements Traveller<File>, List<File> {

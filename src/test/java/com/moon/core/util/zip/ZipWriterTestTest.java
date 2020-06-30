@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class ZipWriterTestTest {
 

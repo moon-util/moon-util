@@ -3,7 +3,7 @@ package com.moon.more.model.getter;
 import com.moon.core.util.interfaces.NameSupplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface NameGetter extends NameSupplier<String>, Getter {

@@ -3,7 +3,7 @@ package com.moon.redis;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface ExceptionHandler extends Consumer<Exception> {

@@ -86,7 +86,7 @@ import static com.moon.core.lang.StringUtil.*;
  * <p>
  * 最后返回所有键值对，如果存在相同键，active 文件覆盖 import 文件，当前文件覆盖 active 文件
  *
- * @author benshaoye
+ * @author moonsky
  */
 public class PropertiesParser implements Parser<PropertiesHashMap, String> {
 

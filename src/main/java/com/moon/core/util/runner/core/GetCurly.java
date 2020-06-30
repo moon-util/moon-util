@@ -5,7 +5,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class GetCurly implements AsGetter {
     final BiConsumer[] consumers;

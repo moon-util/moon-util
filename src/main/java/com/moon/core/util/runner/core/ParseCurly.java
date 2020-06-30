@@ -14,7 +14,7 @@ import static com.moon.core.util.runner.core.ParseSetting.getArrCreator;
 import static com.moon.core.util.runner.core.ParseSetting.getObjCreator;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class ParseCurly {
 

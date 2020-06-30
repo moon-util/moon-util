@@ -3,7 +3,7 @@ package com.moon.core.util.runner.core;
 import java.util.Objects;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 enum Computes implements AsCompute {
     /**

@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * 保存主要 key，并限制 hashCode 和 equals 方法
  *
- * @author benshaoye
+ * @author moonsky
  */
 abstract class BaseProxy<T> {
 

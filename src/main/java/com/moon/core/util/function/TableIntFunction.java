@@ -1,7 +1,7 @@
 package com.moon.core.util.function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @FunctionalInterface
 public interface TableIntFunction<F, S, R> {

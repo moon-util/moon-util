@@ -6,7 +6,7 @@ import com.moon.core.lang.ref.IntAccessor;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class ParseConst {
     private ParseConst() { noInstanceError(); }

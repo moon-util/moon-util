@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class OSUtilTest {
     @Test

@@ -3,7 +3,7 @@ package com.moon.more.excel;
 import java.util.function.Function;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class ProxyBuilder<FROM, R> extends BaseProxy<Object> implements Function<FROM, R> {
 

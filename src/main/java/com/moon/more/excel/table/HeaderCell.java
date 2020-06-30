@@ -1,7 +1,7 @@
 package com.moon.more.excel.table;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class HeaderCell implements TableCell {
 

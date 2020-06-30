@@ -5,7 +5,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * 泛型工具
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class GenericUtil {
 

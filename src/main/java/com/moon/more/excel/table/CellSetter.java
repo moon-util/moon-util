@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 import static org.joda.time.format.DateTimeFormat.forPattern;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 abstract class CellSetter {
 

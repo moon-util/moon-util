@@ -3,7 +3,7 @@ package com.moon.core.dep;
 import com.moon.core.lang.StringUtil;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @SuppressWarnings("all")
 public enum ManageType {

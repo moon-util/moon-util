@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class ResultSetUtil {
 

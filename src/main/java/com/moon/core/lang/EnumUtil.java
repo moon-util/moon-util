@@ -9,7 +9,7 @@ import java.util.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class EnumUtil {
 

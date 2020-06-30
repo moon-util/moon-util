@@ -1,6 +1,6 @@
 package com.moon.spring.jpa.domain;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface JpaAuditable<ID> extends JpaRecordable<ID> {}

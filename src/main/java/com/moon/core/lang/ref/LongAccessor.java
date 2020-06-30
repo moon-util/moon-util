@@ -6,7 +6,7 @@ import java.util.function.LongSupplier;
 import java.util.function.ToLongFunction;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public class LongAccessor implements LongSupplier {
 

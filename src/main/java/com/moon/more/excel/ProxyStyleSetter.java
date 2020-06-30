@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * 应用样式
  *
- * @author benshaoye
+ * @author moonsky
  */
 class ProxyStyleSetter extends ProxySetter<CellStyleProxy, Object> {
 

@@ -4,7 +4,7 @@ import static com.moon.core.enums.Arrays2.STRINGS;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class PackageUtil {
 

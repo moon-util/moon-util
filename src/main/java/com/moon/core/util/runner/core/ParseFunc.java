@@ -10,7 +10,7 @@ import static com.moon.core.util.runner.core.ParseUtil.assertTrue;
 import static com.moon.core.util.runner.core.ParseUtil.nextVal;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 final class ParseFunc {
 

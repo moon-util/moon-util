@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.util.function.Consumer;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public interface ConsumerWriter extends Consumer<PrintWriter> {
 

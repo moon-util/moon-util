@@ -1,7 +1,7 @@
 package com.moon.more.asm;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 public final class JavaUtil {
 

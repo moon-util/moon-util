@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class EnumDescriptorTestTest {
 

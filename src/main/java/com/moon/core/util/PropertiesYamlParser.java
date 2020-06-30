@@ -5,7 +5,7 @@ import com.moon.core.util.interfaces.Parser;
 import java.util.Map;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 class PropertiesYamlParser extends PropertiesParser implements Parser<PropertiesHashMap, String> {
 

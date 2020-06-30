@@ -3,7 +3,7 @@ package com.moon.core.util;
 /**
  * 并发场景下获取当前毫秒数，单独用一个线程不断获取并保存毫秒数
  *
- * @author benshaoye
+ * @author moonsky
  */
 public final class FastTimestamp {
 

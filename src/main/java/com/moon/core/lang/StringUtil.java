@@ -19,7 +19,7 @@ import static com.moon.core.lang.support.StringSupport.formatBuilder;
 import static java.lang.Character.*;
 
 /**
- * @author benshaoye
+ * @author moonsky
  * @date 2018-09-11
  */
 public final class StringUtil {

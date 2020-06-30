@@ -8,7 +8,7 @@ import lombok.ToString;
 import javax.persistence.Entity;
 
 /**
- * @author benshaoye
+ * @author moonsky
  */
 @Data
 @ToString(callSuper = true)
