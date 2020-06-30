@@ -45,7 +45,7 @@ public class Demo {
 ### 反馈或建议
 
 1. 提`Issue`或者`PR`；
-2. 联系作者本人
-<div style="text-align: center;">
-<img src="https://gitee.com/moon-util/moon-util/blob/master/docs/author.jpg"></a>
+2. 联系作者本人微信
+<div style="text-align: center;width:100%;">
+<img src="https://oss.gowapp.com/images/2006/30/jpg/6e0afd03199b4931b7b9d93d1646188b/moon-wx-320.jpg?x-oss-process=image/resize,w_320,limit_0"></a>
 </div>
