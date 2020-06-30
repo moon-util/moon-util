@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * @see Patterns
  */
 @SuppressWarnings("all")
-public class ValidateUtil extends TestUtil {
+public class ValidationUtil extends TestUtil {
 
     /**
      * 集合验证器
@@ -80,7 +80,7 @@ public class ValidateUtil extends TestUtil {
         return ResidentID18Validator.of(value);
     }
 
-    protected ValidateUtil() { }
+    protected ValidationUtil() { }
 
     /**
      * 要求数据为 true

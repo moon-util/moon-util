@@ -1,7 +1,7 @@
 package com.moon.more.util;
 
 import com.moon.core.dep.Dependencies;
-import com.moon.core.util.ValidateUtil;
+import com.moon.core.util.ValidationUtil;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 
@@ -17,9 +17,9 @@ import java.util.Set;
  *
  * @author moonsky
  */
-public final class ValidationUtil extends ValidateUtil {
+public final class ValidatorUtil extends ValidationUtil {
 
-    private ValidationUtil() { }
+    private ValidatorUtil() { }
 
     /**
      * 验证实体类的某个字段值

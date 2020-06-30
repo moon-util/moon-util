@@ -341,6 +341,6 @@ public class CollectUtil extends BaseCollectUtil {
      *                                  可用“{}”占位符接收入参集合
      */
     final static <E, C extends Collection<E>> C requireNotEmpty(C collect, String message) {
-        return ValidateUtil.requireNotEmpty(collect, message);
+        return ValidationUtil.requireNotEmpty(collect, message);
     }
 }

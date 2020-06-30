@@ -25,10 +25,10 @@ class ValidatorUtilTestTest {
         map.put("222", "333");
         map.put("333", "444");
         Assertions.assertThrows(Exception.class,
-            () -> ValidateUtil.ofMap(map).requireAtLeastOf(4, (key, value) -> TestUtil.isIntegerValue(key)).get());
+            () -> ValidationUtil.ofMap(map).requireAtLeastOf(4, (key, value) -> TestUtil.isIntegerValue(key)).get());
         Assertions.assertThrows(Exception.class,
-            () -> ValidateUtil.ofMap(map).requireAtMostOf(2, (key, value) -> TestUtil.isIntegerValue(key)).get());
-        ValidateUtil.ofMap(map)
+            () -> ValidationUtil.ofMap(map).requireAtMostOf(2, (key, value) -> TestUtil.isIntegerValue(key)).get());
+        ValidationUtil.ofMap(map)
 
             .requireAtLeastOf(3, (key, value) -> TestUtil.isIntegerValue(key))
 

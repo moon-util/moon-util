@@ -1,5 +1,6 @@
 package com.moon.more.util;
 
+import com.moon.more.util.annotation.IntIn;
 import org.hibernate.validator.constraints.Length;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,38 @@ class ValidationUtilTestTest {
 
     @Test
     void testValidate() {
-        Set set = ValidationUtil.validate(new User());
+        Set set = ValidatorUtil.validate(new User());
+        Assertions.assertFalse(set.isEmpty());
+        System.out.println(set);
+    }
+
+    public static class Validated {
+
+        @IntIn(values = "1,2,3")
+        private int value;
+    }
+
+    @Test
+    void testAnnotation() {
+        Validated v = new Validated();
+        Set set = ValidatorUtil.validate(v);
+        Assertions.assertFalse(set.isEmpty());
+        System.out.println(set);
+
+        v.value = 1;
+        set = ValidatorUtil.validate(v);
+        Assertions.assertTrue(set.isEmpty());
+        System.out.println(set);
+        v.value = 2;
+        set = ValidatorUtil.validate(v);
+        Assertions.assertTrue(set.isEmpty());
+        System.out.println(set);
+        v.value = 3;
+        set = ValidatorUtil.validate(v);
+        Assertions.assertTrue(set.isEmpty());
+        System.out.println(set);
+        v.value = 4;
+        set = ValidatorUtil.validate(v);
         Assertions.assertFalse(set.isEmpty());
         System.out.println(set);
     }

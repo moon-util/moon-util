@@ -24,19 +24,33 @@ import java.lang.annotation.Target;
  * <p>
  * 默认允许 null 值
  *
- * @author benshaoye
+ * @author moonsky
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Constraint(validatedBy = IntInValidator.class)
 public @interface IntIn {
 
+    /**
+     * 字段是否允许为 null 值
+     *
+     * @return 等于 false 且字段类型是{@link Integer}时，字段不能为 null
+     */
     boolean nullable() default true;
 
     String values() default "";
-
+    /**
+     * 错误消息提示模板
+     *
+     * @return {@link MessageConst#AT_ALL}
+     */
     String message() default "必须是数值 [{values}] 之一";
 
+    /**
+     * 分组验证
+     *
+     * @return 分组对不同场景下使用不同的验证规则
+     */
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};

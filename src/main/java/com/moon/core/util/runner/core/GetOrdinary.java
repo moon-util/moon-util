@@ -7,7 +7,7 @@ import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.BooleanUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
-import com.moon.core.util.ValidateUtil;
+import com.moon.core.util.ValidationUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -72,19 +72,19 @@ class GetOrdinary implements AsGetter {
         if (data instanceof Map) {
             getter = new MapGetter(key);
         } else if (data instanceof List) {
-            ValidateUtil.requireFalse(index < 0, message);
+            ValidationUtil.requireFalse(index < 0, message);
             getter = new ListGetter(index);
         } else if (data.getClass().isArray()) {
             if (index < 0 && ARR_LENGTH.equals(key)) {
                 getter = ArrayLenGetter.LENGTH;
             } else {
-                ValidateUtil.requireFalse(index < 0, message);
+                ValidationUtil.requireFalse(index < 0, message);
                 getter = new ArrayGetter(index);
             }
         } else if (data instanceof ResultSet) {
             getter = index < 0 ? new ResultLabelGetter(key) : new ResultIndexGetter(index);
         } else {
-            ValidateUtil.requireTrue(key instanceof String, message);
+            ValidationUtil.requireTrue(key instanceof String, message);
             getter = new FieldGetter(key);
         }
         this.getter = getter;

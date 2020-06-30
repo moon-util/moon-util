@@ -411,13 +411,13 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
      */
 
     private static String activePath(String sourcePath) {
-        int end = ValidateUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), 0);
+        int end = ValidationUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), 0);
         return sourcePath.substring(0, end);
     }
 
     private static String activeName(String sourcePath) {
         int begin = minimumWithZero(sourcePath.lastIndexOf('/'));
-        int end = ValidateUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), begin);
+        int end = ValidationUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), begin);
         return sourcePath.substring(incrementIfPositive(begin), end);
     }
 

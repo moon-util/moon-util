@@ -29,6 +29,9 @@ public abstract class CollectValidator extends BaseValidator {
     }
 
     protected enum AnyMatch implements Matcher {
+        /**
+         * 数组
+         */
         OBJECTS(null) {
             @Override
             public boolean test(Object value, CollectValidator validator) {
@@ -160,6 +163,9 @@ public abstract class CollectValidator extends BaseValidator {
     }
 
     protected enum AllMatch implements Matcher {
+        /**
+         * 数组
+         */
         OBJECTS(null) {
             @Override
             public boolean test(Object value, CollectValidator validator) {
@@ -291,16 +297,26 @@ public abstract class CollectValidator extends BaseValidator {
     }
 
     protected enum MatchType {
-        ALL {
-            @Override
-            public Matcher get(Class type) { return ALL_MAPPED.getOrDefault(type, AllMatch.OBJECTS); }
-        },
-        ANY {
-            @Override
-            public Matcher get(Class type) { return ANY_MAPPED.getOrDefault(type, AnyMatch.OBJECTS); }
-        };
+        /**
+         * 全匹配
+         */
+        ALL(ALL_MAPPED, AllMatch.OBJECTS),
+        /**
+         * 至少一个匹配
+         */
+        ANY(ANY_MAPPED, AnyMatch.OBJECTS);
 
-        public abstract Matcher get(Class type);
+        private final Map<Class, Matcher> mapped;
+        private final Matcher defaultMatcher;
+
+        MatchType(Map<Class, Matcher> mapped, Matcher defaultMatcher) {
+            this.defaultMatcher = defaultMatcher;
+            this.mapped = mapped;
+        }
+
+        public Matcher get(Class type) {
+            return mapped.getOrDefault(type, defaultMatcher);
+        }
     }
 
     protected Matcher getMather(Object value) { return matchType.get(value.getClass()); }

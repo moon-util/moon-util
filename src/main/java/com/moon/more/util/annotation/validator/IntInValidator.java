@@ -18,7 +18,9 @@ public class IntInValidator extends BaseValidator implements ConstraintValidator
     }
 
     @Override
-    public boolean isValid(Object value, ConstraintValidatorContext context) { return doValidateValue(value); }
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
+        return doValidateValue(value);
+    }
 
     @Override
     protected Class getTargetClass() { return IntIn.class; }
