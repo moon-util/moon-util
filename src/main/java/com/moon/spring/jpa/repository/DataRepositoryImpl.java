@@ -303,14 +303,16 @@ public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaR
     protected <S extends T> S doSaveEntity(Cache cache, S s) {
         String beforeSaveId = s.getId();
         boolean newer = s.isNew();
-        // 在更新前删除一次，防止多并发下删除异常，（在某些情况下，可考虑不要这一步）
+        // 在更新前删除一次，防止并发下删除异常，（在某些情况下，可考虑不要这一步）
         if (!newer) {
             cache.evict(beforeSaveId);
         }
         s = super.save(s);
         if (newer) {
+            // 新数据直接缓存
             cache.put(s.getId(), s);
         } else {
+            // 更新后再次删除，防止缓存了历史数据
             cache.evict(beforeSaveId);
         }
         return s;
@@ -324,22 +326,31 @@ public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaR
         Cache.ValueWrapper wrapper = cache.get(id);
         Object value = wrapper == null ? null : wrapper.get();
         if (value == null) {
+            // 不存在缓存
             Optional optional = super.findById(id);
             if (optional.isPresent()) {
+                // 存在合法数据，缓存并返回
                 value = optional.get();
                 cache.put(id, value);
                 return (T) value;
             } else {
+                // 不存在数据，缓存占位符，并返回 null
                 cache.put(id, PLACEHOLDER);
                 return null;
             }
         } else if (value == PLACEHOLDER) {
+            // 缓存过一个不存在的值
             Object converted = convertIdIfAbsent.apply(id);
             if (converted instanceof RuntimeException) {
                 throw (RuntimeException) converted;
+            } else if (converted instanceof Error) {
+                throw (Error) converted;
+            } else if (converted instanceof Throwable) {
+                throw new IllegalStateException((String) converted);
             }
             return (T) converted;
         } else {
+            // 命中缓存
             return (T) value;
         }
     }

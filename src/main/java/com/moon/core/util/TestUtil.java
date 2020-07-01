@@ -1,13 +1,19 @@
 package com.moon.core.util;
 
+import com.moon.core.enums.IntTesters;
 import com.moon.core.enums.Patterns;
 import com.moon.core.enums.Testers;
 import com.moon.core.lang.CharUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
+import com.moon.core.time.DateTimeUtil;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -21,6 +27,13 @@ import static com.moon.core.enums.Patterns.*;
  * </ul>
  *
  * @author moonsky
+ * @see DateTimeUtil#isDateAfter(LocalDate, LocalDate) 和更多方法
+ * @see DateUtil#isAfter(Date, Date) ...
+ * @see CalendarUtil
+ * @see Patterns
+ * @see Testers
+ * @see IntTesters
+ * @see StringUtil
  */
 @SuppressWarnings("all")
 public class TestUtil {
@@ -77,6 +90,7 @@ public class TestUtil {
      * @param pattern 表达式模式
      *
      * @return 匹配成功返回 true，否则返回 false
+     *
      * @see Patterns
      */
     public final static boolean isMatchOf(CharSequence str, Pattern pattern) {
@@ -91,6 +105,7 @@ public class TestUtil {
      * @param <T>    待测数据类型
      *
      * @return 当数据符合指定条件时，返回 true，否则返回 false
+     *
      * @see Testers
      * @see Patterns
      */
@@ -174,7 +189,7 @@ public class TestUtil {
      * @return 如果检测通过，返回 true，否则返回 false
      */
     public final static boolean isDigit(CharSequence str) {
-        return StringUtil.isAllMatched(str, CharUtil::isDigit);
+        return StringUtil.isAllMatches(str, CharUtil::isDigit);
     }
 
     /**
@@ -194,7 +209,7 @@ public class TestUtil {
      * @return 如果检测通过，返回 true，否则返回 false
      */
     public final static boolean isLetter(CharSequence str) {
-        return StringUtil.isAllMatched(str, Character::isLetter);
+        return StringUtil.isAllMatches(str, Character::isLetter);
     }
 
     /**
@@ -205,7 +220,7 @@ public class TestUtil {
      * @return 如果检测通过，返回 true，否则返回 false
      */
     public final static boolean isLower(CharSequence str) {
-        return StringUtil.isAllMatched(str, Character::isLowerCase);
+        return StringUtil.isAllMatches(str, Character::isLowerCase);
     }
 
     /**
@@ -216,8 +231,18 @@ public class TestUtil {
      * @return 如果检测通过，返回 true，否则返回 false
      */
     public final static boolean isUpper(CharSequence str) {
-        return StringUtil.isAllMatched(str, Character::isUpperCase);
+        return StringUtil.isAllMatches(str, Character::isUpperCase);
     }
+
+    /**
+     * 两个对象是否相等
+     *
+     * @param o1 待测对象 1
+     * @param o2 待测对象 2
+     *
+     * @return true: 相等; false: 不想等
+     */
+    public final static boolean isEquals(Object o1, Object o2) { return Objects.equals(o1, o2); }
 
     /**
      * 验证居民身份证号
@@ -265,6 +290,15 @@ public class TestUtil {
     public final static boolean isMacAddress(CharSequence str) { return MAC_ADDRESS.test(str); }
 
     /**
+     * 验证常用中文汉字
+     *
+     * @param str 待测字符串
+     *
+     * @return 如果检测通过，返回 true，否则返回 false
+     */
+    public final static boolean isChineseWords(CharSequence str) { return CHINESE_WORDS.test(str); }
+
+    /**
      * 验证 11 位手机号
      *
      * @param str 待测字符串
@@ -272,6 +306,35 @@ public class TestUtil {
      * @return 如果检测通过，返回 true，否则返回 false
      */
     public final static boolean isChineseMobile(CharSequence str) { return CHINESE_MOBILE.test(str); }
+
+    /**
+     * 验证是否是中国 6 为邮编
+     *
+     * @param str 待测字符串
+     *
+     * @return 如果检测通过，返回 true，否则返回 false
+     */
+    public final static boolean isChineseZipCode(CharSequence str) { return CHINESE_ZIP_CODE.test(str); }
+
+    /**
+     * 检测字符串是否是日期字符串
+     * 如：yyyy-MM-dd，yyyy年MM月dd日，yyyy/MM/dd
+     *
+     * @param str 待测字符串
+     *
+     * @return 如果检测通过，返回 true，否则返回 false
+     */
+    public final static boolean isDateString(CharSequence str) { return DATE.test(str); }
+
+    /**
+     * 检测字符串是否是时间字符串
+     * 如：HH:mm:ss，HH时mm分ss秒，HH:mm，HH时mm分
+     *
+     * @param str 待测字符串
+     *
+     * @return 如果检测通过，返回 true，否则返回 false
+     */
+    public final static boolean isTimeString(CharSequence str) { return TIME.test(str); }
 
     /**
      * 是否是中国车牌号
@@ -520,9 +583,7 @@ public class TestUtil {
      *
      * @see StringUtil#isEmpty(CharSequence)
      */
-    public final static boolean isEmpty(Collection<?> collect) {
-        return CollectUtil.isEmpty(collect);
-    }
+    public final static boolean isEmpty(Collection<?> collect) { return CollectUtil.isEmpty(collect); }
 
     /**
      * 集合是否不为空
@@ -542,9 +603,7 @@ public class TestUtil {
      *
      * @see StringUtil#isEmpty(CharSequence)
      */
-    public final static boolean isEmpty(Map<?, ?> map) {
-        return MapUtil.isEmpty(map);
-    }
+    public final static boolean isEmpty(Map<?, ?> map) { return MapUtil.isEmpty(map); }
 
     /**
      * Map 是否不为空
@@ -554,6 +613,34 @@ public class TestUtil {
      * @return 当 Map 不为 null 切长度大于 0 时返回 true，否则返回 false
      */
     public final static boolean isNotEmpty(Map<?, ?> map) { return !isEmpty(map); }
+
+    /**
+     * 字符串内所有字符是否都符合条件
+     *
+     * @param cs     待测字符串
+     * @param tester 依次接受 cs 中的字符为参数，返回是否符合条件
+     *
+     * @return 全部都符合条件返回 true
+     *
+     * @see IntTesters
+     */
+    public final static boolean isAllMatches(CharSequence cs, IntPredicate tester) {
+        return StringUtil.isAllMatches(cs, tester);
+    }
+
+    /**
+     * 字符串内所有字符是否都符合条件
+     *
+     * @param cs     待测字符串
+     * @param tester 依次接受 cs 中的字符为参数，返回是否符合条件
+     *
+     * @return 至少有一个符号条件返回 true
+     *
+     * @see IntTesters
+     */
+    public final static boolean isAnyMatches(CharSequence cs, IntPredicate tester) {
+        return StringUtil.isAnyMatches(cs, tester);
+    }
 
     /**
      * 测试集合中所有项符合检查条件

@@ -15,17 +15,49 @@ public class CookieUtil {
 
     private CookieUtil() { noInstanceError(); }
 
+    /**
+     * 获取 Cookie
+     * @param request 请求
+     * @param name Cookie 名
+     * @return Cookie
+     */
     public static Cookie get(HttpServletRequest request, String name) {
         return WebUtils.getCookie(request, name);
     }
 
+    /**
+     * 获取请求客户端 Cookie 值
+     * @param request 请求
+     * @param name  Cookie 名
+     * @return Cookie 值
+     */
     public static String getValue(HttpServletRequest request, String name) {
         Cookie cookie = get(request, name);
         return cookie == null ? null : cookie.getValue();
     }
 
+    /**
+     * 删除 Cookie
+     *
+     * @param response
+     * @param name Cookie 名
+     */
     public static void remove(HttpServletResponse response, String name) {
         set(response, name, null, 0);
+    }
+
+    /**
+     * 设置cookie
+     *
+     * @param response HttpServletResponse
+     * @param name     cookie name
+     * @param value    cookie value
+     */
+    public static void set(HttpServletResponse response, String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 
     /**

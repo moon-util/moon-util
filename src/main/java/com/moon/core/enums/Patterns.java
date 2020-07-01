@@ -41,11 +41,7 @@ public enum Patterns implements Predicate<CharSequence> {
     /**
      * 汉字
      */
-    CHINESE_WORD(Pattern.compile("[\u4E00-\u9FFF]")),
-    /**
-     * 汉字
-     */
-    CHINESE_WORDS(Pattern.compile("[\u4E00-\u9FFF]+")),
+    CHINESE_WORDS(Pattern.compile("[\u4E00-\u9FAF]+")),
     /**
      * 中国大陆手机号
      */
@@ -155,8 +151,8 @@ public enum Patterns implements Predicate<CharSequence> {
      *
      * @throws RequireValidateException 如果不能匹配抛出异常
      */
-    public <C extends CharSequence> C requireMatched(C str) {
-        return requireMatched(str, "Invalid input string, require matches of: {},\n\t\t but got: {}.");
+    public <C extends CharSequence> C requireMatches(C str) {
+        return requireMatches(str, "Invalid input string, require matches of: {},\n\t\t but got: {}.");
     }
 
     /**
@@ -170,7 +166,7 @@ public enum Patterns implements Predicate<CharSequence> {
      *
      * @throws RequireValidateException 如果不能匹配抛出异常
      */
-    public <C extends CharSequence> C requireMatched(C str, String message) {
+    public <C extends CharSequence> C requireMatches(C str, String message) {
         if (test(str)) {
             return str;
         }

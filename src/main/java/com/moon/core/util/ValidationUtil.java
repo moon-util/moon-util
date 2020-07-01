@@ -1,13 +1,18 @@
 package com.moon.core.util;
 
+import com.moon.core.enums.IntTesters;
 import com.moon.core.enums.Patterns;
 import com.moon.core.enums.Testers;
+import com.moon.core.lang.StringUtil;
+import com.moon.core.time.DateTimeUtil;
 import com.moon.core.util.validator.CollectValidator;
 import com.moon.core.util.validator.MapValidator;
 import com.moon.core.util.validator.ResidentID18Validator;
 import com.moon.core.util.validator.Validator;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -17,7 +22,7 @@ import java.util.regex.Pattern;
  * 验证类
  * <ul>
  *     <li>类中所有方法均已“require”作为前缀，作“要求”之义，不符合要求就是错误；参考自{@link Objects#requireNonNull(Object)}命名</li>
- *     <li>类中所有方法第一个参数均是待测数据，从第二个参数开始作为检测条件的一部分</li>
+ *     <li>类中所有方法第一个参数均是待测数据，也是你希望在符合条件时的返回值，从第二个参数开始作为检测条件的一部分</li>
  *     <li>要求数据符合指定检测条件，如果符合要求均返回数据本身，否则统一抛出异常{@link RequireValidateException}</li>
  *     <li>类中的方法一部分有默认消息，另一部分可以自定义消息模板</li>
  *     <li>可自定义消息模板的方法最后一个参数是消息模板，同时消息模板可通过占位符“{}”依次接收待测数据和检测条件为参数</li>
@@ -27,7 +32,13 @@ import java.util.regex.Pattern;
  * 而且这个类的逻辑简单，语义清晰，命名可读性也比较高，没必要写完整的注释，以后其他类在保证可读性基础上根据情况写）
  *
  * @author moonsky
+ * @see DateTimeUtil#isDateAfter(LocalDate, LocalDate) 和更多方法
+ * @see DateUtil#isAfter(Date, Date) ...
+ * @see CalendarUtil
  * @see Patterns
+ * @see Testers
+ * @see IntTesters
+ * @see StringUtil
  */
 @SuppressWarnings("all")
 public class ValidationUtil extends TestUtil {
@@ -492,6 +503,84 @@ public class ValidationUtil extends TestUtil {
     }
 
     /**
+     * 要求对象等于另一个对象是返回当前对象
+     *
+     * @param obj      待测对象
+     * @param expected 目标对象
+     * @param <O>      待测对象数据类型
+     *
+     * @return 当 obj == expected 或 obj != null && obj.equals(expected) 时，返回 obj
+     *
+     * @throws RequireValidateException 当不符合验证条件是，抛出异常
+     */
+    public final static <O> O requireEquals(O obj, Object expected) {
+        if (isEquals(obj, expected)) {
+            return obj;
+        }
+        throw new RequireValidateException("Invalid data");
+    }
+
+    /**
+     * 要求对象等于另一个对象是返回当前对象
+     *
+     * @param obj      待测对象
+     * @param expected 目标对象
+     * @param message  目标对象
+     * @param <O>      待测对象数据类型
+     *
+     * @return 当 obj == expected 或 obj != null && obj.equals(expected) 时，返回 obj
+     *
+     * @throws RequireValidateException 当不符合验证条件是，抛出异常
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <O> O requireEquals(O obj, Object expected, String message) {
+        if (isEquals(obj, expected)) {
+            return obj;
+        }
+        throw new RequireValidateException(message, obj, expected);
+    }
+
+    /**
+     * 要求对象不等于另一个对象是返回当前对象
+     *
+     * @param obj      待测对象
+     * @param expected 目标对象
+     * @param <O>      待测对象数据类型
+     *
+     * @return 当 obj 与 expected 不相等时，返回 obj
+     *
+     * @throws RequireValidateException 当不符合验证条件是，抛出异常
+     */
+    public final static <O> O requireNotEquals(O obj, Object expected) {
+        if (!isEquals(obj, expected)) {
+            return obj;
+        }
+        throw new RequireValidateException("Invalid data");
+    }
+
+    /**
+     * 要求对象不等于另一个对象是返回当前对象
+     *
+     * @param obj      待测对象
+     * @param expected 目标对象
+     * @param message  目标对象
+     * @param <O>      待测对象数据类型
+     *
+     * @return 当 obj 与 expected 不相等时，返回 obj
+     *
+     * @throws RequireValidateException 当不符合验证条件是，抛出异常
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <O> O requireNotEquals(O obj, Object expected, String message) {
+        if (!isEquals(obj, expected)) {
+            return obj;
+        }
+        throw new RequireValidateException(message, obj, expected);
+    }
+
+    /**
      * 要求居民身份证号
      *
      * @param str 待测字符串
@@ -529,6 +618,43 @@ public class ValidationUtil extends TestUtil {
     }
 
     /**
+     * 要求常用中文汉字
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireChineseWords(C str) {
+        if (isChineseWords(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid resident ID: " + str);
+    }
+
+    /**
+     * 要求常用中文汉字
+     *
+     * @param str     待测字符串
+     * @param message 自定义消息模板
+     * @param <C>     字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireChineseWords(C str, String message) {
+        if (isChineseWords(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
      * 要求中国 11 位手机号
      *
      * @param str 待测字符串
@@ -560,6 +686,119 @@ public class ValidationUtil extends TestUtil {
      */
     public final static <C extends CharSequence> C requireChineseMobile(C str, String message) {
         if (isChineseMobile(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
+     * 要求是中国 6 位邮政编码
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireChineseZipCode(C str) {
+        if (isChineseZipCode(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid chinese zip code: " + str);
+    }
+
+    /**
+     * 要求是中国 6 位邮政编码
+     *
+     * @param str     待测字符串
+     * @param message 自定义消息模板
+     * @param <C>     字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireChineseZipCode(C str, String message) {
+        if (isChineseZipCode(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
+     * 要求是日期字符串
+     * 如：yyyy-MM-dd，yyyy年MM月dd日，yyyy/MM/dd
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串类型
+     *
+     * @return 如果符合检测规则，返回字符串本身
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireDateString(C str) {
+        if (isDateString(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid date string: " + str + "; expected like: yyyy-MM-dd");
+    }
+
+    /**
+     * 要求是日期字符串
+     * 如：yyyy-MM-dd，yyyy年MM月dd日，yyyy/MM/dd
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串类型
+     *
+     * @return 如果符合检测规则，返回字符串本身
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireDateString(C str, String message) {
+        if (isDateString(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
+     * 要求是时间字符串
+     * 如：HH:mm:ss，HH时mm分ss秒，HH:mm，HH时mm分
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串类型
+     *
+     * @return 如果符合检测规则，返回字符串本身
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireTimeString(C str) {
+        if (isTimeString(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid date string: " + str + "; expected like: yyyy-MM-dd");
+    }
+
+    /**
+     * 要求是时间字符串
+     * 如：HH:mm:ss，HH时mm分ss秒，HH:mm，HH时mm分
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串类型
+     *
+     * @return 如果符合检测规则，返回字符串本身
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireTimeString(C str, String message) {
+        if (isTimeString(str)) {
             return str;
         }
         throw new RequireValidateException(message, str);

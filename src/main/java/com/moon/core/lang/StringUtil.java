@@ -2,10 +2,13 @@ package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Const;
+import com.moon.core.enums.IntTesters;
 import com.moon.core.enums.Testers;
 import com.moon.core.lang.support.StringSupport;
 import com.moon.core.util.function.IntBiFunction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.IntPredicate;
@@ -257,8 +260,10 @@ public final class StringUtil {
      * @param tester 依次接受 cs 中的字符为参数，返回是否符合条件
      *
      * @return 全部都符合条件返回 true
+     *
+     * @see IntTesters
      */
-    public final static boolean isAllMatched(CharSequence cs, IntPredicate tester) {
+    public final static boolean isAllMatches(CharSequence cs, IntPredicate tester) {
         final int length = length(cs);
         if (length == 0) { return false; }
         for (int i = 0; i < length; i++) {
@@ -277,8 +282,10 @@ public final class StringUtil {
      * @param tester 依次接受 cs 中的字符为参数，返回是否符合条件
      *
      * @return 至少有一个符号条件返回 true
+     *
+     * @see IntTesters
      */
-    public final static boolean isAnyMatched(CharSequence cs, IntPredicate tester) {
+    public final static boolean isAnyMatches(CharSequence cs, IntPredicate tester) {
         final int length = length(cs);
         if (length == 0) { return false; }
         String source = cs.toString();
@@ -1367,4 +1374,14 @@ public final class StringUtil {
 
     todo splitter
      */
+
+    static List<String> split(CharSequence cs, char separator) {
+        List<String> result = new ArrayList<>();
+        if (cs == null || cs.length() == 0) {
+            return result;
+        }
+        int length = cs.length();
+
+        return result;
+    }
 }

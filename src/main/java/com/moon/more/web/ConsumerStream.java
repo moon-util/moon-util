@@ -21,5 +21,5 @@ public interface ConsumerStream extends Consumer<OutputStream> {
      * @param writer
      */
     @Override
-    void accept(OutputStream writer);
+    default void accept(OutputStream writer) { write(writer); }
 }

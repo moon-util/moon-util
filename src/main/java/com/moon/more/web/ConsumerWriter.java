@@ -21,5 +21,5 @@ public interface ConsumerWriter extends Consumer<PrintWriter> {
      * @param writer
      */
     @Override
-    void accept(PrintWriter writer);
+    default void accept(PrintWriter writer) { write(writer); }
 }
