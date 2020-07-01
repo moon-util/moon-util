@@ -21,6 +21,6 @@ class IntTestersTestTest {
         System.out.println("\u9FFF".length());
         System.out.println("\u9FFF".codePointAt(0));
 
-        System.out.println(IntTesters.CHINESE.test('片'));
+        System.out.println(IntTesters.CHINESE_WORD.test('片'));
     }
 }

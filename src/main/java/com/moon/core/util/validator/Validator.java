@@ -1,5 +1,9 @@
 package com.moon.core.util.validator;
 
+import com.moon.core.enums.IntTesters;
+import com.moon.core.enums.Patterns;
+import com.moon.core.enums.Testers;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +128,37 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
      * @return 当前 Validator 对象
      */
     @Override
-    public Validator<T> require(Predicate<? super T> tester) { return super.require(tester); }
+    public Validator<T> require(Predicate<? super T> tester) { return this.require(tester, "Invalid data"); }
+
+    /**
+     * 快速检测某个字段值，要去字段值复合指定要求
+     *
+     * @param getter 获取字段值
+     * @param tester 检测字段值是否符合条件，{@link Patterns}、{@link Testers}、{@link IntTesters}
+     * @param <F>    字段数据类型
+     *
+     * @return 当前 Validator 对象
+     */
+    public <F> Validator<T> requireOnField(Function<? super T, ? extends F> getter, Predicate<? super F> tester) {
+        return requireOnField(getter, tester, "Invalid field value");
+    }
+
+    /**
+     * 快速检测某个字段值，要去字段值复合指定要求
+     *
+     * @param getter  获取字段值
+     * @param tester  检测字段值是否符合条件，{@link Patterns}、{@link Testers}、{@link IntTesters}
+     * @param message 自定义错误消息
+     * @param <F>     字段数据类型
+     *
+     * @return 当前 Validator 对象
+     */
+    public <F> Validator<T> requireOnField(
+        Function<? super T, ? extends F> getter, Predicate<? super F> tester, String message
+    ) {
+        createMsg(tester.test(getter.apply(getValue())), message);
+        return this;
+    }
 
     /**
      * 对实体的集合字段进行验证

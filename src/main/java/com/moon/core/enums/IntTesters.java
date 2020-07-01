@@ -3,6 +3,7 @@ package com.moon.core.enums;
 import com.moon.core.lang.CharUtil;
 
 import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 
 /**
  * @author moonsky
@@ -107,10 +108,36 @@ public enum IntTesters implements IntPredicate {
         public boolean test(int value) { return value >= 0; }
     },
     /**
+     * 奇数
+     */
+    ODD {
+        @Override
+        public boolean test(int value) { return (value & 1) == 1; }
+    },
+    /**
+     * 偶数
+     */
+    EVEN {
+        @Override
+        public boolean test(int value) { return (value & 1) == 0; }
+    },
+    /**
      * 汉字
      */
     CHINESE_WORD {
         @Override
         public boolean test(int value) { return value > 19967 && value < 40880; }
     };
+
+    public final Predicate<Number> notPredicate;
+    public final Predicate<Number> predicate;
+    public final IntPredicate not;
+
+    IntTesters() {
+        predicate = n -> n != null && test(n.intValue());
+        notPredicate = predicate.negate();
+        not = value -> !test(value);
+    }
+
+    public Predicate<Number> asPredicate() { return predicate; }
 }
