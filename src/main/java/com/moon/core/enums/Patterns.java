@@ -35,9 +35,9 @@ public enum Patterns implements Predicate<CharSequence> {
      */
     LETTER(Pattern.compile("[a-zA-Z]+")),
     /**
-     * 居民身份证号
+     * 18位，居民身份证号
      */
-    RESIDENT_ID(Pattern.compile("[1-9]\\d{5}[1-2]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}(\\d|X|x)")),
+    RESIDENT_ID_18(Pattern.compile("[1-9]\\d{5}[1-2]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}(\\d|X|x)")),
     /**
      * 汉字
      */

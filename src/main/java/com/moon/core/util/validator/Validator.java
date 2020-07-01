@@ -1,7 +1,10 @@
 package com.moon.core.util.validator;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -122,4 +125,39 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
      */
     @Override
     public Validator<T> require(Predicate<? super T> tester) { return super.require(tester); }
+
+    /**
+     * 对实体的集合字段进行验证
+     *
+     * @param getter 从对象获取集合字段值的方法
+     * @param <E>    集合项数据类型
+     * @param <C>    集合数据类型
+     *
+     * @return 集合验证器
+     */
+    public <E, C extends Collection<E>> CollectValidator<C, E> onCollectField(Function<? super T, ? extends C> getter) {
+        return new CollectValidator<>(getter.apply(getValue()),
+            isNullable(),
+            ensureMessages(),
+            getSeparator(),
+            isImmediate());
+    }
+
+    /**
+     * 对实体的 Map 字段进行验证
+     *
+     * @param getter 从对象获取 Map 字段值的方法
+     * @param <K>    字段键数据类型
+     * @param <V>    字段值数据类型
+     * @param <M>    Map 类型
+     *
+     * @return Map 验证器
+     */
+    public <K, V, M extends Map<K, V>> MapValidator<M, K, V> onMapField(Function<? super T, ? extends M> getter) {
+        return new MapValidator<>(getter.apply(getValue()),
+            isNullable(),
+            ensureMessages(),
+            getSeparator(),
+            isImmediate());
+    }
 }

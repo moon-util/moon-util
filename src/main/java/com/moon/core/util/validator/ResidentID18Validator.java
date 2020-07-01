@@ -32,28 +32,34 @@ public final class ResidentID18Validator extends BaseValidator<String, ResidentI
      * 性别
      */
     private final int gender;
+    /**
+     * 校验码
+     */
+    final static int[] CODES_VERIFY = {
+        '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'
+    };
+    /**
+     * 因子
+     */
+    final static int[] CODES_FACTOR = {
+        7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2
+    };
 
-    public static boolean isValid(String value) {
+    public static boolean isValid(CharSequence value) {
         if (value == null || value.length() != 18) {
             return false;
         }
         int result = 0;
         final int end = 17, mod = 11;
-        final int[] CODES = {
-            '1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'
-        };
-        final int[] codes = {
-            7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2
-        };
         for (int i = 0, curr; i < end; i++) {
             curr = value.charAt(i);
             if (curr < 48 || curr > 57) {
                 return false;
             }
-            result += (curr - 48) * codes[i];
+            result += (curr - 48) * CODES_FACTOR[i];
         }
         final int index = result % mod;
-        return index >= 0 && value.charAt(end) == CODES[index];
+        return index >= 0 && value.charAt(end) == CODES_VERIFY[index];
     }
 
     public ResidentID18Validator(CharSequence value) {

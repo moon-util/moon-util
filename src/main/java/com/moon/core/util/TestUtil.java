@@ -226,7 +226,7 @@ public class TestUtil {
      *
      * @return 如果检测通过，返回 true，否则返回 false
      */
-    public final static boolean isResidentID(CharSequence str) { return RESIDENT_ID.test(str); }
+    public final static boolean isResidentID18(CharSequence str) { return RESIDENT_ID_18.test(str); }
 
     /**
      * 验证电子邮箱

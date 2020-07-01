@@ -501,8 +501,8 @@ public class ValidationUtil extends TestUtil {
      *
      * @throws RequireValidateException 当检测不通过时抛出异常
      */
-    public final static <C extends CharSequence> C requireResidentID(C str) {
-        if (isResidentID(str)) {
+    public final static <C extends CharSequence> C requireResidentID18(C str) {
+        if (isResidentID18(str)) {
             return str;
         }
         throw new RequireValidateException("Invalid resident ID: " + str);
@@ -521,8 +521,8 @@ public class ValidationUtil extends TestUtil {
      *                                  异常消息由调用方自定义，
      *                                  可用“{}”占位符接收入参字符串
      */
-    public final static <C extends CharSequence> C requireResidentID(C str, String message) {
-        if (isResidentID(str)) {
+    public final static <C extends CharSequence> C requireResidentID18(C str, String message) {
+        if (isResidentID18(str)) {
             return str;
         }
         throw new RequireValidateException(message, str);

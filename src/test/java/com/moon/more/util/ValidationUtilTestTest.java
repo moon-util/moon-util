@@ -1,6 +1,7 @@
 package com.moon.more.util;
 
-import com.moon.more.util.annotation.IntIn;
+import com.moon.more.validator.ValidatorUtil;
+import com.moon.more.validator.annotation.InInts;
 import org.hibernate.validator.constraints.Length;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class ValidationUtilTestTest {
 
     public static class Validated {
 
-        @IntIn(values = "1,2,3")
+        @InInts(values = "1,2,3")
         private int value;
     }
 
