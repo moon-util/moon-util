@@ -2,11 +2,12 @@ package com.moon.core.json;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 /**
  * @author moonsky
  */
-public enum JSONBoolean implements JSON<Object>, Comparable<JSONBoolean> {
+public enum JSONBoolean implements JSON<Object>, Comparable<JSONBoolean>, BooleanSupplier {
     /**
      * true
      */
@@ -25,6 +26,7 @@ public enum JSONBoolean implements JSON<Object>, Comparable<JSONBoolean> {
 
     @Override
     public List<Object> getList(Object key) { throw new UnsupportedOperationException(); }
+
 
     @Override
     @SuppressWarnings("unchecked")
@@ -59,4 +61,9 @@ public enum JSONBoolean implements JSON<Object>, Comparable<JSONBoolean> {
 
     @Override
     public String toString() { return Boolean.toString(value); }
+
+    @Override
+    public boolean getAsBoolean() { return value; }
+
+    public Boolean getBoolean() { return value; }
 }
