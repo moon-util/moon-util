@@ -4,6 +4,8 @@ import com.moon.more.validator.impl.AnyInStringsValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,9 +20,11 @@ import java.lang.annotation.Target;
 public @interface AnyInStrings {
 
     /**
-     * 字段是否允许为 null 值
+     * 数据项是否允许为 null 值，只验证集合或数组里的数据项是否可为 null
+     * <p>
+     * 如果要验证集合/数组字段本身是否可为 null、empty 请用{@link NotNull}、{@link NotEmpty}
      *
-     * @return 等于 false 时，字段不能为 null
+     * @return 等于 false 时不可包含 null 数据项
      */
     boolean nullable() default false;
 
@@ -29,7 +33,7 @@ public @interface AnyInStrings {
      *
      * @return double 值，如："aaa,bbb,ccc,ddd,eee"；注意，在 其他数值验证中，这里会忽略空格，
      * 但在这字符串里不会自动忽略分割符之间的空格
-     * @see #trimmed() trimmed == treu 时，就忽略单项的首尾空格
+     * @see #trimmed() trimmed == true 时，就忽略单项的首尾空格
      */
     String values() default "";
 

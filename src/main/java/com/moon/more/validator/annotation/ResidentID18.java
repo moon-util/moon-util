@@ -4,6 +4,7 @@ import com.moon.more.validator.impl.ResidentID18Validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -13,6 +14,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * 中国 18 为居民身份证号验证
+ * <p>
+ * 不验证值为 null 的情况，如果要求非 null 使用{@link NotNull}
  *
  * @author moonsky
  */

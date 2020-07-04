@@ -1,10 +1,14 @@
 package com.moon.core.util;
 
+import com.moon.core.time.DateTimeUtil;
+import com.moon.core.util.validator.ResidentID18Validator;
+
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -26,20 +30,14 @@ public final class DateUtil extends CalendarUtil {
     public final static boolean isToday(Date value) { return value != null && isSameDay(value, nowDate()); }
 
     public final static boolean isSameDay(Date value, Date other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other);
+        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
+            value) == getDayOfMonth(other);
     }
 
     public final static boolean isSameTime(Date value, Date other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getSecond(value) == getSecond(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other) &&
-            getHour(value) == getHour(other) &&
-            getMinute(value) == getMinute(other);
+        return value != null && getYear(value) == getYear(other) && getSecond(value) == getSecond(other) && getMonth(
+            value) == getMonth(other) && getDayOfMonth(value) == getDayOfMonth(other) && getHour(value) == getHour(other) && getMinute(
+            value) == getMinute(other);
     }
 
     public final static boolean isBefore(Date value, Date other) {
@@ -126,6 +124,30 @@ public final class DateUtil extends CalendarUtil {
     public final static int getSecond(Date value) { return getSecond(toCalendar(value)); }
 
     public final static int getMillisecond(Date value) { return getMillisecond(toCalendar(value)); }
+
+    /**
+     * 根据日期获取年龄（周岁）
+     *
+     * @param date 日期
+     *
+     * @return 周岁
+     *
+     * @see ResidentID18Validator#getAge()
+     */
+    public final static int getAge(Date date) {
+        return DateTimeUtil.toDate(date).until(LocalDate.now()).getYears();
+    }
+
+    /**
+     * 根据日期获取年龄（虚岁）
+     *
+     * @param date 日期
+     *
+     * @return 虚岁
+     *
+     * @see ResidentID18Validator#getNominalAge()
+     */
+    public final static int getNominalAge(Date date) { return getAge(date) + 1; }
 
     /*
      * -------------------------------------------------------------------------

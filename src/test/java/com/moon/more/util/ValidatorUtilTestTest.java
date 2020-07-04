@@ -3,6 +3,7 @@ package com.moon.more.util;
 import com.moon.more.validator.ValidatorUtil;
 import com.moon.more.validator.annotation.AllInInts;
 import com.moon.more.validator.annotation.InInts;
+import com.moon.more.validator.annotation.ResidentID18;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +48,24 @@ class ValidatorUtilTestTest {
         private Integer[] age0 = {1, null};
     }
 
+    public static class UserInfo {
+
+        @ResidentID18
+        private String certNo;
+    }
+
+    @Test
+    void testCertNo() throws Exception {
+        UserInfo info = new UserInfo();
+
+        Set set = ValidatorUtil.validate(info);
+        Assertions.assertTrue(set.isEmpty());
+
+        info.certNo = "";
+        set = ValidatorUtil.validate(info);
+        Assertions.assertFalse(set.isEmpty());
+        System.out.println(set);
+    }
 
     @Test
     void testValidateValue() throws Exception {

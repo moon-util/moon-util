@@ -3,6 +3,7 @@ package com.moon.core.time;
 import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.util.function.TableIntFunction;
+import com.moon.core.util.validator.ResidentID18Validator;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -496,154 +497,28 @@ public final class DateTimeUtil {
     }
 
     /**
-     * 获取年份
+     * 根据日期获取年龄（周岁）
      *
-     * @param date LocalDate 对象
+     * @param date 日期
      *
-     * @return 年份
+     * @return 周岁
+     *
+     * @see ResidentID18Validator#getAge()
+     * @see LocalDateTime#toLocalDate() 不单独对 LocalDateTime 提供方法
      */
-    public static int getYear(LocalDate date) { return requireNonNull(date).getYear(); }
+    public static int getAge(LocalDate date) { return date.until(nowDate()).getYears(); }
 
     /**
-     * 获取月份；
-     * <p>
-     * 注在{@link Date}或{@link Calendar}中直接获取到的月份比实际的要少一月，即当前是 6 月获取到的是 5 月，用的时候需要手动处理；
-     * 但在 jdk8 的日期时间里不是这样的，实际是几月获取到就是几月。
+     * 根据日期获取年龄（虚岁）
      *
-     * @param date LocalDateTime 对象
+     * @param date 日期
      *
-     * @return 月份
+     * @return 虚岁
+     *
+     * @see ResidentID18Validator#getNominalAge()
+     * @see LocalDateTime#toLocalDate() 不单独对 LocalDateTime 提供方法
      */
-    public static int getMonthValue(LocalDate date) { return requireNonNull(date).getMonthValue(); }
-
-    /**
-     * 一月中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是 2 月的第 1 天
-     *
-     * @param date LocalDate 对象
-     *
-     * @return 月中的第几天
-     */
-    public static int getDayOfMonth(LocalDate date) { return requireNonNull(date).getDayOfMonth(); }
-
-    /**
-     * 一年中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是第 32 天
-     *
-     * @param date LocalDate 对象
-     *
-     * @return 年中的第几日
-     */
-    public static int getDayOfYear(LocalDate date) { return requireNonNull(date).getDayOfYear(); }
-
-    /**
-     * 获取星期
-     *
-     * @param date LocalDate 对象
-     *
-     * @return 星期枚举
-     */
-    public static DayOfWeek getDayOfWeek(LocalDate date) { return requireNonNull(date).getDayOfWeek(); }
-
-    /**
-     * 获取年份
-     *
-     * @param date LocalDateTime 对象
-     *
-     * @return 年份
-     */
-    public static int getYear(LocalDateTime date) { return requireNonNull(date).getYear(); }
-
-    /**
-     * 获取月份；
-     * <p>
-     * 注在{@link Date}或{@link Calendar}中直接获取到的月份比实际的要少一月，即当前是 6 月获取到的实际是 5 月，用的时候需要手动处理；
-     * 但在 jdk8 的日期时间里不是这样的，实际是几月就是几月。
-     *
-     * @param date LocalDateTime 对象
-     *
-     * @return 月份
-     */
-    public static int getMonthValue(LocalDateTime date) { return requireNonNull(date).getMonthValue(); }
-
-    /**
-     * 一月中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是 2 月的第 1 天
-     *
-     * @param date LocalDateTime 对象
-     *
-     * @return 月中的第几天
-     */
-    public static int getDayOfMonth(LocalDateTime date) { return requireNonNull(date).getDayOfMonth(); }
-
-    /**
-     * 一年中的第 N 天。如一月一日 => 第 1 天；一月 31 日是第 31 天；二月 1 日是第 32 天
-     *
-     * @param date LocalDateTime 对象
-     *
-     * @return 年中的第几日
-     */
-    public static int getDayOfYear(LocalDateTime date) { return requireNonNull(date).getDayOfYear(); }
-
-    /**
-     * 获取星期
-     *
-     * @param date LocalDateTime 对象
-     *
-     * @return 星期枚举
-     */
-    public static DayOfWeek getDayOfWeek(LocalDateTime date) { return requireNonNull(date).getDayOfWeek(); }
-
-    /**
-     * 获取小时
-     *
-     * @param time 时间
-     *
-     * @return 时间中的小时数
-     */
-    public static int getHour(LocalTime time) { return requireNonNull(time).getHour(); }
-
-    /**
-     * 获取分钟
-     *
-     * @param time 时间
-     *
-     * @return 时间的分钟数
-     */
-    public static int getMinute(LocalTime time) { return requireNonNull(time).getMinute(); }
-
-    /**
-     * 获取秒数
-     *
-     * @param time 时间
-     *
-     * @return 时间的秒数
-     */
-    public static int getSecond(LocalTime time) { return requireNonNull(time).getSecond(); }
-
-    /**
-     * 获取小时
-     *
-     * @param time 时间
-     *
-     * @return 时间的小时数
-     */
-    public static int getHour(LocalDateTime time) { return requireNonNull(time).getHour(); }
-
-    /**
-     * 获取分钟
-     *
-     * @param time 时间
-     *
-     * @return 时间的分钟数
-     */
-    public static int getMinute(LocalDateTime time) { return requireNonNull(time).getMinute(); }
-
-    /**
-     * 获取秒数
-     *
-     * @param time 时间
-     *
-     * @return 时间的秒数
-     */
-    public static int getSecond(LocalDateTime time) { return requireNonNull(time).getSecond(); }
+    public static int getNominalAge(LocalDate date) { return getAge(date) + 1; }
 
     /*
      始末时间

@@ -16,6 +16,6 @@ public class ResidentID18Validation implements ConstraintValidator<ResidentID18,
 
     @Override
     public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-        return ResidentID18Validator.isValid(value);
+        return value == null || ResidentID18Validator.isValid(value);
     }
 }

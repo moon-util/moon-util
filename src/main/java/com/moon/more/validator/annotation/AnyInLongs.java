@@ -4,6 +4,8 @@ import com.moon.more.validator.impl.AnyInLongsValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,9 +22,11 @@ import java.lang.annotation.Target;
 public @interface AnyInLongs {
 
     /**
-     * 字段是否允许为 null 值
+     * 数据项是否允许为 null 值，只验证集合或数组里的数据项是否可为 null
+     * <p>
+     * 如果要验证集合/数组字段本身是否可为 null、empty 请用{@link NotNull}、{@link NotEmpty}
      *
-     * @return 等于 false 且字段数据项类型是{@link Long}时，字段不能为 null
+     * @return 等于 false 时不可包含 null 数据项
      */
     boolean nullable() default false;
 

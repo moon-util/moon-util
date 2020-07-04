@@ -2,6 +2,8 @@ package com.moon.core.util;
 
 import com.moon.core.enums.Const;
 import com.moon.core.lang.LongUtil;
+import com.moon.core.time.DateTimeUtil;
+import com.moon.core.util.validator.ResidentID18Validator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,20 +67,14 @@ public class CalendarUtil {
     public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, current()); }
 
     public final static boolean isSameDay(Calendar value, Calendar other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other);
+        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
+            value) == getDayOfMonth(other);
     }
 
     public final static boolean isSameTime(Calendar value, Calendar other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other) &&
-            getHour(value) == getHour(other) &&
-            getMinute(value) == getMinute(other) &&
-            getSecond(value) == getSecond(other);
+        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
+            value) == getDayOfMonth(other) && getHour(value) == getHour(other) && getMinute(value) == getMinute(other) && getSecond(
+            value) == getSecond(other);
     }
 
     public final static boolean isBefore(Calendar value, Calendar other) {
@@ -355,12 +351,59 @@ public class CalendarUtil {
      */
     public final static int getMillisecond(Calendar value) { return get(value, MILLISECOND); }
 
+    /**
+     * 根据日期获取年龄（周岁）
+     *
+     * @param calendar 日期
+     *
+     * @return 周岁
+     *
+     * @see ResidentID18Validator#getAge()
+     */
+    public final static int getAge(Calendar calendar) {
+        return DateTimeUtil.toDate(calendar).until(LocalDate.now()).getYears();
+    }
+
+    /**
+     * 根据日期获取年龄（虚岁）
+     *
+     * @param calendar 日期
+     *
+     * @return 虚岁
+     *
+     * @see ResidentID18Validator#getNominalAge()
+     */
+    public final static int getNominalAge(Calendar calendar) { return getAge(calendar) + 1; }
+
+    /**
+     * 设置日期指定字段值，总是返回一个新对象
+     * <p>
+     * 注意：在 Calendar 标准处理中，设置的月份是实际月份加一，即如果设置 5 月，实际设置到日期的是 6 月；
+     * 这个方法对这进行了处理，设置的是实际月份，即：如果设置 5 月，实际设置到日期的就是 5 月
+     *
+     * @param value  日期
+     * @param field  字段
+     * @param amount 字段值
+     *
+     * @return 设置新值后的新对象
+     */
     public final static Calendar set(Calendar value, int field, int amount) {
         Calendar copied = copy(value);
         copied.set(field, field == MONTH ? amount - 1 : amount);
         return copied;
     }
 
+    /**
+     * 获取 Calendar 指定字段值
+     * <p>
+     * 注意：在 Calendar 标准处理中，获取到的月份是实际月份减一，即如果现在是 5 月，获取到的是 4 月；
+     * 这个方法对这进行了处理，获取到的是实际月份，即：即如果现在是 5 月，获取到的就是 5 月
+     *
+     * @param cal   日期
+     * @param field 字段
+     *
+     * @return 字段值
+     */
     public final static int get(Calendar cal, int field) {
         return field == MONTH ? cal.get(field) + 1 : cal.get(field);
     }
@@ -371,49 +414,166 @@ public class CalendarUtil {
      * -------------------------------------------------------------------------
      */
 
+    /**
+     * 返回指定模式的 DateFormat
+     *
+     * @param pattern 模式
+     *
+     * @return DateFormat
+     */
     public final static DateFormat toFormat(String pattern) { return new SimpleDateFormat(pattern); }
 
+    /**
+     * 按指定模式格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数组，超出部分忽略
+     *
+     * @param pattern 日期格式
+     * @param values  按年月日、时分秒等书序组成的数组
+     *
+     * @return 格式化后的字符串
+     */
     public final static String format(DateFormat pattern, int... values) { return format(toCalendar(values), pattern); }
 
+    /**
+     * 按指定模式格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数组，超出部分忽略
+     *
+     * @param pattern 日期格式
+     * @param values  按年月日、时分秒等书序组成的数组
+     *
+     * @return 格式化后的字符串
+     */
     public final static String format(String pattern, int... values) { return format(toFormat(pattern), values); }
 
+    /**
+     * 按模式 yyyy-MM-dd HH:mm:ss 格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数组，超出部分忽略
+     *
+     * @param values 按年月日、时分秒等书序组成的数组
+     *
+     * @return 格式化后的字符串
+     */
     public final static String format(int... values) { return format(PATTERNS[values.length - 1], values); }
 
+    /**
+     * 按指定模式格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数字字符串数组，超出部分忽略
+     *
+     * @param pattern 日期格式
+     * @param values  每个字符串都是数字形式，并且按年月日、时分秒等书序组成的数组
+     *
+     * @return 格式化后的字符串
+     */
     public final static String format(DateFormat pattern, String... values) {
         return format(toCalendar(values), pattern);
     }
 
+    /**
+     * 按模式 yyyy-MM-dd HH:mm:ss 格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数字字符串数组，超出部分忽略
+     *
+     * @param values 每个字符串都是数字形式，并且按年月日、时分秒等书序组成的数组
+     *
+     * @return 格式化后的字符串
+     */
     public final static String format(String... values) {
         return format(toFormat(PATTERNS[values.length - 1]), values);
     }
 
+    /**
+     * 按模式 yyyy-MM-dd HH:mm:ss 格式化当前日期
+     *
+     * @return 格式化后的字符串
+     */
     public final static String format() { return format(PATTERN); }
 
+    /**
+     * 按指定模式格式化当前日期
+     *
+     * @param pattern 日期格式
+     *
+     * @return 格式化后的日期字符串
+     */
     public final static String format(String pattern) { return pattern == null ? null : format(new Date(), pattern); }
 
+    /**
+     * 按指定模式格式化日期
+     *
+     * @param date    将要格式化的日期
+     * @param pattern 日期格式
+     *
+     * @return 格式化后的日期字符串
+     */
     public final static String format(Date date, String pattern) {
         return date == null ? null : format(date, toFormat(pattern));
     }
 
+    /**
+     * 按指定模式格式化日期
+     *
+     * @param date      将要格式化的日期
+     * @param formatter 日期格式
+     *
+     * @return 格式化后的日期字符串
+     */
     public final static String format(Date date, DateFormat formatter) {
         return date == null ? null : formatter.format(date);
     }
 
+    /**
+     * 按模式 yyyy-MM-dd HH:mm:ss 格式化指定日期
+     *
+     * @param date 将要格式化的日期
+     *
+     * @return 格式化后的日期字符串
+     */
     public final static String format(Date date) { return date == null ? null : format(date, PATTERN); }
 
+    /**
+     * 按模式 yyyy-MM-dd HH:mm:ss 格式化指定日期
+     *
+     * @param date 将要格式化的日期
+     *
+     * @return 格式化后的日期字符串
+     */
     public final static String format(Calendar date) { return date == null ? null : format(date.getTime()); }
 
+    /**
+     * 按指定模式格式化日期
+     *
+     * @param date    将要格式化的日期
+     * @param pattern 日期格式
+     *
+     * @return 格式化后的日期字符串
+     */
     public final static String format(Calendar date, String pattern) {
         return date == null ? null : format(date.getTime(), pattern);
     }
 
+    /**
+     * 按指定模式格式化日期
+     *
+     * @param date      将要格式化的日期
+     * @param formatter 日期格式
+     *
+     * @return 格式化后的日期字符串
+     */
     public final static String format(Calendar date, DateFormat formatter) {
         return date == null ? null : format(date.getTime(), formatter);
     }
 
-    public final static String toYyyyMM(Date date) { return format(date, yyyy_MM); }
+    /**
+     * 将指定日期格式化成年月字符串
+     *
+     * @param date 将要格式化的日期
+     *
+     * @return 格式化后的年月字符串
+     */
+    public final static String toYearMonth(Date date) { return format(date, yyyy_MM); }
 
-    public final static String toYyyyMMDd(Date date) { return format(date, yyyy_MM_dd); }
+    /**
+     * 将指定日期格式化成年月日字符串
+     *
+     * @param date 将要格式化的日期
+     *
+     * @return 格式化后的年月日字符串
+     */
+    public final static String toYearMonthDay(Date date) { return format(date, yyyy_MM_dd); }
 
     /*
      * -------------------------------------------------------------------------
@@ -522,7 +682,11 @@ public class CalendarUtil {
     public final static Calendar toCalendar(Date date) { return date == null ? null : toCalendar(date.getTime()); }
 
     public final static Calendar toCalendar(LocalDate date, LocalTime time) {
-        return toCalendar(date.getYear(), date.getDayOfMonth(), date.getDayOfMonth(), time.getHour(), time.getMinute(),
+        return toCalendar(date.getYear(),
+            date.getDayOfMonth(),
+            date.getDayOfMonth(),
+            time.getHour(),
+            time.getMinute(),
             time.getSecond());
     }
 
@@ -535,9 +699,12 @@ public class CalendarUtil {
     }
 
     public final static Calendar toCalendar(LocalDateTime date) {
-        return date == null ? null
-            : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), date.getHour(), date.getMinute(),
-                date.getSecond());
+        return date == null ? null : toCalendar(date.getYear(),
+            date.getMonthValue(),
+            date.getDayOfMonth(),
+            date.getHour(),
+            date.getMinute(),
+            date.getSecond());
     }
 
     public final static Calendar toCalendar(int... values) {
@@ -594,6 +761,6 @@ public class CalendarUtil {
         if (value instanceof CharSequence) { return toCalendar((CharSequence) value); }
         if (value instanceof int[]) { return toCalendar((int[]) value); }
         if (value instanceof String[]) { return toCalendar((String[]) value); }
-        throw new IllegalArgumentException("can not converter to java.lang.CharSequence of value: " + value);
+        throw new IllegalArgumentException("can not converter to java.util.Calendar of value: " + value);
     }
 }
