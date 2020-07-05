@@ -8,11 +8,23 @@ import java.util.function.ToDoubleFunction;
 /**
  * @author moonsky
  */
-public class DoubleAccessor implements DoubleSupplier {
+public class DoubleAccessor extends Number implements DoubleSupplier {
 
     private double value;
 
     public DoubleAccessor() { }
+
+    @Override
+    public int intValue() { return (int) value; }
+
+    @Override
+    public long longValue() { return (long) value; }
+
+    @Override
+    public float floatValue() { return (float) value; }
+
+    @Override
+    public double doubleValue() { return value; }
 
     public DoubleAccessor(double value) { this.set(value); }
 

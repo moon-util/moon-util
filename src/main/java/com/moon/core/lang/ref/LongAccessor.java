@@ -8,11 +8,23 @@ import java.util.function.ToLongFunction;
 /**
  * @author moonsky
  */
-public class LongAccessor implements LongSupplier {
+public class LongAccessor extends Number implements LongSupplier {
 
     private long value;
 
     public LongAccessor() { }
+
+    @Override
+    public int intValue() { return (int) value; }
+
+    @Override
+    public long longValue() { return value; }
+
+    @Override
+    public float floatValue() { return value; }
+
+    @Override
+    public double doubleValue() { return value; }
 
     public LongAccessor(long value) { this.set(value); }
 

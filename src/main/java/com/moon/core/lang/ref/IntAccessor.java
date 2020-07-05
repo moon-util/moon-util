@@ -8,11 +8,23 @@ import java.util.function.ToIntFunction;
 /**
  * @author moonsky
  */
-public class IntAccessor implements IntSupplier {
+public class IntAccessor extends Number implements IntSupplier {
 
     private int value;
 
     public IntAccessor() { }
+
+    @Override
+    public int intValue() { return value; }
+
+    @Override
+    public long longValue() { return value; }
+
+    @Override
+    public float floatValue() { return value; }
+
+    @Override
+    public double doubleValue() { return value; }
 
     public IntAccessor(int value) { this.set(value); }
 

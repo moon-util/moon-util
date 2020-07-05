@@ -71,9 +71,6 @@ public class DateTimeUtilTest {
 
     @Test
     void testGetDayOfYear() throws Exception {
-        System.out.println(DateTimeUtil.getDayOfYear(LocalDate.now()));
-        System.out.println(DateTimeUtil.getDayOfMonth(LocalDate.now()));
-        System.out.println(DateTimeUtil.getMonthValue(LocalDate.now()));
         System.out.println(LocalDate.now().getMonth().getValue());
     }
 
