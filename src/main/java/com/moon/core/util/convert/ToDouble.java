@@ -7,25 +7,25 @@ import static com.moon.core.util.convert.ToUtil.*;
 /**
  * @author benshaoye
  */
-enum ToInt implements Converts, PrimitiveConverter {
+enum ToDouble implements Converts, PrimitiveConverter {
     /**
      * Number -> int
      */
     byNumber(ToUtil.concat(Arrs.PRIMITIVE_NUMBERS, Arrs.WRAPPER_NUMBERS, Arrs.EXPAND_NUMBERS)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : ((Number) o).intValue(); }
+        public Object convert(Object o) { return ifn(o) ? null : ((Number) o).doubleValue(); }
     },
     byBoolean(arr(Boolean.class, boolean.class)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : ((Boolean) o ? 1 : 0); }
+        public Object convert(Object o) { return ifn(o) ? null : ((Boolean) o ? 1D : 0D); }
     },
     byChar(arr(Character.class, char.class)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : (int) ((char) o); }
+        public Object convert(Object o) { return ifn(o) ? null : (double) ((char) o); }
     },
     byString(Arrs.STRINGS) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : Integer.parseInt(o.toString()); }
+        public Object convert(Object o) { return ifn(o) ? null : Double.parseDouble(o.toString()); }
     },
     byOptionalInt(arr(OptionalInt.class)) {
         @Override
@@ -34,7 +34,7 @@ enum ToInt implements Converts, PrimitiveConverter {
                 return null;
             }
             OptionalInt optional = (OptionalInt) o;
-            return optional.isPresent() ? optional.getAsInt() : null;
+            return optional.isPresent() ? (double) optional.getAsInt() : null;
         }
     },
     byOptionalLong(arr(OptionalLong.class)) {
@@ -44,7 +44,7 @@ enum ToInt implements Converts, PrimitiveConverter {
                 return null;
             }
             OptionalLong optional = (OptionalLong) o;
-            return optional.isPresent() ? (int) optional.getAsLong() : null;
+            return optional.isPresent() ? (double) optional.getAsLong() : null;
         }
     },
     byOptionalDouble(arr(OptionalDouble.class)) {
@@ -54,7 +54,7 @@ enum ToInt implements Converts, PrimitiveConverter {
                 return null;
             }
             OptionalDouble optional = (OptionalDouble) o;
-            return optional.isPresent() ? (int) optional.getAsDouble() : null;
+            return optional.isPresent() ? optional.getAsDouble() : null;
         }
     },
     byOptional(arr(Optional.class, com.moon.core.util.Optional.class)) {
@@ -65,10 +65,10 @@ enum ToInt implements Converts, PrimitiveConverter {
             }
             if (o instanceof Optional) {
                 Optional optional = (Optional) o;
-                return optional.isPresent() ? (int) optional.get() : null;
+                return optional.isPresent() ? (double) optional.get() : null;
             } else {
                 com.moon.core.util.Optional optional = (com.moon.core.util.Optional) o;
-                return optional.isPresent() ? (int) optional.get() : null;
+                return optional.isPresent() ? (double) optional.get() : null;
             }
         }
     };
@@ -77,11 +77,11 @@ enum ToInt implements Converts, PrimitiveConverter {
     private final Set<Class<?>> hashToSupports;
     private final ToPrimitive toPrimitive;
 
-    ToInt(Class[] supportsFrom) {
-        Class<?>[] supportsTo = arr(Integer.class);
+    ToDouble(Class[] supportsFrom) {
+        Class<?>[] supportsTo = arr(Double.class);
         this.hashToSupports = unmodifiableHashSet(supportsTo);
         this.hashFromSupports = unmodifiableHashSet(supportsFrom);
-        toPrimitive = new ToPrimitive(hashFromSupports, int.class, this, 0);
+        toPrimitive = new ToPrimitive(hashFromSupports, double.class, this, 0D);
     }
 
     @Override
@@ -94,5 +94,5 @@ enum ToInt implements Converts, PrimitiveConverter {
     public Set<Class<?>> supportsFrom() { return hashFromSupports; }
 
     @Override
-    public boolean supportsTo(Class type) { return type == Integer.class; }
+    public boolean supportsTo(Class type) { return type == Double.class; }
 }

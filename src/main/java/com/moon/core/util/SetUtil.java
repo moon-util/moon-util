@@ -20,31 +20,31 @@ public final class SetUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <T> HashSet<T> newHashSet() { return new HashSet<>(); }
+    public static <T> HashSet<T> newSet() { return new HashSet<>(); }
 
-    public static <T> HashSet<T> newHashSet(int initCapacity) { return new HashSet<>(initCapacity); }
+    public static <T> HashSet<T> newSet(int initCapacity) { return new HashSet<>(initCapacity); }
 
-    public static <T> HashSet<T> newHashSet(T value) { return add(newHashSet(), value); }
+    public static <T> HashSet<T> newSet(T value) { return add(newSet(), value); }
 
-    public static <T> HashSet<T> newHashSet(T value1, T value2) { return add(newHashSet(value1), value2); }
+    public static <T> HashSet<T> newSet(T value1, T value2) { return add(newSet(value1), value2); }
 
-    public static <T> HashSet<T> newHashSet(T value1, T value2, T value3) {
-        return add(newHashSet(value1, value2), value3);
+    public static <T> HashSet<T> newSet(T value1, T value2, T value3) {
+        return add(newSet(value1, value2), value3);
     }
 
-    public static <T> HashSet<T> newHashSet(T... values) { return addAll(newHashSet(values.length), values); }
+    public static <T> HashSet<T> newSet(T... values) { return addAll(newSet(values.length), values); }
 
-    public static <T> HashSet<T> newHashSet(Collection<T> collect) {
-        return collect == null ? newHashSet() : new HashSet<>(collect);
+    public static <T> HashSet<T> newSet(Collection<T> collect) {
+        return collect == null ? newSet() : new HashSet<>(collect);
     }
 
-    public static <T> HashSet<T> newHashSet(Iterable<T> iterable) {
-        return iterable == null ? newHashSet() : (iterable instanceof Collection ? new HashSet((Collection) iterable) : addAll(
-            newHashSet(),
+    public static <T> HashSet<T> newSet(Iterable<T> iterable) {
+        return iterable == null ? newSet() : (iterable instanceof Collection ? new HashSet((Collection) iterable) : addAll(
+            newSet(),
             iterable));
     }
 
-    public static <T> HashSet<T> newHashSet(Iterator<T> iterator) { return addAll(newHashSet(), iterator); }
+    public static <T> HashSet<T> newSet(Iterator<T> iterator) { return addAll(newSet(), iterator); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ public final class SetUtil extends CollectUtil {
 
     public static <S, T> Set<T> mapAsSet(Collection<S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);
-        return collect instanceof Set ? (Set<T>) collect : newHashSet(collect);
+        return collect instanceof Set ? (Set<T>) collect : newSet(collect);
     }
 
     /*
@@ -162,20 +162,8 @@ public final class SetUtil extends CollectUtil {
      * @param <T> set 元素类型
      *
      * @return empty ArrayList if null
-     *
-     * @see #newHashSetIfNull(Set)
      */
-    public static <T> Set<T> newIfNull(Set<T> set) { return newHashSetIfNull(set); }
-
-    /**
-     * 确保返回集合不为 null
-     *
-     * @param set set
-     * @param <T> set 元素类型
-     *
-     * @return empty HashSet if null
-     */
-    public static <T> Set<T> newHashSetIfNull(Set<T> set) { return set == null ? newHashSet() : set; }
+    public static <T> Set<T> newIfNull(Set<T> set) { return set == null ? newSet() : set; }
 
     /**
      * 确保返回集合不为 null

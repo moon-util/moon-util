@@ -24,39 +24,39 @@ public final class ListUtil extends CollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public static <T> ArrayList<T> newArrayList() { return new ArrayList<>(); }
+    public static <T> ArrayList<T> newList() { return new ArrayList<>(); }
 
-    public static <T> ArrayList<T> newArrayList(int initCapacity) { return new ArrayList<>(initCapacity); }
+    public static <T> ArrayList<T> newList(int initCapacity) { return new ArrayList<>(initCapacity); }
 
-    public static <T> ArrayList<T> newArrayList(int capacity, IntFunction<? extends T> getter) {
-        ArrayList<T> list = newArrayList(capacity);
+    public static <T> ArrayList<T> newList(int capacity, IntFunction<? extends T> getter) {
+        ArrayList<T> list = newList(capacity);
         for (int i = 0; i < capacity; i++) {
             list.add(getter.apply(i));
         }
         return list;
     }
 
-    public static <T> ArrayList<T> newArrayList(T value) { return add(newArrayList(), value); }
+    public static <T> ArrayList<T> newList(T value) { return add(newList(), value); }
 
-    public static <T> ArrayList<T> newArrayList(T value1, T value2) { return add(newArrayList(value1), value2); }
+    public static <T> ArrayList<T> newList(T value1, T value2) { return add(newList(value1), value2); }
 
-    public static <T> ArrayList<T> newArrayList(T value1, T value2, T value3) {
-        return add(newArrayList(value1, value2), value3);
+    public static <T> ArrayList<T> newList(T value1, T value2, T value3) {
+        return add(newList(value1, value2), value3);
     }
 
-    public static <T> ArrayList<T> newArrayList(T... values) { return addAll(newArrayList(values.length), values); }
+    public static <T> ArrayList<T> newList(T... values) { return addAll(newList(values.length), values); }
 
-    public static <T> ArrayList<T> newArrayList(Collection<? extends T> collect) {
-        return collect == null ? newArrayList() : new ArrayList<>(collect);
+    public static <T> ArrayList<T> newList(Collection<? extends T> collect) {
+        return collect == null ? newList() : new ArrayList<>(collect);
     }
 
-    public static <T> ArrayList<T> newArrayList(Iterable<? extends T> iterable) {
-        return iterable == null ? newArrayList() : (iterable instanceof Collection ? new ArrayList((Collection) iterable) : addAll(
-            newArrayList(),
+    public static <T> ArrayList<T> newList(Iterable<? extends T> iterable) {
+        return iterable == null ? newList() : (iterable instanceof Collection ? new ArrayList((Collection) iterable) : addAll(
+            newList(),
             iterable));
     }
 
-    public static <T> ArrayList<T> newArrayList(Iterator<? extends T> iterator) { return addAll(newArrayList(), iterator); }
+    public static <T> ArrayList<T> newList(Iterator<? extends T> iterator) { return addAll(newList(), iterator); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -95,11 +95,13 @@ public final class ListUtil extends CollectUtil {
             iterable));
     }
 
-    public static <T> LinkedList<T> newLinkedList(Iterator<? extends T> iterator) { return addAll(newLinkedList(), iterator); }
+    public static <T> LinkedList<T> newLinkedList(Iterator<? extends T> iterator) {
+        return addAll(newLinkedList(), iterator);
+    }
 
     public static <S, T> List<T> mapAsList(Collection<? extends S> src, Function<? super S, T> mapper) {
         Collection<T> collect = map(src, mapper);
-        return collect instanceof List ? (List<T>) collect : newArrayList(collect);
+        return collect instanceof List ? (List<T>) collect : newList(collect);
     }
 
     /*
@@ -125,22 +127,8 @@ public final class ListUtil extends CollectUtil {
      * @param <T>  list 元素类型
      *
      * @return empty ArrayList if null
-     *
-     * @see #newArrayListIfNull(List)
      */
-    public static <T> List<T> newIfNull(List<T> list) { return newArrayListIfNull(list); }
-
-    /**
-     * 确保返回集合不为 null
-     *
-     * @param list list
-     * @param <T>  list 元素类型
-     *
-     * @return empty LinkedList if null
-     */
-    public static <T> List<T> newArrayListIfNull(List<T> list) {
-        return list == null ? newArrayList() : list;
-    }
+    public static <T> List<T> newIfNull(List<T> list) { return list == null ? newList() : list; }
 
     /**
      * 确保返回集合不为 null
@@ -189,7 +177,9 @@ public final class ListUtil extends CollectUtil {
      *
      * @return list 第一个元素
      */
-    public static <T> T requireGetFirst(List<? extends T> list, String errorMessage) { return requireGet(list, 0, errorMessage); }
+    public static <T> T requireGetFirst(List<? extends T> list, String errorMessage) {
+        return requireGet(list, 0, errorMessage);
+    }
 
     /**
      * 获取 valuesList 最后一项，任何非法情况下都返回 null
@@ -422,8 +412,8 @@ public final class ListUtil extends CollectUtil {
     /**
      * 去掉集合里的重复项
      *
-     * @param list
-     * @param <T>
+     * @param list 待处理集合
+     * @param <T>  集合中元素数据类型
      *
      * @return 集合本身
      */
@@ -444,12 +434,12 @@ public final class ListUtil extends CollectUtil {
     /**
      * 删除 List 集合中重复项，返回重复项集合
      *
-     * @param list
-     * @param <T>
+     * @param list 待处理集合
+     * @param <T>  集合中元素数据类型
      *
      * @return 删除的重复项，默认用 ArrayList 包装
      */
-    public static <T> List<T> removeRepeats(List<T> list) {
+    public static <T> List<T> deleteRepeated(List<T> list) {
         List<T> repeated = null;
         if (list != null) {
             final int size = list.size();
@@ -463,7 +453,7 @@ public final class ListUtil extends CollectUtil {
                         try {
                             repeated = (List) collect.apply(size);
                         } catch (Throwable e) {
-                            repeated = newArrayList(size);
+                            repeated = newList(size);
                         }
                     }
                     repeated.add(item);

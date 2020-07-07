@@ -8,6 +8,8 @@ import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.time.DateTimeUtil;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
@@ -279,6 +281,25 @@ public class TestUtil {
      * @return 如果检测通过，返回 true，否则返回 false
      */
     public final static boolean isIPV6(CharSequence str) { return IPV6.test(str); }
+
+    /**
+     * 字符串是否是一个 URL 资源
+     *
+     * @param str 待测字符串
+     *
+     * @return 当字符串能被 URL 正常识别时，返回 true，否则返回 false
+     */
+    public final static boolean isURL(CharSequence str) {
+        if (str == null) {
+            return false;
+        }
+        try {
+            new URL(str.toString());
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
+    }
 
     /**
      * 是否是 MAC 地址

@@ -15,7 +15,7 @@ class BaseCollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    static <E, C extends Collection<E>> Collection concat0(C collect, C... cs) {
+    final static <E, C extends Collection<E>> Collection concat0(C collect, C... cs) {
         Collection collection = Collects.deduceOrDefault(collect, Collects.ArrayLists).apply(collect);
         for (C c : cs) { collection.addAll(c); }
         return collection;

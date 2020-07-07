@@ -3,9 +3,12 @@ package com.moon.core.util.convert;
 import com.moon.core.util.converter.Converter;
 
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * @author benshaoye
+ * @see Function
+ * @see #asFunction()
  */
 public interface Converts<F, T> extends Converter<F, T> {
 
@@ -32,6 +35,13 @@ public interface Converts<F, T> extends Converter<F, T> {
      * @return 数据类型来源
      */
     Set<Class> supportsFrom();
+
+    /**
+     * 转换为{@link Function}
+     *
+     * @return Function 函数
+     */
+    default Function<F, T> asFunction() { return f -> convert(f); }
 
     /**
      * 是否支持转换成目标类型

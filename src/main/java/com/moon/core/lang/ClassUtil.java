@@ -56,7 +56,7 @@ public final class ClassUtil {
      * @return 所实现的所有接口集合
      */
     public static Set<Class> getAllInterfaces(Class<?> type) {
-        return ClassSupport.addAllInterfaces(SetUtil.newHashSet(), type);
+        return ClassSupport.addAllInterfaces(SetUtil.newSet(), type);
     }
 
     /**

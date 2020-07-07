@@ -18,18 +18,41 @@ import java.util.function.IntFunction;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
+ * 集合工具类
+ *
  * @author moonsky
  */
 public class CollectUtil extends BaseCollectUtil {
 
     protected CollectUtil() { noInstanceError(); }
 
-    public final static <E> int size(Collection<E> collect) {
+    /**
+     * 返回集合长度
+     *
+     * @param collect 集合
+     *
+     * @return 集合长度，集合为 null 时返回 0
+     */
+    public final static int size(Collection collect) {
         return collect == null ? 0 : collect.size();
     }
 
+    /**
+     * 返回集合长度，当有时候集合可能使用{@link Object}表示的，这个方法可避免手动类型强转
+     *
+     * @param collect 集合
+     *
+     * @return 集合内元素总数，集合为 null 时返回 0
+     */
     public final static int sizeByObject(Object collect) { return collect == null ? 0 : ((Collection) collect).size(); }
 
+    /**
+     * 返回所有集合的总长度
+     *
+     * @param cs 所有集合列表
+     *
+     * @return 所有集合的总长度，为 null 的集合长度为 0
+     */
     public final static int sizeOfAll(Collection... cs) {
         int size = 0, i = 0;
         for (; i < cs.length; size += size(cs[i++])) {
@@ -37,19 +60,70 @@ public class CollectUtil extends BaseCollectUtil {
         return size;
     }
 
-    public final static <T> T[] toArray(Collection<? extends T> collect, IntFunction<? extends T[]> arrCreator) {
+    /**
+     * 将集合转换成数组
+     *
+     * @param collect    集合
+     * @param arrCreator 数组构造器，接收参数为集合元素总数
+     * @param <T>        集合中元素数据类型
+     *
+     * @return 集合中元素组成的数组
+     */
+    public final static <T> T[] toArray(Collection<? super T> collect, IntFunction<? extends T[]> arrCreator) {
         return collect == null ? arrCreator.apply(0) : collect.toArray(arrCreator.apply(size(collect)));
     }
 
+    /**
+     * 将集合转换成数组，若集合为 null 返回默认值
+     *
+     * @param collect    集合
+     * @param arrCreator 数组构造器
+     * @param defaultArr 默认值数组
+     * @param <T>        集合元素数据类型
+     *
+     * @return 数组
+     */
     public final static <T> T[] toArrayOrDefault(
         Collection<? extends T> collect, IntFunction<? extends T[]> arrCreator, T[] defaultArr
     ) { return collect == null ? defaultArr : collect.toArray(arrCreator.apply(size(collect))); }
 
-    public final static <E> boolean isEmpty(Collection<E> collect) {
+    /**
+     * 将集合转换成数组
+     *
+     * @param collect       集合
+     * @param componentType 数组元素数据类型
+     * @param <E>           集合元素数据类型
+     * @param <T>           返回的数组元素数据类型
+     *
+     * @return 数组
+     */
+    public final static <T, E extends T> T[] toArray(Collection<? extends E> collect, Class<? super T> componentType) {
+        Object array = Array.newInstance(componentType, size(collect));
+        if (collect != null) {
+            collect.toArray((E[]) array);
+        }
+        return (T[]) array;
+    }
+
+    /**
+     * 集合是否为空
+     *
+     * @param collect 集合
+     *
+     * @return 当集合为 null 或集合中不包含任何元素时返回 true，否则返回 false
+     */
+    public final static boolean isEmpty(Collection collect) {
         return collect == null || collect.isEmpty();
     }
 
-    public final static <E> boolean isNotEmpty(Collection<E> collect) { return !isEmpty(collect); }
+    /**
+     * 集合是否不为空
+     *
+     * @param collect 集合
+     *
+     * @return 当集合不等于 null 并且集合中至少包含一个元素时返回 true，否则返回 false
+     */
+    public final static boolean isNotEmpty(Collection collect) { return !isEmpty(collect); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -108,55 +182,6 @@ public class CollectUtil extends BaseCollectUtil {
 
     /*
      * ---------------------------------------------------------------------------------
-     * add if non null, 只有当待插入项非空时才执行插入操作
-     * ---------------------------------------------------------------------------------
-     */
-
-
-    public final static <E, C extends Collection<? super E>> C addSkipNull(C collect, E item) {
-        if (collect != null && item != null) {
-            collect.add(item);
-        }
-        return collect;
-    }
-
-    public final static <E, C extends Collection<? super E>> C addSkipNulls(C collect, E item1, E item2) {
-        if (collect != null) {
-            if (item1 != null) {
-                collect.add(item1);
-            }
-            if (item2 != null) {
-                collect.add(item2);
-            }
-        }
-        return collect;
-    }
-
-    public final static <E, C extends Collection<? super E>> C addSkipNulls(C collect, E... items) {
-        if (collect != null) {
-            E item;
-            for (int i = 0; i < items.length; i++) {
-                if ((item = items[i]) != null) {
-                    collect.add(item);
-                }
-            }
-        }
-        return collect;
-    }
-
-    public final static <E, C extends Collection<? super E>> C addSkipNulls(C collect, Iterable<? extends E> iterable) {
-        if (collect != null) {
-            for (E elem : iterable) {
-                if (elem != null) {
-                    collect.add(elem);
-                }
-            }
-        }
-        return collect;
-    }
-
-    /*
-     * ---------------------------------------------------------------------------------
      * converter
      * ---------------------------------------------------------------------------------
      */
@@ -186,22 +211,22 @@ public class CollectUtil extends BaseCollectUtil {
         C1 src, Function<? super T, O> function, IntFunction<CR> container
     ) { return IteratorUtil.mapTo(src, function, container); }
 
+    /**
+     * 将多个集合合并成一个一个集合返回，返回新创建的集合
+     *
+     * @param collect     第一个集合，返回的集合类型尽可能与第一个集合兼容
+     * @param collections 其他集合
+     * @param <T>         集合中元素数据类型
+     *
+     * @return 合并后的集合
+     */
     public final static <T> Collection<T> concat(Collection<T> collect, Collection<T>... collections) {
         return concat0(collect, collections);
     }
 
-    public final static <T> Set<T> toSet(T... items) { return SetUtil.newHashSet(items); }
+    public final static <T> Set<T> toSet(T... items) { return SetUtil.newSet(items); }
 
-    public final static <T> List<T> toList(T... items) { return ListUtil.newArrayList(items); }
-
-    public final static <E, T> T[] toArray(Collection<E> collection, Class<T> componentType) {
-        int index = 0;
-        Object array = Array.newInstance(componentType, collection.size());
-        for (Object item : collection) {
-            Array.set(array, index++, item);
-        }
-        return (T[]) array;
-    }
+    public final static <T> List<T> toList(T... items) { return ListUtil.newList(items); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -209,19 +234,53 @@ public class CollectUtil extends BaseCollectUtil {
      * ---------------------------------------------------------------------------------
      */
 
-    public final static <T> boolean contains(Collection<? super T> collect, T item) {
+    /**
+     * 集合是否包含指定元素
+     *
+     * @param collect 集合
+     * @param item    待测元素
+     *
+     * @return 当集合包含指定元素时，返回 true，否则返回 false
+     */
+    public final static boolean contains(Collection collect, Object item) {
         return collect != null && collect.contains(item);
     }
 
-    public final static <T> boolean containsAny(Collection<? super T> collect, T item1, T item2) {
+    /**
+     * 集合是否包含 item1 和 item2 中至少一个
+     *
+     * @param collect 集合
+     * @param item1   元素 1
+     * @param item2   元素 2
+     *
+     * @return 当集合至少包含元素 1 和元素 2 中至少一个时返回 true，否则返回 false
+     */
+    public final static boolean containsAny(Collection collect, Object item1, Object item2) {
         return collect != null && (collect.contains(item1) || collect.contains(item2));
     }
 
-    public final static <T> boolean containsAll(Collection<? super T> collect, T item1, T item2) {
+    /**
+     * 集合是否同时包含所有待测元素
+     *
+     * @param collect 集合
+     * @param item1   元素 1
+     * @param item2   元素 2
+     *
+     * @return 当集合同时包含所有待测元素是返回 true，否则返回 false
+     */
+    public final static boolean containsAll(Collection collect, Object item1, Object item2) {
         return collect != null && (collect.contains(item1) && collect.contains(item2));
     }
 
-    public final static <T> boolean containsAny(Collection<? super T> collect, T... items) {
+    /**
+     * 集合是否至少包含待测元素中其中一个
+     *
+     * @param collect 集合
+     * @param items   待测元素
+     *
+     * @return 当集合至少包含所有待测元素中至少一个时，返回 true，否则返回 false
+     */
+    public final static boolean containsAny(Collection collect, Object... items) {
         if (collect == null) {
             return false;
         }
@@ -233,7 +292,15 @@ public class CollectUtil extends BaseCollectUtil {
         return false;
     }
 
-    public final static <T> boolean containsAll(Collection<? super T> collect, T... items) {
+    /**
+     * 集合是否同时包含所有待测元素
+     *
+     * @param collect 集合
+     * @param items   待测元素列表
+     *
+     * @return 当集合同时包含所有待测元素是返回 true，否则返回 false
+     */
+    public final static boolean containsAll(Collection collect, Object... items) {
         if (collect == null) {
             return false;
         }
@@ -260,7 +327,15 @@ public class CollectUtil extends BaseCollectUtil {
         return false;
     }
 
-    public final static <T> boolean containsAll(Collection<T> collect1, Collection<T> collect2) {
+    /**
+     * 判断集合 1 是否包含集合 2 中所有元素
+     *
+     * @param collect1 集合 1
+     * @param collect2 集合 2
+     *
+     * @return 当集合 1 包含集合 2 中所有元素时返回 true，否则返回 false
+     */
+    public final static boolean containsAll(Collection collect1, Collection collect2) {
         return collect1 == collect2 || (collect1 != null && collect1.containsAll(collect2));
     }
 

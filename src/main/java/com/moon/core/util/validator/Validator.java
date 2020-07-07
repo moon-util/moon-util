@@ -169,7 +169,7 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
      *
      * @return 集合验证器
      */
-    public <E, C extends Collection<E>> CollectValidator<C, E> onCollectField(Function<? super T, ? extends C> getter) {
+    public <E, C extends Collection<E>> CollectValidator<C, E> requireOnCollectField(Function<? super T, ? extends C> getter) {
         return new CollectValidator<>(getter.apply(getValue()),
             isNullable(),
             ensureMessages(),
@@ -187,7 +187,7 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
      *
      * @return Map 验证器
      */
-    public <K, V, M extends Map<K, V>> MapValidator<M, K, V> onMapField(Function<? super T, ? extends M> getter) {
+    public <K, V, M extends Map<K, V>> MapValidator<M, K, V> requireOnMapField(Function<? super T, ? extends M> getter) {
         return new MapValidator<>(getter.apply(getValue()),
             isNullable(),
             ensureMessages(),

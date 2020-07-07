@@ -8,6 +8,7 @@ import com.moon.core.util.validator.ResidentID18Validator;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.WeekFields;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Consumer;
@@ -15,7 +16,6 @@ import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.time.LocalDateTime.ofInstant;
-import static java.util.Objects.requireNonNull;
 
 /**
  * JDK 8 time 工具类
@@ -494,6 +494,86 @@ public final class DateTimeUtil {
     public static boolean isSecondAfter(LocalDateTime datetime1, LocalDateTime datetime2) {
         return isMinuteAfter(datetime1, datetime2)//
             || (isMinuteEquals(datetime1, datetime2) && datetime1.getSecond() > datetime2.getSecond());
+    }
+
+    /**
+     * 获取一年的第几周
+     *
+     * @param date           日期
+     * @param firstDayOfWeek 一周的第一天是星期几
+     *
+     * @return 返回指定日期是对应当前年的第几周
+     *
+     * @see LocalDateTime#toLocalDate() 转换 LocalDateTime 请先调用这个方法
+     */
+    public static int getWeekOfYear(LocalDate date, DayOfWeek firstDayOfWeek) {
+        return date.get(WeekFields.of(firstDayOfWeek, 4).weekOfYear());
+    }
+
+    /**
+     * 获取一年的第几周，设一周的第一天是星期一
+     *
+     * @param date 日期
+     *
+     * @return 返回指定日期是对应当前年的第几周
+     *
+     * @see LocalDateTime#toLocalDate() 转换 LocalDateTime 请先调用这个方法
+     */
+    public static int getWeekOfYearOnMonday(LocalDate date) {
+        return getWeekOfYear(date, DayOfWeek.MONDAY);
+    }
+
+    /**
+     * 获取一年的第几周，设一周的第一天是星期日
+     *
+     * @param date 日期
+     *
+     * @return 返回指定日期是对应当前年的第几周
+     *
+     * @see LocalDateTime#toLocalDate() 转换 LocalDateTime 请先调用这个方法
+     */
+    public static int getWeekOfYearOnSunday(LocalDate date) {
+        return getWeekOfYear(date, DayOfWeek.SUNDAY);
+    }
+
+    /**
+     * 获取一月的第几周
+     *
+     * @param date           日期
+     * @param firstDayOfWeek 一周的第一天是星期几
+     *
+     * @return 返回指定日期是对应当前月份的第几周
+     *
+     * @see LocalDateTime#toLocalDate() 转换 LocalDateTime 请先调用这个方法
+     */
+    public static int getWeekOfMonth(LocalDate date, DayOfWeek firstDayOfWeek) {
+        return date.get(WeekFields.of(firstDayOfWeek, 4).weekOfMonth());
+    }
+
+    /**
+     * 获取一月的第几周，设一周的第一天是星期一
+     *
+     * @param date 日期
+     *
+     * @return 返回指定日期是对应当前月份的第几周
+     *
+     * @see LocalDateTime#toLocalDate() 转换 LocalDateTime 请先调用这个方法
+     */
+    public static int getWeekOfMonthOnMonday(LocalDate date) {
+        return getWeekOfMonth(date, DayOfWeek.MONDAY);
+    }
+
+    /**
+     * 获取一月的第几周，设一周的第一天是星期日
+     *
+     * @param date 日期
+     *
+     * @return 返回指定日期是对应当前月份的第几周
+     *
+     * @see LocalDateTime#toLocalDate() 转换 LocalDateTime 请先调用这个方法
+     */
+    public static int getWeekOfMonthOnSunday(LocalDate date) {
+        return getWeekOfMonth(date, DayOfWeek.MONDAY);
     }
 
     /**

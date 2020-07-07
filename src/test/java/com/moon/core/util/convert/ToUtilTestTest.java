@@ -1,8 +1,5 @@
 package com.moon.core.util.convert;
 
-import com.moon.core.util.convert.Arrs;
-import com.moon.core.util.convert.ConvertUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -13,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author benshaoye
  */
-class ConvertUtilTestTest {
+class ToUtilTestTest {
 
     @Test
     void testConcat() {
-        Class[] classes = ConvertUtil.concat(WRAPPER_NUMBERS, Arrs.EXPAND_NUMBERS);
+        Class[] classes = ToUtil.concat(WRAPPER_NUMBERS, Arrs.EXPAND_NUMBERS);
         System.out.println(Arrays.toString(WRAPPER_NUMBERS));
         System.out.println(Arrays.toString(Arrs.EXPAND_NUMBERS));
         System.out.println(Arrays.toString(classes));
