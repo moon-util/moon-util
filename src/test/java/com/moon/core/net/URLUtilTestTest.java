@@ -9,6 +9,5 @@ class URLUtilTestTest {
 
     @Test
     void testWith() {
-        URLUtil.ofHttp("www.baidu.com");
     }
 }

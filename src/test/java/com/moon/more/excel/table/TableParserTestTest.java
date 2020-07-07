@@ -37,7 +37,7 @@ class TableParserTestTest {
         // TableParser.parseConfiguration(Employee.class);
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
-                List<Student> students = ListUtil.newArrayList(new Student(),
+                List<Student> students = ListUtil.newList(new Student(),
                     new Student(),
                     new Student(),
                     new Student(),
@@ -120,7 +120,7 @@ class TableParserTestTest {
     void testExportStudentScore(String dir) throws Exception {
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
-                List<Student> students = ListUtil.newArrayList(new Student(),
+                List<Student> students = ListUtil.newList(new Student(),
                     new Student(),
                     new Student(),
                     new Student(),

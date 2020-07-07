@@ -12,8 +12,8 @@ class Collects2TestTest {
 
     @Test
     void testName() {
-        System.out.println(ListUtil.newArrayList(Lists.values()));
-        System.out.println(ListUtil.newArrayList(Sets.values()));
-        System.out.println(ListUtil.newArrayList(Queues.values()));
+        System.out.println(ListUtil.newList(Lists.values()));
+        System.out.println(ListUtil.newList(Sets.values()));
+        System.out.println(ListUtil.newList(Queues.values()));
     }
 }

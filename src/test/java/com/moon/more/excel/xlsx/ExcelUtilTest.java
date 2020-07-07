@@ -119,7 +119,7 @@ class ExcelUtilTest {
         }
 
         private int toTotal(ToIntFunction<ScoreCompare> mapper) {
-            return ListUtil.newArrayList(chinese, math, english, score1, score2).stream().mapToInt(mapper).sum();
+            return ListUtil.newList(chinese, math, english, score1, score2).stream().mapToInt(mapper).sum();
         }
     }
 
@@ -203,7 +203,7 @@ class ExcelUtilTest {
                 style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             });
             sheetFactory.table(tableFactory -> {
-                List<Member> members = ListUtil.newArrayList();
+                List<Member> members = ListUtil.newList();
                 for (int i = 0; i < 12; i++) {
                     members.add(new Member());
                 }

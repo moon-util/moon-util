@@ -27,7 +27,7 @@ class CollectValidatorTestTest {
     @Test
     void testOf() {
         List<String> collect = ListUtil
-            .newArrayList("1111", "22222", "333333", "4444444", "55555555", "dsfgsdfgasdf", "sdfbhdfhnrththn");
+            .newList("1111", "22222", "333333", "4444444", "55555555", "dsfgsdfgasdf", "sdfbhdfhnrththn");
         Assertions.assertThrows(Exception.class, () -> {
             CollectValidator.of(collect).setImmediate(true).requireCountOf(3, str -> str.length() < 2);
         });

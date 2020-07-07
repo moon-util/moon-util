@@ -34,7 +34,7 @@ class TableFactoryTestTest {
     void testRenderBody() throws Exception {
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
-                List<Emp> list = ListUtil.newArrayList(new Emp(), new Emp(), new Emp());
+                List<Emp> list = ListUtil.newList(new Emp(), new Emp(), new Emp());
 
                 tableFactory.renderAll(list);
             });
@@ -105,7 +105,7 @@ class TableFactoryTestTest {
         String str = "今天真美丽";
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.table(tableFactory -> {
-                List<User> list = ListUtil.newArrayList(new User(), new User(), new User());
+                List<User> list = ListUtil.newList(new User(), new User(), new User());
 
                 tableFactory.renderAll(list);
             });

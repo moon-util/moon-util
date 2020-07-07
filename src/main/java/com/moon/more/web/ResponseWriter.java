@@ -16,16 +16,38 @@ public final class ResponseWriter {
 
     public ResponseWriter(HttpServletResponse response) { this.response = response; }
 
-    public ResponseWriter contentType(String type) {
+    /**
+     * 设置响应头内容格式
+     *
+     * @param type 响应内容格式
+     *
+     * @return 当前对象
+     */
+    public ResponseWriter contentTypeOf(String type) {
         response.setContentType(type);
         return this;
     }
 
-    public ResponseWriter contentAsJson() { return contentType("application/json"); }
+    public ResponseWriter contentAsJson() { return contentTypeOf("application/json"); }
 
-    public ResponseWriter contentAsHtml() { return contentType("text/html"); }
+    public ResponseWriter contentAsHtml() { return contentTypeOf("text/html"); }
 
-    public ResponseWriter contentAsText() { return contentType("text/plain"); }
+    public ResponseWriter contentAsText() { return contentTypeOf("text/plain"); }
+
+    public ResponseWriter setHeader(String name, String value) {
+        response.setHeader(name, value);
+        return this;
+    }
+
+    public ResponseWriter addCookie(String name, String value) {
+        CookieUtil.set(response, name, value);
+        return this;
+    }
+
+    public ResponseWriter removeCookie(String name) {
+        CookieUtil.remove(response, name);
+        return this;
+    }
 
     public ResponseWriter charset(String charset) {
         response.setCharacterEncoding(charset);
@@ -72,7 +94,7 @@ public final class ResponseWriter {
         }
     }
 
-    public void write(ConsumerStream writer) {
+    public void writeStream(ConsumerStream writer) {
         HttpServletResponse response = this.response;
         try (OutputStream o = response.getOutputStream()) {
             writer.accept(o);

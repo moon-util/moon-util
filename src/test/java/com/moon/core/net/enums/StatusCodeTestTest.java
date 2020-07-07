@@ -13,7 +13,7 @@ class StatusCodeTestTest {
 
     @Test
     void testCodeOf() {
-        IteratorUtil.map(ListUtil.newArrayList(StatusCode.values()), KeyValue::of).forEach(kv -> {
+        IteratorUtil.map(ListUtil.newList(StatusCode.values()), KeyValue::of).forEach(kv -> {
             Assertions.assertFalse(kv.getValue().matches("\\d+"));
         });
     }

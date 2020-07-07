@@ -7,7 +7,7 @@ import org.hibernate.boot.spi.MetadataBuildingContext;
 
 import java.util.List;
 
-import static com.moon.core.util.ListUtil.newArrayList;
+import static com.moon.core.util.ListUtil.newList;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -31,7 +31,7 @@ class Namings {
         String key, Identifier user, Identifier table, List<Identifier> columns, MetadataBuildingContext context
     ) {
         if (user == null) {
-            List<Identifier> identifiers = newArrayList(table);
+            List<Identifier> identifiers = newList(table);
             identifiers.addAll(columns);
             List<String> names = identifiers.stream().map(id -> id.toString()).collect(toList());
             return toIdentifier(key + "_" + JoinerUtil.join(names, "_"), context);

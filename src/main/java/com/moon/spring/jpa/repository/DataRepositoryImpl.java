@@ -356,6 +356,6 @@ public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaR
     }
 
     static <T> List<T> asList(T first, T second, T... rest) {
-        return ListUtil.addAll(ListUtil.newArrayList(first, second), rest);
+        return ListUtil.addAll(ListUtil.newList(first, second), rest);
     }
 }

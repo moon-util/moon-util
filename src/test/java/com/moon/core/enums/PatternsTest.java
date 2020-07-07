@@ -64,7 +64,7 @@ public class PatternsTest {
     }
 
     private static final String[] getIpv4Arr(int size) {
-        List<String> ipv4List = ListUtil.newArrayList(size);
+        List<String> ipv4List = ListUtil.newList(size);
         IteratorUtil.forEach(size, idx -> {
             ipv4List.add(getIpv4());
         });
@@ -116,7 +116,7 @@ public class PatternsTest {
             indexedMap.put(key, time);
         });
         for (Map<String, Long> time : times) {
-            String key = ListUtil.newArrayList(time.keySet()).get(0);
+            String key = ListUtil.newList(time.keySet()).get(0);
             long[] values = LongUtil.toPrimitiveArr(0, CollectUtil.toArray(time.values(), Long[]::new));
             String sum = StringUtil.padStart(LongUtil.sum(values), 5, ' ');
             String avg = StringUtil.padStart(LongUtil.avg(values), 3, ' ');

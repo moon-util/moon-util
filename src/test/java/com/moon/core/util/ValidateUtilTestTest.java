@@ -10,7 +10,7 @@ import java.util.List;
 class ValidateUtilTestTest {
 
     static List<String> getRandomStrings(){
-        List<String> strings = ListUtil.newArrayList();
+        List<String> strings = ListUtil.newList();
         strings.add(RandomStringUtil.nextLower(12));
         IteratorUtil.forEach(20, idx -> {
             strings.add(RandomStringUtil.nextLower(11));

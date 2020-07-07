@@ -8,6 +8,6 @@ import org.junit.jupiter.api.Test;
 public class InternetUtilTest {
     @Test
     void testGetLocalIP4() {
-        System.out.println(NetworkUtil.getLocalIP4());
+        System.out.println(IPUtil.getLocalIPV4());
     }
 }

@@ -254,6 +254,28 @@ public final class StringUtil {
     }
 
     /**
+     * 字符串是否是 0，主要用于某些网络请求的返回状态码判断
+     *
+     * @param cs 待测字符串
+     *
+     * @return 当字符串内容仅包含 0 时返回 true，否则返回 false
+     */
+    public final static boolean is0(CharSequence cs) {
+        return cs != null && "0".equals(cs.toString());
+    }
+
+    /**
+     * 字符串是否是 1，主要用于某些网络请求的返回状态码判断
+     *
+     * @param cs 待测字符串
+     *
+     * @return 当字符串内容仅包含 1 时返回 true，否则返回 false
+     */
+    public final static boolean is1(CharSequence cs) {
+        return cs != null && "1".equals(cs.toString());
+    }
+
+    /**
      * 字符串内所有字符是否都符合条件
      *
      * @param cs     待测字符串

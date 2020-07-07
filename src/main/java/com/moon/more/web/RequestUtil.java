@@ -3,7 +3,10 @@ package com.moon.more.web;
 import com.moon.core.lang.JoinerUtil;
 import com.moon.core.lang.StringUtil;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +22,14 @@ public final class RequestUtil {
 
     private RequestUtil() { noInstanceError(); }
 
+    /**
+     * 获取所有请求头
+     *
+     * @param request request
+     * @param keys    需要获取的请求头名称
+     *
+     * @return 请求头名称: 请求头值
+     */
     public static Map<String, String> headersMap(HttpServletRequest request, String... keys) {
         Map<String, String> headers = new HashMap<>(16);
         if (keys == null || keys.length < 1) {
@@ -35,10 +46,36 @@ public final class RequestUtil {
         return headers;
     }
 
+    /**
+     * 获取指定请求头
+     *
+     * @param request request
+     * @param name    请求头名字
+     *
+     * @return 请求头值
+     */
     public static String header(HttpServletRequest request, String name) { return request.getHeader(name); }
 
+    /**
+     * 获取请求参数
+     *
+     * @param request request
+     * @param name    参数名
+     *
+     * @return 参数值
+     */
     public static String param(HttpServletRequest request, String name) { return request.getParameter(name); }
 
+    /**
+     * 获取请求参数，有些请求中可能将参数放在 header 中，这里可通过设置 header 优先获取
+     * 如果不存在于 header 中，就从请求参数中获取
+     *
+     * @param request        request
+     * @param name           参数名
+     * @param headerPriority 是否优先从 header 中获取参数值
+     *
+     * @return 参数值
+     */
     public static String param(
         HttpServletRequest request, String name, boolean headerPriority
     ) {
@@ -46,12 +83,50 @@ public final class RequestUtil {
         return isEmpty(tokenVal) ? param(request, name) : nullIfEmpty(tokenVal);
     }
 
+    /**
+     * 获取 request 属性
+     *
+     * @param request request
+     * @param key     属性名
+     * @param <T>     为了兼容返回接收类型
+     *
+     * @return 返回属性值 或 null
+     */
     public static <T> T attr(HttpServletRequest request, String key) { return (T) request.getAttribute(key); }
 
+    /**
+     * 设置 Request 属性
+     *
+     * @param request request 对象
+     * @param key     属性名
+     * @param value   属性值
+     */
     public static void attr(HttpServletRequest request, String key, Object value) { request.setAttribute(key, value); }
+
+    /**
+     * 转发
+     *
+     * @param request
+     * @param response
+     * @param path
+     *
+     * @throws ServletException
+     * @throws IOException
+     */
+    public static void forward(HttpServletRequest request, HttpServletResponse response, String path)
+        throws ServletException, IOException {
+        request.getRequestDispatcher(path).forward(request, response);
+    }
 
     private static boolean isUnknown(String str) { return StringUtil.isEmpty(str) || "unknown".equalsIgnoreCase(str); }
 
+    /**
+     * 获取远程真实请求 IP
+     *
+     * @param request request
+     *
+     * @return ip
+     */
     @SuppressWarnings("all")
     public static String getRequestRealIP(HttpServletRequest request) {
         String ip = null, comma = ",";
@@ -75,7 +150,7 @@ public final class RequestUtil {
         return ip;
     }
 
-    public static String getRequestDomain(HttpServletRequest request) {
+    static String getRequestDomain(HttpServletRequest request) {
         int port = request.getServerPort(), dftPort = 80;
         String protocol = request.getProtocol();
         String host = getRequestRealIP(request);
@@ -87,11 +162,11 @@ public final class RequestUtil {
         }
     }
 
-    public static String getRequestURL(HttpServletRequest request) {
+    static String getRequestURL(HttpServletRequest request) {
         return StringUtil.concat(getRequestDomain(request), request.getContextPath(), request.getServletPath());
     }
 
-    public static String getRequestFullURL(HttpServletRequest request) {
+    static String getRequestFullURL(HttpServletRequest request) {
         String url = getRequestURL(request), query = request.getQueryString();
         return isEmpty(query) ? url : StringUtil.concat(url, "?", query);
     }

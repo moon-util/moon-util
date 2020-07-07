@@ -69,7 +69,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 集合中元素组成的数组
      */
-    public final static <T> T[] toArray(Collection<? super T> collect, IntFunction<? extends T[]> arrCreator) {
+    public final static <T> T[] toArray(Collection<? extends T> collect, IntFunction<T[]> arrCreator) {
         return collect == null ? arrCreator.apply(0) : collect.toArray(arrCreator.apply(size(collect)));
     }
 

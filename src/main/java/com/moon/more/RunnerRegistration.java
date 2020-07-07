@@ -1,10 +1,10 @@
 package com.moon.more;
 
+import com.moon.core.util.ListUtil;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
-
-import static com.moon.core.util.ListUtil.newArrayList;
 
 /**
  * @author moonsky
@@ -44,7 +44,7 @@ public final class RunnerRegistration {
      * @return
      */
     public synchronized List<Runnable> takeAll(boolean clear) {
-        List<Runnable> runners = newArrayList(RUNNERS);
+        List<Runnable> runners = ListUtil.newList(RUNNERS);
         if (clear) {
             RUNNERS.clear();
         }

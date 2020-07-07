@@ -368,18 +368,18 @@ class IGetFun {
             public boolean isChangeless() { return true; }
 
             @Override
-            public List apply(Object value) { return ListUtil.newArrayList(value); }
+            public List apply(Object value) { return ListUtil.newList(value); }
 
             @Override
-            public List apply(Object value1, Object value2) { return ListUtil.newArrayList(value1, value2); }
+            public List apply(Object value1, Object value2) { return ListUtil.newList(value1, value2); }
 
             @Override
             public List apply(Object value1, Object value2, Object value3) {
-                return ListUtil.newArrayList(value1, value2, value3);
+                return ListUtil.newList(value1, value2, value3);
             }
 
             @Override
-            public List apply(Object... values) { return ListUtil.newArrayList(values); }
+            public List apply(Object... values) { return ListUtil.newList(values); }
         };
 
         @Override

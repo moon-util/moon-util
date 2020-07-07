@@ -14,7 +14,7 @@ class InternetUtilTestTest {
 
     @Test
     void testGetLocalIP() throws UnknownHostException {
-        System.out.println(NetworkUtil.getLocalIP4());
+        System.out.println(IPUtil.getLocalIPV4());
 
         InetAddress address = InetAddress.getLocalHost();
 

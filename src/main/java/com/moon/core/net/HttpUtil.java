@@ -15,6 +15,6 @@ public final class HttpUtil {
     private HttpUtil() { ThrowUtil.noInstanceError(); }
 
     public static HttpConnector connector(String url) {
-        return new HttpConnector(url);
+        throw new UnsupportedOperationException();
     }
 }

@@ -1,7 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.net.NetworkUtil;
+import com.moon.core.net.IPUtil;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -32,7 +32,7 @@ public final class MacUtil {
             public String get() { return getAddress(true); }
         };
 
-        private final InetAddress address = NetworkUtil.getLocalhost();
+        private final InetAddress address = IPUtil.getLocalhost();
 
         @Override
         public String get() { return getAddress(false); }

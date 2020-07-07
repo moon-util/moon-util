@@ -32,7 +32,7 @@ class RendererParserTestTest {
         Date date1 = DateUtil.parse("2020-04-01", "yyyy-MM-dd");
         Date date2 = DateUtil.parse("2019-09-01", "yyyy-MM-dd");
         Date date3 = DateUtil.parse("2019-05-01", "yyyy-MM-dd");
-        List<Date> dates = ListUtil.newArrayList(date1, date2, date3, date0);
+        List<Date> dates = ListUtil.newList(date1, date2, date3, date0);
         dates.sort(Comparator.reverseOrder());
         String formatted = DateUtil.format(dates.get(0), "yyyy-MM-dd");
         Assertions.assertEquals("2020-04-01", formatted);

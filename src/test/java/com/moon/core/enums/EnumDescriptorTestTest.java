@@ -15,11 +15,11 @@ class EnumDescriptorTestTest {
 
     @Test
     void testGetName() {
-        Collection<KeyValue> maped = IteratorUtil.map(ListUtil.newArrayList(StatusCode.values()), KeyValue::of);
+        Collection<KeyValue> maped = IteratorUtil.map(ListUtil.newList(StatusCode.values()), KeyValue::of);
 
         maped.forEach(System.out::println);
 
-        maped = IteratorUtil.map(ListUtil.newArrayList(Arrays2.values()), KeyValue::of);
+        maped = IteratorUtil.map(ListUtil.newList(Arrays2.values()), KeyValue::of);
 
         maped.forEach(System.out::println);
     }

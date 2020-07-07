@@ -131,7 +131,7 @@ public abstract class HibernateBaseTest extends MySQLDatabaseBaseTest implements
     }
 
     protected <T> List<T> createList(T... ts) {
-        return ListUtil.newArrayList(ts);
+        return ListUtil.newList(ts);
     }
 
     protected <T> Set<T> createSet(int count, Supplier<T> supplier) {

@@ -13,9 +13,9 @@ class IPUtilTestTest {
 
     @Test
     void testGetLocalIPAddress() {
-        System.out.println(IPUtil.getLocalIPAddress());
-        System.out.println(IPUtil.getLocalIP6Address());
-        System.out.println(Patterns.IPV4.test(IPUtil.getLocalIP6Address()));
-        System.out.println(Patterns.IPV6.test(IPUtil.getLocalIP6Address()));
+        System.out.println(IPUtil.getLocalIPV4());
+        System.out.println(IPUtil.getLocalIPV6Address());
+        System.out.println(Patterns.IPV4.test(IPUtil.getLocalIPV6Address()));
+        System.out.println(Patterns.IPV6.test(IPUtil.getLocalIPV6Address()));
     }
 }

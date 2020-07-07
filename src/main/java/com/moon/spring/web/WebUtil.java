@@ -1,6 +1,8 @@
 package com.moon.spring.web;
 
 import com.moon.more.web.CookieUtil;
+import com.moon.more.web.RequestUtil;
+import com.moon.more.web.ResponseUtil;
 import com.moon.more.web.ResponseWriter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,6 +25,8 @@ import static org.springframework.core.annotation.AnnotatedElementUtils.findMerg
 /**
  * @author moonsky
  * @see org.springframework.web.util.WebUtils
+ * @see RequestUtil
+ * @see ResponseUtil
  */
 public final class WebUtil {
 
@@ -123,6 +127,20 @@ public final class WebUtil {
     public static String getRequestParam(String name) { return getRequest().getParameter(name); }
 
     /**
+     * 获取请求参数值
+     *
+     * @param name           参数名
+     * @param headerPriority 是否优先从 header 获取参数值
+     *
+     * @return 参数值
+     *
+     * @see RequestUtil#param(HttpServletRequest, String, boolean)
+     */
+    public static String getRequestParam(String name, boolean headerPriority) {
+        return RequestUtil.param(getRequest(), name, headerPriority);
+    }
+
+    /**
      * 获取请求属性
      *
      * @param name 属性名
@@ -207,7 +225,7 @@ public final class WebUtil {
      *
      * @return 属性值
      */
-    public static Object getApplicationAttr(String name) {
+    public static Object getAppAttr(String name) {
         return getServletContext().getAttribute(name);
     }
 
@@ -218,7 +236,7 @@ public final class WebUtil {
      * @param name 属性名
      * @param data 属性值
      */
-    public static void setApplicationAttr(String name, Object data) {
+    public static void setAppAttr(String name, Object data) {
         getServletContext().setAttribute(name, data);
     }
 

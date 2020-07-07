@@ -18,7 +18,7 @@ class ListUtilTestTest {
 
     @Test
     void testOfArrayList() {
-        assertTrue(ListUtil.newArrayList() instanceof ArrayList);
+        assertTrue(ListUtil.newList() instanceof ArrayList);
     }
 
     @Test
