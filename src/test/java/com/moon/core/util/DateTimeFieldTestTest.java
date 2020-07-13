@@ -1,8 +1,13 @@
 package com.moon.core.util;
 
+import com.moon.more.validator.ValidatorUtil;
+import org.joda.time.DateTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalTime;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author moonsky
@@ -11,18 +16,11 @@ class DateTimeFieldTestTest {
 
     @Test
     void testName() throws Exception {
-        Calendar calendar = DateUtil.nowCalendar();
-        System.out.println(calendar.get(Calendar.HOUR));
-        System.out.println(calendar.get(Calendar.AM));
-        System.out.println(calendar.get(Calendar.AM_PM));
-        System.out.println(calendar.get(Calendar.PM));
-        System.out.println("=============");
-        calendar = DateUtil.setHourOfDay(calendar, 13);
-        System.out.println(calendar.get(Calendar.HOUR));
-        System.out.println(calendar.get(Calendar.HOUR_OF_DAY));
-        System.out.println(calendar.get(Calendar.MILLISECOND));
-        System.out.println(calendar.get(Calendar.AM));
-        System.out.println(calendar.get(Calendar.AM_PM));
+        Datetime datetime = Datetime.of();
+        LocalTime time = datetime.toLocalTime();
+        System.out.println(datetime.getNanoOfSecond());
+        System.out.println(time.getNano());
 
+        Assertions.assertEquals(time.getNano(),datetime.getNanoOfSecond());
     }
 }

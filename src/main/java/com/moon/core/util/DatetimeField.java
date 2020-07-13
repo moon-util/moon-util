@@ -5,7 +5,7 @@ import java.util.Calendar;
 /**
  * @author moonsky
  */
-public enum DateTimeField {
+public enum DatetimeField {
     MILLISECOND(Calendar.MILLISECOND),
     SECOND(Calendar.SECOND),
     MINUTE(Calendar.MINUTE),
@@ -21,7 +21,7 @@ public enum DateTimeField {
     ;
     public final int value;
 
-    DateTimeField(int value) {
+    DatetimeField(int value) {
         this.value = value;
     }
 }

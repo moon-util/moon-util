@@ -3,6 +3,7 @@ package com.moon.core.enums;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
@@ -135,7 +136,7 @@ public enum TimeZones implements EnumDescriptor {
 
         static boolean isLocal(TimeZones zone) {
             Date date = new Date();
-            String zoned = zone.of(Const.PATTERN).format(date);
+            String zoned = zone.zonedFormat(Const.PATTERN).format(date);
             return get(Const.PATTERN).format(date).equals(zoned);
         }
 
@@ -144,22 +145,12 @@ public enum TimeZones implements EnumDescriptor {
 
     TimeZones(String text) { this.CHINESE_TEXT = text; }
 
-    public final DateFormat of(String pattern) { return with(pattern); }
-
-    public final DateFormat with(String pattern) {
+    final DateFormat zonedFormat(String pattern){
         DateFormat format = getDateFormat(pattern);
         if (this != DEFAULT) {
             format.setTimeZone(getTimeZone());
         }
         return format;
-    }
-
-    public final DateTimeFormatter getFormatter(String pattern) {
-        return DateTimeFormatter.ofPattern(pattern);
-    }
-
-    public final DateTimeFormatter getFormatter(String pattern, Locale locale) {
-        return DateTimeFormatter.ofPattern(pattern, locale);
     }
 
     /**

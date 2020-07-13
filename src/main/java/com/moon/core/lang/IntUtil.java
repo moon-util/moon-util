@@ -5,6 +5,7 @@ import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.TableIntFunction;
 
 import java.util.Iterator;
+import java.util.function.ToIntFunction;
 
 import static com.moon.core.enums.Strings.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -99,6 +100,22 @@ public final class IntUtil {
      */
 
     public static int[] toInts(int... values) { return values; }
+
+    public static int[] toInts(String... values) {
+        return toInts(Integer::parseInt, values);
+    }
+
+    public static <T> int[] toInts(ToIntFunction<? super T> transformer, T... values) {
+        if (values == null) {
+            return null;
+        }
+        final int length = values.length;
+        int[] ints = new int[length];
+        for (int i = 0; i < length; i++) {
+            ints[i] = transformer.applyAsInt(values[i]);
+        }
+        return ints;
+    }
 
     public static int max(int... values) {
         int len = values.length;
