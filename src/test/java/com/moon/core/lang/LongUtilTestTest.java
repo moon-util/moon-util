@@ -19,4 +19,9 @@ class LongUtilTestTest {
         System.out.println(String.valueOf(now).length());
         System.out.println(value.length());
     }
+
+    @Test
+    void testName() throws Exception {
+        System.out.println(DateUtil.format());
+    }
 }

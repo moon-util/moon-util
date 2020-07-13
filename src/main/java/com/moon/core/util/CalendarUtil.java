@@ -204,7 +204,7 @@ public class CalendarUtil {
     }
 
     public final static Calendar plusHours(Calendar value, int amount) {
-        return setHour(value, getHour(value) + amount);
+        return setHourOfDay(value, getHour(value) + amount);
     }
 
     public final static Calendar plusMinutes(Calendar value, int amount) {
@@ -232,7 +232,7 @@ public class CalendarUtil {
     }
 
     public final static Calendar minusHours(Calendar value, int amount) {
-        return setHour(value, getHour(value) - amount);
+        return setHourOfDay(value, getHour(value) - amount);
     }
 
     public final static Calendar minusMinutes(Calendar value, int amount) {
@@ -259,7 +259,7 @@ public class CalendarUtil {
 
     public final static Calendar setDayOfMonth(Calendar value, int amount) { return set(value, DAY_OF_MONTH, amount); }
 
-    public final static Calendar setHour(Calendar value, int amount) { return set(value, HOUR_OF_DAY, amount); }
+    public final static Calendar setHourOfDay(Calendar value, int amount) { return set(value, HOUR_OF_DAY, amount); }
 
     public final static Calendar setMinute(Calendar value, int amount) { return set(value, MINUTE, amount); }
 

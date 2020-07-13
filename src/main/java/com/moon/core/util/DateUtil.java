@@ -97,7 +97,7 @@ public final class DateUtil extends CalendarUtil {
         return setDayOfMonth(toCalendar(value), amount).getTime();
     }
 
-    public final static Date setHour(Date value, int amount) { return setHour(toCalendar(value), amount).getTime(); }
+    public final static Date setHour(Date value, int amount) { return setHourOfDay(toCalendar(value), amount).getTime(); }
 
     public final static Date setMinute(Date value, int amount) {
         return setMinute(toCalendar(value), amount).getTime();

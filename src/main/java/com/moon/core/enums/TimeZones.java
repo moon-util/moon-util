@@ -13,7 +13,7 @@ import static com.moon.core.util.FilterUtil.requireFind;
 /**
  * @author moonsky
  */
-public enum DateFormats implements EnumDescriptor {
+public enum TimeZones implements EnumDescriptor {
     /**
      * Asia/Shanghai
      */
@@ -131,9 +131,9 @@ public enum DateFormats implements EnumDescriptor {
     private final static class This {
 
         static final boolean inChina = This.isLocal(ASIA_SHANGHAI);
-        final static DateFormats DFT = requireFind(DateFormats.values(), This::isLocal);
+        final static TimeZones DFT = requireFind(TimeZones.values(), This::isLocal);
 
-        static boolean isLocal(DateFormats zone) {
+        static boolean isLocal(TimeZones zone) {
             Date date = new Date();
             String zoned = zone.of(Const.PATTERN).format(date);
             return get(Const.PATTERN).format(date).equals(zoned);
@@ -142,7 +142,7 @@ public enum DateFormats implements EnumDescriptor {
         static DateFormat get(String pattern) { return new SimpleDateFormat(pattern); }
     }
 
-    DateFormats(String text) { this.CHINESE_TEXT = text; }
+    TimeZones(String text) { this.CHINESE_TEXT = text; }
 
     public final DateFormat of(String pattern) { return with(pattern); }
 

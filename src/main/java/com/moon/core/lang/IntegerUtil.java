@@ -6,6 +6,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author moonsky
  */
 public final class IntegerUtil {
+
     private IntegerUtil() {
         noInstanceError();
     }
@@ -89,7 +90,9 @@ public final class IntegerUtil {
      * int result = IntUtil.toIntValue(value);
      *
      * @param object 带转换值
+     *
      * @return 转换后的值
+     *
      * @see IntUtil#toIntValue(Object)
      */
     public static Integer toInteger(Object object) {
@@ -109,5 +112,137 @@ public final class IntegerUtil {
         } catch (Exception e) {
             return ThrowUtil.runtime(e, String.format("Can not cast to int of: %s", object));
         }
+    }
+
+    /**
+     * 求最大值
+     *
+     * @param values 数据集合
+     *
+     * @return 最大值
+     */
+    public static int max(Iterable<Integer> values) {
+        int max = Integer.MIN_VALUE;
+        for (Integer value : values) {
+            if (value != null) {
+                max = Math.max(max, value);
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 求最大值
+     *
+     * @param values 数据集合
+     *
+     * @return 最大值
+     */
+    public static int max(Integer... values) {
+        int max = Integer.MIN_VALUE;
+        for (Integer value : values) {
+            if (value != null) {
+                max = Math.max(max, value);
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 求最小值
+     *
+     * @param values 数据集合
+     *
+     * @return 最小值
+     */
+    public static int min(Iterable<Integer> values) {
+        int max = Integer.MAX_VALUE;
+        for (Integer value : values) {
+            if (value != null) {
+                max = Math.min(max, value);
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 求最小值
+     *
+     * @param values 数据集合
+     *
+     * @return 最小值
+     */
+    public static int min(Integer... values) {
+        int max = Integer.MAX_VALUE;
+        for (Integer value : values) {
+            if (value != null) {
+                max = Math.min(max, value);
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 求和
+     *
+     * @param forNull null 值时默认值
+     * @param values  数据集合
+     *
+     * @return 和
+     */
+    public static int sum(int forNull, Iterable<Integer> values) {
+        int sum = 0;
+        for (Integer value : values) {
+            sum += value == null ? forNull : value;
+        }
+        return sum;
+    }
+
+    /**
+     * 求和
+     *
+     * @param forNull null 值时默认值
+     * @param values  数据集合
+     *
+     * @return 和
+     */
+    public static int sum(int forNull, Integer... values) {
+        int sum = 0;
+        for (Integer value : values) {
+            sum += value == null ? forNull : value;
+        }
+        return sum;
+    }
+
+    /**
+     * 求积
+     *
+     * @param forNull null 值时默认值
+     * @param values  数据集合
+     *
+     * @return 积
+     */
+    public static int multiply(int forNull, Iterable<Integer> values) {
+        int sum = 1;
+        for (Integer value : values) {
+            sum *= value == null ? forNull : value;
+        }
+        return sum;
+    }
+
+    /**
+     * 求积
+     *
+     * @param forNull null 值时默认值
+     * @param values  数据集合
+     *
+     * @return 积
+     */
+    public static int multiply(int forNull, Integer... values) {
+        int sum = 1;
+        for (Integer value : values) {
+            sum *= value == null ? forNull : value;
+        }
+        return sum;
     }
 }

@@ -1,9 +1,14 @@
 package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
+import com.moon.core.enums.TimeZones;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.TestUtil;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,8 +38,9 @@ public final class LongUtil {
      */
     public static long defaultIfInvalid(CharSequence cs, long defaultVal) {
         try {
-            return Long.parseLong(cs.toString());
-        } catch (Exception e) {
+            Long value = toLong(cs);
+            return value == null ? defaultVal : value;
+        } catch (Throwable t) {
             return defaultVal;
         }
     }
@@ -45,17 +51,50 @@ public final class LongUtil {
 
     public static Long toLong(Boolean bool) { return bool == null ? null : (long) (bool ? 1 : 0); }
 
-    public static Long toLong(Character value) { return value == null ? null : Long.valueOf(value); }
+    public static Long toLong(Character value) {
+        return value == null ? null : (TestUtil.isDigit(value.toString()) ? toLong(value.toString()) : Long.valueOf(
+            value));
+    }
 
-    public static Long toLong(Byte value) { return value == null ? null : value.longValue(); }
+    public static Long toLong(Number value) { return value == null ? null : value.longValue(); }
 
-    public static Long toLong(Short value) { return value == null ? null : value.longValue(); }
+    public static Long toLong(CharSequence cs) {
+        if (cs == null) {
+            return null;
+        }
+        try {
+            return Long.parseLong(cs.toString().trim());
+        } catch (NumberFormatException e) {
+            try {
+                return DateUtil.toCalendar(cs).getTimeInMillis();
+            } catch (IllegalArgumentException ae) {
+                ae.initCause(e);
+                throw ae;
+            }
+        }
+    }
 
-    public static Long toLong(Float value) { return value == null ? null : value.longValue(); }
+    public static long toLongValue(Date date) { return date.getTime(); }
 
-    public static Long toLong(Double value) { return value == null ? null : value.longValue(); }
+    public static long toLongValue(Calendar calendar) { return calendar.getTimeInMillis(); }
 
-    public static Long toLong(CharSequence cs) { return cs == null ? null : Long.parseLong(cs.toString()); }
+    public static long toLongValue(Boolean value) {
+        return value == null ? 0 : (value ? 1 : 0);
+    }
+
+    public static long toLongValue(CharSequence cs) {
+        return cs == null ? 0 : toLong(cs);
+    }
+
+    public static long toLongValue(Number value) { return value == null ? 0 : toLong(value); }
+
+    public static long toLongValueAtToday(LocalTime time) { return toLong(LocalDateTime.of(LocalDate.now(), time)); }
+
+    public static long toLongValue(LocalDate date) { return toLong(date.atStartOfDay()); }
+
+    public static long toLongValue(LocalDateTime date) {
+        return date.atZone(ZoneOffset.systemDefault()).toInstant().toEpochMilli();
+    }
 
     /**
      * 目前基本数据 Util 内类似的方法均使用了<strong>极大的容忍度</strong>
@@ -109,28 +148,19 @@ public final class LongUtil {
             return (Long) object;
         }
         if (object instanceof Number) {
-            return ((Number) object).longValue();
+            return toLong((Number) object);
         }
         if (object instanceof CharSequence) {
-            try {
-                return Long.parseLong(object.toString().trim());
-            } catch (NumberFormatException e) {
-                try {
-                    return DateUtil.toCalendar(object).getTimeInMillis();
-                } catch (IllegalArgumentException ae) {
-                    ae.initCause(e);
-                    throw ae;
-                }
-            }
+            return toLongValue(object.toString());
         }
         if (object instanceof Boolean) {
-            return (long) ((boolean) object ? 1 : 0);
+            return toLong((Boolean) object);
         }
         if (object instanceof Date) {
-            return ((Date) object).getTime();
+            return toLongValue((Date) object);
         }
         if (object instanceof Calendar) {
-            return ((Calendar) object).getTimeInMillis();
+            return toLongValue((Calendar) object);
         }
         try {
             Object firstItem = SupportUtil.onlyOneItemOrSize(object);
@@ -201,7 +231,7 @@ public final class LongUtil {
         return ret;
     }
 
-    public static Long toObjectArr(long... values) {
+    public static Long[] toObjectArr(long... values) {
         return Arrays2.LONGS.toObjects(values);
     }
 
