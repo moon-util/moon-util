@@ -9,9 +9,13 @@ import java.util.Date;
 import java.util.Objects;
 
 import static com.moon.core.util.DatetimeField.*;
-import static java.util.Calendar.getInstance;
 
 /**
+ * 写这个的时候在想很多判断是否有必要每种日期数据类型都有必要写出来？
+ * 想想还是觉得有必要，这里不写很多时候实际业务中还是会单独写！所有这里会有很多{@code is}开头的方法
+ *
+ * 命名为{@code Datetime}小写“t”为了不与{@code org.joda.time.DateTime}冲突
+ *
  * @author moonsky
  */
 public final class Datetime extends Date {
@@ -70,73 +74,53 @@ public final class Datetime extends Date {
 
     private volatile Calendar calendar;
 
-    public Datetime(long timeMillis) {
-        super(timeMillis);
-        Calendar calendar = getInstance();
-        calendar.setTimeInMillis(timeMillis);
-        this.calendar = calendar;
+    private final boolean immutable;
+
+    private Datetime obtainReturning(Datetime datetime) {
+        return immutable ? new Datetime(datetime) : this;
     }
 
-    public Datetime(Calendar calendar) {
+    private Datetime(Calendar calendar, boolean immutable) {
         super(calendar.getTimeInMillis());
-        this.calendar = DateUtil.copy(calendar);
+        this.calendar = calendar;
+        this.immutable = immutable;
     }
 
-    public Datetime(String date) {
-        this(DateUtil.toCalendar(date));
-    }
+    public Datetime(long timeMillis) { this(DateUtil.toCalendar(timeMillis)); }
 
-    public Datetime(CharSequence date) {
-        this(DateUtil.toCalendar(date));
-    }
+    public Datetime(Calendar calendar) { this(calendar, false); }
 
-    public Datetime(Date date) {
-        this((date == null ? new Date() : date).getTime());
-    }
+    public Datetime(String date) { this(DateUtil.toCalendar(date)); }
 
-    public Datetime(LocalDate localDate) {
-        this(DateUtil.toCalendar(localDate));
-    }
+    public Datetime(CharSequence date) { this(DateUtil.toCalendar(date)); }
 
-    public Datetime(LocalDateTime datetime) {
-        this(DateUtil.toCalendar(datetime));
-    }
+    public Datetime(Date date) { this((date == null ? new Date() : date).getTime()); }
 
-    public Datetime(Datetime datetime) {
-        this(datetime.obtainCalendar());
-    }
+    public Datetime(LocalDate localDate) { this(DateUtil.toCalendar(localDate)); }
 
-    public Datetime(Instant instant) {
-        this(instant.toEpochMilli());
-    }
+    public Datetime(LocalDateTime datetime) { this(DateUtil.toCalendar(datetime)); }
 
-    public Datetime(org.joda.time.DateTime datetime) {
-        this(datetime.toDate());
-    }
+    public Datetime(Datetime datetime) { this(datetime.calendar, datetime.immutable); }
 
-    public Datetime(org.joda.time.LocalDate date) {
-        this(date.toDate());
-    }
+    public Datetime(Instant instant) { this(instant.toEpochMilli()); }
 
-    public Datetime(org.joda.time.LocalDateTime datetime) {
-        this(datetime.toDate());
-    }
+    public Datetime(org.joda.time.DateTime datetime) { this(datetime.toDate()); }
+
+    public Datetime(org.joda.time.LocalDate date) { this(date.toDate()); }
+
+    public Datetime(org.joda.time.LocalDateTime datetime) { this(datetime.toDate()); }
 
     public Datetime() { this(new Date()); }
 
     public static Datetime now() { return new Datetime(); }
 
-    public static Datetime of() { return new Datetime(); }
+    public static Datetime of() { return now(); }
 
     public static Datetime of(long timeOfMillis) { return new Datetime(timeOfMillis); }
 
-    public static Datetime of(CharSequence dateStr) {
-        return new Datetime(dateStr);
-    }
+    public static Datetime of(CharSequence dateStr) { return new Datetime(dateStr); }
 
-    public static Datetime of(int... fields) {
-        return new Datetime(DateUtil.toCalendar(fields));
-    }
+    public static Datetime of(int... fields) { return new Datetime(DateUtil.toCalendar(fields)); }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,74 +128,170 @@ public final class Datetime extends Date {
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public int getYearValue() {
-        return getField(YEAR);
-    }
+    /*
+     * *********************************************************************
+     * getter & setter
+     * *********************************************************************
+     */
 
-    public int getQuarterValue() {
-        return getMonthValue() / 3 + 1;
-    }
+    /**
+     * 是否是不可变对象
+     *
+     * @return 不可变对象每次返回的是新对象，否则操作和返回的是新对象
+     */
+    private boolean isImmutable() { return immutable; }
 
-    public int getMonthValue() {
-        return getField(MONTH);
-    }
+    /**
+     * 设置为不可变数据，不可变数据每次操作均返回新对象
+     *
+     * @see #obtainReturning(Datetime)
+     */
+    private Datetime withImmutable() { return new Datetime(this.calendar, true); }
 
-    public int getWeekOfYear() {
-        return getField(DatetimeField.WEEK_OF_YEAR);
-    }
+    /**
+     * 设置为可变数据，可变数据操作的是同一个对象
+     *
+     * @see #obtainReturning(Datetime)
+     */
+    private Datetime withMutable() { return new Datetime(this.calendar, false); }
 
-    public int getWeekOfMonth() {
-        return getField(DatetimeField.WEEK_OF_MONTH);
-    }
+    /*
+     * *********************************************************************
+     * 操作器
+     * *********************************************************************
+     */
 
-    public int getDayOfYear() {
-        return getField(DatetimeField.DAY_OF_YEAR);
-    }
+    /**
+     * 返回当前年有多少天
+     *
+     * @return 闰年 366 天，其他年份 365 天
+     */
+    public int getYearLength() { return isLeapYear() ? 366 : 365; }
 
-    public int getDayOfMonth() {
-        return getField(DAY_OF_MONTH);
-    }
+    /**
+     * 返回当前年份
+     *
+     * @return 年份
+     */
+    public int getYearValue() { return getField(YEAR); }
 
-    public int getDayOfWeek() {
-        return getField(DatetimeField.DAY_OF_WEEK);
-    }
+    /**
+     * 返回季度
+     *
+     * @return 季度
+     */
+    public int getQuarterValue() { return getMonthValue() / 3 + 1; }
 
-    public int getHourOfDay() {
-        return getField(HOUR_OF_DAY);
-    }
+    /**
+     * 返回当前月份
+     *
+     * @return 月份
+     */
+    public int getMonthValue() { return getField(MONTH); }
 
-    public int getMinuteOfDay() {
-        return getHourOfDay() * 60 + getMinuteOfHour();
-    }
+    /**
+     * 返回当前是一年中的第 N 个星期
+     *
+     * @return N
+     */
+    public int getWeekOfYear() { return getField(DatetimeField.WEEK_OF_YEAR); }
 
-    public int getMinuteOfHour() {
-        return getField(MINUTE);
-    }
+    /**
+     * 返回当前日期是当前月中的第 N 个星期
+     *
+     * @return N
+     */
+    public int getWeekOfMonth() { return getField(DatetimeField.WEEK_OF_MONTH); }
 
-    public int getSecondOfDay() {
-        return getHourOfDay() * 3600 + getSecondOfHour();
-    }
+    /**
+     * 返回当前是一年中的第 N 天
+     *
+     * @return N
+     */
+    public int getDayOfYear() { return getField(DatetimeField.DAY_OF_YEAR); }
 
-    public int getSecondOfHour() {
-        return getMinuteOfHour() * 60 + getSecondOfMinute();
-    }
+    /**
+     * 返回当前日期是当前月中的第 N 天
+     *
+     * @return N
+     */
+    public int getDayOfMonth() { return getField(DAY_OF_MONTH); }
 
-    public int getSecondOfMinute() {
-        return getField(SECOND);
-    }
+    /**
+     * 返回当前日期是当前周中的第 N 天
+     *
+     * @return N
+     */
+    public int getDayOfWeek() { return getField(DatetimeField.DAY_OF_WEEK); }
 
-    public int getMillisOfDay() {
-        return getSecondOfDay() * 1000 + getMillisOfSecond();
-    }
+    /**
+     * 返回 24 小时制的小时数
+     *
+     * @return 小时数
+     */
+    public int getHourOfDay() { return getField(HOUR_OF_DAY); }
 
-    public int getMillisOfHour() {
-        return getSecondOfHour() * 1000 + getMillisOfSecond();
-    }
+    /**
+     * 返回当前时间是“今天”的第 N 分钟
+     *
+     * @return N
+     */
+    public int getMinuteOfDay() { return getHourOfDay() * 60 + getMinuteOfHour(); }
 
-    public int getMillisOfMinute() {
-        return getSecondOfMinute() * 1000 + getMillisOfSecond();
-    }
+    /**
+     * 返回当前时间的分钟数
+     *
+     * @return 分钟数
+     */
+    public int getMinuteOfHour() { return getField(MINUTE); }
 
+    /**
+     * 返回当前时间是“今天”的第 N 秒
+     *
+     * @return N
+     */
+    public int getSecondOfDay() { return getHourOfDay() * 3600 + getSecondOfHour(); }
+
+    /**
+     * 返回当前时间在当前小时中的秒数
+     *
+     * @return 当前小时的第 N 秒
+     */
+    public int getSecondOfHour() { return getMinuteOfHour() * 60 + getSecondOfMinute(); }
+
+    /**
+     * 秒数
+     *
+     * @return 秒数
+     */
+    public int getSecondOfMinute() { return getField(SECOND); }
+
+    /**
+     * 当前毫秒数是今天的第 N 毫秒
+     *
+     * @return N
+     */
+    public int getMillisOfDay() { return getSecondOfDay() * 1000 + getMillisOfSecond(); }
+
+    /**
+     * 当前毫秒数是在当前小时的第 N 毫秒
+     *
+     * @return N
+     */
+    public int getMillisOfHour() { return getSecondOfHour() * 1000 + getMillisOfSecond(); }
+
+    /**
+     * 当前毫秒数是在当前分钟的第 N 毫秒
+     *
+     * @return N
+     */
+    public int getMillisOfMinute() { return getSecondOfMinute() * 1000 + getMillisOfSecond(); }
+
+    /**
+     * 毫秒数
+     *
+     * @return 毫秒数
+     */
     public int getMillisOfSecond() { return getField(MILLISECOND); }
 
     /**
@@ -227,12 +307,24 @@ public final class Datetime extends Date {
      * @return 时间戳
      */
     @Override
-    public long getTime() {
-        return obtainCalendar().getTimeInMillis();
-    }
+    public long getTime() { return obtainCalendar().getTimeInMillis(); }
 
+    /**
+     * 获取指定字段的值
+     *
+     * @param field 字段
+     *
+     * @return 字段值
+     */
     public int getField(DatetimeField field) { return getField(field.value); }
 
+    /**
+     * 获取指定字段值
+     *
+     * @param field 字段
+     *
+     * @return 字段值
+     */
     public int getField(int field) { return obtainCalendar().get(field); }
 
     /*
@@ -248,9 +340,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withSecond(int value) {
-        return withField(SECOND, value);
-    }
+    public Datetime withSecond(int value) { return withField(SECOND, value); }
 
     /**
      * 设置分钟数
@@ -259,9 +349,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withMinute(int value) {
-        return withField(MINUTE, value);
-    }
+    public Datetime withMinute(int value) { return withField(MINUTE, value); }
 
     /**
      * 设置小时数（12 小时制）
@@ -270,9 +358,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withHour(int value) {
-        return withField(DatetimeField.HOUR, value);
-    }
+    public Datetime withHour(int value) { return withField(DatetimeField.HOUR, value); }
 
     /**
      * 设置小时数（24 小时制）
@@ -281,9 +367,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withHourOfDay(int value) {
-        return withField(HOUR_OF_DAY, value);
-    }
+    public Datetime withHourOfDay(int value) { return withField(HOUR_OF_DAY, value); }
 
     /**
      * 设置当前周中的星期
@@ -292,9 +376,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withDayOfWeek(int value) {
-        return withField(DatetimeField.DAY_OF_WEEK, value);
-    }
+    public Datetime withDayOfWeek(int value) { return withField(DatetimeField.DAY_OF_WEEK, value); }
 
     /**
      * 设置当月的第几天
@@ -303,9 +385,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withDayOfMonth(int value) {
-        return withField(DAY_OF_MONTH, value);
-    }
+    public Datetime withDayOfMonth(int value) { return withField(DAY_OF_MONTH, value); }
 
     /**
      * 设置当前年的第几天
@@ -314,9 +394,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withDayOfYear(int value) {
-        return withField(DatetimeField.DAY_OF_YEAR, value);
-    }
+    public Datetime withDayOfYear(int value) { return withField(DatetimeField.DAY_OF_YEAR, value); }
 
     /**
      * 设置当前月份
@@ -325,9 +403,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withMonth(int value) {
-        return withField(MONTH, value);
-    }
+    public Datetime withMonth(int value) { return withField(MONTH, value); }
 
     /**
      * 设置年份
@@ -336,9 +412,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withYear(int value) {
-        return withField(YEAR, value);
-    }
+    public Datetime withYear(int value) { return withField(YEAR, value); }
 
     /**
      * 设置指定字段值
@@ -348,9 +422,7 @@ public final class Datetime extends Date {
      *
      * @return 当前对象
      */
-    public Datetime withField(DatetimeField field, int value) {
-        return withField(field.value, value);
-    }
+    public Datetime withField(DatetimeField field, int value) { return withField(field.value, value); }
 
     /**
      * 设置指定字段值
@@ -362,7 +434,7 @@ public final class Datetime extends Date {
      */
     public Datetime withField(int field, int value) {
         obtainCalendar().set(field, field == Calendar.MONTH ? value - 1 : value);
-        return this;
+        return obtainReturning(this);
     }
 
     /*
@@ -371,37 +443,21 @@ public final class Datetime extends Date {
      * ****************************************************************************
      */
 
-    public Datetime plusYears(int amount) {
-        return plusField(YEAR, amount);
-    }
+    public Datetime plusYears(int amount) { return plusField(YEAR, amount); }
 
-    public Datetime plusMonths(int amount) {
-        return plusField(MONTH, amount);
-    }
+    public Datetime plusMonths(int amount) { return plusField(MONTH, amount); }
 
-    public Datetime plusWeeks(int amount) {
-        return plusField(DAY_OF_MONTH, amount);
-    }
+    public Datetime plusWeeks(int amount) { return plusField(DAY_OF_MONTH, amount); }
 
-    public Datetime plusDays(int amount) {
-        return plusField(DAY_OF_MONTH, amount);
-    }
+    public Datetime plusDays(int amount) { return plusField(DAY_OF_MONTH, amount); }
 
-    public Datetime plusHours(int amount) {
-        return plusField(HOUR_OF_DAY, amount);
-    }
+    public Datetime plusHours(int amount) { return plusField(HOUR_OF_DAY, amount); }
 
-    public Datetime plusMinutes(int amount) {
-        return plusField(MINUTE, amount);
-    }
+    public Datetime plusMinutes(int amount) { return plusField(MINUTE, amount); }
 
-    public Datetime plusSeconds(int amount) {
-        return plusField(SECOND, amount);
-    }
+    public Datetime plusSeconds(int amount) { return plusField(SECOND, amount); }
 
-    public Datetime plusMillis(int amount) {
-        return plusField(MILLISECOND, amount);
-    }
+    public Datetime plusMillis(int amount) { return plusField(MILLISECOND, amount); }
 
     public Datetime plusField(DatetimeField field, int amount) {
         plusField(field.value, amount);
@@ -410,7 +466,7 @@ public final class Datetime extends Date {
 
     public Datetime plusField(int field, int amount) {
         obtainCalendar().add(field, amount);
-        return this;
+        return obtainReturning(this);
     }
 
     /*
@@ -419,37 +475,21 @@ public final class Datetime extends Date {
      * ****************************************************************************
      */
 
-    public Datetime minusYears(int amount) {
-        return minusField(YEAR, amount);
-    }
+    public Datetime minusYears(int amount) { return minusField(YEAR, amount); }
 
-    public Datetime minusMonths(int amount) {
-        return minusField(MONTH, amount);
-    }
+    public Datetime minusMonths(int amount) { return minusField(MONTH, amount); }
 
-    public Datetime minusWeeks(int amount) {
-        return minusField(DAY_OF_MONTH, amount);
-    }
+    public Datetime minusWeeks(int amount) { return minusField(DAY_OF_MONTH, amount); }
 
-    public Datetime minusDays(int amount) {
-        return minusField(DAY_OF_MONTH, amount);
-    }
+    public Datetime minusDays(int amount) { return minusField(DAY_OF_MONTH, amount); }
 
-    public Datetime minusHours(int amount) {
-        return minusField(HOUR_OF_DAY, amount);
-    }
+    public Datetime minusHours(int amount) { return minusField(HOUR_OF_DAY, amount); }
 
-    public Datetime minusMinutes(int amount) {
-        return minusField(MINUTE, amount);
-    }
+    public Datetime minusMinutes(int amount) { return minusField(MINUTE, amount); }
 
-    public Datetime minusSeconds(int amount) {
-        return minusField(SECOND, amount);
-    }
+    public Datetime minusSeconds(int amount) { return minusField(SECOND, amount); }
 
-    public Datetime minusMillis(int amount) {
-        return minusField(MILLISECOND, amount);
-    }
+    public Datetime minusMillis(int amount) { return minusField(MILLISECOND, amount); }
 
     public Datetime minusField(DatetimeField field, int amount) {
         minusField(field.value, amount);
@@ -458,12 +498,10 @@ public final class Datetime extends Date {
 
     public Datetime minusField(int field, int amount) {
         obtainCalendar().add(field, -amount);
-        return this;
+        return obtainReturning(this);
     }
 
-    private Calendar obtainCalendar() {
-        return calendar;
-    }
+    private Calendar obtainCalendar() { return calendar; }
 
     /*
      * ****************************************************************************
@@ -515,6 +553,12 @@ public final class Datetime extends Date {
 
     public boolean isYearAfter(int year) { return getYearValue() > year; }
 
+    public boolean isYearOf(Datetime date) { return date != null && isYearOf(date.getYearValue()); }
+
+    public boolean isYearBefore(Datetime date) { return date != null && isYearBefore(date.getYearValue()); }
+
+    public boolean isYearAfter(Datetime date) { return date != null && isYearAfter(date.getYearValue()); }
+
     public boolean isMonthOf(int year, int month) { return isYearOf(year) && getMonthValue() == month; }
 
     public boolean isMonthBefore(int year, int month) {
@@ -523,6 +567,18 @@ public final class Datetime extends Date {
 
     public boolean isMonthAfter(int year, int month) {
         return isYearAfter(year) || (isYearOf(year) && getMonthValue() > month);
+    }
+
+    public boolean isMonthOf(Datetime date) {
+        return date != null && isMonthOf(date.getYearValue(), date.getMonthValue());
+    }
+
+    public boolean isMonthBefore(Datetime date) {
+        return date != null && isMonthBefore(date.getYearValue(), date.getMonthValue());
+    }
+
+    public boolean isMonthAfter(Datetime date) {
+        return date != null && isMonthAfter(date.getYearValue(), date.getMonthValue());
     }
 
     public boolean isDateOf(int year, int month, int dayOfMonth) {
@@ -537,11 +593,29 @@ public final class Datetime extends Date {
         return isMonthAfter(year, month) || (isMonthOf(year, month) && getDayOfMonth() > dayOfMonth);
     }
 
+    public boolean isDateOf(Datetime date) {
+        return date != null && isDateOf(date.getYearValue(), date.getMonthValue(), date.getDayOfMonth());
+    }
+
+    public boolean isDateBefore(Datetime date) {
+        return date != null && isDateBefore(date.getYearValue(), date.getMonthValue(), date.getDayOfMonth());
+    }
+
+    public boolean isDateAfter(Datetime date) {
+        return date != null && isDateAfter(date.getYearValue(), date.getMonthValue(), date.getDayOfMonth());
+    }
+
     public boolean isHourOf(int hour) { return getHourOfDay() == hour; }
 
     public boolean isHourBefore(int hour) { return getHourOfDay() < hour; }
 
     public boolean isHourAfter(int hour) { return getHourOfDay() > hour; }
+
+    public boolean isHourOf(Datetime hour) { return hour != null && isHourOf(hour.getHourOfDay()); }
+
+    public boolean isHourBefore(Datetime hour) { return hour != null && isHourBefore(hour.getHourOfDay()); }
+
+    public boolean isHourAfter(Datetime hour) { return hour != null && isHourAfter(hour.getHourOfDay()); }
 
     public boolean isMinuteOf(int hour, int minute) { return isHourOf(hour) && getMinuteOfHour() == minute; }
 
@@ -551,6 +625,18 @@ public final class Datetime extends Date {
 
     public boolean isMinuteAfter(int hour, int minute) {
         return isHourAfter(hour) || (isHourOf(hour) && getMinuteOfHour() > minute);
+    }
+
+    public boolean isMinuteOf(Datetime datetime) {
+        return datetime != null && isMinuteOf(datetime.getHourOfDay(), datetime.getMinuteOfHour());
+    }
+
+    public boolean isMinuteBefore(Datetime datetime) {
+        return datetime != null && isMinuteBefore(datetime.getHourOfDay(), datetime.getMinuteOfHour());
+    }
+
+    public boolean isMinuteAfter(Datetime datetime) {
+        return datetime != null && isMinuteAfter(datetime.getHourOfDay(), datetime.getMinuteOfHour());
     }
 
     public boolean isSecondOf(int hour, int minute, int second) {
@@ -565,9 +651,27 @@ public final class Datetime extends Date {
         return isMinuteAfter(hour, minute) || (isMinuteOf(hour, minute) && getSecondOfMinute() > second);
     }
 
+    public boolean isSecondOf(Datetime time) {
+        return time != null && isSecondOf(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute());
+    }
+
+    public boolean isSecondBefore(Datetime time) {
+        return time != null && isSecondBefore(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute());
+    }
+
+    public boolean isSecondAfter(Datetime time) {
+        return time != null && isSecondAfter(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute());
+    }
+
     private final static DatetimeField[] FIELDS = {
         YEAR, MONTH, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE, SECOND, MILLISECOND
     };
+
+    public boolean isDatetimeOf(Datetime datetime) { return equals(datetime); }
+
+    public boolean isDatetimeBefore(Datetime datetime) { return before(datetime); }
+
+    public boolean isDatetimeAfter(Datetime datetime) { return after(datetime); }
 
     public boolean isDatetimeOf(int... values) {
         if (values == null) {
@@ -756,51 +860,67 @@ public final class Datetime extends Date {
     }
 
     @Override
+    @Deprecated
     public int getMonth() { return getMonthValue(); }
 
     @Override
+    @Deprecated
     public int getYear() { return getYearValue(); }
 
     @Override
+    @Deprecated
     public void setYear(int year) { withYear(year); }
 
     @Override
+    @Deprecated
     public void setMonth(int month) { withMonth(month); }
 
     @Override
+    @Deprecated
     public int getDate() { return getDayOfMonth(); }
 
     @Override
+    @Deprecated
     public void setDate(int date) { withDayOfMonth(date); }
 
     @Override
+    @Deprecated
     public int getDay() { return getDayOfWeek(); }
 
     @Override
+    @Deprecated
     public int getHours() { return getHourOfDay(); }
 
     @Override
+    @Deprecated
     public void setHours(int hours) { withHourOfDay(hours); }
 
     @Override
+    @Deprecated
     public int getMinutes() { return getMinuteOfHour(); }
 
     @Override
+    @Deprecated
     public void setMinutes(int minutes) { withMinute(minutes); }
 
     @Override
+    @Deprecated
     public int getSeconds() { return getSecondOfMinute(); }
 
     @Override
+    @Deprecated
     public void setSeconds(int seconds) { withSecond(seconds); }
 
     @Override
+    @Deprecated
     public String toLocaleString() { return toString(); }
 
     @Override
+    @Deprecated
     public String toGMTString() { return toString(); }
 
     @Override
+    @Deprecated
     public int getTimezoneOffset() {
         Calendar calendar = obtainCalendar();
         return -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)) / 60000;
