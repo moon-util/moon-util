@@ -6,7 +6,13 @@ import java.util.Calendar;
  * @author moonsky
  */
 public enum DatetimeField {
+    /**
+     * 毫秒
+     */
     MILLISECOND(Calendar.MILLISECOND),
+    /**
+     * 秒
+     */
     SECOND(Calendar.SECOND),
     MINUTE(Calendar.MINUTE),
     HOUR_OF_DAY(Calendar.HOUR_OF_DAY),
