@@ -18,7 +18,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author moonsky
  */
-public final class RequestUtil {
+public final class RequestUtil extends ContentTypeUtil{
 
     private RequestUtil() { noInstanceError(); }
 

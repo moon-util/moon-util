@@ -22,6 +22,14 @@ import java.lang.annotation.Target;
  *
  *     @ InStrings(values = "ENUM1,ENUM2") // 注意这里不能有多余的空格
  *     private EnumType value;
+ *
+ *     // 声明 trimmed = true 后会进行一次 String.trim() 操作，这样就可以有多余的空格
+ *     @ InStrings(values = "ENUM1,ENUM2", trimmed = true)
+ *     private EnumType type;
+ *
+ *     // 自定义分隔符
+ *     @ InStrings(values = "str1;str2;str3", delimiter = ";")
+ *     private String str;
  * </pre>
  *
  * @author benshaoye

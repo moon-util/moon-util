@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * <p>
  * 如要求 int 值在：1, 2, 3 中
  * <pre class="code">
- *     &#064;IntIn(values = "1,2,3")
+ *     &#064;InInts(values = "1,2,3")
  *     private int value;
  * </pre>
  * <p>

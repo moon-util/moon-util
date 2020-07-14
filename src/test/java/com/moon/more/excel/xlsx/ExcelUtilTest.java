@@ -192,6 +192,7 @@ class ExcelUtilTest {
     }
 
     @Test
+    @EnabledOnOs(OS.MAC)
     void testExportMultiExcelOnMax() throws Exception {
         doExportMultiExcel(Systems.user_home.get());
     }

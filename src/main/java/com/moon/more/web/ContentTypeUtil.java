@@ -9,18 +9,21 @@ import static com.moon.more.web.RequestUtil.header;
 /**
  * @author moonsky
  */
-public final class ContentTypeUtil {
+public class ContentTypeUtil {
 
-    private ContentTypeUtil() { noInstanceError(); }
+    protected ContentTypeUtil() { noInstanceError(); }
 
-    public static boolean isAcceptAny(HttpServletRequest request) { return isAcceptOf(request, "*/*"); }
+    public final static boolean isAcceptAny(HttpServletRequest request) { return isAcceptOf(request, "*/*"); }
 
-    public static boolean isAcceptJson(HttpServletRequest request) { return isAcceptOf(request, "application/json"); }
+    public final static boolean isAcceptJson(HttpServletRequest request) {
+        return isAcceptOf(request,
+            "application/json");
+    }
 
-    public static boolean isAcceptHtml(HttpServletRequest request) { return isAcceptOf(request, "text/html"); }
+    public final static boolean isAcceptHtml(HttpServletRequest request) { return isAcceptOf(request, "text/html"); }
 
     @SuppressWarnings("all")
-    public static boolean isAcceptOf(HttpServletRequest request, String expected) {
+    public final static boolean isAcceptOf(HttpServletRequest request, String expected) {
         if (request == null || isEmpty(expected)) { return false; }
         String acceptVal = header(request, "accept");
         if (isEmpty(acceptVal)) { acceptVal = header(request, "Accept"); }

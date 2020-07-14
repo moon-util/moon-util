@@ -75,6 +75,27 @@ public final class StringUtil {
         return str1 == null ? str2 == null : (str1.equals(str2) || StringSupport.matches(str1, str2));
     }
 
+    /**
+     * 返回字符串中指定字符出现的次数
+     *
+     * @param str 待测字符串
+     * @param ch  目标字符
+     *
+     * @return 字符出现的次数
+     */
+    public static int countOf(final CharSequence str, final char ch) {
+        if (isEmpty(str)) {
+            return 0;
+        }
+        int count = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (ch == str.charAt(i)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /*
      * -------------------------------------------------------------------
      * indexOf

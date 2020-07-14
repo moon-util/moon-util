@@ -4,6 +4,8 @@ import com.moon.more.web.CookieUtil;
 import com.moon.more.web.RequestUtil;
 import com.moon.more.web.ResponseUtil;
 import com.moon.more.web.ResponseWriter;
+import com.moon.spring.web.advice.RestExceptionEnum;
+import com.moon.spring.web.advice.MvcUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestAttributes;
@@ -248,4 +250,38 @@ public final class WebUtil {
      * @throws NullPointerException if {@link #getResponse()} result is null
      */
     public static ResponseWriter getResponseWriter() { return writer(getResponse()); }
+
+    /**
+     * 处理全局异常
+     *
+     * @param request   HttpServletRequest
+     * @param response  HttpServletResponse
+     * @param throwable 异常对象
+     *
+     * @return ResponseEntity
+     *
+     * @throws Throwable 如果{@link RestExceptionEnum}没有对应的异常类型是原样抛出异常
+     * @see MvcUtil
+     * @see RestExceptionEnum
+     */
+    public static ResponseEntity onThrowable(
+        HttpServletRequest request, HttpServletResponse response, Throwable throwable
+    ) throws Throwable {
+        return MvcUtil.onThrowable(request, response, throwable);
+    }
+
+    /**
+     * 处理全局异常
+     *
+     * @param throwable 异常对象
+     *
+     * @return ResponseEntity
+     *
+     * @throws Throwable 如果{@link RestExceptionEnum}没有对应的异常类型是原样抛出异常
+     * @see MvcUtil
+     * @see RestExceptionEnum
+     */
+    public static ResponseEntity onThrowable(Throwable throwable) throws Throwable {
+        return MvcUtil.onThrowable(throwable);
+    }
 }

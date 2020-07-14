@@ -47,7 +47,7 @@ public final class MapUtil {
 
     public static <K, V> LinkedHashMap<K, V> newLinkedHashMap() { return new LinkedHashMap<>(); }
 
-    public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(int capacity) { return newLinkedHashMap(capacity); }
+    public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(int capacity) { return new LinkedHashMap(capacity); }
 
     public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(Map<K, V> map) { return new LinkedHashMap<>(map); }
 

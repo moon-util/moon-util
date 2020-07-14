@@ -1,5 +1,6 @@
 package com.moon.core.util.valid;
 
+import com.moon.core.enums.Testers;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.core.util.validator.Validator;
@@ -23,6 +24,9 @@ public class ValidatorTest {
 
     @Test
     void testEmployee() throws Exception {
+        Validator<Employee> validator = Validator.of(new Employee());
+        validator.when(Testers.isNotNull, scopedValidator -> {
+        });
         Validator.of(new Employee())
             // .setImmediate(true)
             .require(e -> e.address != null, "地址不能为空")

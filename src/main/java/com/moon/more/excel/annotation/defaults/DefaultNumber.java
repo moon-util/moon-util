@@ -61,6 +61,8 @@ public @interface DefaultNumber {
      * 而这个是判断所在的对象是否为 null
      *
      * @return true: 总是填充默认值
+     *
+     * @see TableColumnGroup
      */
     boolean defaultForNullObj() default false;
 
