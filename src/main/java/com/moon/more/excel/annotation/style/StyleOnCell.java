@@ -12,12 +12,12 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UseStyleOnCell {
+public @interface StyleOnCell {
 
     /**
      * 使用样式
      *
-     * @return 以定义的样式
+     * @return 定义的样式
      *
      * @see DefinitionStyle#classname() 引用一个定义的样式名
      */

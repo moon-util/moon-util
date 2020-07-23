@@ -190,9 +190,7 @@ public class TestUtil {
      *
      * @return 如果检测通过，返回 true，否则返回 false
      */
-    public final static boolean isDigit(CharSequence str) {
-        return StringUtil.isAllMatches(str, CharUtil::isDigit);
-    }
+    public final static boolean isDigit(CharSequence str) { return StringUtil.isAllMatches(str, CharUtil::isDigit); }
 
     /**
      * 验证数字
@@ -365,6 +363,15 @@ public class TestUtil {
      * @return 如果是符合规范的车牌号字符串返回 true，否则返回 false
      */
     public final static boolean isPlateNumber(CharSequence str) { return PLATE_NUMBER.test(str); }
+
+    /**
+     * 是否是正确的纳税人税号
+     *
+     * @param str 待测税号字符串
+     *
+     * @return 如果是符合规范的纳税人识别号字符串返回 true，否则返回 false
+     */
+    public final static boolean isTaxpayerCode(CharSequence str) { return TAXPAYER_CODE.test(str); }
 
     /**
      * 是否是 3 位或 6 位 RGB 颜色色号（包含前面“#”开头）

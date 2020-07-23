@@ -15,9 +15,7 @@ import static com.moon.core.lang.ThrowUtil.runtime;
  */
 public final class LangUtil {
 
-    private LangUtil() {
-        noInstanceError();
-    }
+    private LangUtil() { noInstanceError(); }
 
     /**
      * 忽略检查异常执行
@@ -64,14 +62,6 @@ public final class LangUtil {
         }
     }
 
-    public static <T> T defaultWhenThrow(ThrowingSupplier<T> supplier, T defaultValue) {
-        try {
-            return supplier.get();
-        } catch (Throwable t) {
-            return defaultValue;
-        }
-    }
-
     /**
      * 忽略检查异常消费
      *
@@ -102,23 +92,6 @@ public final class LangUtil {
             return function.apply(value);
         } catch (Throwable t) {
             return runtime(t);
-        }
-    }
-
-    /**
-     * 忽略检查异常消费
-     *
-     * @param v1
-     * @param v2
-     * @param consumer
-     * @param <T>
-     * @param <O>
-     */
-    public static <T, O> void acceptBi(T v1, O v2, ThrowingBiConsumer<? super T, ? super O> consumer) {
-        try {
-            consumer.accept(v1, v2);
-        } catch (Throwable t) {
-            runtime(t);
         }
     }
 

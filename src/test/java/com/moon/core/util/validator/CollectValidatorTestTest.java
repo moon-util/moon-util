@@ -4,6 +4,7 @@ import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
+import com.moon.core.util.ThrowUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +43,7 @@ class CollectValidatorTestTest {
 
     @Test
     void testCertValid() {
-        ThrowUtil.ignoreThrowsRun(() -> doCertValid());
+        ThrowUtils.ignoreThrowsRun(() -> doCertValid());
     }
 
     void doCertValid() {

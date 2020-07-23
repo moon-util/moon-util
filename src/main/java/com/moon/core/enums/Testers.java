@@ -1,13 +1,18 @@
 package com.moon.core.enums;
 
+import com.moon.more.validator.annotation.RequirePatternOf;
+import com.moon.more.validator.annotation.RequireTesterOf;
+
 import java.util.*;
 import java.util.function.Predicate;
 
 /**
- * 一系列检查函数，这个可作为参数传递，而不只是静态方法调用
+ * 一系列检查函数，这个可作为参数传递也可用在注解中，而不只是静态方法调用
  *
  * @author moonsky
  * @see Patterns 检查字符串是否匹配规则
+ * @see RequireTesterOf 可用于 hibernate-validator 验证
+ * @see RequirePatternOf 可用于 hibernate-validator 验证
  */
 @SuppressWarnings("rawtypes")
 public enum Testers implements Predicate, EnumDescriptor {

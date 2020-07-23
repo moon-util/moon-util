@@ -4,11 +4,11 @@ import java.util.Date;
 import java.util.function.LongSupplier;
 
 /**
- * 并发场景下获取当前毫秒数，单独用一个线程不断获取并保存毫秒数，或者用 new Date().getTime() 方式获取
+ * 并发场景下获取当前毫秒数，单独用一个线程不断获取并保存毫秒数
  *
  * @author moonsky
  */
-public final class FastTimestamp {
+public final class FastTimestamp implements LongSupplier {
 
     private static volatile FastTimestamp NEW_DATE;
     private static volatile FastTimestamp THREAD;
@@ -59,11 +59,13 @@ public final class FastTimestamp {
      */
     public long getTimestamp() { return supplier.getAsLong(); }
 
+    @Override
+    public long getAsLong() { return supplier.getAsLong(); }
+
     public enum Type {
         /**
          * 用一个新线程不断获取系统时间戳，其他线程从这里获取
-         * 这样保证系统时间永远只有一个线程在访问，不会出现并发问题
-         * 至于时间重复，在毫秒级时间获取下，重复的概率本来就很高
+         * 这样保证系统时间“永远只有”一个线程在访问，不会出现并发问题
          */
         THREAD,
         NEW_DATE,

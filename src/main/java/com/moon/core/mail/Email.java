@@ -1,5 +1,7 @@
 package com.moon.core.mail;
 
+import com.moon.core.lang.StringUtil;
+import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.ListUtil;
 
 import javax.activation.DataHandler;
@@ -77,6 +79,7 @@ public class Email implements Cloneable {
      * 添加收件人
      *
      * @param toUserMailAddress
+     *
      * @return
      */
     public Email addToUser(String toUserMailAddress) {
@@ -103,6 +106,7 @@ public class Email implements Cloneable {
      * 添加抄送人
      *
      * @param copyMailAddress
+     *
      * @return
      */
     public Email addCopy(String copyMailAddress) {
@@ -129,6 +133,7 @@ public class Email implements Cloneable {
      * 添加秘送人
      *
      * @param bccAddress
+     *
      * @return
      */
     public Email addBcc(String bccAddress) {
@@ -155,6 +160,7 @@ public class Email implements Cloneable {
      * 添加附件 : 调用不带附件名的方法时默认文件名为附件名
      *
      * @param attachment
+     *
      * @return
      */
     public Email addAttachment(File attachment) {
@@ -256,21 +262,21 @@ public class Email implements Cloneable {
         return toUsers;
     }
 
-    public Email setToUser(String toUser) {
+    public Email toUser(String toUser) {
         if (isNotEmpty(toUser)) {
             List<String> toUsers = new ArrayList<>();
             toUsers.add(toUser);
-            return this.setToUsers(toUsers);
+            return this.toUsers(toUsers);
         }
         return this;
     }
 
-    public Email setToUsers(String... toUsers) {
-        this.toUsers = toUsers.length > 0 ? ListUtil.addAll(new ArrayList<>(), toUsers) : null;
+    public Email toUsers(String... toUsers) {
+        this.toUsers = ListUtil.addAll(new ArrayList<>(), toUsers);
         return this;
     }
 
-    public Email setToUsers(List<String> toUsers) {
+    public Email toUsers(List<String> toUsers) {
         this.toUsers = requireNotEmpty(toUsers);
         return this;
     }
@@ -287,7 +293,7 @@ public class Email implements Cloneable {
         if (isNotEmpty(copyUser)) {
             List<String> toUsers = new ArrayList<>();
             toUsers.add(copyUser);
-            return this.setToUsers(toUsers);
+            return this.toUsers(toUsers);
         }
         return this;
     }
@@ -414,37 +420,37 @@ public class Email implements Cloneable {
     }
 
     // title
-    public String getTitle() {
+    public String title() {
         return title;
     }
 
-    public Email setTitle(String title) {
+    public Email title(String title) {
         this.title = title;
         return this;
     }
 
     // content
-    public String getContent() {
+    public String content() {
         return content;
     }
 
-    public Email setContent(String content) {
+    public Email content(String content) {
         this.content = content;
         return this;
     }
 
     // charset
-    public String getCharset() {
+    public String charset() {
         return charset;
     }
 
-    public Email setCharset(String charset) {
+    public Email charset(String charset) {
         this.charset = charset;
         return this;
     }
 
-    public Email setCharset(Charset charset) {
-        return this.setCharset(charset.name());
+    public Email charset(Charset charset) {
+        return this.charset(charset.name());
     }
 
     // is html
@@ -452,8 +458,9 @@ public class Email implements Cloneable {
         return isHtml;
     }
 
-    public void setHtml(boolean html) {
+    public Email isHtml(boolean html) {
         isHtml = html;
+        return this;
     }
 
     /******************************** sender **********************************************/
@@ -463,36 +470,48 @@ public class Email implements Cloneable {
      *
      * @return
      */
-    public Email send() {
+    public Future<?> send() {
+        return send(false);
+    }
+    /**
+     * 发送邮件
+     *
+     * @return
+     */
+    public Future<?> send(boolean sync) {
         try {
-            this.send0(this);
+            return this.send0(this, null, sync);
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            return ThrowUtil.unchecked(e);
         }
-        return this;
     }
 
     /**
      * 异步发送邮件
      *
      * @param service
+     *
      * @return
      */
     public Future<?> send(ExecutorService service) {
-        Email sender = this.clone();
-        return service.submit(() -> {
-            sender.send();
-        });
+        try {
+            Email sender = this.clone();
+            return sender.send0(sender, service, false);
+        } catch (Exception e) {
+            return ThrowUtil.unchecked(e);
+        }
     }
 
     /**
      * 发送实际执行方法
      *
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void send0(Email sender) throws MessagingException {
-        Address fromAddress = new InternetAddress(requireNonNull(this.from));
+    private Future<?> send0(Email sender, ExecutorService service, boolean sync) throws MessagingException {
+        String from = StringUtil.defaultIfEmpty(this.from, this.account.getUsername());
+        Address fromAddress = new InternetAddress(requireNonNull(from));
 
         Session session = requireNonNull(sender.account).getSession();
 
@@ -507,8 +526,7 @@ public class Email implements Cloneable {
         setSubject(message, sender);
         setMailContent(message, sender);
 
-        // 异步发送
-        SenderExecutor.sendMail(message);
+        return account.send(message, service, sync);
     }
 
     /**
@@ -516,10 +534,10 @@ public class Email implements Cloneable {
      *
      * @param message
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void setMailContent(MimeMessage message, Email sender)
-        throws MessagingException {
+    private void setMailContent(MimeMessage message, Email sender) throws MessagingException {
         if (isNotEmpty(sender.attachments)) {
             setMailContent0withAttachment(message, sender);
         } else {
@@ -534,10 +552,10 @@ public class Email implements Cloneable {
      *
      * @param message
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void setMailContent0withText(MimeMessage message, Email sender)
-        throws MessagingException {
+    private void setMailContent0withText(MimeMessage message, Email sender) throws MessagingException {
         if (sender.isHtml) {
             message.setContent(sender.content, HTML_TYPE);
         } else {
@@ -550,10 +568,10 @@ public class Email implements Cloneable {
      *
      * @param message
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void setMailContent0withAttachment(MimeMessage message, Email sender)
-        throws MessagingException {
+    private void setMailContent0withAttachment(MimeMessage message, Email sender) throws MessagingException {
         Multipart multipart = new MimeMultipart();
         MimeBodyPart part = new MimeBodyPart();
         multipart.addBodyPart(part);
@@ -587,10 +605,10 @@ public class Email implements Cloneable {
      *
      * @param message
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void setSubject(MimeMessage message, Email sender)
-        throws MessagingException {
+    private void setSubject(MimeMessage message, Email sender) throws MessagingException {
         if (charset == null) {
             message.setSubject(sender.title);
         } else {
@@ -603,10 +621,10 @@ public class Email implements Cloneable {
      *
      * @param message
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void addRecipientsOfToUsers(MimeMessage message, Email sender)
-        throws MessagingException {
+    private void addRecipientsOfToUsers(MimeMessage message, Email sender) throws MessagingException {
         if (sender.toUsers != null) {
             for (String address : sender.toUsers) {
                 message.addRecipients(Message.RecipientType.CC, address);
@@ -619,10 +637,10 @@ public class Email implements Cloneable {
      *
      * @param message
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void addRecipientsOfCopies(MimeMessage message, Email sender)
-        throws MessagingException {
+    private void addRecipientsOfCopies(MimeMessage message, Email sender) throws MessagingException {
         if (sender.copies != null) {
             for (String address : sender.copies) {
                 message.addRecipients(Message.RecipientType.CC, address);
@@ -635,10 +653,10 @@ public class Email implements Cloneable {
      *
      * @param message
      * @param sender
+     *
      * @throws MessagingException
      */
-    private void addRecipientsOfBCCS(MimeMessage message, Email sender)
-        throws MessagingException {
+    private void addRecipientsOfBCCS(MimeMessage message, Email sender) throws MessagingException {
         if (sender.bccs != null) {
             for (String address : sender.bccs) {
                 message.addRecipients(Message.RecipientType.BCC, address);

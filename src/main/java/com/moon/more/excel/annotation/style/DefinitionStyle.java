@@ -13,7 +13,7 @@ import java.lang.annotation.*;
  * 样式可以定义在任何有效列（被{@link TableColumn}或{@link TableColumnGroup}注解的列）或当前实体的类上
  *
  * @author moonsky
- * @see CellStyle
+ * @see StyleOnCell
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -29,7 +29,7 @@ public @interface DefinitionStyle {
      * 默认作用于当前字段，且不会注册到作用域内;
      * 2. 注解在类上，需要主动指定类名（不指定也行，怎么设置就怎么用）
      * <p>
-     * 说明：注解在字段或{@code getter}上，并且没有主动指定{@code classname}和{@link UseStyleOnRow}
+     * 说明：注解在字段或{@code getter}上，并且没有主动指定{@code classname}和{@link StyleOnRow}
      * 那么，这个定义默认会作用于当前列数据
      *
      * @return 类名
@@ -43,7 +43,7 @@ public @interface DefinitionStyle {
      *
      * @return 自定义类
      *
-     * @see StyleBuilder 自定义样式;{@link CellStyle}
+     * @see StyleBuilder 自定义样式;{@link StyleOnCell}
      * @see StyleFontBuilder 自定义样式和字体;{@link Font}
      */
     Class<? extends StyleBuilder> createBy() default StyleBuilder.class;

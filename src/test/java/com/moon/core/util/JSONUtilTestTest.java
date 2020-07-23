@@ -10,7 +10,7 @@ class JSONUtilTestTest {
 
     @Test
     void testReadJsonString() {
-        ThrowUtil.ignoreThrowsRun(() -> {
+        ThrowUtils.ignoreThrowsRun(() -> {
             String filename = "d:/invoice.json";
             String json = JSONUtil.readJsonString(filename);
             System.out.println(json);

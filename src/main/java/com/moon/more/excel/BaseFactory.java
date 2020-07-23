@@ -49,6 +49,15 @@ abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFact
     protected WorkbookProxy getProxy() { return proxy; }
 
     /**
+     * 获取当前行号（从 0 开始）
+     *
+     * @return 行号
+     */
+    public int getRowNum() {
+        return getProxy().getIndexOfRow();
+    }
+
+    /**
      * 预定义样式
      *
      * @param classname 唯一样式名

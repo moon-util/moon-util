@@ -23,7 +23,7 @@ final class AttrConfig {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("AttrConfig{");
-        sb.append(", index=").append(index);
+        sb.append("index=").append(index);
         sb.append(", attribute=").append(attribute);
         sb.append('}');
         return sb.toString();

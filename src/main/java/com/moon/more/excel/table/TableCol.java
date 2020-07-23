@@ -47,7 +47,7 @@ class TableCol implements Comparable<TableCol> {
 
         this.offset = attr.getOffsetVal();
         this.offsetHeadRowsCnt = Math.min(attr.getOffsetHeadRows(), MAX);
-        this.fillSkipped = attr.getOffsetFillSkipped();
+        this.fillSkipped = attr.isOffsetFillSkipped();
         this.defaultClassname = StyleUtil.classname(config.getTargetClass(), name);
     }
 
@@ -69,12 +69,16 @@ class TableCol implements Comparable<TableCol> {
      * 列宽
      */
 
-    void appendColumnWidth(List<Integer> columnsWidth) {
+    final void appendOffsetWidth(List<Integer> columnsWidth) {
         int dftWidth = DEFAULT_HEIGHT;
         for (int i = 0; i < offset; i++) {
             columnsWidth.add(dftWidth);
         }
-        columnsWidth.add(width == null ? dftWidth : width);
+    }
+
+    void appendColumnWidth(List<Integer> columnsWidth) {
+        this.appendOffsetWidth(columnsWidth);
+        columnsWidth.add(width == null ? DEFAULT_HEIGHT : width);
     }
 
     /*
@@ -96,7 +100,7 @@ class TableCol implements Comparable<TableCol> {
         }
     }
 
-    private final HeadCell headCellAtIdx(int rowIdx) {
+    final HeadCell headCellAtIdx(int rowIdx) {
         return new HeadCell(titleAtIdx(rowIdx), rowHeightAtIdx(rowIdx), fillSkipped);
     }
 

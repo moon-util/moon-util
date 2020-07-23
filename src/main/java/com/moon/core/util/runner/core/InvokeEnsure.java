@@ -3,6 +3,7 @@ package com.moon.core.util.runner.core;
 import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Casters;
 import com.moon.core.util.TypeUtil;
+import com.moon.core.util.converter.GenericTypeCaster;
 import com.moon.core.util.converter.TypeCaster;
 import com.moon.core.util.converter.TypeConverter;
 
@@ -325,8 +326,6 @@ class InvokeEnsure {
         }
     }
 
-    protected final static TypeCaster CASTER = TypeUtil.of();
-
     /*
      * ---------------------------------------------------
      * inner classes
@@ -339,12 +338,11 @@ class InvokeEnsure {
     }
 
     private static TypeConverter to(Casters caster, Class type) {
-        return caster == null ? Casters.getOrDefault(type, o -> CASTER.toType(o, type)) : caster;
+        TypeCaster typeCaster = new GenericTypeCaster();
+        return caster == null ? Casters.getOrDefault(type, o -> typeCaster.toType(o, type)) : caster;
     }
 
     private static IntFunction toArr(Casters caster, Class type) {
         return caster == null ? (len -> Array.newInstance(type, len)) : (len -> caster.createArr(len));
     }
-
-    static int length(Object[] arr) { return arr == null ? 0 : arr.length; }
 }

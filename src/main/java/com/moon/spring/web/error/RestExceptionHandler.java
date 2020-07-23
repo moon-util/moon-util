@@ -1,4 +1,4 @@
-package com.moon.spring.web.advice;
+package com.moon.spring.web.error;
 
 import org.springframework.http.ResponseEntity;
 

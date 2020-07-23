@@ -21,7 +21,7 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     Attribute(Marked onMethod, Marked onField) {
         this.onMethod = onMethod;
         this.onField = onField;
-        Assert.notDuplicated(this);
+        Assert.notDuplicated(onMethod, onField);
     }
 
     private <T> T obtainOrNull(Marked marked, Function<Marked, T> getter) {
@@ -86,9 +86,19 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     }
 
     public int getOrder() {
-        return getOrDefault(TableColumn::order, TableColumnGroup::order, 0);
+        return getOrDefault(TableColumn::order, 0);
     }
 
     @Override
     public int compareTo(Attribute o) { return this.getOrder() - o.getOrder(); }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Attribute{");
+        sb.append("name=").append(getName());
+        sb.append(", onField=").append(onField);
+        sb.append(", onMethod=").append(onMethod);
+        sb.append('}');
+        return sb.toString();
+    }
 }

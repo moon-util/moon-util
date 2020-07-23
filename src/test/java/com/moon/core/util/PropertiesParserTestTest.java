@@ -19,7 +19,7 @@ class PropertiesParserTestTest {
     void testParse() {
         FinalAccessor<TreeMap<String, String>> propsAccessor = FinalAccessor.of();
         FinalAccessor<PropertiesGroup> groupAccessor = FinalAccessor.of();
-        ThrowUtil.ignoreThrowsRun(() -> {
+        ThrowUtils.ignoreThrowsRun(() -> {
             String path = "local-test/moon.properties";
             PropertiesParser parser = new PropertiesParser("moon.profiles");
             TreeMap<String, String> sortedProps = new TreeMap<>(Comparator.naturalOrder());

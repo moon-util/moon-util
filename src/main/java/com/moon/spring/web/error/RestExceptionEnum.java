@@ -1,8 +1,9 @@
-package com.moon.spring.web.advice;
+package com.moon.spring.web.error;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.SetUtil;
+import com.moon.spring.jpa.identity.SnowflakeLongIdentifier;
 import org.hibernate.TransientObjectException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -16,8 +17,9 @@ import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLSyntaxErrorException;
-import java.util.HashMap;
 import java.util.Map;
+
+import static com.moon.spring.web.error.ErrorUtil.forErrorsByBindingResult;
 
 /**
  * @author moonsky
@@ -26,9 +28,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     // mvc 表单提交验证错误
     onBingException("org.springframework.validation.BindException") {
         @Override
-        public Object toMessage(Throwable ex) {
-            return ErrorUtil.forErrorsByBindingResult((BindException) ex);
-        }
+        public Object toMessage(Throwable ex) { return forErrorsByBindingResult((BindException) ex); }
     },
     // Hibernate-validator 验证错误
     onConstraintViolationException(ConstraintViolationException.class) {
@@ -56,7 +56,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
         @Override
         public Object toMessage(Throwable t) {
             MethodArgumentNotValidException e = (MethodArgumentNotValidException) t;
-            return ErrorUtil.forErrorsByBindingResult(e.getBindingResult());
+            return forErrorsByBindingResult(e.getBindingResult());
         }
     },
     onHttpMessageNotReadableException("org.springframework.http.converter.HttpMessageNotReadableException",
@@ -84,16 +84,16 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     onMalformedURLException(MalformedURLException.class, "URL格式错误：{}", 400),
     onNullPointerException(NullPointerException.class, "参数或内部数据错误(NPE): null."),
     ;
+
+    private final static transient SnowflakeLongIdentifier worker = SnowflakeLongIdentifier.of(29, 29);
+
+    public static String nextSerialAsString() {
+        return String.valueOf(worker.nextId());
+    }
+
     private final String classname;
     private final String text;
     private final int status;
-
-    private final static class Cached {
-
-        final static Map<String, RestExceptionEnum> CACHE = new HashMap<>();
-    }
-
-    static <T> ResponseEntity<T> returning400(T body) { return ResponseEntity.status(400).body(body); }
 
     RestExceptionEnum(Class type) { this(type, null); }
 
@@ -110,7 +110,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     RestExceptionEnum(String classname, String text) { this(classname, text, 500); }
 
     RestExceptionEnum(String classname, String text, int status) {
-        ExceptionCache.registry(this.classname = classname, this);
+        ExceptionService.doRegistry(this.classname = classname, this);
         this.status = status;
         this.text = text;
     }
@@ -124,7 +124,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     }
 
     public Object toMessage(Throwable throwable) {
-        return StringUtil.concat("[", WebError.nextSerialAsString(), "] ",
+        return StringUtil.concat("[", nextSerialAsString(), "] ",
 
             StringUtil.format(getConstMessage(), throwable.getMessage()));
     }
@@ -146,6 +146,6 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     public static RestExceptionHandler forType(Class type) { return forType(type.getName()); }
 
     public static RestExceptionHandler forType(String classname) {
-        return ExceptionCache.findRestExceptionHandler(classname);
+        return MvcExceptionUtil.getDefaultInstance().findRestExceptionHandler(classname);
     }
 }

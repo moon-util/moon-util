@@ -24,19 +24,7 @@ public final class SetUtil extends CollectUtil {
 
     public static <T> HashSet<T> newSet(int initCapacity) { return new HashSet<>(initCapacity); }
 
-    public static <T> HashSet<T> newSet(T value) { return add(newSet(), value); }
-
-    public static <T> HashSet<T> newSet(T value1, T value2) { return add(newSet(value1), value2); }
-
-    public static <T> HashSet<T> newSet(T value1, T value2, T value3) {
-        return add(newSet(value1, value2), value3);
-    }
-
     public static <T> HashSet<T> newSet(T... values) { return addAll(newSet(values.length), values); }
-
-    public static <T> HashSet<T> newSet(Collection<T> collect) {
-        return collect == null ? newSet() : new HashSet<>(collect);
-    }
 
     public static <T> HashSet<T> newSet(Iterable<T> iterable) {
         return iterable == null ? newSet() : (iterable instanceof Collection ? new HashSet((Collection) iterable) : addAll(
@@ -45,6 +33,32 @@ public final class SetUtil extends CollectUtil {
     }
 
     public static <T> HashSet<T> newSet(Iterator<T> iterator) { return addAll(newSet(), iterator); }
+
+    public static <T> HashSet<T> newHashSet() { return new HashSet<>(); }
+
+    public static <T> HashSet<T> newHashSet(int initCapacity) { return new HashSet<>(initCapacity); }
+
+    public static <T> HashSet<T> newHashSet(T value) { return add(newHashSet(), value); }
+
+    public static <T> HashSet<T> newHashSet(T value1, T value2) { return add(newHashSet(value1), value2); }
+
+    public static <T> HashSet<T> newHashSet(T value1, T value2, T value3) {
+        return add(newHashSet(value1, value2), value3);
+    }
+
+    public static <T> HashSet<T> newHashSet(T... values) { return addAll(newHashSet(values.length), values); }
+
+    public static <T> HashSet<T> newHashSet(Collection<T> collect) {
+        return collect == null ? newHashSet() : new HashSet<>(collect);
+    }
+
+    public static <T> HashSet<T> newHashSet(Iterable<T> iterable) {
+        return iterable == null ? newHashSet() : (iterable instanceof Collection ? new HashSet((Collection) iterable) : addAll(
+            newHashSet(),
+            iterable));
+    }
+
+    public static <T> HashSet<T> newHashSet(Iterator<T> iterator) { return addAll(newHashSet(), iterator); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -80,7 +94,9 @@ public final class SetUtil extends CollectUtil {
             iterable));
     }
 
-    public static <T> LinkedHashSet<T> newLinkedHashSet(Iterator<T> iterator) { return addAll(newLinkedHashSet(), iterator); }
+    public static <T> LinkedHashSet<T> newLinkedHashSet(Iterator<T> iterator) {
+        return addAll(newLinkedHashSet(), iterator);
+    }
 
     /*
      * ---------------------------------------------------------------------------------

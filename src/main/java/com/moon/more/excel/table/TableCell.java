@@ -18,9 +18,11 @@ interface TableCell {
     /**
      * rowIdx
      *
+     * @param rowIdxOffset 行偏移量
+     *
      * @return
      */
-    int getRowIdx();
+    int getRowIdx(int rowIdxOffset);
 
     /**
      * colIdx
@@ -53,11 +55,12 @@ interface TableCell {
     /**
      * 合并表头
      *
+     * @param rowIdxOffset 行索引偏移
      * @param sheet
      */
-    default void merge(Sheet sheet) {
+    default void merge(Sheet sheet, int rowIdxOffset) {
         if (getRowspan() > 1 || getColspan() > 1) {
-            sheet.addMergedRegion(ExcelUtil.region(getRowIdx(),
+            sheet.addMergedRegion(ExcelUtil.region(getRowIdx(rowIdxOffset),
 
                 getColIdx(), getRowspan(), getColspan()));
         }

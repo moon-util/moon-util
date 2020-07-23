@@ -126,7 +126,7 @@ final class HeadUtil {
         Table<Integer, Integer, TableHeaderCell> table, TableHeaderCell cell
     ) {
         int colIdx = cell.getColIdx();
-        int maxRowNum = cell.getRowIdx() + 1;
+        int maxRowNum = cell.getRowIdx(0) + 1;
         for (int rowIdx = 0; rowIdx < maxRowNum; rowIdx++) {
             TableHeaderCell prevRowCell = table.get(rowIdx, colIdx);
             if (prevRowCell.mergeRowsIfLikeCell(cell)) {
@@ -203,7 +203,7 @@ final class HeadUtil {
         public String getValue() { return title; }
 
         @Override
-        public int getRowIdx() { return rowIdx; }
+        public int getRowIdx(int rowIdxOffset) { return rowIdx + rowIdxOffset; }
 
         @Override
         public int getRowspan() { return rowspan; }

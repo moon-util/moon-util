@@ -76,7 +76,7 @@ final class TableProxy {
         }
     }
 
-    private void doOffsetCells(int offset, boolean fillSkipped) {
+    final void doOffsetCells(int offset, boolean fillSkipped) {
         if (fillSkipped) {
             RowFactory factory = this.rowFactory;
             int start = indexer.get();

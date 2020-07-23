@@ -36,19 +36,7 @@ public final class ListUtil extends CollectUtil {
         return list;
     }
 
-    public static <T> ArrayList<T> newList(T value) { return add(newList(), value); }
-
-    public static <T> ArrayList<T> newList(T value1, T value2) { return add(newList(value1), value2); }
-
-    public static <T> ArrayList<T> newList(T value1, T value2, T value3) {
-        return add(newList(value1, value2), value3);
-    }
-
     public static <T> ArrayList<T> newList(T... values) { return addAll(newList(values.length), values); }
-
-    public static <T> ArrayList<T> newList(Collection<? extends T> collect) {
-        return collect == null ? newList() : new ArrayList<>(collect);
-    }
 
     public static <T> ArrayList<T> newList(Iterable<? extends T> iterable) {
         return iterable == null ? newList() : (iterable instanceof Collection ? new ArrayList((Collection) iterable) : addAll(
@@ -57,6 +45,40 @@ public final class ListUtil extends CollectUtil {
     }
 
     public static <T> ArrayList<T> newList(Iterator<? extends T> iterator) { return addAll(newList(), iterator); }
+
+    public static <T> ArrayList<T> newArrayList() { return new ArrayList<>(); }
+
+    public static <T> ArrayList<T> newArrayList(int initCapacity) { return new ArrayList<>(initCapacity); }
+
+    public static <T> ArrayList<T> newArrayList(int capacity, IntFunction<? extends T> getter) {
+        ArrayList<T> list = newArrayList(capacity);
+        for (int i = 0; i < capacity; i++) {
+            list.add(getter.apply(i));
+        }
+        return list;
+    }
+
+    public static <T> ArrayList<T> newArrayList(T value) { return add(newArrayList(), value); }
+
+    public static <T> ArrayList<T> newArrayList(T value1, T value2) { return add(newArrayList(value1), value2); }
+
+    public static <T> ArrayList<T> newArrayList(T value1, T value2, T value3) {
+        return add(newArrayList(value1, value2), value3);
+    }
+
+    public static <T> ArrayList<T> newArrayList(T... values) { return addAll(newArrayList(values.length), values); }
+
+    public static <T> ArrayList<T> newArrayList(Collection<? extends T> collect) {
+        return collect == null ? newArrayList() : new ArrayList<>(collect);
+    }
+
+    public static <T> ArrayList<T> newArrayList(Iterable<? extends T> iterable) {
+        return iterable == null ? newArrayList() : (iterable instanceof Collection ? new ArrayList((Collection) iterable) : addAll(
+            newArrayList(),
+            iterable));
+    }
+
+    public static <T> ArrayList<T> newArrayList(Iterator<? extends T> iterator) { return addAll(newArrayList(), iterator); }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -129,6 +151,17 @@ public final class ListUtil extends CollectUtil {
      * @return empty ArrayList if null
      */
     public static <T> List<T> newIfNull(List<T> list) { return list == null ? newList() : list; }
+
+    /**
+     * 有时候操作的集合可能是{@link Collections#EMPTY_LIST}（某些方法要求返回值为集合是不能为 null）、{@link Arrays#asList(Object[])}
+     * 这些集合是不可变的，直接操作会报异常
+     *
+     * @param list 集合
+     * @param <T>  数据类型
+     *
+     * @return empty ArrayList if list is null
+     */
+    public static <T> List<T> newIfEmpty(List<T> list) { return list == null ? newList() : list; }
 
     /**
      * 确保返回集合不为 null

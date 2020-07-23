@@ -154,7 +154,14 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      */
     public void next(String value, int colspan) { next(value, 1, colspan); }
 
-    // 不提供 double 的 colspan 避免和 next(int, int) 歧义
+    /**
+     * 快速创建下一个单元格，并设置值
+     *
+     * @param value   单元格值
+     * @param colspan 合并单元格的数量
+     */
+    public void next(double value, int colspan) { next(value, 1, colspan); }
+
 
     /**
      * 快速创建下一个单元格，并设置值

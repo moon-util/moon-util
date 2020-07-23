@@ -66,9 +66,7 @@ public class ValidationUtil extends TestUtil {
      *
      * @return Map 验证器
      */
-    public final static <M extends Map<K, V>, K, V> MapValidator<M, K, V> ofMap(M map) {
-        return MapValidator.of(map);
-    }
+    public final static <M extends Map<K, V>, K, V> MapValidator<M, K, V> ofMap(M map) { return MapValidator.of(map); }
 
     /**
      * 对象多条件验证器
@@ -1021,6 +1019,43 @@ public class ValidationUtil extends TestUtil {
      */
     public final static <C extends CharSequence> C requirePlateNumber(C str, String message) {
         if (isPlateNumber(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
+     * 要求是否符合规范的中国纳税人识别号
+     *
+     * @param str 待测纳税人识别号字符串
+     * @param <C> 字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串（纳税人识别号）
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireTaxpayerCode(C str) {
+        if (isTaxpayerCode(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid plate number: " + str);
+    }
+
+    /**
+     * 要求是否符合规范的中国纳税人识别号
+     *
+     * @param str     待测纳税人识别号字符串
+     * @param message 自定义消息模板
+     * @param <C>     字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串（纳税人识别号）
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireTaxpayerCode(C str, String message) {
+        if (isTaxpayerCode(str)) {
             return str;
         }
         throw new RequireValidateException(message, str);

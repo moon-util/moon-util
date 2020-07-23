@@ -1,4 +1,4 @@
-package com.moon.spring.web.advice;
+package com.moon.spring.web.error;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.CollectUtil;

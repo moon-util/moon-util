@@ -28,8 +28,7 @@ public class ZipWriter {
     private final ThrowingRunnable entryCloser;
 
     public ZipWriter(OutputStream out) {
-        this.zipStream = out instanceof ZipOutputStream
-            ? (ZipOutputStream) out : new ZipOutputStream(out);
+        this.zipStream = out instanceof ZipOutputStream ? (ZipOutputStream) out : new ZipOutputStream(out);
         entryCloser = () -> zipStream.closeEntry();
     }
 
@@ -104,7 +103,13 @@ public class ZipWriter {
 
     private String formatAndEnsureEnds(String path) { return ensureEndsSep(formatPath(path)); }
 
-    private void closeEntry() { ThrowUtil.ignoreThrowsRun(entryCloser); }
+    private void closeEntry() {
+        try {
+            entryCloser.run();
+        } catch (Throwable t) {
+            // ignore
+        }
+    }
 
     private String ensureEndsSep(String path) { return isEnds(path) ? path : path + SEP; }
 

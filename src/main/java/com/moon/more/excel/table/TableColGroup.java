@@ -37,6 +37,7 @@ final class TableColGroup extends TableCol {
 
     @Override
     void appendColumnWidth(List<Integer> columnsWidth) {
+        super.appendOffsetWidth(columnsWidth);
         child.appendColumnWidth(columnsWidth);
     }
 
@@ -46,9 +47,9 @@ final class TableColGroup extends TableCol {
         int superRowsLength = super.getHeaderRowsLength();
         if (rowIdx < superRowsLength) {
             int colsCount = child.getHeaderColsCount();
-            int count = colsCount;
-            for (int i = 0; i < count; i++) {
-                super.appendTitlesAtRowIdx(rowTitles, rowIdx);
+            HeadCell headCell = headCellAtIdx(rowIdx);
+            for (int i = 0; i < colsCount; i++) {
+                rowTitles.add(headCell);
             }
         } else {
             child.appendTitlesAtRowIdx(rowTitles, rowIdx - superRowsLength);
@@ -58,6 +59,13 @@ final class TableColGroup extends TableCol {
     @Override
     void render(TableProxy proxy) {
         proxy.startLocalDataNode(getControl(), targetClass);
+        if (proxy.isSkipped()) {
+            proxy.skip(getOffset(), isFillSkipped());
+        } else if (getOffset() > 0) {
+            proxy.doOffsetCells(getOffset(), isFillSkipped());
+            // proxy.indexedCell(getOffset(), isFillSkipped());
+            // System.out.println();
+        }
         child.doRenderRow(proxy);
         proxy.closeLocalDataNode();
     }

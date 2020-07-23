@@ -75,25 +75,17 @@ interface Descriptor {
     /**
      * 读取值，不存在的话返回默认值
      *
-     * @param getter0 TableColumn getter
-     * @param getter1 TableColumnGroup getter
-     * @param dft     默认值
-     * @param <T>     返回值类型
+     * @param getter TableColumn getter
+     * @param dft    默认值
+     * @param <T>    返回值类型
      *
      * @return 获取的值
      */
     default <T> T getOrDefault(
-        Function<TableColumn, T> getter0, Function<TableColumnGroup, T> getter1, T dft
+        Function<TableColumn, T> getter, T dft
     ) {
         TableColumn column = getTableColumn();
-        if (column != null) {
-            return getter0.apply(column);
-        }
-        TableColumnGroup group = getTableColumnGroup();
-        if (group != null) {
-            return getter1.apply(group);
-        }
-        return dft;
+        return column == null ? dft : getter.apply(column);
     }
 
     /**
@@ -102,7 +94,7 @@ interface Descriptor {
      * @return 偏移的值
      */
     default int getOffsetVal() {
-        return getOrDefault(col -> col.offset(), grp -> grp.offset(), 0);
+        return getOrDefault(col -> col.offset(), 0);
     }
 
     /**
@@ -115,9 +107,7 @@ interface Descriptor {
      * @return
      */
     default int getOffsetHeadRows() {
-        return getOrDefault(col -> col.offsetHeadRows(),
-
-            grp -> grp.offsetHeadRows(), Integer.MAX_VALUE);
+        return getOrDefault(col -> col.offsetHeadRows(), Integer.MAX_VALUE);
     }
 
     /**
@@ -125,7 +115,7 @@ interface Descriptor {
      *
      * @return 偏移单元格
      */
-    default boolean getOffsetFillSkipped() { return true; }
+    default boolean isOffsetFillSkipped() { return true; }
 
     /**
      * 是否是组合列
@@ -135,16 +125,9 @@ interface Descriptor {
     default boolean isAnnotatedGroup() { return getTableColumnGroup() != null; }
 
     /**
-     * 是否是数据列
-     *
-     * @return true | false
-     */
-    default boolean isAnnotatedColumn() { return getTableColumn() != null; }
-
-    /**
      * 是否是标记列
      *
      * @return true | false
      */
-    default boolean isAnnotated() { return isAnnotatedGroup() || isAnnotatedColumn(); }
+    default boolean isAnnotated() { return getTableColumn() != null; }
 }

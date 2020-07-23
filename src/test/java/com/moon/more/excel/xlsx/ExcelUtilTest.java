@@ -83,19 +83,24 @@ class ExcelUtilTest {
 
     public static class Score {
 
-        @TableColumnGroup("语文")
+        @TableColumn("语文")
+        @TableColumnGroup
         private ScoreCompare chinese = new ScoreCompare();
 
-        @TableColumnGroup(value = {"数学"})
+        @TableColumn(value = {"数学"})
+        @TableColumnGroup
         private ScoreCompare math = new ScoreCompare();
 
-        @TableColumnGroup({"英语"})
+        @TableColumn({"英语"})
+        @TableColumnGroup
         private ScoreCompare english = new ScoreCompare();
 
-        @TableColumnGroup(value = {"物理"})
+        @TableColumn(value = {"物理"})
+        @TableColumnGroup
         private ScoreCompare score1 = new ScoreCompare();
 
-        @TableColumnGroup({"化学"})
+        @TableColumn({"化学"})
+        @TableColumnGroup
         private ScoreCompare score2 = new ScoreCompare();
 
         // @TableColumnOffset(1)
@@ -164,7 +169,8 @@ class ExcelUtilTest {
         // private Date now = new Date();
         // private LocalDateTime time = LocalDateTime.now();
 
-        @TableColumnGroup({"基本信息"})
+        @TableColumn({"基本信息"})
+        @TableColumnGroup
         private BasicInfo info = new BasicInfo();
 
         // @TableColumn
@@ -175,10 +181,12 @@ class ExcelUtilTest {
         @TableColumn(value = {"值", "纸质", "侄子", "侄子的侄子"}, offset = 2)
         private String value;
 
-        @TableColumnGroup({"得分情况"})
+        @TableColumn({"得分情况"})
+        @TableColumnGroup
         private Score score = new Score();
 
-        @TableColumnGroup(value = {"应发项目"}, rowsHeight4Head = {400, 800})
+        @TableColumn(value = {"应发项目"}, rowsHeight4Head = {400, 800})
+        @TableColumnGroup
         private FeeDetail detail;
 
         public Member() { this.detail = nextBoolean() ? new FeeDetail() : null; }

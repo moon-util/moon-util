@@ -56,7 +56,7 @@ public class FinalAccessor<T> implements Supplier<T> {
 
     public T getOrDefault(T defaultValue) { return isPresent() ? value : defaultValue; }
 
-    public T getOrDefault(Supplier<T> supplier) { return isPresent() ? value : supplier.get(); }
+    public T getOrElse(Supplier<T> supplier) { return isPresent() ? value : supplier.get(); }
 
     public T getOrThrow() { return Objects.requireNonNull(value); }
 
@@ -101,34 +101,13 @@ public class FinalAccessor<T> implements Supplier<T> {
         return this;
     }
 
-    public FinalAccessor<T> ifPresentOrThrow(Consumer<T> consumer) {
-        consumer.accept(Objects.requireNonNull(value));
-        return this;
-    }
-
-    public FinalAccessor<T> ifPresentOrThrow(Consumer<T> consumer, String message) {
-        consumer.accept(Objects.requireNonNull(value, message));
-        return this;
-    }
-
-    public <EX extends Throwable> FinalAccessor<T> ifPresentOrThrow(
-        Consumer<T> consumer, Supplier<EX> supplier
-    ) throws EX {
-        if (isPresent()) {
-            consumer.accept(value);
-        } else {
-            throw supplier.get();
-        }
-        return this;
-    }
-
     /*
      * ------------------------------------------------------------
      * computer
      * ------------------------------------------------------------
      */
 
-    public T replaceAs(T newValue) {
+    public T replaceOf(T newValue) {
         T value = get();
         set(newValue);
         return value;

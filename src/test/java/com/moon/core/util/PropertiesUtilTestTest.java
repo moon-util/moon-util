@@ -1,7 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.enums.Testers;
-import com.moon.core.lang.ThrowUtil;
+import com.moon.spring.annotation.verify.VerifyIdempotent;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -31,7 +31,7 @@ class PropertiesUtilTestTest {
 
     @Test
     void testGet() {
-        ThrowUtil.ignoreThrowsRun(() -> {
+        ThrowUtils.ignoreThrowsRun(() -> {
             Map map = PropertiesUtil.get(path);
             assertNull(map);
             assertTrue(map.size() > 0);
@@ -39,8 +39,9 @@ class PropertiesUtilTestTest {
     }
 
     @Test
+    @VerifyIdempotent
     void testGetString() {
-        ThrowUtil.ignoreThrowsRun(() -> {
+        ThrowUtils.ignoreThrowsRun(() -> {
             String email = PropertiesUtil.getString(path, "email.host");
             String email1 = PropertiesUtil.getString(path, "email.host1");
             assertNotNull(email);

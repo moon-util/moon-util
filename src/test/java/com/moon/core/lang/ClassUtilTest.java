@@ -1,10 +1,9 @@
 package com.moon.core.lang;
 
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -13,19 +12,20 @@ import java.util.Set;
  */
 public class ClassUtilTest {
 
-    interface Interface0 {
+    @Test
+    void testGetShortName() throws Exception {
+        System.out.println(ClassUtil.getShortName(getClass()));
     }
 
-    interface Interface1 extends Interface0 {
-    }
+    interface Interface0 {}
 
-    abstract static class Class0 implements Interface1 {
-    }
+    interface Interface1 extends Interface0 {}
 
-    abstract static class Class1 extends Class0 {
-    }
+    abstract static class Class0 implements Interface1 {}
 
-    @org.junit.Test
+    abstract static class Class1 extends Class0 {}
+
+    @Test
     public void testGetAllInterfaces() {
         Set<Class> interfaces = ClassUtil.getAllInterfaces(Class1.class);
         Assertions.assertTrue(interfaces.contains(Interface0.class));
@@ -40,9 +40,9 @@ public class ClassUtilTest {
         System.out.println(interfaces);
     }
 
-    @org.junit.Test
+    @Test
     public void testGetAllSuperclasses() {
-        ClassUtil.WRAPPER_TO_PRIMITIVE_MAP.forEach((key,value)->{
+        ClassUtil.WRAPPER_TO_PRIMITIVE_MAP.forEach((key, value) -> {
             // System.out.println(key);
             // System.out.println(value);
             Assertions.assertFalse(key.isAssignableFrom(value));
@@ -52,31 +52,31 @@ public class ClassUtilTest {
         // System.out.println(ClassUtil.getAllSuperclasses(List.class));
     }
 
-    @org.junit.Test
+    @Test
     public void testIsAssignableFrom() {
     }
 
-    @org.junit.Test
+    @Test
     public void testIsInstanceOf() {
     }
 
-    @org.junit.Test
+    @Test
     public void testIsInnerClass() {
     }
 
-    @org.junit.Test
+    @Test
     public void testGetClasses() {
     }
 
-    @org.junit.Test
+    @Test
     public void testToWrapperClass() {
     }
 
-    @org.junit.Test
+    @Test
     public void testToPrimitiveClass() {
     }
 
-    @org.junit.Test
+    @Test
     public void testForName() {
     }
 }

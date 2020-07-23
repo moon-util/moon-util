@@ -45,7 +45,7 @@ final class Marked<T extends Member> implements Descriptor {
 
         this.annotationColumn = obtain(member, TableColumn.class);
         this.annotationGroup = obtain(member, TableColumnGroup.class);
-        Assert.notDuplicated(this);
+        // Assert.notDuplicated(this);
     }
 
     public T getMember() { return member; }
@@ -63,16 +63,16 @@ final class Marked<T extends Member> implements Descriptor {
 
     @Override
     public String[] getTitles() {
-        return getOrDefault(col -> col.value(), grp -> grp.value(), null);
+        return getOrDefault(col -> col.value(), null);
     }
 
     @Override
     public short[] getHeadHeightArr() {
-        return getOrDefault(col -> col.rowsHeight4Head(), grp -> grp.rowsHeight4Head(), DEFAULT_HEIGHT_ARR);
+        return getOrDefault(col -> col.rowsHeight4Head(), DEFAULT_HEIGHT_ARR);
     }
 
     @Override
-    public Integer getColumnWidth() { return isAnnotatedColumn() ? getTableColumn().width() : null; }
+    public Integer getColumnWidth() { return isAnnotated() ? getTableColumn().width() : null; }
 
     @Override
     public String getName() { return name; }

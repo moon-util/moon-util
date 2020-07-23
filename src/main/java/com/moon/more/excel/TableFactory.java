@@ -1,5 +1,6 @@
 package com.moon.more.excel;
 
+import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.more.excel.annotation.TableColumn;
 import com.moon.more.excel.annotation.TableColumnGroup;
@@ -26,7 +27,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
 
         = renderer -> renderer.renderHead(end());
 
-    private final HeadRenderer EMPTY = r -> {};
+    private final static HeadRenderer EMPTY = r -> {};
 
     /**
      * 当前正在操作的 sheet 表
@@ -162,6 +163,9 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         }
         if (collect instanceof Stream) {
             return renderAll((Stream) collect, targetClass);
+        }
+        if (collect.getClass().isArray()) {
+            return renderAll(ArrayUtil.toObjectArray(collect), targetClass);
         }
         throw new UnsupportedOperationException("不支持集合类型：" + collect.getClass());
     }

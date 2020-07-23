@@ -3,6 +3,8 @@ package com.moon.core.enums;
 import com.moon.core.util.RequireValidateException;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
+import com.moon.more.validator.annotation.RequirePatternOf;
+import com.moon.more.validator.annotation.RequireTesterOf;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -16,6 +18,8 @@ import static java.lang.Character.isWhitespace;
  *
  * @author moonsky
  * @see Testers 用来检查对象是否符合要求
+ * @see RequireTesterOf 可用于 hibernate-validator 验证
+ * @see RequirePatternOf 可用于 hibernate-validator 验证
  */
 public enum Patterns implements Predicate<CharSequence> {
     /**
@@ -35,7 +39,15 @@ public enum Patterns implements Predicate<CharSequence> {
      */
     LETTER(Pattern.compile("[a-zA-Z]+")),
     /**
-     * 18位，居民身份证号
+     * ASCII 编码(0 ~ 127)
+     */
+    ASCII(Pattern.compile("[\u0000-\007F]+")),
+    /**
+     * UNICODE 编码(0 ~ 65535)
+     */
+    UNICODE(Pattern.compile("[\u0000-\uFFFF]+")),
+    /**
+     * 18位，居民身份证号（这里允许了末尾大写和小写“X”，实际中正确的只有大写）
      */
     RESIDENT_ID_18(Pattern.compile("[1-9]\\d{5}[1-2]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}(\\d|X|x)")),
     /**
@@ -44,6 +56,9 @@ public enum Patterns implements Predicate<CharSequence> {
     CHINESE_WORDS(Pattern.compile("[\u4E00-\u9FAF]+")),
     /**
      * 中国大陆手机号
+     * <p>
+     * 14xxxxxxxxx: 通常是网卡
+     * 17xxxxxxxxx: 通常是虚拟运营商
      */
     CHINESE_MOBILE(Pattern.compile("(?:0|86|\\+86)?1[3456789]\\d{9}")) {
         @Override
@@ -100,11 +115,11 @@ public enum Patterns implements Predicate<CharSequence> {
     /**
      * RGB 6位色号
      */
-    RGB_COLOR6(Pattern.compile("^#[0-9a-f]{6}$", Pattern.CASE_INSENSITIVE)),
+    RGB_COLOR6(Pattern.compile("^#[0-9a-fA-F]{6}$")),
     /**
      * RGB 3位色号
      */
-    RGB_COLOR3(Pattern.compile("^#[0-9a-f]{3}$", Pattern.CASE_INSENSITIVE)),
+    RGB_COLOR3(Pattern.compile("^#[0-9a-fA-F]{3}$")),
     /**
      * 日期校验
      */
@@ -113,6 +128,11 @@ public enum Patterns implements Predicate<CharSequence> {
      * 时间校验
      */
     TIME(Pattern.compile("^(\\d{1,2}:\\d{1,2}(:\\d{1,2})?)|(\\d{1,2}时\\d{1,2}分(\\d{1,2}秒)?)$")),
+    /**
+     * 纳税人识别号
+     * Ref: http://www.qilin668.com/a/5e78a58c99d3cl5.html
+     */
+    TAXPAYER_CODE(Pattern.compile("^[0-9A-HJ-NPQRTUWXY]{2}\\d{6}[0-9A-HJ-NPQRTUWXY]{10}$")),
     ;
 
     private final static class Cached {
@@ -122,7 +142,12 @@ public enum Patterns implements Predicate<CharSequence> {
 
     private final Pattern pattern;
 
-    Patterns(Pattern pattern) { this.pattern = pattern; }
+    public final Predicate not;
+
+    Patterns(Pattern pattern) {
+        this.pattern = pattern;
+        this.not = this.negate();
+    }
 
     /**
      * 获取当前{@code Pattern}

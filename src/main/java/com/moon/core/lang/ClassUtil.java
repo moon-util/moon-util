@@ -1,5 +1,6 @@
 package com.moon.core.lang;
 
+import com.moon.core.enums.Chars;
 import com.moon.core.lang.support.ClassSupport;
 import com.moon.core.util.SetUtil;
 
@@ -77,9 +78,7 @@ public final class ClassUtil {
      *
      * @return 父类集合
      */
-    public static List<Class> getAllSuperclasses(Class type) {
-        return getAllSuperclasses(type, null);
-    }
+    public static List<Class> getAllSuperclasses(Class type) { return getAllSuperclasses(type, null); }
 
     /**
      * 获取类继承的所有父类集合(只包含类，不包含接口)
@@ -200,7 +199,78 @@ public final class ClassUtil {
         }
     }
 
-    public static final <T> Class<T> requireExtendBy(Class<T> type, Class expectType) {
+    /**
+     * 获取类全名
+     *
+     * @param type 目标类
+     *
+     * @return 类全名
+     */
+    public static String getFullName(Class type) { return type.getName(); }
+
+    /**
+     * 获取类简单名称
+     *
+     * @param type 目标类
+     *
+     * @return 简单名称
+     */
+    public static String getSimpleName(Class type) { return type.getSimpleName(); }
+
+    /**
+     * 获取短名称，如：
+     * com.moon.core.lang.ClassUtil  =>  c.m.c.l.ClassUtil
+     *
+     * @param type 目标类
+     *
+     * @return 类的短名称
+     */
+    public static String getShortName(Class type) {
+        final String name = type.getName();
+        final int totalLength = name.length();
+        final char dot = Chars.DOT.value;
+        final StringBuilder builder = new StringBuilder();
+        int beginIndex = 0;
+        int index = name.indexOf(dot, beginIndex);
+        while (index >= 0) {
+            builder.append(name.charAt(beginIndex)).append(dot);
+            beginIndex = index + 1;
+            index = name.indexOf(dot, beginIndex);
+        }
+        builder.append(name, beginIndex, totalLength);
+        return builder.toString();
+    }
+
+    /**
+     * 获取短名称，如：
+     * com.moon.core.lang.ClassUtil  =>  c.m.c.l.ClassUtil
+     * <p>
+     * minLength 获取到的短名称不会短于这个长度，如果类全名比最短长度短，则会添加空格前缀：
+     * com.moon.core.lang.ClassUtil  =>  c.m.c.lang.ClassUtil
+     *
+     * @param type      目标类
+     * @param minLength 期望长度
+     *
+     * @return
+     */
+    private static String getShortName(Class type, int minLength) {
+        String name = type.getName();
+        int totalLength = name.length();
+        StringBuilder builder = new StringBuilder(totalLength);
+        // TODO 待实现
+        return null;
+    }
+
+    /**
+     * 要求待测类必须继承自另一个类
+     *
+     * @param type       待测类
+     * @param expectType 目标类
+     * @param <T>
+     *
+     * @return 如果待测类继承自另一个类，返回待测类
+     */
+    public static final <T> Class<T> requireExtendOf(Class<T> type, Class expectType) {
         if (!expectType.isAssignableFrom(type)) {
             throw new IllegalArgumentException(String.valueOf(type));
         }

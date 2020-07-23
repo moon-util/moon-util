@@ -25,7 +25,6 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * row 工厂
      */
     private final RowFactory factory;
-    private final TableFactory tableFactory;
     private final TemplateFactory templateFactory;
     /**
      * 当前正在操作的 sheet 表
@@ -41,7 +40,6 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     public SheetFactory(WorkbookProxy proxy, WorkbookFactory parent) {
         super(proxy, parent);
         factory = new RowFactory(proxy, this);
-        tableFactory = new TableFactory(proxy, this);
         templateFactory = new TemplateFactory(proxy, this);
     }
 
@@ -104,6 +102,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @param columnIndexes  索引列列表
      *
      * @return 当前 SheetFactory
+     *
+     * @see Sheet#autoSizeColumn(int, boolean)
      */
     public SheetFactory columnsAutoWidth(boolean useMergedCells, int... columnIndexes) {
         if (columnIndexes != null) {
@@ -121,6 +121,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @param columnIndexes 索引列列表
      *
      * @return 当前 SheetFactory
+     *
+     * @see Sheet#autoSizeColumn(int)
      */
     public SheetFactory columnsAutoWidth(int... columnIndexes) {
         if (columnIndexes != null) {
@@ -196,34 +198,11 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
         return this;
     }
 
-    /**
-     * 使用并操作指定行，如果不存在则创建
-     *
-     * @param rowIndex 指定行号
-     * @param consumer 操作器
-     *
-     * @return 当前 SheetFactory
+    /*
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * create row & handle current row
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
-    public SheetFactory useRow(int rowIndex, Consumer<RowFactory> consumer) {
-        return useRow(rowIndex, DFT_APPEND_TYPE, consumer);
-    }
-
-    /**
-     * 使用并操作指定行，如果不存在则创建
-     *
-     * @param rowIndex 指定行号
-     * @param append   如果指定行存在，并且有数据，操作方式是采取追加数据还是覆盖数据；
-     *                 true: 追加新数据（默认）
-     *                 false: 覆盖旧数据
-     * @param consumer 操作器
-     *
-     * @return 当前 SheetFactory
-     */
-    public SheetFactory useRow(int rowIndex, boolean append, Consumer<RowFactory> consumer) {
-        factory.setRow(proxy.useOrCreateRow(rowIndex, append));
-        consumer.accept(getRowFactory());
-        return this;
-    }
 
     /**
      * 创建下一行并设置为当前操作行
@@ -282,6 +261,34 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * 使用并操作指定行，如果不存在则创建
      *
      * @param rowIndex 指定行号
+     * @param consumer 操作器
+     *
+     * @return 当前 SheetFactory
+     */
+    public SheetFactory useRow(int rowIndex, Consumer<RowFactory> consumer) {
+        return useRow(rowIndex, DFT_APPEND_TYPE, consumer);
+    }
+
+    /**
+     * 使用并操作指定行，如果不存在则创建
+     *
+     * @param rowIndex 指定行号
+     * @param append   如果指定行存在，并且有数据，操作方式是采取追加数据还是覆盖数据；
+     *                 true: 追加新数据（默认）
+     *                 false: 覆盖旧数据
+     * @param consumer 操作器
+     *
+     * @return 当前 SheetFactory
+     */
+    public SheetFactory useRow(int rowIndex, boolean append, Consumer<RowFactory> consumer) {
+        consumer.accept(useRow(rowIndex, append));
+        return this;
+    }
+
+    /**
+     * 使用并操作指定行，如果不存在则创建
+     *
+     * @param rowIndex 指定行号
      *
      * @return 行操作器
      */
@@ -314,13 +321,17 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @see TableColumn at field or method
      * @see TableColumnGroup at field or method
-     * @see TableListable at field or method if present {@link TableColumn} or {@link TableColumnGroup}
      * @see TableIndexer at field or method if present {@link TableColumn} or {@link TableColumnGroup}
      * @see TableRecord at type
      */
     public SheetFactory table(Consumer<TableFactory> consumer) {
-        tableFactory.setSheet(getSheet());
-        consumer.accept(tableFactory);
+        TableFactory factory = new TableFactory(proxy, this);
+        factory.setSheet(getSheet());
+        consumer.accept(factory);
+        return this;
+    }
+
+    private SheetFactory table(int rowIndex, int colIndex) {
         return this;
     }
 

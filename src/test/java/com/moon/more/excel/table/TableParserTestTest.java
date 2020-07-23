@@ -60,10 +60,12 @@ class TableParserTestTest {
 
         private EmpBasicInfo basicInfo;
 
-        @TableColumnGroup({"学生信息"})
+        @TableColumn({"学生信息"})
+        @TableColumnGroup()
         private Student student;
 
-        @TableColumnGroup(value = {"基本信息"}, order = -1)
+        @TableColumn({"基本信息"})
+        @TableColumnGroup
         public EmpBasicInfo getBasicInfo() {
             return basicInfo;
         }
@@ -99,7 +101,7 @@ class TableParserTestTest {
         @TableColumn(value = {"地址"}, order = 2)
         private String address;
 
-        @TableColumnGroup(value = "各科成绩", order = 1)
+        @TableColumnGroup
         private Score score;
     }
 

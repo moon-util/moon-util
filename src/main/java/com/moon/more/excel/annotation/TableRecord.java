@@ -37,11 +37,11 @@ public @interface TableRecord {
      * <p>
      * 引入的样式包括（设引入的另一个类为{@code StyleClass}）：
      * <pre>
-     * 1. 直接定义在类{@code StyleClass}上的{@code DefinitionStyle}（1 和 2 是相同优先级）；
-     * 2. 定义在类{@code StyleClass}#{@link #styles()}里的{@code DefinitionStyle}；
-     * 3. 定义在{@code StyleClass} 字段或{@code getter} 上并且主动设置{@link DefinitionStyle#classname()}的样式；
-     * 4. 如果{@code StyleClass} 也定义了{@code importStyles}，那么也会按优先级关系引入；
-     * 5. {@code StyleClass} 内部通过{@link TableColumnGroup} 形成的父子关系的样式不会引入；
+     * 1. 直接定义在类上的{@code DefinitionStyle}（1 和 2 是相同优先级）；
+     * 2. 定义在类#{@link #styles()}里的{@code DefinitionStyle}；
+     * 3. 定义在字段或{@code getter} 上并且主动设置{@link DefinitionStyle#classname()}的样式；
+     * 4. 如果也定义了{@code importStyles}，那么也会按优先级关系引入；
+     * 5. 内部通过{@link TableColumnGroup} 形成的父子关系的样式不会引入；
      * </pre>
      *
      * @return

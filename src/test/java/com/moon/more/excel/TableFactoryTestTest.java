@@ -67,37 +67,18 @@ class TableFactoryTestTest {
             return null;
         }
 
-        @FieldTransform(TypeTransformer.class)
         @TableColumn(value = {"交通工具"})
         public String getType() {
             return null;
         }
 
-        @FieldTransform(SexTransformer.class)
         @TableColumn(value = {"性别"})
         public String getSex() {
             return null;
         }
 
-        public class SexTransformer implements FieldTransformer {
-
-            @Override
-            public Object transform(Object fieldValue) {
-                if (User.this.age > 25) {
-                    return "男";
-                }
-                return "女";
-            }
-        }
     }
 
-    public static class TypeTransformer implements FieldTransformer {
-
-        @Override
-        public Object transform(Object fieldValue) {
-            return "公共汽车";
-        }
-    }
 
     @Test
     @Disabled

@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Stream;
 
 import static com.moon.core.io.FileUtil.getInputStream;
 import static com.moon.core.lang.ThrowUtil.runtime;
@@ -317,6 +318,16 @@ public final class IteratorUtil {
     public static <T> Iterator<T> of(Iterable<T> iterable) { return iterable == null ? EMPTY : iterable.iterator(); }
 
     /**
+     * 流迭代器
+     *
+     * @param stream 流
+     * @param <T>    数据类型
+     *
+     * @return 迭代器
+     */
+    public static <T> Iterator<T> of(Stream<T> stream) { return stream == null ? EMPTY : stream.iterator(); }
+
+    /**
      * 返回 Map 集合迭代器
      *
      * @param map
@@ -408,6 +419,8 @@ public final class IteratorUtil {
             return;
         } else if (data instanceof ResultSet) {
             forEach((ResultSet) data, consumer);
+        } else if (data instanceof Stream) {
+            forEach((Stream) data, consumer);
         } else {
             Class type = data.getClass();
             if (type.isArray()) {
@@ -429,8 +442,9 @@ public final class IteratorUtil {
     public static void forEachFields(Object bean, BiIntConsumer consumer) {
         if (bean != null) {
             IntAccessor indexer = IntAccessor.of();
-            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass()).forEach(
-                (name, desc) -> consumer.accept(desc.getValueIfPresent(bean, true), indexer.getAndIncrement()));
+            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass())
+                .forEach((name, desc) -> consumer.accept(desc.getValueIfPresent(bean, true),
+                    indexer.getAndIncrement()));
         }
     }
 
@@ -688,8 +702,45 @@ public final class IteratorUtil {
         if (iterator != null) { iterator.forEachRemaining(consumer); }
     }
 
+    /**
+     * 遍历处理迭代器，包含索引
+     *
+     * @param iterator 迭代器
+     * @param consumer 处理器
+     * @param <T>      数据类型
+     */
     public static <T> void forEach(Iterator<T> iterator, BiIntConsumer<? super T> consumer) {
-        if (iterator != null) { for (int i = 0; iterator.hasNext(); i++) { consumer.accept(iterator.next(), i); } }
+        if (iterator != null) {
+            for (int i = 0; iterator.hasNext(); i++) {
+                consumer.accept(iterator.next(), i);
+            }
+        }
+    }
+
+    /**
+     * 遍历处理迭代流
+     *
+     * @param stream   流
+     * @param consumer 处理器
+     * @param <T>      数据类型
+     */
+    public static <T> void forEach(Stream<T> stream, Consumer<T> consumer) {
+        if (stream != null) {
+            forEach(stream.iterator(), consumer);
+        }
+    }
+
+    /**
+     * 遍历处理流，可获得索引
+     *
+     * @param stream   流
+     * @param consumer 处理器
+     * @param <T>      数据类型
+     */
+    public static <T> void forEach(Stream<T> stream, BiIntConsumer<T> consumer) {
+        if (stream != null) {
+            forEach(stream.iterator(), consumer);
+        }
     }
 
     /**

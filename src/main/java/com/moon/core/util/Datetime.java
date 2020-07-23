@@ -205,9 +205,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @see Month
      */
-    public DatetimeMonth getMonthOfYear() {
-        return DatetimeMonth.of(getMonthValue());
-    }
+    public DatetimeMonth getMonthOfYear() { return DatetimeMonth.of(getMonthValue()); }
 
     /**
      * 返回当前是一年中的第 N 个星期
@@ -382,7 +380,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 字段值
      */
-    public int getField(DatetimeField field) { return getField(field.value); }
+    public int getField(DatetimeField field) { return get(field.value); }
 
     /**
      * 获取指定字段值
@@ -391,7 +389,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 字段值
      */
-    public int getField(int field) {
+    public int get(int field) {
         return field == Calendar.MONTH ? obtainCalendar().get(field) + 1 : obtainCalendar().get(field);
     }
 
@@ -1178,9 +1176,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
                 case MONTH_OF_YEAR:
                     return getMonthValue();
                 case ERA:
-                    return getField(Calendar.ERA);
+                    return get(Calendar.ERA);
                 case AMPM_OF_DAY:
-                    return getField(Calendar.AM_PM);
+                    return get(Calendar.AM_PM);
                 case MINUTE_OF_HOUR:
                     return getMinuteOfHour();
                 case MINUTE_OF_DAY:
@@ -1192,7 +1190,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
                 case MILLI_OF_SECOND:
                     return getMillisOfSecond();
                 case HOUR_OF_AMPM:
-                    return getField(Calendar.HOUR);
+                    return get(Calendar.HOUR);
                 case MILLI_OF_DAY:
                     return getMillisOfDay();
                 case NANO_OF_SECOND:

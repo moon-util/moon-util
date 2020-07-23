@@ -1,14 +1,16 @@
 package com.moon.core.lang;
 
+import com.moon.core.enums.Systems;
 import com.moon.core.util.CollectUtil;
+import com.moon.core.util.ListUtil;
 import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.TableIntFunction;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -545,6 +547,36 @@ public final class ArrayUtil {
     public static Float[] toObjects(float[] value) { return transformArray(value, Float[]::new); }
 
     public static Double[] toObjects(double[] value) { return transformArray(value, Double[]::new); }
+
+    public static Object[] toObjectArray(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value.getClass().isArray()) {
+            int length = Array.getLength(value);
+            Object[] result = new Object[length];
+            System.arraycopy(value, 0, result, 0, length);
+            return result;
+        }
+        Collection collect = null;
+        if (value instanceof Iterable) {
+            if (value instanceof Collection) {
+                collect = (Collection) value;
+            } else {
+                collect = ListUtil.newList((Iterable) value);
+            }
+        } else if (value instanceof Iterator) {
+            collect = ListUtil.newList((Iterator) value);
+        } else if (value instanceof Stream) {
+            collect = (Collection) ((Stream) value).collect(Collectors.toList());
+        }
+        if (collect != null) {
+            return CollectUtil.toArray(collect, Object[]::new);
+        }
+        Object[] objects = new Object[1];
+        objects[0] = value;
+        return objects;
+    }
 
     private static <T> T transformArray(Object value, IntFunction<T> creator) {
         if (value == null) { return null; }

@@ -1,13 +1,15 @@
 package com.moon.core.mail;
 
+import com.moon.core.lang.MoonUtil;
+import com.moon.core.lang.ThrowUtil;
+import com.moon.core.util.concurrent.SynchronizationFuture;
 import com.sun.mail.util.MailSSLSocketFactory;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
+import javax.mail.*;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.*;
 
 /**
  * @author moonsky
@@ -26,6 +28,8 @@ public class EmailAccount implements Cloneable {
     private boolean SSLEncrypt;
 
     private Properties properties;
+
+    private ExecutorService service;
 
     /******************** constructor ******************************************************/
 
@@ -124,13 +128,38 @@ public class EmailAccount implements Cloneable {
         return this;
     }
 
+    public void setService(ExecutorService service) {
+        this.service = service;
+    }
+
+    Future<?> send(Message message, ExecutorService service, boolean sync) {
+        Runnable runner = () -> {
+            try {
+                Transport.send(message);
+            } catch (MessagingException e) {
+                ThrowUtil.unchecked(e);
+            }
+        };
+        if (sync) {
+            runner.run();
+            return new SynchronizationFuture<>();
+        } else {
+            ExecutorService sender = service == null ? this.service : service;
+            if (sender == null) {
+                return MoonUtil.run(runner);
+            } else {
+                return sender.submit(runner);
+            }
+        }
+    }
+
     /******************** getter and setter end **************************************************/
 
     public Email newEmail() {
         return Email.of(this);
     }
 
-    public EmailInbox inbox() {
+    private EmailInbox inbox() {
         return EmailInbox.of(this);
     }
 
@@ -170,6 +199,7 @@ public class EmailAccount implements Cloneable {
     }
 
     private static class EmailAccountAuthentication extends Authenticator {
+
         private String username;
         private String password;
 
@@ -195,8 +225,7 @@ public class EmailAccount implements Cloneable {
 
     @Override
     public EmailAccount clone() {
-        return new EmailAccount(
-            this.getHost(),
+        return new EmailAccount(this.getHost(),
             this.getUsername(),
             this.getPassword(),
             this.getTimeout(),

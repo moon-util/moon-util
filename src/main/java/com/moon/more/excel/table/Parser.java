@@ -20,12 +20,12 @@ final class Parser<T extends Marked> {
 
     private final static Map<Class, TableRenderer> parsed = new WeakHashMap<>();
 
-    final static TableRenderer cache(Class type, TableRenderer renderer) {
-        parsed.put(type, renderer);
+    final static synchronized TableRenderer cache(Class type, TableRenderer renderer) {
+        parsed.putIfAbsent(type, renderer);
         return renderer;
     }
 
-    private final static synchronized TableRenderer getCached(Class type) { return parsed.get(type); }
+    private final static TableRenderer getCached(Class type) { return parsed.get(type); }
 
     Parser(Creator creator) { this.creator = creator; }
 
@@ -45,7 +45,10 @@ final class Parser<T extends Marked> {
             parseDescriptors(type, annotatedAtM, unAnnotatedAtM);
             parseFields(type, annotatedAtF, unAnnotatedAtF);
 
-            Map<String, Attribute> annotated = ParserUtil.merge2Attr(annotatedAtM, annotatedAtF);
+            Map<String, Attribute> annotated = ParserUtil.merge2Attr(annotatedAtM,
+                annotatedAtF,
+                unAnnotatedAtM,
+                unAnnotatedAtF);
             Map<String, Attribute> unAnnotated = ParserUtil.merge2Attr(unAnnotatedAtM, unAnnotatedAtF);
 
             return toRendererResultAndCache(type, annotated, unAnnotated);
@@ -68,13 +71,16 @@ final class Parser<T extends Marked> {
         return cache(type, renderer);
     }
 
-    private TableRenderer toResultByAnnotated(Class type, Map<String, Attribute> annotated) {
+    private TableRenderer toResultByAnnotated(
+        Class type, Map<String, Attribute> annotated
+    ) {
         return ParserUtil.mapAttrs(type, annotated, config -> {
             Attribute attr = config.getAttribute();
             Class targetClass = attr.getPropertyType();
 
             if (attr.isAnnotatedGroup()) {
-                TableRenderer renderer = doParseConfiguration(targetClass);
+                Class cls = attr.getTableColumnGroup().targetClass();
+                TableRenderer renderer = doParseConfiguration(cls == Void.class ? targetClass : cls);
                 return new TableColGroup(config, renderer);
             }
 
@@ -93,7 +99,7 @@ final class Parser<T extends Marked> {
     }
 
     private static TableRenderer toResultByUnAnnotated(Class type, Map<String, Attribute> unAnnotated) {
-        return ParserUtil.mapAttrs(type, unAnnotated, TableCol::new);
+        return ParserUtil.mapAttrsIfUnAnnotated(type, unAnnotated, TableCol::new);
     }
 
     private void parseDescriptors(Class type, Map annotated, Map unAnnotated) throws IntrospectionException {

@@ -159,6 +159,7 @@ final class TableRenderer implements Renderer {
     public void renderHead(SheetFactory sheetFactory) {
         Sheet sheet = sheetFactory.getSheet();
         List<HeaderCell>[] headerCells = this.headerCells;
+        final int rowIdx = sheetFactory.getRowNum();
         for (List<HeaderCell> rowCells : headerCells) {
             RowFactory factory = sheetFactory.row();
             for (HeaderCell cell : rowCells) {
@@ -171,7 +172,7 @@ final class TableRenderer implements Renderer {
                     factory.index(cell.getColIdx()).val(cell.getValue());
                 }
                 // 合并表头单元格
-                cell.merge(sheet);
+                cell.merge(sheet, rowIdx);
             }
             // maxHeight(factory, rowCells);
         }
@@ -194,19 +195,6 @@ final class TableRenderer implements Renderer {
         doRenderBody1(sheetFactory, iterator, first);
     }
 
-    private void doRenderBody0(SheetFactory sheetFactory, Iterator iterator, Object first) {
-        IntAccessor indexer = IntAccessor.of();
-        if (first != null) {
-            indexer.set(0);
-            renderRecord(indexer, sheetFactory, first);
-        }
-        if (iterator != null) {
-            while (iterator.hasNext()) {
-                renderRecord(indexer, sheetFactory, iterator.next());
-            }
-        }
-    }
-
     private void doRenderBody1(SheetFactory sheetFactory, Iterator iterator, Object first) {
         TableProxy proxy = new TableProxy(sheetFactory, definitions, depth);
         if (first != null) {
@@ -223,18 +211,6 @@ final class TableRenderer implements Renderer {
         proxy.setRowData(data, targetClass);
         proxy.nextRow();
         doRenderRow(proxy);
-    }
-
-    /**
-     * 渲染一条记录
-     *
-     * @param sheetFactory 如参
-     * @param record       集合中的一条数据
-     */
-    private void renderRecord(IntAccessor indexer, SheetFactory sheetFactory, Object record) {
-        RowFactory row = sheetFactory.row();
-        doRenderRow(indexer, row, record);
-        row.style("header");
     }
 
     final void doRenderRow(TableProxy proxy) {

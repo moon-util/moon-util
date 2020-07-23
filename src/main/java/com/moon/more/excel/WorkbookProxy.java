@@ -165,8 +165,6 @@ public final class WorkbookProxy {
 
     WorkbookType getWorkbookType() { return type; }
 
-    // int currentIndexOfCell() { return indexOfCell; }
-
     /*
      sheet
      */
@@ -179,7 +177,12 @@ public final class WorkbookProxy {
     }
 
     Sheet setSheet(Sheet sheet, boolean appendRow) {
-        return appendRow ? setSheet(sheet, sheet.getLastRowNum() + 1) : setSheet(sheet, 0);
+        if (appendRow) {
+            int lastRowIdx = sheet.getLastRowNum();
+            // return setSheet(sheet, lastRowIdx == 0 ? 0 : lastRowIdx + 1);
+            return setSheet(sheet, lastRowIdx);
+        }
+        return setSheet(sheet, 0);
     }
 
     Sheet getSheet() { return sheet; }
@@ -204,17 +207,11 @@ public final class WorkbookProxy {
         }
     }
 
-    // Sheet useSheet() { return useSheet(null); }
-
     Sheet useSheet(String sheetName) { return useSheet(sheetName, DEFAULT_APPEND_DATA); }
-
-    // Sheet useSheet(int index) { return useSheet(index, DEFAULT_APPEND_DATA); }
 
     /*
      row
      */
-
-    // int getIndexOfRow() { return indexOfRow; }
 
     int nextIndexOfRow() { return indexOfRow++; }
 
@@ -235,9 +232,9 @@ public final class WorkbookProxy {
         return setRow(row, Math.max(index, 0));
     }
 
-    // Row setRow(Row row) { return setRow(row, DEFAULT_APPEND_DATA); }
-
     Row getRow() { return row; }
+
+    int getIndexOfRow() { return indexOfRow; }
 
     private Row createRow(int index, boolean appendCell) { return setRow(sheet.createRow(index), appendCell); }
 
@@ -246,11 +243,10 @@ public final class WorkbookProxy {
         if (row == null) {
             row = sheet.createRow(index);
         }
-        this.indexOfRow = index;
+        // 保持 indexOfRow 指向下一行
+        this.indexOfRow = index + 1;
         return setRow(row, appendCell);
     }
-
-    // Row useOrCreateRow(int index) { return useOrCreateRow(index, DEFAULT_APPEND_DATA); }
 
     Row nextRow(boolean appendCell) { return createRow(nextIndexOfRow(), appendCell); }
 
@@ -293,49 +289,9 @@ public final class WorkbookProxy {
             region = new CellRangeAddress(fr, lr, nCellIdx, eCellIdx - 1);
             sheet.addMergedRegion(region);
         }
-        mergedOnCell.replaceAs(region);
+        mergedOnCell.replaceOf(region);
         this.indexOfCell = eCellIdx;
         return nCellIdx;
-    }
-
-    private MergedResult isMergedRegion(Sheet sheet, int row, int column) {
-        int sheetMergeCount = sheet.getNumMergedRegions();
-        for (int i = 0; i < sheetMergeCount; i++) {
-            CellRangeAddress range = sheet.getMergedRegion(i);
-            int firstColumn = range.getFirstColumn();
-            int lastColumn = range.getLastColumn();
-            int firstRow = range.getFirstRow();
-            int lastRow = range.getLastRow();
-            if (row >= firstRow && row <= lastRow) {
-                if (column >= firstColumn && column <= lastColumn) {
-                    return null;
-                }
-            }
-        }
-        return UNMERGED;
-    }
-
-    private final static MergedResult UNMERGED = new MergedResult(false, -1, -1, -1, -1, -1);
-
-    private static class MergedResult {
-
-        private final boolean merged;
-        private final int addressIdx;
-        private final int rowIdx;
-        private final int colIdx;
-        private final int rowspan;
-        private final int colspan;
-
-        private MergedResult(
-            boolean merged, int addressIdx, int rowIdx, int colIdx, int rowspan, int colspan
-        ) {
-            this.merged = merged;
-            this.addressIdx = addressIdx;
-            this.rowIdx = rowIdx;
-            this.colIdx = colIdx;
-            this.rowspan = rowspan;
-            this.colspan = colspan;
-        }
     }
 
     Cell setCell(Cell cell) { return this.cell = cell; }
@@ -370,12 +326,6 @@ public final class WorkbookProxy {
     Cell useOrCreateCell(int index) {
         return useOrCreateCell(index, false);
     }
-
-    // Cell nextCell() { return nextCell(0); }
-
-    // Cell nextCell(int offset) { return nextCell(offset, 1, 1); }
-
-    // Cell nextCell(int rowspan, int colspan) { return nextCell(0, rowspan, colspan); }
 
     Cell nextCell(int offset, int rowspan, int colspan) {
         return createCell(nextIndexOfCell(offset, rowspan, colspan));
