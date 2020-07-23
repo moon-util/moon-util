@@ -8,7 +8,9 @@ import java.time.temporal.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
+import java.util.function.ToIntBiFunction;
 
+import static com.moon.core.util.CalendarUtil.copy;
 import static com.moon.core.util.DatetimeField.*;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 import static java.time.temporal.ChronoField.NANO_OF_DAY;
@@ -19,7 +21,7 @@ import static java.time.temporal.ChronoField.NANO_OF_DAY;
  * <p>
  * 命名为{@code Datetime}小写“t”为了不与{@code org.joda.time.DateTime}冲突
  * <p>
- * 这是一个可变对象，通过{@link #clone()}可实现不可变对象模式
+ * 可变对象可不可变对象切换：{@link #asImmutable()}{@link #asMutable()}
  *
  * @author moonsky
  */
@@ -81,9 +83,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     private final boolean immutable;
 
-    private Datetime obtainReturning(Datetime datetime) {
-        return immutable ? new Datetime(datetime) : this;
-    }
+    private Calendar originCalendar() { return calendar; }
+
+    private Datetime obtainReturning(Calendar calendar) { return immutable ? new Datetime(calendar, true) : this; }
+
+    private Calendar obtainCalendar() { return immutable ? copy(calendar) : calendar; }
 
     private Datetime(Calendar calendar, boolean immutable) {
         super(calendar.getTimeInMillis());
@@ -105,7 +109,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime(LocalDateTime datetime) { this(DateUtil.toCalendar(datetime)); }
 
-    public Datetime(Datetime datetime) { this(DateUtil.copy(datetime.calendar), datetime.immutable); }
+    public Datetime(Datetime datetime) { this(copy(datetime.calendar), datetime.immutable); }
 
     public Datetime(Instant instant) { this(instant.toEpochMilli()); }
 
@@ -127,9 +131,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public static Datetime of(int... fields) { return new Datetime(DateUtil.toCalendar(fields)); }
 
-    public static Datetime ofToday(LocalTime time) {
-        return new Datetime(time.atDate(LocalDate.now()));
-    }
+    public static Datetime ofToday(LocalTime time) { return new Datetime(time.atDate(LocalDate.now())); }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,21 +150,21 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 不可变对象每次返回的是新对象，否则操作和返回的是新对象
      */
-    private boolean isImmutable() { return immutable; }
+    public boolean isImmutable() { return immutable; }
 
     /**
      * 设置为不可变数据，不可变数据每次操作均返回新对象
      *
-     * @see #obtainReturning(Datetime)
+     * @see #obtainReturning(Calendar)
      */
-    private Datetime withImmutable() { return new Datetime(this.calendar, true); }
+    public Datetime asImmutable() { return immutable ? this : new Datetime(copy(calendar), true); }
 
     /**
      * 设置为可变数据，可变数据操作的是同一个对象
      *
-     * @see #obtainReturning(Datetime)
+     * @see #obtainReturning(Calendar)
      */
-    private Datetime withMutable() { return new Datetime(this.calendar, false); }
+    public Datetime asMutable() { return immutable ? new Datetime(copy(calendar), false) : this; }
 
     /*
      * *********************************************************************
@@ -371,7 +373,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @return 时间戳
      */
     @Override
-    public long getTime() { return obtainCalendar().getTimeInMillis(); }
+    public long getTime() { return originCalendar().getTimeInMillis(); }
 
     /**
      * 获取指定字段的值
@@ -389,8 +391,10 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 字段值
      */
-    public int get(int field) {
-        return field == Calendar.MONTH ? obtainCalendar().get(field) + 1 : obtainCalendar().get(field);
+    public int get(int field) { return getFieldVal(obtainCalendar(), field); }
+
+    private static int getFieldVal(Calendar calendar, int field) {
+        return field == Calendar.MONTH ? calendar.get(field) + 1 : calendar.get(field);
     }
 
     /*
@@ -398,6 +402,19 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * * 设置日期数据 ***************************************************************
      * ****************************************************************************
      */
+
+    /**
+     * 设置毫秒数
+     *
+     * @param timeInMillis
+     *
+     * @return
+     */
+    public Datetime withTimeInMillis(long timeInMillis) {
+        Calendar calendar = obtainCalendar();
+        calendar.setTimeInMillis(timeInMillis);
+        return obtainReturning(calendar);
+    }
 
     /**
      * 设置秒数
@@ -532,8 +549,12 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @return 当前对象
      */
     public Datetime with(int field, int value) {
-        obtainCalendar().set(field, field == Calendar.MONTH ? value - 1 : value);
-        return obtainReturning(this);
+        return obtainReturning(setFieldVal(obtainCalendar(), field, value));
+    }
+
+    private static Calendar setFieldVal(Calendar calendar, int field, int value) {
+        calendar.set(field, field == Calendar.MONTH ? value - 1 : value);
+        return calendar;
     }
 
     /**
@@ -573,8 +594,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @return 当前对象
      */
     public Datetime setFirstDayOfWeek(int firstDayOfWeek) {
-        obtainCalendar().setFirstDayOfWeek(firstDayOfWeek);
-        return obtainReturning(this);
+        Calendar calendar = obtainCalendar();
+        calendar.setFirstDayOfWeek(firstDayOfWeek);
+        return obtainReturning(calendar);
     }
 
     /*
@@ -587,9 +609,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime plusMonths(int amount) { return plusField(MONTH, amount); }
 
-    public Datetime plusWeeks(int amount) { return plusField(DAY_OF_MONTH, amount); }
+    public Datetime plusWeeks(int amount) { return plusField(WEEK_OF_YEAR, amount); }
 
-    public Datetime plusDays(int amount) { return plusField(DAY_OF_MONTH, amount); }
+    public Datetime plusDays(int amount) { return plusField(DAY_OF_YEAR, amount); }
 
     public Datetime plusHours(int amount) { return plusField(HOUR_OF_DAY, amount); }
 
@@ -615,7 +637,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime minusMonths(int amount) { return minusField(MONTH, amount); }
 
-    public Datetime minusWeeks(int amount) { return minusField(DAY_OF_MONTH, amount); }
+    public Datetime minusWeeks(int amount) { return minusField(WEEK_OF_YEAR, amount); }
 
     public Datetime minusDays(int amount) { return minusField(DAY_OF_MONTH, amount); }
 
@@ -634,8 +656,66 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Datetime minus(int field, int amount) { return change(field, -amount); }
 
     private Datetime change(int field, int amount) {
-        obtainCalendar().add(field, amount);
-        return obtainReturning(this);
+        return obtainReturning(changeCalendarOf(obtainCalendar(), field, amount));
+    }
+
+    private static Calendar changeCalendarOf(Calendar calendar, int field, int amount) {
+        calendar.add(field, amount);
+        return calendar;
+    }
+
+    private enum CalendarField {
+        /**
+         * 毫秒
+         */
+        MILLISECOND(Calendar.MILLISECOND, 0, 999),
+        /**
+         * 秒
+         */
+        SECOND(Calendar.SECOND, 0, 59),
+        MINUTE(Calendar.MINUTE, 0, 59),
+        HOUR_OF_DAY(Calendar.HOUR_OF_DAY, 0, 23),
+        DAY_OF_MONTH(Calendar.DAY_OF_MONTH, 1, 31) {
+            @Override
+            public int getFieldMaxVal(Calendar value) {
+                return Month.of(getFieldVal(value, Calendar.MONTH))
+                    .length(Year.isLeap(getFieldVal(value, Calendar.YEAR)));
+            }
+        },
+        MONTH(Calendar.MONTH, 1, 12);
+
+        private final static CalendarField[] FIELDS = CalendarField.values();
+        private final int field;
+        private final int min;
+        private final int max;
+
+        CalendarField(int field, int min, int max) {
+            this.field = field;
+            this.min = min;
+            this.max = max;
+        }
+
+        public int getFieldMaxVal(Calendar c) { return max; }
+    }
+
+    private Datetime startingOrEndingOf(CalendarField ending, ToIntBiFunction<Calendar, CalendarField> getter) {
+        CalendarField[] values = CalendarField.FIELDS;
+        CalendarField field;
+        Calendar calendar = obtainCalendar();
+        int last = Math.min(ending.ordinal() + 1, values.length);
+        for (int i = 0; i < last; i++) {
+            field = values[i];
+            setFieldVal(calendar, field.field, getter.applyAsInt(calendar, field));
+        }
+        return obtainReturning(calendar);
+    }
+
+    private Datetime startingOf(CalendarField ending) {
+        return startingOrEndingOf(ending, (c, field) -> field.min);
+    }
+
+    private Datetime endingOf(CalendarField ending) {
+        return startingOrEndingOf(ending, (c, f) -> f.getFieldMaxVal(c));
     }
 
     /**
@@ -643,79 +723,122 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return Datetime
      */
-    public Datetime startOfSecond() { return with(MILLISECOND.value, 0); }
+    public Datetime startOfSecond() { return startingOf(CalendarField.MILLISECOND); }
 
     /**
      * 清除秒
      *
      * @return Datetime
      */
-    public Datetime startOfMinute() { return withSecond(0).startOfSecond(); }
+    public Datetime startOfMinute() { return startingOf(CalendarField.SECOND); }
 
     /**
      * 清除分钟
      *
      * @return Datetime
      */
-    public Datetime startOfHour() { return withMinute(0).startOfMinute(); }
+    public Datetime startOfHour() { return startingOf(CalendarField.MINUTE); }
 
     /**
      * 凌晨 00:00:00
      *
      * @return Datetime
      */
-    public Datetime startOfDay() { return withHourOfDay(0).startOfHour(); }
+    public Datetime startOfDay() { return startingOf(CalendarField.HOUR_OF_DAY); }
+
+    /**
+     * 当前星期的最初时刻
+     *
+     * @return Datetime
+     */
+    public Datetime startOfWeek() { return startOfWeek(getFirstDayOfWeek()); }
+
+    /**
+     * 当前星期的最初时刻
+     *
+     * @param firstDayOfWeek 指定星期几为一周第一天
+     *
+     * @return Datetime
+     */
+    public Datetime startOfWeek(DayOfWeek firstDayOfWeek) {
+        Datetime datetime = startOfDay();
+        int diffDays = datetime.getDayOfWeek().ordinal() - firstDayOfWeek.ordinal();
+        Calendar calendar = datetime.originCalendar();
+        changeCalendarOf(calendar, Calendar.DAY_OF_MONTH, -(diffDays < 0 ? diffDays + 7 : diffDays));
+        return datetime;
+    }
 
     /**
      * 月初
      *
      * @return Datetime
      */
-    public Datetime startOfMonth() { return withDayOfMonth(1).startOfDay(); }
+    public Datetime startOfMonth() { return startingOf(CalendarField.DAY_OF_MONTH); }
 
     /**
      * 年初
      *
      * @return Datetime
      */
-    public Datetime startOfYear() { return withMonth(1).startOfMonth(); }
+    public Datetime startOfYear() { return startingOf(CalendarField.MONTH); }
 
     /**
      * 秒末
      *
      * @return Datetime
      */
-    public Datetime endOfSecond() { return with(Calendar.MILLISECOND, 999); }
+    public Datetime endOfSecond() { return endingOf(CalendarField.MILLISECOND); }
 
     /**
      * 分末
      *
      * @return Datetime
      */
-    public Datetime endOfMinute() { return withSecond(59).endOfSecond(); }
+    public Datetime endOfMinute() { return endingOf(CalendarField.SECOND); }
 
     /**
      * 时末
      *
      * @return Datetime
      */
-    public Datetime endOfHour() { return withMinute(59).endOfMinute(); }
+    public Datetime endOfHour() { return endingOf(CalendarField.MINUTE); }
 
     /**
      * 深夜，23:59:59:999
      *
      * @return Datetime
      */
-    public Datetime endOfDay() { return withHourOfDay(23).endOfHour(); }
+    public Datetime endOfDay() { return endingOf(CalendarField.HOUR_OF_DAY); }
+
+    /**
+     * 本周最末时刻
+     *
+     * @return Datetime
+     */
+    public Datetime endOfWeek() { return endOfWeek(getFirstDayOfWeek()); }
+
+    /**
+     * 本周最末时刻
+     *
+     * @param firstDayOfWeek 指定星期几为一周第一天
+     *
+     * @return Datetime
+     */
+    public Datetime endOfWeek(DayOfWeek firstDayOfWeek) {
+        Datetime datetime = endOfDay();
+        int diffDays = firstDayOfWeek.ordinal() - datetime.getDayOfWeek().ordinal();
+        changeCalendarOf(datetime.originCalendar(),
+            Calendar.DAY_OF_MONTH,
+            (diffDays <= 0 ? diffDays + 6 : diffDays - 1));
+        return datetime;
+    }
 
     /**
      * 月末
      *
      * @return Datetime
      */
-    public Datetime endOfMonth() {
-        return withDayOfMonth(getMonthOfYear().getLastDayOfMonth(getYearValue())).endOfDay();
-    }
+    public Datetime endOfMonth() { return endingOf(CalendarField.DAY_OF_MONTH); }
 
     /**
      * 年末
@@ -723,10 +846,12 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @return Datetime
      */
     public Datetime endOfYear() {
-        return withMonth(12).withDayOfMonth(31).endOfDay();
+        Datetime datetime = endOfDay();
+        Calendar calendar = datetime.originCalendar();
+        setFieldVal(calendar, Calendar.DAY_OF_MONTH, 31);
+        setFieldVal(calendar, Calendar.MONTH, 12);
+        return datetime;
     }
-
-    private Calendar obtainCalendar() { return calendar; }
 
     /*
      * ****************************************************************************
@@ -739,14 +864,14 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 24 小时制 12 点以前，返回 true，否则返回false
      */
-    public boolean isAm() { return obtainCalendar().get(Calendar.AM_PM) == 0; }
+    public boolean isAm() { return originCalendar().get(Calendar.AM_PM) == Calendar.AM; }
 
     /**
      * 是否是下午
      *
      * @return 24 小时制 12 点以后，返回 true，否则返回false
      */
-    public boolean isPm() { return obtainCalendar().get(Calendar.AM_PM) == 1; }
+    public boolean isPm() { return originCalendar().get(Calendar.AM_PM) == Calendar.PM; }
 
     /**
      * 是否是工作日
@@ -979,11 +1104,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      */
 
     @Override
-    public Instant toInstant() { return obtainCalendar().toInstant(); }
+    public Instant toInstant() { return originCalendar().toInstant(); }
 
-    public Calendar toCalendar() { return DateUtil.copy(obtainCalendar()); }
+    public Calendar toCalendar() { return copy(originCalendar()); }
 
-    public Date toDate() { return obtainCalendar().getTime(); }
+    public Date toDate() { return originCalendar().getTime(); }
 
     public java.sql.Date toSqlDate() { return new java.sql.Date(getTime()); }
 
@@ -993,28 +1118,22 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return LocalTime.of(getHourOfDay(), getMinuteOfHour(), getSecondOfMinute(), getNanoOfSecond());
     }
 
-    public LocalDate toLocalDate() {
-        return LocalDate.of(getYearValue(), getMonthValue(), getDayOfMonth());
-    }
+    public LocalDate toLocalDate() { return LocalDate.of(getYearValue(), getMonthValue(), getDayOfMonth()); }
 
-    public LocalDateTime toLocalDateTime() {
-        return LocalDateTime.of(toLocalDate(), toLocalTime());
-    }
+    public LocalDateTime toLocalDateTime() { return LocalDateTime.of(toLocalDate(), toLocalTime()); }
 
     public org.joda.time.LocalDateTime toJodaLocalDateTime() {
-        return org.joda.time.LocalDateTime.fromCalendarFields(obtainCalendar());
+        return org.joda.time.LocalDateTime.fromCalendarFields(originCalendar());
     }
 
-    public org.joda.time.DateTime toJodaDateTime() {
-        return toJodaLocalDateTime().toDateTime();
-    }
+    public org.joda.time.DateTime toJodaDateTime() { return toJodaLocalDateTime().toDateTime(); }
 
     public org.joda.time.LocalDate toJodaLocalDate() {
-        return org.joda.time.LocalDate.fromCalendarFields(obtainCalendar());
+        return org.joda.time.LocalDate.fromCalendarFields(originCalendar());
     }
 
     public org.joda.time.LocalTime toJodaLocalTime() {
-        return org.joda.time.LocalTime.fromCalendarFields(obtainCalendar());
+        return org.joda.time.LocalTime.fromCalendarFields(originCalendar());
     }
 
     /*
@@ -1023,8 +1142,15 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *************************************************************************
      */
 
+    /**
+     * 设置毫秒数时间戳(此方法的操作无论如何都是可变的)
+     *
+     * @param time
+     *
+     * @see #withTimeInMillis(long)
+     */
     @Override
-    public void setTime(long time) { obtainCalendar().setTimeInMillis(time); }
+    public void setTime(long time) { originCalendar().setTimeInMillis(time); }
 
     @Override
     public boolean before(Date when) { return compareTo(when) < 0; }
@@ -1056,9 +1182,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     @Override
     public String toString() { return toString(DateUtil.PATTERN); }
 
-    public String toString(String pattern) {
-        return DateUtil.format(obtainCalendar().getTime(), pattern);
-    }
+    public String toString(String pattern) { return DateUtil.format(originCalendar(), pattern); }
 
     /*
      *************************************************************************
@@ -1066,17 +1190,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *************************************************************************
      */
 
-    public Datetime(int year, int month) {
-        this(year, month, 1);
-    }
+    public Datetime(int year, int month) { this(year, month, 1); }
 
-    public Datetime(int year, int month, int date) {
-        this(year, month, date, 0, 0);
-    }
+    public Datetime(int year, int month, int date) { this(year, month, date, 0, 0); }
 
-    public Datetime(int year, int month, int date, int hrs, int min) {
-        this(year, month, date, hrs, min, 0);
-    }
+    public Datetime(int year, int month, int date, int hrs, int min) { this(year, month, date, hrs, min, 0); }
 
     public Datetime(int year, int month, int date, int hrs, int min, int sec) {
         this(DateUtil.toCalendar(year, month, date, hrs, min, sec));
@@ -1145,7 +1263,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     @Override
     @Deprecated
     public int getTimezoneOffset() {
-        Calendar calendar = obtainCalendar();
+        Calendar calendar = originCalendar();
         return -(calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)) / 60000;
     }
 
