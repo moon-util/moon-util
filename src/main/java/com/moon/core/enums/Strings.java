@@ -78,6 +78,14 @@ public enum Strings implements EnumDescriptor {
      * 字母
      */
     LETTERS("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"),
+    /**
+     * YES
+     */
+    YES("YES"),
+    /**
+     * YES
+     */
+    NO("NO"),
     ;
 
     public final String value;

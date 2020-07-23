@@ -1,4 +1,4 @@
-package com.moon.spring.jpa.identity;
+package com.moon.spring.jpa.id;
 
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
@@ -36,7 +36,7 @@ final class IdentifierUtil {
     }
 
     private static Class toClassOrNull(String classname) {
-        return ClassUtil.forName(assertClassname(classname));
+        return ClassUtil.forNameOrNull(assertClassname(classname));
     }
 
     private static Class toIdentifierClass(String classname) {

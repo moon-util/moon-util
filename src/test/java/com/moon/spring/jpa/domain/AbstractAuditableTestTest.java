@@ -1,21 +1,17 @@
 package com.moon.spring.jpa.domain;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.util.Date;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author moonsky
  */
 class AbstractAuditableTestTest {
 
-    public static class TestAuditable extends AbstractAuditable<String, Date> {
+    public static class TestAuditable extends AbstractAuditRecord<String, Date> {
 
         @Override
         public String getCreatedBy() {

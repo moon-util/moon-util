@@ -5,7 +5,7 @@ import com.moon.core.util.life.BeforeLifeChain;
 import com.moon.core.util.life.NoneLifeChainEnum;
 import com.moon.more.data.registry.LayerEnum;
 import com.moon.spring.data.DataAccessorImpl;
-import com.moon.spring.jpa.domain.JpaRecordable;
+import com.moon.spring.jpa.domain.JpaRecord;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import static com.moon.core.util.life.LifeUtil.before;
 /**
  * @author moonsky
  */
-public abstract class DataServiceImpl<T extends JpaRecordable<String>> extends DataAccessorImpl<String, T>
+public abstract class DataServiceImpl<T extends JpaRecord<String>> extends DataAccessorImpl<String, T>
     implements DataService<T> {
 
     private final BeforeLifeChain DEFAULT_BEFORE = NoneLifeChainEnum.DEFAULT;

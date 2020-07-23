@@ -7,11 +7,11 @@ import com.moon.core.enums.Available;
 /**
  * @author moonsky
  */
-public interface DataRecordable<ID> extends Recordable<ID> {
+public interface DataRecord<ID> extends Record<ID> {
 
-    String WHERE_IDX = " available=0 ";
+    String WHERE_IDX = Available.WHERE_IDX;
 
-    String WHERE_STR = " available='YES' ";
+    String WHERE_STR = Available.WHERE_STR;
 
     /**
      * 获取可用值

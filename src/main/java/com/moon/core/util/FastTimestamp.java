@@ -21,8 +21,14 @@ public final class FastTimestamp implements LongSupplier {
         if (type == null || type == Type.NEW_DATE) {
             supplier = () -> new Date().getTime();
         } else {
-            new Thread(() -> timestamp = System.currentTimeMillis());
-            supplier = () -> timestamp;
+            Thread thread = new Thread(() -> {
+                while (true) {
+                    timestamp = System.currentTimeMillis();
+                }
+            });
+            thread.setDaemon(true);
+            supplier = () -> this.timestamp;
+            thread.start();
         }
     }
 
@@ -62,7 +68,7 @@ public final class FastTimestamp implements LongSupplier {
     @Override
     public long getAsLong() { return supplier.getAsLong(); }
 
-    public enum Type {
+    private enum Type {
         /**
          * 用一个新线程不断获取系统时间戳，其他线程从这里获取
          * 这样保证系统时间“永远只有”一个线程在访问，不会出现并发问题

@@ -1,19 +1,21 @@
-package com.moon.spring.jpa.identity;
+package com.moon.spring.jpa.id;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.id.IdentifierGenerator;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * @author moonsky
  */
-public class TimestampOrderedLongIdentifier extends TimestampOrderedStringIdentifier {
+public class UUIDIdentifier implements IdentifierGenerator {
 
     @Override
     public Serializable generate(
         SharedSessionContractImplementor session, Object object
     ) throws HibernateException {
-        return Long.valueOf(super.generate(session, object).toString());
+        return UUID.randomUUID().toString();
     }
 }

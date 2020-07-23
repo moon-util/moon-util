@@ -14,8 +14,8 @@ import java.util.Objects;
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AbstractRecordable<ID extends Serializable>
-    implements JpaRecordable<ID>, Cloneable, Serializable {
+public abstract class AbstractRecord<ID extends Serializable>
+    implements JpaRecord<ID>, Cloneable, Serializable {
 
     @Id
     @Column(length = 38)
@@ -23,11 +23,11 @@ public abstract class AbstractRecordable<ID extends Serializable>
     @GenericGenerator(name = "generator", strategy = "com.moon.spring.jpa.identity.Identifier")
     private ID id;
 
-    public AbstractRecordable() { }
+    public AbstractRecord() { }
 
-    public AbstractRecordable(ID id) { this.id = id; }
+    public AbstractRecord(ID id) { this.id = id; }
 
-    public AbstractRecordable(AbstractRecordable<ID> recordable) { this(recordable.getId()); }
+    public AbstractRecord(AbstractRecord<ID> recordable) { this(recordable.getId()); }
 
     @Override
     public ID getId() { return id; }
@@ -42,8 +42,8 @@ public abstract class AbstractRecordable<ID extends Serializable>
      *
      * @see JsonIgnore 参考 JsonIgnore 和 JSONField 的使用规则
      * @see JSONField
-     * @see AbstractAuditable#createdBy
-     * @see AbstractAuditable#getCreatedBy()
+     * @see AbstractAuditRecord#createdBy
+     * @see AbstractAuditRecord#getCreatedBy()
      */
     @Override
     @JsonIgnore
@@ -54,7 +54,7 @@ public abstract class AbstractRecordable<ID extends Serializable>
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        AbstractRecordable<?> that = (AbstractRecordable<?>) o;
+        AbstractRecord<?> that = (AbstractRecord<?>) o;
         return Objects.equals(id, that.id);
     }
 

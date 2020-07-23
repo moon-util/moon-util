@@ -3,4 +3,4 @@ package com.moon.spring.jpa.domain;
 /**
  * @author moonsky
  */
-public interface JpaAuditable<ID> extends JpaRecordable<ID> {}
+public interface JpaAuditRecord<ID> extends JpaRecord<ID> {}

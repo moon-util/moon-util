@@ -1,7 +1,7 @@
 package com.moon.spring.jpa.service;
 
 import com.moon.spring.data.BaseAccessor;
-import com.moon.spring.jpa.domain.JpaRecordable;
+import com.moon.spring.jpa.domain.JpaRecord;
 import org.springframework.data.domain.*;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  * @author moonsky
  */
 @SuppressWarnings("all")
-public interface BaseService<T extends JpaRecordable<String>> extends BaseAccessor<String, T> {
+public interface BaseService<T extends JpaRecord<String>> extends BaseAccessor<String, T> {
 
     @Override
     <S extends T> S save(S entity);

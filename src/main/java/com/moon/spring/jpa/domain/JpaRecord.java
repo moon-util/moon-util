@@ -1,6 +1,6 @@
 package com.moon.spring.jpa.domain;
 
-import com.moon.more.data.Recordable;
+import com.moon.more.data.Record;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.Transient;
@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * @author moonsky
  */
-public interface JpaRecordable<ID> extends Persistable<ID>, Recordable<ID>, Cloneable, Serializable {
+public interface JpaRecord<ID> extends Persistable<ID>, Record<ID>, Cloneable, Serializable {
 
     /**
      * 设置 ID
@@ -17,7 +17,6 @@ public interface JpaRecordable<ID> extends Persistable<ID>, Recordable<ID>, Clon
      * @param value
      */
     @Override
-    @Transient
     void setId(ID value);
 
     /**
@@ -26,7 +25,6 @@ public interface JpaRecordable<ID> extends Persistable<ID>, Recordable<ID>, Clon
      * @return the id. Can be {@literal null}.
      */
     @Override
-    @Transient
     ID getId();
 
     /**
@@ -35,6 +33,5 @@ public interface JpaRecordable<ID> extends Persistable<ID>, Recordable<ID>, Clon
      * @return if {@literal true} the object is new.
      */
     @Override
-    @Transient
     boolean isNew();
 }

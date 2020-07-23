@@ -28,16 +28,8 @@ public final class Const {
     /**
      * string
      */
-    public static final String EMPTY = Strings.EMPTY.value;
-    public static final String STR_TRUE = String.valueOf(TRUE);
-    public static final String STR_FALSE = String.valueOf(FALSE);
-    public static final String STR_UNDEFINED = "undefined";
-    public static final String STR_NULL = "null";
-    public static final String STR_EMPTY = EMPTY;
-    /**
-     * ","——英文逗号
-     */
-    public static final String STR_COMMA = Strings.COMMA.value;
+    public static final String EMPTY = Str.EMPTY;
+    public static final String STR_NULL = Str.NULL;
 
     public final static String PATTERN_DATE = yyyy_MM_dd;
 
@@ -48,4 +40,24 @@ public final class Const {
     public final static String PATTERN = yyyy_MM_dd_HH_mm_ss;
 
     public static final int WIN_FILE_INVALID_CHAR = 65279;
+
+    public static final class Str {
+
+        public final static String EMPTY = new String();
+        public final static String COMMA = ",";
+
+        public final static String UNDEFINED = "undefined";
+        public final static String TRUE = String.valueOf(true);
+        public final static String FALSE = String.valueOf(false);
+        public final static String NULL = "null";
+
+        public final static String YES = "YES";
+        public final static String NO = "NO";
+        public final static String Y = "Y";
+        public final static String N = "N";
+
+        public final static String ZERO = "0";
+        public final static String ONE = "1";
+        public final static String TEN = "10";
+    }
 }

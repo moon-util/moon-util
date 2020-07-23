@@ -6,19 +6,17 @@ import com.moon.more.data.registry.EntityRegistryException;
 import com.moon.more.data.registry.LayerEnum;
 import com.moon.spring.data.BaseAccessorImpl;
 import com.moon.spring.data.BaseAccessor;
-import com.moon.spring.jpa.domain.JpaRecordable;
+import com.moon.spring.jpa.domain.JpaRecord;
 import com.moon.spring.jpa.service.BaseService;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
  * @author moonsky
  */
-public class BaseController<T extends JpaRecordable<String>> extends BaseAccessorImpl<String, T> {
+public class BaseController<T extends JpaRecord<String>> extends BaseAccessorImpl<String, T> {
 
     protected BaseController() { this(null); }
 

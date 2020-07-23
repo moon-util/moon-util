@@ -9,13 +9,13 @@ import javax.persistence.MappedSuperclass;
  * @author moonsky
  */
 @MappedSuperclass
-public abstract class BaseRecordable extends AbstractRecordable<String> {
+public abstract class BaseRecord extends AbstractRecord<String> {
 
-    public BaseRecordable() { }
+    public BaseRecord() { }
 
-    public BaseRecordable(String id) { super(id); }
+    public BaseRecord(String id) { super(id); }
 
-    public BaseRecordable(AbstractRecordable<String> recordable) { super(recordable); }
+    public BaseRecord(AbstractRecord<String> recordable) { super(recordable); }
 
     @Override
     @JSONField(serialize = false)

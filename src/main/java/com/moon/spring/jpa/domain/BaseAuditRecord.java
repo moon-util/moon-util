@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
  * @author moonsky
  */
 @MappedSuperclass
-public abstract class BaseAuditable extends AbstractAuditable<String, LocalDateTime> {
+public abstract class BaseAuditRecord extends AbstractAuditRecord<String, LocalDateTime> {
 
-    public BaseAuditable() { }
+    public BaseAuditRecord() { }
 
-    public BaseAuditable(AbstractAuditable<String, LocalDateTime> audit) { super(audit); }
+    public BaseAuditRecord(AbstractAuditRecord<String, LocalDateTime> audit) { super(audit); }
 
-    public BaseAuditable(String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public BaseAuditRecord(String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdBy, updatedBy, createdAt, updatedAt);
     }
 
-    public BaseAuditable(
+    public BaseAuditRecord(
         String id, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt
     ) { super(id, createdBy, updatedBy, createdAt, updatedAt); }
 

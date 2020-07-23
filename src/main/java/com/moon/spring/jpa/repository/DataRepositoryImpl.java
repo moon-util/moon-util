@@ -2,8 +2,8 @@ package com.moon.spring.jpa.repository;
 
 import com.moon.core.enums.Placeholder;
 import com.moon.core.util.ListUtil;
-import com.moon.more.data.DataRecordable;
-import com.moon.more.data.Recordable;
+import com.moon.more.data.DataRecord;
+import com.moon.more.data.Record;
 import com.moon.more.data.registry.LayerRegistry;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -40,7 +40,7 @@ import static org.springframework.data.jpa.convert.QueryByExamplePredicateBuilde
  * @author moonsky
  */
 @NoRepositoryBean
-public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaRepository<T, String>
+public class DataRepositoryImpl<T extends Record<String>> extends SimpleJpaRepository<T, String>
     implements DataRepository<T> {
 
     final static CacheManager NO_OP = new NoOpCacheManager();
@@ -166,8 +166,8 @@ public class DataRepositoryImpl<T extends Recordable<String>> extends SimpleJpaR
 
     protected <S extends T> void disableOne(S entity) {
         if (entity != null) {
-            if (entity instanceof DataRecordable) {
-                ((DataRecordable) entity).withUnavailable();
+            if (entity instanceof DataRecord) {
+                ((DataRecord) entity).withUnavailable();
                 save(entity);
             } else {
                 delete(entity);

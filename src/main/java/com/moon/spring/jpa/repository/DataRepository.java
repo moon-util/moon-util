@@ -1,6 +1,6 @@
 package com.moon.spring.jpa.repository;
 
-import com.moon.more.data.Recordable;
+import com.moon.more.data.Record;
 import com.moon.spring.data.DataAccessor;
 import org.springframework.data.domain.*;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  */
 @NoRepositoryBean
 @SuppressWarnings("all")
-public interface DataRepository<T extends Recordable<String>> extends BaseRepository<T>, DataAccessor<String, T> {
+public interface DataRepository<T extends Record<String>> extends BaseRepository<T>, DataAccessor<String, T> {
 
     @Override
     void disableById(String s);

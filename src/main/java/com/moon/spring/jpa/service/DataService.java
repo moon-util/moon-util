@@ -1,7 +1,7 @@
 package com.moon.spring.jpa.service;
 
 import com.moon.spring.data.DataAccessor;
-import com.moon.spring.jpa.domain.JpaRecordable;
+import com.moon.spring.jpa.domain.JpaRecord;
 import org.springframework.data.domain.*;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  * @author moonsky
  */
 @SuppressWarnings("all")
-public interface DataService<T extends JpaRecordable<String>> extends BaseService<T>, DataAccessor<String, T> {
+public interface DataService<T extends JpaRecord<String>> extends BaseService<T>, DataAccessor<String, T> {
 
     @Override
     void disableById(String s);

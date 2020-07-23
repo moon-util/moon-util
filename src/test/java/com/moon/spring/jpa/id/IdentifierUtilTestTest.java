@@ -1,4 +1,4 @@
-package com.moon.spring.jpa.identity;
+package com.moon.spring.jpa.id;
 
 import org.hibernate.id.IdentifierGenerator;
 import org.junit.jupiter.api.Assertions;

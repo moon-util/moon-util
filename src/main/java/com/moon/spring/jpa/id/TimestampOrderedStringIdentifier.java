@@ -1,8 +1,6 @@
-package com.moon.spring.jpa.identity;
+package com.moon.spring.jpa.id;
 
 import com.moon.core.lang.StringUtil;
-import com.moon.core.util.DateUtil;
-import com.moon.core.util.RandomStringUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;

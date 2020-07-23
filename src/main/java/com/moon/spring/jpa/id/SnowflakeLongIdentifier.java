@@ -1,4 +1,4 @@
-package com.moon.spring.jpa.identity;
+package com.moon.spring.jpa.id;
 
 import com.moon.core.util.OSUtil;
 import com.moon.core.util.RandomUtil;

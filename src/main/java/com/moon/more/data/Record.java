@@ -1,5 +1,6 @@
 package com.moon.more.data;
 
+import com.moon.core.enums.Available;
 import com.moon.more.model.BaseSupporter;
 import com.moon.more.model.id.IdOperator;
 import com.moon.more.model.id.IdSupplier;
@@ -9,17 +10,17 @@ import java.io.Serializable;
 /**
  * @author moonsky
  */
-public interface Recordable<ID> extends IdOperator<ID>, IdSupplier<ID>, BaseSupporter, Cloneable, Serializable {
+public interface Record<ID> extends IdOperator<ID>, IdSupplier<ID>, BaseSupporter, Cloneable, Serializable {
 
     /**
-     * @see DataRecordable#getAvailable()
+     * @see DataRecord#getAvailable()
      */
-    String WHERE_IDX = " available=0 ";
+    String WHERE_IDX = Available.WHERE_IDX;
 
     /**
-     * @see DataRecordable#getAvailable()
+     * @see DataRecord#getAvailable()
      */
-    String WHERE_STR = " available='YES' ";
+    String WHERE_STR = Available.WHERE_STR;
 
     /**
      * 是否是新对象

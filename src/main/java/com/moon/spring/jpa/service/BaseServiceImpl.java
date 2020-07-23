@@ -3,7 +3,7 @@ package com.moon.spring.jpa.service;
 import com.moon.core.util.life.*;
 import com.moon.more.data.registry.LayerEnum;
 import com.moon.spring.data.BaseAccessorImpl;
-import com.moon.spring.jpa.domain.JpaRecordable;
+import com.moon.spring.jpa.domain.JpaRecord;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import static com.moon.core.util.life.LifeUtil.before;
 /**
  * @author moonsky
  */
-public abstract class BaseServiceImpl<T extends JpaRecordable<String>> extends BaseAccessorImpl<String, T>
+public abstract class BaseServiceImpl<T extends JpaRecord<String>> extends BaseAccessorImpl<String, T>
     implements BaseService<T> {
 
     private final BeforeLifeChain DEFAULT_BEFORE = NoneLifeChainEnum.DEFAULT;

@@ -1,14 +1,11 @@
 package com.moon.spring.jpa.repository;
 
-import com.moon.more.data.Recordable;
+import com.moon.more.data.Record;
 import com.moon.spring.data.BaseAccessor;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -18,7 +15,7 @@ import java.util.function.Supplier;
  */
 @NoRepositoryBean
 @SuppressWarnings("all")
-public interface BaseRepository<T extends Recordable<String>>
+public interface BaseRepository<T extends Record<String>>
     extends JpaRepository<T, String>, BaseAccessor<String, T> {
 
     @Override

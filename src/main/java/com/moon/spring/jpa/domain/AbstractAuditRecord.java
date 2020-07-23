@@ -23,8 +23,8 @@ import java.util.Objects;
  * @see JSONField
  */
 @MappedSuperclass
-public abstract class AbstractAuditable<ID extends Serializable, DATE_TYPE> extends AbstractRecordable<ID>
-    implements JpaRecordable<ID>, JpaAuditable<ID>, Cloneable, Serializable {
+public abstract class AbstractAuditRecord<ID extends Serializable, DATE_TYPE> extends AbstractRecord<ID>
+    implements JpaRecord<ID>, JpaAuditRecord<ID>, Cloneable, Serializable {
 
     /**
      * {@link JsonIgnore}无论注解在字段还是{@code getter}、{@code setter}方法上，该字段都会被完全忽略
@@ -68,17 +68,17 @@ public abstract class AbstractAuditable<ID extends Serializable, DATE_TYPE> exte
     @LastModifiedDate
     private DATE_TYPE updatedAt;
 
-    public AbstractAuditable() { }
+    public AbstractAuditRecord() { }
 
-    public AbstractAuditable(AbstractAuditable<ID, DATE_TYPE> audit) {
+    public AbstractAuditRecord(AbstractAuditRecord<ID, DATE_TYPE> audit) {
         this(audit.getId(), audit.getCreatedBy(), audit.getUpdatedBy(), audit.getCreatedAt(), audit.getUpdatedAt());
     }
 
-    public AbstractAuditable(ID createdBy, ID updatedBy, DATE_TYPE createdAt, DATE_TYPE updatedAt) {
+    public AbstractAuditRecord(ID createdBy, ID updatedBy, DATE_TYPE createdAt, DATE_TYPE updatedAt) {
         this(null, createdBy, updatedBy, createdAt, updatedAt);
     }
 
-    public AbstractAuditable(ID id, ID createdBy, ID updatedBy, DATE_TYPE createdAt, DATE_TYPE updatedAt) {
+    public AbstractAuditRecord(ID id, ID createdBy, ID updatedBy, DATE_TYPE createdAt, DATE_TYPE updatedAt) {
         super(id);
         this.createdBy = createdBy;
         this.updatedBy = updatedBy;
@@ -128,7 +128,7 @@ public abstract class AbstractAuditable<ID extends Serializable, DATE_TYPE> exte
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         if (!super.equals(o)) { return false; }
-        AbstractAuditable<?, ?> that = (AbstractAuditable<?, ?>) o;
+        AbstractAuditRecord<?, ?> that = (AbstractAuditRecord<?, ?>) o;
         return Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedBy, that.updatedBy) && Objects.equals(
             createdAt,
             that.createdAt) && Objects.equals(updatedAt, that.updatedAt);

@@ -3,7 +3,7 @@ package com.moon.spring.jpa.domain;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moon.core.enums.Available;
-import com.moon.more.data.DataRecordable;
+import com.moon.more.data.DataRecord;
 
 import javax.persistence.MappedSuperclass;
 import java.util.Objects;
@@ -12,16 +12,16 @@ import java.util.Objects;
  * @author moonsky
  */
 @MappedSuperclass
-public abstract class BaseDataRecordable extends BaseRecordable implements DataRecordable<String> {
+public abstract class BaseDataRecord extends BaseRecord implements DataRecord<String> {
 
     @JsonIgnore
     private Available available;
 
-    public BaseDataRecordable() { }
+    public BaseDataRecord() { }
 
-    public BaseDataRecordable(String id) { super(id); }
+    public BaseDataRecord(String id) { super(id); }
 
-    public BaseDataRecordable(AbstractRecordable<String> recordable) { super(recordable); }
+    public BaseDataRecord(AbstractRecord<String> recordable) { super(recordable); }
 
     @Override
     @JSONField(serialize = false)
@@ -35,7 +35,7 @@ public abstract class BaseDataRecordable extends BaseRecordable implements DataR
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         if (!super.equals(o)) { return false; }
-        BaseDataRecordable that = (BaseDataRecordable) o;
+        BaseDataRecord that = (BaseDataRecord) o;
         return available == that.available;
     }
 
