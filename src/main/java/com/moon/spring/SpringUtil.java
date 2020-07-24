@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 /**
  * @author moonsky
  */
-@Component
 public final class SpringUtil implements ApplicationContextAware {
 
     private static volatile ApplicationContext CTX;

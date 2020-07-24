@@ -12,155 +12,25 @@ import static java.lang.String.format;
  */
 public final class DoubleUtil {
 
-    private DoubleUtil() {
-        noInstanceError();
-    }
+    private DoubleUtil() { noInstanceError(); }
 
-
-    public static double requireEq(double value, double expect) {
-        if (value == expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected: %f, Actual: %f", expect, value));
-    }
-
-
-    public static double requireEq(double value, double expect, String errorMsg) {
-        if (value == expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static double requireGt(double value, double expect) {
-        if (value > expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected great than %f, Actual: %f", expect, value));
-    }
-
-    public static double requireGt(double value, double expect, String errorMsg) {
-        if (value > expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static double requireLt(double value, double expect) {
-        if (value < expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected less than %f, Actual: %f", expect, value));
-    }
-
-    public static double requireLt(double value, double expect, String errorMsg) {
-        if (value < expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static double requireGtOrEq(double value, double expect) {
-        if (value >= expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected not less than %f, Actual: %f", expect, value));
-    }
-
-    public static double requireGtOrEq(double value, double expect, String errorMsg) {
-        if (value >= expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    public static double requireLtOrEq(double value, double expect) {
-        if (value <= expect) {
-            return value;
-        }
-        throw new NumberException(format("Expected not great than %f, Actual: %f", expect, value));
-    }
-
-    public static double requireLtOrEq(double value, double expect, String errorMsg) {
-        if (value <= expect) {
-            return value;
-        }
-        throw new NumberException(errorMsg);
-    }
-
-    /**
-     * 要求期望值在指定范围里，不包含范围边界
-     *
-     * @param value
-     * @param min
-     * @param max
-     *
-     * @return
-     */
-    public static double requireInRange(double value, double min, double max) {
-        requireGt(value, min);
-        requireLt(value, max);
-        return value;
-    }
-
-    public static double requireInRange(double value, double min, double max, String errorMsg) {
-        requireGt(value, min, errorMsg);
-        requireLt(value, max, errorMsg);
-        return value;
-    }
-
-    /**
-     * 要求期望值在指定范围里，包含范围边界
-     *
-     * @param value
-     * @param min
-     * @param max
-     *
-     * @return
-     */
-    public static double requireBetween(double value, double min, double max) {
-        requireGtOrEq(value, min);
-        requireLtOrEq(value, max);
-        return value;
-    }
-
-    public static double requireBetween(double value, double min, double max, String errorMsg) {
-        requireGtOrEq(value, min, errorMsg);
-        requireLtOrEq(value, max, errorMsg);
-        return value;
-    }
-
-    public static boolean isDouble(Object obj) {
-        return obj != null && obj.getClass() == Double.class;
-    }
+    public static boolean isDouble(Object obj) { return obj != null && obj.getClass() == Double.class; }
 
     public static boolean matchDouble(CharSequence obj) { return isDoubleValue(String.valueOf(obj)); }
 
-    public static Double toDouble(Byte value) {
-        return value == null ? null : value.doubleValue();
-    }
+    public static Double toDouble(Byte value) { return value == null ? null : value.doubleValue(); }
 
-    public static Double toDouble(Short value) {
-        return value == null ? null : value.doubleValue();
-    }
+    public static Double toDouble(Short value) { return value == null ? null : value.doubleValue(); }
 
-    public static Double toDouble(Integer value) {
-        return value == null ? null : value.doubleValue();
-    }
+    public static Double toDouble(Integer value) { return value == null ? null : value.doubleValue(); }
 
-    public static Double toDouble(Long value) {
-        return value == null ? null : value.doubleValue();
-    }
+    public static Double toDouble(Long value) { return value == null ? null : value.doubleValue(); }
 
-    public static Double toDouble(Float value) {
-        return value == null ? null : value.doubleValue();
-    }
+    public static Double toDouble(Float value) { return value == null ? null : value.doubleValue(); }
 
     public static Double toDouble(Boolean value) { return value == null ? null : (value ? 1D : 0D); }
 
-    public static Double toDouble(Character value) {
-        return value == null ? null : (double) value;
-    }
+    public static Double toDouble(Character value) { return value == null ? null : (double) value; }
 
     /**
      * 目前基本数据 Util 内类似的方法均使用了<strong>极大的容忍度</strong>
@@ -292,13 +162,13 @@ public final class DoubleUtil {
         return sum;
     }
 
-    public static Double toObjectArr(float... values) {
-        return Arrays2.FLOATS.toObjects(values);
+    public static Double[] toObjectArr(float... values) {
+        return Arrays2.DOUBLES.toObjects(values);
     }
 
     public static double[] toPrimitiveArr(double defaultIfNull, Double... values) {
         int length = values == null ? 0 : values.length;
-        if (length == 0) { return Arrays2.FLOATS.empty(); }
+        if (length == 0) { return Arrays2.DOUBLES.empty(); }
         double[] result = new double[length];
         for (int i = 0; i < length; i++) {
             result[i] = values[i] == null ? defaultIfNull : values[i];

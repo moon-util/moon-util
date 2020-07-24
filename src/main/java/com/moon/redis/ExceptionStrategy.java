@@ -27,7 +27,7 @@ public enum ExceptionStrategy implements ExceptionHandler {
      */
     THROW {
         @Override
-        public void onException(Exception ex) { throw new RuntimeException(ex); }
+        public void onException(Exception ex) { throw new MoonRedisAccessException(ex); }
     };
 
     @Override

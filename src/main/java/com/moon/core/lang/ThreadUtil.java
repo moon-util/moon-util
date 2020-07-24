@@ -11,9 +11,7 @@ public final class ThreadUtil {
 
     public static Thread current() { return Thread.currentThread(); }
 
-    public static void start(Runnable runnable) {
-        of(runnable).start();
-    }
+    public static void start(Runnable runnable) { of(runnable).start(); }
 
     public static Thread of(Runnable runnable) {
         return runnable == null ? new Thread()

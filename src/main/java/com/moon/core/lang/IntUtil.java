@@ -65,7 +65,11 @@ public final class IntUtil {
      */
     public static int defaultIfInvalid(CharSequence cs, int defaultVal) {
         try {
-            return toIntValue(cs);
+            if (cs == null) {
+                return defaultVal;
+            }
+            String value = cs.toString().trim().toLowerCase();
+            return StringUtil.isEmpty(value) ? defaultVal : Integer.parseInt(value);
         } catch (Exception e) {
             return defaultVal;
         }

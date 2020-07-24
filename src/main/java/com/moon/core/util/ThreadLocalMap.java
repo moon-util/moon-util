@@ -42,74 +42,46 @@ public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<
         this.constructor = (constructor == null) ? CONSTRUCTOR : constructor;
     }
 
-    public ThreadLocalMap(Map<K, V> map) {
-        this(() -> new HashMap<>(map));
-    }
+    public ThreadLocalMap(Map<K, V> map) { this(() -> new HashMap<>(map)); }
 
     @Override
-    public int size() {
-        return getMap().size();
-    }
+    public int size() { return getMap().size(); }
 
     @Override
-    public boolean isEmpty() {
-        return getMap().isEmpty();
-    }
+    public boolean isEmpty() { return getMap().isEmpty(); }
 
     @Override
-    public boolean containsKey(Object key) {
-        return getMap().containsKey(key);
-    }
+    public boolean containsKey(Object key) { return getMap().containsKey(key); }
 
     @Override
-    public boolean containsValue(Object value) {
-        return getMap().containsValue(value);
-    }
+    public boolean containsValue(Object value) { return getMap().containsValue(value); }
 
     @Override
-    public V get(Object key) {
-        return getMap().get(key);
-    }
+    public V get(Object key) { return getMap().get(key); }
 
     @Override
-    public V put(K key, V value) {
-        return getMap().put(key, value);
-    }
+    public V put(K key, V value) { return getMap().put(key, value); }
 
     @Override
-    public V remove(Object key) {
-        return getMap().remove(key);
-    }
+    public V remove(Object key) { return getMap().remove(key); }
 
     @Override
-    public void putAll(Map<? extends K, ? extends V> m) {
-        getMap().putAll(m);
-    }
+    public void putAll(Map<? extends K, ? extends V> m) { getMap().putAll(m); }
 
     @Override
-    public void clear() {
-        getMap().clear();
-    }
+    public void clear() { getMap().clear(); }
 
     @Override
-    public Set<K> keySet() {
-        return getMap().keySet();
-    }
+    public Set<K> keySet() { return getMap().keySet(); }
 
     @Override
-    public Collection<V> values() {
-        return getMap().values();
-    }
+    public Collection<V> values() { return getMap().values(); }
 
     @Override
-    public Set<Entry<K, V>> entrySet() {
-        return getMap().entrySet();
-    }
+    public Set<Entry<K, V>> entrySet() { return getMap().entrySet(); }
 
     @Override
-    public void forEach(BiConsumer<? super K, ? super V> action) {
-        this.getMap().forEach(action);
-    }
+    public void forEach(BiConsumer<? super K, ? super V> action) { this.getMap().forEach(action); }
 
     @Override
     public V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
@@ -132,14 +104,10 @@ public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<
     }
 
     @Override
-    public V getOrDefault(Object key, V defaultValue) {
-        return getMap().getOrDefault(key, defaultValue);
-    }
+    public V getOrDefault(Object key, V defaultValue) { return getMap().getOrDefault(key, defaultValue); }
 
     @Override
-    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
-        getMap().replaceAll(function);
-    }
+    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) { getMap().replaceAll(function); }
 
     @Override
     public V putIfAbsent(K key, V value) {
@@ -174,7 +142,5 @@ public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<
     }
 
     @Override
-    public void remove() {
-        super.remove();
-    }
+    public void remove() { super.remove(); }
 }

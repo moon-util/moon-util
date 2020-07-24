@@ -6,12 +6,17 @@
 
   <groupId>com.github.moon-util</groupId>
   <artifactId>moon-util</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <version>0.0.33</version>
 
   <name>moon-util</name>
   <description>a java tool library</description>
   <url>https://github.com/moon-util/moon-util</url>
+
+  <properties>
+    <poi.version>4.1.1</poi.version>
+    <kotlin.version>1.0.0</kotlin.version>
+  </properties>
 
   <licenses>
     <license>
@@ -117,11 +122,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <properties>
-    <poi.version>4.1.1</poi.version>
-    <kotlin.version>1.0.0</kotlin.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -294,11 +294,13 @@
       <optional>true</optional>
     </dependency>
 
+    <!-- redisson 分布式锁等
     <dependency>
       <groupId>org.redisson</groupId>
       <artifactId>redisson</artifactId>
       <version>3.13.0</version>
     </dependency>
+    -->
 
 
     <!-- hibernate-validator 验证需要三个依赖:

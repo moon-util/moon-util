@@ -1,10 +1,5 @@
 package com.moon.core.lang;
 
-import com.moon.core.io.IOUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
-
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -14,11 +9,12 @@ public final class RuntimeUtil {
 
     private RuntimeUtil() { noInstanceError(); }
 
-    static {
-        try {
-            Process process = Runtime.getRuntime().exec("ipconfig -all");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static Runtime getRuntime() {
+        return Runtime.getRuntime();
     }
+
+    /**
+     * 返回最大内存
+     */
+    public final long getMaxMemory() { return getRuntime().maxMemory(); }
 }

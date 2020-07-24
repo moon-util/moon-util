@@ -38,8 +38,11 @@ public final class LongUtil {
      */
     public static long defaultIfInvalid(CharSequence cs, long defaultVal) {
         try {
-            Long value = toLong(cs);
-            return value == null ? defaultVal : value;
+            if (cs == null) {
+                return defaultVal;
+            }
+            String value = cs.toString().trim().toLowerCase();
+            return value == null ? defaultVal : Long.parseLong(value);
         } catch (Throwable t) {
             return defaultVal;
         }
