@@ -10,6 +10,7 @@ import static com.moon.core.lang.StackTraceUtil.getSkipCallerTypeName;
 /**
  * @author moonsky
  */
+@Deprecated
 final class WeakMapManager implements Runnable {
 
     private static WeakMapManager CURRENT;

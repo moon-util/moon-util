@@ -84,7 +84,5 @@ public final class JSONObject extends HashMap<String, Object>
     }
 
     @Override
-    public String toString() {
-        return JSONCfg.WEAK.get().stringify(this);
-    }
+    public String toString() { return JSONCfg.getStringer().stringify(this); }
 }

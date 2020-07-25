@@ -32,6 +32,21 @@ public enum Seasons implements EnumDescriptor {
 
     public int getQuarterValue() { return value; }
 
+    public static Seasons of(int value) {
+        switch (value) {
+            case 1:
+                return SPRING;
+            case 2:
+                return SUMMER;
+            case 3:
+                return AUTUMN;
+            case 4:
+                return WINTER;
+            default:
+                throw new IllegalArgumentException("Invalid quarter value of: " + value + "; Expected 1 ~ 4;");
+        }
+    }
+
     @Override
     public String getText() { return text; }
 }

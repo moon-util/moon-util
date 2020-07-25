@@ -147,7 +147,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      *
      * @return
      */
-    static String toJsonString(Object obj) { return JSONCfg.WEAK.get().stringify(obj); }
+    static String toJsonString(Object obj) { return JSONCfg.getStringer().stringify(obj); }
 
     /**
      * 将 Object 字符串化

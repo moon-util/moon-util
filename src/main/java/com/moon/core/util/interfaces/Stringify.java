@@ -22,5 +22,5 @@ public interface Stringify<T> {
      *
      * @return a new function
      */
-    default Function<T, String> asStringifyFunction() { return this::stringify; }
+    default Function<T, String> asFunction() { return this::stringify; }
 }

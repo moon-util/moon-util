@@ -16,40 +16,22 @@ class DoubleUtilTestTest {
 
     @Test
     void testRequiredEq() {
-        DoubleUtil.requireEq(10.0, 10.0);
-        assertThrows(NumberException.class, () -> DoubleUtil.requireEq(10.0, 10.1));
     }
 
     @Test
     void testRequiredGt() {
-        DoubleUtil.requireGt(10.1, 10.0);
-        DoubleUtil.requireGt(10.2, 10.0);
-        assertThrows(NumberException.class, () -> DoubleUtil.requireGt(10.0, 10.1));
-        assertThrows(NumberException.class, () -> DoubleUtil.requireGt(10.1, 10.1));
     }
 
     @Test
     void testRequiredLt() {
-        DoubleUtil.requireLt(10.1, 10.2);
-        DoubleUtil.requireLt(10.0, 10.2);
-        assertThrows(NumberException.class, () -> DoubleUtil.requireLt(10.2, 10.2));
-        assertThrows(NumberException.class, () -> DoubleUtil.requireLt(10.3, 10.2));
     }
 
     @Test
     void testRequiredGtOrEq() {
-        DoubleUtil.requireGtOrEq(10.2, 10.2);
-        DoubleUtil.requireGtOrEq(10.3, 10.2);
-        assertThrows(NumberException.class, () -> DoubleUtil.requireGtOrEq(10.1, 10.2));
-        assertThrows(NumberException.class, () -> DoubleUtil.requireGtOrEq(10.0, 10.2));
     }
 
     @Test
     void testRequiredLtOrEq() {
-        DoubleUtil.requireLtOrEq(10.2, 10.2);
-        DoubleUtil.requireLtOrEq(10.1, 10.2);
-        DoubleUtil.requireLtOrEq(10.0, 10.2);
-        assertThrows(NumberException.class, () -> DoubleUtil.requireLtOrEq(10.3, 10.2));
     }
 
     @Test

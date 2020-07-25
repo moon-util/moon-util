@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.function.ToIntBiFunction;
 
 import static com.moon.core.util.CalendarUtil.copy;
+import static com.moon.core.util.CalendarUtil.overrideCalendar;
 import static com.moon.core.util.DatetimeField.*;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 import static java.time.temporal.ChronoField.NANO_OF_DAY;
@@ -22,10 +23,14 @@ import static java.time.temporal.ChronoField.NANO_OF_DAY;
  * 命名为{@code Datetime}小写“t”为了不与{@code org.joda.time.DateTime}冲突
  * <p>
  * 可变对象可不可变对象切换：{@link #asImmutable()}{@link #asMutable()}
+ * <p>
+ * 默认星期一是一周第一天:
+ * {@link #getFirstDayOfWeekValue()}、{@link #getFirstDayOfWeek()}；
+ * {@link #startOfWeek(DayOfWeek)}、{@link #endOfWeek(DayOfWeek)}；
  *
  * @author moonsky
  */
-public final class Datetime extends Date implements TemporalAccessor, TemporalAdjuster {
+public final class Datetime extends Date implements TemporalAccessor, TemporalAdjuster, Temporal {
 
     /**
      * 纳秒
@@ -89,9 +94,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     private Calendar obtainCalendar() { return immutable ? copy(calendar) : calendar; }
 
-    private Datetime(Calendar calendar, boolean immutable) {
-        super(calendar.getTimeInMillis());
-        this.calendar = calendar;
+    public Datetime(Calendar originCalendar, boolean immutable) {
+        super(originCalendar.getTimeInMillis());
+        this.calendar = originCalendar;
         this.immutable = immutable;
     }
 
@@ -119,7 +124,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime(org.joda.time.LocalDateTime datetime) { this(datetime.toDate()); }
 
-    public Datetime() { this(new Date()); }
+    public Datetime() { this(System.currentTimeMillis()); }
 
     public static Datetime now() { return new Datetime(); }
 
@@ -132,6 +137,10 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public static Datetime of(int... fields) { return new Datetime(DateUtil.toCalendar(fields)); }
 
     public static Datetime ofToday(LocalTime time) { return new Datetime(time.atDate(LocalDate.now())); }
+
+    public static Datetime of(LocalDate date) { return new Datetime(date); }
+
+    public static Datetime of(LocalDateTime datetime) { return new Datetime(datetime); }
 
     /*
      * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,11 +203,18 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public int getQuarterValue() { return getMonthValue() / 3 + 1; }
 
     /**
-     * 返回当前月份
+     * 返回当前月份，1 ~ 12
      *
      * @return 月份
      */
     public int getMonthValue() { return getField(MONTH); }
+
+    /**
+     * 获取月份索引，0 ~ 11
+     *
+     * @return 月份索引
+     */
+    public int getMonthIndex() { return getMonthValue() - 1; }
 
     /**
      * 获取当前月份
@@ -377,6 +393,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     /**
      * 获取指定字段的值
+     * <p>
+     * 注：获取月份返回的是 1 ~ 12
      *
      * @param field 字段
      *
@@ -386,6 +404,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     /**
      * 获取指定字段值
+     * <p>
+     * 注：获取月份返回的是 1 ~ 12
      *
      * @param field 字段
      *
@@ -500,15 +520,13 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Datetime withMonth(int value) { return withField(MONTH, value); }
 
     /**
-     * 设置月份，1 ~ 12
+     * 设置当前月份，0 ~ 11
      *
-     * @param month 月份
+     * @param index 月份索引：0 ~ 11
      *
      * @return 当前对象
      */
-    public Datetime withMonth(DatetimeMonth month) {
-        return withMonth(month.getValue());
-    }
+    public Datetime withMonthIndex(int index) { return withMonth(index + 1); }
 
     /**
      * 设置月份，1 ~ 12
@@ -517,9 +535,16 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withMonth(Month month) {
-        return withMonth(month.getValue());
-    }
+    public Datetime withMonth(DatetimeMonth month) { return withMonth(month.getValue()); }
+
+    /**
+     * 设置月份，1 ~ 12
+     *
+     * @param month 月份
+     *
+     * @return 当前对象
+     */
+    public Datetime withMonth(Month month) { return withMonth(month.getValue()); }
 
     /**
      * 设置年份
@@ -562,18 +587,14 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 一周的第一天
      */
-    public DayOfWeek getFirstDayOfWeek() {
-        return DayOfWeek.of(getFirstDayOfWeekValue());
-    }
+    public DayOfWeek getFirstDayOfWeek() { return DayOfWeek.of(getFirstDayOfWeekValue()); }
 
     /**
      * 返回一周第一天是星期几
      *
      * @return 一周的第一天序号
      */
-    public int getFirstDayOfWeekValue() {
-        return calendar.getFirstDayOfWeek();
-    }
+    public int getFirstDayOfWeekValue() { return calendar.getFirstDayOfWeek(); }
 
     /**
      * 设置一周的第一天是星期几
@@ -581,10 +602,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @param firstDayOfWeek 给定一周的第一天
      *
      * @return 当前对象
+     *
+     * @see #startOfWeek(DayOfWeek)
+     * @see #endOfWeek(DayOfWeek)
      */
-    public Datetime setFirstDayOfWeek(DayOfWeek firstDayOfWeek) {
-        return setFirstDayOfWeek(firstDayOfWeek.getValue());
-    }
+    public Datetime setFirstDayOfWeek(DayOfWeek firstDayOfWeek) { return setFirstDayOfWeek(firstDayOfWeek.getValue()); }
 
     /**
      * 设置一周的第一天是星期几
@@ -662,6 +684,26 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     private static Calendar changeCalendarOf(Calendar calendar, int field, int amount) {
         calendar.add(field, amount);
         return calendar;
+    }
+
+    @Override
+    public boolean isSupported(TemporalUnit unit) { return toInstant().isSupported(unit); }
+
+    @Override
+    public Datetime with(TemporalField field, long newValue) {
+        LocalDateTime datetime = toLocalDateTime().with(field, newValue);
+        return obtainReturning(overrideCalendar(obtainCalendar(), datetime));
+    }
+
+    @Override
+    public Datetime plus(long amountToAdd, TemporalUnit unit) {
+        LocalDateTime datetime = toLocalDateTime().plus(amountToAdd, unit);
+        return obtainReturning(overrideCalendar(obtainCalendar(), datetime));
+    }
+
+    @Override
+    public long until(Temporal endExclusive, TemporalUnit unit) {
+        return toLocalDateTime().until(endExclusive, unit);
     }
 
     private enum CalendarField {
@@ -750,6 +792,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * 当前星期的最初时刻
      *
      * @return Datetime
+     *
+     * @see #getFirstDayOfWeek()
+     * @see #getFirstDayOfWeekValue()
      */
     public Datetime startOfWeek() { return startOfWeek(getFirstDayOfWeek()); }
 
@@ -823,6 +868,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @param firstDayOfWeek 指定星期几为一周第一天
      *
      * @return Datetime
+     *
+     * @see #setFirstDayOfWeek(int)
+     * @see #setFirstDayOfWeek(DayOfWeek)
      */
     public Datetime endOfWeek(DayOfWeek firstDayOfWeek) {
         Datetime datetime = endOfDay();
@@ -909,7 +957,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public boolean isYearAfter(Datetime date) { return date != null && isYearAfter(date.getYearValue()); }
 
-    public boolean isMonthOf(int year, int month) { return isYearOf(year) && getMonthValue() == month; }
+    public boolean isMonthOf(int year, int month) { return isYearOf(year) && isMonthAt(month); }
+
+    public boolean isMonthAt(int month) { return getMonthValue() == month; }
 
     public boolean isMonthBefore(int year, int month) {
         return isYearBefore(year) || (isYearOf(year) && getMonthValue() < month);
@@ -932,8 +982,10 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     }
 
     public boolean isDateOf(int year, int month, int dayOfMonth) {
-        return isMonthOf(year, month) && getDayOfMonth() == dayOfMonth;
+        return isMonthOf(year, month) && isDateAt(dayOfMonth);
     }
+
+    public boolean isDateAt(int dayOfMonth) { return getDayOfMonth() == dayOfMonth; }
 
     public boolean isDateBefore(int year, int month, int dayOfMonth) {
         return isMonthBefore(year, month) || (isMonthOf(year, month) && getDayOfMonth() < dayOfMonth);
@@ -967,7 +1019,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public boolean isHourAfter(Datetime hour) { return hour != null && isHourAfter(hour.getHourOfDay()); }
 
-    public boolean isMinuteOf(int hour, int minute) { return isHourOf(hour) && getMinuteOfHour() == minute; }
+    public boolean isMinuteOf(int hour, int minute) { return isHourOf(hour) && isMinuteAt(minute); }
+
+    public boolean isMinuteAt(int minute) { return getMinuteOfHour() == minute; }
 
     public boolean isMinuteBefore(int hour, int minute) {
         return isHourBefore(hour) || (isHourOf(hour) && getMinuteOfHour() < minute);
@@ -990,8 +1044,10 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     }
 
     public boolean isSecondOf(int hour, int minute, int second) {
-        return isMinuteOf(hour, minute) && getSecondOfMinute() == second;
+        return isMinuteOf(hour, minute) && isSecondAt(second);
     }
+
+    public boolean isSecondAt(int second) { return getSecondOfMinute() == second; }
 
     public boolean isSecondBefore(int hour, int minute, int second) {
         return isMinuteBefore(hour, minute) || (isMinuteOf(hour, minute) && getSecondOfMinute() < second);
@@ -1096,6 +1152,10 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public boolean isDatetimeAfter(String... values) {
         return values != null && isDatetimeAfter(IntUtil.toInts(values));
     }
+
+    public boolean isBefore(long timeInMillis) { return getTime() < timeInMillis; }
+
+    public boolean isAfter(long timeInMillis) { return getTime() > timeInMillis; }
 
     /*
      * ****************************************************************************

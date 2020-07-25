@@ -549,8 +549,8 @@ public final class ArrayUtil {
     public static Double[] toObjects(double[] value) { return transformArray(value, Double[]::new); }
 
     public static Object[] toObjectArray(Object value) {
-        if (value == null) {
-            return null;
+        if (value == null || value instanceof Object[]) {
+            return (Object[]) value;
         }
         if (value.getClass().isArray()) {
             int length = Array.getLength(value);

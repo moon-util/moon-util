@@ -23,14 +23,14 @@ public class DateTimeUtilTest {
     void testStartingOfMonth() {
         LocalDateTime datetime = LocalDateTime.now();
         System.out.println(DateTimeUtil.format(datetime, Const.PATTERN));
-        System.out.println(DateTimeUtil.format(DateTimeUtil.startingOfMonth(datetime), Const.PATTERN));
-        System.out.println(DateTimeUtil.endingOfYear(datetime).format(formatter));
-        System.out.println(DateTimeUtil.endingOfMonth(datetime).format(formatter));
-        System.out.println(DateTimeUtil.startingOfDay(datetime).format(formatter));
-        System.out.println(DateTimeUtil.endingOfYear(datetime.toLocalDate()).format(patternDate));
-        System.out.println(DateTimeUtil.endingOfDay(datetime).format(formatter));
-        System.out.println(DateTimeUtil.endingOfYear(datetime).getNano());
-        System.out.println(DateTimeUtil.startingOfDay(datetime).getNano());
+        System.out.println(DateTimeUtil.format(DateTimeUtil.startOfMonth(datetime), Const.PATTERN));
+        System.out.println(DateTimeUtil.endOfYear(datetime).format(formatter));
+        System.out.println(DateTimeUtil.endOfMonth(datetime).format(formatter));
+        System.out.println(DateTimeUtil.startOfDay(datetime).format(formatter));
+        System.out.println(DateTimeUtil.endOfYear(datetime.toLocalDate()).format(patternDate));
+        System.out.println(DateTimeUtil.endOfDay(datetime).format(formatter));
+        System.out.println(DateTimeUtil.endOfYear(datetime).getNano());
+        System.out.println(DateTimeUtil.startOfDay(datetime).getNano());
     }
 
     @Test
@@ -97,10 +97,10 @@ public class DateTimeUtilTest {
     @Test
     void testTestGetDayOfWeek() throws Exception {
         LocalDate now = DateTimeUtil.toDate(2020, 06, 29);
-        LocalDate startingOfWeek = DateTimeUtil.startingOfWeek(now, DayOfWeek.SATURDAY);
-        LocalDate endingOfWeek = DateTimeUtil.endingOfWeek(now, DayOfWeek.SATURDAY);
-        System.out.println(DateTimeUtil.format(startingOfWeek, "yyyy-MM-dd"));
-        System.out.println(DateTimeUtil.format(endingOfWeek, "yyyy-MM-dd"));
+        LocalDate startOfWeek = DateTimeUtil.startOfWeek(now, DayOfWeek.SATURDAY);
+        LocalDate endOfWeek = DateTimeUtil.endOfWeek(now, DayOfWeek.SATURDAY);
+        System.out.println(DateTimeUtil.format(startOfWeek, "yyyy-MM-dd"));
+        System.out.println(DateTimeUtil.format(endOfWeek, "yyyy-MM-dd"));
     }
 
     @Test

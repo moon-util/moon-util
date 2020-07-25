@@ -9,14 +9,21 @@ import java.util.function.LongSupplier;
  */
 public final class FastTimestamp implements LongSupplier {
 
-    public static long getTimeInMillis() {
-        return FastTimestampRunner.TIMER.value;
-    }
+    public final static FastTimestamp INSTANCE = new FastTimestamp();
+
+    private FastTimestamp() { }
+
+    public static FastTimestamp getInstance() { return INSTANCE; }
+
+    public static long getTimeInMillis() { return FastTimestampRunner.TIMER.value; }
 
     @Override
     public long getAsLong() { return getTimeInMillis(); }
 
     private enum FastTimestampRunner {
+        /**
+         * 单例计数器
+         */
         TIMER;
         private long value;
 

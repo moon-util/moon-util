@@ -1,5 +1,6 @@
 package com.moon.core.time;
 
+import com.moon.core.enums.Const;
 import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.util.function.TableIntFunction;
@@ -611,7 +612,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在年份的最初时刻
      */
-    public static LocalDate startingOfYear(LocalDate date) { return toDate(IntUtil.toInts(date.getYear())); }
+    public static LocalDate startOfYear(LocalDate date) { return toDate(IntUtil.toInts(date.getYear())); }
 
     /**
      * 年初：当年第 0 纳秒时刻
@@ -620,7 +621,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在年份的最初时刻
      */
-    public static LocalDateTime startingOfYear(LocalDateTime datetime) {
+    public static LocalDateTime startOfYear(LocalDateTime datetime) {
         return toDateTime(IntUtil.toInts(datetime.getYear()));
     }
 
@@ -631,7 +632,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在月份的最初时刻
      */
-    public static LocalDate startingOfMonth(LocalDate date) {
+    public static LocalDate startOfMonth(LocalDate date) {
         return toDate(date.getYear(), date.getMonthValue());
     }
 
@@ -642,7 +643,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在天的最初时刻
      */
-    public static LocalDateTime startingOfMonth(LocalDateTime datetime) {
+    public static LocalDateTime startOfMonth(LocalDateTime datetime) {
         return toDateTime(datetime.getYear(), datetime.getMonthValue());
     }
 
@@ -654,7 +655,7 @@ public final class DateTimeUtil {
      *
      * @return 当前日期所在周的第一天
      */
-    public static LocalDate startingOfWeek(LocalDate date, DayOfWeek firstDayOfWeek) {
+    public static LocalDate startOfWeek(LocalDate date, DayOfWeek firstDayOfWeek) {
         int diffDays = date.getDayOfWeek().ordinal() - firstDayOfWeek.ordinal();
         return date.minusDays(diffDays < 0 ? diffDays + 7 : diffDays);
     }
@@ -667,9 +668,9 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在周的最初时刻
      */
-    public static LocalDateTime startingOfWeek(LocalDateTime datetime, DayOfWeek firstDayOfWeek) {
+    public static LocalDateTime startOfWeek(LocalDateTime datetime, DayOfWeek firstDayOfWeek) {
         int diffDays = datetime.getDayOfWeek().ordinal() - firstDayOfWeek.ordinal();
-        return startingOfDay(datetime.minusDays(diffDays < 0 ? diffDays + 7 : diffDays));
+        return startOfDay(datetime.minusDays(diffDays < 0 ? diffDays + 7 : diffDays));
     }
 
     /**
@@ -679,7 +680,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在天的最初时刻
      */
-    public static LocalDateTime startingOfDay(LocalDateTime datetime) {
+    public static LocalDateTime startOfDay(LocalDateTime datetime) {
         return toDateTime(datetime.getYear(), datetime.getMonth().getValue(), datetime.getDayOfMonth());
     }
 
@@ -690,7 +691,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在小时的最初时刻
      */
-    public static LocalTime startingOfHour(LocalTime time) {
+    public static LocalTime startOfHour(LocalTime time) {
         return toTime(IntUtil.toInts(time.getHour()));
     }
 
@@ -701,8 +702,8 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在小时的最初时刻
      */
-    public static LocalDateTime startingOfHour(LocalDateTime datetime) {
-        return LocalDateTime.of(datetime.toLocalDate(), startingOfHour(datetime.toLocalTime()));
+    public static LocalDateTime startOfHour(LocalDateTime datetime) {
+        return LocalDateTime.of(datetime.toLocalDate(), startOfHour(datetime.toLocalTime()));
     }
 
     /**
@@ -712,8 +713,8 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在分钟的最初时刻
      */
-    public static LocalDateTime startingOfMinute(LocalDateTime datetime) {
-        return LocalDateTime.of(datetime.toLocalDate(), startingOfMinute(datetime.toLocalTime()));
+    public static LocalDateTime startOfMinute(LocalDateTime datetime) {
+        return LocalDateTime.of(datetime.toLocalDate(), startOfMinute(datetime.toLocalTime()));
     }
 
     /**
@@ -723,7 +724,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在分钟的最初时刻
      */
-    public static LocalTime startingOfMinute(LocalTime time) {
+    public static LocalTime startOfMinute(LocalTime time) {
         return toTime(time.getHour(), time.getMinute());
     }
 
@@ -734,7 +735,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在秒的最初时刻
      */
-    public static LocalTime startingOfSecond(LocalTime time) {
+    public static LocalTime startOfSecond(LocalTime time) {
         return toTime(time.getHour(), time.getMinute(), time.getSecond());
     }
 
@@ -745,8 +746,8 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在秒的最初时刻
      */
-    public static LocalDateTime startingOfSecond(LocalDateTime datetime) {
-        return LocalDateTime.of(datetime.toLocalDate(), startingOfSecond(datetime.toLocalTime()));
+    public static LocalDateTime startOfSecond(LocalDateTime datetime) {
+        return LocalDateTime.of(datetime.toLocalDate(), startOfSecond(datetime.toLocalTime()));
     }
 
     /**
@@ -756,7 +757,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在年份的最后时刻
      */
-    public static LocalDate endingOfYear(LocalDate date) {
+    public static LocalDate endOfYear(LocalDate date) {
         return toDate(IntUtil.toInts(date.getYear() + 1)).minusDays(1);
     }
 
@@ -767,7 +768,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在年份的最后时刻
      */
-    public static LocalDateTime endingOfYear(LocalDateTime datetime) {
+    public static LocalDateTime endOfYear(LocalDateTime datetime) {
         return toDateTime(IntUtil.toInts(datetime.getYear() + 1)).minusNanos(1);
     }
 
@@ -778,7 +779,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在月份的最后时刻
      */
-    public static LocalDate endingOfMonth(LocalDate date) {
+    public static LocalDate endOfMonth(LocalDate date) {
         return toDate(date.getYear(), date.getMonth().getValue()).plusMonths(1).minusDays(1);
     }
 
@@ -789,7 +790,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在月份的最后时刻
      */
-    public static LocalDateTime endingOfMonth(LocalDateTime datetime) {
+    public static LocalDateTime endOfMonth(LocalDateTime datetime) {
         return toDateTime(datetime.getYear(), datetime.getMonth().getValue()).plusMonths(1).minusNanos(1);
     }
 
@@ -801,7 +802,7 @@ public final class DateTimeUtil {
      *
      * @return 当前日期所在周的最后一天
      */
-    public static LocalDate endingOfWeek(LocalDate date, DayOfWeek firstDayOfWeek) {
+    public static LocalDate endOfWeek(LocalDate date, DayOfWeek firstDayOfWeek) {
         int diffDays = firstDayOfWeek.ordinal() - date.getDayOfWeek().ordinal();
         return date.plusDays(diffDays <= 0 ? diffDays + 6 : diffDays - 1);
     }
@@ -814,9 +815,9 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在周的最后时刻
      */
-    public static LocalDateTime endingOfWeek(LocalDateTime datetime, DayOfWeek firstDayOfWeek) {
+    public static LocalDateTime endOfWeek(LocalDateTime datetime, DayOfWeek firstDayOfWeek) {
         int diffDays = firstDayOfWeek.ordinal() - datetime.getDayOfWeek().ordinal();
-        return endingOfDay(datetime.plusDays(diffDays <= 0 ? diffDays + 6 : diffDays - 1));
+        return endOfDay(datetime.plusDays(diffDays <= 0 ? diffDays + 6 : diffDays - 1));
     }
 
     /**
@@ -826,7 +827,7 @@ public final class DateTimeUtil {
      *
      * @return 指定日期所在天的最后时刻
      */
-    public static LocalDateTime endingOfDay(LocalDateTime datetime) {
+    public static LocalDateTime endOfDay(LocalDateTime datetime) {
         return toDateTime(datetime.getYear(), datetime.getMonth().getValue(), datetime.getDayOfMonth()).plusDays(1)
             .minusNanos(1);
     }
@@ -838,7 +839,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在小时的最后时刻
      */
-    public static LocalTime endingOfHour(LocalTime time) {
+    public static LocalTime endOfHour(LocalTime time) {
         return toTime(IntUtil.toInts(time.getHour())).plusHours(1).minusNanos(1);
     }
 
@@ -849,8 +850,8 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在小时的最后时刻
      */
-    public static LocalDateTime endingOfHour(LocalDateTime datetime) {
-        return LocalDateTime.of(datetime.toLocalDate(), endingOfHour(datetime.toLocalTime()));
+    public static LocalDateTime endOfHour(LocalDateTime datetime) {
+        return LocalDateTime.of(datetime.toLocalDate(), endOfHour(datetime.toLocalTime()));
     }
 
     /**
@@ -860,7 +861,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在分钟的最后时刻
      */
-    public static LocalTime endingOfMinute(LocalTime time) {
+    public static LocalTime endOfMinute(LocalTime time) {
         return toTime(time.getHour(), time.getMinute()).plusMinutes(1).minusNanos(1);
     }
 
@@ -871,8 +872,8 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在分钟的最后时刻
      */
-    public static LocalDateTime endingOfMinute(LocalDateTime datetime) {
-        return LocalDateTime.of(datetime.toLocalDate(), endingOfMinute(datetime.toLocalTime()));
+    public static LocalDateTime endOfMinute(LocalDateTime datetime) {
+        return LocalDateTime.of(datetime.toLocalDate(), endOfMinute(datetime.toLocalTime()));
     }
 
     /**
@@ -882,7 +883,7 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在秒的最后时刻
      */
-    public static LocalTime endingOfSecond(LocalTime time) {
+    public static LocalTime endOfSecond(LocalTime time) {
         return toTime(time.getHour(), time.getMinute(), time.getSecond()).plusSeconds(1).minusNanos(1);
     }
 
@@ -893,8 +894,8 @@ public final class DateTimeUtil {
      *
      * @return 指定时间所在秒的最后时刻
      */
-    public static LocalDateTime endingOfSecond(LocalDateTime datetime) {
-        return LocalDateTime.of(datetime.toLocalDate(), endingOfSecond(datetime.toLocalTime()));
+    public static LocalDateTime endOfSecond(LocalDateTime datetime) {
+        return LocalDateTime.of(datetime.toLocalDate(), endOfSecond(datetime.toLocalTime()));
     }
 
     /*
@@ -902,6 +903,33 @@ public final class DateTimeUtil {
      * formats
      * ----------------------------------------------------------------------------------
      */
+
+    /**
+     * 格式化日期/时间
+     *
+     * @param accessor 日期/时间
+     *
+     * @return 格式化后的字符串
+     */
+    public static String format(TemporalAccessor accessor) { return format(accessor, Const.PATTERN); }
+
+    /**
+     * 格式化日期
+     *
+     * @param date 日期
+     *
+     * @return 格式化后的字符串
+     */
+    public static String format(LocalDate date) { return format(date, Const.PATTERN_DATE); }
+
+    /**
+     * 格式化时间
+     *
+     * @param time 时间
+     *
+     * @return 格式化后的字符串
+     */
+    public static String format(LocalTime time) { return format(time, Const.PATTERN_TIME); }
 
     /**
      * 格式化日期/时间
@@ -933,17 +961,11 @@ public final class DateTimeUtil {
      * ----------------------------------------------------------------------------------
      */
 
-    public static LocalDateTime safeToDateTime(Instant instant) {
-        return ofInstant(instant, ZoneId.systemDefault());
-    }
+    public static LocalDateTime safeToDateTime(Instant instant) { return ofInstant(instant, ZoneId.systemDefault()); }
 
-    public static LocalDateTime safeToDateTime(Date date) {
-        return safeToDateTime(date.toInstant());
-    }
+    public static LocalDateTime safeToDateTime(Date date) { return safeToDateTime(date.toInstant()); }
 
-    public static LocalDateTime safeToDateTime(Calendar calendar) {
-        return safeToDateTime(calendar.toInstant());
-    }
+    public static LocalDateTime safeToDateTime(Calendar calendar) { return safeToDateTime(calendar.toInstant()); }
 
     public static Instant safeToInstant(Date date) { return date.toInstant(); }
 
@@ -1119,7 +1141,7 @@ public final class DateTimeUtil {
      */
     public static <T> T reduceYears(
         LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, ? extends T> reducer, T totalValue
-    ) { return reduce(startingOfYear(begin), startingOfYear(end), b -> b.plusYears(1), reducer, totalValue); }
+    ) { return reduce(startOfYear(begin), startOfYear(end), b -> b.plusYears(1), reducer, totalValue); }
 
     /**
      * 聚合函数，从开始月份（含）至结束月份（不含），用月份比较，遍历处理每个月份数据
@@ -1145,7 +1167,7 @@ public final class DateTimeUtil {
      */
     public static <T> T reduceMonths(
         LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, ? extends T> reducer, T totalValue
-    ) { return reduce(startingOfMonth(begin), startingOfMonth(end), b -> b.plusMonths(1), reducer, totalValue); }
+    ) { return reduce(startOfMonth(begin), startOfMonth(end), b -> b.plusMonths(1), reducer, totalValue); }
 
     /**
      * 聚合函数，以周为单位逐步遍历增长处理

@@ -4,6 +4,7 @@ import com.moon.core.enums.Const;
 import com.moon.core.lang.LongUtil;
 import com.moon.core.time.DateTimeUtil;
 import com.moon.core.util.validator.ResidentID18Validator;
+import org.joda.time.DateTime;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,9 +21,34 @@ import static java.lang.Integer.parseInt;
 import static java.util.Calendar.*;
 
 /**
+ * 本类所有返回{@link Calendar}的方法均是返回新对象，而不是在原有对象上操作
+ * <p>
+ * 如：
+ * <pre>
+ *     Calendar calendar = Calendar.getInstance();
+ *     Calendar resultCalendar = CalendarUtil.nextYear(calendar);
+ *     assertTrue(calendar != resultCalendar); // 传入对象和返回对象是不同的
+ * </pre>
+ *
  * @author moonsky
  */
 public class CalendarUtil {
+
+    private final static class ImportedJoda {
+
+        final static boolean IMPORTED_JODA;
+
+        static {
+            boolean importedJoda;
+            try {
+                DateTime.now();
+                importedJoda = true;
+            } catch (Throwable t) {
+                importedJoda = false;
+            }
+            IMPORTED_JODA = importedJoda;
+        }
+    }
 
     protected CalendarUtil() { noInstanceError(); }
 
@@ -57,6 +83,13 @@ public class CalendarUtil {
     };
 
     final static Calendar current() { return getInstance(); }
+
+    /**
+     * 是否引入 joda 时间
+     *
+     * @return
+     */
+    public final static boolean isImportedJodaTime() { return ImportedJoda.IMPORTED_JODA; }
 
     /*
      * -------------------------------------------------------------------------
@@ -682,66 +715,21 @@ public class CalendarUtil {
     public final static Calendar toCalendar(Date date) { return date == null ? null : toCalendar(date.getTime()); }
 
     public final static Calendar toCalendar(LocalDate date, LocalTime time) {
-        return toCalendar(date.getYear(),
-            date.getDayOfMonth(),
-            date.getDayOfMonth(),
-            time.getHour(),
-            time.getMinute(),
-            time.getSecond());
+        return overrideCalendar(current(), date, time);
     }
 
     public final static Calendar toCalendar(LocalTime time) {
-        return time == null ? null : toCalendar(LocalDate.now(), time);
+        return toCalendar(LocalDate.now(), time);
     }
 
     public final static Calendar toCalendar(LocalDate date) {
-        return date == null ? null : toCalendar(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0);
+        return overrideCalendar(current(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0, 0);
     }
 
-    public final static Calendar toCalendar(LocalDateTime date) {
-        return date == null ? null : toCalendar(date.getYear(),
-            date.getMonthValue(),
-            date.getDayOfMonth(),
-            date.getHour(),
-            date.getMinute(),
-            date.getSecond());
-    }
+    public final static Calendar toCalendar(LocalDateTime datetime) { return overrideCalendar(current(), datetime); }
 
     public final static Calendar toCalendar(int... values) {
-        if (values == null) { return null; }
-        final int len = values.length, max = 6;
-        int i = 0;
-        Calendar calendar = current();
-        switch (len) {
-            case 0:
-                return calendar;
-            case 1:
-                calendar.set(YEAR, values[i]);
-                break;
-            case 2:
-                calendar.set(YEAR, values[i++]);
-                calendar.set(MONTH, values[i] - 1);
-                break;
-            case 3:
-                calendar.set(values[i++], values[i++] - 1, values[i++]);
-                break;
-            case 4:
-                int minutes = calendar.get(MINUTE);
-                calendar.set(values[i++], values[i++] - 1, values[i++], values[i++], 0);
-                calendar.set(MINUTE, minutes);
-                break;
-            case 5:
-                calendar.set(values[i++], values[i++] - 1, values[i++], values[i++], values[i++]);
-                break;
-            case 6:
-                calendar.set(values[i++], values[i++] - 1, values[i++], values[i++], values[i++], values[i++]);
-            default:
-                if (len > max) {
-                    calendar.set(MILLISECOND, values[i++]);
-                }
-                break;
-        }
-        return calendar;
+        return overrideCalendar(current(), values);
     }
 
     public final static Calendar toCalendar(CharSequence value) {
@@ -762,5 +750,64 @@ public class CalendarUtil {
         if (value instanceof int[]) { return toCalendar((int[]) value); }
         if (value instanceof String[]) { return toCalendar((String[]) value); }
         throw new IllegalArgumentException("can not converter to java.util.Calendar of value: " + value);
+    }
+
+    public final static Calendar overrideCalendar(Calendar calendar, int... fieldsValue) {
+        if (fieldsValue == null) { return null; }
+        final int len = fieldsValue.length, max = 6;
+        int i = 0;
+        switch (len) {
+            case 0:
+                return calendar;
+            case 1:
+                calendar.set(YEAR, fieldsValue[i]);
+                break;
+            case 2:
+                calendar.set(YEAR, fieldsValue[i++]);
+                calendar.set(MONTH, fieldsValue[i] - 1);
+                break;
+            case 3:
+                calendar.set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i]);
+                break;
+            case 4:
+                int minutes = calendar.get(MINUTE);
+                calendar.set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i], 0);
+                calendar.set(MINUTE, minutes);
+                break;
+            case 5:
+                calendar.set(fieldsValue[i++],
+                    fieldsValue[i++] - 1,
+                    fieldsValue[i++],
+                    fieldsValue[i++],
+                    fieldsValue[i++]);
+                break;
+            default:
+                calendar.set(fieldsValue[i++],
+                    fieldsValue[i++] - 1,
+                    fieldsValue[i++],
+                    fieldsValue[i++],
+                    fieldsValue[i++],
+                    fieldsValue[i++]);
+                if (len > max) {
+                    calendar.set(MILLISECOND, fieldsValue[i]);
+                }
+                break;
+        }
+        return calendar;
+    }
+
+    public final static Calendar overrideCalendar(Calendar calendar, LocalDateTime date) {
+        return overrideCalendar(calendar, date.toLocalDate(), date.toLocalTime());
+    }
+
+    public final static Calendar overrideCalendar(Calendar calendar, LocalDate date, LocalTime time) {
+        return overrideCalendar(calendar,
+            date.getYear(),
+            date.getMonthValue(),
+            date.getDayOfMonth(),
+            time.getHour(),
+            time.getMinute(),
+            time.getSecond(),
+            time.getNano() / 1000000);
     }
 }

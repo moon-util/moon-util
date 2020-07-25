@@ -1,110 +1,85 @@
 package com.moon.core.json;
 
 import com.moon.core.beans.BeanInfoUtil;
+import com.moon.core.enums.Const;
+import com.moon.core.lang.StringJoiner;
+import com.moon.core.lang.ref.BooleanAccessor;
+import com.moon.core.lang.ref.DoubleAccessor;
+import com.moon.core.lang.ref.IntAccessor;
+import com.moon.core.lang.ref.LongAccessor;
+import com.moon.core.time.DateTimeUtil;
+import com.moon.core.util.DateUtil;
+import com.moon.core.util.Datetime;
+import com.moon.core.util.SetUtil;
+import com.moon.core.util.function.TableConsumer;
 import com.moon.core.util.interfaces.Stringify;
+import org.joda.time.DateTime;
+import org.joda.time.MutableDateTime;
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+import org.joda.time.format.DateTimeFormat;
+import sun.util.BuddhistCalendar;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.CharBuffer;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.*;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
+import java.util.concurrent.atomic.*;
+import java.util.function.Predicate;
+
+import static com.moon.core.util.CalendarUtil.isImportedJodaTime;
 
 /**
  * @author moonsky
  */
 class JSONStringer implements Stringify {
 
-    JSONStringer() {
-    }
+    private final static Map<Class, Stringifier> STRINGIFIER_MAP = new HashMap<>();
 
-    private void stringify(StringBuilder builder, Collection collect) {
-        builder.append('[');
-        for (Object item : collect) {
-            stringify(builder, item).append(',');
+    final static JSONStringer STRINGER = new JSONStringer();
+
+    static {
+        for (DefaultStringifiers value : DefaultStringifiers.values()) {
+            Set<Class> classes = value.getSupportsCls();
+            for (Class cls : classes) {
+                STRINGIFIER_MAP.put(cls, value);
+            }
         }
-        close(builder, ']');
+
+        if (isImportedJodaTime()) {
+            importJodaTime();
+        }
     }
 
-    private void stringifyOfJavaBean(StringBuilder stringer, Object obj) {
-        BeanInfoUtil.getFieldDescriptorsMap(obj.getClass()).forEach((name, desc) -> {
-            stringer.append('"').append(name).append('"').append(':');
-            stringify(stringer, desc.getValue(obj)).append(',');
-        });
+    private JSONStringer() { }
+
+    private static StringBuilder stringify(StringBuilder builder, Object obj) {
+        return stringify(builder, obj, StringifySettings.EMPTY);
     }
 
-    private void stringify(StringBuilder builder, CharSequence value) {
-        builder.append('"').append(value).append('"');
-    }
-
-    private void stringify(StringBuilder builder, Calendar calendar) {
-        stringify(builder, calendar.getTime());
-    }
-
-    private void stringify(StringBuilder builder, Number value) {
-        builder.append(value);
-    }
-
-    private void stringify(StringBuilder builder, Boolean value) {
-        builder.append(value);
-    }
-
-    private void stringify(StringBuilder builder, Character value) {
-        builder.append(value);
-    }
-
-    private void stringify(StringBuilder builder, Date date) {
-        builder.append('"').append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)).append('"');
-    }
-
-    private void stringify(StringBuilder builder, Map map) {
-        builder.append('{');
-        map.forEach((key, value) -> {
-            builder.append('"').append(key).append('"').append(':');
-            stringify(builder, value).append(',');
-        });
-        close(builder, '}');
-    }
-
-    private StringBuilder stringify(StringBuilder builder, Object obj) {
+    private static StringBuilder stringify(StringBuilder builder, Object obj, StringifySettings settings) {
         if (obj == null) {
-            return builder.append("null");
+            return aroundAppend(builder.append("null"), settings);
         } else {
-            if (obj instanceof Map) {
-                stringify(builder, (Map) obj);
-            } else if (obj instanceof Collection) {
-                stringify(builder, (Collection) obj);
-            } else if (obj instanceof Object[]) {
-                stringify(builder, (Object[]) obj);
-            } else if (obj instanceof boolean[]) {
-                stringify(builder, (boolean[]) obj);
-            } else if (obj instanceof char[]) {
-                stringify(builder, (char[]) obj);
-            } else if (obj instanceof byte[]) {
-                stringify(builder, (byte[]) obj);
-            } else if (obj instanceof short[]) {
-                stringify(builder, (short[]) obj);
-            } else if (obj instanceof int[]) {
-                stringify(builder, (int[]) obj);
-            } else if (obj instanceof long[]) {
-                stringify(builder, (long[]) obj);
-            } else if (obj instanceof float[]) {
-                stringify(builder, (float[]) obj);
-            } else if (obj instanceof double[]) {
-                stringify(builder, (double[]) obj);
-            } else if (obj instanceof Date) {
-                stringify(builder, (Date) obj);
-            } else if (obj instanceof Calendar) {
-                stringify(builder, (Calendar) obj);
-            } else if (obj instanceof Number) {
-                stringify(builder, (Number) obj);
-            } else if (obj instanceof Character) {
-                stringify(builder, (Character) obj);
-            } else if (obj instanceof Boolean) {
-                stringify(builder, (Boolean) obj);
-            } else if (obj instanceof CharSequence) {
-                stringify(builder, (CharSequence) obj);
+            Stringifier stringifier = STRINGIFIER_MAP.get(obj.getClass());
+            if (stringifier == null) {
+                if (obj instanceof Map) {
+                    stringify(builder, (Map) obj, settings);
+                } else if (obj instanceof Iterable) {
+                    stringify(builder, (Iterable) obj, settings);
+                } else if (obj instanceof Object[]) {
+                    stringifyObjects(builder, (Object[]) obj, settings);
+                } else if (obj instanceof Iterator) {
+                    stringify(builder, (Iterator) obj, settings);
+                } else {
+                    stringifyOfJavaBean(builder, obj, settings);
+                }
             } else {
-                stringifyOfJavaBean(builder, obj);
+                stringifier.accept(builder, obj, settings);
             }
         }
         return builder;
@@ -115,79 +90,433 @@ class JSONStringer implements Stringify {
         return stringify(new StringBuilder(), obj).toString();
     }
 
-    private void stringify(StringBuilder builder, Object[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
+    private static void stringifyOfJavaBean(StringBuilder stringer, Object obj, StringifySettings settings) {
+        BeanInfoUtil.getFieldDescriptorsMap(obj.getClass()).forEach((name, desc) -> {
+            stringer.append('"').append(name).append('"').append(':');
+            stringify(stringer, desc.getValue(obj)).append(',');
+            aroundAppend(stringer, settings);
+        });
     }
 
-    private void stringify(StringBuilder builder, boolean[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
+    private static void stringify(StringBuilder builder, Iterator iterator, StringifySettings stringifySettings) {
+        doAppendAroundArray(builder, iterator, stringifySettings, (str, settings, values) -> {
+            while (values.hasNext()) {
+                stringify(builder, values.next(), settings).append(',');
+                aroundAppend(builder, settings);
+            }
+        });
     }
 
-    private void stringify(StringBuilder builder, char[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
+    private static void stringify(StringBuilder builder, Iterable iterable, StringifySettings stringifySettings) {
+        doAppendAroundArray(builder, iterable, stringifySettings, (str, settings, values) -> {
+            for (Object value : values) {
+                stringify(builder, value, settings).append(',');
+                aroundAppend(builder, settings);
+            }
+        });
     }
 
-    private void stringify(StringBuilder builder, byte[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
+    private static void stringify(StringBuilder builder, Map inputMap, StringifySettings stringifySettings) {
+        doAppendAroundObject(builder, inputMap, stringifySettings, (str, settings, values) -> {
+            for (Object o : values.entrySet()) {
+                Map.Entry entry = (Map.Entry) o;
+                builder.append('"').append(entry.getKey()).append('"').append(':');
+                stringify(builder, entry.getValue(), settings).append(',');
+                aroundAppend(builder, settings);
+            }
+        });
     }
 
-    private void stringify(StringBuilder builder, int[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
+    private static void stringifyObjects(StringBuilder builder, Object[] arr, StringifySettings stringifySettings) {
+        doAppendAroundArray(builder, arr, stringifySettings, (str, settings, values) -> {
+            for (Object v : values) {
+                if (v == null) {
+                    aroundAppend(str.append("null").append(','), settings);
+                } else {
+                    str.append('"').append(v).append('"').append(',');
+                    aroundAppend(str, settings);
+                }
+            }
+        });
     }
 
-    private void stringify(StringBuilder builder, short[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
+    interface Stringifier extends TableConsumer<StringBuilder, Object, StringifySettings>, Predicate {
+
+        @Override
+        void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings);
+
+        Set<Class> getSupportsCls();
+
+        @Override
+        default boolean test(Object o) {
+            if (o == null) {
+                return false;
+            }
+            Set<Class> classes = getSupportsCls();
+            if (o instanceof Class) {
+                return classes.contains(o);
+            }
+            return classes.contains(o.getClass());
         }
-        close(builder, ']');
     }
 
-    private void stringify(StringBuilder builder, long[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
+    @SuppressWarnings("all")
+    enum DefaultStringifiers implements Stringifier {
+        CALENDAR {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                builder.append('"').append(DateUtil.format((Calendar) o)).append('"');
+                aroundAppend(builder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(Calendar.class, GregorianCalendar.class, BuddhistCalendar.class);
+            }
+        },
+        DATE {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                builder.append('"').append(DateUtil.format((Date) o)).append('"');
+                aroundAppend(builder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(Date.class, Time.class, java.sql.Date.class, Timestamp.class, Datetime.class);
+            }
+        },
+        JDK8_DATE {
+            @Override
+            public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
+                stringBuilder.append('"').append(DateTimeUtil.format((TemporalAccessor) o)).append('"');
+                aroundAppend(stringBuilder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(LocalDateTime.class, LocalDate.class, LocalTime.class);
+            }
+        },
+        JDK8_DATE_OFFSET {
+            @Override
+            public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
+                stringBuilder.append('"')
+                    .append(DateTimeUtil.format(((OffsetDateTime) o).toLocalDateTime()))
+                    .append('"');
+                aroundAppend(stringBuilder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(OffsetDateTime.class);
+            }
+        },
+        JDK8_DATE_ZONED {
+            @Override
+            public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
+                stringBuilder.append('"')
+                    .append(DateTimeUtil.format(((ZonedDateTime) o).toLocalDateTime()))
+                    .append('"');
+                aroundAppend(stringBuilder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(ZonedDateTime.class);
+            }
+        },
+        WRAPPED {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                builder.append('"').append(o).append('"');
+                aroundAppend(builder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(CharSequence.class,
+                    java.util.StringJoiner.class,
+                    StringBuilder.class,
+                    StringBuffer.class,
+                    StringJoiner.class,
+                    JSONString.class,
+                    CharBuffer.class,
+                    String.class,
+                    // wrapped
+                    Character.class,
+                    char.class);
+            }
+        },
+        UNWRAPPED {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                aroundAppend(builder.append(o), stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(Number.class,
+                    byte.class,
+                    short.class,
+                    int.class,
+                    long.class,
+                    float.class,
+                    double.class,
+                    Byte.class,
+                    Short.class,
+                    Integer.class,
+                    Long.class,
+                    Float.class,
+                    Double.class,
+                    BigDecimal.class,
+                    BigInteger.class,
+                    AtomicInteger.class,
+                    AtomicLong.class,
+                    LongAdder.class,
+                    DoubleAdder.class,
+                    IntAccessor.class,
+                    LongAccessor.class,
+                    DoubleAccessor.class,
+                    LongAccumulator.class,
+                    DoubleAccumulator.class,
+                    JSONNumber.class,
+                    Boolean.class,
+                    // unwrapped
+                    boolean.class,
+                    JSONBoolean.class,
+                    AtomicBoolean.class,
+                    BooleanAccessor.class,
+                    // unwrapped JSONNull
+                    JSONNull.class);
+            }
+        },
+        /**
+         * 数组
+         */
+        CHARSEQUENCES {
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(CharSequence[].class,
+                    java.util.StringJoiner[].class,
+                    StringBuilder[].class,
+                    StringBuffer[].class,
+                    StringJoiner[].class,
+                    String[].class);
+            }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                stringifyObjects(builder, (Object[]) values, stringifySettings);
+            }
+        },
+        CHARS {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(char[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (char[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (char v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        },
+        BOOLEANS {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(boolean[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (boolean[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (boolean v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        },
+        INTS {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(int[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (int[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (int v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        },
+        BYTES {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(byte[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (byte[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (byte v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        },
+        SHORTS {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(short[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (short[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (short v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        },
+        LONGS {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(long[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (long[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (long v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        },
+        FLOATS {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(float[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (float[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (float v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        },
+        DOUBLES {
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(double[].class); }
+
+            @Override
+            public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
+                doAppendAroundArray(builder, (double[]) values, stringifySettings, (str, settings, vs) -> {
+                    for (double v : vs) {
+                        aroundAppend(str.append(v).append(','), settings);
+                    }
+                });
+            }
+        };
     }
 
-    private void stringify(StringBuilder builder, float[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
+    private static <T> void doAppendAroundObject(
+        StringBuilder builder, T value, StringifySettings settings,//
+        TableConsumer<StringBuilder, StringifySettings, T> consumer
+    ) { doAppendAround(builder, value, settings, '{', '}', consumer); }
+
+    private static <T> void doAppendAroundArray(
+        StringBuilder builder, T value, StringifySettings settings,//
+        TableConsumer<StringBuilder, StringifySettings, T> consumer
+    ) { doAppendAround(builder, value, settings, '[', ']', consumer); }
+
+    private static <T> void doAppendAround(
+        StringBuilder builder, T value, StringifySettings settings, char open, char close,//
+        TableConsumer<StringBuilder, StringifySettings, T> consumer
+    ) {
+        startAppend(builder.append(open), settings);
+        consumer.accept(builder, settings, value);
+        endAppended(close(builder, close), settings);
     }
 
-    private void stringify(StringBuilder builder, double[] arr) {
-        builder.append('[');
-        for (Object item : arr) {
-            stringify(builder, item).append(',');
-        }
-        close(builder, ']');
-    }
-
-    private void close(StringBuilder builder, char value) {
+    private static StringBuilder close(StringBuilder builder, char value) {
         builder.setCharAt(builder.length() - 1, value);
+        return builder;
+    }
+
+    private static StringBuilder startAppend(StringBuilder builder, StringifySettings settings) {
+        return builder;
+    }
+
+    private static StringBuilder endAppended(StringBuilder builder, StringifySettings settings) {
+        return builder;
+    }
+
+    private static StringBuilder aroundAppend(StringBuilder builder, StringifySettings settings) {
+        return builder;
+    }
+
+    /*
+     ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     ~ ~ joda date ~~~~~~~~~~~~~~~~~~~~~~
+     ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+
+    @SuppressWarnings("all")
+    enum JodaStringifier implements Stringifier {
+        DATE {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                org.joda.time.LocalDate time = (org.joda.time.LocalDate) o;
+                builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN_TIME).print(time)).append('"');
+                aroundAppend(builder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(org.joda.time.LocalDate.class);
+            }
+        },
+        TIME {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                org.joda.time.LocalTime time = (org.joda.time.LocalTime) o;
+                builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN_TIME).print(time)).append('"');
+                aroundAppend(builder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(org.joda.time.LocalTime.class);
+            }
+        },
+        DATE_TIME {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                if (o instanceof ReadableInstant) {
+                    ReadableInstant instant = (ReadableInstant) o;
+                    builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN).print(instant)).append('"');
+                } else if (o instanceof ReadablePartial) {
+                    ReadablePartial partial = (ReadablePartial) o;
+                    builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN).print(partial)).append('"');
+                } else {
+                    throw new IllegalArgumentException("Invalid datetime value of: " + o);
+                }
+                aroundAppend(builder, stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(DateTime.class,
+                    org.joda.time.Instant.class,
+                    org.joda.time.LocalDateTime.class,
+                    MutableDateTime.class);
+            }
+        };
+    }
+
+    public static void importJodaTime() {
+        for (Stringifier value : JodaStringifier.values()) {
+            Set<Class> classes = value.getSupportsCls();
+            for (Class cls : classes) {
+                STRINGIFIER_MAP.put(cls, value);
+            }
+        }
     }
 }

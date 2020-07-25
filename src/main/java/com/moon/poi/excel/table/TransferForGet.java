@@ -1,6 +1,10 @@
 package com.moon.poi.excel.table;
 
+import com.moon.core.json.JSONNumber;
 import com.moon.core.lang.DoubleUtil;
+import com.moon.core.lang.ref.DoubleAccessor;
+import com.moon.core.lang.ref.IntAccessor;
+import com.moon.core.lang.ref.LongAccessor;
 import com.moon.core.util.CalendarUtil;
 import com.moon.core.util.DateUtil;
 import com.moon.poi.excel.CellFactory;
@@ -15,10 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.DoubleAdder;
-import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.atomic.*;
 
 /**
  * @author moonsky
@@ -47,13 +48,13 @@ enum TransferForGet implements GetTransfer {
     /**
      * 数字
      */
-    DOUBLE(Double.class, double.class) {
+    DOUBLE(Double.class, double.class, DoubleAccessor.class) {
         @Override
         public boolean test(Object data) { return data instanceof Double; }
 
         @Override
         boolean test(Class propertyType) {
-            return propertyType == double.class || propertyType == Double.class;
+            return propertyType == double.class || propertyType == Double.class || propertyType == LongAccessor.class;
         }
 
         @Override
@@ -98,13 +99,21 @@ enum TransferForGet implements GetTransfer {
         Short.class,
         short.class,
         byte.class,
+        long.class,
+        Long.class,
         Byte.class,
         BigDecimal.class,
         BigInteger.class,
         AtomicInteger.class,
         AtomicLong.class,
         DoubleAdder.class,
-        LongAdder.class) {
+        LongAdder.class,
+        IntAccessor.class,
+        LongAccessor.class,
+        DoubleAccessor.class,
+        LongAccumulator.class,
+        DoubleAccumulator.class,
+        JSONNumber.class) {
         @Override
         public boolean test(Object data) { return data instanceof Number; }
 

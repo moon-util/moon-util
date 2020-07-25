@@ -65,6 +65,8 @@ public final class CharUtil {
 
     public static boolean isUnderscore(int ch) { return ch == '_'; }
 
+    public static boolean isChineseYuan(int ch) { return ch == '￥'; }
+
     public static boolean isDollar(int ch) { return ch == '$'; }
 
     /**
@@ -129,7 +131,16 @@ public final class CharUtil {
 
     public static boolean isASCIICode(int ch) { return ch < 128; }
 
-    public static boolean isChar(Object o) { return o != null && o.getClass() == Character.class; }
+    public static boolean isChar(Object o) {
+        if (o != null && (o.getClass() == Character.class)) {
+            return true;
+        }
+        if (o instanceof Integer) {
+            int value = ((Number) o).intValue();
+            return value > -1 && value < 65536;
+        }
+        return false;
+    }
 
     public static int toDigitMaxAs62(int codePoint) {
         if (isDigit(codePoint)) {

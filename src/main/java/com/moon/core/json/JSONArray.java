@@ -53,5 +53,5 @@ public final class JSONArray extends ArrayList<Object>
     public String getString(Integer key) { return cast().toString(get(key)); }
 
     @Override
-    public String toString() { return JSONCfg.WEAK.get().stringify(this); }
+    public String toString() { return JSONCfg.getStringer().stringify(this); }
 }

@@ -1,6 +1,7 @@
 package com.moon.core.io;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -39,7 +40,5 @@ public interface Traveller<T> extends Supplier<List<T>>, List<T> {
      * @return 当前遍历器
      */
     @Override
-    default List<T> get() {
-        return this;
-    }
+    default List<T> get() { return new ArrayList<>(this); }
 }
