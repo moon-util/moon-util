@@ -25,19 +25,19 @@ public final class OptionalUtil {
      * -----------------------------------------------------------
      */
 
-    public static <T> int computeAsIntOrZero(T obj, ToIntFunction<T> function) {
-        return computeAsIntOrDefault(obj, function, 0);
+    public static <T> int computeOrZeroIfNull(T obj, ToIntFunction<T> function) {
+        return computeOrDefaultIfNull(obj, function, 0);
     }
 
-    public static <T> int computeAsIntOrOne(T obj, ToIntFunction<T> function) {
-        return computeAsIntOrDefault(obj, function, 1);
+    public static <T> int computeOrOneIfNull(T obj, ToIntFunction<T> function) {
+        return computeOrDefaultIfNull(obj, function, 1);
     }
 
-    public static <T> int computeAsIntOrDefault(T obj, ToIntFunction<T> fn, int defaultValue) {
+    public static <T> int computeOrDefaultIfNull(T obj, ToIntFunction<T> fn, int defaultValue) {
         return obj == null ? defaultValue : fn.applyAsInt(obj);
     }
 
-    public static <T> int computeAsIntOrGet(T obj, ToIntFunction<T> function, IntSupplier supplier) {
+    public static <T> int computeOrElseIfNull(T obj, ToIntFunction<T> function, IntSupplier supplier) {
         return obj == null ? supplier.getAsInt() : function.applyAsInt(obj);
     }
 
@@ -55,7 +55,7 @@ public final class OptionalUtil {
         return obj == null ? elseVal : function.apply(obj);
     }
 
-    public static <T, R> R computeOrGet(T obj, Function<T, R> function, Supplier<R> supplier) {
+    public static <T, R> R computeOrElse(T obj, Function<T, R> function, Supplier<R> supplier) {
         return obj == null ? supplier.get() : function.apply(obj);
     }
 
@@ -79,38 +79,8 @@ public final class OptionalUtil {
         }
     }
 
-    public static <T, U> void ifPresent(T obj, BiConsumer<T, U> consumer, U param) {
-        if (obj != null) {
-            consumer.accept(obj, param);
-        }
-    }
-
-    public static <T> void ifPresentOrElse(T obj, Consumer<T> consumer, Executable runnable) {
-        if (obj == null) {
-            runnable.execute();
-        } else {
-            consumer.accept(obj);
-        }
-    }
-
-    public static <T> void ifPresentOrThrow(T obj, Consumer<T> consumer) {
-        if (obj == null) {
-            ThrowUtil.runtime();
-        } else {
-            consumer.accept(obj);
-        }
-    }
-
-    public static <T> void ifPresentOrThrow(T obj, Consumer<T> consumer, String message) {
-        if (obj == null) {
-            ThrowUtil.runtime(message);
-        } else {
-            consumer.accept(obj);
-        }
-    }
-
     /*
-     * getSheet or else
+     * get or else
      */
 
     public static <T> T getOrDefault(T value, T defaultVal) {

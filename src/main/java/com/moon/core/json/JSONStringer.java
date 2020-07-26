@@ -162,6 +162,43 @@ class JSONStringer implements Stringify {
 
     @SuppressWarnings("all")
     enum DefaultStringifiers implements Stringifier {
+        OPTIONAL_AT_UTIL {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                Object value = ((Optional) o).get();
+                aroundAppend(builder.append(stringify(builder, value, stringifySettings)), stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(Optional.class); }
+        },
+        OPTIONAL_DOUBLE {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                aroundAppend(builder.append(((OptionalDouble) o).getAsDouble()), stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(OptionalDouble.class); }
+        },
+        OPTIONAL_LONG {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                aroundAppend(builder.append(((OptionalLong) o).getAsLong()), stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(OptionalLong.class); }
+        },
+        OPTIONAL_INT {
+            @Override
+            public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                aroundAppend(builder.append(((OptionalInt) o).getAsInt()), stringifySettings);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(OptionalInt.class); }
+        },
         CALENDAR {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
@@ -208,9 +245,7 @@ class JSONStringer implements Stringify {
             }
 
             @Override
-            public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(OffsetDateTime.class);
-            }
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(OffsetDateTime.class); }
         },
         JDK8_DATE_ZONED {
             @Override
@@ -222,9 +257,7 @@ class JSONStringer implements Stringify {
             }
 
             @Override
-            public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(ZonedDateTime.class);
-            }
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(ZonedDateTime.class); }
         },
         WRAPPED {
             @Override

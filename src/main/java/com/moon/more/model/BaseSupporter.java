@@ -87,7 +87,7 @@ public interface BaseSupporter {
      *
      * @return
      */
-    default <T> T defaultOrElse(T value, Supplier<T> supplier) { return value == null ? supplier.get() : value; }
+    default <T> T elseIfNull(T value, Supplier<T> supplier) { return value == null ? supplier.get() : value; }
 
     /**
      * property value or null

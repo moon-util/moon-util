@@ -29,7 +29,7 @@ public class RedisAccessor<K, V> {
         this.template = redisTemplate;
     }
 
-    private final void onCanIgnoreException(Exception ex) { strategy.onException(ex); }
+    private void onCanIgnoreException(Exception ex) { strategy.onException(ex); }
 
     // ============================= ops ===============================
 
@@ -126,7 +126,8 @@ public class RedisAccessor<K, V> {
      *
      * @param keys 可以传一个值 或多个
      */
-    public void delete(K... keys) {
+    @SafeVarargs
+    public final void delete(K... keys) {
         if (keys != null && keys.length > 0) {
             if (keys.length == 1) {
                 delete(keys[0]);
@@ -187,14 +188,14 @@ public class RedisAccessor<K, V> {
      *
      * @param key   键
      * @param value 值
-     * @param time  时间(秒) time要大于0 如果time小于等于0 将设置无限期
+     * @param expireOfSeconds  时间(秒) time要大于0 如果time小于等于0 将设置无限期
      *
      * @return true成功 false 失败
      */
-    public boolean set(K key, V value, long time) {
+    public boolean set(K key, V value, long expireOfSeconds) {
         try {
-            if (time > 0) {
-                template.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+            if (expireOfSeconds > 0) {
+                template.opsForValue().set(key, value, expireOfSeconds, TimeUnit.SECONDS);
             } else {
                 set(key, value);
             }
@@ -234,15 +235,15 @@ public class RedisAccessor<K, V> {
      *
      * @param key    键
      * @param puller 加载器
-     * @param time   时间
+     * @param expireOfSeconds   时间
      *
      * @return 值
      */
-    public V getOrPull(K key, Supplier<V> puller, long time) {
+    public V getOrPull(K key, Supplier<V> puller, long expireOfSeconds) {
         V cached = (V) get(key);
         if (cached == null) {
             cached = puller.get();
-            set(key, cached, time);
+            set(key, cached, expireOfSeconds);
         }
         return cached;
     }

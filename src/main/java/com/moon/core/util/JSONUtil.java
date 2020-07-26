@@ -17,7 +17,7 @@ import java.util.function.Function;
 import static com.moon.core.enums.Const.WIN_FILE_INVALID_CHAR;
 import static com.moon.core.lang.StringUtil.trimToEmpty;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
-import static com.moon.core.util.OptionalUtil.computeOrGet;
+import static com.moon.core.util.OptionalUtil.computeOrElse;
 
 /**
  * @author moonsky
@@ -112,10 +112,10 @@ public final class JSONUtil {
         Json() {
             Function[] functions = null;
             try {
-                functions = computeOrGet(functions, fs -> fs, this::loadJSON);
-                functions = computeOrGet(functions, fs -> fs, this::loadFastJson);
-                functions = computeOrGet(functions, fs -> fs, this::loadJackson);
-                functions = computeOrGet(functions, fs -> fs, this::loadGson);
+                functions = computeOrElse(functions, fs -> fs, this::loadJSON);
+                functions = computeOrElse(functions, fs -> fs, this::loadFastJson);
+                functions = computeOrElse(functions, fs -> fs, this::loadJackson);
+                functions = computeOrElse(functions, fs -> fs, this::loadGson);
             } catch (Exception e) {
                 functions = this.loadJSON();
             }

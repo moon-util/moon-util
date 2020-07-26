@@ -5,6 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Objects;
+
 /**
  * @author moonsky
  */
@@ -20,11 +22,19 @@ public final class SecurityUtil {
 
     public static boolean isAuthenticated() {
         Authentication auth = getAuthentication();
-        return auth == null ? false : auth.isAuthenticated();
+        return auth != null && auth.isAuthenticated();
     }
 
     public static boolean isAnonymous() {
+        return getAuthentication() instanceof AnonymousAuthenticationToken;
+    }
+
+    public static String getLoggedUsername() {
         Authentication auth = getAuthentication();
-        return auth == null ? false : auth instanceof AnonymousAuthenticationToken;
+        return auth == null || auth instanceof AnonymousAuthenticationToken ? null : auth.getName();
+    }
+
+    public static boolean isLoggedOf(String username) {
+        return Objects.equals(getLoggedUsername(), username);
     }
 }

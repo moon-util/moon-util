@@ -101,11 +101,7 @@ public final class InterceptorUtil {
      * @return 获取到的注解或 null
      */
     public static <T extends Annotation> T getAnnotation(Object handler, Class<T> annotationType) {
-        if (handler instanceof HandlerMethod) {
-            return getAnnotation((HandlerMethod) handler, annotationType);
-        } else {
-            return null;
-        }
+        return handler instanceof HandlerMethod ? getAnnotation((HandlerMethod) handler, annotationType) : null;
     }
 
     /**

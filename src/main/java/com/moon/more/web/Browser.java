@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 /**
  * @author moonsky
  */
-public class Browser {
+class Browser {
 
     public Browser() {
     }
