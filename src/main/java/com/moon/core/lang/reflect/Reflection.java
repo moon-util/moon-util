@@ -4,6 +4,7 @@ import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.ReferenceUtil;
 import com.moon.core.util.FilterUtil;
+import com.moon.core.util.ValidationUtil;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
@@ -39,7 +40,7 @@ final class Reflection {
     final static Predicate<Method> nameTester(Object name) {
         Predicate<Method> tester = CACHE.get(name);
         if (tester == null) {
-            final String finalName = StringUtil.requireNotEmpty(name.toString().trim());
+            final String finalName = ValidationUtil.requireNotEmpty(name.toString().trim());
             CACHE.put(name, tester = method -> method.getName().equals(finalName));
         }
         return tester;

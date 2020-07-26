@@ -21,8 +21,6 @@ public final class ArrayUtil {
 
     private ArrayUtil() { noInstanceError(); }
 
-    public static <T> T[] toArray(T... values) { return values; }
-
     private static <T> T ifNonNull(T value, Consumer<T> consumer) {
         if (value != null) { consumer.accept(value); }
         return value;
@@ -47,6 +45,9 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
+    @SafeVarargs
+    public static <T> T[] toArray(T... values) { return values; }
+
     public static char[] toArray(char... values) { return values; }
 
     public static byte[] toArray(byte... values) { return values; }
@@ -69,6 +70,7 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
+    @SafeVarargs
     public static <T> T[] sort(T... values) { return ifNonNull(values, Arrays::sort); }
 
     public static char[] sort(char... values) { return ifNonNull(values, Arrays::sort); }
@@ -91,6 +93,7 @@ public final class ArrayUtil {
      * ----------------------------------------------------------------
      */
 
+    @SafeVarargs
     public static <T> T[] sort(Comparator<? super T> comparator, T... values) {
         if (values != null) { Arrays.sort(values, comparator); }
         return values;
@@ -548,6 +551,14 @@ public final class ArrayUtil {
 
     public static Double[] toObjects(double[] value) { return transformArray(value, Double[]::new); }
 
+    private static <T> T transformArray(Object value, IntFunction<T> creator) {
+        if (value == null) { return null; }
+        final int length = Array.getLength(value);
+        T arr = creator.apply(length);
+        System.arraycopy(value, 0, arr, 0, length);
+        return arr;
+    }
+
     public static Object[] toObjectArray(Object value) {
         if (value == null || value instanceof Object[]) {
             return (Object[]) value;
@@ -576,14 +587,6 @@ public final class ArrayUtil {
         Object[] objects = new Object[1];
         objects[0] = value;
         return objects;
-    }
-
-    private static <T> T transformArray(Object value, IntFunction<T> creator) {
-        if (value == null) { return null; }
-        final int length = Array.getLength(value);
-        T arr = creator.apply(length);
-        System.arraycopy(value, 0, arr, 0, length);
-        return arr;
     }
 
     /*

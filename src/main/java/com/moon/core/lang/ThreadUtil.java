@@ -14,7 +14,13 @@ public final class ThreadUtil {
     public static void start(Runnable runnable) { of(runnable).start(); }
 
     public static Thread of(Runnable runnable) {
-        return runnable == null ? new Thread()
-            : (runnable instanceof Thread ? (Thread) runnable : new Thread(runnable));
+        return runnable == null ? new Thread() : (runnable instanceof Thread ? (Thread) runnable : new Thread(runnable));
     }
+
+    /**
+     * 当前线程 ID
+     *
+     * @see RuntimeUtil#getCurrentPID()
+     */
+    public static long getCurrentThreadId() { return Thread.currentThread().getId(); }
 }

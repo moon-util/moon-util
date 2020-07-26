@@ -2,6 +2,7 @@ package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.ReferenceUtil;
+import com.moon.core.util.ValidationUtil;
 import com.moon.core.util.runner.RunnerSetting;
 
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ final class ParseDelimiters {
     }
 
     private static AsRunner parseCore(String str, String[] ds, RunnerSetting sets) {
-        String begin = StringUtil.requireNotBlank(ds[0]);
-        String ender = StringUtil.requireNotBlank(ds[1]);
+        String begin = ValidationUtil.requireNotBlank(ds[0]);
+        String ender = ValidationUtil.requireNotBlank(ds[1]);
         final int length = str.length(),
             beginLen = begin.length(), endLen = ender.length();
         int from = str.indexOf(begin), to = str.indexOf(ender);

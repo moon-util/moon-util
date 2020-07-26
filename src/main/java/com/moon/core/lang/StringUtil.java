@@ -5,6 +5,7 @@ import com.moon.core.enums.Const;
 import com.moon.core.enums.IntTesters;
 import com.moon.core.enums.Testers;
 import com.moon.core.lang.support.StringSupport;
+import com.moon.core.util.ValidationUtil;
 import com.moon.core.util.function.IntBiFunction;
 
 import java.util.ArrayList;
@@ -208,35 +209,6 @@ public final class StringUtil {
         return true;
     }
 
-    /**
-     * cs is null or "null"
-     * <p>
-     * StringUtil.isNullString(null)         === true
-     * StringUtil.isNullString("null")       === true
-     * <p>
-     * StringUtil.isNullString("undefined")  === false
-     * StringUtil.isNullString("")           === false
-     * StringUtil.isNullString(" ")          === false
-     * StringUtil.isNullString("a")          === false
-     * StringUtil.isNullString("abc")        === false
-     * StringUtil.isNullString(" a b c ")    === false
-     *
-     * @param cs 待测字符串
-     *
-     * @return 是否是空或 null 字符串
-     */
-    public static boolean isNullString(CharSequence cs) {
-        if (isEmpty(cs)) {
-            return true;
-        }
-        if (cs instanceof StringBuffer) {
-            return "null".equals(cs.toString());
-        }
-        if (cs.length() == 4) {
-            return cs.charAt(0) == 'n' && cs.charAt(1) == 'u' && cs.charAt(2) == 'l' && cs.charAt(3) == 'l';
-        }
-        return false;
-    }
 
     /**
      * cs is null、"null" or "undefined"
@@ -255,7 +227,7 @@ public final class StringUtil {
      *
      * @return 是否是空或 null、undefined
      */
-    public static boolean isUndefined(CharSequence cs) {
+    public static boolean isNullString(CharSequence cs) {
         if (isEmpty(cs)) {
             return true;
         }
@@ -267,11 +239,37 @@ public final class StringUtil {
             case 4:
                 return cs.charAt(0) == 'n' && cs.charAt(1) == 'u' && cs.charAt(2) == 'l' && cs.charAt(3) == 'l';
             case 9:
-                return cs.charAt(0) == 'u' && cs.charAt(1) == 'n' && cs.charAt(2) == 'd' && cs.charAt(3) == 'e' && cs.charAt(
-                    4) == 'f' && cs.charAt(5) == 'i' && cs.charAt(6) == 'n' && cs.charAt(7) == 'e' && cs.charAt(8) == 'd';
+                return safeIsUndefined(cs);
             default:
                 return false;
         }
+    }
+
+    /**
+     * cs is null or "null"
+     * <p>
+     * StringUtil.isNullString(null)         === true
+     * StringUtil.isNullString("null")       === true
+     * <p>
+     * StringUtil.isNullString("undefined")  === false
+     * StringUtil.isNullString("")           === false
+     * StringUtil.isNullString(" ")          === false
+     * StringUtil.isNullString("a")          === false
+     * StringUtil.isNullString("abc")        === false
+     * StringUtil.isNullString(" a b c ")    === false
+     *
+     * @param cs 待测字符串
+     *
+     * @return 是否是空或 null 字符串
+     */
+    public static boolean isUndefined(CharSequence cs) {
+        return isEmpty(cs) || (cs instanceof StringBuffer ? "undefined".equals(cs.toString()) : (cs.length() == 9 && safeIsUndefined(
+            cs)));
+    }
+
+    private static boolean safeIsUndefined(CharSequence cs) {
+        return cs.charAt(0) == 'u' && cs.charAt(1) == 'n' && cs.charAt(2) == 'd' && cs.charAt(3) == 'e' && cs.charAt(4) == 'f' && cs
+            .charAt(5) == 'i' && cs.charAt(6) == 'n' && cs.charAt(7) == 'e' && cs.charAt(8) == 'd';
     }
 
     /**
@@ -281,9 +279,7 @@ public final class StringUtil {
      *
      * @return 当字符串内容仅包含 0 时返回 true，否则返回 false
      */
-    public final static boolean is0(CharSequence cs) {
-        return cs != null && "0".equals(cs.toString());
-    }
+    public final static boolean is0(CharSequence cs) { return cs != null && "0".equals(cs.toString()); }
 
     /**
      * 字符串是否是 1，主要用于某些网络请求的返回状态码判断
@@ -292,9 +288,16 @@ public final class StringUtil {
      *
      * @return 当字符串内容仅包含 1 时返回 true，否则返回 false
      */
-    public final static boolean is1(CharSequence cs) {
-        return cs != null && "1".equals(cs.toString());
-    }
+    public final static boolean is1(CharSequence cs) { return cs != null && "1".equals(cs.toString()); }
+
+    /**
+     * 是否是真值
+     *
+     * @param sequence 待测字符串
+     *
+     * @return
+     */
+    public static boolean isTrue(CharSequence sequence) { return BooleanUtil.isTrue(sequence); }
 
     /**
      * 字符串内所有字符是否都符合条件
@@ -347,31 +350,19 @@ public final class StringUtil {
      */
 
     public static <C extends CharSequence> C requireEmpty(C c) {
-        if (isEmpty(c)) { return c; }
-        String error = "Require an empty String, but got: ";
-        throw new IllegalArgumentException(error + c);
+        return ValidationUtil.requireEmpty(c);
     }
 
     public static <C extends CharSequence> C requireNotEmpty(C c) {
-        if (isEmpty(c)) {
-            String error = "Require a not empty String, but got: ";
-            throw new IllegalArgumentException(error + c);
-        }
-        return c;
+        return ValidationUtil.requireNotEmpty(c);
     }
 
     public static <C extends CharSequence> C requireBlank(C c) {
-        if (isBlank(c)) { return c; }
-        String error = "Require a blank String, but got: ";
-        throw new IllegalArgumentException(error + c);
+        return ValidationUtil.requireBlank(c);
     }
 
     public static <C extends CharSequence> C requireNotBlank(C c) {
-        if (isBlank(c)) {
-            String error = "Require a not blank String, but got: ";
-            throw new IllegalArgumentException(error + c);
-        }
-        return c;
+        return ValidationUtil.requireNotBlank(c);
     }
 
     /*
@@ -553,6 +544,46 @@ public final class StringUtil {
         return ret == null ? null : (length(ret) > 0 ? (ret.charAt(0) == 65279 ? ret.substring(1) : ret) : EMPTY);
     }
 
+    public static String trimStart(String str) {
+        if (str == null) {
+            return null;
+        }
+        int length = str.length();
+        for (int i = 0; i < length; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return str.substring(i);
+            }
+        }
+        return str;
+    }
+
+    public static String trimEnd(String str) {
+        if (str == null) {
+            return null;
+        }
+        int length = str.length();
+        for (int i = length - 1; i >= 0; i--) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return str.substring(0, i + 1);
+            }
+        }
+        return str;
+    }
+
+    public static String trimStart(String str, String search) {
+        return str == null ? null : str.startsWith(search) ? substrAfter(str, search) : str;
+    }
+
+    public static String trimEnd(String str, String search) {
+        return str == null ? null : str.endsWith(search) ? substrBefore(str, search) : str;
+    }
+
+    private static String trim(String str, String search) { return trim(str, search, search); }
+
+    private static String trim(String str, String open, String close) {
+        return str;
+    }
+
     /*
      * -------------------------------------------------------------------
      * operations
@@ -687,7 +718,7 @@ public final class StringUtil {
      */
 
     /**
-     * 格式化内容
+     * 格式化内容，占位符为：{}
      *
      * @param template 含有占位符的模板，默认占位符为：{}
      * @param values   每个占位符对应的值，
@@ -1412,19 +1443,38 @@ public final class StringUtil {
         return index < 0 ? EMPTY : str.substring(index);
     }
 
+    /**
+     * 丢弃开闭字符串之外的部分
+     * @param str
+     * @param start
+     * @param end
+     * @return
+     */
+    static String discardOutside(String str, String start, String end) {
+        return str;
+    }
+
     /*
     split
-
-    todo splitter
      */
 
-    static List<String> split(CharSequence cs, char separator) {
+    public static List<String> split(CharSequence cs, char separator) {
         List<String> result = new ArrayList<>();
-        if (cs == null || cs.length() == 0) {
+        int length = cs == null ? 0 : cs.length();
+        if (length == 0) {
             return result;
         }
-        int length = cs.length();
-
+        char ch;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            if ((ch = cs.charAt(i)) == separator) {
+                result.add(builder.toString());
+                builder = new StringBuilder();
+            } else {
+                builder.append(ch);
+            }
+        }
+        result.add(builder.toString());
         return result;
     }
 }

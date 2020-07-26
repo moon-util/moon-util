@@ -7,6 +7,7 @@ import com.moon.core.util.validator.Validator;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -584,6 +585,10 @@ class StringUtilTestTest {
      */
     @Test
     void testCharCodeAt() {
+        assertEquals("abc  ",StringUtil.trimStart("  abc  "));
+        String value = ":asd:asd:";
+        List<String> splitted = StringUtil.split(value, ':');
+        System.out.println(splitted);
     }
 
     @Test

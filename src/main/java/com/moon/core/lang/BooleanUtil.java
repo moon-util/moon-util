@@ -44,7 +44,7 @@ public final class BooleanUtil {
     public static boolean toBoolean(Number value) { return value != null && value.doubleValue() != 0; }
 
     public static boolean toBoolean(CharSequence cs) {
-        return cs != null && Boolean.parseBoolean(cs.toString());
+        return isTrue(cs);
     }
 
     /**
@@ -111,4 +111,44 @@ public final class BooleanUtil {
     public static boolean isFalse(Object value) {return Boolean.FALSE.equals(value);}
 
     public static boolean isNotFalse(Object value) {return !Boolean.FALSE.equals(value);}
+
+    public static boolean isTrue(CharSequence sequence) { return falseIfInvalid(sequence); }
+
+    public static boolean trueIfInvalid(CharSequence sequence) { return defaultIfInvalid(sequence, true); }
+
+    public static boolean falseIfInvalid(CharSequence sequence) { return defaultIfInvalid(sequence, false); }
+
+    public static boolean defaultIfInvalid(CharSequence sequence, boolean defaultValue) {
+        if (sequence == null) {
+            return defaultValue;
+        }
+        switch (sequence.toString()) {
+            case "true":
+            case "TRUE":
+            case "yes":
+            case "YES":
+            case "1":
+            case "on":
+            case "ON":
+            case "enable":
+            case "enabled":
+            case "ENABLE":
+            case "ENABLED":
+                return true;
+            case "false":
+            case "FALSE":
+            case "no":
+            case "NO":
+            case "0":
+            case "off":
+            case "OFF":
+            case "disable":
+            case "disabled":
+            case "DISABLE":
+            case "DISABLED":
+                return false;
+            default:
+                return defaultValue;
+        }
+    }
 }

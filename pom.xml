@@ -295,12 +295,12 @@
     </dependency>
 
     <!-- redisson 分布式锁等
+    -->
     <dependency>
       <groupId>org.redisson</groupId>
       <artifactId>redisson</artifactId>
       <version>3.13.0</version>
     </dependency>
-    -->
 
 
     <!-- hibernate-validator 验证需要三个依赖:

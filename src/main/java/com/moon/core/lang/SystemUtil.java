@@ -43,41 +43,30 @@ public final class SystemUtil {
     }
 
     public static boolean getBooleanValue(String name, boolean defaultValue) {
-        String value = getProperty(name);
-        if (value == null) {
-            return defaultValue;
-        }
-        switch (value) {
-            case "true":
-            case "TRUE":
-            case "yes":
-            case "YES":
-            case "1":
-            case "on":
-            case "ON":
-            case "enable":
-            case "enabled":
-            case "ENABLE":
-            case "ENABLED":
-                return true;
-            case "false":
-            case "FALSE":
-            case "no":
-            case "NO":
-            case "0":
-            case "off":
-            case "OFF":
-            case "disable":
-            case "disabled":
-            case "DISABLE":
-            case "DISABLED":
-                return false;
-            default:
-                return defaultValue;
-        }
+        return BooleanUtil.defaultIfInvalid(getProperty(name), defaultValue);
     }
 
     public static int getIntValue(String name, int defaultValue) {
         return IntUtil.defaultIfInvalid(getProperty(name), defaultValue);
+    }
+
+    public static String getJvmName() { return getProperty("java.vm.name"); }
+
+    public static String getJvmVersion() { return getProperty("java.vm.version"); }
+
+    public static String getJvmInfo() { return getProperty("java.vm.info"); }
+
+    public static String getJavaVersion() { return getProperty("java.version"); }
+
+    /**
+     * 返回 java 数字版本号，脂肪整数，如：
+     * 1.7  ==>  7
+     * 1.8  ==>  8
+     * 9    ==>  9
+     *
+     * @return
+     */
+    private static int getJavaNumberVersion() {
+        throw new UnsupportedOperationException();
     }
 }
