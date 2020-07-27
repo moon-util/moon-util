@@ -37,7 +37,7 @@ public final class JSONString implements JSON<Object>,
 
     @Override
     public String toString() {
-        return data;
+        return new StringBuilder().append('"').append(data).append('"').toString();
     }
 
     @Override

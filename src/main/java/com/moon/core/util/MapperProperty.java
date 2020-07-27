@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Deprecated
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MapperProperty {
+@interface MapperProperty {
 
     boolean serialize() default true;
 

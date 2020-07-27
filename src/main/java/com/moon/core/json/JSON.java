@@ -158,6 +158,18 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      */
     static String stringify(Object obj) { return toJsonString(obj); }
 
+    /**
+     * 字符串化
+     *
+     * @param obj    数据
+     * @param indent 缩进
+     *
+     * @return json 字符串
+     */
+    static String stringify(Object obj, int indent) {
+        return JSONCfg.getStringer().stringify(obj, StringifySettings.of(indent));
+    }
+
     /*
      * ------------------------------------------------------
      * get value

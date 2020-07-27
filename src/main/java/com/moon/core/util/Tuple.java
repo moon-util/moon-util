@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * @author moonsky
  */
-public final class Tuple<T> implements Iterable<T>, Serializable {
+public final class Tuple<T> implements Iterable<T>, Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,9 +54,7 @@ public final class Tuple<T> implements Iterable<T>, Serializable {
      *
      * @return 元组所有元素
      */
-    public T[] getElements() {
-        return Arrays.copyOf(elements, elements.length);
-    }
+    public T[] getElements() { return Arrays.copyOf(elements, elements.length); }
 
     /**
      * 遍历处理所有元素
@@ -64,9 +62,7 @@ public final class Tuple<T> implements Iterable<T>, Serializable {
      * @param consumer
      */
     @Override
-    public void forEach(Consumer<? super T> consumer) {
-        IteratorUtil.forEach(elements, consumer);
-    }
+    public void forEach(Consumer<? super T> consumer) { IteratorUtil.forEach(elements, consumer); }
 
     /**
      * 遍历处理所有元素
@@ -87,6 +83,9 @@ public final class Tuple<T> implements Iterable<T>, Serializable {
      */
     @Override
     public Iterator<T> iterator() { return IteratorUtil.of(elements); }
+
+    @Override
+    protected Tuple clone() { return new Tuple<>(this.elements); }
 
     @Override
     public String toString() {

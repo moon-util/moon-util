@@ -19,7 +19,7 @@ public final class ComparatorUtil {
      *
      * @return 多条件比较器
      */
-    public static <T> Comparator<T> ofAll(Comparator<T>... comparators) {
+    public static <T> Comparator<T> ofMulti(Comparator<T>... comparators) {
         return (o1, o2) -> {
             for (Comparator<T> comparator : comparators) {
                 int result = comparator.compare(o1, o2);

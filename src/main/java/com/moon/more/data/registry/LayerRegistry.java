@@ -3,9 +3,6 @@ package com.moon.more.data.registry;
 
 import com.moon.spring.data.BaseAccessor;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static com.moon.more.data.registry.LayerEnum.*;
 
 

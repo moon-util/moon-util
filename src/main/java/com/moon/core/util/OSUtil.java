@@ -12,9 +12,7 @@ import java.util.function.Supplier;
  */
 public final class OSUtil {
 
-    private OSUtil() {
-        ThrowUtil.noInstanceError();
-    }
+    private OSUtil() { ThrowUtil.noInstanceError(); }
 
     private static final boolean osIsLinux = nameHas("linux");
     private static final boolean osIsMacOsX = nameHas("mac name x");
@@ -34,9 +32,7 @@ public final class OSUtil {
         }
     }
 
-    public static boolean onMacOS() {
-        return osIsMacOsX;
-    }
+    public static boolean onMacOS() { return osIsMacOsX; }
 
     public static void ifOnMacOS(Executable executor) {
         if (onMacOS()) {
@@ -44,9 +40,7 @@ public final class OSUtil {
         }
     }
 
-    public static boolean onWindows() {
-        return osIsWindows;
-    }
+    public static boolean onWindows() { return osIsWindows; }
 
     public static void ifOnWindows(Executable executor) {
         if (onWindows()) {

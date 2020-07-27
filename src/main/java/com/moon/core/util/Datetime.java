@@ -621,6 +621,19 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return obtainReturning(calendar);
     }
 
+    /**
+     * 设置第一个星期最少多少天
+     *
+     * @param value 年份或月份的第一个星期很可能跨年或跨月，这种情况下设置在当前月份的部分最少多少天才视为第一个星期
+     *
+     * @return Datetime
+     */
+    public Datetime setMinimalDaysInFirstWeek(int value) {
+        Calendar calendar = obtainCalendar();
+        calendar.setMinimalDaysInFirstWeek(value);
+        return obtainReturning(calendar);
+    }
+
     /*
      * ****************************************************************************
      * * 日期加法操作 ***************************************************************
@@ -643,9 +656,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime plusMillis(int amount) { return plusField(MILLISECOND, amount); }
 
-    public Datetime plusField(DatetimeField field, int amount) {
-        return plus(field.value, amount);
-    }
+    public Datetime plusField(DatetimeField field, int amount) { return plus(field.value, amount); }
 
     public Datetime plus(int field, int amount) { return change(field, amount); }
 
@@ -671,9 +682,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime minusMillis(int amount) { return minusField(MILLISECOND, amount); }
 
-    public Datetime minusField(DatetimeField field, int amount) {
-        return minus(field.value, amount);
-    }
+    public Datetime minusField(DatetimeField field, int amount) { return minus(field.value, amount); }
 
     public Datetime minus(int field, int amount) { return change(field, -amount); }
 
@@ -1342,6 +1351,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
             ChronoField cf = (ChronoField) field;
             switch (cf) {
                 case YEAR:
+                case YEAR_OF_ERA:
                     return getYearValue();
                 case DAY_OF_WEEK:
                     return getDayOfWeekValue();
@@ -1375,8 +1385,6 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
                     return getNanoOfSecond();
                 case EPOCH_DAY:
                     return toEpochDay();
-                case YEAR_OF_ERA:
-                    // equals getYearValue();
                 default:
             }
         }

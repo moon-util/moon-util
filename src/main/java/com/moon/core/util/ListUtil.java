@@ -161,7 +161,7 @@ public final class ListUtil extends CollectUtil {
      *
      * @return empty ArrayList if list is null
      */
-    public static <T> List<T> newIfEmpty(List<T> list) { return list == null ? newList() : list; }
+    public static <T> List<T> newIfEmpty(List<T> list) { return isEmpty(list) ? newList() : list; }
 
     /**
      * 确保返回集合不为 null

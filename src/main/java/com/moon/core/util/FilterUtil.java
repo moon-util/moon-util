@@ -2,7 +2,10 @@ package com.moon.core.util;
 
 import com.moon.core.enums.Collects;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -24,6 +27,44 @@ public final class FilterUtil {
      */
 
     /**
+     * 合并多个“且”检查条件
+     *
+     * @param testers 检查列表
+     * @param <T>     数据类型
+     *
+     * @return 合并后的检查器
+     */
+    public static <T> Predicate<T> ofAll(Predicate<T>... testers) {
+        return value -> {
+            for (Predicate<T> tester : testers) {
+                if (!tester.test(value)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
+    /**
+     * 合并多个“或”检查条件
+     *
+     * @param testers 检查列表
+     * @param <T>     数据类型
+     *
+     * @return 合并后的检查器
+     */
+    public static <T> Predicate<T> ofAny(Predicate<T>... testers) {
+        return value -> {
+            for (Predicate<T> tester : testers) {
+                if (tester.test(value)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+    }
+
+    /**
      * 在数组中查找符合条件的第一项
      *
      * @param arr    查找范围数组
@@ -32,8 +73,8 @@ public final class FilterUtil {
      *
      * @return 返回 optional
      */
-    public static <T> Optional<T> findAsOptional(T[] arr, Predicate<? super T> tester) {
-        return Optional.ofNullable(nullableFind(arr, tester));
+    public static <T> java.util.Optional<T> findAsOptional(T[] arr, Predicate<? super T> tester) {
+        return java.util.Optional.ofNullable(nullableFind(arr, tester));
     }
 
     /**
@@ -45,8 +86,8 @@ public final class FilterUtil {
      *
      * @return 返回 optional
      */
-    public static <T> Optional<T> findAsOptional(Iterable<T> iterable, Predicate<? super T> tester) {
-        return Optional.ofNullable(nullableFind(iterable, tester));
+    public static <T> java.util.Optional<T> findAsOptional(Iterable<T> iterable, Predicate<? super T> tester) {
+        return java.util.Optional.ofNullable(nullableFind(iterable, tester));
     }
 
     /**

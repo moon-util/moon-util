@@ -17,9 +17,17 @@ public final class MapUtil {
 
     public static Map empty() {return EmptyHashMap.EMPTY_MAP;}
 
-    public static Map emptyIfNull(Map map) { return emptyHashMapIfNull(map); }
+    public static <K, V> Map<K, V> newIfNull(Map<K, V> map) { return emptyHashMapIfNull(map); }
 
-    public static <K, V> Map<K, V> with(K key, V value) { return put(null, key, value); }
+    public static <K, V> Map<K, V> newIfEmpty(Map<K, V> map) { return isEmpty(map) ? newHashMap() : map; }
+
+    public static <K, V> Map<K, V> newMap() { return newHashMap(); }
+
+    public static <K, V> Map<K, V> newMap(K key, V value) { return put(null, key, value); }
+
+    public static <K, V> Map<K, V> newMap(K key, V value, K key1, V value1) {
+        return put(newMap(key, value), key1, value1);
+    }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -75,9 +83,7 @@ public final class MapUtil {
         return putAll(putAll(newTreeMap((maps.length + 1) * 16), map), maps);
     }
 
-    public static <K, V> Map<K, V> emptyTreeMapIfNull(Map<K, V> map) {
-        return map == null ? newTreeMap() : map;
-    }
+    public static <K, V> Map<K, V> emptyTreeMapIfNull(Map<K, V> map) { return map == null ? newTreeMap() : map; }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -166,7 +172,7 @@ public final class MapUtil {
      * @return 非 null Map
      */
     public static <K, V, M extends Map<K, V>> M put(M map, K key, V value) {
-        map = (M) emptyIfNull(map);
+        map = (M) newIfNull(map);
         map.put(key, value);
         return map;
     }

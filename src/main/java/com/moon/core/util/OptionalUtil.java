@@ -1,6 +1,5 @@
 package com.moon.core.util;
 
-import com.moon.core.lang.Executable;
 import com.moon.core.lang.ThrowUtil;
 
 import java.util.OptionalDouble;
@@ -15,9 +14,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class OptionalUtil {
 
-    private OptionalUtil() {
-        noInstanceError();
-    }
+    private OptionalUtil() { noInstanceError(); }
 
     /*
      * -----------------------------------------------------------

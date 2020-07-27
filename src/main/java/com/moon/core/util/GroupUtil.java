@@ -18,6 +18,95 @@ public final class GroupUtil {
     private GroupUtil() { ThrowUtil.noInstanceError(); }
 
     /**
+     * 单元素分组，将集合或数组元素按元素进行分组，如果存在多个相同“键”，最终只会保留一个
+     *
+     * @param iterator 集合
+     * @param function 分组函数
+     * @param <K>      键类型
+     * @param <E>      元素类型
+     *
+     * @return 分组集合
+     */
+    public static <K, E> Map<K, E> simpleGroup(
+        Iterator<? extends E> iterator, Function<? super E, ? extends K> function
+    ) {
+        HashMap resultMap = new HashMap(16);
+        if (iterator != null) {
+            while (iterator.hasNext()) {
+                E item = iterator.next();
+                resultMap.put(function.apply(item), item);
+            }
+        }
+        return resultMap;
+    }
+
+    /**
+     * 单元素分组，将集合或数组元素按元素进行分组，如果存在多个相同“键”，最终只会保留一个
+     *
+     * @param collect  集合
+     * @param function 分组函数
+     * @param <K>      键类型
+     * @param <E>      元素类型
+     *
+     * @return 分组集合
+     */
+    public static <K, E> Map<K, E> simpleGroup(
+        Iterable<? extends E> collect, Function<? super E, ? extends K> function
+    ) {
+        HashMap resultMap = new HashMap(16);
+        if (collect != null) {
+            for (E item : collect) {
+                resultMap.put(function.apply(item), item);
+            }
+        }
+        return resultMap;
+    }
+
+    /**
+     * 单元素分组，将集合或数组元素按元素进行分组，如果存在多个相同“键”，最终只会保留一个
+     *
+     * @param collect  集合
+     * @param function 分组函数
+     * @param <K>      键类型
+     * @param <E>      元素类型
+     *
+     * @return 分组集合
+     */
+    public static <K, E> Map<K, E> simpleGroup(
+        Collection<? extends E> collect, Function<? super E, ? extends K> function
+    ) {
+        int len = collect == null ? 0 : collect.size();
+        HashMap resultMap = new HashMap(len);
+        if (collect != null) {
+            for (E item : collect) {
+                resultMap.put(function.apply(item), item);
+            }
+        }
+        return resultMap;
+    }
+
+    /**
+     * 单元素分组，将集合或数组元素按元素进行分组，如果存在多个相同“键”，最终只会保留一个
+     *
+     * @param arr      数组
+     * @param function 分组函数
+     * @param <K>      键类型
+     * @param <E>      元素类型
+     *
+     * @return 分组集合
+     */
+    public static <K, E> Map<K, E> simpleGroup(E[] arr, Function<? super E, ? extends K> function) {
+        int len = arr == null ? 0 : arr.length;
+        HashMap resultMap = new HashMap(len);
+        if (arr != null) {
+            for (E item : arr) {
+                resultMap.put(function.apply(item), item);
+            }
+        }
+        return resultMap;
+    }
+
+    /**
      * 对数组分组，分组集合为{@code List}
      *
      * @param arr      待分组数组

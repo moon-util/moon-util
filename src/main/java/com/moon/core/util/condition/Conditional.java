@@ -74,7 +74,5 @@ public interface Conditional {
      *
      * @return T 类型的值
      */
-    default <T> T getOrNull(ThrowingSupplier<T> supplier) {
-        return isMatched() ? supplier.uncheckedGet() : null;
-    }
+    default <T> T getOrNull(ThrowingSupplier<T> supplier) { return isMatched() ? supplier.uncheckedGet() : null; }
 }

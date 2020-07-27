@@ -26,9 +26,9 @@ import java.nio.CharBuffer;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.*;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.concurrent.atomic.*;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import static com.moon.core.util.CalendarUtil.isImportedJodaTime;
@@ -55,26 +55,43 @@ class JSONStringer implements Stringify {
         }
     }
 
-    private JSONStringer() { }
-
-    private static StringBuilder stringify(StringBuilder builder, Object obj) {
-        return stringify(builder, obj, StringifySettings.EMPTY);
+    @Override
+    public String stringify(Object obj) {
+        return stringify(obj, StringifySettings.EMPTY);
     }
 
-    private static StringBuilder stringify(StringBuilder builder, Object obj, StringifySettings settings) {
+    public String stringify(Object data, StringifySettings settings) {
+        return stringify(new StringBuilder(), data, settings).toString();
+    }
+
+    public StringBuilder stringify(StringBuilder container, Object data, StringifySettings settings) {
+        settings.initialize();
+        doStringify(container, data, settings);
+        settings.destroy();
+        return container;
+    }
+
+    private JSONStringer() { }
+
+    private static StringBuilder doStringify(StringBuilder builder, Object obj) {
+        return doStringify(builder, obj, StringifySettings.EMPTY);
+    }
+
+    private static StringBuilder doStringify(StringBuilder builder, Object obj, StringifySettings settings) {
         if (obj == null) {
-            return aroundAppend(builder.append("null"), settings);
+            return addUnwrapped(builder, settings, "null");
         } else {
+            // 用 Map 的方式比逐个 instanceof 效率快
             Stringifier stringifier = STRINGIFIER_MAP.get(obj.getClass());
             if (stringifier == null) {
                 if (obj instanceof Map) {
-                    stringify(builder, (Map) obj, settings);
+                    stringifyMap(builder, (Map) obj, settings);
                 } else if (obj instanceof Iterable) {
-                    stringify(builder, (Iterable) obj, settings);
+                    stringifyCollect(builder, (Iterable) obj, settings);
                 } else if (obj instanceof Object[]) {
                     stringifyObjects(builder, (Object[]) obj, settings);
                 } else if (obj instanceof Iterator) {
-                    stringify(builder, (Iterator) obj, settings);
+                    stringifyIterator(builder, (Iterator) obj, settings);
                 } else {
                     stringifyOfJavaBean(builder, obj, settings);
                 }
@@ -85,44 +102,49 @@ class JSONStringer implements Stringify {
         return builder;
     }
 
-    @Override
-    public String stringify(Object obj) {
-        return stringify(new StringBuilder(), obj).toString();
-    }
-
     private static void stringifyOfJavaBean(StringBuilder stringer, Object obj, StringifySettings settings) {
-        BeanInfoUtil.getFieldDescriptorsMap(obj.getClass()).forEach((name, desc) -> {
-            stringer.append('"').append(name).append('"').append(':');
-            stringify(stringer, desc.getValue(obj)).append(',');
-            aroundAppend(stringer, settings);
+        doAppendAroundObject(stringer, obj, settings, (builder, setting, data) -> {
+            BeanInfoUtil.getFieldDescriptorsMap(data.getClass()).forEach((name, desc) -> {
+                beforeAppend(builder, settings);
+                builder.append('"').append(name).append('"').append(':');
+                doStringify(builder, desc.getValue(data)).append(',');
+                afterAppended(builder, settings);
+            });
         });
     }
 
-    private static void stringify(StringBuilder builder, Iterator iterator, StringifySettings stringifySettings) {
+    private static void stringifyIterator(
+        StringBuilder builder, Iterator iterator, StringifySettings stringifySettings
+    ) {
         doAppendAroundArray(builder, iterator, stringifySettings, (str, settings, values) -> {
             while (values.hasNext()) {
-                stringify(builder, values.next(), settings).append(',');
-                aroundAppend(builder, settings);
+                beforeAppend(str, settings);
+                doStringify(builder, values.next(), settings).append(',');
+                afterAppended(str, settings);
             }
         });
     }
 
-    private static void stringify(StringBuilder builder, Iterable iterable, StringifySettings stringifySettings) {
+    private static void stringifyCollect(
+        StringBuilder builder, Iterable iterable, StringifySettings stringifySettings
+    ) {
         doAppendAroundArray(builder, iterable, stringifySettings, (str, settings, values) -> {
             for (Object value : values) {
-                stringify(builder, value, settings).append(',');
-                aroundAppend(builder, settings);
+                beforeAppend(str, settings);
+                doStringify(str, value, settings).append(',');
+                afterAppended(str, settings);
             }
         });
     }
 
-    private static void stringify(StringBuilder builder, Map inputMap, StringifySettings stringifySettings) {
+    private static void stringifyMap(StringBuilder builder, Map inputMap, StringifySettings stringifySettings) {
         doAppendAroundObject(builder, inputMap, stringifySettings, (str, settings, values) -> {
             for (Object o : values.entrySet()) {
                 Map.Entry entry = (Map.Entry) o;
+                beforeAppend(str, settings);
                 builder.append('"').append(entry.getKey()).append('"').append(':');
-                stringify(builder, entry.getValue(), settings).append(',');
-                aroundAppend(builder, settings);
+                doStringify(builder, entry.getValue(), settings).append(',');
+                afterAppended(str, settings);
             }
         });
     }
@@ -131,10 +153,11 @@ class JSONStringer implements Stringify {
         doAppendAroundArray(builder, arr, stringifySettings, (str, settings, values) -> {
             for (Object v : values) {
                 if (v == null) {
-                    aroundAppend(str.append("null").append(','), settings);
+                    beforeAppend(str, settings);
+                    str.append("null").append(',');
+                    afterAppended(str, settings);
                 } else {
-                    str.append('"').append(v).append('"').append(',');
-                    aroundAppend(str, settings);
+                    doStringify(str, v, settings).append(',');
                 }
             }
         });
@@ -166,7 +189,9 @@ class JSONStringer implements Stringify {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
                 Object value = ((Optional) o).get();
-                aroundAppend(builder.append(stringify(builder, value, stringifySettings)), stringifySettings);
+                beforeAppend(builder, stringifySettings);
+                doStringify(builder, value, stringifySettings);
+                afterAppended(builder, stringifySettings);
             }
 
             @Override
@@ -175,7 +200,10 @@ class JSONStringer implements Stringify {
         OPTIONAL_DOUBLE {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                aroundAppend(builder.append(((OptionalDouble) o).getAsDouble()), stringifySettings);
+                double value = ((OptionalDouble) o).getAsDouble();
+                beforeAppend(builder, stringifySettings);
+                builder.append(value);
+                afterAppended(builder, stringifySettings);
             }
 
             @Override
@@ -184,7 +212,10 @@ class JSONStringer implements Stringify {
         OPTIONAL_LONG {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                aroundAppend(builder.append(((OptionalLong) o).getAsLong()), stringifySettings);
+                long value = ((OptionalLong) o).getAsLong();
+                beforeAppend(builder, stringifySettings);
+                builder.append(value);
+                afterAppended(builder, stringifySettings);
             }
 
             @Override
@@ -193,7 +224,10 @@ class JSONStringer implements Stringify {
         OPTIONAL_INT {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                aroundAppend(builder.append(((OptionalInt) o).getAsInt()), stringifySettings);
+                int value = ((OptionalInt) o).getAsInt();
+                beforeAppend(builder, stringifySettings);
+                builder.append(value);
+                afterAppended(builder, stringifySettings);
             }
 
             @Override
@@ -202,8 +236,8 @@ class JSONStringer implements Stringify {
         CALENDAR {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                builder.append('"').append(DateUtil.format((Calendar) o)).append('"');
-                aroundAppend(builder, stringifySettings);
+                String value = DateUtil.format((Calendar) o);
+                addString(builder, stringifySettings, value);
             }
 
             @Override
@@ -214,8 +248,8 @@ class JSONStringer implements Stringify {
         DATE {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                builder.append('"').append(DateUtil.format((Date) o)).append('"');
-                aroundAppend(builder, stringifySettings);
+                String value = DateUtil.format((Date) o);
+                addString(builder, stringifySettings, value);
             }
 
             @Override
@@ -226,22 +260,44 @@ class JSONStringer implements Stringify {
         JDK8_DATE {
             @Override
             public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
-                stringBuilder.append('"').append(DateTimeUtil.format((TemporalAccessor) o)).append('"');
-                aroundAppend(stringBuilder, stringifySettings);
+                String value = DateTimeUtil.format((LocalDate) o);
+                addString(stringBuilder, stringifySettings, value);
             }
 
             @Override
             public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(LocalDateTime.class, LocalDate.class, LocalTime.class);
+                return SetUtil.newSet(LocalDate.class);
+            }
+        },
+        JDK8_TIME {
+            @Override
+            public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
+                String value = DateTimeUtil.format((LocalTime) o);
+                addString(stringBuilder, stringifySettings, value);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(LocalTime.class);
+            }
+        },
+        JDK8_DATE_TIME {
+            @Override
+            public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
+                String value = DateTimeUtil.format((LocalDateTime) o);
+                addString(stringBuilder, stringifySettings, value);
+            }
+
+            @Override
+            public Set<Class> getSupportsCls() {
+                return SetUtil.newSet(LocalDateTime.class);
             }
         },
         JDK8_DATE_OFFSET {
             @Override
             public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
-                stringBuilder.append('"')
-                    .append(DateTimeUtil.format(((OffsetDateTime) o).toLocalDateTime()))
-                    .append('"');
-                aroundAppend(stringBuilder, stringifySettings);
+                String value = DateTimeUtil.format(((OffsetDateTime) o).toLocalDateTime());
+                addString(stringBuilder, stringifySettings, value);
             }
 
             @Override
@@ -250,10 +306,8 @@ class JSONStringer implements Stringify {
         JDK8_DATE_ZONED {
             @Override
             public void accept(StringBuilder stringBuilder, Object o, StringifySettings stringifySettings) {
-                stringBuilder.append('"')
-                    .append(DateTimeUtil.format(((ZonedDateTime) o).toLocalDateTime()))
-                    .append('"');
-                aroundAppend(stringBuilder, stringifySettings);
+                String value = DateTimeUtil.format(((ZonedDateTime) o).toLocalDateTime());
+                addString(stringBuilder, stringifySettings, value);
             }
 
             @Override
@@ -262,8 +316,7 @@ class JSONStringer implements Stringify {
         WRAPPED {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                builder.append('"').append(o).append('"');
-                aroundAppend(builder, stringifySettings);
+                addString(builder, stringifySettings, o);
             }
 
             @Override
@@ -284,7 +337,7 @@ class JSONStringer implements Stringify {
         UNWRAPPED {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                aroundAppend(builder.append(o), stringifySettings);
+                addUnwrapped(builder, stringifySettings, o);
             }
 
             @Override
@@ -351,7 +404,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (char[]) values, stringifySettings, (str, settings, vs) -> {
                     for (char v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -364,7 +417,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (boolean[]) values, stringifySettings, (str, settings, vs) -> {
                     for (boolean v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -377,7 +430,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (int[]) values, stringifySettings, (str, settings, vs) -> {
                     for (int v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -390,7 +443,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (byte[]) values, stringifySettings, (str, settings, vs) -> {
                     for (byte v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -403,7 +456,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (short[]) values, stringifySettings, (str, settings, vs) -> {
                     for (short v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -416,7 +469,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (long[]) values, stringifySettings, (str, settings, vs) -> {
                     for (long v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -429,7 +482,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (float[]) values, stringifySettings, (str, settings, vs) -> {
                     for (float v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -442,7 +495,7 @@ class JSONStringer implements Stringify {
             public void accept(StringBuilder builder, Object values, StringifySettings stringifySettings) {
                 doAppendAroundArray(builder, (double[]) values, stringifySettings, (str, settings, vs) -> {
                     for (double v : vs) {
-                        aroundAppend(str.append(v).append(','), settings);
+                        afterAppended(beforeAppend(str, settings).append(v).append(','), settings);
                     }
                 });
             }
@@ -463,9 +516,24 @@ class JSONStringer implements Stringify {
         StringBuilder builder, T value, StringifySettings settings, char open, char close,//
         TableConsumer<StringBuilder, StringifySettings, T> consumer
     ) {
-        startAppend(builder.append(open), settings);
+        startAppend(builder, open, settings);
         consumer.accept(builder, settings, value);
-        endAppended(close(builder, close), settings);
+        endAppended(builder, close, settings);
+    }
+
+    private static StringBuilder addString(StringBuilder sb, StringifySettings settings, Object value) {
+        return addAround(sb, settings, value, (builder, str) -> builder.append('"').append(str).append('"'));
+    }
+
+    private static StringBuilder addUnwrapped(StringBuilder sb, StringifySettings settings, Object value) {
+        return addAround(sb, settings, value, (builder, v) -> builder.append(v));
+    }
+
+    private static <T> StringBuilder addAround(
+        StringBuilder builder, StringifySettings settings, T data, BiConsumer<StringBuilder, T> appender
+    ) {
+        appender.accept(beforeAppend(builder, settings), data);
+        return afterAppended(builder, settings);
     }
 
     private static StringBuilder close(StringBuilder builder, char value) {
@@ -473,15 +541,42 @@ class JSONStringer implements Stringify {
         return builder;
     }
 
-    private static StringBuilder startAppend(StringBuilder builder, StringifySettings settings) {
+    private static StringBuilder startAppend(StringBuilder builder, char open, StringifySettings settings) {
+        addUnwrapped(builder, settings, String.valueOf(open));
+        settings.open();
         return builder;
     }
 
-    private static StringBuilder endAppended(StringBuilder builder, StringifySettings settings) {
+    private static StringBuilder endAppended(StringBuilder builder, char close, StringifySettings settings) {
+        if (settings.getIndentWhitespaces() != null) {
+            // close(builder, '\n');
+            builder.deleteCharAt(builder.length() - 1);
+            settings.close();
+            beforeAppend(builder, settings);
+            builder.append(close);
+        } else {
+            close(builder, close);
+        }
         return builder;
     }
 
-    private static StringBuilder aroundAppend(StringBuilder builder, StringifySettings settings) {
+    private static StringBuilder beforeAppend(StringBuilder builder, StringifySettings settings) {
+        if (builder.length() > 0) {
+            char last = builder.charAt(builder.length() - 1);
+            if (last == ':') {
+                builder.append(' ');
+            } else if (last != '\n') {
+                String indent = settings.getIndentWhitespaces();
+                if (indent != null) {
+                    builder.append('\n');
+                    builder.append(indent);
+                }
+            }
+        }
+        return builder;
+    }
+
+    private static StringBuilder afterAppended(StringBuilder builder, StringifySettings settings) {
         return builder;
     }
 
@@ -491,47 +586,53 @@ class JSONStringer implements Stringify {
      ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
+    private static void importJodaTime() {
+        for (Stringifier value : JodaStringifier.values()) {
+            Set<Class> classes = value.getSupportsCls();
+            for (Class cls : classes) {
+                STRINGIFIER_MAP.put(cls, value);
+            }
+        }
+    }
+
     @SuppressWarnings("all")
     enum JodaStringifier implements Stringifier {
         DATE {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
-                org.joda.time.LocalDate time = (org.joda.time.LocalDate) o;
-                builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN_TIME).print(time)).append('"');
-                aroundAppend(builder, stringifySettings);
+                org.joda.time.LocalDate date = (org.joda.time.LocalDate) o;
+                String formatted = DateTimeFormat.forPattern(Const.PATTERN_DATE).print(date);
+                addString(builder, stringifySettings, formatted);
             }
 
             @Override
-            public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(org.joda.time.LocalDate.class);
-            }
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(org.joda.time.LocalDate.class); }
         },
         TIME {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
                 org.joda.time.LocalTime time = (org.joda.time.LocalTime) o;
-                builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN_TIME).print(time)).append('"');
-                aroundAppend(builder, stringifySettings);
+                String formatted = DateTimeFormat.forPattern(Const.PATTERN_TIME).print(time);
+                addString(builder, stringifySettings, formatted);
             }
 
             @Override
-            public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(org.joda.time.LocalTime.class);
-            }
+            public Set<Class> getSupportsCls() { return SetUtil.newSet(org.joda.time.LocalTime.class); }
         },
         DATE_TIME {
             @Override
             public void accept(StringBuilder builder, Object o, StringifySettings stringifySettings) {
+                String formatted;
                 if (o instanceof ReadableInstant) {
                     ReadableInstant instant = (ReadableInstant) o;
-                    builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN).print(instant)).append('"');
+                    formatted = DateTimeFormat.forPattern(Const.PATTERN).print(instant);
                 } else if (o instanceof ReadablePartial) {
                     ReadablePartial partial = (ReadablePartial) o;
-                    builder.append('"').append(DateTimeFormat.forPattern(Const.PATTERN).print(partial)).append('"');
+                    formatted = DateTimeFormat.forPattern(Const.PATTERN).print(partial);
                 } else {
                     throw new IllegalArgumentException("Invalid datetime value of: " + o);
                 }
-                aroundAppend(builder, stringifySettings);
+                addString(builder, stringifySettings, formatted);
             }
 
             @Override
@@ -542,14 +643,5 @@ class JSONStringer implements Stringify {
                     MutableDateTime.class);
             }
         };
-    }
-
-    public static void importJodaTime() {
-        for (Stringifier value : JodaStringifier.values()) {
-            Set<Class> classes = value.getSupportsCls();
-            for (Class cls : classes) {
-                STRINGIFIER_MAP.put(cls, value);
-            }
-        }
     }
 }
