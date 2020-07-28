@@ -1,7 +1,6 @@
 package com.moon.core.util.support;
 
 import com.moon.core.io.FileUtil;
-import com.moon.core.lang.support.SystemSupport;
 
 import java.io.File;
 import java.io.InputStream;
@@ -84,7 +83,7 @@ public final class ResourceSupport {
         }
     }
 
-    static URL getUrl(String path) { return SystemSupport.class.getResource(path); }
+    static URL getUrl(String path) { return ResourceSupport.class.getResource(path); }
 
     public static InputStream getResourceAsStream(String path) {
         try {

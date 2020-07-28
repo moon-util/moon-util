@@ -166,7 +166,7 @@ enum TransferForGet implements GetTransfer {
 
         @Override
         public void transfer(CellFactory factory, Object value) {
-            if (value instanceof Number) {
+            if (value instanceof Calendar) {
                 factory.val((Calendar) value);
             } else {
                 factory.val(CalendarUtil.toCalendar(value));
@@ -233,6 +233,57 @@ enum TransferForGet implements GetTransfer {
         public void transfer(CellFactory factory, Object data) {
             factory.getCell().setBlank();
         }
+    },
+    UTIL_OPTIONAL_INT {
+        @Override
+        public void transfer(CellFactory factory, Object value) {
+            OptionalInt optional = (OptionalInt) value;
+            if (optional.isPresent()) {
+                factory.getCell().setCellValue(optional.getAsInt());
+            } else {
+                factory.getCell().setBlank();
+            }
+        }
+
+        @Override
+        boolean test(Object data) { return data instanceof OptionalInt; }
+
+        @Override
+        boolean test(Class propertyType) { return propertyType == OptionalInt.class; }
+    },
+    UTIL_OPTIONAL_LONG {
+        @Override
+        public void transfer(CellFactory factory, Object value) {
+            OptionalLong optional = (OptionalLong) value;
+            if (optional.isPresent()) {
+                factory.getCell().setCellValue(optional.getAsLong());
+            } else {
+                factory.getCell().setBlank();
+            }
+        }
+
+        @Override
+        boolean test(Object data) { return data instanceof OptionalLong; }
+
+        @Override
+        boolean test(Class propertyType) { return propertyType == OptionalLong.class; }
+    },
+    UTIL_OPTIONAL_DOUBLE {
+        @Override
+        public void transfer(CellFactory factory, Object value) {
+            OptionalDouble optional = (OptionalDouble) value;
+            if (optional.isPresent()) {
+                factory.getCell().setCellValue(optional.getAsDouble());
+            } else {
+                factory.getCell().setBlank();
+            }
+        }
+
+        @Override
+        boolean test(Object data) { return data instanceof OptionalDouble; }
+
+        @Override
+        boolean test(Class propertyType) { return propertyType == OptionalDouble.class; }
     },
     /**
      * 默认

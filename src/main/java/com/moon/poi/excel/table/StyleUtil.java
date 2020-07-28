@@ -36,7 +36,7 @@ final class StyleUtil {
         return StringUtil.concat(type.getSimpleName(), "#", propertyName);
     }
 
-    static Map<String, StyleBuilder> toStyleMap(Class<?> type) {
+    static Map<String, StyleBuilder> toStyleMapOnTargetClass(Class<?> type) {
         return parsePropertyStyle(EMPTY, type.getAnnotationsByType(DefinitionStyle.class));
     }
 

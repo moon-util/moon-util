@@ -5,12 +5,9 @@ package com.moon.poi.excel.table;
 // import com.moon.more.excel.annotation.TableColumnGroup;
 // import com.moon.more.excel.annotation.defaults.DefaultValue;
 
+import com.moon.core.lang.NumberUtil;
 import com.moon.core.util.DateUtil;
 import com.moon.poi.excel.annotation.TableColumn;
-import org.joda.time.DateTime;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author moonsky
@@ -60,19 +57,8 @@ final class Assert {
         }
     }
 
-    private final static Set<Class> NUMBER_CLASSES = new HashSet<>();
-
-    static {
-        NUMBER_CLASSES.add(byte.class);
-        NUMBER_CLASSES.add(short.class);
-        NUMBER_CLASSES.add(int.class);
-        NUMBER_CLASSES.add(long.class);
-        NUMBER_CLASSES.add(float.class);
-        NUMBER_CLASSES.add(double.class);
-    }
-
     static boolean isNumberType(Class type) {
-        return Number.class.isAssignableFrom(type) || NUMBER_CLASSES.contains(type);
+        return NumberUtil.isGeneralNumberClass(type);
     }
 
     static boolean isImportedJodaTime() { return DateUtil.isImportedJodaTime(); }

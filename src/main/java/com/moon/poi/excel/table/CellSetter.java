@@ -275,7 +275,11 @@ abstract class CellSetter {
         if (setter != null) {
             return setter;
         }
-        return getOrBuild(ReadablePartial.class, type, pattern, ReadablePartialSetter::new);
+        setter = getOrBuild(ReadablePartial.class, type, pattern, ReadablePartialSetter::new);
+        if (setter != null) {
+            return setter;
+        }
+        return getOrBuild(Number.class, type, pattern, LongJodaTimeSetter::new);
     }
 
     private abstract static class JodaDateSetter extends StringCellSetter {

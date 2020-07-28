@@ -47,7 +47,7 @@ class EnumUtilTestTest {
                 TestMultiItemsEnum.THIRD,
             });
         assertArrayEquals(
-            EnumUtil.sortValues(TestMultiItemsEnum.class, Comparator.comparingInt(o -> o.value)),
+            EnumUtil.sortedValues(TestMultiItemsEnum.class, Comparator.comparingInt(o -> o.value)),
             new TestMultiItemsEnum[]{
                 TestMultiItemsEnum.THIRD,
                 TestMultiItemsEnum.SECOND,

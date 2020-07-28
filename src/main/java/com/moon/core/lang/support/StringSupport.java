@@ -7,9 +7,10 @@ import com.moon.core.util.function.IntBiFunction;
 import java.util.function.Predicate;
 
 /**
+ * 所有以{@code Support}结尾的类不建议使用
  * @author moonsky
  */
-public class StringSupport {
+public final class StringSupport {
 
     static final char[] MARK = {'{', '}'};
     static final char[] EMPTY = Arrays2.CHARS.empty();

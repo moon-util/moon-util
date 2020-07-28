@@ -68,7 +68,7 @@ final class ParserUtil {
         TableCol[] columns = new TableCol[list.size()];
         AttrConfig config = new AttrConfig(targetClass);
 
-        Map styleMap = StyleUtil.toStyleMap(targetClass);
+        Map styleMap = StyleUtil.toStyleMapOnTargetClass(targetClass);
 
         for (int i = 0, size = list.size(); i < size; i++) {
             Attribute attr = list.get(i);

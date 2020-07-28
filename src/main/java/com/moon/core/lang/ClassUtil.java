@@ -158,6 +158,28 @@ public final class ClassUtil {
     public static Class toWrapperClass(Class clazz) { return PRIMITIVE_TO_WRAPPER_MAP.get(clazz); }
 
     /**
+     * 是否是基本数据类型类
+     *
+     * @param type 待测类
+     *
+     * @return 当 type 是 byte、short、int、long、float、double、boolean、char 其中之一时返回 true，否则返回 false
+     */
+    public static boolean isPrimitiveClass(Class type) {
+        return PRIMITIVE_TO_WRAPPER_MAP.containsKey(type);
+    }
+
+    /**
+     * 是否是数字基本数据类型类
+     *
+     * @param type 待测类
+     *
+     * @return 当 type 是 byte、short、int、long、float、double 其中之一时返回 true，否则返回 false
+     */
+    public static boolean isNumberPrimitiveClass(Class type) {
+        return NumberUtil.isNumberPrimitiveClass(type);
+    }
+
+    /**
      * 返回包装类对应的基本数据类型
      *
      * @param clazz 包装类
@@ -165,6 +187,28 @@ public final class ClassUtil {
      * @return 包装类对应的基本数据类型；如果 clazz 不是包装类，而是其他类时返回 null
      */
     public static Class toPrimitiveClass(Class clazz) { return WRAPPER_TO_PRIMITIVE_MAP.get(clazz); }
+
+    /**
+     * 是否是基本包装类型类
+     *
+     * @param type 待测类
+     *
+     * @return 当 type 是 Byte、Short、Integer、Long、Float、Double、Boolean、Character 其中之一时返回 true，否则返回 false
+     */
+    public static boolean isWrapperClass(Class type) {
+        return WRAPPER_TO_PRIMITIVE_MAP.containsKey(type);
+    }
+
+    /**
+     * 是否是数字基本包装类型类
+     *
+     * @param type 待测类
+     *
+     * @return 当 type 是 Byte、Short、Integer、Long、Float、Double 其中之一时返回 true，否则返回 false
+     */
+    public static boolean isNumberWrapperClass(Class type) {
+        return NumberUtil.isNumberWrapperClass(type);
+    }
 
     /**
      * 参考{@link Class#forName(String)}, 屏蔽了检查异常

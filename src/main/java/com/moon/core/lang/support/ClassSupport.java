@@ -10,9 +10,7 @@ import java.util.Set;
  */
 public final class ClassSupport {
 
-    private ClassSupport() {
-        ThrowUtil.noInstanceError();
-    }
+    private ClassSupport() { ThrowUtil.noInstanceError(); }
 
     public static Set<Class> addAllInterfaces(Set<Class> list, Class[] types) {
         for (int i = 0; i < types.length; i++) {

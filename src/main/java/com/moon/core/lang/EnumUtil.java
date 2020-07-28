@@ -1,6 +1,5 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.DetectUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.TestUtil;
 
@@ -84,7 +83,7 @@ public final class EnumUtil {
      * @return 枚举值
      */
     public static <T extends Enum<T>> T[] sortedValuesByName(Class<T> type) {
-        return sortValues(type, Comparator.comparing(Enum::name));
+        return sortedValues(type, Comparator.comparing(Enum::name));
     }
 
     /**
@@ -96,7 +95,7 @@ public final class EnumUtil {
      *
      * @return 枚举值
      */
-    public static <T extends Enum<T>> T[] sortValues(Class<T> type, Comparator<? super T> comparator) {
+    public static <T extends Enum<T>> T[] sortedValues(Class<T> type, Comparator<? super T> comparator) {
         return ArrayUtil.sort(comparator, values(type));
     }
 

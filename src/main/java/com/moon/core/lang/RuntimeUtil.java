@@ -11,9 +11,7 @@ public final class RuntimeUtil {
 
     private RuntimeUtil() { noInstanceError(); }
 
-    public static Runtime getRuntime() {
-        return Runtime.getRuntime();
-    }
+    public static Runtime getRuntime() { return Runtime.getRuntime(); }
 
     /**
      * 最大内存
