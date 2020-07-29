@@ -1,5 +1,6 @@
 package com.moon.poi.excel.xlsx;
 
+import com.moon.core.lang.SystemUtil;
 import com.moon.poi.excel.Renderer;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import com.moon.poi.excel.table.TableParser;
@@ -24,5 +25,10 @@ public class StyleTest extends TableParser{
     @Test
     void testParseStyle() throws Exception {
         Renderer renderer = parseConfiguration(Employee.class);
+    }
+
+    @Test
+    void testPrintUserDir() throws Exception {
+        System.out.println(SystemUtil.get("user.dir"));
     }
 }

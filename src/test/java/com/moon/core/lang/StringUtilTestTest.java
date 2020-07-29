@@ -1,6 +1,5 @@
 package com.moon.core.lang;
 
-import com.moon.core.enums.Testers;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.validator.Validator;
@@ -585,10 +584,79 @@ class StringUtilTestTest {
      */
     @Test
     void testCharCodeAt() {
-        assertEquals("abc  ",StringUtil.trimStart("  abc  "));
+        assertEquals("abc  ", StringUtil.trimStart("  abc  "));
         String value = ":asd:asd:";
         List<String> splitted = StringUtil.split(value, ':');
         System.out.println(splitted);
+    }
+
+    @Test
+    void testCharsMatches() throws Exception {
+        String str0 = "123123123456789789";
+        String str1 = "123";
+        char[] chars0 = str0.toCharArray();
+        char[] chars1 = str1.toCharArray();
+        assertEquals(0, CharUtil.indexOf(chars0, chars1));
+        assertEquals(3, CharUtil.indexOf(chars0, chars1, 3));
+        assertEquals(6, CharUtil.indexOf(chars0, chars1, 6));
+        System.out.println(StringUtil.trimStart(str0, str1));
+    }
+
+    @Test
+    void testTrimEnding() throws Exception {
+        String str = "123123456789789";
+        String ending = "789";
+        char[] origin = str.toCharArray();
+        char[] search = ending.toCharArray();
+        int searchLen = search.length;
+        int originLastIdx = origin.length - searchLen;
+        boolean matches = CharUtil.isSafeRegionMatches(origin, originLastIdx, search, 0);
+        System.out.println(matches);
+
+        System.out.println(StringUtil.trimEnd(str, ending));
+    }
+
+    @Test
+    void testSubstrBetween1() throws Exception {
+        String str = "aa(123456)bbaa";
+        assertEquals("(123456)bb", StringUtil.substrBetween(str, "aa"));
+        assertEquals("123456", StringUtil.substrBetween(str, "(", ")"));
+        assertEquals("(123456", StringUtil.substrBetween(str, "(", ")", true, false));
+        assertEquals("123456)", StringUtil.substrBetween(str, "(", ")", false, true));
+        assertEquals("(123456)", StringUtil.substrBetween(str, "(", ")", true, true));
+    }
+
+    @Test
+    void testTrimOpenToClose() throws Exception {
+        String str = "12345612345678956789";
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_START));
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+        System.out.println(StringUtil.trim(str, "123456", "56789"));
+
+        str = "12345612345656789";
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789"));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+
+        str = "56789";
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789"));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+
+        str = "123456123456";
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789"));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+    }
+
+    @Test
+    void testSplitAsString() {
+        System.out.println(StringUtil.split("abc|def|ghj", "|"));
     }
 
     @Test

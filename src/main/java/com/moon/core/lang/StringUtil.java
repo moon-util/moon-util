@@ -6,6 +6,7 @@ import com.moon.core.enums.IntTesters;
 import com.moon.core.enums.Testers;
 import com.moon.core.lang.support.StringSupport;
 import com.moon.core.util.ValidationUtil;
+import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.IntBiFunction;
 
 import java.util.ArrayList;
@@ -132,8 +133,28 @@ public final class StringUtil {
      */
     public static String concat(CharSequence... css) { return concatAllMatched(Testers.TRUE, css); }
 
+    /**
+     * 拼接字符串
+     *
+     * @param predicate 拼接条件，只有通过检测的字符串才拼接
+     * @param css       字符串列表
+     *
+     * @return 连接后的字符串
+     */
     public static String concatAllMatched(Predicate<CharSequence> predicate, CharSequence... css) {
         return concatHandler(predicate, css);
+    }
+
+    /**
+     * 拼接字符串
+     *
+     * @param converter 转换器，主要用于提供默认值等
+     * @param css       字符串列表
+     *
+     * @return 连接后的字符串
+     */
+    public static String concat(BiIntFunction<CharSequence, CharSequence> converter, CharSequence... css) {
+        return concatHandler(converter, css);
     }
 
     /*
@@ -349,21 +370,13 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static <C extends CharSequence> C requireEmpty(C c) {
-        return ValidationUtil.requireEmpty(c);
-    }
+    public static <C extends CharSequence> C requireEmpty(C c) { return ValidationUtil.requireEmpty(c); }
 
-    public static <C extends CharSequence> C requireNotEmpty(C c) {
-        return ValidationUtil.requireNotEmpty(c);
-    }
+    public static <C extends CharSequence> C requireNotEmpty(C c) { return ValidationUtil.requireNotEmpty(c); }
 
-    public static <C extends CharSequence> C requireBlank(C c) {
-        return ValidationUtil.requireBlank(c);
-    }
+    public static <C extends CharSequence> C requireBlank(C c) { return ValidationUtil.requireBlank(c); }
 
-    public static <C extends CharSequence> C requireNotBlank(C c) {
-        return ValidationUtil.requireNotBlank(c);
-    }
+    public static <C extends CharSequence> C requireNotBlank(C c) { return ValidationUtil.requireNotBlank(c); }
 
     /*
      * -------------------------------------------------------------------
@@ -533,17 +546,53 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
+    /**
+     * 裁剪首尾空白字符
+     *
+     * @param string 待裁剪字符串
+     *
+     * @return 裁剪首尾空白字符完成后的字符串
+     */
     public static String trim(CharSequence string) { return trimToEmpty(string); }
 
+    /**
+     * 裁剪首尾空白字符
+     *
+     * @param string 待裁剪字符串
+     *
+     * @return 若裁剪完后的字符串不包含任何元素，则返回 null，否则返回裁剪完成的字符串
+     */
     public static String trimToNull(CharSequence string) { return trimToDefault(string, NULL); }
 
+    /**
+     * 裁剪首尾空白字符
+     *
+     * @param string 待裁剪字符串
+     *
+     * @return 若 cs == null，返回空字符串，否则返回裁剪后的字符
+     */
     public static String trimToEmpty(CharSequence string) { return trimToDefault(string, EMPTY); }
 
+    /**
+     * 裁剪首尾空白字符
+     *
+     * @param cs           待裁剪字符串
+     * @param defaultValue 默认值
+     *
+     * @return 若 cs == null，返回{@code defaultValue}，否则返回裁剪后的字符
+     */
     public static String trimToDefault(CharSequence cs, String defaultValue) {
-        String ret = isEmpty(cs) ? defaultValue : cs.toString().trim();
-        return ret == null ? null : (length(ret) > 0 ? (ret.charAt(0) == 65279 ? ret.substring(1) : ret) : EMPTY);
+        return cs == null ? defaultValue : defaultIfNull((cs.charAt(0) == 65279 ? cs.subSequence(1,
+            cs.length()) : cs).toString().trim(), defaultValue);
     }
 
+    /**
+     * 取消开始部分的空白字符
+     *
+     * @param str 待处理字符串
+     *
+     * @return 如果字符串头部存在空白字符，就删除头部的空白字符，否则返回原字符串
+     */
     public static String trimStart(String str) {
         if (str == null) {
             return null;
@@ -557,6 +606,13 @@ public final class StringUtil {
         return str;
     }
 
+    /**
+     * 取消结尾部分的空白字符
+     *
+     * @param str 待处理字符串
+     *
+     * @return 如果字符串尾部存在空白字符，就删除尾部的空白字符，否则返回原字符串
+     */
     public static String trimEnd(String str) {
         if (str == null) {
             return null;
@@ -570,18 +626,256 @@ public final class StringUtil {
         return str;
     }
 
-    public static String trimStart(String str, String search) {
-        return str == null ? null : str.startsWith(search) ? substrAfter(str, search) : str;
+    /**
+     * 删除头部从第一个字符开始所有连续匹配的字符串
+     *
+     * @param str      待处理字符串
+     * @param starting 目标前缀
+     *
+     * @return 删除完成的字符串
+     *
+     * @see #trimPrefix(String, String) 只删除头部一个匹配的字符串
+     */
+    public static String trimStart(String str, String starting) {
+        if (isEmpty(starting) || isEmpty(str)) {
+            return str;
+        }
+        char[] origin = str.toCharArray();
+        char[] search = starting.toCharArray();
+        int start = 0, index = CharUtil.indexOf(origin, search, start);
+        while (index >= 0) {
+            start = index + search.length;
+            index = CharUtil.indexOf(origin, search, start);
+        }
+        return start > 0 ? str.substring(start) : str;
     }
 
-    public static String trimEnd(String str, String search) {
-        return str == null ? null : str.endsWith(search) ? substrBefore(str, search) : str;
+    /**
+     * 删除尾部从最后一个字符开始所有连续匹配字符串
+     *
+     * @param str    待处理字符串
+     * @param ending 目标后缀
+     *
+     * @return 删除完成的字符串
+     *
+     * @see #triggerSuffix(CharSequence, String) 只删除尾部一个匹配的字符串
+     */
+    public static String trimEnd(String str, String ending) {
+        if (isEmpty(ending) || isEmpty(str)) {
+            return str;
+        }
+        char[] origin = str.toCharArray();
+        char[] search = ending.toCharArray();
+        int searchLen = search.length;
+        int originLen = origin.length;
+        int lastIdx = originLen, originLastIdx = originLen - searchLen;
+        while (CharUtil.isSafeRegionMatches(origin, originLastIdx, search, 0)) {
+            lastIdx = originLastIdx;
+            originLastIdx -= searchLen;
+            if (originLastIdx < 0) {
+                break;
+            }
+        }
+        return lastIdx == originLen ? str : str.substring(0, lastIdx);
     }
 
-    private static String trim(String str, String search) { return trim(str, search, search); }
+    /**
+     * 裁剪首尾标记字符
+     *
+     * @param str 待处理字符串
+     * @param tag 标记字符串
+     *
+     * @return 裁剪后的字符串
+     */
+    public static String trim(String str, String tag) { return trim(str, tag, tag); }
 
-    private static String trim(String str, String open, String close) {
-        return str;
+    /**
+     * 裁剪首尾开闭标记字符串
+     *
+     * @param str   待处理字符串
+     * @param open  头部标记字符串
+     * @param close 尾部标记字符串
+     *
+     * @return 裁剪后的字符串
+     */
+    public static String trim(String str, String open, String close) { return trim(str, open, close, null); }
+
+    /**
+     * 裁剪首尾标记字符
+     *
+     * @param str   待处理字符串
+     * @param open  头部标记字符串
+     * @param close 尾部标记字符串
+     * @param type  处理方式
+     *
+     * @return 裁剪后的字符串
+     */
+    public static String trim(String str, String open, String close, TrimType type) {
+        if (isEmpty(open)) {
+            return trimEnd(str, close);
+        }
+        if (isEmpty(close)) {
+            return trimStart(str, open);
+        }
+        if (isEmpty(str)) {
+            return str;
+        }
+        if (type != null) {
+            switch (type) {
+                case PRIORITY_START:
+                    return trimEnd(trimStart(str, open), close);
+                case PRIORITY_END:
+                    return trimStart(trimEnd(str, close), open);
+                default:
+            }
+        }
+        char[] origin = str.toCharArray();
+        char[] start = open.toCharArray();
+        char[] end = close.toCharArray();
+        int originLen = origin.length;
+        int startLen = start.length;
+        int endLen = end.length;
+        int minTagLen = Math.min(startLen, endLen);
+        if (originLen < minTagLen) {
+            return str;
+        }
+        int firstIdx = 0, lastIdx = originLen;
+        int originLastIdx = originLen - endLen, count;
+        while (true) {
+            if (CharUtil.isSafeRegionMatches(origin, firstIdx, start, 0)) {
+                firstIdx = firstIdx + startLen;
+            }
+            if (CharUtil.isSafeRegionMatches(origin, originLastIdx, end, 0)) {
+                lastIdx = originLastIdx;
+                originLastIdx -= endLen;
+            }
+            count = lastIdx - firstIdx;
+            if (count < 0) {
+                if (type == TrimType.BALANCE_START) {
+                    return str.substring(firstIdx, lastIdx + endLen);
+                } else if (type == TrimType.BALANCE_END) {
+                    return str.substring(firstIdx - startLen, lastIdx);
+                } else {
+                    // type == null or type == DEFAULT
+                    return Const.EMPTY;
+                }
+            } else if (count < minTagLen) {
+                return str.substring(firstIdx, lastIdx);
+            }
+        }
+    }
+
+    public enum TrimType {
+        /**
+         * 优先裁剪头部，头部处理完后余下的部分裁剪尾部
+         */
+        PRIORITY_START,
+        /**
+         * 优先裁剪尾部
+         */
+        PRIORITY_END,
+        /**
+         * 平衡裁剪，最后如存在交叉部分，优先裁剪头部
+         */
+        BALANCE_START,
+        /**
+         * 平衡裁剪，最后如存在交叉部分，优先裁剪尾部
+         */
+        BALANCE_END,
+        /**
+         * 平衡裁剪，最后如存在交叉部分，返回空字符串(这是默认情况)
+         */
+        DEFAULT
+    }
+
+    /**
+     * 取消前缀
+     *
+     * @param str    待处理字符串
+     * @param prefix 目标前缀
+     *
+     * @return 如果待处理字符串以目标为前缀，就删除前缀，否则返回原字符串
+     *
+     * @see #trimStart(String, String) 删除头部所有连续匹配的字符串
+     */
+    public static String trimPrefix(String str, String prefix) {
+        return str == null ? null : str.startsWith(prefix) ? substrAfter(str, prefix) : str;
+    }
+
+    /**
+     * 取消后缀
+     *
+     * @param str    待处理字符串
+     * @param suffix 目标后缀
+     *
+     * @return 如果待处理字符串以目标为后缀，就删除后缀，否则返回原字符串
+     *
+     * @see #trimEnd(String, String) 删除尾部所有连续匹配的字符串
+     */
+    public static String trimSuffix(String str, String suffix) {
+        return str == null ? null : str.endsWith(suffix) ? substrBefore(str, suffix) : str;
+    }
+
+    /**
+     * 在头部保持前缀
+     *
+     * @param str
+     * @param prefix
+     *
+     * @return
+     */
+    public static String padPrefixIfAbsent(String str, String prefix) {
+        return isEmpty(str) ? prefix : (isEmpty(prefix) || str.startsWith(prefix) ? str : (prefix + str));
+    }
+
+    /**
+     * 在尾部保持后缀
+     *
+     * @param str
+     * @param prefix
+     *
+     * @return
+     */
+    public static String padSuffixIfAbsent(String str, String prefix) {
+        return isEmpty(str) ? prefix : (isEmpty(prefix) || str.endsWith(prefix) ? str : (str + prefix));
+    }
+
+    /**
+     * 切换前缀，如果原字符串已指定后缀结尾，就删除，否则就追加
+     *
+     * @param str    字符串
+     * @param prefix 前缀
+     *
+     * @return 转换后的字符串
+     */
+    public static String triggerPrefix(CharSequence str, String prefix) {
+        if (isEmpty(str)) {
+            return prefix;
+        }
+        String origin = str.toString();
+        if (origin.startsWith(prefix)) {
+            return origin.substring(prefix.length());
+        }
+        return origin + prefix;
+    }
+
+    /**
+     * 切换后缀，如果原字符串已指定后缀结尾，就删除，否则就追加
+     *
+     * @param str    字符串
+     * @param suffix 后缀
+     *
+     * @return 转换后的字符串
+     */
+    public static String triggerSuffix(CharSequence str, String suffix) {
+        if (isEmpty(str)) {
+            return suffix;
+        }
+        String origin = str.toString();
+        if (origin.endsWith(suffix)) {
+            return origin.substring(0, origin.length() - suffix.length());
+        }
+        return origin + suffix;
     }
 
     /*
@@ -939,9 +1233,7 @@ public final class StringUtil {
      *
      * @return 转换后的字符串
      */
-    public static String camelcaseToHyphen(String str, char hyphen) {
-        return camelcaseToHyphen(str, hyphen, true);
-    }
+    public static String camelcaseToHyphen(String str, char hyphen) { return camelcaseToHyphen(str, hyphen, true); }
 
     /**
      * 驼峰转连字符，可自定义连字符号和是否拆分连接连续大写字母
@@ -956,7 +1248,7 @@ public final class StringUtil {
      *
      * @param str             字符串
      * @param hyphen          自定义连字符号
-     * @param continuousSplit 连续大写字母是否拆分连接
+     * @param continuousSplit 连续大写字母是否拆分
      *
      * @return 转换后的字符串
      */
@@ -1044,9 +1336,7 @@ public final class StringUtil {
      *
      * @return 替换后的子串；如果 str == null，则返回 null
      */
-    public static String replace(String str, char old, char now) {
-        return str == null ? null : str.replace(old, now);
-    }
+    public static String replace(String str, char old, char now) { return str == null ? null : str.replace(old, now); }
 
     /**
      * 替换第一个匹配子串
@@ -1057,9 +1347,9 @@ public final class StringUtil {
      *
      * @return 替换后的子串；如果 str == null，则返回 null
      */
-    public static String replaceFirst(
-        String src, String old, String now
-    ) { return src == null ? null : src.replaceFirst(old, now); }
+    public static String replaceFirst(String src, String old, String now) {
+        return src == null ? null : src.replaceFirst(old, now);
+    }
 
     /**
      * 指定位置字符，主要是支持负值索引
@@ -1077,6 +1367,16 @@ public final class StringUtil {
             return str.charAt(index < length ? index : index % length);
         }
     }
+
+    /**
+     * 指定位置子字符串，仅包含单个字符
+     *
+     * @param str   原字符串
+     * @param index 位置
+     *
+     * @return 单个字符的字符串
+     */
+    public static String substrAt(CharSequence str, int index) { return String.valueOf(charAt(str, index)); }
 
     /**
      * StringUtil.substrBefore(null, *)      = null
@@ -1203,6 +1503,23 @@ public final class StringUtil {
      * @return 起始字符串和结束字符串之间的子串；任意不符合截取条件的情况返回 null
      */
     public static String substrBetween(String str, String open, String close) {
+        return substrBetween(str, open, close, false, false);
+    }
+
+    /**
+     * 截取字符串之间的第一个子串
+     *
+     * @param str          原字符串
+     * @param open         起始字符串
+     * @param close        结束字符串
+     * @param includeOpen  是否包含起始字符串
+     * @param includeClose 是否包含结束字符串
+     *
+     * @return 起始字符串和结束字符串之间的子串；任意不符合截取条件的情况返回 null
+     */
+    public static String substrBetween(
+        String str, String open, String close, boolean includeOpen, boolean includeClose
+    ) {
         if (str == null || open == null || close == null) {
             return null;
         }
@@ -1214,7 +1531,7 @@ public final class StringUtil {
         if (end < 0) {
             return null;
         }
-        return str.substring(start + open.length(), end);
+        return str.substring(includeOpen ? start : start + open.length(), includeClose ? end + close.length() : end);
     }
 
     /**
@@ -1229,9 +1546,7 @@ public final class StringUtil {
      * @see String#substring(int) 实现方式
      * @see #slice(String, int) 强调"片段"
      */
-    public static String substr(String str, int from) {
-        return isEmpty(str) ? EMPTY : str.substring(from);
-    }
+    public static String substr(String str, int from) { return isEmpty(str) ? EMPTY : str.substring(from); }
 
     /**
      * 从字符串中截取子串
@@ -1244,9 +1559,7 @@ public final class StringUtil {
      *
      * @throws StringIndexOutOfBoundsException 子串范围超长时抛出异常
      */
-    public static String substr(String str, int from, int charsCount) {
-        return substr(str, from, charsCount, false);
-    }
+    public static String substr(String str, int from, int charsCount) { return substr(str, from, charsCount, false); }
 
     /**
      * 从字符串中截取子串
@@ -1443,31 +1756,28 @@ public final class StringUtil {
         return index < 0 ? EMPTY : str.substring(index);
     }
 
-    /**
-     * 丢弃开闭字符串之外的部分
-     * @param str
-     * @param start
-     * @param end
-     * @return
-     */
-    static String discardOutside(String str, String start, String end) {
-        return str;
-    }
-
     /*
     split
      */
 
-    public static List<String> split(CharSequence cs, char separator) {
+    /**
+     * 字符串拆分，将字符串按指定分隔符拆分
+     *
+     * @param str       待拆分字符串
+     * @param separator 分隔符
+     *
+     * @return 拆分后的字符串
+     */
+    public static List<String> split(CharSequence str, char separator) {
         List<String> result = new ArrayList<>();
-        int length = cs == null ? 0 : cs.length();
+        int length = str == null ? 0 : str.length();
         if (length == 0) {
             return result;
         }
         char ch;
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            if ((ch = cs.charAt(i)) == separator) {
+            if ((ch = str.charAt(i)) == separator) {
                 result.add(builder.toString());
                 builder = new StringBuilder();
             } else {
@@ -1475,6 +1785,36 @@ public final class StringUtil {
             }
         }
         result.add(builder.toString());
+        return result;
+    }
+
+    /**
+     * 字符串拆分，将字符串按指定分隔符拆分
+     *
+     * @param str       待拆分字符串
+     * @param separator 分隔符
+     *
+     * @return 拆分后的字符串
+     */
+    public static List<String> split(CharSequence str, String separator) {
+        List<String> result = new ArrayList<>();
+        int length = str == null ? 0 : str.length();
+        if (length == 0) {
+            return result;
+        }
+        String origin = str.toString();
+        if (isEmpty(separator)) {
+            result.add(origin);
+            return result;
+        }
+        final int sepLen = separator.length();
+        int startIdx = 0, endIdx = origin.indexOf(separator);
+        while (endIdx >= 0) {
+            result.add(origin.substring(startIdx, endIdx));
+            startIdx = endIdx + sepLen;
+            endIdx = origin.indexOf(separator, startIdx);
+        }
+        result.add(origin.substring(startIdx));
         return result;
     }
 }

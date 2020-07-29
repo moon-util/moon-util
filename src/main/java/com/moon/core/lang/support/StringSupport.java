@@ -2,12 +2,15 @@ package com.moon.core.lang.support;
 
 import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.CharUtil;
+import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.IntBiFunction;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * 所有以{@code Support}结尾的类不建议使用
+ *
  * @author moonsky
  */
 public final class StringSupport {
@@ -40,6 +43,8 @@ public final class StringSupport {
         }
         return false;
     }
+
+    // public static boolean regionMatchs
 
     public static boolean regionMatches(
         CharSequence cs, boolean ignoreCase, int thisStart, CharSequence substring, int start, int length
@@ -80,6 +85,18 @@ public final class StringSupport {
                 if (predicate.test(tmp)) {
                     sb.append(tmp);
                 }
+            }
+            return sb.toString();
+        }
+        return "";
+    }
+
+    public static String concatHandler(BiIntFunction<CharSequence, CharSequence> formatter, CharSequence... css) {
+        int length = css.length;
+        if (length > 0) {
+            StringBuilder sb = new StringBuilder(length * 16);
+            for (int i = 0, len = length; i < len; i++) {
+                sb.append(formatter.apply(css[i], i));
             }
             return sb.toString();
         }

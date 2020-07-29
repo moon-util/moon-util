@@ -11,6 +11,66 @@ public final class CharUtil {
 
     private CharUtil() { noInstanceError(); }
 
+    /**
+     * 字符片段是否相等
+     *
+     * @param src       字符数组 1
+     * @param srcStart  起始位置
+     * @param srcEnd    结束位置
+     * @param dest      字符数组 2
+     * @param destStart 起始位置
+     * @param destEnd   结束位置
+     *
+     * @return 如果两个字符数组指定片段内的内容相同返回 true，否则返回 false
+     */
+    public static boolean isRegionMatches(
+        char[] src, int srcStart, int srcEnd, char[] dest, int destStart, int destEnd
+    ) {
+        int srcCnt = srcEnd - srcStart, destCnt = destEnd - destStart;
+        if (srcCnt != destCnt || srcStart < 0 || destStart < 0) {
+            return false;
+        }
+        int srcLen = src.length;
+        if (srcEnd >= srcLen) {
+            return false;
+        }
+        int destLen = dest.length;
+        if (destEnd >= destLen) {
+            return false;
+        }
+        for (int i = 0; i < srcCnt; i++) {
+            if (src[srcStart + i] != dest[destStart + i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 字符片段是否相等
+     * <p>
+     * 这个方法默认由调用方保证索引位置安全
+     *
+     * @param src       字符数组 1
+     * @param srcStart  起始位置
+     * @param dest      字符数组 2
+     * @param destStart 起始位置
+     *
+     * @return 如果两个字符数组指定片段内的内容相同返回 true，否则返回 false
+     */
+    public static boolean isSafeRegionMatches(char[] src, int srcStart, char[] dest, int destStart) {
+        int count = dest.length - destStart;
+        if (srcStart + count <= src.length) {
+            for (int i = 0; i < count; i++) {
+                if (src[srcStart + i] != dest[destStart + i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     public static int indexOf(final char[] src, final char[] test) { return indexOf(src, test, 0); }
 
     public static int indexOf(final char[] src, final char[] test, int fromIndex) {
@@ -35,12 +95,17 @@ public final class CharUtil {
         }
 
         final char first = test[0];
-        for (int i = fromIndex, idx; i < l1; i++) {
+        for (int i = fromIndex, idx, actIdx; i < l1; i++) {
             if (src[i] == first) {
                 idx = 1;
                 for (; idx < l2; idx++) {
-                    if (src[idx + i] != test[idx]) {
-                        break;
+                    actIdx = idx + i;
+                    if (actIdx < l1) {
+                        if (src[actIdx] != test[idx]) {
+                            break;
+                        }
+                    } else {
+                        return -1;
                     }
                 }
                 if (idx >= l2) {
@@ -51,23 +116,19 @@ public final class CharUtil {
         return -1;
     }
 
-    public static boolean isVarStarting(int ch) {
-        return isLetter(ch) || is_(ch) || is$(ch) || isChinese(ch);
-    }
+    public static boolean isVarStarting(int ch) { return isLetter(ch) || is_(ch) || is$(ch) || isChinese(ch); }
 
-    public static boolean isVar(int ch) {
-        return isLetterOrDigit(ch) || is_(ch) || is$(ch) || isChinese(ch);
-    }
+    public static boolean isVar(int ch) { return isLetterOrDigit(ch) || is_(ch) || is$(ch) || isChinese(ch); }
 
     public static boolean is_(int ch) { return isUnderscore(ch); }
 
-    public static boolean is$(int ch) { return isDollar(ch); }
+    public static boolean is$(int ch) { return ch == '$'; }
 
     public static boolean isUnderscore(int ch) { return ch == '_'; }
 
     public static boolean isChineseYuan(int ch) { return ch == '￥'; }
 
-    public static boolean isDollar(int ch) { return ch == '$'; }
+    public static boolean isDollar(int ch) { return is$(ch); }
 
     /**
      * "[4e00-9fa5]"
