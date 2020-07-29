@@ -3,6 +3,7 @@ package com.moon.core.lang;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.validator.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -652,6 +653,15 @@ class StringUtilTestTest {
         assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
         assertEquals("", StringUtil.trim(str, "123456", "56789"));
         assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+    }
+
+    @Test
+    void testSubstrBefore1() throws Exception {
+        // StringUtil.substrBefore()
+        System.out.println("123".indexOf("1"));
+        System.out.println("123".substring(0, 0));
+        // StringUtils.substringBefore()
+        // ArrayUtil.
     }
 
     @Test

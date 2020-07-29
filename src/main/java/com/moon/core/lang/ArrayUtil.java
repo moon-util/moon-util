@@ -589,6 +589,16 @@ public final class ArrayUtil {
         return objects;
     }
 
+    @SafeVarargs
+    public static <D, R> List<R> mapBy(Function<? super D, ? extends R> mapper, D... dataArr) {
+        List<R> result = new ArrayList<>();
+        int length = length(dataArr);
+        for (int i = 0; i < length; i++) {
+            result.add(mapper.apply(dataArr[i]));
+        }
+        return result;
+    }
+
     /*
      * 属性求和
      */

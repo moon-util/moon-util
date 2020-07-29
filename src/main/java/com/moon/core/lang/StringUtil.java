@@ -12,10 +12,7 @@ import com.moon.core.util.function.IntBiFunction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.IntPredicate;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static com.moon.core.enums.Const.STR_NULL;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -470,6 +467,18 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
+    public static String[] mapBy(Function<? super CharSequence, String> mapper, CharSequence... css) {
+        if (css == null) {
+            return null;
+        }
+        int length = css.length;
+        String[] results = new String[length];
+        for (int i = 0; i < length; i++) {
+            results[i] = mapper.apply(css[i]);
+        }
+        return results;
+    }
+
     public static String toString(Object value) { return toStringOrDefault(value, STR_NULL); }
 
     public static String toString(char[] chars) {
@@ -505,6 +514,45 @@ public final class StringUtil {
      * repeat
      * -------------------------------------------------------------------
      */
+
+    /**
+     * StringUtil.repeat('?', 5, ',')    ====> "?,?,?,?,?"
+     *
+     * @param ch
+     * @param count
+     * @param joinedChar
+     *
+     * @return
+     */
+    public static String repeat(char ch, int count, char joinedChar) {
+        StringBuilder builder = new StringBuilder(count * 2);
+        for (int i = 0; i < count; i++) {
+            builder.append(ch).append(joinedChar);
+        }
+        return builder.deleteCharAt(builder.length()).toString();
+    }
+
+    public static String repeat(CharSequence str, int count, String joinedStr) {
+        if (str == null) {
+            return null;
+        }
+        joinedStr = emptyIfNull(joinedStr);
+        int length = str.length();
+        int strLen = joinedStr.length();
+        StringBuilder builder = new StringBuilder((length + strLen) * count);
+        for (int i = 0; i < count; i++) {
+            builder.append(str).append(joinedStr);
+        }
+        return builder.substring(0, builder.length() - strLen);
+    }
+
+    public static String repeat(char ch, int count) {
+        char[] chars = new char[count];
+        for (int i = 0; i < count; i++) {
+            chars[i] = ch;
+        }
+        return new String(chars);
+    }
 
     public static String repeat(CharSequence cs, int count) {
         if (cs != null) {
@@ -553,7 +601,16 @@ public final class StringUtil {
      *
      * @return 裁剪首尾空白字符完成后的字符串
      */
-    public static String trim(CharSequence string) { return trimToEmpty(string); }
+    public static String trim(CharSequence string) { return string == null ? null : string.toString().trim(); }
+
+    /**
+     * 裁剪所有字符串的空白字符
+     *
+     * @param strings
+     *
+     * @return
+     */
+    public static String[] trimAll(CharSequence... strings) { return mapBy(StringUtil::trim, strings); }
 
     /**
      * 裁剪首尾空白字符
@@ -582,7 +639,7 @@ public final class StringUtil {
      * @return 若 cs == null，返回{@code defaultValue}，否则返回裁剪后的字符
      */
     public static String trimToDefault(CharSequence cs, String defaultValue) {
-        return cs == null ? defaultValue : defaultIfNull((cs.charAt(0) == 65279 ? cs.subSequence(1,
+        return cs == null ? defaultValue : defaultIfEmpty((cs.charAt(0) == 65279 ? cs.subSequence(1,
             cs.length()) : cs).toString().trim(), defaultValue);
     }
 
@@ -1321,6 +1378,25 @@ public final class StringUtil {
         return str.charAt(index);
     }
 
+    public static int[] codePointsAll(CharSequence str) {
+        return str == null ? null : codePointsBetween(str, 0, str.length());
+    }
+
+    public static int[] codePointsBetween(CharSequence str, int from, int to) {
+        if (str == null) {
+            return null;
+        }
+        int endIdx = Math.min(to, str.length());
+        int startIdx = Math.max(from, 0);
+        int length = endIdx - startIdx;
+        BooleanUtil.requireFalse(length < 0);
+        int[] points = new int[length];
+        for (int i = 0; i < length; i++) {
+            points[i] = str.charAt(i + startIdx);
+        }
+        return points;
+    }
+
     /*
      * -------------------------------------------------------------------
      * replace
@@ -1387,6 +1463,9 @@ public final class StringUtil {
      * StringUtil.substrBefore("abc", "d")   = "abc"
      * StringUtil.substrBefore("abc", "")    = ""
      * StringUtil.substrBefore("abc", null)  = "abc"
+     * <p>
+     * copied from StringUtils#substringBefore(..)
+     * 以下 substrBefore 开头或 substrAfter 开头的均来自{@code StringUtils}
      *
      * @param str
      * @param search
@@ -1397,11 +1476,8 @@ public final class StringUtil {
         if (isEmpty(str) || search == null) {
             return str;
         }
-        if (search.isEmpty()) {
-            return EMPTY;
-        }
         int index = str.indexOf(search);
-        return index < 0 ? str : str.substring(0, index);
+        return index < 0 ? str : (index == 0 ? EMPTY : str.substring(0, index));
     }
 
     /**
@@ -1662,15 +1738,25 @@ public final class StringUtil {
      * @return
      */
     public static String discardAfter(String str, String search) {
-        if (isEmpty(str)) {
-            return EMPTY;
-        }
-        if (isEmpty(search)) {
+        return discardAfter(str, search, false);
+    }
+
+    /**
+     * 丢弃匹配内容之后的字符串
+     *
+     * @param str             原字符串
+     * @param search          待匹配字符串
+     * @param emptyIfNotFound 如不存在匹配字符串是否返回空字符串，否则返回原字符串
+     *
+     * @return
+     */
+    public static String discardAfter(String str, String search, boolean emptyIfNotFound) {
+        if (isEmpty(str) || isEmpty(search)) {
             return EMPTY;
         }
         int index = str.indexOf(search);
         if (index < 0) {
-            return str;
+            return emptyIfNotFound ? EMPTY : str;
         }
         return str.substring(0, index + search.length());
     }
@@ -1692,6 +1778,19 @@ public final class StringUtil {
      * @return
      */
     public static String discardAfterLast(String str, String search) {
+        return discardAfterLast(str, search, false);
+    }
+
+    /**
+     * 丢弃最后一个匹配字符串之后的内容
+     *
+     * @param str             原字符串
+     * @param search          待匹配字符串
+     * @param emptyIfNotFound 如不存在匹配字符串是否返回空字符串，否则返回原字符串
+     *
+     * @return
+     */
+    public static String discardAfterLast(String str, String search, boolean emptyIfNotFound) {
         if (isEmpty(str)) {
             return EMPTY;
         }
@@ -1700,7 +1799,7 @@ public final class StringUtil {
         }
         int index = str.lastIndexOf(search);
         if (index < 0) {
-            return str;
+            return emptyIfNotFound ? EMPTY : str;
         }
         return str.substring(0, index + search.length());
     }
@@ -1722,6 +1821,19 @@ public final class StringUtil {
      * @return 处理完成的字符串
      */
     public static String discardBefore(String str, String search) {
+        return discardBefore(str, search, false);
+    }
+
+    /**
+     * 丢弃匹配字符串之前的内容
+     *
+     * @param str             原字符串
+     * @param search          待匹配字符串
+     * @param emptyIfNotFound 如不存在匹配字符串是否返回空字符串，否则返回原字符串
+     *
+     * @return 处理完成的字符串
+     */
+    public static String discardBefore(String str, String search, boolean emptyIfNotFound) {
         if (isEmpty(str)) {
             return EMPTY;
         }
@@ -1729,7 +1841,7 @@ public final class StringUtil {
             return str;
         }
         int index = str.indexOf(search);
-        return index < 0 ? str : str.substring(index);
+        return index < 0 ? (emptyIfNotFound ? EMPTY : str) : str.substring(index);
     }
 
     /**
@@ -1749,11 +1861,24 @@ public final class StringUtil {
      * @return 处理完成的字符串
      */
     public static String discardBeforeLast(String str, String search) {
+        return discardBeforeLast(str, search, false);
+    }
+
+    /**
+     * 丢弃最后一个匹配字符串之前的内容
+     *
+     * @param str             原字符串
+     * @param search          待匹配字符串
+     * @param emptyIfNotFound 如不存在匹配字符串是否返回空字符串，否则返回原字符串
+     *
+     * @return
+     */
+    public static String discardBeforeLast(String str, String search, boolean emptyIfNotFound) {
         if (isEmpty(str) || isEmpty(search)) {
             return EMPTY;
         }
         int index = str.lastIndexOf(search);
-        return index < 0 ? EMPTY : str.substring(index);
+        return index < 0 ? (emptyIfNotFound ? EMPTY : str) : str.substring(index);
     }
 
     /*
@@ -1816,5 +1941,27 @@ public final class StringUtil {
         }
         result.add(origin.substring(startIdx));
         return result;
+    }
+
+    /**
+     * 拆分出每个英文单词，拆分出的字符串只包含大写或小写字母
+     *
+     * @param sequence
+     *
+     * @return
+     */
+    private static List<String> splitAlphas(CharSequence sequence) {
+        return new ArrayList<>();
+    }
+
+    /**
+     * 拆分每个单词，拆分出的每个字符串只包含大小写字母或数字
+     *
+     * @param sequence
+     *
+     * @return
+     */
+    private static List<String> splitAlphanumerics(CharSequence sequence) {
+        return new ArrayList<>();
     }
 }
