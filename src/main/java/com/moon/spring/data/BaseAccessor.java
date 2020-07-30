@@ -1,7 +1,7 @@
 package com.moon.spring.data;
 
-import com.moon.more.model.BaseSupporter;
-import com.moon.more.model.id.IdSupplier;
+import com.moon.core.model.BaseSupporter;
+import com.moon.core.model.supplier.IdSupplier;
 import org.springframework.data.domain.*;
 
 import java.util.List;

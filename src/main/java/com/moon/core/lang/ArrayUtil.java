@@ -249,23 +249,23 @@ public final class ArrayUtil {
     public static boolean isEmpty(boolean... arr) { return length(arr) == 0; }
 
     @SafeVarargs
-    public static <T> boolean isNotEmpty(T... arr) { return isEmpty(arr); }
+    public static <T> boolean isNotEmpty(T... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(double... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(double... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(long... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(long... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(int... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(int... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(byte... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(byte... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(char... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(char... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(float... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(float... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(short... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(short... arr) { return length(arr) > 0; }
 
-    public static boolean isNotEmpty(boolean... arr) { return isEmpty(arr); }
+    public static boolean isNotEmpty(boolean... arr) { return length(arr) > 0; }
 
     /*
      * ----------------------------------------------------------------

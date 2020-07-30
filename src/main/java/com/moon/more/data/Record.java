@@ -1,9 +1,9 @@
 package com.moon.more.data;
 
 import com.moon.core.enums.Available;
-import com.moon.more.model.BaseSupporter;
-import com.moon.more.model.id.IdOperator;
-import com.moon.more.model.id.IdSupplier;
+import com.moon.core.model.BaseSupporter;
+import com.moon.core.model.supplier.IdOperator;
+import com.moon.core.model.supplier.IdSupplier;
 
 import java.io.Serializable;
 

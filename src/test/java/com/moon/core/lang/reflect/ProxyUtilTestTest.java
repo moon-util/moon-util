@@ -2,7 +2,7 @@ package com.moon.core.lang.reflect;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.RandomStringUtil;
-import com.moon.core.util.interfaces.ValueSupplier;
+import com.moon.core.model.supplier.ValueSupplier;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationHandler;

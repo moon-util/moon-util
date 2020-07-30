@@ -1,7 +1,7 @@
 package com.moon.core.util.validator;
 
 import com.moon.core.enums.Const;
-import com.moon.core.util.interfaces.ValueSupplier;
+import com.moon.core.model.supplier.ValueSupplier;
 
 import static java.util.Objects.requireNonNull;
 

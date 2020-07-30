@@ -1,4 +1,4 @@
-package com.moon.more.model.getter;
+package com.moon.core.model.getter;
 
 /**
  * @author moonsky

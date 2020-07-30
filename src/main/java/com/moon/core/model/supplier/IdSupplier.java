@@ -1,4 +1,4 @@
-package com.moon.core.util.interfaces;
+package com.moon.core.model.supplier;
 
 import java.util.function.Supplier;
 
@@ -6,19 +6,17 @@ import java.util.function.Supplier;
  * @author moonsky
  */
 @FunctionalInterface
-public interface KeySupplier<T> {
-
+public interface IdSupplier<T> {
     /**
-     * 获取 KEY
+     * 获取 ID
      *
-     * @return key
+     * @return
      */
-    T getKey();
-
+    T getId();
     /**
      * transfer to a {@link Supplier}
      *
      * @return a new supplier
      */
-    default Supplier<T> asKeySupplier() { return this::getKey; }
+    default Supplier<T> asIdSupplier(){ return this::getId; }
 }

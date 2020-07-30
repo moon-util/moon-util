@@ -1,6 +1,8 @@
 package com.moon.core.enums;
 
-import com.moon.more.model.getter.NameGetter;
+import com.moon.core.model.IdName;
+import com.moon.core.model.KeyValue;
+import com.moon.core.model.getter.NameGetter;
 
 /**
  * @author moonsky
@@ -30,8 +32,8 @@ public interface EnumDescriptor extends NameGetter {
      *
      * @return 枚举名字
      *
-     * @see com.moon.more.model.IdName
-     * @see com.moon.more.model.KeyValue
+     * @see IdName
+     * @see KeyValue
      * @see com.moon.core.net.enums.StatusCode
      * @see Enum#name()
      */

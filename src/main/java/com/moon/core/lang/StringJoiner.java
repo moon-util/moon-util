@@ -1,7 +1,7 @@
 package com.moon.core.lang;
 
 import com.moon.core.enums.Const;
-import com.moon.core.util.interfaces.ValueSupplier;
+import com.moon.core.model.supplier.ValueSupplier;
 
 import java.io.IOException;
 import java.io.Serializable;

@@ -3,7 +3,7 @@ package com.moon.spring.web.error;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.CollectUtil;
 import com.moon.core.util.ListUtil;
-import com.moon.more.model.KeyValue;
+import com.moon.core.model.KeyValue;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;

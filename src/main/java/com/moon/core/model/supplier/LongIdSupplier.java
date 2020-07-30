@@ -1,4 +1,4 @@
-package com.moon.more.model.id;
+package com.moon.core.model.supplier;
 
 /**
  * @author moonsky

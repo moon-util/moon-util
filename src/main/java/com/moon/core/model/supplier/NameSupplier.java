@@ -1,4 +1,4 @@
-package com.moon.core.util.interfaces;
+package com.moon.core.model.supplier;
 
 import java.util.function.Supplier;
 
@@ -6,19 +6,19 @@ import java.util.function.Supplier;
  * @author moonsky
  */
 @FunctionalInterface
-public interface ValueSupplier<T> {
+public interface NameSupplier<T> {
 
     /**
-     * 获取值
+     * 获取 name
      *
-     * @return value
+     * @return name
      */
-    T getValue();
+    T getName();
 
     /**
      * transfer to a {@link Supplier}
      *
      * @return a new supplier
      */
-    default Supplier<T> asValueSupplier() { return this::getValue; }
+    default Supplier<T> asNameSupplier() { return this::getName; }
 }

@@ -1,6 +1,6 @@
-package com.moon.more.model.getter;
+package com.moon.core.model.getter;
 
-import com.moon.core.util.interfaces.ValueSupplier;
+import com.moon.core.model.supplier.ValueSupplier;
 
 /**
  * @author moonsky

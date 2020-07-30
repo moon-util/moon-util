@@ -1,6 +1,6 @@
 package com.moon.spring.data;
 
-import com.moon.more.model.id.IdSupplier;
+import com.moon.core.model.supplier.IdSupplier;
 
 /**
  * @author moonsky

@@ -1,11 +1,12 @@
-package com.moon.more.model;
+package com.moon.core.model;
 
 import com.moon.core.enums.EnumDescriptor;
-import com.moon.more.model.getter.IdGetter;
-import com.moon.more.model.getter.NameGetter;
-import com.moon.more.model.id.IdOperator;
-import com.moon.more.model.id.IdSupplier;
-import com.moon.core.util.interfaces.NameSupplier;
+import com.moon.core.model.getter.IdGetter;
+import com.moon.core.model.getter.NameGetter;
+import com.moon.core.model.supplier.IdOperator;
+import com.moon.core.model.supplier.IdSupplier;
+import com.moon.core.model.getter.IdNameGetter;
+import com.moon.core.model.supplier.NameSupplier;
 
 import java.util.Objects;
 
@@ -13,8 +14,7 @@ import java.util.Objects;
  * @author moonsky
  */
 public final class IdName
-    implements NameSupplier<String>, IdOperator<String>,
-               IdSupplier<String>, IdGetter, NameGetter {
+    implements NameSupplier<String>, IdOperator<String>, IdSupplier<String>, IdGetter, NameGetter, IdNameGetter {
 
     private String id;
 

@@ -1,15 +1,15 @@
-package com.moon.more.model.converter;
+package com.moon.core.model.converter;
 
 /**
  * @author moonsky
  */
 @FunctionalInterface
-public interface VOConverter<T> extends Converter {
+public interface DTOConverter<T> extends Converter {
 
     /**
      * convert to typeof T
      *
      * @return
      */
-    T toVO();
+    T toDTO();
 }

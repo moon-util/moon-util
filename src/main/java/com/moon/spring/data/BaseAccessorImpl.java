@@ -3,7 +3,7 @@ package com.moon.spring.data;
 import com.moon.more.RunnerRegistration;
 import com.moon.more.data.registry.LayerEnum;
 import com.moon.more.data.registry.LayerRegistry;
-import com.moon.more.model.id.IdSupplier;
+import com.moon.core.model.supplier.IdSupplier;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;

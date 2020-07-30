@@ -1,17 +1,19 @@
-package com.moon.more.model;
+package com.moon.core.model;
 
 import com.moon.core.enums.EnumDescriptor;
-import com.moon.core.util.interfaces.KeySupplier;
-import com.moon.core.util.interfaces.ValueSupplier;
-import com.moon.more.model.getter.KeyGetter;
-import com.moon.more.model.getter.ValueGetter;
+import com.moon.core.model.getter.KeyValueGetter;
+import com.moon.core.model.supplier.KeySupplier;
+import com.moon.core.model.supplier.ValueSupplier;
+import com.moon.core.model.getter.KeyGetter;
+import com.moon.core.model.getter.ValueGetter;
 
 import java.util.Objects;
 
 /**
  * @author moonsky
  */
-public final class KeyValue implements ValueSupplier<String>, KeySupplier<String>, KeyGetter, ValueGetter {
+public final class KeyValue
+    implements ValueSupplier<String>, KeySupplier<String>, KeyGetter, ValueGetter, KeyValueGetter {
 
     private String key;
     private String value;

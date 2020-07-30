@@ -129,6 +129,8 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.10</version>
     </dependency>
+
+    <!-- test -->
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
@@ -171,6 +173,15 @@
       <version>1.6.0</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- test project supports -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -178,17 +189,20 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.13.1</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4.7</version>
       <scope>provided</scope>
     </dependency>
+
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -244,11 +258,11 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>com.fasterxml.uuid</groupId>
-      <artifactId>java-uuid-generator</artifactId>
-      <version>4.0</version>
-    </dependency>
+    <!--    <dependency>-->
+    <!--      <groupId>com.fasterxml.uuid</groupId>-->
+    <!--      <artifactId>java-uuid-generator</artifactId>-->
+    <!--      <version>4.0</version>-->
+    <!--    </dependency>-->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>

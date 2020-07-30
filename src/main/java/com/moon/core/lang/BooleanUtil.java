@@ -151,4 +151,24 @@ public final class BooleanUtil {
                 return defaultValue;
         }
     }
+
+    public static int toInt(boolean value) { return value ? 1 : 0; }
+
+    public static String toLowerYesNoString(boolean value) {
+        return toString(value, "yes", "no", false);
+    }
+
+    public static String toString(boolean value) {
+        return Boolean.toString(value);
+    }
+
+    public static String toLowerOnOffString(boolean value) {
+        return toString(value, "on", "off", false);
+    }
+
+    public static String toString(boolean value, String trueStringVal, String falseStringVal, boolean upper) {
+        return upper //
+               ? (value ? trueStringVal : falseStringVal).toLowerCase()//
+               : (value ? trueStringVal : falseStringVal).toUpperCase();
+    }
 }
