@@ -25,6 +25,7 @@ public class DatetimeTest {
     @Test
     void testNow() throws Exception {
         System.out.println(Datetime.now());
+        System.out.println(CalendarUtil.get(CalendarUtil.nowCalendar(), Calendar.ERA));
     }
 
     @Test

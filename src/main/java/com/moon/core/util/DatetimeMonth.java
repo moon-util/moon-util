@@ -1,5 +1,7 @@
 package com.moon.core.util;
 
+import com.moon.core.enums.EnumDescriptor;
+
 import java.time.DateTimeException;
 import java.time.Month;
 import java.time.Year;
@@ -15,7 +17,7 @@ import java.util.Calendar;
  * @see java.util.Calendar
  * @see java.util.Calendar#JANUARY
  */
-public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster {
+public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster, EnumDescriptor {
     /**
      * 一月
      */
@@ -69,6 +71,8 @@ public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster {
     public Month getMonth() { return month; }
 
     public int getValue() { return ordinal() + 1; }
+
+    public String getShortName() { return name().substring(0, 3); }
 
     public String getChineseText() { return ChineseText; }
 
@@ -153,4 +157,7 @@ public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster {
     public Temporal adjustInto(Temporal temporal) {
         return getMonth().adjustInto(temporal);
     }
+
+    @Override
+    public String getText() { return name(); }
 }

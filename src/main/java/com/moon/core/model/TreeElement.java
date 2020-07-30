@@ -99,7 +99,7 @@ public class TreeElement<T> {
                     list = new ArrayList<>();
                     grouped.put(key, list);
                 }
-                TreeElement element = new TreeElement();
+                TreeElement<T> element = new TreeElement<>();
                 element.setName(nameGetter.apply(datum));
                 element.setId(idGetter.apply(datum));
                 element.setData(datum);
