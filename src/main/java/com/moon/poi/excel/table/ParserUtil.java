@@ -30,9 +30,12 @@ final class ParserUtil {
         if (Modifier.isInterface(modifiers) || Modifier.isAbstract(modifiers)) {
             throw new IllegalStateException("指定类「" + type + "」不能是接口或抽象类");
         }
-        // if (!FieldTransformer.class.isAssignableFrom(type)) {
-        //     throw new IllegalStateException("指定类「" + type + "」应该是「" + expectSuperClass + "」的实现类");
-        // }
+        if (!expectSuperClass.isAssignableFrom(type)) {
+            throw new IllegalStateException("指定类「" + type + "」必须是「" + expectSuperClass + "」的实现类");
+        }
+        // if (!ieldTransformer.class.isAssignableFrom(type)) {
+        //         //     throw new IllegalStateException("指定类「" + type + "」应该是「" + expectSuperClass + "」的实现类");
+        //         // }F
     }
 
 
@@ -65,19 +68,18 @@ final class ParserUtil {
     private static TableRenderer doMapAttrs(
         Class targetClass, List<Attribute> list, Function<AttrConfig, TableCol> transformer
     ) {
-        TableCol[] columns = new TableCol[list.size()];
+        // TableCol[] columns = new TableCol[list.size()];
+        List<TableCol> columns = new ArrayList<>();
         AttrConfig config = new AttrConfig(targetClass);
 
-        Map styleMap = StyleUtil.toStyleMapOnTargetClass(targetClass);
-
+        Map styleMap = StyleUtil.collect(targetClass, list);
         for (int i = 0, size = list.size(); i < size; i++) {
             Attribute attr = list.get(i);
-            styleMap.putAll(StyleUtil.toStyleMap(targetClass, attr));
-            config.setAttribute(list.get(i), i);
-            columns[i] = transformer.apply(config);
+            config.setAttribute(attr, i);
+            columns.add(transformer.apply(config));
         }
 
-        return new TableRenderer(targetClass, styleMap, columns);
+        return new TableRenderer(targetClass, styleMap, ListUtil.toArray(columns, TableCol[]::new));
     }
 
     static void putMarked(Marked marked, Map annotated, Map unAnnotated) {

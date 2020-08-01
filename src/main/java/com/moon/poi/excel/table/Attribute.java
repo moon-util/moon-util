@@ -1,14 +1,20 @@
 package com.moon.poi.excel.table;
 
 import com.moon.core.lang.ArrayUtil;
+import com.moon.core.util.ListUtil;
 import com.moon.poi.excel.PropertyControl;
 import com.moon.poi.excel.annotation.TableColumn;
 import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.style.DefinitionStyle;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author moonsky
@@ -27,6 +33,11 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     private <T> T obtainOrNull(Marked marked, Function<Marked, T> getter) {
         return marked == null ? null : getter.apply(marked);
     }
+
+    // private <T> T obtain(Predicate<? super T> tester, Function<Marked, T> getter) {
+    //     T value = obtainOrNull(onMethod, getter);
+    //     return tester.test(value) ? obtainOrNull(onField, getter) : value;
+    // }
 
     private <T> T obtainOrNull(Function<Marked, T> getter) {
         T value = obtainOrNull(onMethod, getter);
@@ -73,6 +84,24 @@ final class Attribute implements Descriptor, Comparable<Attribute> {
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
         return (T) obtainOrNull(m -> m.getAnnotation(annotationType));
+    }
+
+    Method getMemberMethod() {
+        return (Method) onMethod.getMember();
+    }
+
+    Field getMemberField() {
+        return (Field) onField.getMember();
+    }
+
+    @Override
+    public List<DefinitionStyle> getDefinitionStylesOnMethod() {
+        return onMethod == null ? Collections.EMPTY_LIST : onMethod.getDefinitionStylesOnMethod();
+    }
+
+    @Override
+    public List<DefinitionStyle> getDefinitionStylesOnField() {
+        return onField == null ? Collections.EMPTY_LIST : onField.getDefinitionStylesOnField();
     }
 
     @Override

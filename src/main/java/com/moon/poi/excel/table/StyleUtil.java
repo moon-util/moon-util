@@ -1,75 +1,202 @@
 package com.moon.poi.excel.table;
 
 import com.moon.core.lang.ClassUtil;
+import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.StringUtil;
+import com.moon.core.util.CollectUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
+import com.moon.core.util.SetUtil;
+import com.moon.poi.excel.annotation.TableRecord;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
+import com.moon.poi.excel.annotation.style.StyleForCell;
 import org.apache.poi.ss.usermodel.*;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.moon.core.lang.StringUtil.defaultIfEmpty;
+import static com.moon.core.lang.StringUtil.isNotEmpty;
 
 /**
  * @author moonsky
  */
 final class StyleUtil {
 
+    private final static String SEPARATOR = ":";
+
     final static Map defaultMap = Collections.emptyMap();
 
     final static String EMPTY = "";
 
-    static Map<Class, Map<String, StyleBuilder>> collectStyleMap(TableCol[] columns, Map thisStyleMap) {
-        Map<Class, Map<String, StyleBuilder>> definitions = MapUtil.newHashMap();
+    private static String scoped(Object type) {
+        return IntUtil.toCompressionString(System.identityHashCode(type), Integer.MAX_VALUE);
+    }
 
-        for (TableCol column : columns) {
-            column.collectStyleMap(definitions, thisStyleMap);
+    private static String defaultClassnameForEmpty(
+        String prefix, Attribute attribute, Function<Attribute, String> scopedPrefix
+    ) {
+        return classnameOf(prefix, classnameOf(scopedPrefix.apply(attribute), attribute.getName()));
+    }
+
+    private static String getClassnameIfAbsent(
+        List<DefinitionStyle> styles, String prefix, Attribute attribute, Function<Attribute, String> scopedPrefix
+    ) {
+        if (ListUtil.isNotEmpty(styles)) {
+            if (styles.size() == 1) {
+                DefinitionStyle style = styles.get(0);
+                String classname = style.classname();
+                if (StringUtil.isEmpty(classname)) {
+                    return defaultClassnameForEmpty(prefix, attribute, scopedPrefix);
+                } else {
+                    return classnameOf(prefix, classname);
+                }
+            }
+            for (DefinitionStyle style : styles) {
+                if (StringUtil.isEmpty(style.classname())) {
+                    return defaultClassnameForEmpty(prefix, attribute, scopedPrefix);
+                }
+            }
         }
-
-        return returningMap(definitions);
+        return null;
     }
 
-    static String classname(Class type, String propertyName) {
-        return StringUtil.concat(type.getSimpleName(), "#", propertyName);
-    }
-
-    static Map<String, StyleBuilder> toStyleMapOnTargetClass(Class<?> type) {
-        return parsePropertyStyle(EMPTY, type.getAnnotationsByType(DefinitionStyle.class));
-    }
-
-    static Map<String, StyleBuilder> toStyleMap(Class type, Attribute attr) {
-        DefinitionStyle.List list = attr.getAnnotation(DefinitionStyle.List.class);
-        DefinitionStyle style = attr.getAnnotation(DefinitionStyle.class);
-        String defaultName = classname(type, attr.getName());
-        Map resultMap = null;
-        if (style != null) {
-            DefinitionStyle[] styles = {style};
-            resultMap = parsePropertyStyle(defaultName, styles);
-        } else if (list != null) {
-            resultMap = parsePropertyStyle(defaultName, list.value());
+    static String getTableColClassname(Class type, Attribute attribute) {
+        String prefix = scoped(type);
+        StyleForCell styleForCell = attribute.getAnnotation(StyleForCell.class);
+        if (styleForCell == null) {
+            String classname = getClassnameIfAbsent(attribute.getDefinitionStylesOnMethod(),
+                prefix,
+                attribute,
+                attr -> scoped(attr.getMemberMethod()));
+            return classname == null ? getClassnameIfAbsent(attribute.getDefinitionStylesOnField(),
+                prefix,
+                attribute,
+                attr -> scoped(attr.getMemberField())) : classname;
+        } else {
+            // TODO 暂未实现条件样式
+            Class conditional = styleForCell.conditional();
+            String classname = styleForCell.value();
+            return classnameOf(prefix, classname);
         }
-        return returningMap(resultMap);
     }
 
-    static Map getScopedMapOrEmpty(Map<?, Map> definitions, Class type) {
-        return definitions.isEmpty() ? defaultMap : definitions.getOrDefault(type, defaultMap);
+    private static String classnameOf(String prefix, String classname) {
+        return StringUtil.concat(prefix, SEPARATOR, classname);
     }
 
-    private static Map returningMap(Map resultMap) {
-        return MapUtil.isEmpty(resultMap) ? defaultMap : resultMap;
-    }
-
-    private static Map<String, StyleBuilder> parsePropertyStyle(String dftName, DefinitionStyle... styles) {
-        Map<String, StyleBuilder> builderMap = MapUtil.newHashMap();
-        for (DefinitionStyle style : styles) {
-            StyleBuilder builder = toBuilder(style);
-            String classname = defaultIfEmpty(style.classname(), dftName);
-            builderMap.put(classname, builder);
+    private static void collectImports(
+        Set<Class<?>> rang, final Map<String, StyleBuilder> builderMap, final String prefix, final TableRecord record
+    ) {
+        if (record == null) {
+            return;
         }
-        return builderMap;
+        Class<?>[] imports = record.importStyles();
+        for (final Class<?> importClass : imports) {
+            TableRecord importRecord = null;
+            // 递归深层引入样式
+            if (rang.contains(importClass)) {
+                continue;
+            } else {
+                rang.add(importClass);
+                importRecord = importClass.getAnnotation(TableRecord.class);
+                collectImports(rang, builderMap, prefix, importRecord);
+            }
+            // 定义在 getter 方法上的命名样式
+            try {
+                BeanInfo info = Introspector.getBeanInfo(importClass);
+                PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
+                for (PropertyDescriptor descriptor : descriptors) {
+                    Method getter = descriptor.getReadMethod();
+                    if (getter != null) {
+                        DefinitionStyle[] styles = getter.getAnnotationsByType(DefinitionStyle.class);
+                        // 只保留命名样式
+                        Stream<DefinitionStyle> stream = Arrays.stream(styles)
+                            .filter(style -> isNotEmpty(style.classname()));
+                        parseStyles(builderMap, prefix, null, ListUtil.newList(stream));
+                    }
+                }
+            } catch (IntrospectionException e) {
+                // ignore
+            }
+            // 定义在字段上的命名样式
+            Class thisClass = importClass;
+            while (thisClass != Object.class) {
+                Field[] fields = thisClass.getDeclaredFields();
+                for (Field field : fields) {
+                    DefinitionStyle[] styles = field.getAnnotationsByType(DefinitionStyle.class);
+                    // 只保留命名样式
+                    Stream<DefinitionStyle> stream = Arrays.stream(styles)
+                        .filter(style -> isNotEmpty(style.classname()));
+                    parseStyles(builderMap, prefix, null, ListUtil.newList(stream));
+                }
+                thisClass = thisClass.getSuperclass();
+            }
+            // 定义在类上的所有样式
+            parseStyleOnClass(builderMap, importClass, prefix, importRecord);
+        }
+    }
+
+    private static void parseStyleOnClass(
+        Map<String, StyleBuilder> builderMap, Class<?> type, String prefix, TableRecord record
+    ) {
+        List<DefinitionStyle> classStyles = ListUtil.newList(type.getAnnotationsByType(DefinitionStyle.class));
+        if (record != null) {
+            ListUtil.addAll(classStyles, record.styles());
+        }
+        parseStyles(builderMap, prefix, EMPTY, classStyles);
+    }
+
+    static Map<String, StyleBuilder> collect(Class<?> type, List<Attribute> attrs) {
+        Map<String, StyleBuilder> builderMap = MapUtil.newMap();
+        final String prefix = scoped(type);
+        // 首先引入外部定义样式
+        final TableRecord tableRecord = type.getAnnotation(TableRecord.class);
+        collectImports(SetUtil.newSet(type), builderMap, prefix, tableRecord);
+        // 解析类定义样式
+        parseStyleOnClass(builderMap, type, prefix, tableRecord);
+        // 解析字段上的样式
+        for (Attribute attr : attrs) {
+            List<DefinitionStyle> stylesOnField = attr.getDefinitionStylesOnField();
+            if (CollectUtil.isNotEmpty(stylesOnField)) {
+                String name = classnameOf(scoped(attr.getMemberField()), attr.getName());
+                parseStyles(builderMap, prefix, name, stylesOnField);
+            }
+            // getter 方法上的默认样式覆盖字段上的默认样式
+            List<DefinitionStyle> stylesOnMethod = attr.getDefinitionStylesOnMethod();
+            if (CollectUtil.isNotEmpty(stylesOnMethod)) {
+                String name = classnameOf(scoped(attr.getMemberMethod()), attr.getName());
+                parseStyles(builderMap, prefix, name, stylesOnMethod);
+            }
+        }
+        return MapUtil.isEmpty(builderMap) ? defaultMap : builderMap;
+    }
+
+    private static void parseStyles(
+        Map<String, StyleBuilder> builderMap,
+        String scope,
+        String defaultClassnameForEmpty,
+        Collection<DefinitionStyle> styles
+    ) { parseStyles(builderMap, scope, defaultClassnameForEmpty, ListUtil.toArray(styles, DefinitionStyle[]::new)); }
+
+    private static void parseStyles(
+        Map<String, StyleBuilder> builderMap, String scope, String defaultClassnameForEmpty, DefinitionStyle... styles
+    ) {
+        int length = styles == null ? 0 : styles.length;
+        for (int i = 0; i < length; i++) {
+            DefinitionStyle style = styles[i];
+            String classname = classnameOf(scope, defaultIfEmpty(style.classname(), defaultClassnameForEmpty));
+            builderMap.put(classname, toBuilder(style));
+        }
     }
 
     private static StyleBuilder toBuilder(DefinitionStyle style) {

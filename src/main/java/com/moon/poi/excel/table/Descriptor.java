@@ -2,8 +2,10 @@ package com.moon.poi.excel.table;
 
 import com.moon.poi.excel.annotation.TableColumn;
 import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.style.DefinitionStyle;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -57,6 +59,19 @@ interface Descriptor {
      * @return 注解实例或 null
      */
     <T extends Annotation> T getAnnotation(Class<T> annotationType);
+
+    /**
+     * 获取样式定义
+     *
+     * @return
+     */
+    List<DefinitionStyle> getDefinitionStylesOnMethod();
+    /**
+     * 获取样式定义
+     *
+     * @return
+     */
+    List<DefinitionStyle> getDefinitionStylesOnField();
 
     /**
      * 获取字段注解

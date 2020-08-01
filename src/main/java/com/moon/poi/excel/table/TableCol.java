@@ -48,7 +48,7 @@ class TableCol implements Comparable<TableCol> {
         this.offset = attr.getOffsetVal();
         this.offsetHeadRowsCnt = Math.min(attr.getOffsetHeadRows(), MAX);
         this.fillSkipped = attr.isOffsetFillSkipped();
-        this.defaultClassname = StyleUtil.classname(config.getTargetClass(), name);
+        this.defaultClassname = StyleUtil.getTableColClassname(config.getTargetClass(), attr);
     }
 
     protected final PropertyControl getControl() { return control; }
@@ -63,7 +63,7 @@ class TableCol implements Comparable<TableCol> {
      * 收集样式
      */
 
-    void collectStyleMap(Map<Class, Map<String, StyleBuilder>> definitions, Map sourceMap) {}
+    void collectStyleMap(Map<String, StyleBuilder> collector) {}
 
     /*
      * 列宽
@@ -192,8 +192,15 @@ class TableCol implements Comparable<TableCol> {
         }
     }
 
+    final void applyClassname(CellFactory factory) {
+        if (defaultClassname != null) {
+            factory.styleAs(defaultClassname);
+        }
+    }
+
     final void setNormalVal(CellFactory factory, Object value) {
         setter.set(factory, value);
+        applyClassname(factory);
     }
 
     void render(TableProxy proxy) {

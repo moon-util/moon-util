@@ -17,5 +17,5 @@ public @interface TableColumnGroup {
      *
      * @return 目标类，指定了优先以指定的为准，不指定也会自动推测
      */
-    Class targetClass() default Void.class;
+    Class<?> targetClass() default Void.class;
 }

@@ -1,7 +1,6 @@
 package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
-import com.moon.core.enums.TimeZones;
 import com.moon.core.util.DateUtil;
 import com.moon.core.util.TestUtil;
 
@@ -12,8 +11,7 @@ import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
 
-import static com.moon.core.lang.IntUtil.DIGITS;
-import static com.moon.core.lang.IntUtil.TEN;
+import static com.moon.core.lang.IntUtil.*;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.lang.String.format;
 
@@ -344,6 +342,114 @@ public final class LongUtil {
                 // Accumulating negatively avoids surprises near MAX_VALUE
                 // digit = Character.digit(s.charAt(i++), radix);
                 digit = CharUtil.toDigitMaxAs62(s.charAt(i++));
+                if (digit < 0) {
+                    throw new NumberFormatException(s);
+                }
+                if (result < multmin) {
+                    throw new NumberFormatException(s);
+                }
+                result *= radix;
+                if (result < limit + digit) {
+                    throw new NumberFormatException(s);
+                }
+                result -= digit;
+            }
+        } else {
+            throw new NumberFormatException(s);
+        }
+        return negative ? result : -result;
+    }
+
+    /**
+     * 高压缩进制转换（最高支持 20902 进制, {@link IntUtil#MAX_CHINESE_CHAR}-{@link IntUtil#MIN_CHINESE_CHAR}+1）
+     * <p>
+     * 这个区间是正则表达式汉字所在的区间，也是电脑能显示的一段较大的连续字符区间，返回字符串可满足计算机识别顺序；
+     * <p>
+     * 还原原数字：{@link #parseCompressionString(String, int)}
+     * <p>
+     * 兼容{@link #toString(long, int)} ；
+     * 兼容{@link #parseLong(String, int)}；
+     * 不兼容{@link Integer#toString(int, int)}；
+     *
+     * @param value 值
+     * @param radix 进制
+     *
+     * @return 转换后的字符串
+     */
+    @SuppressWarnings("all")
+    public static String toCompressionString(long value, int radix) {
+        if (radix < 63) {
+            return toString(value, radix);
+        }
+        final int min = MIN_CHINESE_CHAR, maxLen = 8;
+        radix = Math.min(MAX_RADIX, radix);
+
+        char[] buf = new char[maxLen];
+        boolean negative = (value < 0);
+        int charPos = maxLen - 1;
+        if (!negative) {
+            value = -value;
+        }
+        while (value <= -radix) {
+            buf[charPos--] = (char) (min - (value % radix));
+            value = value / radix;
+        }
+        buf[charPos] = (char) (min - value);
+        if (negative) {
+            buf[--charPos] = '-';
+        }
+        return new String(buf, charPos, (maxLen - charPos));
+    }
+
+    /**
+     * 高压缩进制解析（最高支持 20902 进制)
+     * <p>
+     * 用于解析{@link #toCompressionString(long, int)}生成的字符串
+     * <p>
+     * 兼容{@link #toString(long, int)}；
+     * 不兼容{@link Long#toString(long, int)}；
+     *
+     * @param s     字符串
+     * @param radix 进制
+     *
+     * @return 转换后的数字
+     */
+    @SuppressWarnings("all")
+    public static long parseCompressionString(String s, int radix) {
+        if (radix < 63) {
+            return parseLong(s, radix);
+        }
+        if (s == null) {
+            throw new NumberFormatException("null");
+        }
+        if (radix > MAX_RADIX) {
+            throw new NumberFormatException("radix " + radix + " greater than " + MAX_RADIX);
+        }
+        long result = 0;
+        boolean negative = false;
+        int i = 0, len = s.length();
+        long limit = -Long.MAX_VALUE;
+        long multmin;
+        int digit;
+        if (len > 0) {
+            char firstChar = s.charAt(0);
+            if (firstChar < '0') {
+                // Possible leading "+" or "-"
+                if (firstChar == '-') {
+                    negative = true;
+                    limit = Long.MIN_VALUE;
+                } else if (firstChar != '+') {
+                    throw new NumberFormatException(s);
+                }
+                if (len == 1) {
+                    // Cannot have lone "+" or "-"
+                    throw new NumberFormatException(s);
+                }
+                i++;
+            }
+            multmin = limit / radix;
+            while (i < len) {
+                digit = s.charAt(i++) - MIN_CHINESE_CHAR;
                 if (digit < 0) {
                     throw new NumberFormatException(s);
                 }

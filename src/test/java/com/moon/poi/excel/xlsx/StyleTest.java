@@ -24,7 +24,7 @@ public class StyleTest extends TableParser{
 
     @Test
     void testParseStyle() throws Exception {
-        Renderer renderer = parseConfiguration(Employee.class);
+        Renderer renderer = parseOnly(Employee.class);
     }
 
     @Test

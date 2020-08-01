@@ -6,6 +6,8 @@ import org.apache.poi.ss.usermodel.Font;
 import java.lang.annotation.*;
 
 /**
+ * 暂未支持；请使用{@link DefinitionStyle}和{@link StyleFontBuilder}组合实现自定义字体
+ *
  * @author moonsky
  * @see Font
  */

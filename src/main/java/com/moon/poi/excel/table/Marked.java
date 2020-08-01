@@ -1,7 +1,9 @@
 package com.moon.poi.excel.table;
 
+import com.moon.core.util.ListUtil;
 import com.moon.poi.excel.annotation.TableColumn;
 import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.style.DefinitionStyle;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -9,6 +11,8 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -53,6 +57,22 @@ final class Marked<T extends Member> implements Descriptor {
     @Override
     public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
         return obtain(member, annotationType);
+    }
+
+    @Override
+    public List<DefinitionStyle> getDefinitionStylesOnMethod() {
+        if (member instanceof Method) {
+            return ListUtil.newList(((Method) member).getAnnotationsByType(DefinitionStyle.class));
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public List<DefinitionStyle> getDefinitionStylesOnField() {
+        if (member instanceof Field) {
+            return ListUtil.newList(((Field) member).getAnnotationsByType(DefinitionStyle.class));
+        }
+        return Collections.EMPTY_LIST;
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface StyleOnCell {
+public @interface StyleForCell {
 
     /**
      * 使用样式

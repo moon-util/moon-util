@@ -36,6 +36,7 @@ abstract class TableDft extends TableCol {
             setNormalVal(factory, defaultVal);
         } else {
             defaulter.transfer(factory, defaultVal);
+            applyClassname(factory);
         }
     }
 

@@ -394,4 +394,115 @@ public final class IntUtil {
         }
         return negative ? result : -result;
     }
+
+    final static char MIN_CHINESE_CHAR = '\u4e00';
+    final static char MAX_CHINESE_CHAR = '\u9fa5';
+    public final static int MAX_RADIX = MAX_CHINESE_CHAR - MIN_CHINESE_CHAR + 1;
+
+    /**
+     * 高压缩进制转换（最高支持 20902 进制, {@link #MAX_CHINESE_CHAR}-{@link #MIN_CHINESE_CHAR}+1）
+     * <p>
+     * 这个区间是正则表达式汉字所在的区间，也是电脑能显示的一段较大的连续字符区间；
+     * <p>
+     * 还原原数字：{@link #parseCompressionString(String, int)}
+     * <p>
+     * 兼容{@link #toString(int, int)}；
+     * 兼容{@link #parseInt(String, int)}；
+     * 不兼容{@link Integer#toString(int, int)}；
+     *
+     * @param value 值
+     * @param radix 进制
+     *
+     * @return 转换后的字符串
+     */
+    public static String toCompressionString(int value, int radix) {
+        if (radix < 63) {
+            return toString(value, radix);
+        }
+        final int min = MIN_CHINESE_CHAR, maxLen = 5;
+        radix = Math.min(MAX_RADIX, radix);
+
+        char[] buf = new char[maxLen];
+        boolean negative = (value < 0);
+        int charPos = maxLen - 1;
+        if (!negative) {
+            value = -value;
+        }
+        while (value <= -radix) {
+            buf[charPos--] = (char) (min - (value % radix));
+            value = value / radix;
+        }
+        buf[charPos] = (char) (min - value);
+        if (negative) {
+            buf[--charPos] = '-';
+        }
+        return new String(buf, charPos, (maxLen - charPos));
+    }
+
+    /**
+     * 高压缩进制解析（最高支持 20902 进制)
+     * <p>
+     * 用于解析{@link #toCompressionString(int, int)}生成的字符串
+     * <p>
+     * 兼容{@link #toString(int, int)}；
+     * 不兼容{@link Integer#toString(int, int)}；
+     *
+     * @param s     字符串
+     * @param radix 进制
+     *
+     * @return 转换后的数字
+     */
+    @SuppressWarnings("all")
+    public static int parseCompressionString(String s, int radix) {
+        if (radix < 63) {
+            return parseInt(s, radix);
+        }
+        if (s == null) {
+            throw new NumberFormatException("null");
+        }
+        if (radix > MAX_RADIX) {
+            throw new NumberFormatException("radix " + radix + " greater than " + MAX_RADIX);
+        }
+        int result = 0;
+        boolean negative = false;
+        int i = 0, len = s.length();
+        int limit = -Integer.MAX_VALUE;
+        int multmin;
+        int digit;
+        if (len > 0) {
+            char firstChar = s.charAt(0);
+            if (firstChar < '0') {
+                // Possible leading "+" or "-"
+                if (firstChar == '-') {
+                    negative = true;
+                    limit = Integer.MIN_VALUE;
+                } else if (firstChar != '+') {
+                    throw new NumberFormatException(s);
+                }
+                if (len == 1) {
+                    // Cannot have lone "+" or "-"
+                    throw new NumberFormatException(s);
+                }
+                i++;
+            }
+            multmin = limit / radix;
+            while (i < len) {
+                digit = s.charAt(i++) - MIN_CHINESE_CHAR;
+                if (digit < 0) {
+                    throw new NumberFormatException(s);
+                }
+                if (result < multmin) {
+                    throw new NumberFormatException(s);
+                }
+                result *= radix;
+                if (result < limit + digit) {
+                    throw new NumberFormatException(s);
+                }
+                result -= digit;
+            }
+        } else {
+            throw new NumberFormatException(s);
+        }
+        return negative ? result : -result;
+    }
 }

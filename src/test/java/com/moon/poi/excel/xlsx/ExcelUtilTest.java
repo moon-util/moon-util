@@ -11,8 +11,11 @@ import com.moon.poi.excel.annotation.defaults.DefaultNumber;
 import com.moon.poi.excel.annotation.defaults.DefaultValue;
 import com.moon.poi.excel.annotation.format.DateTimePattern;
 import com.moon.poi.excel.annotation.format.NumberPattern;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.IndexedColors;
+import com.moon.poi.excel.annotation.style.DefinitionStyle;
+import com.moon.poi.excel.annotation.style.StyleBuilder;
+import com.moon.poi.excel.annotation.style.StyleFontBuilder;
+import com.moon.poi.excel.annotation.style.StyleForCell;
+import org.apache.poi.ss.usermodel.*;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -44,9 +47,27 @@ class ExcelUtilTest {
         ADDRESS.add("郑州市正定机场");
     }
 
+    public static class BackgroundColor implements StyleFontBuilder {
+
+        @Override
+        public void accept(CellStyle style, Font font) {
+            font.setBold(true);
+            font.setColor(IndexedColors.RED.index);
+            style.setAlignment(HorizontalAlignment.RIGHT);
+            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            style.setFillForegroundColor(IndexedColors.AQUA.index);
+            style.setFont(font);
+        }
+    }
+
+    @DefinitionStyle(classname = "name",
+        align = HorizontalAlignment.RIGHT,
+        fillPattern = FillPatternType.SOLID_FOREGROUND,
+        foregroundColor = 49)
     public static class BasicInfo {
 
         // @TableColumn
+        @StyleForCell("name")
         @TableColumn({"姓名"})
         private String name = "张三";
 
@@ -56,10 +77,12 @@ class ExcelUtilTest {
 
         // @TableColumn
         @TableColumn({"性别"})
+        @DefinitionStyle(classname = "sex", createBy = BackgroundColor.class)
         private String sex = nextBoolean() ? "男" : "女";
 
         // @TableColumn
-        @TableColumn(value = {"居住地址"},width = 4000)
+        @TableColumn(value = {"居住地址"}, width = 4000)
+        @StyleForCell("sex")
         private String address = ADDRESS.get(nextInt(0, ADDRESS.size()));
 
         // @TableColumn
@@ -70,7 +93,7 @@ class ExcelUtilTest {
     public static class ScoreCompare {
 
         // @TableColumn
-        @NumberPattern(value = "$##.00",minIntDigit = 4,minFractionDigit = 4)
+        @NumberPattern(value = "$##.00", minIntDigit = 4, minFractionDigit = 4)
         @TableColumn({"上次得分"})
         private int prev = nextInt(59, 95);
 
@@ -120,7 +143,7 @@ class ExcelUtilTest {
 
         // @TableColumnOffset(1)
         // @TableColumn
-        @TableColumn(value = {"分数统计", "分数变化"}, order = 1, offset = 2,offsetHeadRows = 1)
+        @TableColumn(value = {"分数统计", "分数变化"}, order = 1, offset = 2, offsetHeadRows = 1)
         public int getDiffTotal() {
             return getThisTotal() - getPrevTotal();
         }

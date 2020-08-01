@@ -1,17 +1,18 @@
 package com.moon.poi.excel.table;
 
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.poi.excel.CellFactory;
-import com.moon.poi.excel.Renderer;
-import com.moon.poi.excel.RowFactory;
-import com.moon.poi.excel.SheetFactory;
+import com.moon.core.util.MapUtil;
+import com.moon.poi.excel.*;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
+import com.moon.poi.excel.annotation.style.StyleFontBuilder;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * @author moonsky
@@ -20,7 +21,7 @@ final class TableRenderer implements Renderer {
 
     private final static TableCol[] EMPTY = new TableCol[0];
 
-    private final Map<Class, Map<String, StyleBuilder>> definitions;
+    private final Map<String, StyleBuilder> definitions;
     private final Class targetClass;
     private final List<HeadCell>[] tableHeadCells;
     private final List<HeaderCell>[] headerCells;
@@ -40,7 +41,12 @@ final class TableRenderer implements Renderer {
         List<HeaderCell>[] headerCells = HeadUtil.collectHeaderCells(tableHead);
 
         this.depth = HeadUtil.groupDepth(columns);
-        this.definitions = StyleUtil.collectStyleMap(columns, styleMap);
+        // 收集样式
+        Map<String, StyleBuilder> definitionsMap = MapUtil.newHashMap(styleMap);
+        for (TableCol column : columns) {
+            column.collectStyleMap(definitionsMap);
+        }
+        this.definitions = MapUtil.immutableIfEmpty(definitionsMap);
 
         this.targetClass = targetClass;
         this.headerCells = headerCells;
@@ -76,18 +82,8 @@ final class TableRenderer implements Renderer {
         return columnsCount;
     }
 
-    void collectStyleMap(
-        Map<Class, Map<String, StyleBuilder>> definitions, Map sourceMap
-    ) {
-        Map<Class, Map<String, StyleBuilder>> thisDef = this.definitions;
-        for (Map.Entry<Class, Map<String, StyleBuilder>> classMapEntry : thisDef.entrySet()) {
-            Map<String, StyleBuilder> builderMap = classMapEntry.getValue();
-            Map newMap = new HashMap(sourceMap);
-            newMap.putAll(builderMap);
-            if (!newMap.isEmpty()) {
-                definitions.put(classMapEntry.getKey(), newMap);
-            }
-        }
+    final void collectStyleMap(Map<String, StyleBuilder> collector) {
+        collector.putAll(definitions);
     }
 
     void appendColumnWidth(List<Integer> columnsWidth) {
@@ -179,6 +175,19 @@ final class TableRenderer implements Renderer {
         sheetFactory.setColumnsWidthBegin(0, this.columnsWidth);
     }
 
+    final void definitionStyles(TableFactory factory) {
+        for (Map.Entry<String, StyleBuilder> builderEntry : definitions.entrySet()) {
+            final String classname = builderEntry.getKey();
+            StyleBuilder builder = builderEntry.getValue();
+            if (builder instanceof StyleFontBuilder) {
+                BiConsumer<CellStyle, Font> consumer = (BiConsumer<CellStyle, Font>) builder;
+                factory.definitionStyle(classname, consumer);
+            } else {
+                factory.definitionStyle(builderEntry.getKey(), builder);
+            }
+        }
+    }
+
     /**
      * 渲染一条数据
      *
@@ -206,22 +215,20 @@ final class TableRenderer implements Renderer {
     }
 
     private void renderRecord(TableProxy proxy, Object data) {
-        proxy.setRowData(data, targetClass);
+        proxy.setRowData(data);
         proxy.nextRow();
         doRenderRow(proxy);
     }
 
     final void doRenderRow(TableProxy proxy) {
-        int length = columns.length;
-        for (int i = 0; i < length; i++) {
-            columns[i].render(proxy);
+        for (TableCol column : columns) {
+            column.render(proxy);
         }
     }
 
     final void doRenderRow(IntAccessor indexer, RowFactory rowFactory, Object entityData) {
-        int length = columns.length;
-        for (int i = 0; i < length; i++) {
-            columns[i].render(indexer, rowFactory, entityData);
+        for (TableCol column : columns) {
+            column.render(indexer, rowFactory, entityData);
         }
     }
 }

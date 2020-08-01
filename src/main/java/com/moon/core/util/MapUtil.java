@@ -15,7 +15,11 @@ public final class MapUtil {
 
     private MapUtil() { ThrowUtil.noInstanceError(); }
 
-    public static Map empty() {return EmptyHashMap.EMPTY_MAP;}
+    public static Map immutableEmpty() { return EmptyHashMap.EMPTY_MAP; }
+
+    public static <K, V> Map<K, V> immutableIfEmpty(Map<K, V> map) { return isEmpty(map) ? immutableEmpty() : map; }
+
+    public static <K, V> Map<K, V> immutableIfNull(Map<K, V> map) { return map == null ? immutableEmpty() : map; }
 
     public static <K, V> Map<K, V> newIfNull(Map<K, V> map) { return emptyHashMapIfNull(map); }
 

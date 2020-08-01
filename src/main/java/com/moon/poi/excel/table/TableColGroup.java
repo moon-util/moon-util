@@ -31,9 +31,7 @@ final class TableColGroup extends TableCol {
     int getHeaderRowsCount() { return super.getHeaderRowsCount() + child.getHeaderRowsCount(); }
 
     @Override
-    void collectStyleMap(
-        Map<Class, Map<String, StyleBuilder>> definitions, Map sourceMap
-    ) { child.collectStyleMap(definitions, sourceMap); }
+    final void collectStyleMap(Map<String, StyleBuilder> collector) { child.collectStyleMap(collector); }
 
     @Override
     void appendColumnWidth(List<Integer> columnsWidth) {
@@ -58,13 +56,11 @@ final class TableColGroup extends TableCol {
 
     @Override
     void render(TableProxy proxy) {
-        proxy.startLocalDataNode(getControl(), targetClass);
+        proxy.startLocalDataNode(getControl());
         if (proxy.isSkipped()) {
             proxy.skip(getOffset(), isFillSkipped());
         } else if (getOffset() > 0) {
             proxy.doOffsetCells(getOffset(), isFillSkipped());
-            // proxy.indexedCell(getOffset(), isFillSkipped());
-            // System.out.println();
         }
         child.doRenderRow(proxy);
         proxy.closeLocalDataNode();

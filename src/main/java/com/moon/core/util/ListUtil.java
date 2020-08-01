@@ -6,6 +6,7 @@ import com.moon.core.lang.ThrowUtil;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -46,6 +47,10 @@ public final class ListUtil extends CollectUtil {
 
     public static <T> ArrayList<T> newList(Iterator<? extends T> iterator) { return addAll(newList(), iterator); }
 
+    public static <T> ArrayList<T> newList(Stream<? extends T> stream) {
+        return stream == null ? newList() : newList(stream.iterator());
+    }
+
     public static <T> ArrayList<T> newArrayList() { return new ArrayList<>(); }
 
     public static <T> ArrayList<T> newArrayList(int initCapacity) { return new ArrayList<>(initCapacity); }
@@ -78,7 +83,10 @@ public final class ListUtil extends CollectUtil {
             iterable));
     }
 
-    public static <T> ArrayList<T> newArrayList(Iterator<? extends T> iterator) { return addAll(newArrayList(), iterator); }
+    public static <T> ArrayList<T> newArrayList(Iterator<? extends T> iterator) {
+        return addAll(newArrayList(),
+            iterator);
+    }
 
     /*
      * ---------------------------------------------------------------------------------

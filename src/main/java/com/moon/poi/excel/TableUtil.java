@@ -7,5 +7,5 @@ import com.moon.poi.excel.table.TableParser;
  */
 final class TableUtil extends TableParser {
 
-    static Renderer parse(Class targetClass) { return parseConfiguration(targetClass); }
+    static Renderer parse(Class targetClass, TableFactory factory) { return parseConfiguration(targetClass, factory); }
 }

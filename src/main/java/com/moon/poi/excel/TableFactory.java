@@ -9,6 +9,8 @@ import com.moon.poi.excel.annotation.TableRecord;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -199,7 +201,16 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return this;
     }
 
-    private Renderer parse(Class targetClass) { return TableUtil.parse(targetClass); }
+    private final Map<Class<?>, Renderer> thisCached = new ConcurrentHashMap<>();
+
+    private Renderer parse(Class<?> targetClass) {
+        Renderer renderer = thisCached.get(targetClass);
+        if (renderer == null) {
+            renderer = TableUtil.parse(targetClass, this);
+            thisCached.put(targetClass, renderer);
+        }
+        return renderer;
+    }
 
     /**
      * 这实际上只是个代理

@@ -13,7 +13,7 @@ import java.lang.annotation.*;
  * 样式可以定义在任何有效列（被{@link TableColumn}或{@link TableColumnGroup}注解的列）或当前实体的类上
  *
  * @author moonsky
- * @see StyleOnCell
+ * @see StyleForCell
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -43,7 +43,7 @@ public @interface DefinitionStyle {
      *
      * @return 自定义类
      *
-     * @see StyleBuilder 自定义样式;{@link StyleOnCell}
+     * @see StyleBuilder 自定义样式;{@link StyleForCell}
      * @see StyleFontBuilder 自定义样式和字体;{@link Font}
      */
     Class<? extends StyleBuilder> createBy() default StyleBuilder.class;

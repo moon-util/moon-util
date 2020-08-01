@@ -14,7 +14,6 @@ import java.util.Map;
  */
 final class TableProxy {
 
-    private final Map<?, Map> definitions;
     private final SheetFactory sheetFactory;
     private final IntAccessor indexer;
 
@@ -24,7 +23,6 @@ final class TableProxy {
 
     TableProxy(SheetFactory sheetFactory, Map definitions, int depth) {
         this.sheetFactory = sheetFactory;
-        this.definitions = definitions;
         this.indexer = IntAccessor.of();
         DataNode root = new DataNode(null, null, null);
         DataNode head = root, next;
@@ -36,8 +34,7 @@ final class TableProxy {
         this.node = root;
     }
 
-    public void setRowData(Object rowData, Class targetClass) {
-        this.node.styleMap = StyleUtil.getScopedMapOrEmpty(definitions, targetClass);
+    public void setRowData(Object rowData) {
         this.node.data = rowData;
         this.indexer.set(0);
     }
@@ -48,9 +45,8 @@ final class TableProxy {
 
     boolean isSkipped() { return node.isSkipped(); }
 
-    void startLocalDataNode(PropertyControl controller, Class targetClass) {
+    void startLocalDataNode(PropertyControl controller) {
         DataNode next = node.next;
-        next.styleMap = StyleUtil.getScopedMapOrEmpty(definitions, targetClass);
         next.data = getThisData(controller);
         node = next;
     }
@@ -89,8 +85,6 @@ final class TableProxy {
 
         private final DataNode prev;
         private DataNode next;
-
-        private Map<?, StyleBuilder> styleMap;
         private Object data;
 
         private DataNode(DataNode prev, DataNode next, Object data) {
