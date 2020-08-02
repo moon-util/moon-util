@@ -33,9 +33,6 @@ final class ParserUtil {
         if (!expectSuperClass.isAssignableFrom(type)) {
             throw new IllegalStateException("指定类「" + type + "」必须是「" + expectSuperClass + "」的实现类");
         }
-        // if (!ieldTransformer.class.isAssignableFrom(type)) {
-        //         //     throw new IllegalStateException("指定类「" + type + "」应该是「" + expectSuperClass + "」的实现类");
-        //         // }F
     }
 
 
@@ -68,6 +65,7 @@ final class ParserUtil {
     private static TableRenderer doMapAttrs(
         Class targetClass, List<Attribute> list, Function<AttrConfig, TableCol> transformer
     ) {
+        list.sort(Attribute::compareTo);
         // TableCol[] columns = new TableCol[list.size()];
         List<TableCol> columns = new ArrayList<>();
         AttrConfig config = new AttrConfig(targetClass);

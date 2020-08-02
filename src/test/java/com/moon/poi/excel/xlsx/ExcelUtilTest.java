@@ -4,17 +4,15 @@ import com.moon.core.enums.Systems;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.poi.excel.ExcelUtil;
-import com.moon.poi.excel.annotation.*;
 import com.moon.poi.excel.annotation.TableColumn;
 import com.moon.poi.excel.annotation.TableColumnGroup;
-import com.moon.poi.excel.annotation.defaults.DefaultNumber;
-import com.moon.poi.excel.annotation.defaults.DefaultValue;
+import com.moon.poi.excel.annotation.value.DefaultNumber;
+import com.moon.poi.excel.annotation.value.DefaultValue;
 import com.moon.poi.excel.annotation.format.DateTimePattern;
 import com.moon.poi.excel.annotation.format.NumberPattern;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
-import com.moon.poi.excel.annotation.style.StyleBuilder;
 import com.moon.poi.excel.annotation.style.StyleFontBuilder;
-import com.moon.poi.excel.annotation.style.StyleForCell;
+import com.moon.poi.excel.annotation.style.Classname;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
@@ -67,7 +65,7 @@ class ExcelUtilTest {
     public static class BasicInfo {
 
         // @TableColumn
-        @StyleForCell("name")
+        @Classname("name")
         @TableColumn({"姓名"})
         private String name = "张三";
 
@@ -82,7 +80,7 @@ class ExcelUtilTest {
 
         // @TableColumn
         @TableColumn(value = {"居住地址"}, width = 4000)
-        @StyleForCell("sex")
+        @Classname("sex")
         private String address = ADDRESS.get(nextInt(0, ADDRESS.size()));
 
         // @TableColumn

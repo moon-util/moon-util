@@ -36,6 +36,8 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      */
     private Sheet sheet;
 
+    private boolean cacheDisabled = false;
+
     public TableFactory(WorkbookProxy proxy, SheetFactory parent) { super(proxy, parent); }
 
     void setSheet(Sheet sheet) { this.sheet = sheet; }
@@ -44,6 +46,23 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     protected Sheet get() { return getSheet(); }
 
     public Sheet getSheet() { return sheet; }
+
+    private boolean isCacheDisabled() {
+        return cacheDisabled;
+    }
+
+    /**
+     * 是否禁用解析缓存，生产环境下适当缓存可避免频繁解析，提高效率
+     * 开发测试环境下可随时修改一些注解配置等
+     *
+     * @param disabled 是否禁用
+     *
+     * @return this
+     */
+    public TableFactory cacheDisabled(boolean disabled) {
+        this.cacheDisabled = disabled;
+        return this;
+    }
 
     /**
      * 渲染表头
@@ -204,12 +223,16 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     private final Map<Class<?>, Renderer> thisCached = new ConcurrentHashMap<>();
 
     private Renderer parse(Class<?> targetClass) {
-        Renderer renderer = thisCached.get(targetClass);
-        if (renderer == null) {
-            renderer = TableUtil.parse(targetClass, this);
-            thisCached.put(targetClass, renderer);
+        if (isCacheDisabled()) {
+            return TableUtil.parse(targetClass, this, true);
+        } else {
+            Renderer renderer = thisCached.get(targetClass);
+            if (renderer == null) {
+                renderer = TableUtil.parse(targetClass, this, false);
+                thisCached.put(targetClass, renderer);
+            }
+            return renderer;
         }
-        return renderer;
     }
 
     /**

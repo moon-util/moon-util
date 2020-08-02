@@ -1,6 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.enums.Collects;
+import com.moon.core.enums.Testers;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +26,18 @@ public final class FilterUtil {
      * find one
      * --------------------------------------------------------------
      */
+
+    /**
+     * 返回第一个非 null 元素
+     *
+     * @param ts  数据列表
+     * @param <T> 数据类型
+     *
+     * @return 如果存在第一个非 null 元素，则返回该元素，否则返回 null
+     */
+    public static <T> T firstNotNull(T... ts) {
+        return nullableFind(ts, (Predicate<? super T>) Testers.isNotNull);
+    }
 
     /**
      * 合并多个“且”检查条件

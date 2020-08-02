@@ -15,7 +15,7 @@ public @interface TableColumn {
     /**
      * 列标题，可设置合并标题
      * <p>
-     * 默认字段名首字母大写，如：name -&gt; Name；age -&gt; Age
+     * 默认字段名首字母大写，如：name => Name；age => Age
      *
      * @return 列标题
      */
@@ -25,14 +25,27 @@ public @interface TableColumn {
      * 表头行高，
      * <p>
      * 数量和位置与表头标题{@link #value()}对应，
-     * 不足的自动用<code>-1（不设置）</code>补上，
-     * 超出部分自动忽略；
+     * 不足的自动用<code>-1（不设置）</code>补上，如果不打算设置某行行高也可用 -1 跳过，
+     * 超出部分自动忽略，如果有通过{@link TableColumnGroup}形成多级关系，父级超出部分也不会影响子级行高；
      * <p>
-     * 只有设置了标题的位置才能设置行高，否则就忽略
+     * 只有设置了标题的位置才能设置行高，否则就忽略；
+     * <p>
+     * 由于行高可是针对所有列，所以这样设置可将注意力放在实际要用的位置，不用考虑其他地方
      *
      * @return
      */
     short[] rowsHeight4Head() default {};
+
+    /**
+     * 表头样式
+     *
+     * 数量和位置与{@link #value()}对应，
+     *
+     * 由于数据的单元格，设置单元格样式请使用
+     *
+     * @return
+     */
+    String[] classnames4Head() default {};
 
     /**
      * -1 代表不设置
@@ -53,24 +66,32 @@ public @interface TableColumn {
     int width() default -1;
 
     /**
-     * 排序顺序
+     * 列排序，order 值只用来比较大小，不要求连续
+     * <p>
+     * 列按 order 大小排序，相同{@code order}列一定相邻，通常按字段声明顺序排序，
+     * 如果 order 相同，但{@link TableColumn}交替出现在{@code getter}或{@code field}上，
+     * 可能会存在例外情况，这种情况可修改 order 大小
      *
      * @return 顺序号
      */
     int order() default 0;
 
     /**
-     * 单元格偏移
+     * 列偏移
      *
      * @return 偏移量
      */
     int offset() default 0;
 
     /**
-     * 标题参与偏移的行数, 当{@code offsetHeadRows}大于等于表头行数时，
-     * 所有标题行都偏移，否则只偏移倒数{@code offsetHeadRows}行
+     * 标题参与偏移的级数
      *
-     * @return 表头偏移行数
+     * <pre>
+     * 设 N = {@code offsetHeadRows}, COUNT = 表头行数;
+     * 当 N >= COUNT 时，所有标题行都参与偏移，否则只偏移倒数 N 行;
+     * </pre>
+     *
+     * @return 表头偏移级数
      */
-    int offsetHeadRows() default Integer.MAX_VALUE;
+    int offsetHeadRows() default 1;
 }

@@ -1,5 +1,7 @@
 package com.moon.poi.excel.annotation;
 
+import com.moon.core.lang.Unsupported;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -8,6 +10,7 @@ import java.lang.annotation.Target;
 /**
  * @author moonsky
  */
+@Unsupported
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableIndexer {
@@ -28,10 +31,10 @@ public @interface TableIndexer {
      *
      * @return 序号值
      */
-    int startingAt() default 1;
+    int startFrom() default 1;
 
     /**
-     * 每次索引增长数量
+     * 增量
      *
      * @return 数值
      */

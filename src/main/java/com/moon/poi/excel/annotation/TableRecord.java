@@ -1,5 +1,7 @@
 package com.moon.poi.excel.annotation;
 
+import com.moon.core.lang.Unsupported;
+import com.moon.core.util.function.ToShortFunction;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 
 import java.lang.annotation.ElementType;
@@ -15,13 +17,20 @@ import java.lang.annotation.Target;
 public @interface TableRecord {
 
     /**
-     * 行高, 小于 0 默认不设置，超过表头行数的忽略；
-     * <p>
-     * 如有通过{@link TableColumnGroup}形成了多级关系，最终按每行最大高度设置；
+     * 数据行行高
      *
-     * @return
+     * @return 行高
      */
-    short[] headerRowsHeight() default {};
+    @Unsupported
+    short rowHeight() default -1;
+
+    /**
+     * 以计算的方式返回数据行行高，参数为当前数据对象
+     *
+     * @return 计算实现类
+     */
+    @Unsupported
+    Class<? extends ToShortFunction> computedRowHeightFor() default ToShortFunction.class;
 
     /**
      * 定义样式，这里定义的样式最终会合{@link #importStyles()}的样式合并
@@ -40,8 +49,8 @@ public @interface TableRecord {
      * 1. 直接定义在类上的{@code DefinitionStyle}（1 和 2 是相同优先级）；
      * 2. 定义在类#{@link #styles()}里的{@code DefinitionStyle}；
      * 3. 定义在字段或{@code getter} 上并且主动设置{@link DefinitionStyle#classname()}的样式；
-     * 4. 如果也定义了{@code importStyles}，那么也会按优先级关系引入；
-     * 5. 内部通过{@link TableColumnGroup} 形成的父子关系的样式不会引入；
+     * 4. 如果也定义了{@code importStyles}，那么也会按优先级关系递归引入；
+     * 5. 内部通过{@link TableColumnGroup} 形成的多级关系的样式不会引入；
      * </pre>
      *
      * @return

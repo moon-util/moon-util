@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(DefinitionFont.List.class)
-public @interface DefinitionFont {
+@interface DefinitionFont {
 
     /**
      * @return

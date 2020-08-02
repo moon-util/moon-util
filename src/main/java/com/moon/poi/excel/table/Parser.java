@@ -1,7 +1,9 @@
 package com.moon.poi.excel.table;
 
-import com.moon.poi.excel.annotation.defaults.DefaultNumber;
-import com.moon.poi.excel.annotation.defaults.DefaultValue;
+import com.moon.poi.excel.annotation.TableColumnImage;
+import com.moon.poi.excel.annotation.value.DefaultNumber;
+import com.moon.poi.excel.annotation.value.DefaultValue;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -9,7 +11,9 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * @author moonsky
@@ -31,10 +35,16 @@ final class Parser<T extends Marked> {
 
     protected Creator getCreator() { return creator; }
 
-    protected TableRenderer doParseConfiguration(Class type) {
-        TableRenderer renderer = getCached(type);
-        if (renderer != null) {
-            return renderer;
+    // protected TableRenderer doParseConfiguration(Class type) {
+    //     return doParseConfiguration(type, false);
+    // }
+
+    protected TableRenderer doParseConfiguration(Class type, boolean cacheDisabled) {
+        if (!cacheDisabled) {
+            TableRenderer renderer = getCached(type);
+            if (renderer != null) {
+                return renderer;
+            }
         }
 
         try {
@@ -51,7 +61,7 @@ final class Parser<T extends Marked> {
                 unAnnotatedAtF);
             Map<String, Attribute> unAnnotated = ParserUtil.merge2Attr(unAnnotatedAtM, unAnnotatedAtF);
 
-            return toRendererResultAndCache(type, annotated, unAnnotated);
+            return toRendererResultAndCache(type, annotated, unAnnotated, cacheDisabled);
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -60,19 +70,19 @@ final class Parser<T extends Marked> {
     }
 
     private TableRenderer toRendererResultAndCache(
-        Class type, Map<String, Attribute> annotated, Map<String, Attribute> unAnnotated
+        Class type, Map<String, Attribute> annotated, Map<String, Attribute> unAnnotated, boolean cacheDisabled
     ) {
         TableRenderer renderer;
         if (annotated.isEmpty()) {
             renderer = toResultByUnAnnotated(type, unAnnotated);
         } else {
-            renderer = toResultByAnnotated(type, annotated);
+            renderer = toResultByAnnotated(type, annotated, cacheDisabled);
         }
         return cache(type, renderer);
     }
 
     private TableRenderer toResultByAnnotated(
-        Class type, Map<String, Attribute> annotated
+        Class type, Map<String, Attribute> annotated, boolean cacheDisabled
     ) {
         return ParserUtil.mapAttrs(type, annotated, config -> {
             Attribute attr = config.getAttribute();
@@ -80,8 +90,13 @@ final class Parser<T extends Marked> {
 
             if (attr.isAnnotatedGroup()) {
                 Class cls = attr.getTableColumnGroup().targetClass();
-                TableRenderer renderer = doParseConfiguration(cls == Void.class ? targetClass : cls);
+                TableRenderer renderer = doParseConfiguration(cls == Void.class ? targetClass : cls, cacheDisabled);
                 return new TableColGroup(config, renderer);
+            }
+
+            TableColumnImage isImage = attr.getAnnotation(TableColumnImage.class);
+            if (isImage != null) {
+                // Workbook.PICTURE_TYPE_DIB
             }
 
             DefaultNumber atNumber = attr.getAnnotation(DefaultNumber.class);

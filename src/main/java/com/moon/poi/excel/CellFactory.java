@@ -1,6 +1,7 @@
 package com.moon.poi.excel;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.core.net.URLUtil;
 import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
 import org.apache.poi.ss.usermodel.Cell;
@@ -8,6 +9,13 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -447,6 +455,95 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
     public CellFactory val(LocalDateTime value) {
         getCell().setCellValue(value);
         return this;
+    }
+
+    /**
+     * 导出图片，写到当前单元格
+     *
+     * @param localPath 图片路径
+     *
+     * @return CellFactory
+     */
+    public CellFactory valImage(String localPath) {
+        return valImage(new File(localPath));
+    }
+
+    /**
+     * 导出图片，写到当前单元格
+     *
+     * @param path 图片路径
+     *
+     * @return CellFactory
+     */
+    public CellFactory valImage(Path path) {
+        return valImage(path.toFile());
+    }
+
+    /**
+     * 导出图片，写到当前单元格
+     *
+     * @param file 图片文件
+     *
+     * @return CellFactory
+     */
+    public CellFactory valImage(File file) {
+        try {
+            return file == null ? this : valImage(ImageIO.read(file));
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
+    }
+
+    /**
+     * 导出图片，写到当前单元格
+     *
+     * @param stream 图片
+     *
+     * @return CellFactory
+     */
+    public CellFactory valImage(InputStream stream) {
+        try {
+            return stream == null ? this : valImage(ImageIO.read(stream));
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
+    }
+
+    /**
+     * 导出图片，写到当前单元格
+     *
+     * @param image 图片
+     *
+     * @return CellFactory
+     */
+    public CellFactory valImage(BufferedImage image) {
+        return this;
+    }
+
+    /**
+     * 导出图片，写到当前单元格
+     *
+     * @param url 图片地址
+     *
+     * @return CellFactory
+     */
+    public CellFactory valImage(URL url) {
+        try {
+            return url == null ? this : valImage(ImageIO.read(url));
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
+    }
+
+    /**
+     * 导出图片，写到当前单元格
+     *
+     * @param url 图片地址
+     *
+     * @return CellFactory
+     */
+    public CellFactory valImageUrl(String url) {
+        return valImage(URLUtil.toURL(url));
     }
 
     /**

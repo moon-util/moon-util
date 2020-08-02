@@ -168,7 +168,7 @@ final class TableRenderer implements Renderer {
                 // 合并表头单元格
                 cell.merge(sheet, rowIdx);
             }
-            // maxHeight(factory, rowCells);
+            maxHeight(factory, rowCells);
         }
 
         // 设置列宽

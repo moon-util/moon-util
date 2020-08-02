@@ -258,6 +258,11 @@ public final class WorkbookProxy {
      cell
      */
 
+    void writeImageOnCell(){
+        Drawing drawing = sheet.createDrawingPatriarch();
+        // drawing.createPicture()
+    }
+
     int nextIndexOfCell(int offset, int rowspan, int colspan) {
         int cIdx = this.indexOfCell;
         Map<Integer, Object> rowFilled = getRowFilled();
