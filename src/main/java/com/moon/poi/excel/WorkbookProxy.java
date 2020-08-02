@@ -2,13 +2,20 @@ package com.moon.poi.excel;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.FinalAccessor;
+import com.moon.core.util.CollectUtil;
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.IntConsumer;
 
 /**
  * @author moonsky
@@ -39,6 +46,9 @@ public final class WorkbookProxy {
     private Map<Integer, Object> rowFilled;
     private Cell cell;
 
+    // 图片管理器
+    private Table<Sheet, Integer, List<IntConsumer>> pictureManagerTable;
+
     WorkbookProxy(Workbook workbook) {
         this.workbook = workbook;
         if (WorkbookType.XLSX.test(workbook)) {
@@ -53,6 +63,14 @@ public final class WorkbookProxy {
     }
 
     Workbook getWorkbook() { return workbook; }
+
+    public Table<Sheet, Integer, List<IntConsumer>> getPictureManagerTable() {
+        return pictureManagerTable;
+    }
+
+    public Table<Sheet, Integer, List<IntConsumer>> ensurePictureManagerTable() {
+        return pictureManagerTable == null ? (pictureManagerTable = new TableImpl<>()) : pictureManagerTable;
+    }
 
     private Table<Integer, Integer, Object> getTable(Sheet sheet) {
         Table t = this.table;
@@ -163,6 +181,23 @@ public final class WorkbookProxy {
 
     WorkbookType getWorkbookType() { return type; }
 
+    ClientAnchor getAnchor() {
+        FinalAccessor<CellRangeAddress> region = this.mergedOnCell;
+        if (region.isAbsent()) {
+            Cell cell = getCell();
+            int rowIdx = cell.getRowIndex();
+            int colIdx = cell.getColumnIndex();
+            return getWorkbookType().newAnchor(0, 0, 0, 0, colIdx, rowIdx, colIdx + 1, rowIdx + 1);
+        } else {
+            CellRangeAddress address = region.get();
+            int col1 = address.getFirstColumn();
+            int col2 = address.getLastColumn();
+            int row1 = address.getFirstRow();
+            int row2 = address.getLastRow();
+            return getWorkbookType().newAnchor(0, 0, 0, 0, col1, row1, col2 + 1, row2 + 1);
+        }
+    }
+
     /*
      sheet
      */
@@ -175,12 +210,7 @@ public final class WorkbookProxy {
     }
 
     Sheet setSheet(Sheet sheet, boolean appendRow) {
-        if (appendRow) {
-            int lastRowIdx = sheet.getLastRowNum();
-            // return setSheet(sheet, lastRowIdx == 0 ? 0 : lastRowIdx + 1);
-            return setSheet(sheet, lastRowIdx);
-        }
-        return setSheet(sheet, 0);
+        return setSheet(sheet, appendRow ? sheet.getLastRowNum() : 0);
     }
 
     Sheet getSheet() { return sheet; }
@@ -258,9 +288,67 @@ public final class WorkbookProxy {
      cell
      */
 
-    void writeImageOnCell(){
-        Drawing drawing = sheet.createDrawingPatriarch();
-        // drawing.createPicture()
+    int getColumnWidth() {
+        return sheet.getColumnWidth(getCell().getColumnIndex());
+    }
+
+    void setColumnWidth(Sheet sheet, int index, int width) {
+        sheet.setColumnWidth(index, width);
+        Table<Sheet, Integer, List<IntConsumer>> table = getPictureManagerTable();
+        if (table != null) {
+            List<IntConsumer> consumers = table.get(sheet, index);
+            if (consumers != null) {
+                for (IntConsumer consumer : consumers) {
+                    consumer.accept(width);
+                }
+            }
+        }
+    }
+
+    boolean isAllowAutoWidth(Sheet sheet, int index) {
+        Table<Sheet, Integer, List<IntConsumer>> table = getPictureManagerTable();
+        return table == null || CollectUtil.isEmpty(table.get(sheet, index));
+    }
+
+    IntConsumer getIndexedColumnRunner(BufferedImage image) {
+        final Row row = this.getRow();
+        final double w = image.getWidth(), h = image.getHeight();
+        final double scale = h / w, compatibleScale = scale / 3;
+        // System.out.println("Width: " + w + ", Height: " + h + ", Scale: " + scale);
+        return width -> {
+            // System.out.println(row.getHeight());
+            // System.out.println(width + "\t\t" + (width * scale) + "\t\t" + ((short) (width * scale)));
+            row.setHeight((short) (width * compatibleScale));
+        };
+    }
+
+    final void writeImageOnCell(BufferedImage image) {
+        IntConsumer consumer = getIndexedColumnRunner(image);
+        final int width = getColumnWidth();
+        try {
+            Sheet sheet = getSheet();
+            Drawing drawing = sheet.createDrawingPatriarch();
+            ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", byteArr);
+            ClientAnchor anchor = getAnchor();
+            byte[] bytes = byteArr.toByteArray();
+            int picture = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
+            drawing.createPicture(anchor, picture);
+
+            // 执行器
+            Table table = ensurePictureManagerTable();
+            int columnIndex = getCell().getColumnIndex();
+            List list = (List) table.get(sheet, columnIndex);
+            if (list == null) {
+                list = new ArrayList();
+                table.put(sheet, columnIndex, list);
+            }
+            list.add(consumer);
+        } catch (Throwable t) {
+            throw new IllegalStateException(t);
+        } finally {
+            consumer.accept(width);
+        }
     }
 
     int nextIndexOfCell(int offset, int rowspan, int colspan) {
@@ -298,6 +386,8 @@ public final class WorkbookProxy {
     }
 
     Cell setCell(Cell cell) { return this.cell = cell; }
+
+    Cell getCell() { return cell; }
 
     CellRangeAddress getRegion() { return mergedOnCell.get(); }
 

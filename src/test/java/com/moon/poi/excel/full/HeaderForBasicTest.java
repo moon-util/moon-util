@@ -406,5 +406,12 @@ public class HeaderForBasicTest {
 
     @Test
     void testName() throws Exception {
+        ExcelUtil.xlsx().sheet(sheetFactory -> {
+            sheetFactory.row(rowFactory -> {
+                rowFactory.cell()
+                    .valImageUrl("http://a3.att.hudong.com/14/75/01300000164186121366756803686.jpg")
+                    .width(8000);
+            });
+        }).write("D:/export-image.xlsx");
     }
 }

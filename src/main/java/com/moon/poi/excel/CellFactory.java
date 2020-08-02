@@ -249,7 +249,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @see SheetFactory#setWidth(int, int)
      */
     public CellFactory width(int width) {
-        getSheet().setColumnWidth(getColumnIndex(), width);
+        getProxy().setColumnWidth(getSheet(), getColumnIndex(), width);
         return this;
     }
 
@@ -261,7 +261,11 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @see SheetFactory#columnsAutoWidth(int...)
      */
     public CellFactory autoWidth() {
-        getSheet().autoSizeColumn(getColumnIndex());
+        Sheet sheet = getSheet();
+        int index = getColumnIndex();
+        if (getProxy().isAllowAutoWidth(sheet, index)) {
+            sheet.autoSizeColumn(index);
+        }
         return this;
     }
 
@@ -517,6 +521,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @return CellFactory
      */
     public CellFactory valImage(BufferedImage image) {
+        getProxy().writeImageOnCell(image);
         return this;
     }
 

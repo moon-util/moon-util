@@ -157,14 +157,15 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
             int max = MAX_WIDTH;
             Integer columnWidth;
             Sheet sheet = getSheet();
+            WorkbookProxy proxy = getProxy();
             for (int i = 0; i < len; i++) {
                 if ((columnWidth = widths[i]) != null) {
                     int index = i + startIdx;
                     int width = columnWidth;
                     if (width > -1) {
                         if (width < max) {
-                            sheet.setColumnWidth(index, width);
-                        } else {
+                            proxy.setColumnWidth(sheet, index, width);
+                        } else if (proxy.isAllowAutoWidth(sheet, index)) {
                             sheet.autoSizeColumn(index);
                         }
                     }
@@ -183,7 +184,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return 当前 SheetFactory
      */
     public SheetFactory setWidth(int columnIndex, int width) {
-        getSheet().setColumnWidth(columnIndex, width);
+        getProxy().setColumnWidth(getSheet(), columnIndex, width);
         return this;
     }
 

@@ -29,14 +29,14 @@ enum WorkbookType implements Predicate<Workbook> {
      */
     XLS("org.apache.poi.hssf.usermodel.HSSFWorkbook", new HAnchor(), new HRich());
 
-    private final Supplier<ClientAnchor> anchorCreator;
+    private final AnchorSupplier anchorCreator;
     private final Function<String, RichTextString> richTextBuilder;
     private final Class target;
 
     WorkbookType(String type) { this(type, new XAnchor(), new XRich()); }
 
     WorkbookType(
-        String type, Supplier<ClientAnchor> anchorCreator, Function<String, RichTextString> richTextBuilder
+        String type, AnchorSupplier anchorCreator, Function<String, RichTextString> richTextBuilder
     ) {
         Class target;
         try {
@@ -61,6 +61,10 @@ enum WorkbookType implements Predicate<Workbook> {
 
     ClientAnchor newAnchor() { return anchorCreator.get(); }
 
+    ClientAnchor newAnchor(int dx1, int dy1, int dx2, int dy2, int col1, int row1, int col2, int row2) {
+        return anchorCreator.apply(dx1, dy1, dx2, dy2, col1, row1, col2, row2);
+    }
+
     private static class HRich implements Function<String, RichTextString> {
 
         @Override
@@ -73,15 +77,34 @@ enum WorkbookType implements Predicate<Workbook> {
         public RichTextString apply(String s) { return new XSSFRichTextString(s); }
     }
 
-    private static class HAnchor implements Supplier<ClientAnchor> {
+    @SuppressWarnings("all")
+    private interface AnchorSupplier extends Supplier<ClientAnchor> {
+
+        @Override
+        ClientAnchor get();
+
+        ClientAnchor apply(int dx1, int dy1, int dx2, int dy2, int col1, int row1, int col2, int row2);
+    }
+
+    private static class HAnchor implements AnchorSupplier {
 
         @Override
         public ClientAnchor get() { return new HSSFClientAnchor(); }
+
+        @Override
+        public ClientAnchor apply(int dx1, int dy1, int dx2, int dy2, int col1, int row1, int col2, int row2) {
+            return new HSSFClientAnchor(dx1, dy1, dx2, dy2, (short) col1, row1, (short) col2, row2);
+        }
     }
 
-    private static class XAnchor implements Supplier<ClientAnchor> {
+    private static class XAnchor implements AnchorSupplier {
 
         @Override
         public ClientAnchor get() { return new XSSFClientAnchor(); }
+
+        @Override
+        public ClientAnchor apply(int dx1, int dy1, int dx2, int dy2, int col1, int row1, int col2, int row2) {
+            return new XSSFClientAnchor(dx1, dy1, dx2, dy2, col1, row1, col2, row2);
+        }
     }
 }
