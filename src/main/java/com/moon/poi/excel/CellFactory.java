@@ -1,7 +1,6 @@
 package com.moon.poi.excel;
 
 import com.moon.core.lang.StringUtil;
-import com.moon.core.net.URLUtil;
 import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
 import org.apache.poi.ss.usermodel.Cell;
@@ -9,13 +8,6 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -54,9 +46,13 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      */
     public CellFactory(WorkbookProxy proxy, RowFactory parent) { super(proxy, parent); }
 
+    private synchronized ImageFactory newImageFactory() {
+        return this.imageFactory = new ImageFactory(getProxy(), this);
+    }
+
     private ImageFactory obtainImageFactory() {
         ImageFactory factory = this.imageFactory;
-        return factory == null ? (this.imageFactory = new ImageFactory(getProxy(), this)) : factory;
+        return factory == null ? newImageFactory() : factory;
     }
 
     /**

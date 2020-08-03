@@ -12,7 +12,7 @@ import java.lang.annotation.*;
  * @author moonsky
  * @see Font
  */
-@Unsupported
+@Unsupported("暂不支持注解式定义字体，请使用 DefinitionStyle + StyleFontBuilder")
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(DefinitionFont.List.class)

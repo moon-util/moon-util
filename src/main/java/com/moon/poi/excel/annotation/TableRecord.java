@@ -19,7 +19,7 @@ public @interface TableRecord {
      * <p>
      * 这里定义的优先级更高，会覆盖{@code includeStyles}的同名样式
      *
-     * @return
+     * @return 样式定义
      */
     DefinitionStyle[] styles() default {};
 
@@ -35,7 +35,7 @@ public @interface TableRecord {
      * 5. 内部通过{@link TableColumnGroup} 形成的多级关系的样式不会引入；
      * </pre>
      *
-     * @return
+     * @return 引入在其他类定义的样式定义到自己的作用域
      */
     Class[] importStyles() default {};
 }
