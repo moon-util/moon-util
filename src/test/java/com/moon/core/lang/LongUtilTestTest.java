@@ -1,7 +1,7 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.DateUtil;
-import com.moon.core.util.Datetime;
+import com.moon.core.time.DateUtil;
+import com.moon.core.time.Datetime;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;

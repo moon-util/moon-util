@@ -1,8 +1,9 @@
-package com.moon.core.util;
+package com.moon.core.time;
 
 import com.moon.core.enums.Const;
 import com.moon.core.lang.LongUtil;
 import com.moon.core.time.DateTimeUtil;
+import com.moon.core.util.TestUtil;
 import com.moon.core.util.validator.ResidentID18Validator;
 import org.joda.time.DateTime;
 

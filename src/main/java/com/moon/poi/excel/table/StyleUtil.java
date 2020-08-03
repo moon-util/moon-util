@@ -10,7 +10,7 @@ import com.moon.core.util.SetUtil;
 import com.moon.poi.excel.annotation.TableRecord;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
-import com.moon.poi.excel.annotation.style.Classname;
+import com.moon.poi.excel.annotation.style.TableHeadClassname;
 import org.apache.poi.ss.usermodel.*;
 
 import java.beans.BeanInfo;
@@ -72,7 +72,7 @@ final class StyleUtil {
 
     static String getTableColClassname(Class type, Attribute attribute) {
         String prefix = scoped(type);
-        Classname styleForCell = attribute.getAnnotation(Classname.class);
+        TableHeadClassname styleForCell = attribute.getAnnotation(TableHeadClassname.class);
         if (styleForCell == null) {
             String classname = getClassnameIfAbsent(attribute.getDefinitionStylesOnMethod(),
                 prefix,
@@ -83,8 +83,6 @@ final class StyleUtil {
                 attribute,
                 attr -> scoped(attr.getMemberField())) : classname;
         } else {
-            // TODO 暂未实现条件样式
-            Class conditional = styleForCell.conditional();
             String classname = styleForCell.value();
             return classnameOf(prefix, classname);
         }

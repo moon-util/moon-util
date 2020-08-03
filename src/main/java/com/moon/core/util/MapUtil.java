@@ -1,5 +1,6 @@
 package com.moon.core.util;
 
+import com.moon.core.lang.ArrayUtil;
 import com.moon.core.lang.ThrowUtil;
 
 import java.util.*;
@@ -31,6 +32,19 @@ public final class MapUtil {
 
     public static <K, V> Map<K, V> newMap(K key, V value, K key1, V value1) {
         return put(newMap(key, value), key1, value1);
+    }
+
+    public static <K, V, M extends Map<K, V>> M fillAs(M map, V value, Iterable<? extends K> keys) {
+        if (keys != null) {
+            for (K key : keys) {
+                map.put(key, value);
+            }
+        }
+        return map;
+    }
+
+    public static <K, V, M extends Map<K, V>> M fillAs(M map, V value, K... keys) {
+        return ArrayUtil.isNotEmpty(keys) ? map : fillAs(map, value, Arrays.asList(keys));
     }
 
     /*

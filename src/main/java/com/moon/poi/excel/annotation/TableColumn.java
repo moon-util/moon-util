@@ -37,17 +37,6 @@ public @interface TableColumn {
     short[] rowsHeight4Head() default {};
 
     /**
-     * 表头样式
-     *
-     * 数量和位置与{@link #value()}对应，
-     *
-     * 由于数据的单元格，设置单元格样式请使用
-     *
-     * @return
-     */
-    String[] classnames4Head() default {};
-
-    /**
      * -1 代表不设置
      * <p>
      * 如果{@ode width}大于等于 255*256 代表自动宽度，如：{@link Integer#MAX_VALUE}

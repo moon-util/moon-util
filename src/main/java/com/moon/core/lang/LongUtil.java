@@ -1,7 +1,7 @@
 package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
-import com.moon.core.util.DateUtil;
+import com.moon.core.time.DateUtil;
 import com.moon.core.util.TestUtil;
 
 import java.time.LocalDate;

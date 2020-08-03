@@ -31,6 +31,8 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
 
     private final TypeCaster caster = TypeUtil.cast();
 
+    private ImageFactory imageFactory;
+
     /**
      * 当前正在操作的单元格
      */
@@ -51,6 +53,11 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @param parent 父节点
      */
     public CellFactory(WorkbookProxy proxy, RowFactory parent) { super(proxy, parent); }
+
+    private ImageFactory obtainImageFactory() {
+        ImageFactory factory = this.imageFactory;
+        return factory == null ? (this.imageFactory = new ImageFactory(getProxy(), this)) : factory;
+    }
 
     /**
      * 当前正在操作的单元格实例
@@ -461,94 +468,8 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
         return this;
     }
 
-    /**
-     * 导出图片，写到当前单元格
-     *
-     * @param localPath 图片路径
-     *
-     * @return CellFactory
-     */
-    public CellFactory valImage(String localPath) {
-        return valImage(new File(localPath));
-    }
-
-    /**
-     * 导出图片，写到当前单元格
-     *
-     * @param path 图片路径
-     *
-     * @return CellFactory
-     */
-    public CellFactory valImage(Path path) {
-        return valImage(path.toFile());
-    }
-
-    /**
-     * 导出图片，写到当前单元格
-     *
-     * @param file 图片文件
-     *
-     * @return CellFactory
-     */
-    public CellFactory valImage(File file) {
-        try {
-            return file == null ? this : valImage(ImageIO.read(file));
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
-    }
-
-    /**
-     * 导出图片，写到当前单元格
-     *
-     * @param stream 图片
-     *
-     * @return CellFactory
-     */
-    public CellFactory valImage(InputStream stream) {
-        try {
-            return stream == null ? this : valImage(ImageIO.read(stream));
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
-    }
-
-    /**
-     * 导出图片，写到当前单元格
-     *
-     * @param image 图片
-     *
-     * @return CellFactory
-     */
-    public CellFactory valImage(BufferedImage image) {
-        getProxy().writeImageOnCell(image);
-        return this;
-    }
-
-    /**
-     * 导出图片，写到当前单元格
-     *
-     * @param url 图片地址
-     *
-     * @return CellFactory
-     */
-    public CellFactory valImage(URL url) {
-        try {
-            return url == null ? this : valImage(ImageIO.read(url));
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
-    }
-
-    /**
-     * 导出图片，写到当前单元格
-     *
-     * @param url 图片地址
-     *
-     * @return CellFactory
-     */
-    public CellFactory valImageUrl(String url) {
-        return valImage(URLUtil.toURL(url));
+    ImageFactory image() {
+        return obtainImageFactory();
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.moon.poi.excel.full;
 
 import com.moon.core.enums.Systems;
+import com.moon.core.time.DateUtil;
 import com.moon.poi.excel.ExcelUtil;
 import com.moon.poi.excel.annotation.TableColumn;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -409,8 +410,14 @@ public class HeaderForBasicTest {
         ExcelUtil.xlsx().sheet(sheetFactory -> {
             sheetFactory.row(rowFactory -> {
                 rowFactory.cell()
-                    .valImageUrl("http://a3.att.hudong.com/14/75/01300000164186121366756803686.jpg")
+                    // .valImageUrl("http://a3.att.hudong.com/14/75/01300000164186121366756803686.jpg")
                     .width(8000);
+            });
+            sheetFactory.row(rowFactory -> {
+                rowFactory.cell();//.valImageUrl("http://a0.att.hudong.com/56/12/01300000164151121576126282411.jpg");
+            });
+            sheetFactory.row(rowFactory -> {
+                rowFactory.cell();//.valImageUrl("http://a2.att.hudong.com/36/48/19300001357258133412489354717.jpg");
             });
         }).write("D:/export-image.xlsx");
     }

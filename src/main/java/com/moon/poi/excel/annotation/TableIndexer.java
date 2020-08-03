@@ -8,9 +8,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 索引
+ *
  * @author moonsky
  */
-@Unsupported
+@Unsupported("暂不支持")
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableIndexer {

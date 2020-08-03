@@ -1,5 +1,6 @@
 package com.moon.poi.excel.annotation;
 
+import com.moon.core.lang.Unsupported;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.lang.annotation.ElementType;
@@ -10,6 +11,7 @@ import java.lang.annotation.Target;
 /**
  * @author moonsky
  */
+@Unsupported("暂不支持以注解方式图片导出")
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableColumnImage {

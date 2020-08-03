@@ -1,6 +1,7 @@
-package com.moon.core.util;
+package com.moon.core.time;
 
 import com.moon.core.enums.EnumDescriptor;
+import com.moon.core.lang.StringUtil;
 
 import java.time.DateTimeException;
 import java.time.Month;
@@ -72,11 +73,33 @@ public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster, EnumDes
 
     public int getValue() { return ordinal() + 1; }
 
-    public String getShortName() { return name().substring(0, 3); }
-
+    /**
+     * 中文名称
+     *
+     * @return
+     */
     public String getChineseText() { return ChineseText; }
 
-    public String getShortChineseText() { return month + "月"; }
+    /**
+     * 短中文名称
+     *
+     * @return
+     */
+    public String getChineseShortText() { return month + "月"; }
+
+    /**
+     * 英文名称
+     *
+     * @return
+     */
+    public String getEnglishText() { return StringUtil.capitalize(name().toLowerCase()); }
+
+    /**
+     * 短名称，英文前三位
+     *
+     * @return
+     */
+    public String getEnglishShortText() { return name().substring(0, 3); }
 
     public static DatetimeMonth of(int month) {
         if (month < 1 || month > 12) {

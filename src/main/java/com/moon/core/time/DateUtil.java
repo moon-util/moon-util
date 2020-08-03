@@ -1,6 +1,5 @@
-package com.moon.core.util;
+package com.moon.core.time;
 
-import com.moon.core.time.DateTimeUtil;
 import com.moon.core.util.validator.ResidentID18Validator;
 
 import java.sql.Time;

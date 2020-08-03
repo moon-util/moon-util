@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Classname {
+public @interface TableHeadClassname {
 
     /**
      * 使用样式
@@ -22,11 +22,4 @@ public @interface Classname {
      * @see DefinitionStyle#classname() 引用一个定义的样式名
      */
     String value() default "";
-
-    /**
-     * 条件样式
-     *
-     * @return
-     */
-    Class conditional() default Void.class;
 }

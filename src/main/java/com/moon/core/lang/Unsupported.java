@@ -30,4 +30,12 @@ import java.lang.annotation.Target;
     ElementType.TYPE_USE
 })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Unsupported {}
+public @interface Unsupported {
+
+    /**
+     * 提示文字
+     *
+     * @return
+     */
+    String value() default "";
+}

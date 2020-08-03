@@ -1,7 +1,5 @@
 package com.moon.poi.excel.annotation;
 
-import com.moon.core.lang.Unsupported;
-import com.moon.core.util.function.ToShortFunction;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 
 import java.lang.annotation.ElementType;
@@ -15,22 +13,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TableRecord {
-
-    /**
-     * 数据行行高
-     *
-     * @return 行高
-     */
-    @Unsupported
-    short rowHeight() default -1;
-
-    /**
-     * 以计算的方式返回数据行行高，参数为当前数据对象
-     *
-     * @return 计算实现类
-     */
-    @Unsupported
-    Class<? extends ToShortFunction> computedRowHeightFor() default ToShortFunction.class;
 
     /**
      * 定义样式，这里定义的样式最终会合{@link #importStyles()}的样式合并

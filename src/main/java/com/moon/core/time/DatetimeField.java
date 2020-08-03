@@ -1,11 +1,13 @@
-package com.moon.core.util;
+package com.moon.core.time;
+
+import com.moon.core.enums.EnumDescriptor;
 
 import java.util.Calendar;
 
 /**
  * @author moonsky
  */
-public enum DatetimeField {
+public enum DatetimeField implements EnumDescriptor {
     /**
      * 毫秒
      */
@@ -58,4 +60,12 @@ public enum DatetimeField {
     public final int value;
 
     DatetimeField(int value) { this.value = value; }
+
+    /**
+     * 枚举信息
+     *
+     * @return 枚举信息
+     */
+    @Override
+    public String getText() { return name(); }
 }

@@ -1,12 +1,13 @@
-package com.moon.core.enums;
+package com.moon.core.time;
+
+import com.moon.core.enums.Const;
+import com.moon.core.enums.EnumDescriptor;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import static com.moon.core.util.FilterUtil.requireFind;
@@ -146,7 +147,7 @@ public enum TimeZones implements EnumDescriptor {
     TimeZones(String text) { this.CHINESE_TEXT = text; }
 
     final DateFormat zonedFormat(String pattern){
-        DateFormat format = getDateFormat(pattern);
+        DateFormat format = This.get(pattern);
         if (this != DEFAULT) {
             format.setTimeZone(getTimeZone());
         }
@@ -207,18 +208,5 @@ public enum TimeZones implements EnumDescriptor {
             }
         }
         return new String(chars);
-    }
-
-    /**
-     * 获取本地时区日期格式化器
-     *
-     * @param pattern 日期模式
-     *
-     * @return 本地时区日期格式化器
-     */
-    public static DateFormat getDateFormat(String pattern) { return This.get(pattern); }
-
-    public static DateTimeFormatter getDateFormatter(String pattern) {
-        return DateTimeFormatter.ofPattern(pattern);
     }
 }

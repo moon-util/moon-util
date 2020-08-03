@@ -1,4 +1,4 @@
-package com.moon.core.util;
+package com.moon.core.time;
 
 import com.moon.core.lang.IntUtil;
 
@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.function.ToIntBiFunction;
 
-import static com.moon.core.util.CalendarUtil.copy;
-import static com.moon.core.util.CalendarUtil.overrideCalendar;
-import static com.moon.core.util.DatetimeField.*;
+import static com.moon.core.time.CalendarUtil.copy;
+import static com.moon.core.time.CalendarUtil.overrideCalendar;
+import static com.moon.core.time.DatetimeField.*;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 import static java.time.temporal.ChronoField.NANO_OF_DAY;
 
@@ -27,6 +27,20 @@ import static java.time.temporal.ChronoField.NANO_OF_DAY;
  * 默认星期一是一周第一天:
  * {@link #getFirstDayOfWeekValue()}、{@link #getFirstDayOfWeek()}；
  * {@link #startOfWeek(DayOfWeek)}、{@link #endOfWeek(DayOfWeek)}；
+ * <p>
+ * 方法概览：
+ * <pre>
+ * 1. getXxx: 获取日期属性相关方法
+ * 2. withXxx: 设置日期属性相关方法（区分可变和不可变对象，返回值可能不同）
+ * 3. plusXxx: 日期加法，增加年月日等
+ * 3. minusXxx: 减法，减去年月日等
+ * 4. startOfXxx: 某个范围的起始时间，如 startOfMonth => 月初（当月的最初时刻）
+ * 5. endOfXxx: 某个范围的最末时刻；
+ * 6. isXxx: 日期比较
+ * 7. toXxx: 各种日期类型转换
+ * </pre>
+ * <p>
+ * 注意：{@link #setTime(long)}无论如何都是设置当前对象，与是否是可变对象无关，建议使用{@link #withTimeInMillis(long)}
  *
  * @author moonsky
  */
@@ -85,7 +99,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public final static int MIN_MONTH = 1;
 
     private final Calendar calendar;
-
+    /**
+     * 是否是不可变对象
+     */
     private final boolean immutable;
 
     private Calendar originCalendar() { return calendar; }
@@ -224,6 +240,15 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @see Month
      */
     public DatetimeMonth getMonthOfYear() { return DatetimeMonth.of(getMonthValue()); }
+
+    /**
+     * 获取星座
+     *
+     * @return Constellation
+     */
+    public Constellation getConstellation() {
+        return Constellation.of(getMonthValue(), getDayOfMonth());
+    }
 
     /**
      * 返回当前是一年中的第 N 个星期

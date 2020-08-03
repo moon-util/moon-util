@@ -1,5 +1,6 @@
 package com.moon.poi.excel.annotation.style;
 
+import com.moon.core.lang.Unsupported;
 import org.apache.poi.common.usermodel.fonts.FontCharset;
 import org.apache.poi.ss.usermodel.Font;
 
@@ -11,6 +12,7 @@ import java.lang.annotation.*;
  * @author moonsky
  * @see Font
  */
+@Unsupported
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(DefinitionFont.List.class)

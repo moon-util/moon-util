@@ -12,7 +12,7 @@ import com.moon.poi.excel.annotation.format.DateTimePattern;
 import com.moon.poi.excel.annotation.format.NumberPattern;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import com.moon.poi.excel.annotation.style.StyleFontBuilder;
-import com.moon.poi.excel.annotation.style.Classname;
+import com.moon.poi.excel.annotation.style.TableHeadClassname;
 import org.apache.poi.ss.usermodel.*;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class ExcelUtilTest {
     public static class BasicInfo {
 
         // @TableColumn
-        @Classname("name")
+        @TableHeadClassname("name")
         @TableColumn({"姓名"})
         private String name = "张三";
 
@@ -80,7 +80,7 @@ class ExcelUtilTest {
 
         // @TableColumn
         @TableColumn(value = {"居住地址"}, width = 4000)
-        @Classname("sex")
+        @TableHeadClassname("sex")
         private String address = ADDRESS.get(nextInt(0, ADDRESS.size()));
 
         // @TableColumn

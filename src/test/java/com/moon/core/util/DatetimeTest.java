@@ -1,16 +1,13 @@
 package com.moon.core.util;
 
-import com.moon.core.enums.TimeZones;
-import org.junit.jupiter.api.Assertions;
+import com.moon.core.time.CalendarUtil;
+import com.moon.core.time.Datetime;
 import org.junit.jupiter.api.Test;
 
 import java.time.*;
 import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.zone.ZoneRules;
 import java.util.Calendar;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DatetimeTest {
 
     public DatetimeTest() {
+        // Datetime.now().
     }
 
     @Test
@@ -180,7 +178,7 @@ public class DatetimeTest {
         System.out.println(datetime);
         // datetime.with(ChronoField.DAY_OF_MONTH, 20);
         for (ChronoField value : ChronoField.values()) {
-            System.out.println("case ChronoField."+value.name()+":");
+            System.out.println("case ChronoField." + value.name() + ":");
         }
     }
 
@@ -189,7 +187,7 @@ public class DatetimeTest {
         Datetime datetime = Datetime.now();
         LocalDateTime dateTime0 = datetime.toLocalDateTime();
         System.out.println(dateTime0);
-        LocalDateTime dateTime1 =  dateTime0.with(ChronoField.DAY_OF_MONTH, 12);
+        LocalDateTime dateTime1 = dateTime0.with(ChronoField.DAY_OF_MONTH, 12);
         System.out.println(dateTime1);
         System.out.println(dateTime1.getDayOfMonth());
         System.out.println(Datetime.of(dateTime1));
