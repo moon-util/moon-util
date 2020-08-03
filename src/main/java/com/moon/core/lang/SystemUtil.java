@@ -70,6 +70,13 @@ public final class SystemUtil {
     public static String getTempDir() { return get("java.io.tmpdir"); }
 
     /**
+     * 用户目录
+     */
+    public static String getUserDir() { return get("user.dir"); }
+
+    public static String getUserHome() { return get("user.home"); }
+
+    /**
      * 工作目录
      */
     public static String getWorkingDir() { return get("user.dir"); }

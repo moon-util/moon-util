@@ -48,7 +48,7 @@ class TableCol implements Comparable<TableCol> {
         this.offset = attr.getOffsetVal();
         this.offsetHeadRowsCnt = Math.min(attr.getOffsetHeadRows(), MAX);
         this.fillSkipped = attr.isOffsetFillSkipped();
-        this.defaultClassname = StyleUtil.getTableColClassname(config.getTargetClass(), attr);
+        this.defaultClassname = StyleUtil.getTableColClassname(config);
     }
 
     protected final PropertyControl getControl() { return control; }

@@ -25,6 +25,10 @@ public class StyleUtilTest extends TableParser {
     @DefinitionStyle()
     private String notDefStyle;
 
+    @Test
+    void testGetTableColClassname() throws Exception {
+    }
+
     @TableRecord(importStyles = {StyleUtilTest.class})
     @DefinitionStyle(classname = "defaultStyleOnDeptNo1")
     @DefinitionStyle(classname = "defaultStyleOnDeptNo2")

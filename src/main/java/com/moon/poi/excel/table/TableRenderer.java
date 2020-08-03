@@ -125,7 +125,7 @@ final class TableRenderer implements Renderer {
     }
 
     @Override
-    public void captionWith(SheetFactory factory, String caption, String classname, int height) {
+    public void title(SheetFactory factory, String caption, String classname, int height) {
         int colspan;
         List<HeaderCell>[] cells = this.headerCells;
         if (cells.length > 0) {

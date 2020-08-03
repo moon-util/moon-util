@@ -13,8 +13,8 @@ public interface Renderer {
      * @param factory sheet 渲染器
      * @param caption 标题
      */
-    default void captionWith(SheetFactory factory, String caption) {
-        captionWith(factory, caption, null, -1);
+    default void title(SheetFactory factory, String caption) {
+        title(factory, caption, null, -1);
     }
 
     /**
@@ -25,7 +25,7 @@ public interface Renderer {
      * @param classname 定义的样式名
      * @param height    标题行高
      */
-    void captionWith(SheetFactory factory, String caption, String classname, int height);
+    void title(SheetFactory factory, String caption, String classname, int height);
 
     /**
      * 渲染表头

@@ -10,7 +10,6 @@ import com.moon.core.util.SetUtil;
 import com.moon.poi.excel.annotation.TableRecord;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
-import com.moon.poi.excel.annotation.style.TableHeadClassname;
 import org.apache.poi.ss.usermodel.*;
 
 import java.beans.BeanInfo;
@@ -70,22 +69,51 @@ final class StyleUtil {
         return null;
     }
 
-    static String getTableColClassname(Class type, Attribute attribute) {
-        String prefix = scoped(type);
-        TableHeadClassname styleForCell = attribute.getAnnotation(TableHeadClassname.class);
-        if (styleForCell == null) {
+    /**
+     * 如果字段上存在主动命名的 style，就直接使用主动命名
+     * <p>
+     * 如果不存在主动命名的 style，首先检查当前字段或 getter 方法是否有注解{@link DefinitionStyle}
+     * 如果有且仅有一个，无论该{@link DefinitionStyle}是否定义了{@code classname}，都直接使用该样式，
+     * 如果有多个，则使用其中没有设置{@code classname}的{@link DefinitionStyle}
+     * 如果一个也没有，则检查是否存在全局默认定义，即在类上是否有定义没有设置{@code classname}的{@link DefinitionStyle}有就使用
+     * 否则返回 null
+     *
+     * @param config
+     *
+     * @return
+     */
+    static String getTableColClassname(AttrConfig config) {
+        Attribute attribute = config.getAttribute();
+        if (!attribute.isAnnotated()) {
+            return null;
+        }
+        String prefix = scoped(config.getTargetClass());
+        String style = attribute.getTableColumn().style();
+        // TableHeadClassname styleForCell = attribute.getAnnotation(TableHeadClassname.class);
+        if (StringUtil.isEmpty(style)) {
             String classname = getClassnameIfAbsent(attribute.getDefinitionStylesOnMethod(),
                 prefix,
                 attribute,
                 attr -> scoped(attr.getMemberMethod()));
-            return classname == null ? getClassnameIfAbsent(attribute.getDefinitionStylesOnField(),
+            classname = classname == null ? getClassnameIfAbsent(attribute.getDefinitionStylesOnField(),
                 prefix,
                 attribute,
                 attr -> scoped(attr.getMemberField())) : classname;
+            if (classname == null) {
+                return config.isDefinedDefaultStyle() ? classnameOfEmpty(config.getTargetClass()) : null;
+            }
+            return classname;
         } else {
-            String classname = styleForCell.value();
-            return classnameOf(prefix, classname);
+            return classnameOf(prefix, style);
         }
+    }
+
+    static String classnameOfEmpty(Class prefix) {
+        return classnameOf(prefix, EMPTY);
+    }
+
+    private static String classnameOf(Class prefix, String classname) {
+        return classnameOf(scoped(prefix), classname);
     }
 
     private static String classnameOf(String prefix, String classname) {
@@ -109,6 +137,8 @@ final class StyleUtil {
                 importRecord = importClass.getAnnotation(TableRecord.class);
                 collectImports(rang, builderMap, prefix, importRecord);
             }
+            // 定义在类上的所有样式
+            parseStyleOnClass(builderMap, importClass, prefix, importRecord);
             // 定义在 getter 方法上的命名样式
             try {
                 BeanInfo info = Introspector.getBeanInfo(importClass);
@@ -139,8 +169,6 @@ final class StyleUtil {
                 }
                 thisClass = thisClass.getSuperclass();
             }
-            // 定义在类上的所有样式
-            parseStyleOnClass(builderMap, importClass, prefix, importRecord);
         }
     }
 
@@ -148,9 +176,6 @@ final class StyleUtil {
         Map<String, StyleBuilder> builderMap, Class<?> type, String prefix, TableRecord record
     ) {
         List<DefinitionStyle> classStyles = ListUtil.newList(type.getAnnotationsByType(DefinitionStyle.class));
-        if (record != null) {
-            ListUtil.addAll(classStyles, record.styles());
-        }
         parseStyles(builderMap, prefix, EMPTY, classStyles);
     }
 
@@ -162,18 +187,18 @@ final class StyleUtil {
         collectImports(SetUtil.newSet(type), builderMap, prefix, tableRecord);
         // 解析类定义样式
         parseStyleOnClass(builderMap, type, prefix, tableRecord);
-        // 解析字段上的样式
         for (Attribute attr : attrs) {
-            List<DefinitionStyle> stylesOnField = attr.getDefinitionStylesOnField();
-            if (CollectUtil.isNotEmpty(stylesOnField)) {
-                String name = classnameOf(scoped(attr.getMemberField()), attr.getName());
-                parseStyles(builderMap, prefix, name, stylesOnField);
-            }
             // getter 方法上的默认样式覆盖字段上的默认样式
             List<DefinitionStyle> stylesOnMethod = attr.getDefinitionStylesOnMethod();
             if (CollectUtil.isNotEmpty(stylesOnMethod)) {
                 String name = classnameOf(scoped(attr.getMemberMethod()), attr.getName());
                 parseStyles(builderMap, prefix, name, stylesOnMethod);
+            }
+            // 解析字段上的样式
+            List<DefinitionStyle> stylesOnField = attr.getDefinitionStylesOnField();
+            if (CollectUtil.isNotEmpty(stylesOnField)) {
+                String name = classnameOf(scoped(attr.getMemberField()), attr.getName());
+                parseStyles(builderMap, prefix, name, stylesOnField);
             }
         }
         return MapUtil.isEmpty(builderMap) ? defaultMap : builderMap;

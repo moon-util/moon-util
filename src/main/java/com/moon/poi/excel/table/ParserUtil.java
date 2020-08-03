@@ -68,9 +68,9 @@ final class ParserUtil {
         list.sort(Attribute::compareTo);
         // TableCol[] columns = new TableCol[list.size()];
         List<TableCol> columns = new ArrayList<>();
-        AttrConfig config = new AttrConfig(targetClass);
-
         Map styleMap = StyleUtil.collect(targetClass, list);
+        AttrConfig config = new AttrConfig(targetClass, styleMap);
+
         for (int i = 0, size = list.size(); i < size; i++) {
             Attribute attr = list.get(i);
             config.setAttribute(attr, i);

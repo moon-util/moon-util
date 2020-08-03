@@ -1,5 +1,7 @@
 package com.moon.poi.excel.annotation;
 
+import com.moon.poi.excel.annotation.style.DefinitionStyle;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -83,4 +85,13 @@ public @interface TableColumn {
      * @return 表头偏移级数
      */
     int offsetHeadRows() default 1;
+
+    /**
+     * 应用样式
+     * <p>
+     * 应用由{@link DefinitionStyle#classname()}定义的样式
+     *
+     * @return 样式名
+     */
+    String style() default "";
 }

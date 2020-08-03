@@ -3,7 +3,7 @@ package com.moon.core.io;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.runner.RunnerUtil;
-import com.moon.poi.excel.annotation.style.TableHeadClassname;
+import com.moon.poi.excel.annotation.style.HeadStyle;
 // import com.moon.poi.excel.annotation.style.ClassnameForHead;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class FileUtilTestTest {
     // @ClassnameForHead
     // @ClassnameForHead
     // @ClassnameForHead
-    @TableHeadClassname
+    @HeadStyle
     String path;
     File file, dir;
     Object data;
