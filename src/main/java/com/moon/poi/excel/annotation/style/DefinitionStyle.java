@@ -15,6 +15,7 @@ import java.lang.annotation.*;
  *
  * @author moonsky
  * @see HeadStyle
+ * @see TableColumn#style()
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -61,15 +62,6 @@ public @interface DefinitionStyle {
      * @see CellStyle#cloneStyleFrom(CellStyle)
      */
     @Unsupported String extendBy() default "";
-
-    /**
-     * 引用字体
-     *
-     * @return
-     *
-     * @see DefinitionFont#id()
-     */
-    @Unsupported String refFontId() default "";
 
     /**
      * 前景色色值

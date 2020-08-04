@@ -7,6 +7,7 @@ import com.moon.core.util.CollectUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.SetUtil;
+import com.moon.core.util.function.ShortFunction;
 import com.moon.poi.excel.annotation.TableRecord;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
@@ -236,20 +237,37 @@ final class StyleUtil {
 
         consumers.add(style.wrapText() ? WrapText.WRAP : WrapText.UNWRAP);
 
-        if (style.backgroundColor() > -1) {
-            consumers.add(new FillBackgroundColor(style.backgroundColor()));
+        addIfValidColor(consumers, style.backgroundColor(), FillBackgroundColor::new);
+        addIfValidColor(consumers, style.foregroundColor(), FillForegroundColor::new);
+        short[] colors = style.borderColor();
+        switch (colors.length) {
+            default:
+            case 4:
+                addIfValidColor(consumers, colors[3], BorderColorLeft::new);
+            case 3:
+                addIfValidColor(consumers, colors[2], BorderColorBottom::new);
+            case 2:
+                addIfValidColor(consumers, colors[1], BorderColorRight::new);
+            case 1:
+                addIfValidColor(consumers, colors[0], BorderColorTop::new);
+            case 0:
+                break;
         }
-        if (style.foregroundColor() > -1) {
-            consumers.add(new FillForegroundColor(style.foregroundColor()));
+        BorderStyle[] styles = style.border();
+        switch (styles.length) {
+            default:
+            case 4:
+                consumers.add(new BorderStyleLeft(styles[3]));
+            case 3:
+                consumers.add(new BorderStyleBottom(styles[2]));
+            case 2:
+                consumers.add(new BorderStyleRight(styles[1]));
+            case 1:
+                consumers.add(new BorderStyleTop(styles[0]));
+            case 0:
+                break;
         }
-        if (style.borderColor().length > 0) {
-            consumers.add(new BorderColor(style.borderColor()));
-        }
-        if (style.border().length > 0) {
-            consumers.add(new Border(style.border()));
-        }
-        Consumer[] consumerArr = ListUtil.toArray(consumers, Consumer[]::new);
-        return new TableStyleBuilder(consumerArr);
+        return new TableStyleBuilder(ListUtil.toArray(consumers, Consumer[]::new));
     }
 
     private static class TableStyleBuilder implements StyleBuilder {
@@ -269,71 +287,84 @@ final class StyleUtil {
         }
     }
 
-    private static class Border implements Consumer<CellStyle> {
+    private abstract static class BorderStyleBase implements Consumer<CellStyle> {
 
-        private final BorderStyle[] styles;
-        private final int length;
+        protected final BorderStyle style;
 
-        private Border(BorderStyle[] styles) {
-            this.styles = Arrays.copyOf(styles, styles.length);
-            this.length = Math.min(styles.length, 4);
-        }
-
-        @Override
-        public void accept(CellStyle style) {
-            BorderStyle[] colors = this.styles;
-            int length = this.length;
-            for (int i = 0; i < length; i++) {
-                switch (i) {
-                    case 0:
-                        style.setBorderTop(colors[i]);
-                        break;
-                    case 1:
-                        style.setBorderRight(colors[i]);
-                        break;
-                    case 2:
-                        style.setBorderBottom(colors[i]);
-                        break;
-                    case 3:
-                        style.setBorderLeft(colors[i]);
-                        break;
-                }
-            }
-        }
+        protected BorderStyleBase(BorderStyle style) {this.style = style;}
     }
 
-    private static class BorderColor implements Consumer<CellStyle> {
+    private final static class BorderStyleTop extends BorderStyleBase {
 
-        private final short[] colors;
-        private final int length;
-
-        private BorderColor(short[] colors) {
-            this.colors = Arrays.copyOf(colors, colors.length);
-            this.length = Math.min(colors.length, 4);
-        }
+        protected BorderStyleTop(BorderStyle style) { super(style); }
 
         @Override
-        public void accept(CellStyle style) {
-            short[] colors = this.colors;
-            int length = this.length;
-            for (int i = 0; i < length; i++) {
-                switch (i) {
-                    case 0:
-                        style.setTopBorderColor(colors[i]);
-                        break;
-                    case 1:
-                        style.setRightBorderColor(colors[i]);
-                        break;
-                    case 2:
-                        style.setBottomBorderColor(colors[i]);
-                        break;
-                    case 3:
-                        style.setLeftBorderColor(colors[i]);
-                        break;
-                }
-            }
-        }
+        public void accept(CellStyle cellStyle) { cellStyle.setBorderTop(style); }
     }
+
+    private final static class BorderStyleRight extends BorderStyleBase {
+
+        protected BorderStyleRight(BorderStyle style) { super(style); }
+
+        @Override
+        public void accept(CellStyle cellStyle) { cellStyle.setBorderRight(style); }
+    }
+
+    private final static class BorderStyleBottom extends BorderStyleBase {
+
+        protected BorderStyleBottom(BorderStyle style) { super(style); }
+
+        @Override
+        public void accept(CellStyle cellStyle) { cellStyle.setBorderBottom(style); }
+    }
+
+    private final static class BorderStyleLeft extends BorderStyleBase {
+
+        protected BorderStyleLeft(BorderStyle style) { super(style); }
+
+        @Override
+        public void accept(CellStyle cellStyle) { cellStyle.setBorderLeft(style); }
+    }
+
+    private abstract static class BorderColorBase implements Consumer<CellStyle> {
+
+        protected final short color;
+
+        protected BorderColorBase(short color) {this.color = color;}
+    }
+
+    private final static class BorderColorTop extends BorderColorBase {
+
+        protected BorderColorTop(short width) { super(width); }
+
+        @Override
+        public void accept(CellStyle cellStyle) { cellStyle.setTopBorderColor(color); }
+    }
+
+    private final static class BorderColorRight extends BorderColorBase {
+
+        protected BorderColorRight(short width) { super(width); }
+
+        @Override
+        public void accept(CellStyle cellStyle) { cellStyle.setRightBorderColor(color); }
+    }
+
+    private final static class BorderColorBottom extends BorderColorBase {
+
+        protected BorderColorBottom(short width) { super(width); }
+
+        @Override
+        public void accept(CellStyle cellStyle) { cellStyle.setBottomBorderColor(color); }
+    }
+
+    private final static class BorderColorLeft extends BorderColorBase {
+
+        protected BorderColorLeft(short width) { super(width); }
+
+        @Override
+        public void accept(CellStyle cellStyle) { cellStyle.setLeftBorderColor(color); }
+    }
+
 
     private enum WrapText implements Consumer<CellStyle> {
 
@@ -403,7 +434,6 @@ final class StyleUtil {
 
     private static class FillForegroundColor implements Consumer<CellStyle> {
 
-
         private final short color;
 
         private FillForegroundColor(short color) {this.color = color;}
@@ -411,6 +441,12 @@ final class StyleUtil {
         @Override
         public void accept(CellStyle style) {
             style.setFillForegroundColor(color);
+        }
+    }
+
+    private static <T> void addIfValidColor(List<? super T> consumers, short color, ShortFunction<T> builder) {
+        if (color > -1) {
+            consumers.add(builder.apply(color));
         }
     }
 }

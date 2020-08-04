@@ -70,8 +70,8 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory titleOf(String title) {
-        return title(title == null ? null : TableTitle.of(title));
+    public TableFactory title(String title) {
+        return titleOf(title == null ? null : TableTitle.of(title));
     }
 
     /**
@@ -82,8 +82,8 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory titleOf(String title, String classname) {
-        return title(title == null ? null : TableTitle.of(title, classname));
+    public TableFactory title(String title, String classname) {
+        return titleOf(title == null ? null : TableTitle.of(title, classname));
     }
 
     /**
@@ -93,7 +93,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory title(TableTitle title) {
+    public TableFactory titleOf(TableTitle title) {
         this.title = title;
         return this;
     }
@@ -139,29 +139,35 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      * -----------------------------------------------------------------------------------
      */
 
-    public <T> TableFactory render(Iterator<T> iterator) { return render(iterator, null); }
+    public <T> TableFactory render(Iterator<? extends T> iterator) { return render(iterator, null); }
 
-    public <T> TableFactory render(Iterator<T> iterator, Class<T> targetClass) {
+    public <T> TableFactory render(Iterator<? extends T> iterator, Class<? super T> targetClass) {
         return doRenderData(iterator, targetClass, getHeaderRenderer());
     }
 
-    public <T> TableFactory render(Iterable<T> iterable) { return render(iterable.iterator()); }
+    public <T> TableFactory render(Iterable<? extends T> iterable) { return render(iterable.iterator()); }
 
-    public <T> TableFactory render(Iterable<T> iterable, Class<T> targetClass) {
+    public <T> TableFactory render(Iterable<? extends T> iterable, Class<? super T> targetClass) {
         return render(iterable.iterator(), targetClass);
     }
 
-    public <T> TableFactory render(Stream<T> stream) { return render(stream.iterator()); }
+    public <T> TableFactory render(Stream<? extends T> stream) { return render(stream.iterator()); }
 
-    public <T> TableFactory render(Stream<T> stream, Class<T> targetClass) {
+    public <T> TableFactory render(Stream<? extends T> stream, Class<? super T> targetClass) {
         return render(stream.iterator(), targetClass);
     }
 
-    public <T> TableFactory render(T... data) {
-        return data == null ? this : render(data.getClass().getComponentType(), data);
+    @SafeVarargs
+    public final <T> TableFactory render(T... data) {
+        if (data == null) {
+            return this;
+        }
+        Class targetClass = data.getClass().getComponentType();
+        return render(IteratorUtil.of(data), targetClass);
     }
 
-    public <T> TableFactory render(Class targetClass, T... data) {
+    @SafeVarargs
+    public final <T> TableFactory render(Class<? super T> targetClass, T... data) {
         return data == null ? this : render(IteratorUtil.of(data), targetClass);
     }
 
@@ -215,7 +221,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
     protected SheetFactory end() { return getParentFactory(); }
 
     private <T> TableFactory doRenderData(
-        Iterator<T> iterator, Class<T> targetClass, PartRenderer headRenderer
+        Iterator<? extends T> iterator, Class<? super T> targetClass, PartRenderer headRenderer
     ) {
         SheetFactory factory = end();
         Renderer renderer = null;
