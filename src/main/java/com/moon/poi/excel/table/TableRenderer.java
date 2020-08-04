@@ -1,5 +1,6 @@
 package com.moon.poi.excel.table;
 
+import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.MapUtil;
 import com.moon.poi.excel.*;
@@ -125,7 +126,10 @@ final class TableRenderer implements Renderer {
     }
 
     @Override
-    public void title(SheetFactory factory, String caption, String classname, int height) {
+    public void title(SheetFactory factory, TableTitle title) {
+        if (title == null || title.getTitle() == null) {
+            return;
+        }
         int colspan;
         List<HeaderCell>[] cells = this.headerCells;
         if (cells.length > 0) {
@@ -135,12 +139,12 @@ final class TableRenderer implements Renderer {
         }
 
         RowFactory rowFactory = factory.row();
-        CellFactory cellFactory = rowFactory.cell(1, colspan).val(caption);
-        if (classname != null) {
-            cellFactory.styleAs(classname);
+        CellFactory cellFactory = rowFactory.cell(1, colspan).val(title.getTitle());
+        if (title.getClassname() != null) {
+            cellFactory.styleAs(title.getClassname());
         }
-        if (height > -1) {
-            rowFactory.height(height);
+        if (title.getHeight() > -1) {
+            rowFactory.height(title.getHeight());
         }
     }
 

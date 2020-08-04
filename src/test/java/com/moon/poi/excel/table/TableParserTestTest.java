@@ -46,7 +46,7 @@ class TableParserTestTest {
                     new Student(),
                     new Student());
 
-                tableFactory.renderHead(Employee.class);
+                tableFactory.render(Employee.class);
             });
         }).write(new File(dir, "group-header.xlsx"));
 
@@ -131,7 +131,7 @@ class TableParserTestTest {
                     new Student(),
                     new Student());
 
-                tableFactory.renderAll(students);
+                tableFactory.render(students);
             });
         }).write(new File(dir, "score.xlsx"));
     }

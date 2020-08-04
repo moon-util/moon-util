@@ -11,21 +11,9 @@ public interface Renderer {
      * 设置总标题，独占一行，并合并列
      *
      * @param factory sheet 渲染器
-     * @param caption 标题
+     * @param title   标题
      */
-    default void title(SheetFactory factory, String caption) {
-        title(factory, caption, null, -1);
-    }
-
-    /**
-     * 设置总标题，独占一行，并合并列
-     *
-     * @param factory   sheet 渲染器
-     * @param caption   标题
-     * @param classname 定义的样式名
-     * @param height    标题行高
-     */
-    void title(SheetFactory factory, String caption, String classname, int height);
+    void title(SheetFactory factory, TableTitle title);
 
     /**
      * 渲染表头

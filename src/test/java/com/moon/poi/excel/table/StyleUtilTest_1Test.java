@@ -152,7 +152,7 @@ class StyleUtilTest_1Test extends TableParser {
                 for (int i = 0; i < 4; i++) {
                     list.add(new Employee_4());
                 }
-                tableFactory.renderAll(list);
+                tableFactory.render(list);
             });
         }).write(new File(dir, "export-score.xlsx"));
     }

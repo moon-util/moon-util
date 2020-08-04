@@ -239,7 +239,7 @@ class ExcelUtilTest {
                 for (int i = 0; i < 12; i++) {
                     members.add(new Member());
                 }
-                tableFactory.renderAll(members);
+                tableFactory.render(members);
             });
         }).write(new File(dir, "member-score.xlsx"));
     }

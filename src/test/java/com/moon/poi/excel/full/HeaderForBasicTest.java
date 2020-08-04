@@ -299,28 +299,28 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单表头").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_0.class);
+                tableFactory.render(DemoForExcelHead_0.class);
             });
 
             sheetFactory.row(rowFactory -> {}).row(rowFactory -> {
                 rowFactory.cell().val("简单表头 + 列排序").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_0_0.class);
+                tableFactory.render(DemoForExcelHead_0_0.class);
             });
 
             sheetFactory.row(rowFactory -> {}).row(rowFactory -> {
                 rowFactory.cell().val("简单表头 + 列偏移").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_0_1.class);
+                tableFactory.render(DemoForExcelHead_0_1.class);
             });
 
             sheetFactory.row(rowFactory -> {}).row(rowFactory -> {
                 rowFactory.cell().val("简单表头 + 行高").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_0_2.class);
+                tableFactory.render(DemoForExcelHead_0_2.class);
             });
 
 
@@ -328,7 +328,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 1").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_1.class);
+                tableFactory.render(DemoForExcelHead_1.class);
             });
 
 
@@ -336,7 +336,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 1 + 列排序").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_1_0.class);
+                tableFactory.render(DemoForExcelHead_1_0.class);
             });
 
 
@@ -344,7 +344,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 2").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_2.class);
+                tableFactory.render(DemoForExcelHead_2.class);
             });
 
 
@@ -352,7 +352,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 2 + 列偏移 1").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_2_1.class);
+                tableFactory.render(DemoForExcelHead_2_1.class);
             });
 
 
@@ -360,7 +360,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 2 + 列偏移 2").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_2_2.class);
+                tableFactory.render(DemoForExcelHead_2_2.class);
             });
 
 
@@ -368,7 +368,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 2 + 列偏移 3: 表头所有行均参与偏移").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_2_3.class);
+                tableFactory.render(DemoForExcelHead_2_3.class);
             });
 
 
@@ -376,7 +376,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 2 + 列偏移 3: 表头所有行都不参与偏移").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_2_4.class);
+                tableFactory.render(DemoForExcelHead_2_4.class);
             });
 
 
@@ -384,7 +384,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 3").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_3.class);
+                tableFactory.render(DemoForExcelHead_3.class);
             });
 
 
@@ -392,7 +392,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("简单多级表头 3 + 列排序").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_3_0.class);
+                tableFactory.render(DemoForExcelHead_3_0.class);
             });
 
 
@@ -400,7 +400,7 @@ public class HeaderForBasicTest {
                 rowFactory.cell().val("多级表头 3 + 列排序 + 行高").styleAs("placeholder");
             });
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(DemoForExcelHead_3_1.class);
+                tableFactory.render(DemoForExcelHead_3_1.class);
             });
         }).write(new File(dir, "member-score.xlsx"));
     }

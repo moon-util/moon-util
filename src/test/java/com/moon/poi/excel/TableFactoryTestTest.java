@@ -36,7 +36,7 @@ class TableFactoryTestTest {
             sheetFactory.table(tableFactory -> {
                 List<Emp> list = ListUtil.newList(new Emp(), new Emp(), new Emp());
 
-                tableFactory.renderAll(list);
+                tableFactory.render(list);
             });
         }).write("/Users/moonsky/test1.xlsx");
     }
@@ -88,7 +88,7 @@ class TableFactoryTestTest {
             sheetFactory.table(tableFactory -> {
                 List<User> list = ListUtil.newList(new User(), new User(), new User());
 
-                tableFactory.renderAll(list);
+                tableFactory.render(list);
             });
         }).write("/Users/moonsky/test1.xlsx");
     }

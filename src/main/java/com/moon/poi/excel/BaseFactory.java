@@ -44,7 +44,7 @@ abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFact
     /**
      * 获取
      *
-     * @return 获取代理模型
+     * @return 获取代理对象
      */
     protected WorkbookProxy getProxy() { return proxy; }
 
@@ -153,7 +153,7 @@ abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFact
     /**
      * 返回父节点工厂，如果当前是“根”（{@link WorkbookFactory}），则返回自身
      * <p>
-     * <strong>最好别调用这个方法</strong>
+     * <strong>不建议调用这个方法</strong>
      *
      * @return 父节点工厂
      */

@@ -154,7 +154,7 @@ public class ExcelTest {
                 details.add(new MemberDetail());
                 details.add(new MemberDetail());
                 details.add(new MemberDetail());
-                tableFactory.renderAll(details);
+                tableFactory.render(details);
             });
         }).write(new File(dir, "member-detail.xlsx"));
     }
@@ -175,15 +175,15 @@ public class ExcelTest {
         ExcelUtil.xlsx().sheet("MemberDetail", sheetFactory -> {
             sheetFactory.row(2);
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(MemberDetail.class);
+                tableFactory.render(MemberDetail.class);
             });
         }).sheet("MemberInfo", sheetFactory -> {
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(MemberInfo.class);
+                tableFactory.render(MemberInfo.class);
             });
         }).sheet("MemberScore", sheetFactory -> {
             sheetFactory.table(tableFactory -> {
-                tableFactory.renderHead(MemberScore.class);
+                tableFactory.render(MemberScore.class);
             });
         }).write(new File(dir, "member-detail.xlsx"));
     }
