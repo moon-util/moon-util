@@ -4,7 +4,6 @@ import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.poi.excel.annotation.TableColumn;
 import com.moon.poi.excel.annotation.TableColumnGroup;
-import com.moon.poi.excel.annotation.TableIndexer;
 import com.moon.poi.excel.annotation.TableRecord;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -21,7 +20,7 @@ import java.util.stream.Stream;
  * @see TableColumnGroup 标记一个实体字段
  * @see TableRecord 标记一个实体
  * * @see TableListable 标记一个列表字段，一个实体里最多只能有一列可迭代
- * @see TableIndexer 标记一列索引
+ // * @see TableIndexer 标记一列索引
  */
 public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory> {
 

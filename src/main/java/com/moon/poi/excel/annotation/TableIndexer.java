@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Unsupported("暂不支持")
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableIndexer {
+@interface TableIndexer {
 
     /**
      * 序号标题；

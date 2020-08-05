@@ -1,6 +1,5 @@
 package com.moon.poi.excel.table;
 
-import com.moon.poi.excel.annotation.TableColumnImage;
 import com.moon.poi.excel.annotation.value.DefaultNumber;
 import com.moon.poi.excel.annotation.value.DefaultValue;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -94,10 +93,10 @@ final class Parser<T extends Marked> {
                 return new TableColGroup(config, renderer);
             }
 
-            TableColumnImage isImage = attr.getAnnotation(TableColumnImage.class);
-            if (isImage != null) {
+            // TableColumnImage isImage = attr.getAnnotation(TableColumnImage.class);
+            // if (isImage != null) {
                 // Workbook.PICTURE_TYPE_DIB
-            }
+            // }
 
             DefaultNumber atNumber = attr.getAnnotation(DefaultNumber.class);
             if (atNumber != null && Assert.isNumberType(targetClass)) {
