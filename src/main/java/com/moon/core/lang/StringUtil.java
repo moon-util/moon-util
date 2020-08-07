@@ -95,6 +95,38 @@ public final class StringUtil {
         return count;
     }
 
+    public static int countOf(final CharSequence str, final String search) {
+        return countOf(str, search, 0, false);
+    }
+
+    public static int countOf(final CharSequence str, final String search, int defaultIfInputNull, boolean fulled) {
+        if (str == null) {
+            return defaultIfInputNull;
+        }
+        if (str == search) {
+            return 1;
+        }
+        String input = str.toString();
+        int length = input.length();
+        int searchLength = length(search);
+        if (length == 0) {
+            return searchLength == 0 ? 1 : 0;
+        }
+        String substr = String.valueOf(search);
+        int index = 0;
+        int count = 0;
+        int diff = fulled ? 1 : length;
+        do {
+            int nextIndex = input.indexOf(substr, index);
+            if (nextIndex < 0) {
+                return count;
+            } else {
+                count++;
+                index = nextIndex + diff;
+            }
+        } while (true);
+    }
+
     /*
      * -------------------------------------------------------------------
      * indexOf
@@ -191,6 +223,29 @@ public final class StringUtil {
     public static boolean isEmpty(CharSequence string) { return string == null || string.length() == 0; }
 
     /**
+     * 是否包含空字符串
+     *
+     * @param values
+     *
+     * @return
+     */
+    public static boolean isAnyEmpty(CharSequence... values) {
+        if (values == null || values.length == 0) {
+            return true;
+        }
+        for (CharSequence value : values) {
+            if (isEmpty(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isNoneEmpty(CharSequence... values) {
+        return !isAnyEmpty(values);
+    }
+
+    /**
      * @param string 待测字符串
      *
      * @return 是否不为空
@@ -225,6 +280,29 @@ public final class StringUtil {
             }
         }
         return true;
+    }
+
+    /**
+     * 是否包含空字符串
+     *
+     * @param values
+     *
+     * @return
+     */
+    public static boolean isAnyBlank(CharSequence... values) {
+        if (values == null || values.length == 0) {
+            return true;
+        }
+        for (CharSequence value : values) {
+            if (isBlank(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isNoneBlank(CharSequence... values) {
+        return !isAnyBlank(values);
     }
 
     /**
@@ -1965,27 +2043,5 @@ public final class StringUtil {
         }
         result.add(origin.substring(startIdx));
         return result;
-    }
-
-    /**
-     * 拆分出每个英文单词，拆分出的字符串只包含大写或小写字母
-     *
-     * @param sequence
-     *
-     * @return
-     */
-    private static List<String> splitAlphas(CharSequence sequence) {
-        return new ArrayList<>();
-    }
-
-    /**
-     * 拆分每个单词，拆分出的每个字符串只包含大小写字母或数字
-     *
-     * @param sequence
-     *
-     * @return
-     */
-    private static List<String> splitAlphanumerics(CharSequence sequence) {
-        return new ArrayList<>();
     }
 }
