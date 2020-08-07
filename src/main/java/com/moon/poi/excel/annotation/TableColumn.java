@@ -1,6 +1,7 @@
 package com.moon.poi.excel.annotation;
 
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
+import com.moon.poi.excel.annotation.style.HeadStyle;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -94,4 +95,11 @@ public @interface TableColumn {
      * @return 样式名
      */
     String style() default "";
+
+    /**
+     * 表头样式
+     *
+     * @return
+     */
+    HeadStyle[] styleForHead() default {};
 }

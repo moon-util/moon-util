@@ -1,5 +1,6 @@
 package com.moon.core.math;
 
+import com.moon.core.lang.NumberUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.lang.ThrowUtil;
 
@@ -12,7 +13,8 @@ import static com.moon.core.lang.ThrowUtil.runtime;
 /**
  * @author moonsky
  */
-public final class BigDecimalUtil {
+public final class BigDecimalUtil extends NumberUtil {
+
     private BigDecimalUtil() { ThrowUtil.noInstanceError(); }
 
     public static BigDecimal valueOf(String value) { return new BigDecimal(value); }

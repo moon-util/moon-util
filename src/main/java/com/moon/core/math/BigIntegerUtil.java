@@ -1,5 +1,6 @@
 package com.moon.core.math;
 
+import com.moon.core.lang.NumberUtil;
 import com.moon.core.lang.SupportUtil;
 import com.moon.core.lang.ThrowUtil;
 
@@ -11,14 +12,11 @@ import static com.moon.core.lang.NumberComparator.*;
 /**
  * @author moonsky
  */
-public final class BigIntegerUtil {
-    private BigIntegerUtil() {
-        ThrowUtil.noInstanceError();
-    }
+public final class BigIntegerUtil extends NumberUtil {
 
-    public static BigInteger valueOf(String value) {
-        return new BigInteger(value);
-    }
+    private BigIntegerUtil() { ThrowUtil.noInstanceError(); }
+
+    public static BigInteger valueOf(String value) { return new BigInteger(value); }
 
     public static BigInteger valueOf(int value) {
         return value == 0 ? BigInteger.ZERO : (value == 1 ? BigInteger.ONE : BigInteger.valueOf(value));

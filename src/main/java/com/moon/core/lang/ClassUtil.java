@@ -175,8 +175,8 @@ public final class ClassUtil {
      *
      * @return 当 type 是 byte、short、int、long、float、double 其中之一时返回 true，否则返回 false
      */
-    public static boolean isNumberPrimitiveClass(Class type) {
-        return NumberUtil.isNumberPrimitiveClass(type);
+    public static boolean isPrimitiveNumberClass(Class type) {
+        return NumberUtil.isPrimitiveNumberClass(type);
     }
 
     /**
@@ -206,8 +206,8 @@ public final class ClassUtil {
      *
      * @return 当 type 是 Byte、Short、Integer、Long、Float、Double 其中之一时返回 true，否则返回 false
      */
-    public static boolean isNumberWrapperClass(Class type) {
-        return NumberUtil.isNumberWrapperClass(type);
+    public static boolean isWrapperNumberClass(Class type) {
+        return NumberUtil.isWrapperNumberClass(type);
     }
 
     /**
