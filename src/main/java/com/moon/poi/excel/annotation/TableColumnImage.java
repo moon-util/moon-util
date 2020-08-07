@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Unsupported("暂不支持以注解方式图片导出")
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableColumnImage {
+@interface TableColumnImage {
 
     /**
      * 图片来源

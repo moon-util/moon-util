@@ -227,6 +227,30 @@ public final class StringUtil {
         return true;
     }
 
+    /**
+     * 返回字符串是否包含指定前缀
+     *
+     * @param cs     待测字符串
+     * @param prefix 期望前缀
+     *
+     * @return 如果字符串以指定字符串为前缀返回 true，否则返回 false
+     */
+    public static boolean startsWith(CharSequence cs, CharSequence prefix) {
+        return (cs == prefix) || (cs != null && prefix != null && cs.toString().startsWith(prefix.toString()));
+    }
+
+    /**
+     * 返回字符串是否包含指定后缀
+     *
+     * @param cs     待测字符串
+     * @param suffix 期望后缀
+     *
+     * @return 如果字符串以指定字符串为后缀返回 true，否则返回 false
+     */
+    public static boolean endsWith(CharSequence cs, CharSequence suffix) {
+        return (cs == suffix) || (cs != null && suffix != null && cs.toString().endsWith(suffix.toString()));
+    }
+
 
     /**
      * cs is null、"null" or "undefined"
