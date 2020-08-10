@@ -26,7 +26,7 @@ public final class ResultSetUtil {
 
     private ResultSetUtil() { noInstanceError(); }
 
-    public static Map<String, Object> oneToMap(ResultSet set, String... columnsLabel) {
+    public static Map<String, Object> rowToMap(ResultSet set, String... columnsLabel) {
         try {
             String column;
             Map<String, Object> ret = new HashMap<>();
@@ -47,7 +47,7 @@ public final class ResultSetUtil {
      *
      * @return 当前行数据
      */
-    public static Map<String, Object> oneToMap(ResultSet set) { return oneToMap(set, getColumnsLabel(set)); }
+    public static Map<String, Object> rowToMap(ResultSet set) { return rowToMap(set, getColumnsLabel(set)); }
 
     /**
      * 将剩余行每行映射成一个 Map 对象，所有数据用一个 List 返回
@@ -61,7 +61,7 @@ public final class ResultSetUtil {
             String[] columns = getColumnsLabel(set);
             List<Map<String, Object>> ret = new ArrayList<>();
             while (set.next()) {
-                ret.add(oneToMap(set, columns));
+                ret.add(rowToMap(set, columns));
             }
             return ret;
         } catch (Exception e) {
@@ -76,7 +76,7 @@ public final class ResultSetUtil {
      *
      * @return 数据数组
      */
-    public static Object[] oneToArray(ResultSet set) {
+    public static Object[] rowToArray(ResultSet set) {
         try {
             int count = getColumnsCount(set);
             Object[] ret = new Object[count];
@@ -122,7 +122,7 @@ public final class ResultSetUtil {
      *
      * @return 实例 bean
      */
-    public static <T> T oneToBean(ResultSet set, T bean) {
+    public static <T> T rowToBean(ResultSet set, T bean) {
         BeanInfoUtil.getFieldDescriptorsMap(bean.getClass())
             .forEach((name, descriptor) -> descriptor.ifSetterPresent(getConsumer(set, bean)));
         return bean;
@@ -137,7 +137,7 @@ public final class ResultSetUtil {
      *
      * @return 转换后的 type 实例
      */
-    public static <T> T oneToInstance(ResultSet set, Class<T> type) {
+    public static <T> T rowToInstance(ResultSet set, Class<T> type) {
         T bean = ConstructorUtil.newInstance(type);
         Consumer<FieldDescriptor> consumer = getConsumer(set, bean);
         BeanInfoUtil.getFieldDescriptorsMap(type).forEach((name, descriptor) -> descriptor.ifSetterPresent(consumer));
