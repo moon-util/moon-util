@@ -49,7 +49,6 @@ public class ArrayUtilTest {
 
         Map<String, Object> resultMap = ArrayUtil.reduce(20, (map, idx) -> {
 
-            return map;
         }, MapUtil.newHashMap());
     }
 

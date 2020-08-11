@@ -5,6 +5,7 @@ import com.moon.core.enums.Lists;
 import com.moon.core.enums.Sets;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.function.BiIntFunction;
+import com.moon.core.util.function.TableIntConsumer;
 import com.moon.core.util.function.TableIntFunction;
 
 import java.lang.reflect.Array;
@@ -343,8 +344,8 @@ public class CollectUtil extends BaseCollectUtil {
      * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
      * <pre>
      * 1. 接受一个集合作为源数据；
-     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
-     * 3. 初始值，作为第一次传入处理器的参数
+     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引）；
+     * 3. 初始值，作为第一次传入处理器的参数，也是最后返回结果
      * </pre>
      *
      * @param iterable   源数据集合
@@ -355,17 +356,17 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Iterator, TableIntFunction, Object)
+     * @see #reduce(Iterator, TableIntConsumer, Object)
      * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterable<? extends E> iterable, TableIntFunction<? super T, ? super E, ? extends T> reducer, T totalValue
+        Iterable<? extends E> iterable, TableIntConsumer<? super T, ? super E> reducer, T totalValue
     ) {
         if (iterable != null) {
             int index = 0;
             for (E item : iterable) {
-                totalValue = reducer.apply(totalValue, item, index++);
+                reducer.accept(totalValue, item, index++);
             }
         }
         return totalValue;
@@ -375,8 +376,8 @@ public class CollectUtil extends BaseCollectUtil {
      * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
      * <pre>
      * 1. 接受一个集合作为源数据；
-     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
-     * 3. 初始值，作为第一次传入处理器的参数
+     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引）；
+     * 3. 初始值，作为第一次传入处理器的参数，也是最后返回结果
      * </pre>
      *
      * @param iterator   源数据集合
@@ -387,16 +388,16 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Iterable, TableIntFunction, Object)
+     * @see #reduce(Iterable, TableIntConsumer, Object)
      * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterator<? extends E> iterator, TableIntFunction<? super T, ? super E, ? extends T> reducer, T totalValue
+        Iterator<? extends E> iterator, TableIntConsumer<? super T, ? super E> reducer, T totalValue
     ) {
         if (iterator != null) {
             for (int i = 0; iterator.hasNext(); i++) {
-                totalValue = reducer.apply(totalValue, iterator.next(), i);
+                reducer.accept(totalValue, iterator.next(), i);
             }
         }
         return totalValue;

@@ -1,12 +1,18 @@
 package com.moon.core.time;
 
 import com.moon.core.enums.Const;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author moonsky
@@ -38,10 +44,21 @@ public class DateTimeUtilTest {
 
     @Test
     void testNowDate() throws Exception {
+        List<String> formatted = DateTimeUtil.reduceMonths(LocalDate.now(),
+            LocalDate.now().plusYears(1),
+            (total, date, idx) -> total.add(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date)),
+            new ArrayList());
+        Assertions.assertEquals(formatted.size(), 12);
     }
 
     @Test
     void testNowTime() throws Exception {
+        Map resultMap = Stream.of(1,2,3,4,5,6).reduce(new HashMap<>(16), (map, kv) -> {
+            return map;
+        }, (hashMap, hashMap2) -> {
+            return hashMap;
+        });
+        System.out.println(resultMap);
     }
 
     @Test
