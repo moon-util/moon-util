@@ -1,6 +1,7 @@
 package com.moon.core.time;
 
 import com.moon.core.enums.Const;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,7 @@ public class DateTimeUtilTest {
 
     @Test
     void testNowTime() throws Exception {
-        Map resultMap = Stream.of(1,2,3,4,5,6).reduce(new HashMap<>(16), (map, kv) -> {
+        Map resultMap = Stream.of(1, 2, 3, 4, 5, 6).reduce(new HashMap<>(16), (map, kv) -> {
             return map;
         }, (hashMap, hashMap2) -> {
             return hashMap;
@@ -63,6 +64,11 @@ public class DateTimeUtilTest {
 
     @Test
     void testNowDateTime() throws Exception {
+        String body = Jsoup.connect("http://60.205.182.215/cyhr/main/wechat/registerBaseInfo/register-invite.jsp")
+            .get()
+            // .body()
+            .outerHtml();
+        System.out.println(body);
     }
 
     @Test

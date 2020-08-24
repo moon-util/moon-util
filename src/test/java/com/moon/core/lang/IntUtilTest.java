@@ -78,5 +78,7 @@ public class IntUtilTest {
 
     @Test
     void testParseUnusualString() throws Exception {
+        String ipv4 = "135.75.43.52";
+
     }
 }

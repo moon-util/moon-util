@@ -20,6 +20,28 @@ public final class GroupUtil {
     /**
      * 单元素分组，将集合或数组元素按元素进行分组，如果存在多个相同“键”，最终只会保留一个
      *
+     * 如（js 格式伪代码）：
+     * <pre>
+     * var list = [
+     *   {id: 1, name: '上海'},
+     *   {id: 2, name: '北京'},
+     *   {id: 1, name: '广州'},
+     * ]
+     *
+     * var map = singletonGroup(list, obj => obj.id);
+     * map like: {
+     *     1: {id: 1, name: '广州'},
+     *     2: {id: 2, name: '北京'},
+     * }
+     * </pre>
+     *
+     * 如需自定义 Map 类型，可参考如下：
+     * <pre>
+     * CollectUtil.reduce(collect, (resultMap, item, idx) -> {
+     *    resultMap.put(function.apply(item), item);
+     * }, new LinkedHashMap());
+     * </pre>
+     *
      * @param iterator 集合
      * @param function 分组函数
      * @param <K>      键类型
@@ -27,7 +49,7 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> simpleGroup(
+    public static <K, E> Map<K, E> groupAsSimpled(
         Iterator<? extends E> iterator, Function<? super E, ? extends K> function
     ) {
         HashMap resultMap = new HashMap(16);
@@ -50,9 +72,12 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> simpleGroup(
+    public static <K, E> Map<K, E> groupAsSimpled(
         Iterable<? extends E> collect, Function<? super E, ? extends K> function
     ) {
+        if (collect instanceof Collection) {
+            return groupAsSimpled((Collection) collect, function);
+        }
         HashMap resultMap = new HashMap(16);
         if (collect != null) {
             for (E item : collect) {
@@ -72,7 +97,7 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> simpleGroup(
+    public static <K, E> Map<K, E> groupAsSimpled(
         Collection<? extends E> collect, Function<? super E, ? extends K> function
     ) {
         int len = collect == null ? 0 : collect.size();
@@ -95,7 +120,7 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> simpleGroup(E[] arr, Function<? super E, ? extends K> function) {
+    public static <K, E> Map<K, E> groupAsSimpled(E[] arr, Function<? super E, ? extends K> function) {
         int len = arr == null ? 0 : arr.length;
         HashMap resultMap = new HashMap(len);
         if (arr != null) {

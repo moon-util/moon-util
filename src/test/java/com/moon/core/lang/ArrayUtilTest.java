@@ -1,7 +1,10 @@
 package com.moon.core.lang;
 
+import com.moon.core.io.FileUtil;
 import com.moon.core.util.MapUtil;
+import com.moon.core.util.ValidationUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.validation.ValidationUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -12,6 +15,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author moonsky
  */
 public class ArrayUtilTest {
+
+    @Test
+    void testName() throws Exception {
+        // ValidationUtil.requireDateString("");
+        // ValidationUtil.of("string");
+        String path = "D:\\WorkSpaces\\github\\javascript\\json-mock\\node_modules\\codemirror\\theme";
+        FileUtil.traveller().traverse(path).forEach(name -> {
+            // System.out.println(name.getName());
+            // String importStr = StringUtil.format("import 'codemirror/theme/{}';", name.getName());
+            String onlyName = StringUtil.substrBefore(name.getName(), ".css");
+            String thisName = StringUtil.format("'{}',", onlyName);
+            System.out.println(thisName);
+
+        });
+    }
 
     @Test
     void testSplice() {
