@@ -1,8 +1,13 @@
 package com.moon.core.time;
 
 import com.moon.core.enums.Const;
+import com.moon.core.enums.IntTesters;
+import com.moon.core.lang.ArrayUtil;
 import com.moon.core.lang.IntUtil;
+import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.SupportUtil;
+import com.moon.core.util.CollectUtil;
+import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.function.TableIntConsumer;
 import com.moon.core.util.function.TableIntFunction;
 import com.moon.core.util.validator.ResidentID18Validator;
@@ -13,6 +18,7 @@ import java.time.temporal.TemporalAccessor;
 import java.time.temporal.WeekFields;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -1109,6 +1115,37 @@ public final class DateTimeUtil {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(String.format("Can not cast to LocalDateTime of: %s", obj.toString()),
                 e);
+        }
+    }
+
+    /*
+     * ----------------------------------------------------------------------------------
+     * parse
+     * ----------------------------------------------------------------------------------
+     */
+
+    public static LocalDateTime parseToDateTime(CharSequence dateString) {
+        return dateString == null ? null : toDateTime(CalendarUtil.parseToCalendar(dateString.toString()));
+    }
+
+    public static LocalDate parseToDate(CharSequence dateString) {
+        return dateString == null ? null : toDate(CalendarUtil.parseToCalendar(dateString.toString()));
+    }
+
+    public static LocalTime parseToTime(CharSequence dateString) {
+        List<Integer> numerics = StringUtil.extractContinuousMatched(dateString,
+            IntTesters.DIGIT,
+            Integer::parseInt,
+            true);
+        if (numerics.isEmpty()) {
+            return null;
+        } else {
+            int index = 0;
+            int[] values = new int[numerics.size()];
+            for (Integer numeric : numerics) {
+                values[index++] = numeric;
+            }
+            return numerics.isEmpty() ? null : toTime(values);
         }
     }
 

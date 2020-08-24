@@ -1,12 +1,16 @@
 package com.moon.core.lang;
 
+import com.moon.core.time.Datetime;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.validator.Validator;
 import org.junit.jupiter.api.Test;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -856,5 +860,28 @@ class StringUtilTestTest {
         assertEquals("56789", StringUtil.slice(str, 5, 15));
         assertEquals("2", StringUtil.slice("123", 1, -1));
         assertEquals("2", StringUtil.slice("123", -2, -1));
+    }
+
+    @Test
+    void testExtractContinuousMatched() throws Exception {
+        String date = "";
+        Function converter = s -> s;
+        assertTrue(StringUtil.extractContinuousMatched(date, ch -> ch > 47 && ch < 58, converter, true).isEmpty());
+        assertNull(StringUtil.extractContinuousMatched(null, ch -> ch > 47 && ch < 58, converter, false));
+        assertTrue(StringUtil.extractContinuousMatched(null, ch -> ch > 47 && ch < 58, converter, true).isEmpty());
+        List<String> extracted = StringUtil.extractContinuousMatched("2020-01-02",
+            ch -> ch > 47 && ch < 58,
+            converter,
+            true);
+        assertEquals(extracted.size(), 3);
+        System.out.println(extracted);
+    }
+
+    @Test
+    void testDatetime() throws Exception {
+        String date = Datetime.now().toString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        System.out.println(date);
+        date = Datetime.now().toString(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        System.out.println(date);
     }
 }

@@ -1,8 +1,7 @@
 package com.moon.core.time;
 
-import com.moon.core.enums.Const;
 import com.moon.core.lang.LongUtil;
-import com.moon.core.time.DateTimeUtil;
+import com.moon.core.lang.StringUtil;
 import com.moon.core.util.TestUtil;
 import com.moon.core.util.validator.ResidentID18Validator;
 import org.joda.time.DateTime;
@@ -12,17 +11,20 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.lang.Integer.parseInt;
 import static java.util.Calendar.*;
 
 /**
- * 本类所有返回{@link Calendar}的方法均是返回新对象，而不是在原有对象上操作
+ * 1. 本类所有返回{@link Calendar}的方法均是返回新对象，而不是在原有对象上操作
+ * <p>
+ * 2. 本类针对 MONTH 字段做了人性化处理，在标准 Calendar 中， MONTH 字段的 5，实际上对应的是 6 月，这里作人性化
+ * 处理之后，你只需要考虑想要设置的值，比如：“我想给 Calendar 设置为 5 月” ==> {@code CalendarUtil.setMonth(5);}即可;
  * <p>
  * 如：
  * <pre>
@@ -82,6 +84,7 @@ public class CalendarUtil {
     private final static int[] PARSE_FIELD_OF_CALENDAR = {
         YEAR, MONTH, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE, SECOND, MILLISECOND
     };
+    private final static int[] PARSE_FIELD_INITIALIZE_VALUES = {-1, 1, 1, 0, 0, 0, 0};
 
     final static Calendar current() { return getInstance(); }
 
@@ -412,7 +415,7 @@ public class CalendarUtil {
     /**
      * 设置日期指定字段值，总是返回一个新对象
      * <p>
-     * 注意：在 Calendar 标准处理中，设置的月份是实际月份加一，即如果设置 5 月，实际设置到日期的是 6 月；
+     * 注意 month 字段人性化处理：在 Calendar 标准处理中，设置的月份是实际月份加一，即如果设置 5 月，实际设置到日期的是 6 月；
      * 这个方法对这进行了处理，设置的是实际月份，即：如果设置 5 月，实际设置到日期的就是 5 月
      *
      * @param value  日期
@@ -422,15 +425,27 @@ public class CalendarUtil {
      * @return 设置新值后的新对象
      */
     public final static Calendar set(Calendar value, int field, int amount) {
-        Calendar copied = copy(value);
-        copied.set(field, field == MONTH ? amount - 1 : amount);
-        return copied;
+        return originSetField(copy(value), field, amount);
+    }
+
+    /**
+     * 非复制设置字段值，同样针对 month 字段做了人性化处理
+     *
+     * @param value
+     * @param field
+     * @param amount
+     *
+     * @return
+     */
+    public final static Calendar originSetField(Calendar value, int field, int amount) {
+        value.set(field, field == MONTH ? amount - 1 : amount);
+        return value;
     }
 
     /**
      * 获取 Calendar 指定字段值
      * <p>
-     * 注意：在 Calendar 标准处理中，获取到的月份是实际月份减一，即如果现在是 5 月，获取到的是 4 月；
+     * 注意 month 字段人性化处理：在 Calendar 标准处理中，获取到的月份是实际月份减一，即如果现在是 5 月，获取到的是 4 月；
      * 这个方法对这进行了处理，获取到的是实际月份，即：即如果现在是 5 月，获取到的就是 5 月
      *
      * @param cal   日期
@@ -618,59 +633,21 @@ public class CalendarUtil {
 
     /**
      * 解析成 Calendar 日期
+     * <p>
+     * 要求符合格式 "yyyy-MM-dd HH:mm:ss SSS" 的一个或多个字段；
+     * 1. 超出部分将忽略
+     * 2. 不足部分将用该字段的默认值填充，比如：月、日填充为 1，时间的各字段填充为 0
      *
-     * @param dateString 要求符合格式 "yyyy-MM-dd HH:mm:ss SSS" 的一个或多个字段（超出部分将忽略）
+     * @param dateString 符合格式 "yyyy-MM-dd HH:mm:ss SSS" 的字符串
      */
     public static Calendar parseToCalendar(String dateString) {
-        dateString = dateString == null ? Const.EMPTY : dateString.trim();
-        int strLen = dateString.length();
-        int idx = 0;
-        if (strLen > idx) {
+        List<String> numerics = StringUtil.extractNumerics(dateString);
+        final int size = numerics.size();
+        return size > 0 ? toCalendar(numerics.toArray(new String[size])) : null;
+    }
 
-            List<String> fieldsValue = new ArrayList<>();
-            StringBuilder sb = new StringBuilder();
-            char ch;
-            boolean moreBlank = false;
-
-            do {
-                ch = dateString.charAt(idx++);
-                if (ch > 47 && ch < 58) {
-                    sb.append(ch);
-                    moreBlank = false;
-                } else if (!moreBlank) {
-                    fieldsValue.add(sb.toString());
-                    sb.setLength(0);
-                    moreBlank = true;
-                }
-            } while (strLen > idx);
-
-            if (sb.length() > 0) {
-                fieldsValue.add(sb.toString());
-            }
-
-            int size = fieldsValue.size();
-            if (size == 0) {
-                throw new IllegalArgumentException("Must input date string.");
-            }
-            int length = PARSE_FIELD_OF_CALENDAR.length;
-
-            length = Math.min(size, length);
-            Calendar calendar = getInstance();
-            calendar.clear();
-
-            for (int i = 0; i < length; i++) {
-                int currField = PARSE_FIELD_OF_CALENDAR[i];
-                if (currField == MONTH) {
-                    calendar.set(currField, parseInt(fieldsValue.get(i)) - 1);
-                } else {
-                    calendar.set(currField, parseInt(fieldsValue.get(i)));
-                }
-            }
-
-            return calendar;
-        }
-
-        return null;
+    public static <T> T parseDateString(String dateString, Function<Calendar, T> transformer) {
+        return transformer.apply(parseToCalendar(dateString));
     }
 
     /*
@@ -679,28 +656,42 @@ public class CalendarUtil {
 
     /**
      * 解析成 Calendar 日期
+     * <p>
+     * 要求用 String 表示的年、月、日、时、分、秒、毫秒等一个或多个字段按顺序传入
+     * 1. 超出部分将忽略
+     * 2. 不足部分将用该字段的默认值填充，比如：月、日填充为 1，时间的各字段填充为 0
      *
-     * @param values 用 String 表示的年、月、日、时、分、秒、毫秒等一个或多个字段按顺序传入
+     * @param values 符合年、月、日、时、分、秒、毫秒顺序的字段
      */
     public final static Calendar toCalendar(String... values) {
-        if (values == null) { return null; }
-        int size = values.length;
+        int valuesLen = values == null ? 0 : values.length;
+        if (valuesLen < 1) { return null; }
         int length = PARSE_FIELD_OF_CALENDAR.length;
-        size = Math.min(size, length);
+        int size = Math.min(valuesLen, length);
         Calendar calendar = getInstance();
         calendar.clear();
         int i = 0;
         for (; i < size; i++) {
-            int currField = PARSE_FIELD_OF_CALENDAR[i];
-            if (currField == MONTH) {
-                calendar.set(currField, parseInt(values[i]) - 1);
-            } else {
-                calendar.set(currField, parseInt(values[i]));
-            }
+            originSetField(calendar, PARSE_FIELD_OF_CALENDAR[i], parseInt(values[i]));
         }
         for (; i < length; i++) {
-            int field = PARSE_FIELD_OF_CALENDAR[i];
-            calendar.set(field, field == DAY_OF_MONTH ? 1 : 0);
+            originSetField(calendar, PARSE_FIELD_OF_CALENDAR[i], PARSE_FIELD_INITIALIZE_VALUES[i]);
+        }
+        return calendar;
+    }
+
+    public final static Calendar toCalendar(int... values) {
+        int size = values == null ? 0 : values.length;
+        if (size < 1) { return null; }
+        Calendar calendar = getInstance();
+        calendar.clear();
+        int i = 0;
+        for (; i < size; i++) {
+            originSetField(calendar, PARSE_FIELD_OF_CALENDAR[i], values[i]);
+        }
+        int length = PARSE_FIELD_OF_CALENDAR.length;
+        for (; i < length; i++) {
+            originSetField(calendar, PARSE_FIELD_OF_CALENDAR[i], PARSE_FIELD_INITIALIZE_VALUES[i]);
         }
         return calendar;
     }
@@ -719,9 +710,7 @@ public class CalendarUtil {
         return overrideCalendar(current(), date, time);
     }
 
-    public final static Calendar toCalendar(LocalTime time) {
-        return toCalendar(LocalDate.now(), time);
-    }
+    public final static Calendar toCalendar(LocalTime time) { return toCalendar(LocalDate.now(), time); }
 
     public final static Calendar toCalendar(LocalDate date) {
         return overrideCalendar(current(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0, 0);
@@ -729,14 +718,29 @@ public class CalendarUtil {
 
     public final static Calendar toCalendar(LocalDateTime datetime) { return overrideCalendar(current(), datetime); }
 
-    public final static Calendar toCalendar(int... values) {
-        return overrideCalendar(current(), values);
-    }
-
+    /**
+     * 字符串解析为 Calendar
+     * 1. 如果字符串是数字：
+     * 1.1 位数小于 5，则认为是一个年份，解析为{@code value}年最初时刻
+     * 1.2 位数大于 4，则认为是时间戳，解析为时间戳对应的{@code Calendar}
+     * 2. 其他情况则认为是符合：yyyy-MM-dd HH:mm:ss SSS 一个或多个字段的日期字符串
+     *
+     * @param value
+     *
+     * @return
+     */
     public final static Calendar toCalendar(CharSequence value) {
         if (value == null) { return null; }
         String temp = value.toString();
-        return TestUtil.isDigit(temp) ? toCalendar(LongUtil.toLong(temp)) : parseToCalendar(temp);
+        if (TestUtil.isDigit(temp)) {
+            if (temp.length() < 5) {
+                int[] values = {parseInt(temp)};
+                return toCalendar(values);
+            } else {
+                return toCalendar(LongUtil.toLong(temp));
+            }
+        }
+        return parseToCalendar(temp);
     }
 
     public final static Calendar toCalendar(Object value) {
@@ -752,6 +756,12 @@ public class CalendarUtil {
         if (value instanceof String[]) { return toCalendar((String[]) value); }
         throw new IllegalArgumentException("can not converter to java.util.Calendar of value: " + value);
     }
+
+    /*
+     * -----------------------------------------------------------------------------------
+     * 覆盖 Calendar 字段
+     * -----------------------------------------------------------------------------------
+     */
 
     public final static Calendar overrideCalendar(Calendar calendar, int... fieldsValue) {
         if (fieldsValue == null) { return null; }
@@ -771,9 +781,8 @@ public class CalendarUtil {
                 calendar.set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i]);
                 break;
             case 4:
-                int minutes = calendar.get(MINUTE);
-                calendar.set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i], 0);
-                calendar.set(MINUTE, minutes);
+                int minute = calendar.get(MINUTE);
+                calendar.set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i], minute);
                 break;
             case 5:
                 calendar.set(fieldsValue[i++],

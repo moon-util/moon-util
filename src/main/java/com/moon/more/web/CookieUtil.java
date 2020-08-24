@@ -1,7 +1,5 @@
 package com.moon.more.web;
 
-import org.springframework.web.util.WebUtils;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +20,15 @@ public class CookieUtil {
      * @return Cookie
      */
     public static Cookie get(HttpServletRequest request, String name) {
-        return WebUtils.getCookie(request, name);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (name.equals(cookie.getName())) {
+                    return cookie;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -42,9 +48,7 @@ public class CookieUtil {
      * @param response
      * @param name Cookie 名
      */
-    public static void remove(HttpServletResponse response, String name) {
-        set(response, name, null, 0);
-    }
+    public static void remove(HttpServletResponse response, String name) { set(response, name, null, 0); }
 
     /**
      * 设置cookie

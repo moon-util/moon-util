@@ -1988,6 +1988,55 @@ public final class StringUtil {
      */
 
     /**
+     * 提取字符串中符合条件的连续字符
+     *
+     * @param str              源字符串
+     * @param tester           检测条件，接收的参数为某个位置的字符码
+     * @param converter        返回值转换器
+     * @param emptyIfInputNull 当 str == null 时，是否返回空集合，否则返回 null
+     *
+     * @return 符合条件的字符串集合
+     */
+    public static <T> List<T> extractContinuousMatched(
+        CharSequence str, IntPredicate tester, Function<String, T> converter, boolean emptyIfInputNull
+    ) {
+        if (str == null) {
+            return emptyIfInputNull ? new ArrayList<>() : null;
+        }
+        String input = str.toString();
+        List<T> resultArr = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        int length = input.length(), idx = 0;
+        boolean blocked = false;
+        char ch;
+        for (int i = 0; i < length; i++) {
+            if (tester.test(ch = input.charAt(idx++))) {
+                sb.append(ch);
+                blocked = false;
+            } else if (!blocked) {
+                resultArr.add(converter.apply(sb.toString()));
+                sb.setLength(0);
+                blocked = true;
+            }
+        }
+        if (sb.length() > 0) {
+            resultArr.add(converter.apply(sb.toString()));
+        }
+        return resultArr;
+    }
+
+    /**
+     * 提取字符串中的数字
+     *
+     * @param str 源字符串
+     *
+     * @return 返回字符串中数字集合
+     */
+    public static List<String> extractNumerics(CharSequence str) {
+        return extractContinuousMatched(str, ch -> ch > 47 && ch < 58, s -> s, true);
+    }
+
+    /**
      * 字符串拆分，将字符串按指定分隔符拆分
      *
      * @param str       待拆分字符串

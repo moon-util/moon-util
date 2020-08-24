@@ -3,7 +3,9 @@ package com.moon.core.time;
 import com.moon.core.lang.IntUtil;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -1277,6 +1279,14 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public String toString() { return toString(DateUtil.PATTERN); }
 
     public String toString(String pattern) { return DateUtil.format(originCalendar(), pattern); }
+
+    public String toString(DateTimeFormatter formatter) {
+        return formatter.format(this);
+    }
+
+    public String toString(DateFormat formatter) {
+        return formatter.format(this);
+    }
 
     /*
      *************************************************************************

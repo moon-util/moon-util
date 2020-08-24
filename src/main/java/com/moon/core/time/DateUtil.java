@@ -171,6 +171,9 @@ public final class DateUtil extends CalendarUtil {
      * -------------------------------------------------------------------------
      */
 
+    public static Date parseToDate(String dateString){
+        return toDate(parseToCalendar(dateString));
+    }
 
     public static Date parse(String dateString, String patten) {
         return parse(dateString, new SimpleDateFormat(patten));
@@ -255,7 +258,7 @@ public final class DateUtil extends CalendarUtil {
      *
      * @param dateString 要求符合格式 "yyyy-MM-dd HH:mm:ss SSS" 的一个或多个字段（超出部分将忽略）
      */
-    public static Date toDate(String dateString) { return toDate(parseToCalendar(dateString)); }
+    public static Date toDate(String dateString) { return parseToDate(dateString); }
 
     /**
      * 解析成 Date 日期
