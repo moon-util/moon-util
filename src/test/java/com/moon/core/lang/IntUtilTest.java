@@ -1,6 +1,9 @@
 package com.moon.core.lang;
 
 import com.moon.core.util.RandomUtil;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -79,6 +82,9 @@ public class IntUtilTest {
     @Test
     void testParseUnusualString() throws Exception {
         String ipv4 = "135.75.43.52";
-
+        System.out.println(DateTime.parse("2020-08-24 00:00:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
+            .plusDays(1)
+            .minusSeconds(1)
+            .isBefore(DateTime.now()));
     }
 }

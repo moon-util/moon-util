@@ -49,7 +49,7 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> groupAsSimpled(
+    public static <K, E> Map<K, E> simplifyGroup(
         Iterator<? extends E> iterator, Function<? super E, ? extends K> function
     ) {
         HashMap resultMap = new HashMap(16);
@@ -72,11 +72,11 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> groupAsSimpled(
+    public static <K, E> Map<K, E> simplifyGroup(
         Iterable<? extends E> collect, Function<? super E, ? extends K> function
     ) {
         if (collect instanceof Collection) {
-            return groupAsSimpled((Collection) collect, function);
+            return simplifyGroup((Collection) collect, function);
         }
         HashMap resultMap = new HashMap(16);
         if (collect != null) {
@@ -97,7 +97,7 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> groupAsSimpled(
+    public static <K, E> Map<K, E> simplifyGroup(
         Collection<? extends E> collect, Function<? super E, ? extends K> function
     ) {
         int len = collect == null ? 0 : collect.size();
@@ -120,7 +120,7 @@ public final class GroupUtil {
      *
      * @return 分组集合
      */
-    public static <K, E> Map<K, E> groupAsSimpled(E[] arr, Function<? super E, ? extends K> function) {
+    public static <K, E> Map<K, E> simplifyGroup(E[] arr, Function<? super E, ? extends K> function) {
         int len = arr == null ? 0 : arr.length;
         HashMap resultMap = new HashMap(len);
         if (arr != null) {

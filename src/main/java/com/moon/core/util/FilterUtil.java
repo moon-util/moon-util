@@ -35,7 +35,7 @@ public final class FilterUtil {
      *
      * @return 如果存在第一个非 null 元素，则返回该元素，否则返回 null
      */
-    public static <T> T firstNotNull(T... ts) {
+    public static <T> T nullableFirst(T... ts) {
         return nullableFind(ts, (Predicate<? super T>) Testers.isNotNull);
     }
 
