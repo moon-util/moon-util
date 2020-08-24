@@ -1092,14 +1092,18 @@ public final class DateTimeUtil {
         if (obj == null) {
             return null;
         }
+        if (obj instanceof LocalDateTime) {
+            return (LocalDateTime) obj;
+        }
         if (obj instanceof CharSequence) {
             return toDateTime((CharSequence) obj);
         }
         if (obj instanceof Number) {
-            if (obj instanceof Long || obj instanceof Double) {
-                return toDateTime(((Number) obj).longValue());
+            int maybeYear = ((Number) obj).intValue();
+            if (maybeYear < 10000) {
+                return toDateTime(new int[]{maybeYear});
             }
-            return toDateTime(new int[]{(Integer) obj});
+            return toDateTime(((Number) obj).longValue());
         }
         if (obj instanceof int[]) {
             return toDateTime((int[]) obj);
@@ -1109,6 +1113,13 @@ public final class DateTimeUtil {
         }
         if (obj instanceof Calendar) {
             return toDateTime((Calendar) obj);
+        }
+        if (obj instanceof LocalDate) {
+            LocalDate date = (LocalDate) obj;
+            return toDateTime(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+        }
+        if (obj instanceof LocalTime) {
+            return LocalDateTime.of(LocalDate.now(), (LocalTime) obj);
         }
         try {
             return toDateTime(SupportUtil.onlyOneItemOrSize(obj));
@@ -1133,20 +1144,8 @@ public final class DateTimeUtil {
     }
 
     public static LocalTime parseToTime(CharSequence dateString) {
-        List<Integer> numerics = StringUtil.extractContinuousMatched(dateString,
-            IntTesters.DIGIT,
-            Integer::parseInt,
-            true);
-        if (numerics.isEmpty()) {
-            return null;
-        } else {
-            int index = 0;
-            int[] values = new int[numerics.size()];
-            for (Integer numeric : numerics) {
-                values[index++] = numeric;
-            }
-            return numerics.isEmpty() ? null : toTime(values);
-        }
+        List<String> numerics = StringUtil.extractNumerics(dateString);
+        return numerics.isEmpty() ? null : toTime(IntUtil.toInts(numerics, Integer::parseInt));
     }
 
     /*

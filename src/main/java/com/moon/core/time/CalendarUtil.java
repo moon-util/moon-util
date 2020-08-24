@@ -699,6 +699,10 @@ public class CalendarUtil {
     public final static Calendar toCalendar(Number num) { return num == null ? null : toCalendar(num.longValue()); }
 
     public final static Calendar toCalendar(long timeMillis) {
+        if (timeMillis < 10000) {
+            int[] values = {(int) timeMillis};
+            return toCalendar(values);
+        }
         Calendar calendar = getInstance();
         calendar.setTimeInMillis(timeMillis);
         return calendar;

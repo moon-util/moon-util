@@ -1996,6 +1996,7 @@ public final class StringUtil {
      * @param emptyIfInputNull 当 str == null 时，是否返回空集合，否则返回 null
      *
      * @return 符合条件的字符串集合
+     * @see #extractNumerics(CharSequence) 示例，提取字符串中所有数字
      */
     public static <T> List<T> extractContinuousMatched(
         CharSequence str, IntPredicate tester, Function<String, T> converter, boolean emptyIfInputNull
@@ -2006,10 +2007,10 @@ public final class StringUtil {
         String input = str.toString();
         List<T> resultArr = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        int length = input.length(), idx = 0;
+        int length = input.length();
         boolean blocked = false;
         char ch;
-        for (int i = 0; i < length; i++) {
+        for (int idx = 0; idx < length; idx++) {
             if (tester.test(ch = input.charAt(idx++))) {
                 sb.append(ch);
                 blocked = false;
@@ -2033,7 +2034,7 @@ public final class StringUtil {
      * @return 返回字符串中数字集合
      */
     public static List<String> extractNumerics(CharSequence str) {
-        return extractContinuousMatched(str, ch -> ch > 47 && ch < 58, s -> s, true);
+        return extractContinuousMatched(str, IntTesters.DIGIT, s -> s, true);
     }
 
     /**

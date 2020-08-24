@@ -2,10 +2,9 @@ package com.moon.core.lang;
 
 import com.moon.core.util.CollectUtil;
 import com.moon.core.util.function.BiIntConsumer;
-import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.TableIntConsumer;
-import com.moon.core.util.function.TableIntFunction;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.ToIntFunction;
 
@@ -111,6 +110,7 @@ public final class IntUtil {
         return toInts(Integer::parseInt, values);
     }
 
+    @SafeVarargs
     public static <T> int[] toInts(ToIntFunction<? super T> transformer, T... values) {
         if (values == null) {
             return null;
@@ -119,6 +119,18 @@ public final class IntUtil {
         int[] ints = new int[length];
         for (int i = 0; i < length; i++) {
             ints[i] = transformer.applyAsInt(values[i]);
+        }
+        return ints;
+    }
+
+    public static <T> int[] toInts(Collection<T> collect, ToIntFunction<? super T> transformer) {
+        if (collect == null) {
+            return null;
+        }
+        int index = 0;
+        int[] ints = new int[collect.size()];
+        for (T item : collect) {
+            ints[index++] = transformer.applyAsInt(item);
         }
         return ints;
     }
@@ -242,7 +254,7 @@ public final class IntUtil {
             return toIntValue((CharSequence) o);
         }
         if (o instanceof Character) {
-            return ((Character) o).charValue();
+            return (Character) o;
         }
         if (o instanceof Boolean) {
             return (boolean) o ? 1 : 0;
