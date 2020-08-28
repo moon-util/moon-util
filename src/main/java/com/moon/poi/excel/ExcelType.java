@@ -82,6 +82,11 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
         return index > 0 && filepath.substring(index + 1).equalsIgnoreCase(extension);
     }
 
+    public boolean isInstance(Workbook workbook) {
+        // return workbook
+        return false;
+    }
+
     interface WorkbookBuilder extends Supplier<Workbook>, Function<InputStream, Workbook> {
 
         /**

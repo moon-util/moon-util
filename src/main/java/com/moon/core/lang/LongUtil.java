@@ -369,7 +369,7 @@ public final class LongUtil {
      * <p>
      * 兼容{@link #toString(long, int)} ；
      * 兼容{@link #parseLong(String, int)}；
-     * 不兼容{@link Integer#toString(int, int)}；
+     * 不兼容{@link Long#toString(long, int)}；
      *
      * @param value 值
      * @param radix 进制

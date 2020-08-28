@@ -140,17 +140,29 @@ public class CalendarUtil {
 
     public final static int nowDayOfYear() { return getDayOfYear(current()); }
 
-    public final static int nowHours() { return getHour(current()); }
+    public final static int nowHour() { return getHour(current()); }
 
-    public final static int nowMinutes() { return getMinute(current()); }
+    public final static int nowMinute() { return getMinute(current()); }
 
-    public final static int nowSeconds() { return getSecond(current()); }
+    public final static int nowSecond() { return getSecond(current()); }
 
-    public final static int nowMilliseconds() { return getMillisecond(current()); }
+    public final static int nowMillisecond() { return getMillisecond(current()); }
 
     public final static Calendar nowCalendar() { return current(); }
 
+    /**
+     * 当前时间戳（毫秒数）
+     *
+     * @return
+     */
     public final static long now() { return System.currentTimeMillis(); }
+
+    /**
+     * 当前时间戳（秒数）
+     *
+     * @return
+     */
+    public final static long nowTimeSeconds() { return now() / 1000; }
 
     /**
      * 默认当前时间，如果指定时间为 null 的话
@@ -178,7 +190,21 @@ public class CalendarUtil {
         return current;
     }
 
-    public final static Calendar clearMilliseconds(Calendar calendar) { return setMillisecond(calendar, 0); }
+    public final static Calendar startOfSecond(Calendar calendar) { return setMillisecond(calendar, 0); }
+
+    public final static Calendar startOfDay(Calendar calendar) {
+        return toCalendar(getYear(calendar), getMonth(calendar), getDayOfMonth(calendar));
+    }
+
+    public final static Calendar startOfMonth(Calendar calendar) {
+        return toCalendar(getYear(calendar), getMonth(calendar));
+    }
+
+    public final static Calendar startOfYear(Calendar calendar) { return toCalendar(getYear(calendar)); }
+
+    public final static Calendar endOfYear(Calendar calendar) {
+        return new Datetime(calendar).endOfYear().originCalendar();
+    }
 
     /*
      * -------------------------------------------------------------------------
@@ -671,7 +697,7 @@ public class CalendarUtil {
         Calendar calendar = getInstance();
         calendar.clear();
         int i = 0;
-        for (; i < size; i++) {
+        for (int minLen = Math.min(size, PARSE_FIELD_OF_CALENDAR.length); i < minLen; i++) {
             originSetField(calendar, PARSE_FIELD_OF_CALENDAR[i], parseInt(values[i]));
         }
         for (; i < length; i++) {
@@ -686,7 +712,7 @@ public class CalendarUtil {
         Calendar calendar = getInstance();
         calendar.clear();
         int i = 0;
-        for (; i < size; i++) {
+        for (int minLen = Math.min(size, PARSE_FIELD_OF_CALENDAR.length); i < minLen; i++) {
             originSetField(calendar, PARSE_FIELD_OF_CALENDAR[i], values[i]);
         }
         int length = PARSE_FIELD_OF_CALENDAR.length;

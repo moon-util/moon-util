@@ -197,6 +197,15 @@ public final class ExcelUtil extends LoadUtil {
         return of(type.load(excelInputStream));
     }
 
+    public static String formatFilename(String originFilename, Workbook workbook) {
+        for (ExcelType value : ExcelType.values()) {
+            if (value.test(originFilename)) {
+                return originFilename;
+            }
+        }
+        return originFilename;
+    }
+
     /**
      * 获取单元格的值
      *

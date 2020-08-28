@@ -102,15 +102,21 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     private final Calendar calendar;
     /**
-     * 是否是不可变对象
+     * 是否是不可变对象(默认为 false，是可变对象)
      */
     private final boolean immutable;
 
-    private Calendar originCalendar() { return calendar; }
+    Calendar originCalendar() { return calendar; }
 
     private Datetime obtainReturning(Calendar calendar) { return immutable ? new Datetime(calendar, true) : this; }
 
     private Calendar obtainCalendar() { return immutable ? copy(calendar) : calendar; }
+
+    /*
+     * *********************************************************************************************
+     * * 构造器 *************************************************************************************
+     * *********************************************************************************************
+     */
 
     public Datetime(Calendar originCalendar, boolean immutable) {
         super(originCalendar.getTimeInMillis());
@@ -144,9 +150,19 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime() { this(System.currentTimeMillis()); }
 
+    /*
+     * **************************************************************************************
+     * * 静态方法 ****************************************************************************
+     * **************************************************************************************
+     */
+
     public static Datetime now() { return new Datetime(); }
 
     public static Datetime of() { return now(); }
+
+    public static Datetime of(Date date) { return new Datetime(date); }
+
+    public static Datetime of(Calendar calendar) { return new Datetime(calendar); }
 
     public static Datetime of(long timeOfMillis) { return new Datetime(timeOfMillis); }
 
@@ -161,15 +177,29 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public static Datetime of(LocalDateTime datetime) { return new Datetime(datetime); }
 
     /*
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * ~ 构造器结束 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * 构造不可变对象 ***************************************************************************************
      */
 
+    public static Datetime ofImmutable() { return ofImmutable(DateUtil.current()); }
+
+    public static Datetime ofImmutable(Date date) { return ofImmutable(DateUtil.toCalendar(date)); }
+
+    public static Datetime ofImmutable(Calendar calendar) { return new Datetime(calendar, true); }
+
+    public static Datetime ofImmutable(long timeOfMillis) { return ofImmutable(DateUtil.toCalendar(timeOfMillis)); }
+
+    public static Datetime ofImmutable(CharSequence dateStr) { return ofImmutable(DateUtil.toCalendar(dateStr)); }
+
+    public static Datetime ofImmutable(int... fields) { return ofImmutable(DateUtil.toCalendar(fields)); }
+
+    public static Datetime ofImmutable(LocalDate date) { return ofImmutable(DateUtil.toCalendar(date)); }
+
+    public static Datetime ofImmutable(LocalDateTime datetime) { return ofImmutable(DateUtil.toCalendar(datetime)); }
+
     /*
-     * *********************************************************************
-     * getter & setter
-     * *********************************************************************
+     * ************************************************************************************************
+     * getter & setter ********************************************************************************
+     * ************************************************************************************************
      */
 
     /**
@@ -178,6 +208,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @return 不可变对象每次返回的是新对象，否则操作和返回的是新对象
      */
     public boolean isImmutable() { return immutable; }
+
+    public boolean isMutable() { return !immutable; }
 
     /**
      * 设置为不可变数据，不可变数据每次操作均返回新对象
@@ -221,14 +253,14 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public int getQuarterValue() { return getMonthValue() / 3 + 1; }
 
     /**
-     * 返回当前月份，1 ~ 12
+     * 返回当前月份，1 * 12
      *
      * @return 月份
      */
     public int getMonthValue() { return getField(MONTH); }
 
     /**
-     * 获取月份索引，0 ~ 11
+     * 获取月份索引，0 * 11
      *
      * @return 月份索引
      */
@@ -251,6 +283,23 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Constellation getConstellation() {
         return Constellation.of(getMonthValue(), getDayOfMonth());
     }
+
+    /**
+     * 获取年龄（周岁），假设当前{@code Datetime}是某一对象的生日
+     * 返回到当前时刻的年数
+     *
+     * @return
+     */
+    public int getAge() {
+        return toLocalDate().until(LocalDate.now()).getYears();
+    }
+
+    /**
+     * 获取年龄（虚岁）
+     *
+     * @return
+     */
+    public int getNominalAge() { return getAge() + 1; }
 
     /**
      * 返回当前是一年中的第 N 个星期
@@ -283,7 +332,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     /**
      * 返回当前是星期几，从 0 开始
      *
-     * @return 0 ~ 6
+     * @return 0 * 6
      */
     public int getDayOfWeekValue() { return getField(DatetimeField.DAY_OF_WEEK); }
 
@@ -378,6 +427,10 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     /**
      * Nanos per second.
      */
+    static final int MILLS_PER_SECOND = 1000;
+    /**
+     * Nanos per second.
+     */
     static final long NANOS_PER_SECOND = 1000_000_000L;
     /**
      * Nanos per minute.
@@ -421,7 +474,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     /**
      * 获取指定字段的值
      * <p>
-     * 注：获取月份返回的是 1 ~ 12
+     * 注：获取月份返回的是 1 * 12
      *
      * @param field 字段
      *
@@ -432,7 +485,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     /**
      * 获取指定字段值
      * <p>
-     * 注：获取月份返回的是 1 ~ 12
+     * 注：获取月份返回的是 1 * 12
      *
      * @param field 字段
      *
@@ -538,7 +591,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Datetime withDayOfYear(int value) { return withField(DatetimeField.DAY_OF_YEAR, value); }
 
     /**
-     * 设置当前月份，1 ~ 12
+     * 设置当前月份，1 * 12
      *
      * @param value 月份
      *
@@ -547,16 +600,16 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Datetime withMonth(int value) { return withField(MONTH, value); }
 
     /**
-     * 设置当前月份，0 ~ 11
+     * 设置当前月份，0 * 11
      *
-     * @param index 月份索引：0 ~ 11
+     * @param index 月份索引：0 * 11
      *
      * @return 当前对象
      */
     public Datetime withMonthIndex(int index) { return withMonth(index + 1); }
 
     /**
-     * 设置月份，1 ~ 12
+     * 设置月份，1 * 12
      *
      * @param month 月份
      *
@@ -565,7 +618,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Datetime withMonth(DatetimeMonth month) { return withMonth(month.getValue()); }
 
     /**
-     * 设置月份，1 ~ 12
+     * 设置月份，1 * 12
      *
      * @param month 月份
      *
@@ -617,7 +670,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public DayOfWeek getFirstDayOfWeek() { return DayOfWeek.of(getFirstDayOfWeekValue()); }
 
     /**
-     * 返回一周第一天是星期几
+     * 返回一周第一天是星期几( 0 ~ 6 )
      *
      * @return 一周的第一天序号
      */
@@ -649,7 +702,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     }
 
     /**
-     * 设置第一个星期最少多少天
+     * 设置第一个星期最少多少天(默认: {@code value == 4})
      *
      * @param value 年份或月份的第一个星期很可能跨年或跨月，这种情况下设置在当前月份的部分最少多少天才视为第一个星期
      *
@@ -958,7 +1011,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public boolean isPm() { return originCalendar().get(Calendar.AM_PM) == Calendar.PM; }
 
     /**
-     * 是否是工作日
+     * 是否是工作日(仅指非周末)
      *
      * @return 周一至周五返回 true，周六或周天返回 false
      */
@@ -1234,7 +1287,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     /*
      *************************************************************************
-    override methods on java.util.Date
+     * override methods for java.util.Date
      *************************************************************************
      */
 
@@ -1280,13 +1333,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public String toString(String pattern) { return DateUtil.format(originCalendar(), pattern); }
 
-    public String toString(DateTimeFormatter formatter) {
-        return formatter.format(this);
-    }
+    public String toString(DateTimeFormatter formatter) { return formatter.format(this); }
 
-    public String toString(DateFormat formatter) {
-        return formatter.format(this);
-    }
+    public String toString(DateFormat formatter) { return formatter.format(this); }
 
     /*
      *************************************************************************

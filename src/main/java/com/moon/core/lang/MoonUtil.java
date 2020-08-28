@@ -14,6 +14,8 @@ public final class MoonUtil {
 
     private final static ThreadPoolExecutor executor;
 
+    private final static MoonConfig CONFIG = new MoonConfig();
+
     static {
         int core = 1;
         int max = CPUUtil.getCoreCount();
@@ -40,4 +42,8 @@ public final class MoonUtil {
     public static <T> Future<T> run(Callable<T> runner) {
         return executor.submit(runner);
     }
+
+    public static MoonConfig getMoonConfig() { return CONFIG; }
+
+    public static void setMoonConfig(MoonConfig config) { CONFIG.override(config); }
 }

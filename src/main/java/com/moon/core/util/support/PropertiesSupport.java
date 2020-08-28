@@ -1,6 +1,8 @@
 package com.moon.core.util.support;
 
 import com.moon.core.io.IOUtil;
+import com.moon.core.lang.MoonConfig;
+import com.moon.core.lang.MoonUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.IteratorUtil;
 
@@ -18,9 +20,14 @@ import static java.lang.String.valueOf;
  * @author moonsky
  */
 public final class PropertiesSupport {
+
     private PropertiesSupport() { ThrowUtil.noInstanceError(); }
 
-    private static final Map<String, HashMap<String, String>> CACHE = new ConcurrentHashMap<>();
+    private static final MoonConfig config = MoonUtil.getMoonConfig();
+
+    private static final Map<String, HashMap<String, String>> CACHE
+
+        = config.get(PropertiesSupport.class, ConcurrentHashMap::new);
 
     public static final void refreshAll() {
         CACHE.forEach((key, item) -> CACHE.compute(key, (k, v) -> {
@@ -64,7 +71,9 @@ public final class PropertiesSupport {
         try {
             properties.load(stream);
             HashMap<String, String> hashMap = toHashMap(properties);
-            CACHE.put(path, hashMap);
+            if (config.isCacheLoadedProperties()) {
+                CACHE.put(path, hashMap);
+            }
             return hashMap;
         } catch (IOException e) {
             throw new IllegalArgumentException(e);

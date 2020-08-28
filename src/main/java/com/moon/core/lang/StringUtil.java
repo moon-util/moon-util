@@ -2055,7 +2055,7 @@ public final class StringUtil {
         for (int i = 0; i < length; i++) {
             if ((ch = str.charAt(i)) == separator) {
                 result.add(builder.toString());
-                builder = new StringBuilder();
+                builder.setLength(0);
             } else {
                 builder.append(ch);
             }
