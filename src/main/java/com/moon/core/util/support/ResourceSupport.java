@@ -26,7 +26,7 @@ public final class ResourceSupport {
         if (path == null) {
             return false;
         } else {
-            path = FileUtil.formatPath(path);
+            path = FileUtil.formatFilepath(path);
             URL url = getUrl(path);
             if (url == null && ((path = path.trim()).length() > 0)) {
                 if (getUrl(path) == null) {
@@ -61,7 +61,7 @@ public final class ResourceSupport {
         if (path == null) {
             return null;
         } else {
-            path = FileUtil.formatPath(path);
+            path = FileUtil.formatFilepath(path);
             URL url = getUrl(path);
             if (url == null && ((path = path.trim()).length() > 0)) {
                 if ((url = getUrl(path)) == null) {

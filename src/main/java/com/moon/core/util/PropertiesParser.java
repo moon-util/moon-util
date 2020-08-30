@@ -220,7 +220,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
         } else {
             parsedSources.put(propertiesSource, null);
         }
-        final String sourcePath = FileUtil.formatPath(propertiesSource);
+        final String sourcePath = FileUtil.formatFilepath(propertiesSource);
         final String activeName = activeName(sourcePath);
         final String activePath = activePath(sourcePath);
 

@@ -197,10 +197,18 @@ public final class ExcelUtil extends LoadUtil {
         return of(type.load(excelInputStream));
     }
 
+    /**
+     * 格式化文件名
+     *
+     * @param originFilename 文件名
+     * @param workbook       Excel 文档
+     *
+     * @return 符合格式的文件名
+     */
     public static String formatFilename(String originFilename, Workbook workbook) {
         for (ExcelType value : ExcelType.values()) {
-            if (value.test(originFilename)) {
-                return originFilename;
+            if (value.test(workbook)) {
+                return value.formatFilename(originFilename);
             }
         }
         return originFilename;

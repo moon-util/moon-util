@@ -504,6 +504,20 @@ public final class DateTimeUtil {
             || (isMinuteEquals(datetime1, datetime2) && datetime1.getSecond() > datetime2.getSecond());
     }
 
+    public final static boolean isBeforeMonthDay(LocalDate date, LocalDate date2) {
+        return isBeforeMonthDay(date, date2.getMonthValue(), date2.getDayOfMonth());
+    }
+
+    public final static boolean isBeforeMonthDay(LocalDate date, int month, int dayOfMonth) {
+        int month1 = date.getMonthValue();
+        return month1 > month || (month1 == month && date.getDayOfMonth() > dayOfMonth);
+    }
+
+    public final static boolean isAfterMonthDay(LocalDate date, int month, int dayOfMonth) {
+        int month1 = date.getMonthValue();
+        return month1 > month || (month1 == month && date.getDayOfMonth() > dayOfMonth);
+    }
+
     /**
      * 获取一年的第几周
      *
@@ -587,14 +601,27 @@ public final class DateTimeUtil {
     /**
      * 根据日期获取年龄（周岁）
      *
-     * @param date 日期
+     * @param birthday 出生日期
      *
      * @return 周岁
      *
      * @see ResidentID18Validator#getAge()
      * @see LocalDateTime#toLocalDate() 不单独对 LocalDateTime 提供方法
      */
-    public static int getAge(LocalDate date) { return date.until(nowDate()).getYears(); }
+    public static int getAge(LocalDate birthday) { return getAge(birthday, LocalDate.now()); }
+
+    /**
+     * 返回生日到指定日期的周岁数
+     *
+     * @param birthday 出生日期
+     * @param endDate  指定日期
+     *
+     * @return 周岁
+     */
+    public static int getAge(LocalDate birthday, LocalDate endDate) {
+        int age = endDate.getYear() - birthday.getYear();
+        return isBeforeMonthDay(birthday, endDate) ? age - 1 : age;
+    }
 
     /**
      * 根据日期获取年龄（虚岁）

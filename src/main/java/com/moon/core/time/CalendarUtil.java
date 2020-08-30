@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
+import static java.lang.Integer.numberOfTrailingZeros;
 import static java.lang.Integer.parseInt;
 import static java.util.Calendar.*;
 
@@ -125,6 +126,28 @@ public class CalendarUtil {
     public final static boolean isBeforeNow(Calendar value) { return isBefore(value, current()); }
 
     public final static boolean isAfterNow(Calendar value) { return isAfter(value, current()); }
+
+    public final static boolean isEqualsMonthDay(Calendar calendar1, Calendar calendar2) {
+        return getMonth(calendar1) == getMonth(calendar2) && getDayOfMonth(calendar1) == getDayOfMonth(calendar2);
+    }
+
+    public final static boolean isBeforeMonthDay(Calendar calendar1, Calendar calendar2) {
+        return isBeforeMonthDay(calendar1, getMonth(calendar2), getDayOfMonth(calendar2));
+    }
+
+    public final static boolean isBeforeMonthDay(Calendar calendar1, int month, int dayOfMonth) {
+        int month1 = getMonth(calendar1);
+        return month1 > month || (month1 == month && getDayOfMonth(calendar1) > dayOfMonth);
+    }
+
+    public final static boolean isAfterMonthDay(Calendar calendar1, Calendar calendar2) {
+        return isAfterMonthDay(calendar1, getMonth(calendar2), getDayOfMonth(calendar2));
+    }
+
+    public final static boolean isAfterMonthDay(Calendar calendar1, int month, int dayOfMonth) {
+        int month1 = getMonth(calendar1);
+        return month1 < month || (month1 == month && getDayOfMonth(calendar1) < dayOfMonth);
+    }
 
     /*
      * -------------------------------------------------------------------------
@@ -417,26 +440,47 @@ public class CalendarUtil {
     /**
      * 根据日期获取年龄（周岁）
      *
-     * @param calendar 日期
+     * @param birthday 出生日期
      *
      * @return 周岁
      *
      * @see ResidentID18Validator#getAge()
      */
-    public final static int getAge(Calendar calendar) {
-        return DateTimeUtil.toDate(calendar).until(LocalDate.now()).getYears();
-    }
+    public final static int getAge(Calendar birthday) { return getAge(birthday, current()); }
 
     /**
      * 根据日期获取年龄（虚岁）
      *
-     * @param calendar 日期
+     * @param birthday 出生日期
      *
      * @return 虚岁
      *
      * @see ResidentID18Validator#getNominalAge()
      */
-    public final static int getNominalAge(Calendar calendar) { return getAge(calendar) + 1; }
+    public final static int getNominalAge(Calendar birthday) { return getAge(birthday) + 1; }
+
+    /**
+     * 返回生日到指定日期的周岁数
+     *
+     * @param birthday 出生日期
+     * @param endDate  指定日期
+     *
+     * @return 周岁
+     */
+    public final static int getAge(Calendar birthday, Calendar endDate) {
+        int age = getYear(endDate) - getYear(birthday);
+        return isBeforeMonthDay(birthday, endDate) ? age - 1 : age;
+    }
+
+    /**
+     * 返回生日到指定日期的周虚岁
+     *
+     * @param birthday 出生日期
+     * @param endDate  指定日期
+     *
+     * @return 虚岁
+     */
+    public final static int getNominalAge(Calendar birthday, Calendar endDate) { return getAge(birthday, endDate) + 1; }
 
     /**
      * 设置日期指定字段值，总是返回一个新对象
@@ -457,11 +501,11 @@ public class CalendarUtil {
     /**
      * 非复制设置字段值，同样针对 month 字段做了人性化处理
      *
-     * @param value
-     * @param field
-     * @param amount
+     * @param value  calendar
+     * @param field  field
+     * @param amount 差值
      *
-     * @return
+     * @return calendar
      */
     public final static Calendar originSetField(Calendar value, int field, int amount) {
         value.set(field, field == MONTH ? amount - 1 : amount);

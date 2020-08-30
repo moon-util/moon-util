@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author moonsky
  */
@@ -44,9 +46,9 @@ class FileUtilTestTest {
         outFreeSpace("a:DriverA");
 
         Object ret = RunnerUtil.run("{'1':5,'6':0,'2':0,'8':0,'3':0,}");
-        Assertions.assertEquals(MapUtil.sizeByObject(ret), 5);
+        assertEquals(MapUtil.sizeByObject(ret), 5);
         ret = RunnerUtil.run("['1']+'1'", ret);
-        Assertions.assertEquals(ret, "51");
+        assertEquals(ret, "51");
     }
 
     @Test
@@ -172,5 +174,16 @@ class FileUtilTestTest {
 
     @Test
     void testFormatPath() {
+    }
+
+    @Test
+    void testFormatFilename() throws Exception {
+        String filename = "filename.xlsx";
+        assertEquals("filename.xlsx", FileUtil.formatFilename(filename, "XLSX"));
+        assertEquals("filename.xls.XLSX", FileUtil.formatFilename("filename.xls", "XLSX"));
+    }
+
+    @Test
+    void testFormatFilepath() throws Exception {
     }
 }

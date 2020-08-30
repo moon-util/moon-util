@@ -1,6 +1,5 @@
 package com.moon.core.io;
 
-import com.moon.core.enums.Const;
 import com.moon.core.lang.LangUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.SupportUtil;
@@ -73,7 +72,7 @@ public final class FileUtil {
                 copyToDirectory(sourceFile, targetFile.getParentFile());
             } else if (sourceFile.isFile()) {
                 try (FileOutputStream output = getOutputStream(targetFile);
-                     FileInputStream input = getInputStream(sourceFile)) {
+                    FileInputStream input = getInputStream(sourceFile)) {
                     IOUtil.copy(input, output);
                 } catch (IOException e) {
                     runtime(e);
@@ -98,7 +97,9 @@ public final class FileUtil {
     public static FileOutputStream getOutputStream(String filePath) { return getOutputStream(filePath, false); }
 
     public static FileOutputStream getOutputStream(File file, boolean append) {
-        return createNewFile(file) ? applyBi(file, append, FileOutputStream::new) : ThrowUtil.runtime("File not exist: " + file);
+        return createNewFile(file) ? applyBi(file,
+            append,
+            FileOutputStream::new) : ThrowUtil.runtime("File not exist: " + file);
     }
 
     public static FileOutputStream getOutputStream(String filePath, boolean append) {
@@ -139,7 +140,7 @@ public final class FileUtil {
 
     public static boolean mkdirs(String... pathOptions) {
         File dir = getFile(pathOptions);
-        return dir == null ? false : mkdirs(dir);
+        return dir != null && mkdirs(dir);
     }
 
     public static boolean mkdirs(String path) { return mkdirs(new File(path)); }
@@ -452,17 +453,32 @@ public final class FileUtil {
      * -----------------------------------------------------------------------
      */
 
+    /**
+     * \
+     */
     public static final char WIN_FileSeparator_Char = (char) 92;
-    public static final char App_FileSeparatorChar = (char) 47;
 
-    public final static String formatPath(String filePath) {
-        if (filePath != null) {
+    /**
+     * /
+     */
+    public static final char APP_FileSeparator_Char = (char) 47;
+
+    public final static String formatFilename(String filename, String extension) {
+        char dot = '.';
+        String dotExtension = extension.charAt(0) == dot ? extension : dot + extension;
+        int dotIndex = filename.lastIndexOf(dot);
+        return (dotIndex > 0 && filename.substring(dotIndex)
+            .equalsIgnoreCase(dotExtension)) ? filename : (filename + dotExtension);
+    }
+
+    public final static String formatFilepath(String filepath) {
+        if (filepath != null) {
             int index = 0;
             char[] chars = null;
             char WIN = WIN_FileSeparator_Char;
-            char DFT = App_FileSeparatorChar;
-            for (int i = 0, len = filePath.length(); i < len; i++) {
-                char ch = filePath.charAt(i);
+            char DFT = APP_FileSeparator_Char;
+            for (int i = 0, len = filepath.length(); i < len; i++) {
+                char ch = filepath.charAt(i);
                 chars = SupportUtil.setChar(chars, index++, ch == WIN ? DFT : ch);
             }
             return chars == null ? null : new String(chars, 0, index);

@@ -290,9 +290,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return
      */
-    public int getAge() {
-        return toLocalDate().until(LocalDate.now()).getYears();
-    }
+    public int getAge() { return CalendarUtil.getAge(originCalendar()); }
 
     /**
      * 获取年龄（虚岁）
@@ -1034,8 +1032,22 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      */
     public boolean isLeapYear() { return Year.isLeap(getYearValue()); }
 
+    /**
+     * 是否是指定年份
+     *
+     * @param year
+     *
+     * @return
+     */
     public boolean isYearOf(int year) { return getYearValue() == year; }
 
+    /**
+     * 是否在指定年份之前
+     *
+     * @param year
+     *
+     * @return 当日期所代表的年份在待测年份之前时返回 true，否则返回 false
+     */
     public boolean isYearBefore(int year) { return getYearValue() < year; }
 
     public boolean isYearAfter(int year) { return getYearValue() > year; }
@@ -1245,6 +1257,58 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public boolean isBefore(long timeInMillis) { return getTime() < timeInMillis; }
 
     public boolean isAfter(long timeInMillis) { return getTime() > timeInMillis; }
+
+    /**
+     * 当前日期所指的月份是否在指定日期（月份和日期）之前
+     *
+     * @param month      月份
+     * @param dayOfMonth 日期
+     *
+     * @return
+     */
+    public boolean isBeforeMonthDay(int month, int dayOfMonth) {
+        int thisMonth = getMonthValue(), thisDayOfMonth = getDayOfMonth();
+        return thisMonth < month || (thisMonth == month && thisDayOfMonth < dayOfMonth);
+    }
+
+    /**
+     * 当前日期所指的月份是否在指定日期（月份和日期）之后
+     *
+     * @param month      月份
+     * @param dayOfMonth 日期
+     *
+     * @return
+     */
+    public boolean isAfterMonthDay(int month, int dayOfMonth) {
+        int thisMonth = getMonthValue(), thisDayOfMonth = getDayOfMonth();
+        return thisMonth > month || (thisMonth == month && thisDayOfMonth > dayOfMonth);
+    }
+
+    /**
+     * 当前日期所指的时分是否在指定时分之前
+     *
+     * @param hour   小时
+     * @param minute 分钟
+     *
+     * @return
+     */
+    public boolean isBeforeHourMinute(int hour, int minute) {
+        int thisHour = getHourOfDay(), thisMinute = getMinuteOfHour();
+        return thisHour < hour || (thisHour == hour && thisMinute < minute);
+    }
+
+    /**
+     * 当前日期所指的时分是否在指定时分之后
+     *
+     * @param hour   小时
+     * @param minute 分钟
+     *
+     * @return
+     */
+    public boolean isAfterHourMinute(int hour, int minute) {
+        int thisHour = getHourOfDay(), thisMinute = getMinuteOfHour();
+        return thisHour < hour || (thisHour == hour && thisMinute < minute);
+    }
 
     /*
      * ****************************************************************************

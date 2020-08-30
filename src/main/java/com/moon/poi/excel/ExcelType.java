@@ -1,6 +1,7 @@
 package com.moon.poi.excel;
 
 import com.moon.core.dep.Dependencies;
+import com.moon.core.io.FileUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -22,17 +23,26 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
     /**
      * Excel 2003
      */
-    XLS(new XlsGetter()),
+    XLS(new XlsGetter()) {
+        @Override
+        public boolean test(Workbook workbook) { return workbook instanceof HSSFWorkbook; }
+    },
     /**
      * Excel 2007
      */
-    XLSX(new XlsxGetter()),
+    XLSX(new XlsxGetter()) {
+        @Override
+        public boolean test(Workbook workbook) { return workbook instanceof XSSFWorkbook; }
+    },
     /**
      * Excel 2007 用于超大文件
      * <p>
      * 一般情况下极少用到
      */
-    SUPER(new SuperGetter(), "xlsx");
+    SUPER(new SuperGetter(), "xlsx") {
+        @Override
+        public boolean test(Workbook workbook) { return workbook instanceof SXSSFWorkbook; }
+    };
     /**
      * excel workbook 创建器
      */
@@ -82,9 +92,24 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
         return index > 0 && filepath.substring(index + 1).equalsIgnoreCase(extension);
     }
 
-    public boolean isInstance(Workbook workbook) {
-        // return workbook
-        return false;
+    /**
+     * 检测文档是否匹配
+     *
+     * @param workbook 文档
+     *
+     * @return 匹配: true，不匹配：false
+     */
+    public abstract boolean test(Workbook workbook);
+
+    /**
+     * 格式化文件名
+     *
+     * @param originFilename 输入文件名
+     *
+     * @return 返回符合要求的文件名
+     */
+    public String formatFilename(String originFilename) {
+        return FileUtil.formatFilename(originFilename, extension);
     }
 
     interface WorkbookBuilder extends Supplier<Workbook>, Function<InputStream, Workbook> {
@@ -96,9 +121,9 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
          *
          * @return excel Workbook
          *
-         * @throws IOException
-         * @throws InvalidFormatException
-         * @throws IllegalStateException
+         * @throws IOException            exception
+         * @throws InvalidFormatException exception
+         * @throws IllegalStateException  exception
          */
         Workbook load(File file);
     }

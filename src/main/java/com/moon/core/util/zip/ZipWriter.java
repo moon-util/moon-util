@@ -4,7 +4,6 @@ import com.moon.core.exception.DefaultException;
 import com.moon.core.io.FileUtil;
 import com.moon.core.io.IOUtil;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.function.ThrowingConsumer;
 import com.moon.core.util.function.ThrowingRunnable;
 
@@ -15,7 +14,7 @@ import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static com.moon.core.io.FileUtil.formatPath;
+import static com.moon.core.io.FileUtil.formatFilepath;
 
 /**
  * @author moonsky
@@ -101,7 +100,7 @@ public class ZipWriter {
         }
     }
 
-    private String formatAndEnsureEnds(String path) { return ensureEndsSep(formatPath(path)); }
+    private String formatAndEnsureEnds(String path) { return ensureEndsSep(formatFilepath(path)); }
 
     private void closeEntry() {
         try {
