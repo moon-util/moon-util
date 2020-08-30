@@ -595,7 +595,7 @@ public final class DateTimeUtil {
      * @see LocalDateTime#toLocalDate() 转换 LocalDateTime 请先调用这个方法
      */
     public static int getWeekOfMonthOnSunday(LocalDate date) {
-        return getWeekOfMonth(date, DayOfWeek.MONDAY);
+        return getWeekOfMonth(date, DayOfWeek.SUNDAY);
     }
 
     /**
