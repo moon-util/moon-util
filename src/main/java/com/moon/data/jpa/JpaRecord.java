@@ -32,5 +32,5 @@ public interface JpaRecord<ID> extends Persistable<ID>, Record<ID>, Cloneable, S
      * @return if {@literal true} the object is new.
      */
     @Override
-    boolean isNew();
+    default boolean isNew() { return getId() == null; }
 }

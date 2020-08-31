@@ -18,7 +18,7 @@ public interface Record<ID> extends IdOperator<ID>, Cloneable, Serializable {
      *
      * @return
      */
-    boolean isNew();
+    default boolean isNew() { return getId() == null; }
 
     /**
      * 获取 ID

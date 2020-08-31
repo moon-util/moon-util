@@ -2,7 +2,6 @@ package com.moon.data.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.moon.data.jpa.JpaAuditRecord;
 import com.moon.data.jpa.JpaRecord;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,7 +25,7 @@ import java.util.Objects;
  */
 @MappedSuperclass
 public abstract class AbstractJpaAuditRecord<ID extends Serializable, DATE_TYPE> extends AbstractJpaRecord<ID>
-    implements JpaRecord<ID>, JpaAuditRecord<ID>, Cloneable, Serializable {
+    implements JpaRecord<ID>, Cloneable, Serializable {
 
     /**
      * {@link JsonIgnore}无论注解在字段还是{@code getter}、{@code setter}方法上，该字段都会被完全忽略

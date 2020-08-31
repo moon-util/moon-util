@@ -38,11 +38,11 @@ public class SqlRepositoryQuery implements RepositoryQuery {
         QueryExtractor extractor,
         EntityManager em
     ) {
-        this.metadata = metadata;
-        this.factory = factory;
-        this.method = method;
-        this.extractor = extractor;
         this.em = em;
+        this.method = method;
+        this.factory = factory;
+        this.metadata = metadata;
+        this.extractor = extractor;
         this.sql = Objects.requireNonNull(sql);
         this.queryMethod = new QueryMethod(method, metadata, factory);
 
