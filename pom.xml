@@ -279,8 +279,7 @@
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-jpa</artifactId>
-      <version>2.2.6.RELEASE</version>
-      <optional>true</optional>
+      <version>2.3.3.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.data</groupId>
@@ -314,6 +313,7 @@
       <groupId>org.redisson</groupId>
       <artifactId>redisson</artifactId>
       <version>3.13.0</version>
+      <optional>true</optional>
     </dependency>
 
 

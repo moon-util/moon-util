@@ -3,7 +3,7 @@ package com.moon.spring.web.error;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.SetUtil;
-import com.moon.spring.jpa.id.SnowflakeLongIdentifier;
+import com.moon.data.jpa.id.SnowflakeLongIdentifier;
 import org.hibernate.TransientObjectException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
