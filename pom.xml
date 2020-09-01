@@ -6,8 +6,8 @@
 
   <groupId>com.github.moon-util</groupId>
   <artifactId>moon-util</artifactId>
-  <packaging>pom</packaging>
-  <version>0.0.34</version>
+  <packaging>jar</packaging>
+  <version>0.0.37</version>
 
   <name>moon-util</name>
   <description>a java tool library</description>

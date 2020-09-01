@@ -46,7 +46,7 @@ public abstract class DataRecordEntity extends BaseRecordEntity implements DataR
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("DataRecordable{");
+        final StringBuilder sb = new StringBuilder("DataRecordEntity{");
         sb.append(super.toString());
         sb.append("available=").append(available);
         sb.append('}');
