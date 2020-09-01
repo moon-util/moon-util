@@ -51,7 +51,7 @@ public abstract class DataAuditRecordEntity extends BaseAuditRecordEntity implem
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("DataAuditable{");
+        final StringBuilder sb = new StringBuilder("DataAuditRecordEntity{");
         sb.append(super.toString());
         sb.append("available=").append(available);
         sb.append('}');
