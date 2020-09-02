@@ -142,7 +142,7 @@ public abstract class AbstractJpaAuditRecord<ID extends Serializable, DATE_TYPE>
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractAuditable{");
+        final StringBuilder sb = new StringBuilder("AbstractJpaAuditRecord{");
         sb.append(super.toString());
         sb.append("createdBy=").append(createdBy);
         sb.append(", updatedBy=").append(updatedBy);
