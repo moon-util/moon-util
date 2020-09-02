@@ -16,27 +16,17 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public class BaseController<T extends Record<String>> extends BaseAccessorImpl<String, T> {
+public abstract class BaseController<T extends Record<String>> extends BaseAccessorImpl<String, T> {
 
     protected BaseController() { this(null); }
 
-    protected BaseController(Class accessType) { super(accessType, null); }
-
-    protected BaseController(Class accessType, Class domainClass) {
-        super(accessType, LayerEnum.SERVICE, LayerEnum.CONTROLLER, domainClass);
+    protected BaseController(Class<? extends BaseAccessor<String, T>> accessServeClass) {
+        this(accessServeClass, null);
     }
 
-    protected BaseController(LayerEnum accessLay, Class domainClass) {
-        this(accessLay, LayerEnum.CONTROLLER, domainClass);
+    protected BaseController(Class<? extends BaseAccessor<String, T>> accessServeClass, Class<T> domainClass) {
+        super(accessServeClass, domainClass);
     }
-
-    protected BaseController(LayerEnum accessLay, LayerEnum registryLay, Class domainClass) {
-        super(null, accessLay, registryLay, domainClass);
-    }
-
-    protected BaseController(
-        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
-    ) { super(accessServeClass, accessLay, registryMeLay, domainClass); }
 
     @PostConstruct
     public void postConstruct() {
@@ -53,12 +43,24 @@ public class BaseController<T extends Record<String>> extends BaseAccessorImpl<S
     @Override
     protected BaseAccessor<String, T> getDefaultAccessor() { return getService(); }
 
+    @Override
+    protected LayerEnum pullingThisLayer() { return LayerEnum.CONTROLLER; }
+
+    @Override
+    protected LayerEnum pullingAccessLayer() { return LayerEnum.SERVICE; }
+
     /**
      * 目标服务
      *
      * @return
      */
-    protected BaseService<T> getService() { return null; }
+    protected BaseService<T> getService() {
+        BaseAccessor accessor = getAccessor();
+        if (accessor instanceof BaseService) {
+            return (BaseService<T>) accessor;
+        }
+        return null;
+    }
 
 
     /* registry -------------------------------------------------------- */

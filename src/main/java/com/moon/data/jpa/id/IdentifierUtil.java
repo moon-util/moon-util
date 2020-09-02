@@ -4,6 +4,7 @@ import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
 import com.moon.core.util.Assert;
 import com.moon.core.util.TypeUtil;
+import com.moon.core.util.ValidationUtil;
 import com.moon.core.util.converter.TypeCaster;
 import org.hibernate.id.IdentifierGenerator;
 
@@ -53,7 +54,7 @@ final class IdentifierUtil {
     }
 
     public static IdentifierGenerator newInstance(String description) {
-        Assert.hasText(description);
+        ValidationUtil.requireNotBlank(description);
         String[] descriptions = description.split(":");
         Class type = toIdentifierClass(descriptions[0]);
         final int length = descriptions.length;

@@ -1,16 +1,21 @@
 package com.moon.data;
 
-import com.moon.core.model.supplier.IdOperator;
+import com.moon.core.model.supplier.IdSupplier;
+import org.hibernate.annotations.Where;
 
 import java.io.Serializable;
 
 /**
  * @author moonsky
  */
-public interface Record<ID> extends IdOperator<ID>, Cloneable, Serializable {
-
+public interface Record<ID> extends IdSupplier<ID>, Cloneable, Serializable {
+    /**
+     * @see Where#clause()
+     */
     String WHERE_IDX = RecordConst.WHERE_IDX;
-
+    /**
+     * @see Where#clause()
+     */
     String WHERE_STR = RecordConst.WHERE_STR;
 
     /**
@@ -33,6 +38,5 @@ public interface Record<ID> extends IdOperator<ID>, Cloneable, Serializable {
      *
      * @param value
      */
-    @Override
     void setId(ID value);
 }

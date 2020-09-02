@@ -1,6 +1,5 @@
 package com.moon.data;
 
-import com.moon.data.registry.LayerEnum;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -9,34 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAccessorImpl<ID, T>
     implements DataAccessor<ID, T> {
 
-    protected DataAccessorImpl(LayerEnum accessLay) { super(accessLay); }
-
-    protected DataAccessorImpl(LayerEnum accessLay, Class domainClass) {
-        super(accessLay, domainClass);
-    }
-
-    protected DataAccessorImpl(LayerEnum accessLay, LayerEnum thisLay) {
-        super(accessLay, thisLay);
-    }
-
-    protected DataAccessorImpl(Class accessServeClass, LayerEnum thisLay) {
-        super(accessServeClass, thisLay);
-    }
-
-    protected DataAccessorImpl(Class accessServeClass, LayerEnum thisLay, Class domainClass) {
-        super(accessServeClass, thisLay, domainClass);
-    }
-
-    protected DataAccessorImpl(
-        Class accessServeClass, LayerEnum accessLay, LayerEnum thisLay
-    ) {
-        super(accessServeClass, accessLay, thisLay);
-    }
-
-    protected DataAccessorImpl(
-        Class accessServeClass, LayerEnum accessLay, LayerEnum thisLay, Class domainClass
-    ) {
-        super(accessServeClass, accessLay, thisLay, domainClass);
+    /**
+     * 构造器
+     *
+     * @param accessServeClass 将要访问的服务具体实现类型，如：UserServiceImpl
+     * @param domainClass      具体实体类型
+     */
+    protected DataAccessorImpl(Class<? extends BaseAccessor<ID, T>> accessServeClass, Class<T> domainClass) {
+        super(accessServeClass, domainClass);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.moon.data.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.moon.core.lang.StringUtil;
+import com.moon.core.model.getter.IdGetter;
 
 import javax.persistence.MappedSuperclass;
 
@@ -9,7 +10,7 @@ import javax.persistence.MappedSuperclass;
  * @author moonsky
  */
 @MappedSuperclass
-public abstract class BaseRecordEntity extends AbstractJpaRecord<String> {
+public abstract class BaseRecordEntity extends AbstractJpaRecord<String> implements IdGetter {
 
     public BaseRecordEntity() { }
 

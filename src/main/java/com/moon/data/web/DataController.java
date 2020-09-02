@@ -1,9 +1,11 @@
 package com.moon.data.web;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.data.BaseAccessor;
 import com.moon.data.DataAccessor;
 import com.moon.data.DataAccessorImpl;
 import com.moon.data.Record;
+import com.moon.data.service.BaseService;
 import com.moon.data.service.DataService;
 import com.moon.data.registry.LayerEnum;
 import com.moon.data.registry.RecordRegistry;
@@ -16,27 +18,17 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public class DataController<T extends Record<String>> extends DataAccessorImpl<String, T> {
+public abstract class DataController<T extends Record<String>> extends DataAccessorImpl<String, T> {
 
     protected DataController() { this(null); }
 
-    protected DataController(Class accessType) { super(accessType, null); }
-
-    protected DataController(Class accessType, Class domainClass) {
-        super(accessType, LayerEnum.SERVICE, LayerEnum.CONTROLLER, domainClass);
+    protected DataController(Class<? extends BaseAccessor<String, T>> accessServeClass) {
+        this(accessServeClass, null);
     }
 
-    protected DataController(LayerEnum accessLay, Class domainClass) {
-        this(accessLay, LayerEnum.CONTROLLER, domainClass);
+    protected DataController(Class<? extends BaseAccessor<String, T>> accessServeClass, Class<T> domainClass) {
+        super(accessServeClass, domainClass);
     }
-
-    protected DataController(LayerEnum accessLay, LayerEnum registryLay, Class domainClass) {
-        super(null, accessLay, registryLay, domainClass);
-    }
-
-    protected DataController(
-        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
-    ) { super(accessServeClass, accessLay, registryMeLay, domainClass); }
 
     @PostConstruct
     public void postConstruct() {
@@ -53,12 +45,24 @@ public class DataController<T extends Record<String>> extends DataAccessorImpl<S
     @Override
     protected DataAccessor<String, T> getDefaultAccessor() { return getService(); }
 
+    @Override
+    protected LayerEnum pullingThisLayer() { return LayerEnum.CONTROLLER; }
+
+    @Override
+    protected LayerEnum pullingAccessLayer() { return LayerEnum.SERVICE; }
+
     /**
      * 目标服务
      *
      * @return
      */
-    protected DataService<T> getService() { return null; }
+    protected DataService<T> getService() {
+        BaseAccessor accessor = getAccessor();
+        if (accessor instanceof DataService) {
+            return (DataService<T>) accessor;
+        }
+        return null;
+    }
 
 
     /* registry -------------------------------------------------------- */

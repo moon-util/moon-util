@@ -7,8 +7,12 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  *
  * @author moonsky
  */
-public final class GenericUtil {
+final class GenericUtil {
 
     private GenericUtil() { noInstanceError(); }
 
+    public static Class getActualClassForLabel(Class currentClass, Class targetClass, String typeVariableName) {
+        // currentClass.
+        return null;
+    }
 }

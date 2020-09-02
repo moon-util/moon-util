@@ -51,12 +51,5 @@ public final class RunnerRegistration {
         return runners;
     }
 
-    /**
-     * 默认队列
-     */
-    private final static RunnerRegistration REGISTRATION = newInstance();
-
-    public static RunnerRegistration getInstance() { return REGISTRATION; }
-
     public static RunnerRegistration newInstance() { return new RunnerRegistration(); }
 }

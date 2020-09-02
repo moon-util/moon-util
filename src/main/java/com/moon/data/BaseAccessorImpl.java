@@ -2,9 +2,9 @@ package com.moon.data;
 
 import com.moon.data.registry.LayerEnum;
 import com.moon.data.registry.LayerRegistry;
-import com.moon.more.RunnerRegistration;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -24,15 +24,9 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
         return thisClass != null && superClass != null && superClass.isAssignableFrom(thisClass);
     }
 
-    private final static Class NULL = null;
+    protected static boolean isAccessorType(Class cls) { return isExtendOf(cls, BaseAccessor.class); }
 
-    protected static boolean isAccessorType(Class cls) {
-        return isExtendOf(cls, BaseAccessor.class);
-    }
-
-    protected static boolean isRecordableType(Class cls) {
-        return isExtendOf(cls, Record.class);
-    }
+    protected static boolean isRecordableType(Class cls) { return isExtendOf(cls, Record.class); }
 
     protected final Class deduceDomainClass() {
         Class domainClass = null;
@@ -59,92 +53,85 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
     }
 
     @Autowired
-    private WebApplicationContext context;
+    private ApplicationContext context;
+    @Autowired(required = false)
+    private WebApplicationContext webContext;
 
     protected final Class domainClass;
     private BaseAccessor<ID, T> accessor;
-
-    protected BaseAccessorImpl(LayerEnum accessLay) {
-        this(accessLay, NULL);
-    }
-
-    protected BaseAccessorImpl(LayerEnum accessLay, Class domainClass) {
-        this(NULL, accessLay, domainClass);
-    }
-
-    protected BaseAccessorImpl(LayerEnum accessLay, LayerEnum registryMeLay) {
-        this(NULL, accessLay, registryMeLay, NULL);
-    }
-
-    protected BaseAccessorImpl(Class<? extends BaseAccessor> accessServeClass, LayerEnum registryMeLay) {
-        this(accessServeClass, registryMeLay, NULL);
-    }
-
-    protected BaseAccessorImpl(
-        Class<? extends BaseAccessor> accessServeClass, LayerEnum registryMeLay, Class domainClass
-    ) { this(accessServeClass, null, registryMeLay, domainClass); }
-
-    protected BaseAccessorImpl(
-        Class<? extends BaseAccessor> accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay
-    ) { this(accessServeClass, accessLay, registryMeLay, NULL); }
 
     /**
      * 构造器
      *
      * @param accessServeClass 将要访问的服务具体实现类型，如：UserServiceImpl
-     * @param accessLay        内部管理访问的层
-     * @param registryMeLay    内部管理注册的层，注册后供其他层访问
      * @param domainClass      具体实体类型
      */
     protected BaseAccessorImpl(
-        Class<? extends BaseAccessor> accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
+        Class<? extends BaseAccessor<ID, T>> accessServeClass, Class<T> domainClass
     ) {
-        if (domainClass == null || !(domainClass != null && isRecordableType(domainClass))) {
-            if (isRecordableType(accessServeClass)) {
-                domainClass = accessServeClass;
-                accessServeClass = null;
+        Class access = accessServeClass, domain = domainClass;
+
+        if (domain == null) {
+            domain = deduceDomainClass();
+        } else if (!isRecordableType(domain)) {
+            if (isAccessorType(domain)) {
+                Class tempClass = null;
+                if (!isAccessorType(access)) {
+                    tempClass = access;
+                    access = domain;
+                }
+                if (tempClass != null && isRecordableType(tempClass)) {
+                    domain = tempClass;
+                }
             } else {
-                domainClass = deduceDomainClass();
+                domain = deduceDomainClass();
             }
         }
 
-        if (!(accessServeClass != null && isAccessorType(accessServeClass))) {
-            if (domainClass == null && isRecordableType(accessServeClass)) {
-                domainClass = accessServeClass;
+        if (access == null || !isAccessorType(access)) {
+            if (domain == null && isRecordableType(access)) {
+                domain = access;
             }
-            accessServeClass = null;
+            access = null;
         }
 
-        domainClass = domainClass == null ? deduceDomainClass() : domainClass;
-        Runnable runner = getRunner(accessServeClass, accessLay, domainClass);
-        LayerRegistry.registry(registryMeLay, domainClass, this);
-        RunnerRegistration.getInstance().registry(runner);
-        this.domainClass = domainClass;
+        this.domainClass = domain == null ? deduceDomainClass() : domain;
+        LayerRegistry.registry(pullingThisLayer(), getDomainClass(), this);
+        RecordUtil.registry(getInjectRunner(access));
     }
 
-    protected Runnable getRunner(
-        Class<? extends BaseAccessor> accessServeClass, LayerEnum accessLay, Class domainClass
-    ) {
+    protected Runnable getInjectRunner(Class<? extends BaseAccessor> accessServeClass) {
         return () -> {
             BaseAccessor accessor = getDefaultAccessor();
             if (accessor == null && accessServeClass != null) {
                 accessor = getContext().getBean(accessServeClass);
             }
             if (accessor == null) {
-                accessor = LayerRegistry.get(accessLay, domainClass);
+                accessor = LayerRegistry.get(pullingAccessLayer(), getDomainClass());
             }
-            this.accessor = accessor;
+            if (this.accessor == null) {
+                this.accessor = accessor;
+            }
         };
     }
 
     public Class getDomainClass() { return domainClass; }
 
-    protected WebApplicationContext getContext() { return context; }
+    protected ApplicationContext getContext() { return context; }
+
+    protected WebApplicationContext getWebContext() {
+        WebApplicationContext webContext = this.webContext;
+        if (webContext != null) {
+            return webContext;
+        }
+        ApplicationContext context = this.getContext();
+        if (context instanceof WebApplicationContext) {
+            return (WebApplicationContext) context;
+        }
+        return null;
+    }
 
     protected BaseAccessor<ID, T> getAccessor() { return accessor; }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {}
 
     /**
      * like getRepository
@@ -156,6 +143,25 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     protected BaseAccessor<ID, T> getDefaultAccessor() { return null; }
+
+    /**
+     * 告诉注册器，“我”是哪一层
+     *
+     * @return
+     */
+    protected abstract LayerEnum pullingThisLayer();
+
+    /**
+     * 我要访问的是哪一层
+     * <p>
+     * 通常：controller 访问 service，service 访问 repository/mapper层
+     *
+     * @return
+     */
+    protected abstract LayerEnum pullingAccessLayer();
+
+    @Override
+    public void afterPropertiesSet() throws Exception { }
 
     @Override
     public boolean existsById(String id) { return getAccessor().existsById(id); }

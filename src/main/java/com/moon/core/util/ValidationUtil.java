@@ -1796,12 +1796,13 @@ public class ValidationUtil extends TestUtil {
      * @return 当符合验证条件时返回字符串本身，否则抛出异常
      *
      * @throws RequireValidateException 若字符串为空白字符串时抛出异常
+     * @see #requireHasText(CharSequence)
      */
     public final static <C extends CharSequence> C requireNotBlank(C str) {
         if (isNotBlank(str)) {
             return str;
         }
-        throw new RequireValidateException("Invalid CharSequence, require not blank, but got: " + str);
+        throw new RequireValidateException("Invalid CharSequence, require not blank, but got: '" + str + "'");
     }
 
     /**
@@ -1816,8 +1817,48 @@ public class ValidationUtil extends TestUtil {
      * @throws RequireValidateException 若字符串为空白字符串时抛出异常
      *                                  异常消息由调用方自定义，
      *                                  可用“{}”占位符接收入参字符串
+     * @see #requireHasText(CharSequence, String)
      */
     public final static <C extends CharSequence> C requireNotBlank(C str, String message) {
+        if (isNotBlank(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
+     * 要求字符串是非空白字符串，至少包含一个非空白字符
+     *
+     * @param str 待测字符串
+     * @param <C> 待测字符串数据类型
+     *
+     * @return 当符合验证条件时返回字符串本身，否则抛出异常
+     *
+     * @throws RequireValidateException 若字符串为空白字符串时抛出异常
+     * @see #requireNotBlank(CharSequence)
+     */
+    public final static <C extends CharSequence> C requireHasText(C str) {
+        if (isNotBlank(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Invalid CharSequence, require has text, but got: '" + str + "'");
+    }
+
+    /**
+     * 要求字符串是非空白字符串，至少包含一个非空白字符
+     *
+     * @param str     待测字符串
+     * @param message 自定义消息模板
+     * @param <C>     待测字符串数据类型
+     *
+     * @return 当符合验证条件时返回字符串本身，否则抛出异常
+     *
+     * @throws RequireValidateException 若字符串为空白字符串时抛出异常
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     * @see #requireNotBlank(CharSequence, String)
+     */
+    public final static <C extends CharSequence> C requireHasText(C str, String message) {
         if (isNotBlank(str)) {
             return str;
         }
