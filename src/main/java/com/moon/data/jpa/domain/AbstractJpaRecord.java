@@ -15,13 +15,13 @@ import java.util.Objects;
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AbstractJpaRecord<ID extends Serializable>
-    implements JpaRecord<ID>, Cloneable, Serializable {
+public abstract class AbstractJpaRecord<ID extends Serializable> implements JpaRecord<ID>, Cloneable, Serializable {
 
     @Id
     @Column(length = 38)
-    @GeneratedValue(generator = "AbstractJpaRecordGenerator")
-    @GenericGenerator(name = "AbstractJpaRecordGenerator", strategy = "com.moon.data.jpa.id.Identifier")
+    @GeneratedValue(generator = "moonAbstractJpaRecordIdentifierGenerator")
+    @GenericGenerator(name = "moonAbstractJpaRecordIdentifierGenerator",//
+        strategy = "com.moon.data.jpa.id.RecordIdentifierGenerator")
     private ID id;
 
     public AbstractJpaRecord() { }
@@ -49,6 +49,7 @@ public abstract class AbstractJpaRecord<ID extends Serializable>
     @Override
     @JsonIgnore
     @JSONField(serialize = false)
+    @SuppressWarnings("all")
     public boolean isNew() { return getId() == null; }
 
     @Override

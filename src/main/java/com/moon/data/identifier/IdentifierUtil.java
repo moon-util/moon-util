@@ -1,12 +1,12 @@
-package com.moon.data.jpa.id;
+package com.moon.data.identifier;
 
 import com.moon.core.lang.ClassUtil;
+import com.moon.core.lang.StringUtil;
+import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
-import com.moon.core.util.Assert;
 import com.moon.core.util.TypeUtil;
-import com.moon.core.util.ValidationUtil;
 import com.moon.core.util.converter.TypeCaster;
-import org.hibernate.id.IdentifierGenerator;
+import com.moon.data.IdentifierGenerator;
 
 import java.lang.reflect.Constructor;
 import java.util.Objects;
@@ -14,15 +14,12 @@ import java.util.Objects;
 /**
  * @author moonsky
  */
-final class IdentifierUtil {
+public final class IdentifierUtil {
 
-    private final static String packageName;
+    private final static String packageName = IdentifierUtil.class.getPackage().getName();
 
-    static {
-        packageName = IdentifierUtil.class.getPackage().getName();
-    }
+    private IdentifierUtil() { ThrowUtil.noInstanceError(); }
 
-    private IdentifierUtil() { }
 
     private static void assertNot(String classname, Class<?> type) {
         if (type.getName().equals(classname)) {
@@ -32,7 +29,6 @@ final class IdentifierUtil {
 
     private static String assertClassname(String classname) {
         assertNot(classname, IdentifierUtil.class);
-        assertNot(classname, Identifier.class);
         return classname;
     }
 
@@ -41,12 +37,15 @@ final class IdentifierUtil {
     }
 
     private static Class toIdentifierClass(String classname) {
+        // 类全名
         Class type = toClassOrNull(classname);
         if (type == null) {
+            // 类简写
             classname = packageName + "." + classname;
             type = toClassOrNull(classname);
         }
         if (type == null) {
+            // 省略后缀的简写
             classname = classname + "Identifier";
             type = toClassOrNull(classname);
         }
@@ -54,7 +53,9 @@ final class IdentifierUtil {
     }
 
     public static IdentifierGenerator newInstance(String description) {
-        ValidationUtil.requireNotBlank(description);
+        if (StringUtil.isBlank(description)) {
+            return new UUIDIdentifier();
+        }
         String[] descriptions = description.split(":");
         Class type = toIdentifierClass(descriptions[0]);
         final int length = descriptions.length;

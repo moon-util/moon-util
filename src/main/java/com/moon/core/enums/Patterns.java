@@ -124,6 +124,12 @@ public enum Patterns implements Predicate<CharSequence> {
      * 日期校验
      */
     DATE(Pattern.compile("^(\\d{2,4})([\\-/年]?)(\\d{1,2})([\\-/.月]?)(\\d{1,2})日?$")),
+    DATE_年月日(Pattern.compile("^\\d{4}年\\d{2}月\\d{2}日$")),
+    DATE_yyyy_MM_dd(Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$")),
+    DATE_MM$dd$yyyy(Pattern.compile("^\\d{2}/\\d{2}/\\d{4}$")),
+    DATE_dd$MM$yyyy(Pattern.compile("^\\d{2}/\\d{2}/\\d{4}$")),
+    DATE_M$d$yyyy(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}$")),
+    DATE_d$M$yyyy(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}$")),
     /**
      * 时间校验
      */

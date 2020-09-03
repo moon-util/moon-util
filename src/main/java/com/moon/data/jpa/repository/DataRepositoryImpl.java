@@ -40,7 +40,9 @@ import static org.springframework.data.jpa.convert.QueryByExamplePredicateBuilde
 /**
  * @author moonsky
  */
+@Transactional
 @NoRepositoryBean
+@SuppressWarnings("all")
 public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRepository<T, String>
     implements DataRepository<T> {
 
@@ -111,7 +113,7 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public List<T> saveAll(T first, T second, T... entities) { return saveAll(asList(first, second, entities)); }
 
     @Override
@@ -132,19 +134,19 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteAll(T first, T second, T... entities) { deleteAll(asList(first, second, entities)); }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void disableById(String id) { findById(id).ifPresent(this::disableOne); }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void disable(T entity) { disableOne(entity); }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void disableAll(Iterable<? extends T> entities) {
         if (entities != null) {
             for (T entity : entities) {
@@ -154,7 +156,7 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> void disableAll(S first, S second, S... entities) {
         disableOne(first);
         disableOne(second);
@@ -208,11 +210,11 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> S save(S entity) { return doSaveEntity(entity); }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> List<S> saveAll(Iterable<S> entities) {
         List<S> list = new ArrayList();
         if (entities == null) {
@@ -227,7 +229,7 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> S saveAndFlush(S entity) {
         S saved = doSaveEntity(entity);
         flush();
@@ -248,21 +250,21 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void delete(T entity) {
         super.delete(entity);
         getCache().evict(entity.getId());
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteById(String s) {
         super.deleteById(s);
         getCache().evict(s);
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteAll(Iterable<? extends T> entities) {
         if (entities != null) {
             Cache cache = getCache();
@@ -274,21 +276,21 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteAll() {
         super.deleteAll();
         getCache().clear();
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteAllInBatch() {
         super.deleteAllInBatch();
         getCache().clear();
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteInBatch(Iterable<T> entities) {
         super.deleteInBatch(entities);
         Cache cache = getCache();

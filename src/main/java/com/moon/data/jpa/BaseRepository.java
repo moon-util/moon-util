@@ -1,7 +1,6 @@
 package com.moon.data.jpa;
 
-import com.moon.data.BaseAccessor;
-import com.moon.data.jpa.JpaRecord;
+import com.moon.data.accessor.BaseAccessor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;

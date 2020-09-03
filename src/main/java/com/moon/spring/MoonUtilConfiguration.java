@@ -1,6 +1,6 @@
 package com.moon.spring;
 
-import com.moon.data.RecordUtil;
+import com.moon.data.accessor.RecordUtil;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;

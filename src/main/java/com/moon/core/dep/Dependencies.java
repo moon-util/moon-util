@@ -38,6 +38,10 @@ public enum Dependencies {
      * redisson
      */
     REDISSON(strs("org.redisson:redisson:3.6+"), strs("org.redisson:redisson-spring-boot-starter:3.6+")),
+    /**
+     * uuid 生成器
+     */
+    UUID_GENERATOR(strs("com.fasterxml.uuid:java-uuid-generator:4.x+")),
     ;
     /**
      * 基本依赖包信息

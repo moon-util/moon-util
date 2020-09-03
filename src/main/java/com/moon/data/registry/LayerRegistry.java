@@ -1,7 +1,7 @@
 package com.moon.data.registry;
 
 
-import com.moon.data.BaseAccessor;
+import com.moon.data.accessor.BaseAccessor;
 
 import static com.moon.data.registry.LayerEnum.*;
 

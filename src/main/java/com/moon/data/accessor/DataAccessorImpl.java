@@ -1,10 +1,13 @@
-package com.moon.data;
+package com.moon.data.accessor;
 
+import com.moon.data.Record;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author moonsky
  */
+@Transactional
+@SuppressWarnings("all")
 public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAccessorImpl<ID, T>
     implements DataAccessor<ID, T> {
 
@@ -30,7 +33,7 @@ public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAcc
      * @param id
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void disableById(ID id) { getAccessor().disableById(id); }
 
     /**
@@ -39,7 +42,7 @@ public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAcc
      * @param entity
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void disable(T entity) { getAccessor().disable(entity); }
 
     /**
@@ -48,7 +51,7 @@ public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAcc
      * @param entities
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void disableAll(Iterable<? extends T> entities) { getAccessor().disableAll(entities); }
 
     /**
@@ -59,7 +62,7 @@ public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAcc
      * @param entities
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> void disableAll(S first, S second, S... entities) {
         getAccessor().disableAll(first, second, entities);
     }

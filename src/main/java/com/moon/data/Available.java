@@ -5,6 +5,8 @@ import org.hibernate.annotations.Where;
 
 /**
  * 是否有效、可用等
+ * <p>
+ * 这里用于逻辑删除
  *
  * @author moonsky
  */

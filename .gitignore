@@ -4,8 +4,6 @@
 /.idea
 target
 moon-annotations
-moon-test
-**/moon-test/**
 
 # Log file
 *.log

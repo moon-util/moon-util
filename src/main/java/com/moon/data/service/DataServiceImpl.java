@@ -1,13 +1,16 @@
 package com.moon.data.service;
 
-import com.moon.data.BaseAccessor;
-import com.moon.data.DataAccessorImpl;
+import com.moon.data.accessor.BaseAccessor;
+import com.moon.data.accessor.DataAccessorImpl;
 import com.moon.data.Record;
 import com.moon.data.registry.LayerEnum;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author moonsky
  */
+@Transactional
+@SuppressWarnings("all")
 public abstract class DataServiceImpl<T extends Record<String>> extends DataAccessorImpl<String, T>
     implements DataService<T> {
 

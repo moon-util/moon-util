@@ -1,6 +1,6 @@
 package com.moon.data.jpa;
 
-import com.moon.data.DataAccessor;
+import com.moon.data.accessor.DataAccessor;
 import org.springframework.data.domain.*;
 import org.springframework.data.repository.NoRepositoryBean;
 

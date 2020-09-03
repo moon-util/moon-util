@@ -1,5 +1,6 @@
-package com.moon.data;
+package com.moon.data.accessor;
 
+import com.moon.data.Record;
 import com.moon.data.registry.LayerEnum;
 import com.moon.data.registry.LayerRegistry;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,6 +19,8 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
+@Transactional
+@SuppressWarnings("all")
 public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements BaseAccessor<ID, T>, InitializingBean {
 
     private static boolean isExtendOf(Class thisClass, Class superClass) {
@@ -177,7 +180,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> S save(S entity) { return getAccessor().save(entity); }
 
     /**
@@ -188,7 +191,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> S saveAndFlush(S entity) { return getAccessor().saveAndFlush(entity); }
 
     /**
@@ -199,7 +202,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public <S extends T> List<S> saveAll(Iterable<S> entities) { return getAccessor().saveAll(entities); }
 
     /**
@@ -212,7 +215,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public List<T> saveAll(T first, T second, T... entities) { return getAccessor().saveAll(first, second, entities); }
 
     /**
@@ -221,7 +224,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<T> findAll() { return getAccessor().findAll(); }
 
     /**
@@ -232,7 +235,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<T> findAll(Sort sort) { return getAccessor().findAll(sort); }
 
     /**
@@ -243,7 +246,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<T> findAll(Pageable pageable) { return getAccessor().findAll(pageable); }
 
     /**
@@ -255,7 +258,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public <S extends T> Iterable<S> findAll(Example<S> example) { return getAccessor().findAll(example); }
 
     /**
@@ -268,7 +271,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public <S extends T> List<S> findAll(Example<S> example, Sort sort) { return getAccessor().findAll(example, sort); }
 
     /**
@@ -281,7 +284,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public <S extends T> Page<S> findAll(Example<S> example, Pageable pageable) {
         return getAccessor().findAll(example, pageable);
     }
@@ -294,7 +297,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Slice<T> sliceAll(Pageable pageable) { return getAccessor().sliceAll(pageable); }
 
     /**
@@ -307,7 +310,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public <S extends T> Slice<S> sliceAll(Example<S> example, Pageable pageable) {
         return getAccessor().sliceAll(example, pageable);
     }
@@ -320,7 +323,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<T> findAllById(Iterable<ID> ids) { return getAccessor().findAllById(ids); }
 
     /**
@@ -333,7 +336,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<T> findAllById(ID first, ID second, ID... ids) {
         return getAccessor().findAllById(first, second, ids);
     }
@@ -346,7 +349,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<T> findById(ID id) { return getAccessor().findById(id); }
 
     /**
@@ -357,7 +360,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public T getById(ID id) { return getAccessor().getById(id); }
 
     /**
@@ -369,7 +372,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public T getById(ID id, String throwsMessageIfAbsent) {
         return getAccessor().getById(id, throwsMessageIfAbsent);
     }
@@ -386,7 +389,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @throws X
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public <X extends Throwable> T getById(ID id, Supplier<? extends X> throwIfAbsent) throws X {
         return getAccessor().getById(id, throwIfAbsent);
     }
@@ -399,7 +402,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public T getOne(ID id) { return getAccessor().getOne(id); }
 
     /**
@@ -410,7 +413,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @return
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public T getOrNull(ID id) { return getAccessor().getOrNull(id); }
 
     /**
@@ -419,7 +422,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @param id
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteById(ID id) { getAccessor().deleteById(id); }
 
     /**
@@ -428,7 +431,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @param entity
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void delete(T entity) { getAccessor().delete(entity); }
 
     /**
@@ -437,7 +440,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @param entities
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteAll(Iterable<? extends T> entities) { getAccessor().deleteAll(entities); }
 
     /**
@@ -448,6 +451,6 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @param entities
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public void deleteAll(T first, T second, T... entities) { getAccessor().deleteAll(first, second, entities); }
 }

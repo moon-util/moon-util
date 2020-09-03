@@ -1,6 +1,6 @@
 package com.moon.data.service;
 
-import com.moon.data.BaseAccessor;
+import com.moon.data.accessor.BaseAccessor;
 import com.moon.data.Record;
 import org.springframework.data.domain.*;
 

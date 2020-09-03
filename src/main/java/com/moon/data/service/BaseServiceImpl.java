@@ -1,13 +1,16 @@
 package com.moon.data.service;
 
-import com.moon.data.BaseAccessor;
-import com.moon.data.BaseAccessorImpl;
+import com.moon.data.accessor.BaseAccessor;
+import com.moon.data.accessor.BaseAccessorImpl;
 import com.moon.data.Record;
 import com.moon.data.registry.LayerEnum;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author moonsky
  */
+@Transactional
+@SuppressWarnings("all")
 public abstract class BaseServiceImpl<T extends Record<String>> extends BaseAccessorImpl<String, T>
     implements BaseService<T> {
 
