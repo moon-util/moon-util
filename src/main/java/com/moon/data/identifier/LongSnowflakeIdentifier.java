@@ -24,7 +24,7 @@ public class LongSnowflakeIdentifier implements IdentifierGenerator<Long, Object
     /**
      * 时间起始标记点，作为基准，一般取系统的最近时间（一旦确定不能变动）
      */
-    private final long twepoch = 1288834974657L;
+    private final long twepoch = 1598889600000L;
     /**
      * 机器标识位数
      */

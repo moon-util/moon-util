@@ -2,6 +2,7 @@ package com.moon.data.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.moon.data.Record;
 import com.moon.data.jpa.JpaRecord;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -70,6 +71,10 @@ public abstract class AbstractJpaAuditRecord<ID extends Serializable, DATE_TYPE>
     private DATE_TYPE updatedAt;
 
     public AbstractJpaAuditRecord() { }
+
+    public AbstractJpaAuditRecord(Record<ID> record) {
+        super(record);
+    }
 
     public AbstractJpaAuditRecord(AbstractJpaAuditRecord<ID, DATE_TYPE> audit) {
         this(audit.getId(), audit.getCreatedBy(), audit.getUpdatedBy(), audit.getCreatedAt(), audit.getUpdatedAt());

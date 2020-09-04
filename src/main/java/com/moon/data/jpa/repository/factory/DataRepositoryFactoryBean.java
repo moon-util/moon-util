@@ -1,7 +1,7 @@
-package com.moon.data.jpa.repository;
+package com.moon.data.jpa.repository.factory;
 
-import com.moon.data.jpa.BaseRepository;
 import com.moon.data.jpa.JpaRecord;
+import com.moon.data.jpa.repository.BaseStringRepository;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
@@ -10,7 +10,7 @@ import javax.persistence.EntityManager;
 /**
  * @author moonsky
  */
-public class DataRepositoryFactoryBean<T extends BaseRepository<E>, E extends JpaRecord<String>>
+public class DataRepositoryFactoryBean<T extends BaseStringRepository<E>, E extends JpaRecord<String>>
     extends JpaRepositoryFactoryBean<T, E, String> {
 
     public DataRepositoryFactoryBean(Class<? extends T> ri) { super(ri); }

@@ -1,6 +1,6 @@
 package com.moon.data.jpa.id;
 
-import com.moon.data.jpa.domain.DataAuditRecordEntity;
+import com.moon.data.jpa.domain.DataStringAuditRecord;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,7 +14,7 @@ import javax.persistence.Entity;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Entity(name = "tb_pushed_hook_detail")
-public class PushedHookDetail extends DataAuditRecordEntity {
+public class PushedHookDetail extends DataStringAuditRecord {
 
     private String name;
 

@@ -1,4 +1,4 @@
-package com.moon.data.jpa.repository;
+package com.moon.data.jpa.repository.factory;
 
 import com.moon.data.annotation.SqlStatement;
 import org.springframework.data.jpa.provider.QueryExtractor;

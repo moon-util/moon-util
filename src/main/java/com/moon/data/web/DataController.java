@@ -1,14 +1,15 @@
 package com.moon.data.web;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.data.Record;
 import com.moon.data.accessor.BaseAccessor;
 import com.moon.data.accessor.DataAccessor;
 import com.moon.data.accessor.DataAccessorImpl;
-import com.moon.data.Record;
-import com.moon.data.service.DataService;
 import com.moon.data.registry.LayerEnum;
 import com.moon.data.registry.RecordRegistry;
 import com.moon.data.registry.RecordRegistryException;
+import com.moon.data.service.DataService;
+import com.moon.data.service.DataStringService;
 
 import javax.annotation.PostConstruct;
 import java.util.Optional;
@@ -17,15 +18,15 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public abstract class DataController<T extends Record<String>> extends DataAccessorImpl<String, T> {
+public abstract class DataController<T extends Record<ID>, ID> extends DataAccessorImpl<T, ID> {
 
     protected DataController() { this(null); }
 
-    protected DataController(Class<? extends BaseAccessor<String, T>> accessServeClass) {
+    protected DataController(Class<? extends BaseAccessor<T, ID>> accessServeClass) {
         this(accessServeClass, null);
     }
 
-    protected DataController(Class<? extends BaseAccessor<String, T>> accessServeClass, Class<T> domainClass) {
+    protected DataController(Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass) {
         super(accessServeClass, domainClass);
     }
 
@@ -42,10 +43,10 @@ public abstract class DataController<T extends Record<String>> extends DataAcces
     }
 
     @Override
-    protected DataAccessor<String, T> getDefaultAccessor() { return getService(); }
+    protected DataAccessor<T, ID> getDefaultAccessor() { return getService(); }
 
     @Override
-    protected LayerEnum pullingThisLayer() { return LayerEnum.CONTROLLER; }
+    protected LayerEnum provideThisLayer() { return LayerEnum.CONTROLLER; }
 
     @Override
     protected LayerEnum pullingAccessLayer() { return LayerEnum.SERVICE; }
@@ -55,10 +56,10 @@ public abstract class DataController<T extends Record<String>> extends DataAcces
      *
      * @return
      */
-    protected DataService<T> getService() {
+    protected DataService<T, ID> getService() {
         BaseAccessor accessor = getAccessor();
-        if (accessor instanceof DataService) {
-            return (DataService<T>) accessor;
+        if (accessor instanceof DataStringService) {
+            return (DataService) accessor;
         }
         return null;
     }
@@ -71,7 +72,7 @@ public abstract class DataController<T extends Record<String>> extends DataAcces
             try {
                 return type.newInstance();
             } catch (Exception e) {
-                throw new BaseSettingsException("不能创建实例：" + type);
+                throw new RecordSettingException("不能创建实例：" + type);
             }
         });
     }
@@ -88,7 +89,9 @@ public abstract class DataController<T extends Record<String>> extends DataAcces
         Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends DataService> serviceSupplier
     ) {
         RecordRegistry.registry(type, id -> {
-            if (StringUtil.isEmpty(id)) {
+            if (id == null) {
+                return defaultEntitySupplier.get();
+            } else if (id instanceof CharSequence && StringUtil.isEmpty((CharSequence) id)) {
                 return defaultEntitySupplier.get();
             } else {
                 Optional optional = serviceSupplier.get().findById(id);

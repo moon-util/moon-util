@@ -2,12 +2,13 @@ package com.moon.data.web;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.data.Record;
+import com.moon.data.accessor.BaseAccessor;
+import com.moon.data.accessor.BaseAccessorImpl;
+import com.moon.data.registry.LayerEnum;
 import com.moon.data.registry.RecordRegistry;
 import com.moon.data.registry.RecordRegistryException;
-import com.moon.data.registry.LayerEnum;
-import com.moon.data.accessor.BaseAccessorImpl;
-import com.moon.data.accessor.BaseAccessor;
 import com.moon.data.service.BaseService;
+import com.moon.data.service.BaseStringService;
 
 import javax.annotation.PostConstruct;
 import java.util.Optional;
@@ -16,15 +17,15 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public abstract class BaseController<T extends Record<String>> extends BaseAccessorImpl<String, T> {
+public abstract class BaseController<T extends Record<ID>, ID> extends BaseAccessorImpl<T, ID> {
 
     protected BaseController() { this(null); }
 
-    protected BaseController(Class<? extends BaseAccessor<String, T>> accessServeClass) {
+    protected BaseController(Class<? extends BaseAccessor<T, ID>> accessServeClass) {
         this(accessServeClass, null);
     }
 
-    protected BaseController(Class<? extends BaseAccessor<String, T>> accessServeClass, Class<T> domainClass) {
+    protected BaseController(Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass) {
         super(accessServeClass, domainClass);
     }
 
@@ -41,10 +42,10 @@ public abstract class BaseController<T extends Record<String>> extends BaseAcces
     }
 
     @Override
-    protected BaseAccessor<String, T> getDefaultAccessor() { return getService(); }
+    protected BaseAccessor<T, ID> getDefaultAccessor() { return getService(); }
 
     @Override
-    protected LayerEnum pullingThisLayer() { return LayerEnum.CONTROLLER; }
+    protected LayerEnum provideThisLayer() { return LayerEnum.CONTROLLER; }
 
     @Override
     protected LayerEnum pullingAccessLayer() { return LayerEnum.SERVICE; }
@@ -54,10 +55,10 @@ public abstract class BaseController<T extends Record<String>> extends BaseAcces
      *
      * @return
      */
-    protected BaseService<T> getService() {
+    protected BaseService<T, ID> getService() {
         BaseAccessor accessor = getAccessor();
-        if (accessor instanceof BaseService) {
-            return (BaseService<T>) accessor;
+        if (accessor instanceof BaseStringService) {
+            return (BaseService) accessor;
         }
         return null;
     }
@@ -70,7 +71,7 @@ public abstract class BaseController<T extends Record<String>> extends BaseAcces
             try {
                 return type.newInstance();
             } catch (Exception e) {
-                throw new BaseSettingsException("不能创建实例：" + type);
+                throw new RecordSettingException("不能创建实例：" + type);
             }
         });
     }
@@ -87,7 +88,9 @@ public abstract class BaseController<T extends Record<String>> extends BaseAcces
         Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends BaseService> serviceSupplier
     ) {
         RecordRegistry.registry(type, id -> {
-            if (StringUtil.isEmpty(id)) {
+            if (id == null) {
+                return defaultEntitySupplier.get();
+            } else if (id instanceof CharSequence && StringUtil.isEmpty((CharSequence) id)) {
                 return defaultEntitySupplier.get();
             } else {
                 Optional optional = serviceSupplier.get().findById(id);

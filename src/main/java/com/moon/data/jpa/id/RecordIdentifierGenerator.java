@@ -1,32 +1,31 @@
 package com.moon.data.jpa.id;
 
-import com.moon.core.lang.Moon;
+import com.moon.core.lang.MoonKey;
 import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.core.lang.reflect.ProxyUtil;
-import com.moon.data.IdentifierGenerator;
 import com.moon.data.identifier.IdentifierUtil;
 import com.moon.spring.SpringUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.id.IdentifierGenerator;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
 
 /**
  * id 生成器
  *
  * @author moonsky
  */
-public class RecordIdentifierGenerator implements org.hibernate.id.IdentifierGenerator {
+public class RecordIdentifierGenerator implements IdentifierGenerator {
 
-    private final LazyAccessor<org.hibernate.id.IdentifierGenerator> accessor;
-
-    public RecordIdentifierGenerator() {
-        this.accessor = LazyAccessor.of(() -> {
-            String value = SpringUtil.getProperty(Moon.Data.Jpa.IDENTIFIER);
-            IdentifierGenerator identifier = IdentifierUtil.newInstance(value);
-            return ProxyUtil.newProxyInstance(new ProxiedIdentifierGenerator(identifier), org.hibernate.id.IdentifierGenerator.class);
-        });
-    }
+    private final LazyAccessor<IdentifierGenerator> accessor = LazyAccessor.of(() -> {
+        String key = MoonKey.Data.Jpa.IDENTIFIER;
+        String value = SpringUtil.getProperty(key);
+        com.moon.data.IdentifierGenerator identifier = IdentifierUtil.newInstance(value, key);
+        InvocationHandler handler = new ProxiedIdentifierGenerator(identifier);
+        return ProxyUtil.newProxyInstance(handler, IdentifierGenerator.class);
+    });
 
     @Override
     public Serializable generate(

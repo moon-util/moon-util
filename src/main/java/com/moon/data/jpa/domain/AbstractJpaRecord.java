@@ -2,6 +2,7 @@ package com.moon.data.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.moon.data.Record;
 import com.moon.data.jpa.JpaRecord;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,7 +29,7 @@ public abstract class AbstractJpaRecord<ID extends Serializable> implements JpaR
 
     public AbstractJpaRecord(ID id) { this.id = id; }
 
-    public AbstractJpaRecord(AbstractJpaRecord<ID> recordable) { this(recordable.getId()); }
+    public AbstractJpaRecord(Record<ID> recordable) { this(recordable.getId()); }
 
     @Override
     public ID getId() { return id; }

@@ -24,13 +24,11 @@ public class ProxiedIdentifierGenerator implements org.hibernate.id.IdentifierGe
     @Override
     public Serializable generate(
         SharedSessionContractImplementor session, Object object
-    ) throws HibernateException {
-        return generateId(object, session);
-    }
+    ) throws HibernateException { return generateId(object, session); }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
-        return generateId(null, null);
+        return generateId(args[1], (SharedSessionContractImplementor) args[0]);
     }
 
     /**
@@ -44,7 +42,5 @@ public class ProxiedIdentifierGenerator implements org.hibernate.id.IdentifierGe
     @Override
     public Serializable generateId(
         Object entity, SharedSessionContractImplementor session
-    ) {
-        return identifier.generateId(entity, session);
-    }
+    ) { return identifier.generateId(entity, session); }
 }

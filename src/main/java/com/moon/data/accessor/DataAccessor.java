@@ -5,7 +5,7 @@ import com.moon.data.Record;
 /**
  * @author moonsky
  */
-public interface DataAccessor<ID, T extends Record<ID>> extends BaseAccessor<ID, T> {
+public interface DataAccessor<T extends Record<ID>, ID> extends BaseAccessor<T, ID> {
 
     /**
      * 逻辑删除

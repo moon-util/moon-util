@@ -9,10 +9,12 @@ import java.io.Serializable;
  * @author moonsky
  */
 public interface Record<ID> extends IdSupplier<ID>, Cloneable, Serializable {
+
     /**
      * @see Where#clause()
      */
     String WHERE_IDX = RecordConst.WHERE_IDX;
+
     /**
      * @see Where#clause()
      */
@@ -27,6 +29,8 @@ public interface Record<ID> extends IdSupplier<ID>, Cloneable, Serializable {
 
     /**
      * 获取 ID
+     * <p>
+     * 当使用{@link Long}做主键时，注意前后端数字的兼容性
      *
      * @return
      */

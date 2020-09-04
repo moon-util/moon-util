@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 @SuppressWarnings("all")
-public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAccessorImpl<ID, T>
-    implements DataAccessor<ID, T> {
+public abstract class DataAccessorImpl<T extends Record<ID>, ID> extends BaseAccessorImpl<T, ID>
+    implements DataAccessor<T, ID> {
 
     /**
      * 构造器
@@ -17,15 +17,15 @@ public abstract class DataAccessorImpl<ID, T extends Record<ID>> extends BaseAcc
      * @param accessServeClass 将要访问的服务具体实现类型，如：UserServiceImpl
      * @param domainClass      具体实体类型
      */
-    protected DataAccessorImpl(Class<? extends BaseAccessor<ID, T>> accessServeClass, Class<T> domainClass) {
+    protected DataAccessorImpl(Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass) {
         super(accessServeClass, domainClass);
     }
 
     @Override
-    protected DataAccessor<ID, T> getAccessor() { return (DataAccessor<ID, T>) super.getAccessor(); }
+    protected DataAccessor<T, ID> getAccessor() { return (DataAccessor<T, ID>) super.getAccessor(); }
 
     @Override
-    protected DataAccessor<ID, T> getDefaultAccessor() { return null; }
+    protected DataAccessor<T, ID> getDefaultAccessor() { return null; }
 
     /**
      * 逻辑删除

@@ -46,7 +46,7 @@ public final class FastTimestamp implements LongSupplier {
         @SuppressWarnings("all")
         FastTimestampRunner() {
             this.scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
-                Thread thread = new Thread(runnable, "FastTimestampRunner");
+                Thread thread = new Thread(runnable, "MoonUtil-FastTimestampRunner");
                 thread.setDaemon(true);
                 return thread;
             });

@@ -1,8 +1,8 @@
 package com.moon.data;
 
-import com.moon.data.jpa.domain.BaseAuditRecordEntity;
-import com.moon.data.service.BaseServiceImpl;
-import com.moon.data.service.DataServiceImpl;
+import com.moon.data.jpa.domain.BaseStringAuditRecord;
+import com.moon.data.service.BaseStringServiceImpl;
+import com.moon.data.service.DataStringServiceImpl;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
 
@@ -16,13 +16,13 @@ import java.util.Arrays;
 class BaseAccessorImplTestTest {
 
     @Data
-    public static class AccountEntity extends BaseAuditRecordEntity {
+    public static class AccountEntity extends BaseStringAuditRecord {
 
         private String name;
     }
 
-    public static class AccountBaseServe extends BaseServiceImpl<AccountEntity> {}
-    public static class AccountDataServe extends DataServiceImpl<AccountEntity> {}
+    public static class AccountBaseServe extends BaseStringServiceImpl<AccountEntity> {}
+    public static class AccountDataServe extends DataStringServiceImpl<AccountEntity> {}
 
     @Test
     void testDeduceDomainClass() throws Exception {

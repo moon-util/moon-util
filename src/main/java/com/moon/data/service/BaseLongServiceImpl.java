@@ -1,8 +1,8 @@
 package com.moon.data.service;
 
+import com.moon.data.Record;
 import com.moon.data.accessor.BaseAccessor;
 import com.moon.data.accessor.BaseAccessorImpl;
-import com.moon.data.Record;
 import com.moon.data.registry.LayerEnum;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,21 +11,21 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 @SuppressWarnings("all")
-public abstract class BaseServiceImpl<T extends Record<String>> extends BaseAccessorImpl<String, T>
-    implements BaseService<T> {
+public abstract class BaseLongServiceImpl<T extends Record<Long>> extends BaseAccessorImpl<T, Long>
+    implements BaseLongService<T> {
 
-    protected BaseServiceImpl() { this(null); }
+    protected BaseLongServiceImpl() { this(null); }
 
-    protected BaseServiceImpl(Class<? extends BaseAccessor<String, T>> accessServeClass) {
+    protected BaseLongServiceImpl(Class<? extends BaseAccessor<T, Long>> accessServeClass) {
         this(accessServeClass, null);
     }
 
-    protected BaseServiceImpl(Class<? extends BaseAccessor<String, T>> accessServeClass, Class<T> domainClass) {
+    protected BaseLongServiceImpl(Class<? extends BaseAccessor<T, Long>> accessServeClass, Class<T> domainClass) {
         super(accessServeClass, domainClass);
     }
 
     @Override
-    protected LayerEnum pullingThisLayer() { return LayerEnum.SERVICE; }
+    protected LayerEnum provideThisLayer() { return LayerEnum.SERVICE; }
 
     @Override
     protected LayerEnum pullingAccessLayer() { return LayerEnum.REPOSITORY; }

@@ -1,7 +1,9 @@
-package com.moon.data.jpa;
+package com.moon.data.jpa.repository;
 
-import com.moon.data.accessor.DataAccessor;
+import com.moon.data.accessor.BaseAccessor;
+import com.moon.data.jpa.JpaRecord;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.List;
@@ -13,19 +15,7 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings("all")
 @NoRepositoryBean
-public interface DataRepository<T extends JpaRecord<String>> extends BaseRepository<T>, DataAccessor<String, T> {
-
-    @Override
-    void disableById(String s);
-
-    @Override
-    void disable(T entity);
-
-    @Override
-    void disableAll(Iterable<? extends T> entities);
-
-    @Override
-    <S extends T> void disableAll(S first, S second, S... entities);
+public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaRepository<T, ID>, BaseAccessor<T, ID> {
 
     @Override
     List<T> saveAll(T first, T second, T... entities);
@@ -37,19 +27,19 @@ public interface DataRepository<T extends JpaRecord<String>> extends BaseReposit
     <S extends T> Slice<S> sliceAll(Example<S> example, Pageable pageable);
 
     @Override
-    List<T> findAllById(String first, String second, String... strings);
+    List<T> findAllById(ID first, ID second, ID... strings);
 
     @Override
-    T getById(String s);
+    T getById(ID s);
 
     @Override
-    T getById(String s, String throwsMessageIfAbsent);
+    T getById(ID s, String throwsMessageIfAbsent);
 
     @Override
-    <X extends Throwable> T getById(String s, Supplier<? extends X> throwIfAbsent) throws X;
+    <X extends Throwable> T getById(ID s, Supplier<? extends X> throwIfAbsent) throws X;
 
     @Override
-    T getOrNull(String s);
+    T getOrNull(ID s);
 
     @Override
     void deleteAll(T first, T second, T... entities);
@@ -61,7 +51,7 @@ public interface DataRepository<T extends JpaRecord<String>> extends BaseReposit
     List<T> findAll(Sort sort);
 
     @Override
-    List<T> findAllById(Iterable<String> strings);
+    List<T> findAllById(Iterable<ID> strings);
 
     @Override
     <S extends T> List<S> saveAll(Iterable<S> entities);
@@ -79,7 +69,7 @@ public interface DataRepository<T extends JpaRecord<String>> extends BaseReposit
     void deleteAllInBatch();
 
     @Override
-    T getOne(String s);
+    T getOne(ID s);
 
     @Override
     <S extends T> List<S> findAll(Example<S> example);
@@ -94,16 +84,16 @@ public interface DataRepository<T extends JpaRecord<String>> extends BaseReposit
     <S extends T> S save(S entity);
 
     @Override
-    Optional<T> findById(String s);
+    Optional<T> findById(ID s);
 
     @Override
-    boolean existsById(String s);
+    boolean existsById(ID s);
 
     @Override
     long count();
 
     @Override
-    void deleteById(String s);
+    void deleteById(ID s);
 
     @Override
     void delete(T entity);

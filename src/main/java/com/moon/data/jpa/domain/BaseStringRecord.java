@@ -2,7 +2,7 @@ package com.moon.data.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.model.getter.IdGetter;
+import com.moon.data.Record;
 
 import javax.persistence.MappedSuperclass;
 
@@ -10,13 +10,13 @@ import javax.persistence.MappedSuperclass;
  * @author moonsky
  */
 @MappedSuperclass
-public abstract class BaseRecordEntity extends AbstractJpaRecord<String> implements IdGetter {
+public abstract class BaseStringRecord extends AbstractJpaRecord<String> {
 
-    public BaseRecordEntity() { }
+    public BaseStringRecord() { }
 
-    public BaseRecordEntity(String id) { super(id); }
+    public BaseStringRecord(String id) { super(id); }
 
-    public BaseRecordEntity(AbstractJpaRecord<String> recordable) { super(recordable); }
+    public BaseStringRecord(Record<String> recordable) { super(recordable); }
 
     @Override
     @JSONField(serialize = false)

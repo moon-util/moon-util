@@ -1,8 +1,7 @@
-package com.moon.data.jpa.repository;
+package com.moon.data.jpa.repository.factory;
 
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.ref.FinalAccessor;
-import com.moon.core.util.IteratorUtil;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.query.JpaQueryLookupStrategy;

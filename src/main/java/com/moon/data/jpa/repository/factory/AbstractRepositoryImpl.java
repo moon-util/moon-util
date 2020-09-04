@@ -1,13 +1,14 @@
-package com.moon.data.jpa.repository;
+package com.moon.data.jpa.repository.factory;
 
-import com.moon.core.enums.Placeholder;
+import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.core.util.ListUtil;
 import com.moon.data.DataRecord;
-import com.moon.data.jpa.DataRepository;
 import com.moon.data.jpa.JpaRecord;
+import com.moon.data.jpa.repository.DataRepository;
 import com.moon.data.registry.LayerRegistry;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.support.NoOpCacheManager;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,70 +42,86 @@ import static org.springframework.data.jpa.convert.QueryByExamplePredicateBuilde
 /**
  * @author moonsky
  */
-@Transactional
 @NoRepositoryBean
-@SuppressWarnings("all")
-public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRepository<T, String>
-    implements DataRepository<T> {
+@Transactional(readOnly = true)
+public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extends SimpleJpaRepository<T, ID>
+    implements DataRepository<T, ID> {
 
     final static CacheManager NO_OP = new NoOpCacheManager();
 
-    final static Placeholder PLACEHOLDER = Placeholder.DEFAULT;
+    final static Serializable PLACEHOLDER = new byte[0];
 
-    private final CacheManager cacheManager = NO_OP;
+    private final LazyAccessor<CacheManager> cacheManagerAccessor;
 
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
-    private final Function<String, Object> NULL_FN = o -> null;
+    private final Function<ID, Object> NULL_FN = o -> null;
 
     private final Class domainClass;
     private final EntityManager em;
 
-    public DataRepositoryImpl(JpaEntityInformation<T, ?> ei, EntityManager em) {
+    public AbstractRepositoryImpl(
+        JpaEntityInformation<T, ?> ei, EntityManager em
+    ) {
         super(ei, em);
         this.em = em;
-        domainClass = ei.getJavaType();
+        this.domainClass = ei.getJavaType();
         LayerRegistry.registerRepository(domainClass, this);
+        this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
     }
 
-    public DataRepositoryImpl(Class<T> domainClass, EntityManager em) {
+    public AbstractRepositoryImpl(Class<T> domainClass, EntityManager em) {
         super(domainClass, em);
         this.em = em;
         this.domainClass = domainClass;
         LayerRegistry.registerRepository(domainClass, this);
+        this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
     }
 
-    @Override
-    public void setEscapeCharacter(EscapeCharacter escapeCharacter) {
-        super.setEscapeCharacter(escapeCharacter);
-        this.escapeCharacter = escapeCharacter;
-    }
+    /**
+     * 放入缓存后的操作
+     *
+     * @param cache
+     * @param id
+     * @param domainClass
+     * @param entity
+     */
+    protected void onCachedEntity(Cache cache, ID id, Class<T> domainClass, Object entity) {}
+
+    /**
+     * 删除缓存后的操作
+     *
+     * @param cache
+     * @param id
+     * @param domainClass
+     */
+    protected void onCacheEvicted(Cache cache, ID id, Class<T> domainClass) {}
 
     @Override
-    public T getOrNull(String id) { return findFromCacheById(NULL_FN, id); }
+    public T getOrNull(ID id) { return findFromCacheById(NULL_FN, id); }
 
     @Override
-    public T getById(String id) {
+    public T getById(ID id) {
         T value = findFromCacheById(NULL_FN, id);
         if (value == null) {
-            throw new IllegalArgumentException("数据不存在: " + id);
+            throw new NullPointerException("数据不存在: " + id);
         } else {
             return value;
         }
     }
 
     @Override
-    public T getById(String id, String throwsMessageIfAbsent) {
+    public T getById(ID id, String throwsMessageIfAbsent) {
         T value = findFromCacheById(NULL_FN, id);
         if (value == null) {
-            throw new IllegalArgumentException(throwsMessageIfAbsent);
+            throw new NullPointerException(throwsMessageIfAbsent);
         } else {
             return value;
         }
     }
 
     @Override
-    public <X extends Throwable> T getById(String id, Supplier<? extends X> throwIfAbsent) throws X {
+    public <X extends Throwable> T getById(ID id, Supplier<? extends X> throwIfAbsent) throws X {
         T value = findFromCacheById(NULL_FN, id);
         if (value == null) {
             throw throwIfAbsent.get();
@@ -118,18 +136,19 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
 
     @Override
     public Slice<T> sliceAll(Pageable pageable) {
-        return pageable.isUnpaged() ? new SliceImpl<>(findAll()) : readSlice(getQuery(null, pageable), pageable);
+        return pageable.isUnpaged() ? new SliceImpl<>(findAll()) : readSlicedEntities(getQuery(null, pageable),
+            pageable);
     }
 
     @Override
     public <S extends T> Slice<S> sliceAll(Example<S> example, Pageable pageable) {
         ExampleSpecification<S> spec = new ExampleSpecification<>(example, escapeCharacter);
         TypedQuery<S> query = getQuery(spec, example.getProbeType(), pageable);
-        return pageable.isUnpaged() ? new SliceImpl<>(query.getResultList()) : readSlice(query, pageable);
+        return pageable.isUnpaged() ? new SliceImpl<>(query.getResultList()) : readSlicedEntities(query, pageable);
     }
 
     @Override
-    public List<T> findAllById(String first, String second, String... ids) {
+    public List<T> findAllById(ID first, ID second, ID... ids) {
         return findAllById(asList(first, second, ids));
     }
 
@@ -139,18 +158,19 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
 
     @Override
     @Transactional
-    public void disableById(String id) { findById(id).ifPresent(this::disableOne); }
+    public void disableById(ID id) { findById(id).ifPresent(this::doDisableEntity); }
 
     @Override
     @Transactional
-    public void disable(T entity) { disableOne(entity); }
+    public void disable(T entity) { doDisableEntity(entity); }
 
     @Override
     @Transactional
     public void disableAll(Iterable<? extends T> entities) {
         if (entities != null) {
+            Cache cache = getCache();
             for (T entity : entities) {
-                disableOne(entity);
+                doDisableEntity(cache, entity);
             }
         }
     }
@@ -158,27 +178,35 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     @Override
     @Transactional
     public <S extends T> void disableAll(S first, S second, S... entities) {
-        disableOne(first);
-        disableOne(second);
+        Cache cache = getCache();
+        doDisableEntity(cache, first);
+        doDisableEntity(cache, second);
         if (entities != null) {
             for (S entity : entities) {
-                disableOne(entity);
+                doDisableEntity(cache, entity);
             }
         }
     }
 
-    protected <S extends T> void disableOne(S entity) {
+    protected <S extends T> void doDisableEntity(S entity) {
+        doDisableEntity(getCache(), entity);
+    }
+
+    protected <S extends T> void doDisableEntity(Cache cache, S entity) {
         if (entity != null) {
             if (entity instanceof DataRecord) {
                 ((DataRecord) entity).withUnavailable();
-                save(entity);
+                ID id = entity.getId();
+                cache.evict(id);
+                doSaveEntity(entity);
+                doEvictCache(cache, id);
             } else {
                 delete(entity);
             }
         }
     }
 
-    protected <S extends T> Slice<S> readSlice(TypedQuery<S> query, Pageable pageable) {
+    protected <S extends T> Slice<S> readSlicedEntities(TypedQuery<S> query, Pageable pageable) {
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
         List<S> content = query.getResultList();
@@ -237,13 +265,13 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     }
 
     @Override
-    public Optional<T> findById(String s) { return ofNullable(findFromCacheById(NULL_FN, s)); }
+    public Optional<T> findById(ID s) { return ofNullable(findFromCacheById(NULL_FN, s)); }
 
     @Override
-    public List<T> findAllById(Iterable<String> strings) {
+    public List<T> findAllById(Iterable<ID> strings) {
         List<T> results = new ArrayList(guessSize(strings));
         Cache cache = getCache();
-        for (String identity : strings) {
+        for (ID identity : strings) {
             results.add(findFromCacheById(cache, NULL_FN, identity));
         }
         return results;
@@ -253,14 +281,14 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     @Transactional
     public void delete(T entity) {
         super.delete(entity);
-        getCache().evict(entity.getId());
+        doEvictCache(entity.getId());
     }
 
     @Override
     @Transactional
-    public void deleteById(String s) {
+    public void deleteById(ID s) {
         super.deleteById(s);
-        getCache().evict(s);
+        doEvictCache(s);
     }
 
     @Override
@@ -270,7 +298,7 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
             Cache cache = getCache();
             for (T entity : entities) {
                 super.delete(entity);
-                cache.evict(entity.getId());
+                doEvictCache(cache, entity.getId(), domainClass);
             }
         }
     }
@@ -294,26 +322,48 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
     public void deleteInBatch(Iterable<T> entities) {
         super.deleteInBatch(entities);
         Cache cache = getCache();
+        Class domainClass = getDomainClass();
         for (T entity : entities) {
-            cache.evict(entity.getId());
+            doEvictCache(cache, entity.getId(), domainClass);
         }
     }
 
-    protected Cache getCache() { return cacheManager.getCache(domainClass.getName()); }
+    protected Cache getCache() {
+        return getCache(getDomainClass().getName());
+    }
+
+    protected Cache getCache(String namespace) {
+        return cacheManagerAccessor.get().getCache(namespace);
+    }
+
+    protected void doEvictCache(ID id) {
+        doEvictCache(getCache(), id, getDomainClass());
+    }
+
+    protected void doEvictCache(Cache cache, ID id) {
+        doEvictCache(cache, id, getDomainClass());
+    }
+
+    protected void doEvictCache(Cache cache, ID id, Class domainClass) {
+        cache.evict(id);
+        onCacheEvicted(cache, id, domainClass);
+    }
 
     protected <S extends T> S doSaveEntity(S s) { return doSaveEntity(getCache(), s); }
 
     protected <S extends T> S doSaveEntity(Cache cache, S s) {
-        String beforeSaveId = s.getId();
+        ID beforeSaveId = s.getId();
         boolean newer = s.isNew();
-        // 在更新前删除一次，防止并发下删除异常，（在某些情况下，可考虑不要这一步）
         if (!newer) {
+            // 在更新前删除一次，防止并发下删除异常，（在某些情况下，可考虑不要这一步）
             cache.evict(beforeSaveId);
         }
         s = super.save(s);
         if (newer) {
             // 新数据直接缓存
-            cache.put(s.getId(), s);
+            ID savedId = s.getId();
+            cache.put(savedId, s);
+            onCachedEntity(cache, savedId, getDomainClass(), s);
         } else {
             // 更新后再次删除，防止缓存了历史数据
             cache.evict(beforeSaveId);
@@ -321,25 +371,25 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
         return s;
     }
 
-    protected T findFromCacheById(Function<String, Object> convertIdIfAbsent, String id) {
+    protected T findFromCacheById(Function<ID, Object> convertIdIfAbsent, ID id) {
         return findFromCacheById(getCache(), convertIdIfAbsent, id);
     }
 
-    protected T findFromCacheById(Cache cache, Function<String, Object> convertIdIfAbsent, String id) {
+    protected T findFromCacheById(Cache cache, Function<ID, Object> convertIdIfAbsent, ID id) {
         Cache.ValueWrapper wrapper = cache.get(id);
         Object value = wrapper == null ? null : wrapper.get();
         if (value == null) {
             // 不存在缓存
-            Optional optional = super.findById(id);
-            if (optional.isPresent()) {
-                // 存在合法数据，缓存并返回
-                value = optional.get();
-                cache.put(id, value);
-                return (T) value;
-            } else {
+            value = findFromDatabaseById(id);
+            if (value == null) {
                 // 不存在数据，缓存占位符，并返回 null
                 cache.put(id, PLACEHOLDER);
                 return null;
+            } else {
+                // 存在合法数据，缓存后返回
+                cache.put(id, value);
+                onCachedEntity(cache, id, getDomainClass(), value);
+                return (T) value;
             }
         } else if (value == PLACEHOLDER) {
             // 缓存过一个不存在的值
@@ -358,7 +408,14 @@ public class DataRepositoryImpl<T extends JpaRecord<String>> extends SimpleJpaRe
         }
     }
 
-    static <T> List<T> asList(T first, T second, T... rest) {
+    final T findFromDatabaseById(ID id) {
+        if (id == null) {
+            throw new IllegalArgumentException("The given id must not be null!");
+        }
+        return em.find(getDomainClass(), id);
+    }
+
+    protected static <T> List<T> asList(T first, T second, T... rest) {
         return ListUtil.addAll(ListUtil.newList(first, second), rest);
     }
 }

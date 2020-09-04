@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  */
 @Transactional
 @SuppressWarnings("all")
-public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements BaseAccessor<ID, T>, InitializingBean {
+public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements BaseAccessor<T, ID>, InitializingBean {
 
     private static boolean isExtendOf(Class thisClass, Class superClass) {
         return thisClass != null && superClass != null && superClass.isAssignableFrom(thisClass);
@@ -61,7 +61,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
     private WebApplicationContext webContext;
 
     protected final Class domainClass;
-    private BaseAccessor<ID, T> accessor;
+    private BaseAccessor<T, ID> accessor;
 
     /**
      * 构造器
@@ -70,7 +70,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      * @param domainClass      具体实体类型
      */
     protected BaseAccessorImpl(
-        Class<? extends BaseAccessor<ID, T>> accessServeClass, Class<T> domainClass
+        Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass
     ) {
         Class access = accessServeClass, domain = domainClass;
 
@@ -99,7 +99,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
         }
 
         this.domainClass = domain == null ? deduceDomainClass() : domain;
-        LayerRegistry.registry(pullingThisLayer(), getDomainClass(), this);
+        LayerRegistry.registry(provideThisLayer(), getDomainClass(), this);
         RecordUtil.registry(getInjectRunner(access));
     }
 
@@ -134,7 +134,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
         return null;
     }
 
-    protected BaseAccessor<ID, T> getAccessor() { return accessor; }
+    protected BaseAccessor<T, ID> getAccessor() { return accessor; }
 
     /**
      * like getRepository
@@ -145,14 +145,14 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
      *
      * @return
      */
-    protected BaseAccessor<ID, T> getDefaultAccessor() { return null; }
+    protected BaseAccessor<T, ID> getDefaultAccessor() { return null; }
 
     /**
      * 告诉注册器，“我”是哪一层
      *
      * @return
      */
-    protected abstract LayerEnum pullingThisLayer();
+    protected abstract LayerEnum provideThisLayer();
 
     /**
      * 我要访问的是哪一层
@@ -167,7 +167,7 @@ public abstract class BaseAccessorImpl<ID, T extends Record<ID>> implements Base
     public void afterPropertiesSet() throws Exception { }
 
     @Override
-    public boolean existsById(String id) { return getAccessor().existsById(id); }
+    public boolean existsById(ID id) { return getAccessor().existsById(id); }
 
     @Override
     public long count() { return getAccessor().count(); }

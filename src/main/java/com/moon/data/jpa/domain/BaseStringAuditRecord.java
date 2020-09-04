@@ -2,6 +2,7 @@ package com.moon.data.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.moon.core.lang.StringUtil;
+import com.moon.data.Record;
 
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
@@ -10,17 +11,19 @@ import java.time.LocalDateTime;
  * @author moonsky
  */
 @MappedSuperclass
-public abstract class BaseAuditRecordEntity extends AbstractJpaAuditRecord<String, LocalDateTime> {
+public abstract class BaseStringAuditRecord extends AbstractJpaAuditRecord<String, LocalDateTime> {
 
-    public BaseAuditRecordEntity() { }
+    public BaseStringAuditRecord() { }
 
-    public BaseAuditRecordEntity(AbstractJpaAuditRecord<String, LocalDateTime> audit) { super(audit); }
+    public BaseStringAuditRecord(Record<String> record) { super(record); }
 
-    public BaseAuditRecordEntity(String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public BaseStringAuditRecord(AbstractJpaAuditRecord<String, LocalDateTime> audit) { super(audit); }
+
+    public BaseStringAuditRecord(String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(createdBy, updatedBy, createdAt, updatedAt);
     }
 
-    public BaseAuditRecordEntity(
+    public BaseStringAuditRecord(
         String id, String createdBy, String updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt
     ) { super(id, createdBy, updatedBy, createdAt, updatedAt); }
 

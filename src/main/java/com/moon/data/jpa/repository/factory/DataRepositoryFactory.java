@@ -1,5 +1,6 @@
-package com.moon.data.jpa.repository;
+package com.moon.data.jpa.repository.factory;
 
+import com.moon.data.identifier.IdentifierUtil;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
@@ -12,7 +13,6 @@ import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryComposition;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
@@ -43,11 +43,18 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
         RepositoryInformation information, EntityManager em
     ) {
         JpaEntityInformation ei = getEntityInformation(information.getDomainType());
-        return new DataRepositoryImpl<>(ei, em);
+        Class idType = information.getIdType();
+        IdentifierUtil.addIdentifierType(idType);
+        if (idType == String.class) {
+            return new DataStringRepositoryImpl<>(ei, em);
+        } else if (idType == Long.class) {
+            return new DataLongRepositoryImpl<>(ei, em);
+        }
+        throw new UnsupportedOperationException("Unsupported id type of: " + idType);
     }
 
     @Override
-    protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) { return DataRepositoryImpl.class; }
+    protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) { return DataStringRepositoryImpl.class; }
 
 
     @Override

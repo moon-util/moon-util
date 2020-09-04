@@ -1,8 +1,8 @@
 package com.moon.data;
 
-import com.moon.core.lang.Moon;
+import com.moon.core.lang.MoonKey;
 import com.moon.data.jpa.id.RecordIdentifierGenerator;
-import com.moon.data.jpa.repository.DataRepositoryFactoryBean;
+import com.moon.data.jpa.repository.factory.DataRepositoryFactoryBean;
 import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -16,9 +16,9 @@ public final class RecordConst {
     /**
      * moon.data.jpa.identifier
      *
-     * @see RecordIdentifierGenerator#RecordIdentifierGenerator()
+     * @see RecordIdentifierGenerator
      */
-    public final static String jpaIdentifierKey = Moon.Data.Jpa.IDENTIFIER;
+    public final static String jpaIdentifierKey = MoonKey.Data.Jpa.IDENTIFIER;
 
     /**
      * 逻辑删除用

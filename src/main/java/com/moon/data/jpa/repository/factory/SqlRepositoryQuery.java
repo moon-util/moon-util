@@ -1,4 +1,4 @@
-package com.moon.data.jpa.repository;
+package com.moon.data.jpa.repository.factory;
 
 import com.moon.data.annotation.SqlStatement;
 import org.hibernate.query.NativeQuery;
@@ -69,7 +69,7 @@ public class SqlRepositoryQuery implements RepositoryQuery {
             // nativeQuery.
             List list = query.getResultList();
             return list;
-        }else {
+        } else {
             List list = query.getResultList();
             return list;
         }

@@ -1,7 +1,6 @@
 package com.moon.data.accessor;
 
 import com.moon.core.model.BaseSupporter;
-import com.moon.core.model.supplier.IdSupplier;
 import com.moon.data.Record;
 import org.springframework.data.domain.*;
 
@@ -12,7 +11,7 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public interface BaseAccessor<ID, T extends Record<ID>> extends BaseSupporter {
+public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
 
     /**
      * 保存
@@ -160,10 +159,12 @@ public interface BaseAccessor<ID, T extends Record<ID>> extends BaseSupporter {
 
     /**
      * 表中是否存在对应 ID 存在的值
+     *
      * @param id
+     *
      * @return
      */
-    boolean existsById(String id);
+    boolean existsById(ID id);
 
     /**
      * 返回表总数
