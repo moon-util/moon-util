@@ -7,75 +7,78 @@ import static com.moon.core.util.convert.ToUtil.*;
 /**
  * @author benshaoye
  */
-enum ToShort implements Converts, PrimitiveConverter {
+enum ToShort implements Converts {
     /**
      * Number -> int
      */
-    byNumber(ToUtil.concat(Arrs.PRIMITIVE_NUMBERS, Arrs.WRAPPER_NUMBERS, Arrs.EXPAND_NUMBERS)) {
+    byNumber(ToUtil.concatArr(Types.PRIMITIVE_NUMBERS, Types.WRAPPER_NUMBERS, Types.EXPAND_NUMBERS)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : ((Number) o).shortValue(); }
+        public Object convertTo(Object o) { return ifn(o) ? null : ((Number) o).shortValue(); }
     },
     byBoolean(arr(Boolean.class, boolean.class)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : ((Boolean) o ? (short) 1 : (short) 0); }
+        public Object convertTo(Object o) { return ifn(o) ? null : ((Boolean) o ? (short) 1 : (short) 0); }
     },
     byChar(arr(Character.class, char.class)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : (short) ((char) o); }
+        public Object convertTo(Object o) { return ifn(o) ? null : (short) ((char) o); }
     },
-    byString(Arrs.STRINGS) {
+    byString(Types.STRINGS) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : Short.parseShort(o.toString()); }
+        public Object convertTo(Object o) { return ifn(o) ? null : Short.parseShort(o.toString()); }
     },
     byOptionalInt(arr(OptionalInt.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
-                return null;
+                return ZERO;
             }
             OptionalInt optional = (OptionalInt) o;
-            return optional.isPresent() ? (short) optional.getAsInt() : null;
+            return optional.isPresent() ? (short) optional.getAsInt() : ZERO;
         }
     },
     byOptionalLong(arr(OptionalLong.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
-                return null;
+                return ZERO;
             }
             OptionalLong optional = (OptionalLong) o;
-            return optional.isPresent() ? (short) optional.getAsLong() : null;
+            return optional.isPresent() ? (short) optional.getAsLong() : ZERO;
         }
     },
     byOptionalDouble(arr(OptionalDouble.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
-                return null;
+                return ZERO;
             }
             OptionalDouble optional = (OptionalDouble) o;
-            return optional.isPresent() ? (short) optional.getAsDouble() : null;
+            return optional.isPresent() ? (short) optional.getAsDouble() : ZERO;
         }
     },
-    byOptional(arr(Optional.class, com.moon.core.util.Optional.class)) {
+    byUtilOptional(arr(Optional.class, com.moon.core.util.Optional.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
-                return null;
+                return ZERO;
             }
-            if (o instanceof Optional) {
-                Optional optional = (Optional) o;
-                return optional.isPresent() ? (short) optional.get() : null;
-            } else {
-                com.moon.core.util.Optional optional = (com.moon.core.util.Optional) o;
-                return optional.isPresent() ? (short) optional.get() : null;
-            }
+            Optional optional = (Optional) o;
+            return optional.isPresent() ? ((Number) optional.get()).shortValue() : ZERO;
+        }
+    },
+    byMoonOptional(arr(Optional.class, com.moon.core.util.Optional.class)) {
+        @Override
+        public Object convertTo(Object o) {
+            com.moon.core.util.Optional optional = (com.moon.core.util.Optional) o;
+            return optional.isPresent() ? ((Number) optional.get()).shortValue() : ZERO;
         }
     };
 
     private final Set<Class<?>> hashFromSupports;
     private final Set<Class<?>> hashToSupports;
     private final ToPrimitive toPrimitive;
+    protected final Short ZERO = (short) 0;
 
     ToShort(Class[] supportsFrom) {
         Class<?>[] supportsTo = arr(Short.class);
@@ -83,9 +86,6 @@ enum ToShort implements Converts, PrimitiveConverter {
         this.hashFromSupports = unmodifiableHashSet(supportsFrom);
         toPrimitive = new ToPrimitive(hashFromSupports, short.class, this, 0L);
     }
-
-    @Override
-    public Converts toValue() { return toPrimitive; }
 
     @Override
     public Set<Class<?>> supportsTo() { return hashToSupports; }

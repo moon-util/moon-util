@@ -186,9 +186,9 @@ public class RedisAccessor<K, V> {
     /**
      * 普通缓存放入并设置时间
      *
-     * @param key   键
-     * @param value 值
-     * @param expireOfSeconds  时间(秒) time要大于0 如果time小于等于0 将设置无限期
+     * @param key             键
+     * @param value           值
+     * @param expireOfSeconds 时间(秒) time要大于0 如果time小于等于0 将设置无限期
      *
      * @return true成功 false 失败
      */
@@ -233,9 +233,9 @@ public class RedisAccessor<K, V> {
     /**
      * 从缓存中获取，获取为 null 则加载，并指定缓存时间缓存
      *
-     * @param key    键
-     * @param puller 加载器
-     * @param expireOfSeconds   时间
+     * @param key             键
+     * @param puller          加载器
+     * @param expireOfSeconds 时间
      *
      * @return 值
      */
@@ -705,7 +705,8 @@ public class RedisAccessor<K, V> {
      */
     public long listRemove(K key, long count, Object value) {
         try {
-            return template.opsForList().remove(key, count, value);
+            Long removed = template.opsForList().remove(key, count, value);
+            return removed == null ? 0 : removed;
         } catch (Exception e) {
             onCanIgnoreException(e);
             return 0;

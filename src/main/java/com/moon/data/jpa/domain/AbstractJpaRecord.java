@@ -2,6 +2,7 @@ package com.moon.data.jpa.domain;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.moon.data.Record;
 import com.moon.data.jpa.JpaRecord;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,20 +16,20 @@ import java.util.Objects;
  */
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AbstractJpaRecord<ID extends Serializable>
-    implements JpaRecord<ID>, Cloneable, Serializable {
+public abstract class AbstractJpaRecord<ID extends Serializable> implements JpaRecord<ID>, Cloneable, Serializable {
 
     @Id
     @Column(length = 38)
-    @GeneratedValue(generator = "AbstractJpaRecordGenerator")
-    @GenericGenerator(name = "AbstractJpaRecordGenerator", strategy = "com.moon.data.jpa.id.Identifier")
+    @GeneratedValue(generator = "moonAbstractJpaRecordIdentifierGenerator")
+    @GenericGenerator(name = "moonAbstractJpaRecordIdentifierGenerator",//
+        strategy = "com.moon.data.jpa.id.RecordIdentifierGenerator")
     private ID id;
 
     public AbstractJpaRecord() { }
 
     public AbstractJpaRecord(ID id) { this.id = id; }
 
-    public AbstractJpaRecord(AbstractJpaRecord<ID> recordable) { this(recordable.getId()); }
+    public AbstractJpaRecord(Record<ID> recordable) { this(recordable.getId()); }
 
     @Override
     public ID getId() { return id; }
@@ -49,6 +50,7 @@ public abstract class AbstractJpaRecord<ID extends Serializable>
     @Override
     @JsonIgnore
     @JSONField(serialize = false)
+    @SuppressWarnings("all")
     public boolean isNew() { return getId() == null; }
 
     @Override

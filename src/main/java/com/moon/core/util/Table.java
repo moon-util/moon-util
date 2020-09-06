@@ -191,35 +191,35 @@ public interface Table<X, Y, Z> {
     /**
      * 行数
      *
-     * @return
+     * @return 表格行数
      */
     int sizeOfRows();
 
     /**
      * 最大列数
      *
-     * @return
+     * @return 表格最大列数
      */
     int maxSizeOfColumns();
 
     /**
      * 最小列数
      *
-     * @return
+     * @return 表格最小列数
      */
     int minSizeOfColumns();
 
     /**
      * 映射对数量
      *
-     * @return
+     * @return 表格总映射数
      */
     int size();
 
     /**
      * 是否为空
      *
-     * @return
+     * @return 表格是否为空
      */
     default boolean isEmpty() { return sizeOfRows() == 0 || maxSizeOfColumns() == 0; }
 
@@ -228,7 +228,7 @@ public interface Table<X, Y, Z> {
      *
      * @param x X轴
      *
-     * @return
+     * @return 是否包含指定行的值
      */
     default boolean contains(X x) { return get(x) != null; }
 
@@ -238,7 +238,7 @@ public interface Table<X, Y, Z> {
      * @param x X轴
      * @param y Y轴
      *
-     * @return
+     * @return 是否包含指定位置的值
      */
     default boolean contains(X x, Y y) { return get(x, y) != null; }
 }

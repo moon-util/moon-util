@@ -1,13 +1,16 @@
 package com.moon.data.web;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.core.util.logger.Log;
+import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.Record;
-import com.moon.data.registry.RecordRegistry;
-import com.moon.data.registry.RecordRegistryException;
+import com.moon.data.accessor.BaseAccessor;
+import com.moon.data.accessor.BaseAccessorImpl;
 import com.moon.data.registry.LayerEnum;
-import com.moon.data.BaseAccessorImpl;
-import com.moon.data.BaseAccessor;
+import com.moon.data.registry.RecordRegistry;
+import com.moon.data.registry.RecordDuplicateRegistryException;
 import com.moon.data.service.BaseService;
+import com.moon.data.service.BaseStringService;
 
 import javax.annotation.PostConstruct;
 import java.util.Optional;
@@ -16,27 +19,20 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public class BaseController<T extends Record<String>> extends BaseAccessorImpl<String, T> {
+@SuppressWarnings("all")
+public abstract class BaseController<T extends Record<ID>, ID> extends BaseAccessorImpl<T, ID> {
+
+    private final static Log logger = LoggerUtil.getLogger();
 
     protected BaseController() { this(null); }
 
-    protected BaseController(Class accessType) { super(accessType, null); }
-
-    protected BaseController(Class accessType, Class domainClass) {
-        super(accessType, LayerEnum.SERVICE, LayerEnum.CONTROLLER, domainClass);
+    protected BaseController(Class<? extends BaseAccessor<T, ID>> accessServeClass) {
+        this(accessServeClass, null);
     }
 
-    protected BaseController(LayerEnum accessLay, Class domainClass) {
-        this(accessLay, LayerEnum.CONTROLLER, domainClass);
+    protected BaseController(Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass) {
+        super(accessServeClass, domainClass);
     }
-
-    protected BaseController(LayerEnum accessLay, LayerEnum registryLay, Class domainClass) {
-        super(null, accessLay, registryLay, domainClass);
-    }
-
-    protected BaseController(
-        Class accessServeClass, LayerEnum accessLay, LayerEnum registryMeLay, Class domainClass
-    ) { super(accessServeClass, accessLay, registryMeLay, domainClass); }
 
     @PostConstruct
     public void postConstruct() {
@@ -44,21 +40,35 @@ public class BaseController<T extends Record<String>> extends BaseAccessorImpl<S
         if (domainClass != null) {
             try {
                 registryVo2Entity(domainClass);
-            } catch (RecordRegistryException e) {
-                // ignore
+            } catch (RecordDuplicateRegistryException e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(StringUtil.format("已取消重复注册实例: {}", domainClass));
+                }
             }
         }
     }
 
     @Override
-    protected BaseAccessor<String, T> getDefaultAccessor() { return getService(); }
+    protected BaseAccessor<T, ID> provideDefaultAccessor() { return getService(); }
+
+    @Override
+    protected LayerEnum provideThisLayer() { return LayerEnum.CONTROLLER; }
+
+    @Override
+    protected LayerEnum pullingAccessLayer() { return LayerEnum.SERVICE; }
 
     /**
      * 目标服务
      *
      * @return
      */
-    protected BaseService<T> getService() { return null; }
+    protected BaseService<T, ID> getService() {
+        BaseAccessor accessor = getAccessor();
+        if (accessor instanceof BaseStringService) {
+            return (BaseService) accessor;
+        }
+        return null;
+    }
 
 
     /* registry -------------------------------------------------------- */
@@ -68,7 +78,7 @@ public class BaseController<T extends Record<String>> extends BaseAccessorImpl<S
             try {
                 return type.newInstance();
             } catch (Exception e) {
-                throw new BaseSettingsException("不能创建实例：" + type);
+                throw new RecordDowngradeBuildException("不能创建实例：" + type);
             }
         });
     }
@@ -85,7 +95,9 @@ public class BaseController<T extends Record<String>> extends BaseAccessorImpl<S
         Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends BaseService> serviceSupplier
     ) {
         RecordRegistry.registry(type, id -> {
-            if (StringUtil.isEmpty(id)) {
+            if (id == null) {
+                return defaultEntitySupplier.get();
+            } else if (id instanceof CharSequence && StringUtil.isEmpty((CharSequence) id)) {
                 return defaultEntitySupplier.get();
             } else {
                 Optional optional = serviceSupplier.get().findById(id);

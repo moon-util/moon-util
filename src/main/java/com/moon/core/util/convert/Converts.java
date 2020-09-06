@@ -20,7 +20,7 @@ public interface Converts<F, T> extends Converter<F, T> {
      * @return 转换后的值
      */
     @Override
-    T convert(F o);
+    T convertTo(F o);
 
     /**
      * 支持转换成什么数据类型
@@ -41,7 +41,7 @@ public interface Converts<F, T> extends Converter<F, T> {
      *
      * @return Function 函数
      */
-    default Function<F, T> asFunction() { return f -> convert(f); }
+    default Function<F, T> asFunction() { return f -> convertTo(f); }
 
     /**
      * 是否支持转换成目标类型

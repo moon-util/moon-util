@@ -1,7 +1,6 @@
 package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
-import com.moon.core.exception.NumberException;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.util.TestUtil.isDoubleValue;

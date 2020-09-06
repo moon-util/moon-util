@@ -172,11 +172,11 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
     /**
      * 实现
      *
-     * @param namespace
-     * @param bubbleDelimiters
-     * @param parsedSources
+     * @param namespace        命名空间
+     * @param bubbleDelimiters 参数是否冒泡
+     * @param parsedSources    已解析的数据
      *
-     * @return
+     * @return 返回带有命名空间的解析器
      */
     protected PropertiesParser getParser(
         String namespace, boolean bubbleDelimiters, Map<String, PropertiesHashMap> parsedSources
@@ -185,9 +185,9 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
     /**
      * 解析
      *
-     * @param sourcePath
+     * @param sourcePath 指定资源配置属性列表
      *
-     * @return
+     * @return 配置属性
      */
     protected PropertiesHashMap getResources(String sourcePath) {
         return new PropertiesHashMap(PropertiesUtil.get(sourcePath));
@@ -312,8 +312,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
                 String[] delimiters = delimitersValue.split(",");
                 return new Delimiters(delimiters[0], delimiters[1]);
             } catch (Throwable e) {
-                throw new IllegalArgumentException(
-                    "无效分隔符（delimiters）" + "，必须是用英文逗号（,）分割的两个非空字符串，但是配置的是：" + delimitersValue);
+                throw new IllegalArgumentException("无效分隔符（delimiters）" + "，必须是用英文逗号（,）分割的两个非空字符串，但是配置的是：" + delimitersValue);
             }
         }
         return defaultDelimiters;
@@ -396,7 +395,8 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
      */
     private PropertiesHashMap parseNSMap(String ns, String formatted, IDelimiters delimiters) {
         return ns == null || StringUtil.equals(ns, currentNamespace) ? parse(formatted, delimiters) : getParser(ns,
-            bubbleDelimiters, this.parsedSources).parse(formatted, delimiters);
+            bubbleDelimiters,
+            this.parsedSources).parse(formatted, delimiters);
     }
 
     private PropertiesHashMap parseNSMap(String formatted, String[] strings, IDelimiters delimiters) {

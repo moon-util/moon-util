@@ -3,7 +3,6 @@ package com.moon.core.model;
 import com.moon.core.enums.EnumDescriptor;
 import com.moon.core.model.getter.IdGetter;
 import com.moon.core.model.getter.NameGetter;
-import com.moon.core.model.supplier.IdOperator;
 import com.moon.core.model.supplier.IdSupplier;
 import com.moon.core.model.getter.IdNameGetter;
 import com.moon.core.model.supplier.NameSupplier;
@@ -14,7 +13,7 @@ import java.util.Objects;
  * @author moonsky
  */
 public final class IdName
-    implements NameSupplier<String>, IdOperator<String>, IdSupplier<String>, IdGetter, NameGetter, IdNameGetter {
+    implements NameSupplier<String>, IdSupplier<String>, IdGetter, NameGetter, IdNameGetter {
 
     private String id;
 
@@ -53,7 +52,6 @@ public final class IdName
     @Override
     public String getId() { return id; }
 
-    @Override
     public void setId(String id) { this.id = id; }
 
     @Override

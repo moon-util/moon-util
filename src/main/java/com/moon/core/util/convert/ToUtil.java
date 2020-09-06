@@ -16,11 +16,11 @@ final class ToUtil {
 
     private ToUtil() { ThrowUtil.noInstanceError(); }
 
-    static <T> T[] concat(T[] arr1, T[] arr2) {
+    static <T> T[] concatArr(T[] arr1, T[] arr2) {
         return ArrayUtil.splice(arr1, arr1.length, 0, arr2);
     }
 
-    static <T> T[] concat(T[] first, T[]... arrays) {
+    static <T> T[] concatArr(T[] first, T[]... arrays) {
         List<T> list = ListUtil.newList(first);
         for (T[] arr : arrays) {
             ListUtil.addAll(list, arr);

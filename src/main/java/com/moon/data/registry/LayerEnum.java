@@ -1,7 +1,7 @@
 package com.moon.data.registry;
 
 
-import com.moon.data.BaseAccessor;
+import com.moon.data.accessor.BaseAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,25 +14,23 @@ public enum LayerEnum implements Function<Class, BaseAccessor> {
     // dao
     REPOSITORY,
     MAPPER,
+    DAO,
 
     // service
     SERVICE,
 
     // controller
     CONTROLLER,
-
-    // other
-    SUPPLIER,
     ;
 
     private final Map<Class, BaseAccessor> cached = new HashMap<>();
 
     LayerEnum() {}
 
-    public void registry(Class domainClass, BaseAccessor accessor){ cached.put(domainClass, accessor); }
+    public void registry(Class domainClass, BaseAccessor accessor) { cached.put(domainClass, accessor); }
 
-    public BaseAccessor get(Class domainClass){ return apply(domainClass); }
+    public BaseAccessor get(Class domainClass) { return apply(domainClass); }
 
     @Override
-    public BaseAccessor apply(Class domainClass){ return cached.get(domainClass); }
+    public BaseAccessor apply(Class domainClass) { return cached.get(domainClass); }
 }

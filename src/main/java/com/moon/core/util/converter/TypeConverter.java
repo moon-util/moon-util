@@ -12,5 +12,5 @@ public interface TypeConverter<R> extends Converter<Object, R> {
      * @return
      */
     @Override
-    R convert(Object o);
+    R convertTo(Object o);
 }

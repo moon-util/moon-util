@@ -12,11 +12,14 @@ import static com.moon.core.util.TypeUtil.cast;
  * @author moonsky
  */
 public final class PropertiesUtil {
+
     private PropertiesUtil() { noInstanceError(); }
 
     public static final void refreshAll() { PropertiesSupport.refreshAll(); }
 
-    public static final PropertiesGroup group(Map<? extends String, ?> properties) { return PropertiesGroup.of(properties); }
+    public static final PropertiesGroup group(Map<? extends String, ?> properties) {
+        return PropertiesGroup.of(properties);
+    }
 
     /*
      * -----------------------------------------------------------
@@ -27,7 +30,8 @@ public final class PropertiesUtil {
     /**
      * properties 文件解析器
      *
-     * @return
+     * @return 返回解析器
+     *
      * @see PropertiesParser
      */
     public static final PropertiesParser parser() { return new PropertiesParser(); }
@@ -36,7 +40,9 @@ public final class PropertiesUtil {
      * properties 文件解析器
      *
      * @param namespace
-     * @return
+     *
+     * @return 返回解析器
+     *
      * @see PropertiesParser
      */
     public static final PropertiesParser parser(String namespace) { return new PropertiesParser(namespace); }
@@ -51,7 +57,8 @@ public final class PropertiesUtil {
      * get all properties
      *
      * @param path resources path or url
-     * @return
+     *
+     * @return 返回指定资源的配置文件
      */
     public static final Map<String, String> getOrEmpty(String path) { return PropertiesSupport.getOrEmpty(path); }
 
@@ -71,9 +78,15 @@ public final class PropertiesUtil {
 
     public static final long getLongValue(String path, String key) { return cast().toLongValue(getString(path, key)); }
 
-    public static final double getDoubleValue(String path, String key) { return cast().toDoubleValue(getString(path, key)); }
+    public static final double getDoubleValue(String path, String key) {
+        return cast().toDoubleValue(getString(path,
+            key));
+    }
 
-    public static final boolean getBooleanValue(String path, String key) { return cast().toBooleanValue(getString(path, key)); }
+    public static final boolean getBooleanValue(String path, String key) {
+        return cast().toBooleanValue(getString(path,
+            key));
+    }
 
     /*
      * -----------------------------------------------------------
@@ -88,26 +101,22 @@ public final class PropertiesUtil {
 
     public static final int getOrDefault(String path, String key, int defaultVal) {
         Map<String, String> map = getOrNull(path);
-        return (map != null && (key = map.get(key)) != null)
-            ? cast().toIntValue(key) : defaultVal;
+        return (map != null && (key = map.get(key)) != null) ? cast().toIntValue(key) : defaultVal;
     }
 
     public static final long getOrDefault(String path, String key, long defaultVal) {
         Map<String, String> map = getOrNull(path);
-        return (map != null && (key = map.get(key)) != null)
-            ? cast().toLongValue(key) : defaultVal;
+        return (map != null && (key = map.get(key)) != null) ? cast().toLongValue(key) : defaultVal;
     }
 
     public static final double getOrDefault(String path, String key, double defaultVal) {
         Map<String, String> map = getOrNull(path);
-        return (map != null && (key = map.get(key)) != null)
-            ? cast().toDoubleValue(key) : defaultVal;
+        return (map != null && (key = map.get(key)) != null) ? cast().toDoubleValue(key) : defaultVal;
     }
 
     public static final boolean getOrDefault(String path, String key, boolean defaultVal) {
         Map<String, String> map = getOrNull(path);
-        return (map != null && (key = map.get(key)) != null)
-            ? cast().toBooleanValue(key) : defaultVal;
+        return (map != null && (key = map.get(key)) != null) ? cast().toBooleanValue(key) : defaultVal;
     }
 
     public static final boolean getOrTrue(String path, String key) { return getOrDefault(path, key, true); }

@@ -26,7 +26,11 @@ public final class ProxyUtil {
      * @return 动态代理类
      */
     public static <T> T newProxyInstance(T obj, InvocationHandler handler) {
-        Class[] interfaces = ClassUtil.getAllInterfacesArr(obj.getClass());
+        Class[] classes = ClassUtil.getAllInterfacesArr(obj.getClass());
+        return newProxyInstance(handler, classes);
+    }
+
+    public static <T> T newProxyInstance(InvocationHandler handler, Class... interfaces) {
         return (T) Proxy.newProxyInstance(LOADER, interfaces, handler);
     }
 }

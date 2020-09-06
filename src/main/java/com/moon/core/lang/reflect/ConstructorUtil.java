@@ -28,16 +28,37 @@ public final class ConstructorUtil {
 
     final static int ONE = 1;
     final static int ZERO = 0;
-    final static WeakLocation<Class, Integer, Object> WEAK
-        = WeakLocation.ofManaged();
-    final static WeakLocation<Class, Integer, Supplier<Constructor>> WEAK_ITEM
-        = WeakLocation.ofManaged();
+    final static WeakLocation<Class, Integer, Object> WEAK = WeakLocation.ofManaged();
+    final static WeakLocation<Class, Integer, Supplier<Constructor>> WEAK_ITEM = WeakLocation.ofManaged();
+
+    /**
+     * 从字符串中解析构造实体，要求构造器必须是 public 修饰的
+     * {@code constructorCaller}类似{@code com.name.ObjectClass()}
+     * <pre>
+     * newInstance("com.name.ObjectClass")              ====> ObjectClass 对象
+     * newInstance("ObjectClass()", "com.name")         ====> ObjectClass 对象
+     * newInstance("Object()", "com.name", "Class")     ====> ObjectClass 对象
+     * newInstance("Object(1, 2)", "com.name", "Class") ====> 有参构造器构造的 ObjectClass 对象
+     * </pre>
+     *
+     * @param constructorCaller 构造器，必须不为 null
+     * @param packageName       包名，可为 null
+     * @param classnameSuffix   类名后缀，可为 null
+     * @param <T>               返回对象数据类型
+     *
+     * @return
+     */
+    static <T> T newInstance(String constructorCaller, String packageName, String classnameSuffix) {
+
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * 获取指定了类的所有公共构造器
      *
      * @param <T>
      * @param type
+     *
      * @return
      */
     public static <T> List getConstructors(Class<T> type) {
@@ -49,6 +70,7 @@ public final class ConstructorUtil {
      *
      * @param <T>
      * @param type
+     *
      * @return
      */
     public static <T> List getDeclaredConstructors(Class<T> type) {
@@ -60,6 +82,7 @@ public final class ConstructorUtil {
      *
      * @param <T>
      * @param type
+     *
      * @return
      */
     public static <T> Constructor getEmptyConstructor(Class type) {
@@ -81,6 +104,7 @@ public final class ConstructorUtil {
      *
      * @param type
      * @param <T>
+     *
      * @return
      */
     public static <T> Constructor<T> getEmptyDeclaredConstructor(Class type) {
@@ -103,6 +127,7 @@ public final class ConstructorUtil {
      * @param type
      * @param parameterTypes
      * @param <T>
+     *
      * @return
      */
     public static <T> Constructor<T> getConstructor(Class type, Class... parameterTypes) {
@@ -123,6 +148,7 @@ public final class ConstructorUtil {
      * @param type
      * @param parameterTypes
      * @param <T>
+     *
      * @return
      */
     public static <T> List<Constructor<T>> getMatchConstructors(Class type, Class... parameterTypes) {
@@ -138,6 +164,7 @@ public final class ConstructorUtil {
      * @param type
      * @param parameterTypes
      * @param <T>
+     *
      * @return
      */
     public static <T> Constructor<T> getMatchConstructor(Class<T> type, Class... parameterTypes) {
@@ -148,8 +175,8 @@ public final class ConstructorUtil {
             if (!list.isEmpty()) {
                 accessor.set(list.get(0));
             } else {
-                message = "Can not find constructor of type: " +
-                    type + " with parameterTypes: " + Arrays.toString(parameterTypes);
+                message = "Can not find constructor of type: " + type + " with parameterTypes: " + Arrays.toString(
+                    parameterTypes);
             }
             final String finalMessage = message;
             return () -> accessor.getOrThrow(finalMessage);
@@ -161,6 +188,7 @@ public final class ConstructorUtil {
      *
      * @param type
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Class<T> type) {
@@ -172,10 +200,12 @@ public final class ConstructorUtil {
      *
      * @param type
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Class<T> type, boolean accessible) {
-        return accessible ? newInstance(getEmptyDeclaredConstructor(type), accessible) : newInstance(getConstructor(type));
+        return accessible ? newInstance(getEmptyDeclaredConstructor(type),
+            accessible) : newInstance(getConstructor(type));
     }
 
     /**
@@ -184,6 +214,7 @@ public final class ConstructorUtil {
      * @param type
      * @param arguments
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Class<T> type, Object... arguments) {
@@ -197,6 +228,7 @@ public final class ConstructorUtil {
      * @param type
      * @param arguments
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Class<T> type, boolean accessible, Object... arguments) {
@@ -218,6 +250,7 @@ public final class ConstructorUtil {
      *
      * @param constructor 空参数构造器
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Constructor<T> constructor) {
@@ -230,6 +263,7 @@ public final class ConstructorUtil {
      * @param accessible
      * @param constructor 用空构造器创建一个实例
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Constructor<T> constructor, boolean accessible) {
@@ -242,6 +276,7 @@ public final class ConstructorUtil {
      * @param constructor
      * @param arguments
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Constructor<T> constructor, Object... arguments) {
@@ -255,6 +290,7 @@ public final class ConstructorUtil {
      * @param constructor
      * @param arguments
      * @param <T>
+     *
      * @return
      */
     public static <T> T newInstance(Constructor<T> constructor, boolean accessible, Object... arguments) {
@@ -271,9 +307,12 @@ public final class ConstructorUtil {
      * @param constructor
      * @param arguments
      * @param <T>
+     *
      * @return
      */
-    public static <T> T newInstance(boolean asPossibly, Constructor<T> constructor, boolean accessible, Object... arguments) {
+    public static <T> T newInstance(
+        boolean asPossibly, Constructor<T> constructor, boolean accessible, Object... arguments
+    ) {
         try {
             return newInstance(constructor, accessible, arguments);
         } catch (IllegalArgumentException e) {

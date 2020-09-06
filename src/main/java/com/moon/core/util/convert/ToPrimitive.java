@@ -29,8 +29,8 @@ final class ToPrimitive implements Converts {
      * @return 转换后的值
      */
     @Override
-    public Object convert(Object o) {
-        Object value = wrappedConvert.convert(o);
+    public Object convertTo(Object o) {
+        Object value = wrappedConvert.convertTo(o);
         return value == null ? defaultIfNull : value;
     }
 

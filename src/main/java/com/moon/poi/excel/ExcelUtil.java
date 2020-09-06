@@ -1,5 +1,6 @@
 package com.moon.poi.excel;
 
+import com.moon.core.lang.StringUtil;
 import com.moon.core.util.TypeUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -239,6 +240,16 @@ public final class ExcelUtil extends LoadUtil {
             case _NONE:
             default:
                 return null;
+        }
+    }
+
+    public static String getStringValue(Cell cell) {
+        try {
+            return cell.getStringCellValue();
+        } catch (NullPointerException e) {
+            return null;
+        } catch (Exception e) {
+            return StringUtil.stringify(getValue(cell));
         }
     }
 

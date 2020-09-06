@@ -7,29 +7,29 @@ import static com.moon.core.util.convert.ToUtil.*;
 /**
  * @author benshaoye
  */
-enum ToInt implements Converts, PrimitiveConverter {
+enum ToInt implements Converts {
     /**
      * Number -> int
      */
-    byNumber(ToUtil.concat(Arrs.PRIMITIVE_NUMBERS, Arrs.WRAPPER_NUMBERS, Arrs.EXPAND_NUMBERS)) {
+    byNumber(ToUtil.concatArr(Types.PRIMITIVE_NUMBERS, Types.WRAPPER_NUMBERS, Types.EXPAND_NUMBERS)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : ((Number) o).intValue(); }
+        public Object convertTo(Object o) { return ifn(o) ? null : ((Number) o).intValue(); }
     },
     byBoolean(arr(Boolean.class, boolean.class)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : ((Boolean) o ? 1 : 0); }
+        public Object convertTo(Object o) { return ifn(o) ? null : ((Boolean) o ? 1 : 0); }
     },
     byChar(arr(Character.class, char.class)) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : (int) ((char) o); }
+        public Object convertTo(Object o) { return ifn(o) ? null : (int) ((char) o); }
     },
-    byString(Arrs.STRINGS) {
+    byString(Types.STRINGS) {
         @Override
-        public Object convert(Object o) { return ifn(o) ? null : Integer.parseInt(o.toString()); }
+        public Object convertTo(Object o) { return ifn(o) ? null : Integer.parseInt(o.toString()); }
     },
     byOptionalInt(arr(OptionalInt.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
                 return null;
             }
@@ -39,7 +39,7 @@ enum ToInt implements Converts, PrimitiveConverter {
     },
     byOptionalLong(arr(OptionalLong.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
                 return null;
             }
@@ -49,7 +49,7 @@ enum ToInt implements Converts, PrimitiveConverter {
     },
     byOptionalDouble(arr(OptionalDouble.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
                 return null;
             }
@@ -59,7 +59,7 @@ enum ToInt implements Converts, PrimitiveConverter {
     },
     byOptional(arr(Optional.class, com.moon.core.util.Optional.class)) {
         @Override
-        public Object convert(Object o) {
+        public Object convertTo(Object o) {
             if (o == null) {
                 return null;
             }
@@ -83,9 +83,6 @@ enum ToInt implements Converts, PrimitiveConverter {
         this.hashFromSupports = unmodifiableHashSet(supportsFrom);
         toPrimitive = new ToPrimitive(hashFromSupports, int.class, this, 0);
     }
-
-    @Override
-    public Converts toValue() { return toPrimitive; }
 
     @Override
     public Set<Class<?>> supportsTo() { return hashToSupports; }

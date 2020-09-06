@@ -2,7 +2,6 @@ package com.moon.core.util.runner.core;
 
 import com.moon.core.enums.Arrays2;
 import com.moon.core.enums.Casters;
-import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.GenericTypeCaster;
 import com.moon.core.util.converter.TypeCaster;
 import com.moon.core.util.converter.TypeConverter;
@@ -220,10 +219,10 @@ class InvokeEnsure {
                     if (length == 1 && paramType.isInstance(arg)) {
                         return arg;
                     }
-                    Array.set(param = creator.apply(length), 0, converter.convert(arg));
+                    Array.set(param = creator.apply(length), 0, converter.convertTo(arg));
                     for (int i = 1; i < length; i++) {
                         arg = lasts[i].run(data);
-                        Array.set(param, i, converter.convert(arg));
+                        Array.set(param, i, converter.convertTo(arg));
                     }
                     return param;
             }
@@ -319,7 +318,7 @@ class InvokeEnsure {
             AsRunner[] pres = this.pres;
             Object[] arr = new Object[length];
             for (int i = 0; i < prev; i++) {
-                arr[i] = converter.convert(pres[i].run(data));
+                arr[i] = converter.convertTo(pres[i].run(data));
             }
             arr[prev] = getThisVarArg(data);
             return arr;

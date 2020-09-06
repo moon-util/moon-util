@@ -13,5 +13,5 @@ public interface Converter<T, R> {
      *
      * @return
      */
-    R convert(T o);
+    R convertTo(T o);
 }

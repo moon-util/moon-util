@@ -28,11 +28,17 @@ public final class SpringUtil implements ApplicationContextAware {
 
     public static ApplicationContext getContext() { return CTX; }
 
-    public static <T> T getBean(Class<T> type) { return CTX.getBean(type); }
+    public static <T> T getBean(Class<T> type) {
+        return CTX == null ? null : CTX.getBean(type);
+    }
 
-    public static Object getBean(String beanName) { return CTX.getBean(beanName); }
+    public static Object getBean(String beanName) {
+        return CTX == null ? null : CTX.getBean(beanName);
+    }
 
-    public static <T> T getBean(String beanName, Class<T> requiredType) { return CTX.getBean(beanName, requiredType); }
+    public static <T> T getBean(String beanName, Class<T> requiredType) {
+        return CTX == null ? null : CTX.getBean(beanName, requiredType);
+    }
 
     public static Environment getEnvironment() {
         ApplicationContext ctx = getContext();

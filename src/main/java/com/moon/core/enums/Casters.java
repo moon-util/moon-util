@@ -443,7 +443,7 @@ public enum Casters implements EnumDescriptor, BiFunction<Object, Class, Object>
     }
 
     @Override
-    public Object convert(Object o) { return cast(o); }
+    public Object convertTo(Object o) { return cast(o); }
 
     @Override
     public Object apply(Object o, Class aClass) { return cast(o); }

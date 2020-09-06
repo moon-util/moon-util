@@ -1,7 +1,7 @@
 package com.moon.data.registry;
 
 
-import com.moon.data.BaseAccessor;
+import com.moon.data.accessor.BaseAccessor;
 
 import static com.moon.data.registry.LayerEnum.*;
 
@@ -44,10 +44,4 @@ public class LayerRegistry {
     }
 
     public static BaseAccessor getMapper(Class domainClass) { return get(MAPPER, domainClass); }
-
-    public static void registerSupplier(Class domainClass, BaseAccessor accessor) {
-        registry(SUPPLIER, domainClass, accessor);
-    }
-
-    public static BaseAccessor getSupplier(Class domainClass) { return get(SUPPLIER, domainClass); }
 }

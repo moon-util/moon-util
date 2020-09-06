@@ -1,8 +1,7 @@
 package com.moon.core.model;
 
 import com.moon.core.lang.ArrayUtil;
-import com.moon.core.model.getter.IdNameGetter;
-import com.moon.core.model.getter.KeyValueGetter;
+import com.moon.core.model.getter.*;
 
 import java.util.*;
 import java.util.function.Function;
@@ -12,7 +11,7 @@ import java.util.function.Function;
  *
  * @author moonsky
  */
-public class TreeElement<T> {
+public class TreeElement<T> implements IdGetter, NameGetter {
 
     private String id;
 
@@ -38,12 +37,12 @@ public class TreeElement<T> {
     }
 
     public static <T extends KeyValueGetter> List<TreeElement<T>> fromKeyValueList(
-        List<T> data, Function<T, String> grouper, Function<String, String>... reGroupers
-    ) { return fromList(data, grouper, KeyValueGetter::getKey, KeyValueGetter::getValue, reGroupers); }
+        Iterable<T> data, Function<T, String> grouper, Function<String, String>... reGroupers
+    ) { return fromList(data, grouper, KeyGetter::getKey, ValueGetter::getValue, reGroupers); }
 
     public static <T extends IdNameGetter> List<TreeElement<T>> fromIdNameList(
-        List<T> data, Function<T, String> grouper, Function<String, String>... reGroupers
-    ) { return fromList(data, grouper, IdNameGetter::getId, IdNameGetter::getName, reGroupers); }
+        Iterable<T> data, Function<T, String> grouper, Function<String, String>... reGroupers
+    ) { return fromList(data, grouper, IdGetter::getId, NameGetter::getName, reGroupers); }
 
     /**
      * 从数据列表中解析树形结构，注意参数{@code grouper}的返回值说明
@@ -59,7 +58,9 @@ public class TreeElement<T> {
      * @return
      */
     public static <T> List<TreeElement<T>> fromList(
-        List<T> data, Function<T, String> grouper, Function<T, String> idGetter, Function<T, String> nameGetter
+        Iterable<T> data, Function<T, String> grouper,
+
+        Function<T, String> idGetter, Function<T, String> nameGetter
     ) { return fromList(data, grouper, idGetter, nameGetter, null); }
 
     /**
@@ -77,7 +78,7 @@ public class TreeElement<T> {
      * @return
      */
     public static <T> List<TreeElement<T>> fromList(
-        List<T> data,
+        Iterable<T> data,
         Function<T, String> grouper,
         Function<T, String> idGetter,
         Function<T, String> nameGetter,
@@ -133,10 +134,12 @@ public class TreeElement<T> {
         return topParents;
     }
 
+    @Override
     public String getId() { return id; }
 
     public void setId(String id) { this.id = id; }
 
+    @Override
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
