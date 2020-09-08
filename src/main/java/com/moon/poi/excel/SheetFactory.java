@@ -106,9 +106,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      */
     public SheetFactory columnsAutoWidth(boolean useMergedCells, int... columnIndexes) {
         if (columnIndexes != null) {
-            int length = columnIndexes.length;
-            for (int i = 0; i < length; i++) {
-                sheet.autoSizeColumn(columnIndexes[i], useMergedCells);
+            for (int columnIndex : columnIndexes) {
+                sheet.autoSizeColumn(columnIndex, useMergedCells);
             }
         }
         return this;
@@ -125,9 +124,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      */
     public SheetFactory columnsAutoWidth(int... columnIndexes) {
         if (columnIndexes != null) {
-            int length = columnIndexes.length;
-            for (int i = 0; i < length; i++) {
-                sheet.autoSizeColumn(columnIndexes[i]);
+            for (int columnIndex : columnIndexes) {
+                sheet.autoSizeColumn(columnIndex);
             }
         }
         return this;
@@ -153,7 +151,6 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     public SheetFactory setColumnsWidthBegin(int startIdx, Integer[] widths) {
         int len = widths == null ? 0 : widths.length;
         if (len > 0) {
-            int max = MAX_WIDTH;
             Integer columnWidth;
             Sheet sheet = getSheet();
             WorkbookProxy proxy = getProxy();
@@ -162,7 +159,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
                     int index = i + startIdx;
                     int width = columnWidth;
                     if (width > -1) {
-                        if (width < max) {
+                        if (width < MAX_WIDTH) {
                             proxy.setColumnWidth(sheet, index, width);
                         } else if (proxy.isAllowAutoWidth(sheet, index)) {
                             sheet.autoSizeColumn(index);
@@ -356,7 +353,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     /**
      * 聚合所有行
      *
-     * @return
+     * @return 当前对象 SheetFactory
      */
     private SheetFactory reduce() {
         throw new UnsupportedOperationException();
@@ -373,9 +370,9 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     /**
      * 注解式表格渲染
      *
-     * @param consumer
+     * @param consumer 表格渲染处理器
      *
-     * @return
+     * @return 当前对象 SheetFactory
      *
      * @see TableColumn at field or method
      * @see TableColumnGroup at field or method
@@ -400,9 +397,9 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * <p>
      * 可以横向或纵向自由伸展，但请注意不要超过 sheet 的最大边界
      *
-     * @param consumer
+     * @param consumer 模板渲染处理器
      *
-     * @return
+     * @return 当前对象 SheetFactory
      */
     SheetFactory template(TemplateRegion region, Consumer<TemplateFactory> consumer) {
         templateFactory.setSheet(getSheet());
