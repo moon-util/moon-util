@@ -3,7 +3,7 @@ package com.moon.core.util.logger;
 /**
  * @author benshaoye
  */
-enum NoLogImpl implements Log {
+enum NoLogImpl implements Logger {
     /**
      * 单例
      */

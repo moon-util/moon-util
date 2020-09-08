@@ -1,7 +1,7 @@
 package com.moon.data.web;
 
 import com.moon.core.lang.StringUtil;
-import com.moon.core.util.logger.Log;
+import com.moon.core.util.logger.Logger;
 import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.Record;
 import com.moon.data.accessor.BaseAccessor;
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("all")
 public abstract class BaseController<T extends Record<ID>, ID> extends BaseAccessorImpl<T, ID> {
 
-    private final static Log logger = LoggerUtil.getLogger();
+    private final static Logger logger = LoggerUtil.getLogger();
 
     protected BaseController() { this(null); }
 

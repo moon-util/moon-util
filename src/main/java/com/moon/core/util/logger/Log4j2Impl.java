@@ -2,14 +2,13 @@ package com.moon.core.util.logger;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 /**
  * @author benshaoye
  */
-final class Log4j2Impl implements Log {
+final class Log4j2Impl implements Logger {
 
-    private final Logger logger;
+    private final org.apache.log4j.Logger logger;
 
     Log4j2Impl(String loggerName) { logger = LogManager.getLogger(loggerName); }
 

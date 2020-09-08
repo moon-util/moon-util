@@ -11,62 +11,52 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class LoggerUtil {
 
-    private final static Function<String, Log> LOG_CREATOR;
+    private static Function<String, Logger> LOG_CREATOR;
+
+    private static void tryImplementation(Runnable runner) {
+        if (LOG_CREATOR == null) {
+            try {
+                runner.run();
+            } catch (Throwable var2) {
+            }
+        }
+    }
+
+    private static void setImplementation(Function<String, Logger> creator) {
+        try {
+            creator.apply(LoggerUtil.class.getName());
+            LOG_CREATOR = creator;
+        } catch (Throwable t) {
+            LOG_CREATOR = null;
+            throw new IllegalStateException(t);
+        }
+    }
 
     static {
-        String classname = LoggerUtil.class.getName();
-        Function<String, Log> creator;
-        Log log;
-
-        try {
-            log = new Slf4jImpl(classname);
-            creator = Slf4jImpl::new;
-        } catch (Throwable t) {
-            creator = null;
-            log = null;
-        }
-        try {
-            if (log == null) {
-                log = new Log4jImpl(classname);
-                creator = Log4jImpl::new;
-            }
-        } catch (Throwable t) {
-            creator = null;
-            log = null;
-        }
-        try {
-            if (log == null) {
-                log = new Log4j2Impl(classname);
-                creator = Log4j2Impl::new;
-            }
-        } catch (Throwable t) {
-            creator = null;
-            log = null;
-        }
-        try {
-            if (log == null) {
-                log = new CommonsLogImpl(classname);
-                creator = CommonsLogImpl::new;
-            }
-        } catch (Throwable t) {
-            creator = null;
-            log = null;
-        }
-
-        if (log == null) {
-            creator = name -> NoLogImpl.IMPL;
-        }
-
-        LOG_CREATOR = creator;
+        tryImplementation(LoggerUtil::useSlf4jImplementation);
+        tryImplementation(LoggerUtil::useLog4jImplementation);
+        tryImplementation(LoggerUtil::useLog4j2Implementation);
+        tryImplementation(LoggerUtil::useCommonsLogImplementation);
+        tryImplementation(LoggerUtil::useNoLogImplementation);
     }
+
+    public static void useSlf4jImplementation() { setImplementation(Slf4jImpl::new); }
+
+    public static void useLog4jImplementation() { setImplementation(Log4jImpl::new); }
+
+    public static void useLog4j2Implementation() { setImplementation(Log4j2Impl::new); }
+
+    public static void useCommonsLogImplementation() { setImplementation(CommonsLogImpl::new); }
+
+    public static void useNoLogImplementation() { setImplementation(name -> NoLogImpl.IMPL); }
 
     private LoggerUtil() { noInstanceError(); }
 
-    public static Log getLogger() {
+    public static Logger getLogger() {
         return getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
     }
 
-    public static Log getLogger(Class type) { return getLogger(type.getName()); }
+    public static Logger getLogger(Class type) { return getLogger(type.getName()); }
 
-    public static Log getLogger(String loggerName) { return LOG_CREATOR.apply(loggerName); }
+    public static Logger getLogger(String loggerName) { return LOG_CREATOR.apply(loggerName); }
 }

@@ -3,7 +3,7 @@ package com.moon.core.util.logger;
 /**
  * @author benshaoye
  */
-public interface Log {
+public interface Logger {
 
     /**
      * 是否开启调试级别日志

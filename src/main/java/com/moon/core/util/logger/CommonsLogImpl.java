@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @author benshaoye
  */
-final class CommonsLogImpl implements Log {
+final class CommonsLogImpl implements Logger {
 
     private final org.apache.commons.logging.Log logger;
 

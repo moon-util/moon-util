@@ -1,16 +1,15 @@
 package com.moon.core.util.logger;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 /**
  * @author benshaoye
  */
-final class Log4jImpl implements Log{
+final class Log4jImpl implements Logger {
 
-    private final Logger logger;
+    private final org.apache.log4j.Logger logger;
 
-    Log4jImpl(String loggerName) { logger = Logger.getLogger(loggerName); }
+    Log4jImpl(String loggerName) { logger = org.apache.log4j.Logger.getLogger(loggerName); }
 
     @Override
     public boolean isDebugEnabled() { return logger.isDebugEnabled(); }

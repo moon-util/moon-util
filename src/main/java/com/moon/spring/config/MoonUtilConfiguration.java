@@ -1,6 +1,6 @@
 package com.moon.spring.config;
 
-import com.moon.core.util.logger.Log;
+import com.moon.core.util.logger.Logger;
 import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.accessor.AccessorRegistration;
 import com.moon.redis.ExceptionHandler;
@@ -35,7 +35,7 @@ import java.util.List;
 @Import({SpringUtil.class})
 public class MoonUtilConfiguration implements ImportSelector {
 
-    private final static Log logger = LoggerUtil.getLogger();
+    private final static Logger logger = LoggerUtil.getLogger();
 
     @Override
     @SuppressWarnings("all")

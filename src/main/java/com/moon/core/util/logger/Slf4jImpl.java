@@ -1,14 +1,13 @@
 package com.moon.core.util.logger;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author benshaoye
  */
-final class Slf4jImpl implements Log {
+final class Slf4jImpl implements Logger {
 
-    private final Logger logger;
+    private final org.slf4j.Logger logger;
 
     Slf4jImpl(String loggerName) { logger = LoggerFactory.getLogger(loggerName); }
 
