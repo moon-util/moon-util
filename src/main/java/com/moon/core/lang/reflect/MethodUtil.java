@@ -1,7 +1,7 @@
 package com.moon.core.lang.reflect;
 
 import com.moon.core.lang.ClassUtil;
-import com.moon.core.lang.SupportUtil;
+import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.WeakLocation;
 import com.moon.core.util.FilterUtil;
@@ -67,7 +67,7 @@ public final class MethodUtil {
     }
 
     public final static Method getPublicMethod(Class type, String methodName) {
-        Method m = SupportUtil.matchOne(getPublicMethods(type, methodName), Asserts.noParams);
+        Method m = ParseSupportUtil.matchOne(getPublicMethods(type, methodName), Asserts.noParams);
         if (m == null) {
             ThrowUtil.runtime("Can not find public method: "
                 + type + "." + methodName + "();");
@@ -139,7 +139,7 @@ public final class MethodUtil {
     }
 
     public final static Method getDeclaredMethod(Class type, String methodName) {
-        Method m = SupportUtil.matchOne(getDeclaredMethods(type, methodName), Asserts.noParams);
+        Method m = ParseSupportUtil.matchOne(getDeclaredMethods(type, methodName), Asserts.noParams);
         if (m == null) {
             throwErr(type, methodName);
         }
@@ -207,7 +207,7 @@ public final class MethodUtil {
     }
 
     public final static Method getAccessibleMethod(Class type, String methodName) {
-        Method m = SupportUtil.matchOne(getAllMethods(type, methodName), Asserts.noParams);
+        Method m = ParseSupportUtil.matchOne(getAllMethods(type, methodName), Asserts.noParams);
         if (m == null) {
             throwErr(type, methodName);
         }

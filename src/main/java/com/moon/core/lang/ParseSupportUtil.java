@@ -16,12 +16,20 @@ import static java.lang.Character.isWhitespace;
  *
  * @author moonsky
  */
-public final class SupportUtil {
+public final class ParseSupportUtil {
 
     private final static char DOT = '.';
 
-    private SupportUtil() { noInstanceError("这个类不推荐任何形式调用"); }
+    private ParseSupportUtil() { noInstanceError("这个类不推荐任何形式调用"); }
 
+    /**
+     * 添加 true
+     *
+     * @param data
+     * @param posBegin
+     *
+     * @return
+     */
     public static int addTrueValue(char[] data, int posBegin) {
         data[posBegin++] = 't';
         data[posBegin++] = 'r';
@@ -64,6 +72,21 @@ public final class SupportUtil {
         return posBegin;
     }
 
+    /**
+     * 解析普通变量
+     * 变量：由数字、字母、汉字、$、_ 构成，切不能以数字开头
+     * <p>
+     * 这里只是承担解析任务，第一个字符有调用识别后传入，
+     * <p>
+     * 默认第一个字符也是变量组成部分，并且没有判断
+     *
+     * @param chars   所有字符
+     * @param indexer 第一个字符（current）的下一个字符在 chars 中的索引位置
+     * @param len     chars 的长度
+     * @param current 第一个字符
+     *
+     * @return
+     */
     public final static String parseVar(char[] chars, IntAccessor indexer, int len, int current) {
         char curr = (char) current;
         char[] value = {curr};
@@ -167,7 +190,7 @@ public final class SupportUtil {
      *
      * @param chars   字符数组
      * @param indexer 索引器
-     * @param <T> 无
+     * @param <T>     无
      *
      * @return 无
      */
@@ -186,8 +209,13 @@ public final class SupportUtil {
             msg.append("\n Message : ").append(message);
         }
         msg.append("\n Context : ").append(">>>>>").append(chars, start, maxLen).append("<<<<<");
-        msg.append("\n Location: >>>>>").append(chars, start, preLen).append('ˇ').append(chars[index]).append('ˇ')
-            .append(chars, index + 1, postLen).append("<<<<<");
+        msg.append("\n Location: >>>>>")
+            .append(chars, start, preLen)
+            .append('ˇ')
+            .append(chars[index])
+            .append('ˇ')
+            .append(chars, index + 1, postLen)
+            .append("<<<<<");
         throw new IllegalArgumentException(msg.toString());
     }
 

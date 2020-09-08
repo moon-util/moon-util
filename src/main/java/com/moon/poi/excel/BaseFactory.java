@@ -53,7 +53,7 @@ abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFact
      *
      * @return 行号
      */
-    public int getRowNum() {
+    public int getRowIndex() {
         return getProxy().getIndexOfRow();
     }
 

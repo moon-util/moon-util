@@ -132,7 +132,7 @@ public final class ShortUtil {
             return Short.valueOf(String.valueOf((Boolean) value ? 1 : 0));
         }
         try {
-            return toShort(SupportUtil.onlyOneItemOrSize(value));
+            return toShort(ParseSupportUtil.onlyOneItemOrSize(value));
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Can not cast to short of: %s", value), e);
         }

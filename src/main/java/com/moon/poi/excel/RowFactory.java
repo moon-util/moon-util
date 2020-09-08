@@ -267,7 +267,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory cell() { return cell(1, 1); }
+    public CellFactory newCell() { return newCell(1, 1); }
 
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
@@ -276,7 +276,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory cell(int offset) { return cell(1, 1, offset); }
+    public CellFactory newCell(int offset) { return newCell(1, 1, offset); }
 
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
@@ -286,7 +286,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory cell(int rowspan, int colspan) { return cell(rowspan, colspan, 0); }
+    public CellFactory newCell(int rowspan, int colspan) { return newCell(rowspan, colspan, 0); }
 
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
@@ -297,7 +297,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory cell(int rowspan, int colspan, int offset) {
+    public CellFactory newCell(int rowspan, int colspan, int offset) {
         nextCell(rowspan, colspan, offset);
         return getCellFactory();
     }
@@ -313,7 +313,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory cell(Consumer<CellFactory> consumer) { return cell(0, consumer); }
+    public RowFactory newCell(Consumer<CellFactory> consumer) { return newCell(0, consumer); }
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器
@@ -323,7 +323,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory cell(int offset, Consumer<CellFactory> consumer) { return cell(1, 1, offset, consumer); }
+    public RowFactory newCell(int offset, Consumer<CellFactory> consumer) { return newCell(1, 1, offset, consumer); }
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器
@@ -334,8 +334,8 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory cell(int rowspan, int colspan, Consumer<CellFactory> consumer) {
-        return cell(rowspan, colspan, 0, consumer);
+    public RowFactory newCell(int rowspan, int colspan, Consumer<CellFactory> consumer) {
+        return newCell(rowspan, colspan, 0, consumer);
     }
 
     /**
@@ -348,7 +348,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory cell(int rowspan, int colspan, int offset, Consumer<CellFactory> consumer) {
+    public RowFactory newCell(int rowspan, int colspan, int offset, Consumer<CellFactory> consumer) {
         nextCell(rowspan, colspan, offset);
         consumer.accept(getCellFactory());
         return this;

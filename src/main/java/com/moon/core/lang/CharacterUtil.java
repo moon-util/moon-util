@@ -34,7 +34,7 @@ public final class CharacterUtil {
             return (char) (bool ? 1 : 0);
         }
         try {
-            Object firstItem = SupportUtil.onlyOneItemOrSize(value);
+            Object firstItem = ParseSupportUtil.onlyOneItemOrSize(value);
             return toCharValue(firstItem);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Can not cast to Character of: %s", value), e);

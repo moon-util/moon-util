@@ -271,6 +271,10 @@ public final class WorkbookProxy {
         if (row == null) {
             row = sheet.createRow(index);
         }
+        return purelyUseRow(row, index, appendCell);
+    }
+
+    Row purelyUseRow(Row row, int index, boolean appendCell) {
         // 保持 indexOfRow 指向下一行
         this.indexOfRow = index + 1;
         return setRow(row, appendCell);

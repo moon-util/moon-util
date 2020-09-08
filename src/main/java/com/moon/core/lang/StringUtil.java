@@ -609,6 +609,10 @@ public final class StringUtil {
         return value == null ? defaultValue : value.toString();
     }
 
+    public static String toStringOrNull(Object value) {
+        return toStringOrDefault(value, null);
+    }
+
     public static String stringify(Object value) { return toStringOrDefault(value, null); }
 
     /*
@@ -1113,14 +1117,14 @@ public final class StringUtil {
             if (Character.isWhitespace(curr)) {
                 if (isNotWhitespace) {
                     isNotWhitespace = false;
-                    value = SupportUtil.setChar(value, idx++, curr);
+                    value = ParseSupportUtil.setChar(value, idx++, curr);
                 }
             } else {
                 isNotWhitespace = true;
-                value = SupportUtil.setChar(value, idx++, curr);
+                value = ParseSupportUtil.setChar(value, idx++, curr);
             }
         }
-        return SupportUtil.toStr(value, idx);
+        return ParseSupportUtil.toStr(value, idx);
     }
 
     public static String sortChars(String str) {
@@ -1149,14 +1153,14 @@ public final class StringUtil {
             for (; i < len; i++) {
                 char ch = sourceString.charAt(i);
                 if (chars == null) {
-                    chars = SupportUtil.setChar(null, index++, ch);
+                    chars = ParseSupportUtil.setChar(null, index++, ch);
                 } else {
                     for (j = 0; j < index; j++) {
                         if (chars[j] == ch) {
                             continue outer;
                         }
                     }
-                    chars = SupportUtil.setChar(chars, index++, ch);
+                    chars = ParseSupportUtil.setChar(chars, index++, ch);
                 }
             }
             return String.valueOf(chars, 0, index);
@@ -1996,6 +2000,7 @@ public final class StringUtil {
      * @param emptyIfInputNull 当 str == null 时，是否返回空集合，否则返回 null
      *
      * @return 符合条件的字符串集合
+     *
      * @see #extractNumerics(CharSequence) 示例，提取字符串中所有数字
      */
     public static <T> List<T> extractContinuousMatched(

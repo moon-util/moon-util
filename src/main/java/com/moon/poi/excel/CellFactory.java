@@ -487,7 +487,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前单元格的值
      */
-    public Object val() { return ExcelUtil.getValue(getCell()); }
+    public Object getValue() { return ExcelUtil.getValue(getCell()); }
 
     /**
      * 以指定类型获取值
@@ -497,8 +497,8 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前单元格的值
      */
-    public <T> T valAs(Class<? extends T> type) {
-        return caster.toType(val(), type);
+    public <T> T getValue(Class<? extends T> type) {
+        return caster.toType(getValue(), type);
     }
 
     /**
@@ -509,8 +509,8 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前单元格的值
      */
-    public <T> T valAs(Function<Object, ? extends T> converter) {
-        return converter.apply(val());
+    public <T> T getValue(Function<Object, ? extends T> converter) {
+        return converter.apply(getValue());
     }
 
     /**
@@ -521,7 +521,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @return 当前 CellFactory
      */
     public CellFactory useVal(Consumer consumer) {
-        consumer.accept(val());
+        consumer.accept(getValue());
         return this;
     }
 
@@ -534,7 +534,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @return 当前 CellFactory
      */
     public <T> CellFactory useVal(Class<? extends T> type, Consumer<? super T> consumer) {
-        consumer.accept(valAs(type));
+        consumer.accept(getValue(type));
         return this;
     }
 
@@ -547,7 +547,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @return 当前 CellFactory
      */
     public <T> CellFactory useVal(Function<Object, ? extends T> converter, Consumer<? super T> consumer) {
-        consumer.accept(valAs(converter));
+        consumer.accept(getValue(converter));
         return this;
     }
 

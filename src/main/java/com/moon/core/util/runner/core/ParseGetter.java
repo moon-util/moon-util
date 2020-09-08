@@ -1,6 +1,6 @@
 package com.moon.core.util.runner.core;
 
-import com.moon.core.lang.SupportUtil;
+import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.runner.RunnerSetting;
 import com.moon.core.util.runner.core.InvokeEnsure.EnsureArgs0;
@@ -34,7 +34,7 @@ final class ParseGetter {
      * @return
      */
     final static AsValuer parseVar(char[] chars, IntAccessor indexer, int len, int current) {
-        String str = SupportUtil.parseVar(chars, indexer, len, current);
+        String str = ParseSupportUtil.parseVar(chars, indexer, len, current);
         switch (str) {
             case "null":
                 return DataConst.NULL;

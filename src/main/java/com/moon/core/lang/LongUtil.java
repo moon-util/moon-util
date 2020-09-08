@@ -164,7 +164,7 @@ public final class LongUtil {
             return toLongValue((Calendar) object);
         }
         try {
-            Object firstItem = SupportUtil.onlyOneItemOrSize(object);
+            Object firstItem = ParseSupportUtil.onlyOneItemOrSize(object);
             return toLong(firstItem);
         } catch (Exception e) {
             throw new IllegalArgumentException(format("Can not cast to int of: %s", object), e);

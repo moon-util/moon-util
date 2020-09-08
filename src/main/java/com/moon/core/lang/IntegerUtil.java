@@ -108,7 +108,7 @@ public final class IntegerUtil {
             return (boolean) object ? 1 : 0;
         }
         try {
-            return IntUtil.toIntValue(SupportUtil.onlyOneItemOrSize(object));
+            return IntUtil.toIntValue(ParseSupportUtil.onlyOneItemOrSize(object));
         } catch (Exception e) {
             return ThrowUtil.runtime(e, String.format("Can not cast to int of: %s", object));
         }

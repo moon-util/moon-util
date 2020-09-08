@@ -93,7 +93,7 @@ public final class DoubleUtil {
             return (double) ((Boolean) value ? 1 : 0);
         }
         try {
-            return toDouble(SupportUtil.onlyOneItemOrSize(value));
+            return toDouble(ParseSupportUtil.onlyOneItemOrSize(value));
         } catch (Exception e) {
             throw new IllegalArgumentException(format("Can not cast to double of: %s", value), e);
         }

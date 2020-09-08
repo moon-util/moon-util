@@ -257,7 +257,7 @@ public final class CharUtil {
             return (char) (bool ? 49 : 48);
         }
         try {
-            Object firstItem = SupportUtil.onlyOneItemOrSize(o);
+            Object firstItem = ParseSupportUtil.onlyOneItemOrSize(o);
             return toCharValue(firstItem);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Can not cast to char of: %s", o), e);

@@ -64,16 +64,16 @@ class ExcelUtilTestTest {
                 rowFactory.next("群众");
                 rowFactory.next("团员");
                 // rowFactory.next("男性");
-                rowFactory.cell().val("男性").commentAs("default");
-                rowFactory.cell().val("女性").commentAs("default");
+                rowFactory.newCell().val("男性").commentAs("default");
+                rowFactory.newCell().val("女性").commentAs("default");
             });
             sheetFactory.row(rowFactory -> {
-                rowFactory.cell(cellFactory -> cellFactory.val("女性"));
-                rowFactory.cell().val(0).comment("今天是个好日子");
+                rowFactory.newCell(cellFactory -> cellFactory.val("女性"));
+                rowFactory.newCell().val(0).comment("今天是个好日子");
             });
             sheetFactory.row(rowFactory -> {
-                rowFactory.cell(cellFactory -> cellFactory.val("女性"));
-                rowFactory.cell(1, 1, -1).val(0).comment("今天是个好日子");
+                rowFactory.newCell(cellFactory -> cellFactory.val("女性"));
+                rowFactory.newCell(1, 1, -1).val(0).comment("今天是个好日子");
             });
         }).finish().write("D:/test.xlsx");
         // excelFactory.shee
@@ -94,10 +94,10 @@ class ExcelUtilTestTest {
             font.setColor(IndexedColors.RED.index);
         }).sheet(sheetFactory -> {
             sheetFactory.row(rowFactory -> {
-                rowFactory.cell(3, 3).val("值").styleAs("header");
-                rowFactory.cell().styleAs("header");
-                rowFactory.cell(2, 2).val("值").styleAs("header");
-                rowFactory.cell().active();
+                rowFactory.newCell(3, 3).val("值").styleAs("header");
+                rowFactory.newCell().styleAs("header");
+                rowFactory.newCell(2, 2).val("值").styleAs("header");
+                rowFactory.newCell().active();
             });
         }).finish().write("D:/test.xlsx");
     }
@@ -127,12 +127,12 @@ class ExcelUtilTestTest {
             for (int j = 0; j < count; j++) {
                 sheetFactory.row(rowFactory -> {
                     for (int i = 0; i < count; i++) {
-                        rowFactory.cell().val("电脑").styleAs("style" + i);
+                        rowFactory.newCell().val("电脑").styleAs("style" + i);
                     }
                 });
                 sheetFactory.row(rowFactory -> {
                     for (int i = 0; i < count; i++) {
-                        rowFactory.cell().val("奖品").styleAs("style" + i);
+                        rowFactory.newCell().val("奖品").styleAs("style" + i);
                     }
                 });
             }

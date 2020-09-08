@@ -1,7 +1,7 @@
 package com.moon.core.util.runner.core;
 
 import com.moon.core.lang.CharUtil;
-import com.moon.core.lang.SupportUtil;
+import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.runner.Runner;
 import com.moon.core.util.runner.RunnerSetting;
@@ -63,7 +63,7 @@ public class ParseUtil {
      * @return 下一个非空白字符
      */
     final static int nextVal(char[] chars, IntAccessor indexer, final int len) {
-        return SupportUtil.skipWhitespaces(chars, indexer, len);
+        return ParseSupportUtil.skipWhitespaces(chars, indexer, len);
     }
 
     /*
@@ -72,10 +72,10 @@ public class ParseUtil {
      * -------------------------------------------------------
      */
 
-    final static <T> T throwErr(char[] chars, IntAccessor indexer) { return SupportUtil.throwErr(chars, indexer); }
+    final static <T> T throwErr(char[] chars, IntAccessor indexer) { return ParseSupportUtil.throwErr(chars, indexer); }
 
     final static <T> T throwErr(String message, char[] chars, IntAccessor indexer) {
-        return SupportUtil.throwErr(message, chars, indexer);
+        return ParseSupportUtil.throwErr(message, chars, indexer);
     }
 
     static AsRunner doThrow(String msg) { throw new IllegalArgumentException(msg); }

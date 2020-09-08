@@ -116,7 +116,7 @@ public final class ByteUtil {
             return Byte.valueOf(String.valueOf(((boolean) object) ? 1 : 0));
         }
         try {
-            Object firstItem = SupportUtil.onlyOneItemOrSize(object);
+            Object firstItem = ParseSupportUtil.onlyOneItemOrSize(object);
             return toByte(firstItem);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Can not cast to int of: %s", object), e);

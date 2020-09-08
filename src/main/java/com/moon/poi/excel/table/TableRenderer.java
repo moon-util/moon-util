@@ -1,6 +1,5 @@
 package com.moon.poi.excel.table;
 
-import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.MapUtil;
 import com.moon.poi.excel.*;
@@ -139,7 +138,7 @@ final class TableRenderer implements Renderer {
         }
 
         RowFactory rowFactory = factory.row();
-        CellFactory cellFactory = rowFactory.cell(1, colspan).val(title.getTitle());
+        CellFactory cellFactory = rowFactory.newCell(1, colspan).val(title.getTitle());
         if (title.getClassname() != null) {
             cellFactory.styleAs(title.getClassname());
         }
@@ -157,7 +156,7 @@ final class TableRenderer implements Renderer {
     public void renderHead(SheetFactory sheetFactory) {
         Sheet sheet = sheetFactory.getSheet();
         List<HeaderCell>[] headerCells = this.headerCells;
-        final int rowIdx = sheetFactory.getRowNum();
+        final int rowIdx = sheetFactory.getRowIndex();
         for (List<HeaderCell> rowCells : headerCells) {
             RowFactory factory = sheetFactory.row();
             for (HeaderCell cell : rowCells) {

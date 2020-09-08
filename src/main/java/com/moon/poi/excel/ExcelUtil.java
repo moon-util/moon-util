@@ -1,5 +1,6 @@
 package com.moon.poi.excel;
 
+import com.moon.core.lang.DoubleUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.TypeUtil;
 import org.apache.poi.ss.usermodel.*;
@@ -244,12 +245,31 @@ public final class ExcelUtil extends LoadUtil {
     }
 
     public static String getStringValue(Cell cell) {
+        return getStringValue(cell, null);
+    }
+
+    public static String getStringValue(Cell cell, String defaultIfNull) {
         try {
             return cell.getStringCellValue();
         } catch (NullPointerException e) {
-            return null;
+            return defaultIfNull;
         } catch (Exception e) {
-            return StringUtil.stringify(getValue(cell));
+            return StringUtil.toStringOrDefault(getValue(cell), defaultIfNull);
+        }
+    }
+
+    public static double getNumericValue(Cell cell) {
+        return getNumericValue(cell, 0);
+    }
+
+    public static double getNumericValue(Cell cell, double defaultIfNull) {
+        try {
+            return cell.getNumericCellValue();
+        } catch (NullPointerException e) {
+            return defaultIfNull;
+        } catch (Exception e) {
+            Double value = DoubleUtil.toDouble(getValue(cell));
+            return value == null ? defaultIfNull : value;
         }
     }
 

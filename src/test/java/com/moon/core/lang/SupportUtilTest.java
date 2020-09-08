@@ -3,8 +3,8 @@ package com.moon.core.lang;
 import com.moon.core.lang.ref.IntAccessor;
 import org.junit.jupiter.api.Test;
 
-import static com.moon.core.lang.SupportUtil.parseNum;
-import static com.moon.core.lang.SupportUtil.parseStr;
+import static com.moon.core.lang.ParseSupportUtil.parseNum;
+import static com.moon.core.lang.ParseSupportUtil.parseStr;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

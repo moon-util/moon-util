@@ -1,7 +1,7 @@
 package com.moon.core.math;
 
 import com.moon.core.lang.NumberUtil;
-import com.moon.core.lang.SupportUtil;
+import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.lang.ThrowUtil;
 
 import java.math.BigDecimal;
@@ -62,7 +62,7 @@ public final class BigDecimalUtil extends NumberUtil {
             return valueOf(value.toString());
         }
         try {
-            return toBigDecimal(SupportUtil.onlyOneItemOrSize(value));
+            return toBigDecimal(ParseSupportUtil.onlyOneItemOrSize(value));
         } catch (Exception e) {
             return runtime(e, String.format("Can not cast to BigDecimal of: %s", value));
         }

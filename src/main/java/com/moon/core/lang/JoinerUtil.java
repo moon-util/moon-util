@@ -58,10 +58,10 @@ public final class JoinerUtil {
                 int newLen = 5 + (5 + sepLen) * (len - 1);
 
                 char[] data = new char[newLen];
-                int pos = SupportUtil.addBooleanValue(data, array[0], 0);
+                int pos = ParseSupportUtil.addBooleanValue(data, array[0], 0);
                 for (int i = 1; i < len; i++) {
                     separator.getChars(0, sepLen, data, pos);
-                    pos = SupportUtil.addBooleanValue(data, array[i], pos + sepLen);
+                    pos = ParseSupportUtil.addBooleanValue(data, array[i], pos + sepLen);
                 }
                 return String.valueOf(data, 0, pos);
             }

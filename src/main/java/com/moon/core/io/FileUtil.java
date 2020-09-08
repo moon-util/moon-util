@@ -2,7 +2,7 @@ package com.moon.core.io;
 
 import com.moon.core.lang.LangUtil;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.lang.SupportUtil;
+import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.function.ThrowingConsumer;
@@ -479,7 +479,7 @@ public final class FileUtil {
             char DFT = APP_FileSeparator_Char;
             for (int i = 0, len = filepath.length(); i < len; i++) {
                 char ch = filepath.charAt(i);
-                chars = SupportUtil.setChar(chars, index++, ch == WIN ? DFT : ch);
+                chars = ParseSupportUtil.setChar(chars, index++, ch == WIN ? DFT : ch);
             }
             return chars == null ? null : new String(chars, 0, index);
         }

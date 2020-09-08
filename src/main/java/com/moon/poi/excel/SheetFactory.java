@@ -2,7 +2,6 @@ package com.moon.poi.excel;
 
 import com.moon.poi.excel.annotation.TableColumn;
 import com.moon.poi.excel.annotation.TableColumnGroup;
-// import com.moon.poi.excel.annotation.TableIndexer;
 import com.moon.poi.excel.annotation.TableRecord;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -273,16 +272,16 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     /**
      * 使用并操作指定行，如果不存在则创建
      *
-     * @param rowIndex 指定行号
-     * @param append   如果指定行存在，并且有数据，操作方式是采取追加数据还是覆盖数据；
-     *                 true: 追加新数据（默认）
-     *                 false: 覆盖旧数据
-     * @param consumer 操作器
+     * @param rowIndex   指定行号
+     * @param appendCell 如果指定行存在，并且有数据，操作方式是采取追加数据还是覆盖数据；
+     *                   true: 追加新数据（默认）
+     *                   false: 覆盖旧数据
+     * @param consumer   操作器
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory useRow(int rowIndex, boolean append, Consumer<RowFactory> consumer) {
-        consumer.accept(useRow(rowIndex, append));
+    public SheetFactory useRow(int rowIndex, boolean appendCell, Consumer<RowFactory> consumer) {
+        consumer.accept(useRow(rowIndex, appendCell));
         return this;
     }
 
@@ -300,17 +299,75 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     /**
      * 使用并操作指定行，如果不存在则创建
      *
-     * @param rowIndex 指定行号
-     * @param append   如果指定行存在，并且有数据，操作方式是采取追加数据还是覆盖数据；
-     *                 true: 追加新数据（默认）
-     *                 false: 覆盖旧数据
+     * @param rowIndex   指定行号
+     * @param appendCell 如果指定行存在，并且有数据，那么在操作单元格时是采取追加数据还是覆盖数据的方式；
+     *                   true: 追加新数据（默认）
+     *                   false: 覆盖旧数据
      *
      * @return 行操作器
      */
-    public RowFactory useRow(int rowIndex, boolean append) {
+    public RowFactory useRow(int rowIndex, boolean appendCell) {
         RowFactory rowFactory = getRowFactory();
-        rowFactory.setRow(proxy.useOrCreateRow(rowIndex, append));
+        rowFactory.setRow(proxy.useOrCreateRow(rowIndex, appendCell));
         return rowFactory;
+    }
+
+    /**
+     * 遍历处理每行数据
+     *
+     * @param consumer 处理器
+     *
+     * @return 当前 SheetFactory
+     */
+    public SheetFactory forEach(Consumer<RowFactory> consumer) {
+        return forEach(0, consumer);
+    }
+
+    /**
+     * 遍历处理每行数据
+     *
+     * @param fromRowIndex 从哪一行开始
+     * @param consumer     处理器
+     *
+     * @return 当前 SheetFactory
+     */
+    public SheetFactory forEach(int fromRowIndex, Consumer<RowFactory> consumer) {
+        return forEach(fromRowIndex, getSheet().getLastRowNum() + 1, consumer);
+    }
+
+    /**
+     * 遍历处理每行数据
+     *
+     * @param fromRowIndex 从哪一行开始
+     * @param toRowIndex   至哪一行结束
+     * @param consumer     处理器
+     *
+     * @return 当前 SheetFactory
+     */
+    public SheetFactory forEach(int fromRowIndex, int toRowIndex, Consumer<RowFactory> consumer) {
+        RowFactory rowFactory = getRowFactory();
+        for (int i = fromRowIndex; i < toRowIndex; i++) {
+            rowFactory.setRow(proxy.useOrCreateRow(i, true));
+            consumer.accept(rowFactory);
+        }
+        return this;
+    }
+
+    /**
+     * 聚合所有行
+     *
+     * @return
+     */
+    private SheetFactory reduce() {
+        throw new UnsupportedOperationException();
+    }
+
+    private SheetFactory reduceAll() {
+        throw new UnsupportedOperationException();
+    }
+
+    private static class Boundary {
+
     }
 
     /**
