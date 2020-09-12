@@ -36,10 +36,12 @@ public class TreeElement<T> implements IdGetter, NameGetter {
         this.id = id;
     }
 
+    @SafeVarargs
     public static <T extends KeyValueGetter> List<TreeElement<T>> fromKeyValueList(
         Iterable<T> data, Function<T, String> grouper, Function<String, String>... reGroupers
     ) { return fromList(data, grouper, KeyGetter::getKey, ValueGetter::getValue, reGroupers); }
 
+    @SafeVarargs
     public static <T extends IdNameGetter> List<TreeElement<T>> fromIdNameList(
         Iterable<T> data, Function<T, String> grouper, Function<String, String>... reGroupers
     ) { return fromList(data, grouper, IdGetter::getId, NameGetter::getName, reGroupers); }
@@ -47,7 +49,7 @@ public class TreeElement<T> implements IdGetter, NameGetter {
     /**
      * 从数据列表中解析树形结构，注意参数{@code grouper}的返回值说明
      *
-     * @param data
+     * @param data       原数据
      * @param grouper    分组函数；
      *                   返回值为父节点的 id；
      *                   若返回值为 null 代表没有父节点，可用来标记顶级节点
@@ -55,28 +57,29 @@ public class TreeElement<T> implements IdGetter, NameGetter {
      * @param nameGetter 当前节点的 name，{@link #name}
      * @param <T>        数据类型
      *
-     * @return
+     * @return 返回树形化后的每个顶级节点列表
      */
     public static <T> List<TreeElement<T>> fromList(
         Iterable<T> data, Function<T, String> grouper,
 
         Function<T, String> idGetter, Function<T, String> nameGetter
-    ) { return fromList(data, grouper, idGetter, nameGetter, null); }
+    ) { return fromList(data, grouper, idGetter, nameGetter, (Function<String, String>) null); }
 
     /**
      * 从数据列表中解析树形结构，注意参数{@code grouper}的返回值，null 值是有特殊意义的
      *
-     * @param data
+     * @param data       原数据
      * @param grouper    分组函数；
      *                   返回值为父节点的 id；
      *                   若返回值为 null 代表没有父节点，可用来标记顶级节点
      * @param idGetter   当前节点的 id，{@link #id}
      * @param nameGetter 当前节点的 name，{@link #name}
-     * @param reGroupers 再分组函数（第一次分组以及树形化之后，可能还剩余有数据，可以重新分组）
+     * @param reGroupers 再分组函数（第一次【前一次】分组以及树形化之后，可能还剩余有数据，可以重新分组）
      * @param <T>        数据类型
      *
-     * @return
+     * @return 返回树形化后的每个顶级节点列表
      */
+    @SafeVarargs
     public static <T> List<TreeElement<T>> fromList(
         Iterable<T> data,
         Function<T, String> grouper,
@@ -95,11 +98,7 @@ public class TreeElement<T> implements IdGetter, NameGetter {
                 element.setData(datum);
                 topParents.add(element);
             } else {
-                List<TreeElement<T>> list = grouped.get(key);
-                if (list == null) {
-                    list = new ArrayList<>();
-                    grouped.put(key, list);
-                }
+                List<TreeElement<T>> list = grouped.computeIfAbsent(key, k -> new ArrayList<>());
                 TreeElement<T> element = new TreeElement<>();
                 element.setName(nameGetter.apply(datum));
                 element.setId(idGetter.apply(datum));
@@ -111,8 +110,7 @@ public class TreeElement<T> implements IdGetter, NameGetter {
         // 再分组
         if (!grouped.isEmpty() && ArrayUtil.isNotEmpty(reGroupers)) {
             Map<String, List<TreeElement<T>>> restGrouped = grouped;
-            for (int i = 0, len = reGroupers.length; i < len; i++) {
-                Function<String, String> groupFn = reGroupers[i];
+            for (Function<String, String> groupFn : reGroupers) {
                 Map<String, List<TreeElement<T>>> reGrouped = new HashMap<>();
                 for (Map.Entry<String, List<TreeElement<T>>> listEntry : restGrouped.entrySet()) {
                     String reGroupKey = groupFn.apply(listEntry.getKey());
