@@ -5,7 +5,7 @@ import java.util.function.Function;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * 日志工具类，默认日志顺序：slf4j、log4j、log4j2、commons-log、no-log
+ * 日志工具类，默认日志顺序：slf4j、log4j、log4j2、commons-log、jdk-log、no-log
  *
  * @author moonsky
  */
@@ -17,7 +17,7 @@ public final class LoggerUtil {
         if (LOG_CREATOR == null) {
             try {
                 runner.run();
-            } catch (Throwable var2) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -36,7 +36,8 @@ public final class LoggerUtil {
         tryImplementation(LoggerUtil::useSlf4jImplementation);
         tryImplementation(LoggerUtil::useLog4jImplementation);
         tryImplementation(LoggerUtil::useLog4j2Implementation);
-        tryImplementation(LoggerUtil::useCommonsLogImplementation);
+        tryImplementation(LoggerUtil::useCommonsImplementation);
+        tryImplementation(LoggerUtil::useJdk14Implementation);
         tryImplementation(LoggerUtil::useNoLogImplementation);
     }
 
@@ -46,7 +47,9 @@ public final class LoggerUtil {
 
     public static void useLog4j2Implementation() { setImplementation(Log4j2Impl::new); }
 
-    public static void useCommonsLogImplementation() { setImplementation(CommonsLogImpl::new); }
+    public static void useCommonsImplementation() { setImplementation(CommonsLogImpl::new); }
+
+    public static void useJdk14Implementation() { setImplementation(Jdk14LogImpl::new); }
 
     public static void useNoLogImplementation() { setImplementation(name -> NoLogImpl.IMPL); }
 
