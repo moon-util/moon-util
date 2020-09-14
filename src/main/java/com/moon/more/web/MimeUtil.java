@@ -9,9 +9,9 @@ import static com.moon.more.web.RequestUtil.header;
 /**
  * @author moonsky
  */
-public class ContentTypeUtil {
+public class MimeUtil {
 
-    protected ContentTypeUtil() { noInstanceError(); }
+    protected MimeUtil() { noInstanceError(); }
 
     /**
      * 请求可接受什么形式的数据响应

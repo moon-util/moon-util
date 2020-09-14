@@ -5,7 +5,9 @@ import java.util.function.Function;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
- * 日志工具类，默认日志顺序：slf4j、log4j、log4j2、commons-log、no-log
+ * 日志工具类，提供统一的日志包装{@link Logger}，可咋不同场景下自动获取相应的实际日志库
+ * <p>
+ * 默认日志顺序：slf4j、log4j、log4j2、commons-log、no-log
  *
  * @author moonsky
  */
