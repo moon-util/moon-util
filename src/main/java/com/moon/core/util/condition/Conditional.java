@@ -43,7 +43,7 @@ public interface Conditional extends BooleanSupplier {
      *
      * @return 动态条件执行器
      */
-    static Conditional of(BooleanSupplier dynamicCondition) {
+    static Conditional ofDynamic(BooleanSupplier dynamicCondition) {
         return DynamicCondition.of(dynamicCondition);
     }
 

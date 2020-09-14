@@ -504,9 +504,9 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     /**
      * 设置毫秒数
      *
-     * @param timeInMillis
+     * @param timeInMillis 时间戳
      *
-     * @return
+     * @return 时间对象
      */
     public Datetime withTimeInMillis(long timeInMillis) {
         Calendar calendar = obtainCalendar();
@@ -962,8 +962,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Datetime endOfWeek(DayOfWeek firstDayOfWeek) {
         Datetime datetime = endOfDay();
         int diffDays = firstDayOfWeek.ordinal() - datetime.getDayOfWeek().ordinal();
-        changeCalendarOf(datetime.originCalendar(),
-            Calendar.DAY_OF_MONTH,
+        changeCalendarOf(datetime.originCalendar(), Calendar.DAY_OF_MONTH,
             (diffDays <= 0 ? diffDays + 6 : diffDays - 1));
         return datetime;
     }
@@ -1334,6 +1333,14 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public LocalDate toLocalDate() { return LocalDate.of(getYearValue(), getMonthValue(), getDayOfMonth()); }
 
     public LocalDateTime toLocalDateTime() { return LocalDateTime.of(toLocalDate(), toLocalTime()); }
+
+    public YearMonth toYearMonth() {
+        return YearMonth.of(getYearValue(), getMonthValue());
+    }
+
+    public MonthDay toMonthDay() {
+        return MonthDay.of(getMonthValue(), getDayOfMonth());
+    }
 
     public org.joda.time.LocalDateTime toJodaLocalDateTime() {
         return org.joda.time.LocalDateTime.fromCalendarFields(originCalendar());

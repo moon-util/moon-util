@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * @author moonsky
  */
-final class LocalStorage<T> {
+public class LocalStorage<T> {
 
     private final static String PATH_NAMESPACE;
     private final static char CHAR_HYPHEN = '-';
