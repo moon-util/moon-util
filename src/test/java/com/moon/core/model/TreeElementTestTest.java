@@ -3,6 +3,7 @@ package com.moon.core.model;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.Labels;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.moon.core.io.IOUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.TestUtil;
 import org.jsoup.Jsoup;
@@ -12,6 +13,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Iterator;
@@ -97,5 +101,15 @@ class TreeElementTestTest {
             }
         }
         return cities;
+    }
+
+    @Test
+    void testGetCitiesList() throws Exception {
+        String urlPath = "http://www.mca.gov.cn///article/sj/xzqh/2020/2020/2020072805001.html";
+        URL url  = new URL(urlPath);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        InputStream stream = connection.getInputStream();
+        String content = IOUtil.toString(stream);
+        System.out.println(content);
     }
 }
