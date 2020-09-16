@@ -4,9 +4,8 @@ import com.moon.core.enums.Collects;
 import com.moon.core.enums.Lists;
 import com.moon.core.enums.Sets;
 import com.moon.core.lang.ArrayUtil;
-import com.moon.core.util.function.BiIntFunction;
+import com.moon.core.util.function.BiIntConsumer;
 import com.moon.core.util.function.TableIntConsumer;
-import com.moon.core.util.function.TableIntFunction;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -357,8 +356,8 @@ public class CollectUtil extends BaseCollectUtil {
      * @return 返回最后一项处理完后的结果
      *
      * @see #reduce(Iterator, TableIntConsumer, Object)
-     * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
-     * @see ArrayUtil#reduce(int, BiIntFunction, Object)
+     * @see ArrayUtil#reduce(int, BiIntConsumer, Object)
+     * @see ArrayUtil#reduce(Object[], TableIntConsumer, Object)
      */
     public final static <T, E> T reduce(
         Iterable<? extends E> iterable, TableIntConsumer<? super T, ? super E> reducer, T totalValue
@@ -389,8 +388,8 @@ public class CollectUtil extends BaseCollectUtil {
      * @return 返回最后一项处理完后的结果
      *
      * @see #reduce(Iterable, TableIntConsumer, Object)
-     * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
-     * @see ArrayUtil#reduce(int, BiIntFunction, Object)
+     * @see ArrayUtil#reduce(int, BiIntConsumer, Object)
+     * @see ArrayUtil#reduce(Object[], TableIntConsumer, Object)
      */
     public final static <T, E> T reduce(
         Iterator<? extends E> iterator, TableIntConsumer<? super T, ? super E> reducer, T totalValue
