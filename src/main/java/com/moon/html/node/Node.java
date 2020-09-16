@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * @author moonsky
  */
-public abstract class Node implements Cloneable, Serializable {
+public abstract class Node extends EventTarget implements Cloneable, Serializable {
 
     private final String nodeName;
     private final int nodeType;
