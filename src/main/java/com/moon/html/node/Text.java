@@ -5,13 +5,13 @@ import com.moon.core.lang.StringUtil;
 /**
  * @author moonsky
  */
-public final class Comment extends Node {
+public final class Text extends Node {
 
     private Element parent;
 
-    public Comment(String comment) {
-        super("#comment", 8);
-        setNodeValue(StringUtil.trimToEmpty(comment));
+    public Text(String textContent) {
+        super("#text", 2);
+        this.setNodeValue(StringUtil.trimToEmpty(textContent));
     }
 
     public int length() { return nodeValue().length(); }

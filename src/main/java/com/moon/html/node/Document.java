@@ -5,7 +5,11 @@ package com.moon.html.node;
  */
 public abstract class Document extends Node {
 
-    public Document(String nodeName) {
-        super("#document", 9);
+    private DocumentType doctype;
+
+    public Document() { super("#document", 9); }
+
+    public DocumentType doctype() {
+        return doctype;
     }
 }
