@@ -58,7 +58,7 @@ public class NumberUtil {
      *
      * @return 如果两个数字相等，返回 true
      */
-    public final static boolean compareToOrEquals(Number num1, Number num2) {
+    public final static boolean compareEquals(Number num1, Number num2) {
         try {
             Comparable value1 = (Comparable) num1;
             return (value1 != null && value1.compareTo(num2) == 0) || Objects.equals(num2, num1);
