@@ -58,13 +58,13 @@ class TreeElementTestTest {
                 return key.substring(0, 4) + "00";
             }
         });
-        System.out.println(elements);
+        // System.out.println(elements);
 
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         filter.getExcludes().add("data");
-        System.out.println(JSON.toJSONString(elements, Labels.excludes("data")));
+        // System.out.println(JSON.toJSONString(elements, Labels.excludes("data")));
         System.out.println("========================================");
-        System.out.println(JSON.toJSONString(elements, filter));
+        // System.out.println(JSON.toJSONString(elements, filter));
     }
 
     /**
@@ -76,6 +76,7 @@ class TreeElementTestTest {
      */
     private List<KeyValue> getCitiesList() throws IOException {
         Document document = Jsoup.connect("http://www.mca.gov.cn///article/sj/xzqh/2020/2020/2020072805001.html").get();
+        System.out.println(document.outerHtml());
         List<Element> list = document.body().select("td").stream().filter(element -> {
             return StringUtil.isNotBlank(element.text());
         }).collect(Collectors.toList());

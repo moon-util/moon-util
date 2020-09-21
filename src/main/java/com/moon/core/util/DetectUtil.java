@@ -5,7 +5,7 @@ import com.moon.core.lang.ThrowUtil;
 /**
  * @author moonsky
  */
-public final class DetectUtil {
+final class DetectUtil {
     private DetectUtil() { ThrowUtil.noInstanceError(); }
 
     private static boolean isChinese(String str) {
