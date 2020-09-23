@@ -102,14 +102,20 @@ public class CalendarUtil {
     public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, getInstance()); }
 
     public final static boolean isSameDay(Calendar value, Calendar other) {
-        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
-            value) == getDayOfMonth(other);
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other);
     }
 
     public final static boolean isSameTime(Calendar value, Calendar other) {
-        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
-            value) == getDayOfMonth(other) && getHour(value) == getHour(other) && getMinute(value) == getMinute(other) && getSecond(
-            value) == getSecond(other);
+        return value != null &&
+            getYear(value) == getYear(other) &&
+            getMonth(value) == getMonth(other) &&
+            getDayOfMonth(value) == getDayOfMonth(other) &&
+            getHour(value) == getHour(other) &&
+            getMinute(value) == getMinute(other) &&
+            getSecond(value) == getSecond(other);
     }
 
     public final static boolean isBefore(Calendar value, Calendar other) {
@@ -173,14 +179,14 @@ public class CalendarUtil {
     /**
      * 当前时间戳（毫秒数）
      *
-     * @return
+     * @return 返回当前时刻时间戳
      */
     public final static long nowTimeMillis() { return System.currentTimeMillis(); }
 
     /**
      * 当前时间戳（秒数）
      *
-     * @return
+     * @return 时间戳（秒数）
      */
     public final static long nowTimeSeconds() { return nowTimeMillis() / 1000; }
 
@@ -401,36 +407,36 @@ public class CalendarUtil {
     /**
      * 获取小时
      *
-     * @param value
+     * @param value Calendar 对象
      *
-     * @return
+     * @return 小时数
      */
     public final static int getHour(Calendar value) { return get(value, HOUR_OF_DAY); }
 
     /**
      * 获取分钟
      *
-     * @param value
+     * @param value Calendar 对象
      *
-     * @return
+     * @return 分钟数
      */
     public final static int getMinute(Calendar value) { return get(value, MINUTE); }
 
     /**
      * 获取秒数
      *
-     * @param value
+     * @param value Calendar 对象
      *
-     * @return
+     * @return 秒数
      */
     public final static int getSecond(Calendar value) { return get(value, SECOND); }
 
     /**
      * 获取毫秒数
      *
-     * @param value
+     * @param value Calendar 对象
      *
-     * @return
+     * @return 毫秒数
      */
     public final static int getMillisecond(Calendar value) { return get(value, MILLISECOND); }
 
@@ -538,58 +544,6 @@ public class CalendarUtil {
      * @return DateFormat
      */
     public final static DateFormat toFormat(String pattern) { return new SimpleDateFormat(pattern); }
-
-    /**
-     * 按指定模式格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数组，超出部分忽略
-     *
-     * @param pattern 日期格式
-     * @param values  按年月日、时分秒等书序组成的数组
-     *
-     * @return 格式化后的字符串
-     */
-    public final static String format(DateFormat pattern, int... values) { return format(toCalendar(values), pattern); }
-
-    /**
-     * 按指定模式格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数组，超出部分忽略
-     *
-     * @param pattern 日期格式
-     * @param values  按年月日、时分秒等书序组成的数组
-     *
-     * @return 格式化后的字符串
-     */
-    public final static String format(String pattern, int... values) { return format(toFormat(pattern), values); }
-
-    /**
-     * 按模式 yyyy-MM-dd HH:mm:ss 格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数组，超出部分忽略
-     *
-     * @param values 按年月日、时分秒等书序组成的数组
-     *
-     * @return 格式化后的字符串
-     */
-    public final static String format(int... values) { return format(PATTERNS[values.length - 1], values); }
-
-    /**
-     * 按指定模式格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数字字符串数组，超出部分忽略
-     *
-     * @param pattern 日期格式
-     * @param values  每个字符串都是数字形式，并且按年月日、时分秒等书序组成的数组
-     *
-     * @return 格式化后的字符串
-     */
-    public final static String format(DateFormat pattern, String... values) {
-        return format(toCalendar(values), pattern);
-    }
-
-    /**
-     * 按模式 yyyy-MM-dd HH:mm:ss 格式化日期，要求日期是按：年、月、日、时、分、秒、毫秒顺序组成的数字字符串数组，超出部分忽略
-     *
-     * @param values 每个字符串都是数字形式，并且按年月日、时分秒等书序组成的数组
-     *
-     * @return 格式化后的字符串
-     */
-    public final static String format(String... values) {
-        return format(toFormat(PATTERNS[values.length - 1]), values);
-    }
 
     /**
      * 按模式 yyyy-MM-dd HH:mm:ss 格式化当前日期
@@ -729,7 +683,7 @@ public class CalendarUtil {
      * 示例：
      * |-----------------------------------------------------------------------------------|
      * | Date String                 | Year | Month | Day | Hour | Minute | Second | Micro |
-     * |-----------------------------------------------------------------------------------|
+     * |-----------------------------|------|-------|-----|------|--------|--------|-------|
      * | 1980年02月03日08时09分59秒23  | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
      * | 1980年2月3日8时9分59秒23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
      * | 1980年02月03日08095923       | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
@@ -741,7 +695,7 @@ public class CalendarUtil {
      * | 1980 020308 095923          | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
      * | 19800203                    | 1980 | 02    | 03  | 00   | 00     | 00     | 00    |
      * | 日期19800203时间080959毫秒23  | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
-     * |-----------------------------------------------------------------------------------|
+     * |-----------------------------|------|-------|-----|------|--------|--------|-------|
      * | 999                         | 999  | 01    | 01  | 00   | 00     | 00     | 00    |
      * | 1                           | 1    | 01    | 01  | 00   | 00     | 00     | 00    |
      * |-----------------------------------------------------------------------------------|
@@ -764,27 +718,20 @@ public class CalendarUtil {
         final int[] values = {1970, 1, 1, 0, 0, 0, 0};
         int last = Math.min(strLen, maxIdx), vLastIdx = values.length - 1;
 
-        for (char ch; strIdx < strLen; strIdx++) {
-            if ((ch = chars[strIdx]) > 47 && ch < 58) {
+        for (char ch; strIdx < strLen; ) {
+            if ((ch = chars[strIdx++]) > 47 && ch < 58) {
                 field[fieldIdx++] = ch;
-                if (fieldIdx >= last) {
-                    values[valuesIdx++] = toInt(field, fieldIdx);
-                    if (valuesIdx > vLastIdx) {
-                        return values;
-                    }
-                    strIdx = skipNonNumeric(chars, strIdx + 1, strLen) - 1;
-                    last = valuesIdx == vLastIdx ? 3 : 2;
-                    fieldIdx = 0;
+                if (fieldIdx < last) {
+                    continue;
                 }
-            } else {
-                values[valuesIdx++] = toInt(field, fieldIdx);
-                if (valuesIdx > vLastIdx) {
-                    return values;
-                }
-                strIdx = skipNonNumeric(chars, strIdx + 1, strLen) - 1;
-                last = valuesIdx == vLastIdx ? 3 : 2;
-                fieldIdx = 0;
             }
+            values[valuesIdx++] = toInt(field, fieldIdx);
+            if (valuesIdx > vLastIdx) {
+                return values;
+            }
+            strIdx = skipNonNumeric(chars, strIdx, strLen);
+            last = valuesIdx == vLastIdx ? 3 : 2;
+            fieldIdx = 0;
         }
         if (valuesIdx == 0) {
             return null;
@@ -809,8 +756,7 @@ public class CalendarUtil {
      * @return 下一个数字字符索引或 charsLen
      */
     private final static int skipNonNumeric(char[] chars, int startIdx, int charsLen) {
-        char ch;
-        for (; startIdx < charsLen; startIdx++) {
+        for (char ch; startIdx < charsLen; startIdx++) {
             if ((ch = chars[startIdx]) > 47 && ch < 58) {
                 return startIdx;
             }
@@ -888,7 +834,9 @@ public class CalendarUtil {
         return overrideCalendar(getInstance(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0, 0);
     }
 
-    public final static Calendar toCalendar(LocalDateTime datetime) { return overrideCalendar(getInstance(), datetime); }
+    public final static Calendar toCalendar(LocalDateTime datetime) {
+        return overrideCalendar(getInstance(), datetime);
+    }
 
     /**
      * 字符串解析为 Calendar
@@ -957,19 +905,13 @@ public class CalendarUtil {
                 calendar.set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i], minute);
                 break;
             case 5:
-                calendar.set(fieldsValue[i++],
-                    fieldsValue[i++] - 1,
-                    fieldsValue[i++],
-                    fieldsValue[i++],
-                    fieldsValue[i++]);
+                calendar
+                    .set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i++], fieldsValue[i++]);
                 break;
             default:
-                calendar.set(fieldsValue[i++],
-                    fieldsValue[i++] - 1,
-                    fieldsValue[i++],
-                    fieldsValue[i++],
-                    fieldsValue[i++],
-                    fieldsValue[i++]);
+                calendar
+                    .set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i++], fieldsValue[i++],
+                        fieldsValue[i++]);
                 if (len > max) {
                     calendar.set(MILLISECOND, fieldsValue[i]);
                 }
@@ -983,13 +925,7 @@ public class CalendarUtil {
     }
 
     public final static Calendar overrideCalendar(Calendar calendar, LocalDate date, LocalTime time) {
-        return overrideCalendar(calendar,
-            date.getYear(),
-            date.getMonthValue(),
-            date.getDayOfMonth(),
-            time.getHour(),
-            time.getMinute(),
-            time.getSecond(),
-            time.getNano() / 1000000);
+        return overrideCalendar(calendar, date.getYear(), date.getMonthValue(), date.getDayOfMonth(), time.getHour(),
+            time.getMinute(), time.getSecond(), time.getNano() / 1000000);
     }
 }
