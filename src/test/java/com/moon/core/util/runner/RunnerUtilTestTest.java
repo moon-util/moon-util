@@ -318,11 +318,11 @@ class RunnerUtilTestTest extends AbstractTest {
     @Test
     void testParseRunPerformance() {
         int count = 100000;
-        long begin = DateUtil.now();
+        long begin = DateUtil.nowTimeMillis();
         for (int i = 0; i < count; i++) {
             RunnerUtil.parseRun("{{1+2}}");
         }
-        long end = DateUtil.now();
+        long end = DateUtil.nowTimeMillis();
         // Console.out.println(end - begin);
     }
 

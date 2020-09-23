@@ -16,7 +16,7 @@ final class WeakMapManager implements Runnable {
     private static WeakMapManager CURRENT;
 
     private int index = -1;
-    private long sss = DateUtil.now();
+    private long sss = DateUtil.nowTimeMillis();
     private final static int amount = 60 * 1000;
     private final static int length = 1024;
     private final Map[] maps = new Map[length];
@@ -44,12 +44,12 @@ final class WeakMapManager implements Runnable {
 
     @Override
     public void run() {
-        long now = DateUtil.now();
+        long now = DateUtil.nowTimeMillis();
         if (now - sss > amount) {
             for (int i = 0, to = index; i < to; i++) {
                 maps[i].size();
             }
-            sss = DateUtil.now();
+            sss = DateUtil.nowTimeMillis();
         }
     }
 }

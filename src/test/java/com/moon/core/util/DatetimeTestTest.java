@@ -19,7 +19,7 @@ class DatetimeTestTest {
 
     @Test
     void testOf() {
-        Calendar calendar = CalendarUtil.nowCalendar();
+        Calendar calendar = CalendarUtil.getCalendar();
         Datetime datetime = new Datetime(calendar);
         for (DayOfWeek value : DayOfWeek.values()) {
             datetime.setFirstDayOfWeek(value);

@@ -68,11 +68,11 @@ public final class DateUtil extends CalendarUtil {
 
     public static Date nowDate() { return new Date(); }
 
-    public static java.sql.Date nowSqlDate() { return new java.sql.Date(now()); }
+    public static java.sql.Date nowSqlDate() { return new java.sql.Date(nowTimeMillis()); }
 
-    public static Time nowSqlTime() { return new java.sql.Time(now()); }
+    public static Time nowSqlTime() { return new java.sql.Time(nowTimeMillis()); }
 
-    public static Timestamp nowTimestamp() { return new Timestamp(now()); }
+    public static Timestamp nowTimestamp() { return new Timestamp(nowTimeMillis()); }
 
     /*
      * -------------------------------------------------------------------------

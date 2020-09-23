@@ -13,7 +13,7 @@ class CalendarUtilTestTest {
 
     @Test
     void testGetDayOfYear() {
-        Calendar calendar = CalendarUtil.nowCalendar();
+        Calendar calendar = CalendarUtil.getCalendar();
         calendar = CalendarUtil.nextDay(calendar);
         System.out.println(CalendarUtil.getDayOfYear(calendar));
         System.out.println(CalendarUtil.getDayOfWeek(calendar));

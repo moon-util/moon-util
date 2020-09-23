@@ -84,7 +84,7 @@ public class CalendarUtil {
     };
     private final static int[] PARSE_FIELD_INITIALIZE_VALUES = {-1, 1, 1, 0, 0, 0, 0};
 
-    final static Calendar current() { return getInstance(); }
+    final static Calendar getInstance() { return Calendar.getInstance(); }
 
     /**
      * 是否引入 joda 时间
@@ -99,7 +99,7 @@ public class CalendarUtil {
      * -------------------------------------------------------------------------
      */
 
-    public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, current()); }
+    public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, getInstance()); }
 
     public final static boolean isSameDay(Calendar value, Calendar other) {
         return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
@@ -120,9 +120,9 @@ public class CalendarUtil {
         return value != null && value.getTimeInMillis() > other.getTimeInMillis();
     }
 
-    public final static boolean isBeforeNow(Calendar value) { return isBefore(value, current()); }
+    public final static boolean isBeforeNow(Calendar value) { return isBefore(value, getInstance()); }
 
-    public final static boolean isAfterNow(Calendar value) { return isAfter(value, current()); }
+    public final static boolean isAfterNow(Calendar value) { return isAfter(value, getInstance()); }
 
     public final static boolean isEqualsMonthDay(Calendar calendar1, Calendar calendar2) {
         return getMonth(calendar1) == getMonth(calendar2) && getDayOfMonth(calendar1) == getDayOfMonth(calendar2);
@@ -152,37 +152,37 @@ public class CalendarUtil {
      * -------------------------------------------------------------------------
      */
 
-    public final static int nowYear() { return getYear(current()); }
+    public final static int nowYear() { return getYear(getInstance()); }
 
-    public final static int nowMonth() { return getMonth(current()); }
+    public final static int nowMonth() { return getMonth(getInstance()); }
 
-    public final static int nowDayOfMonth() { return getDayOfMonth(current()); }
+    public final static int nowDayOfMonth() { return getDayOfMonth(getInstance()); }
 
-    public final static int nowDayOfYear() { return getDayOfYear(current()); }
+    public final static int nowDayOfYear() { return getDayOfYear(getInstance()); }
 
-    public final static int nowHour() { return getHour(current()); }
+    public final static int nowHour() { return getHour(getInstance()); }
 
-    public final static int nowMinute() { return getMinute(current()); }
+    public final static int nowMinute() { return getMinute(getInstance()); }
 
-    public final static int nowSecond() { return getSecond(current()); }
+    public final static int nowSecond() { return getSecond(getInstance()); }
 
-    public final static int nowMillisecond() { return getMillisecond(current()); }
+    public final static int nowMillisecond() { return getMillisecond(getInstance()); }
 
-    public final static Calendar nowCalendar() { return current(); }
+    public final static Calendar getCalendar() { return getInstance(); }
 
     /**
      * 当前时间戳（毫秒数）
      *
      * @return
      */
-    public final static long now() { return System.currentTimeMillis(); }
+    public final static long nowTimeMillis() { return System.currentTimeMillis(); }
 
     /**
      * 当前时间戳（秒数）
      *
      * @return
      */
-    public final static long nowTimeSeconds() { return now() / 1000; }
+    public final static long nowTimeSeconds() { return nowTimeMillis() / 1000; }
 
     /**
      * 默认当前时间，如果指定时间为 null 的话
@@ -192,7 +192,7 @@ public class CalendarUtil {
      * @return
      */
     public final static Calendar nowIfNull(Calendar calendar) {
-        return calendar == null ? current() : calendar;
+        return calendar == null ? getInstance() : calendar;
     }
 
     /*
@@ -443,7 +443,7 @@ public class CalendarUtil {
      *
      * @see ResidentID18Validator#getAge()
      */
-    public final static int getAge(Calendar birthday) { return getAge(birthday, current()); }
+    public final static int getAge(Calendar birthday) { return getAge(birthday, getInstance()); }
 
     /**
      * 根据日期获取年龄（虚岁）
@@ -836,7 +836,7 @@ public class CalendarUtil {
         if (valuesLen < 1) { return null; }
         int length = PARSE_FIELD_OF_CALENDAR.length;
         int size = Math.min(valuesLen, length);
-        Calendar calendar = getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.clear();
         int i = 0;
         for (int minLen = Math.min(size, PARSE_FIELD_OF_CALENDAR.length); i < minLen; i++) {
@@ -851,7 +851,7 @@ public class CalendarUtil {
     public final static Calendar toCalendar(int... values) {
         int size = values == null ? 0 : values.length;
         if (size < 1) { return null; }
-        Calendar calendar = getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.clear();
         int i = 0;
         for (int minLen = Math.min(size, PARSE_FIELD_OF_CALENDAR.length); i < minLen; i++) {
@@ -871,7 +871,7 @@ public class CalendarUtil {
             int[] values = {(int) timeMillis};
             return toCalendar(values);
         }
-        Calendar calendar = getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeMillis);
         return calendar;
     }
@@ -879,16 +879,16 @@ public class CalendarUtil {
     public final static Calendar toCalendar(Date date) { return date == null ? null : toCalendar(date.getTime()); }
 
     public final static Calendar toCalendar(LocalDate date, LocalTime time) {
-        return overrideCalendar(current(), date, time);
+        return overrideCalendar(getInstance(), date, time);
     }
 
     public final static Calendar toCalendar(LocalTime time) { return toCalendar(LocalDate.now(), time); }
 
     public final static Calendar toCalendar(LocalDate date) {
-        return overrideCalendar(current(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0, 0);
+        return overrideCalendar(getInstance(), date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0, 0);
     }
 
-    public final static Calendar toCalendar(LocalDateTime datetime) { return overrideCalendar(current(), datetime); }
+    public final static Calendar toCalendar(LocalDateTime datetime) { return overrideCalendar(getInstance(), datetime); }
 
     /**
      * 字符串解析为 Calendar

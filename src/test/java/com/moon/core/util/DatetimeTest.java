@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.time.*;
 import java.time.temporal.ChronoField;
 import java.util.Calendar;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +22,7 @@ public class DatetimeTest {
     @Test
     void testNow() throws Exception {
         System.out.println(Datetime.now());
-        System.out.println(CalendarUtil.get(CalendarUtil.nowCalendar(), Calendar.ERA));
+        System.out.println(CalendarUtil.get(CalendarUtil.getCalendar(), Calendar.ERA));
     }
 
     @Test

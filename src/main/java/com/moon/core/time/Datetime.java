@@ -180,7 +180,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * 构造不可变对象 ***************************************************************************************
      */
 
-    public static Datetime ofImmutable() { return ofImmutable(DateUtil.current()); }
+    public static Datetime ofImmutable() { return ofImmutable(DateUtil.getInstance()); }
 
     public static Datetime ofImmutable(Date date) { return ofImmutable(DateUtil.toCalendar(date)); }
 

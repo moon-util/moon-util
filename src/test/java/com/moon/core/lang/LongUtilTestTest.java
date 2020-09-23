@@ -15,9 +15,9 @@ class LongUtilTestTest {
 
     @Test
     void testTestToString() throws Exception {
-        long now = DateUtil.now();
+        long now = DateUtil.nowTimeMillis();
         System.out.println(now);
-        String value = LongUtil.toString(DateUtil.now(), 36);
+        String value = LongUtil.toString(DateUtil.nowTimeMillis(), 36);
         System.out.println(value);
         System.out.println(String.valueOf(now).length());
         System.out.println(value.length());
