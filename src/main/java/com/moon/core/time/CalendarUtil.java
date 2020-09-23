@@ -1,7 +1,6 @@
 package com.moon.core.time;
 
 import com.moon.core.lang.LongUtil;
-import com.moon.core.lang.StringUtil;
 import com.moon.core.util.TestUtil;
 import com.moon.core.util.validator.ResidentID18Validator;
 import org.joda.time.DateTime;
@@ -13,11 +12,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
-import static java.lang.Integer.numberOfTrailingZeros;
 import static java.lang.Integer.parseInt;
 import static java.util.Calendar.*;
 
@@ -709,15 +706,116 @@ public class CalendarUtil {
      * 2. 不足部分将用该字段的默认值填充，比如：月、日填充为 1，时间的各字段填充为 0
      *
      * @param dateString 符合格式 "yyyy-MM-dd HH:mm:ss SSS" 的字符串
+     *
+     * @see #extractDateFields(String)
      */
     public static Calendar parseToCalendar(String dateString) {
-        List<String> numerics = StringUtil.extractNumerics(dateString);
-        final int size = numerics.size();
-        return size > 0 ? toCalendar(numerics.toArray(new String[size])) : null;
+        return toCalendar(extractDateFields(dateString));
     }
 
     public static <T> T parseDateString(String dateString, Function<Calendar, T> transformer) {
         return transformer.apply(parseToCalendar(dateString));
+    }
+
+    /**
+     * 提取日期字段
+     * <p>
+     * 要求符合格式：yyyy-MM-dd HH:mm:ss SSS 的一个或多个字段，并且每个字段的位数一致
+     * 1. 超出部分将忽略
+     * 2. 不足部分用该字段初始值填充，月日填充 1，时间各字段填充 0；
+     * 3. 如果各字段之间有有效的非数字符号（汉字、- 号、/ 号、: 号、. 号等）间隔，间隔符号之间的数字就是字段值，格式无特殊要求
+     * 4. 如果只有连续的数字则严格要求年份是 4 位，月日时分秒字段都是两位，最后紧接的最多三位连续数字是毫秒数
+     * <p>
+     * 示例：
+     * |-----------------------------------------------------------------------------------|
+     * | Date String                 | Year | Month | Day | Hour | Minute | Second | Micro |
+     * |-----------------------------------------------------------------------------------|
+     * | 1980年02月03日08时09分59秒23  | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980年2月3日8时9分59秒23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980年02月03日08095923       | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980-02-03 08:09:59.23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980-02/03 08.09*59 23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980 02 03 08 09 59 23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980 02 03 08 09 59         | 1980 | 02    | 03  | 08   | 09     | 59     | 00    |
+     * | 1980020308095923            | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980 020308 095923          | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 19800203                    | 1980 | 02    | 03  | 00   | 00     | 00     | 00    |
+     * | 日期19800203时间080959毫秒23  | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * |-----------------------------------------------------------------------------------|
+     * | 999                         | 999  | 01    | 01  | 00   | 00     | 00     | 00    |
+     * | 1                           | 1    | 01    | 01  | 00   | 00     | 00     | 00    |
+     * |-----------------------------------------------------------------------------------|
+     *
+     * @param dateString 输入的日期字符串
+     *
+     * @return 日期年月日时分秒毫秒各字段的值或如果字符串中不包含任何数字时返回 null
+     */
+    @SuppressWarnings("all")
+    public final static int[] extractDateFields(String dateString) {
+        if (dateString == null || dateString.length() == 0) {
+            return null;
+        }
+        int maxIdx = 4, fieldIdx = 0, valuesIdx = 0;
+        char[] chars = dateString.toCharArray(), field = new char[maxIdx];
+        int strLen = chars.length, strIdx = skipNonNumeric(chars, 0, strLen);
+        if (strIdx == strLen) {
+            return null;
+        }
+        final int[] values = {1970, 1, 1, 0, 0, 0, 0};
+        int last = Math.min(strLen, maxIdx), vLastIdx = values.length - 1;
+
+        for (char ch; strIdx < strLen; strIdx++) {
+            if ((ch = chars[strIdx]) > 47 && ch < 58) {
+                field[fieldIdx++] = ch;
+                if (fieldIdx >= last) {
+                    values[valuesIdx++] = toInt(field, fieldIdx);
+                    if (valuesIdx > vLastIdx) {
+                        return values;
+                    }
+                    strIdx = skipNonNumeric(chars, strIdx + 1, strLen) - 1;
+                    last = valuesIdx == vLastIdx ? 3 : 2;
+                    fieldIdx = 0;
+                }
+            } else {
+                values[valuesIdx++] = toInt(field, fieldIdx);
+                if (valuesIdx > vLastIdx) {
+                    return values;
+                }
+                strIdx = skipNonNumeric(chars, strIdx + 1, strLen) - 1;
+                last = valuesIdx == vLastIdx ? 3 : 2;
+                fieldIdx = 0;
+            }
+        }
+        if (valuesIdx == 0) {
+            return null;
+        }
+        if (fieldIdx > 0) {
+            values[valuesIdx++] = toInt(field, fieldIdx);
+        }
+        return values;
+    }
+
+    private final static int toInt(char[] chars, int lastIdx) {
+        return Integer.parseInt(new String(chars, 0, lastIdx));
+    }
+
+    /**
+     * 从 startIdx 开始跳过所有非数字字符，返回下一个数字字符的索引，如果超过 chars 长度，则返回 charsLen
+     *
+     * @param chars    原始 chars
+     * @param startIdx 其实索引
+     * @param charsLen chars 长度
+     *
+     * @return 下一个数字字符索引或 charsLen
+     */
+    private final static int skipNonNumeric(char[] chars, int startIdx, int charsLen) {
+        char ch;
+        for (; startIdx < charsLen; startIdx++) {
+            if ((ch = chars[startIdx]) > 47 && ch < 58) {
+                return startIdx;
+            }
+        }
+        return charsLen;
     }
 
     /*
