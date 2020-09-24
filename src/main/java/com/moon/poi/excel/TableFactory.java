@@ -105,7 +105,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory set(boolean renderHead, boolean renderBody) {
+    public TableFactory config(boolean renderHead, boolean renderBody) {
         this.renderHead = renderHead;
         this.renderBody = renderBody;
         return this;
@@ -138,24 +138,86 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      * -----------------------------------------------------------------------------------
      */
 
+    /**
+     * 渲染列表数据，默认解析第一项的类上的配置
+     *
+     * @param iterator 列表
+     * @param <T>      数据类型
+     *
+     * @return this
+     */
     public <T> TableFactory render(Iterator<? extends T> iterator) { return render(iterator, null); }
 
+    /**
+     * 渲染列表数据，如果{@code targetClass}不为{@code null}，则解析{@code targetClass}
+     * 否则默认解析第一项的类上的配置
+     *
+     * @param iterator    列表
+     * @param targetClass 自定义配置类
+     * @param <T>         数据类型
+     *
+     * @return this
+     */
     public <T> TableFactory render(Iterator<? extends T> iterator, Class<? super T> targetClass) {
         return doRenderData(iterator, targetClass, getHeaderRenderer());
     }
 
+    /**
+     * 渲染列表数据，默认解析第一项的类上的配置
+     *
+     * @param iterable 列表
+     * @param <T>      数据类型
+     *
+     * @return this
+     */
     public <T> TableFactory render(Iterable<? extends T> iterable) { return render(iterable.iterator()); }
 
+    /**
+     * 渲染列表数据，如果{@code targetClass}不为{@code null}，则解析{@code targetClass}
+     * 否则默认解析第一项的类上的配置
+     *
+     * @param iterable    列表
+     * @param targetClass 自定义配置类
+     * @param <T>         数据类型
+     *
+     * @return this
+     */
     public <T> TableFactory render(Iterable<? extends T> iterable, Class<? super T> targetClass) {
         return render(iterable.iterator(), targetClass);
     }
 
+    /**
+     * 渲染列表数据，默认解析第一项的类上的配置
+     *
+     * @param stream 列表
+     * @param <T>    数据类型
+     *
+     * @return this
+     */
     public <T> TableFactory render(Stream<? extends T> stream) { return render(stream.iterator()); }
 
+    /**
+     * 渲染列表数据，如果{@code targetClass}不为{@code null}，则解析{@code targetClass}
+     * 否则默认解析第一项的类上的配置
+     *
+     * @param stream      列表
+     * @param targetClass 自定义配置类
+     * @param <T>         数据类型
+     *
+     * @return this
+     */
     public <T> TableFactory render(Stream<? extends T> stream, Class<? super T> targetClass) {
         return render(stream.iterator(), targetClass);
     }
 
+    /**
+     * 渲染数组列表数组，默认解析第一项的类上的配置
+     *
+     * @param data 数据列表
+     * @param <T>  数据类型
+     *
+     * @return this
+     */
     @SafeVarargs
     public final <T> TableFactory render(T... data) {
         if (data == null) {
@@ -165,6 +227,15 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
         return render(IteratorUtil.of(data), targetClass);
     }
 
+    /**
+     * 渲染数组列表数组，默认解析第一项的类上的配置
+     *
+     * @param targetClass 自定义配置类
+     * @param data        数据列表
+     * @param <T>         数据类型
+     *
+     * @return this
+     */
     @SafeVarargs
     public final <T> TableFactory render(Class<? super T> targetClass, T... data) {
         return data == null ? this : render(IteratorUtil.of(data), targetClass);
@@ -199,7 +270,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
             return render((Iterable) collect, targetClass);
         }
         if (collect instanceof Object[]) {
-            return render((Object[]) collect, targetClass);
+            return render(targetClass, (Object[]) collect);
         }
         if (collect instanceof Iterator) {
             return render((Iterator) collect, targetClass);

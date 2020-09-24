@@ -171,7 +171,7 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
             try {
                 return new XSSFWorkbook();
             } catch (NoClassDefFoundError e) {
-                throw Dependencies.XLS.getException();
+                throw Dependencies.XLSX.getException();
             }
         }
 
@@ -207,7 +207,7 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
             try {
                 return new SXSSFWorkbook();
             } catch (NoClassDefFoundError e) {
-                throw Dependencies.XLS.getException();
+                throw Dependencies.XLSX.getException();
             }
         }
 
