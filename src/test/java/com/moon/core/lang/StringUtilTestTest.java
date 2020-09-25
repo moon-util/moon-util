@@ -633,29 +633,36 @@ class StringUtilTestTest {
     @Test
     void testTrimOpenToClose() throws Exception {
         String str = "12345612345678956789";
-        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
-        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
-        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_START));
-        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_START));
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_END));
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.BALANCE_START));
+        System.out.println(StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.BALANCE_END));
         System.out.println(StringUtil.trim(str, "123456", "56789"));
 
         str = "12345612345656789";
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_START));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_END));
         assertEquals("", StringUtil.trim(str, "123456", "56789"));
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.BALANCE_END));
 
         str = "56789";
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_START));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_END));
         assertEquals("", StringUtil.trim(str, "123456", "56789"));
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.BALANCE_END));
 
         str = "123456123456";
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_START));
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.PRIORITY_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_START));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_END));
         assertEquals("", StringUtil.trim(str, "123456", "56789"));
-        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimType.BALANCE_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.BALANCE_END));
+
+        str = "123456789";
+        assertEquals("789", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.BALANCE_START));
+        assertEquals("1234", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.BALANCE_END));
+        assertEquals("789", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_START));
+        assertEquals("1234", StringUtil.trim(str, "123456", "56789", StringUtil.TrimStrategy.PRIORITY_END));
+        assertEquals("", StringUtil.trim(str, "123456", "56789"));
     }
 
     @Test
@@ -883,5 +890,143 @@ class StringUtilTestTest {
         System.out.println(date);
         date = Datetime.now().toString(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         System.out.println(date);
+    }
+
+    @Test
+    void testCountOf() throws Exception {
+        System.out.println(StringUtil.countOf("111111", "11", 0, false));
+        System.out.println(StringUtil.countOf("111111", "11", 0, true));
+    }
+
+    @Test
+    void testTestCountOf() throws Exception {
+    }
+
+    @Test
+    void testTestCountOf1() throws Exception {
+    }
+
+    @Test
+    void testIsAnyEmpty() throws Exception {
+    }
+
+    @Test
+    void testIsNoneEmpty() throws Exception {
+    }
+
+    @Test
+    void testIsAnyBlank() throws Exception {
+    }
+
+    @Test
+    void testIsNoneBlank() throws Exception {
+    }
+
+    @Test
+    void testStartsWith() throws Exception {
+    }
+
+    @Test
+    void testEndsWith() throws Exception {
+    }
+
+    @Test
+    void testIs0() throws Exception {
+    }
+
+    @Test
+    void testIs1() throws Exception {
+    }
+
+    @Test
+    void testIsTrue() throws Exception {
+    }
+
+    @Test
+    void testIsAllMatches() throws Exception {
+    }
+
+    @Test
+    void testIsAnyMatches() throws Exception {
+    }
+
+    @Test
+    void testMapBy() throws Exception {
+    }
+
+    @Test
+    void testToStringOrDefaultIfNull() throws Exception {
+    }
+
+    @Test
+    void testToStringOrNull() throws Exception {
+    }
+
+    @Test
+    void testTrimAll() throws Exception {
+    }
+
+    @Test
+    void testTrimStart() throws Exception {
+    }
+
+    @Test
+    void testTrimEnd() throws Exception {
+    }
+
+    @Test
+    void testTestTrimStart() throws Exception {
+    }
+
+    @Test
+    void testTestTrimEnd() throws Exception {
+    }
+
+    @Test
+    void testTrimPrefix() throws Exception {
+    }
+
+    @Test
+    void testTrimSuffix() throws Exception {
+    }
+
+    @Test
+    void testPadPrefixIfAbsent() throws Exception {
+    }
+
+    @Test
+    void testPadSuffixIfAbsent() throws Exception {
+    }
+
+    @Test
+    void testTriggerPrefix() throws Exception {
+    }
+
+    @Test
+    void testTriggerSuffix() throws Exception {
+    }
+
+    @Test
+    void testCodePointsAll() throws Exception {
+    }
+
+    @Test
+    void testCodePointsBetween() throws Exception {
+    }
+
+    @Test
+    void testSubstrAt() throws Exception {
+    }
+
+    @Test
+    void testExtractNumerics() throws Exception {
+    }
+
+    @Test
+    void testSplit() throws Exception {
+    }
+
+    @Test
+    void testTestSplit() throws Exception {
     }
 }

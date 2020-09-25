@@ -174,6 +174,18 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements Base
     public long count() { return getAccessor().count(); }
 
     /**
+     * 插入
+     *
+     * @param entity 将要插入的对象
+     * @param <S>    数据类型
+     *
+     * @return 返回插入数据后的对象
+     */
+    @Override
+    @Transactional
+    public <S extends T> S insert(S entity) { return getAccessor().insert(entity); }
+
+    /**
      * 保存
      *
      * @param entity 将要保存的对象

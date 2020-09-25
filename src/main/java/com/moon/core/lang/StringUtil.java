@@ -95,10 +95,41 @@ public final class StringUtil {
         return count;
     }
 
+    /**
+     * 在源字符串中查找指定字符串出现次数
+     *
+     * @param str    源字符串
+     * @param search 指定查找字符串
+     *
+     * @return 字符串出现次数
+     */
     public static int countOf(final CharSequence str, final String search) {
         return countOf(str, search, 0, false);
     }
 
+    /**
+     * 在源字符串中查找指定字符串出现次数
+     * <p>
+     * 匹配方式{@code fulled}指的是每次查找跳过的字符数，是从下一个字符开始匹配还是跳过自身之后的下一个字符串开始匹配，
+     * 示例：
+     * <pre>
+     * String str = "111111";
+     * String search = "11";
+     * // 当 fulled = false 时:
+     * int count = StringUtil.countOf(str, search, 0, false);
+     * assert count == 3;
+     * // 当 fulled = true 时:
+     * int count = StringUtil.countOf(str, search, 0, true);
+     * assert count == 5;
+     * </pre>
+     *
+     * @param str                源字符串
+     * @param search             指定查找字符串
+     * @param defaultIfInputNull 当源字符串为 null 时的默认返回值
+     * @param fulled             匹配方式
+     *
+     * @return 字符串出现次数
+     */
     public static int countOf(final CharSequence str, final String search, int defaultIfInputNull, boolean fulled) {
         if (str == null) {
             return defaultIfInputNull;
@@ -115,7 +146,7 @@ public final class StringUtil {
         String substr = String.valueOf(search);
         int index = 0;
         int count = 0;
-        int diff = fulled ? 1 : length;
+        int diff = fulled ? 1 : substr.length();
         do {
             int nextIndex = input.indexOf(substr, index);
             if (nextIndex < 0) {
@@ -241,9 +272,7 @@ public final class StringUtil {
         return false;
     }
 
-    public static boolean isNoneEmpty(CharSequence... values) {
-        return !isAnyEmpty(values);
-    }
+    public static boolean isNoneEmpty(CharSequence... values) { return !isAnyEmpty(values); }
 
     /**
      * @param string 待测字符串
@@ -301,9 +330,7 @@ public final class StringUtil {
         return false;
     }
 
-    public static boolean isNoneBlank(CharSequence... values) {
-        return !isAnyBlank(values);
-    }
+    public static boolean isNoneBlank(CharSequence... values) { return !isAnyBlank(values); }
 
     /**
      * 返回字符串是否包含指定前缀
@@ -581,7 +608,7 @@ public final class StringUtil {
         return results;
     }
 
-    public static String toString(Object value) { return toStringOrDefault(value, STR_NULL); }
+    public static String toString(Object value) { return toStringOrDefaultIfNull(value, STR_NULL); }
 
     public static String toString(char[] chars) {
         return chars == null ? STR_NULL : new String(chars, 0, chars.length);
@@ -603,17 +630,17 @@ public final class StringUtil {
         return builder;
     }
 
-    public static String toStringOrEmpty(Object value) { return toStringOrDefault(value, Const.EMPTY); }
+    public static String toStringOrEmpty(Object value) { return toStringOrDefaultIfNull(value, Const.EMPTY); }
 
-    public static String toStringOrDefault(Object value, String defaultValue) {
+    public static String toStringOrDefaultIfNull(Object value, String defaultValue) {
         return value == null ? defaultValue : value.toString();
     }
 
     public static String toStringOrNull(Object value) {
-        return toStringOrDefault(value, null);
+        return toStringOrDefaultIfNull(value, null);
     }
 
-    public static String stringify(Object value) { return toStringOrDefault(value, null); }
+    public static String stringify(Object value) { return toStringOrDefaultIfNull(value, null); }
 
     /*
      * -------------------------------------------------------------------
@@ -800,17 +827,19 @@ public final class StringUtil {
      * @see #trimPrefix(String, String) 只删除头部一个匹配的字符串
      */
     public static String trimStart(String str, String starting) {
-        if (isEmpty(starting) || isEmpty(str)) {
+        int startingLen = length(starting);
+        if (startingLen == 0 || isEmpty(str)) {
             return str;
         }
-        char[] origin = str.toCharArray();
-        char[] search = starting.toCharArray();
-        int start = 0, index = CharUtil.indexOf(origin, search, start);
-        while (index >= 0) {
-            start = index + search.length;
-            index = CharUtil.indexOf(origin, search, start);
-        }
-        return start > 0 ? str.substring(start) : str;
+        int start = 0, index;
+        do {
+            index = str.indexOf(starting, start);
+            if (index < 0) {
+                return start > 0 ? str.substring(start) : str;
+            } else {
+                start = index + startingLen;
+            }
+        } while (true);
     }
 
     /**
@@ -827,10 +856,13 @@ public final class StringUtil {
         if (isEmpty(ending) || isEmpty(str)) {
             return str;
         }
+        int searchLen = ending.length();
+        int originLen = str.length();
+        if (originLen < searchLen) {
+            return str;
+        }
         char[] origin = str.toCharArray();
         char[] search = ending.toCharArray();
-        int searchLen = search.length;
-        int originLen = origin.length;
         int lastIdx = originLen, originLastIdx = originLen - searchLen;
         while (CharUtil.isSafeRegionMatches(origin, originLastIdx, search, 0)) {
             lastIdx = originLastIdx;
@@ -873,7 +905,7 @@ public final class StringUtil {
      *
      * @return 裁剪后的字符串
      */
-    public static String trim(String str, String open, String close, TrimType type) {
+    public static String trim(String str, String open, String close, TrimStrategy type) {
         if (isEmpty(open)) {
             return trimEnd(str, close);
         }
@@ -914,9 +946,9 @@ public final class StringUtil {
             }
             count = lastIdx - firstIdx;
             if (count < 0) {
-                if (type == TrimType.BALANCE_START) {
+                if (type == TrimStrategy.BALANCE_START) {
                     return str.substring(firstIdx, lastIdx + endLen);
-                } else if (type == TrimType.BALANCE_END) {
+                } else if (type == TrimStrategy.BALANCE_END) {
                     return str.substring(firstIdx - startLen, lastIdx);
                 } else {
                     // type == null or type == DEFAULT
@@ -928,7 +960,7 @@ public final class StringUtil {
         }
     }
 
-    public enum TrimType {
+    public enum TrimStrategy {
         /**
          * 优先裁剪头部，头部处理完后余下的部分裁剪尾部
          */
@@ -948,7 +980,7 @@ public final class StringUtil {
         /**
          * 平衡裁剪，最后如存在交叉部分，返回空字符串(这是默认情况)
          */
-        DEFAULT
+        EMPTY
     }
 
     /**

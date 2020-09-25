@@ -155,6 +155,13 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
     }
 
     @Override
+    @Transactional
+    public <S extends T> S insert(S entity) {
+        em.persist(entity);
+        return entity;
+    }
+
+    @Override
     public List<T> findAllById(ID first, ID second, ID... ids) {
         return findAllById(asList(first, second, ids));
     }

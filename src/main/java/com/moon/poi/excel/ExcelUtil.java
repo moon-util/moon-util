@@ -254,7 +254,7 @@ public final class ExcelUtil extends LoadUtil {
         } catch (NullPointerException e) {
             return defaultIfNull;
         } catch (Exception e) {
-            return StringUtil.toStringOrDefault(getValue(cell), defaultIfNull);
+            return StringUtil.toStringOrDefaultIfNull(getValue(cell), defaultIfNull);
         }
     }
 

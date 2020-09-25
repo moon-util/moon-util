@@ -15,6 +15,16 @@ import java.util.function.Supplier;
 public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
 
     /**
+     * 插入
+     *
+     * @param entity 将要插入的对象
+     * @param <S>    数据类型
+     *
+     * @return 返回插入数据后的对象
+     */
+    <S extends T> S insert(S entity);
+
+    /**
      * 保存
      *
      * @param entity 将要保存的对象
