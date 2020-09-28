@@ -5,6 +5,7 @@ import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.util.function.TableIntConsumer;
+import com.moon.core.util.function.TableIntFunction;
 import com.moon.core.util.validator.ResidentID18Validator;
 
 import java.time.*;
@@ -1199,7 +1200,7 @@ public final class DateTimeUtil {
      * @return 执行完聚合函数后的总值
      */
     public static <T> T reduceYears(
-        LocalDate begin, LocalDate end, TableIntConsumer<? super T, LocalDate> reducer, T totalValue
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, T> reducer, T totalValue
     ) { return reduce(startOfYear(begin), startOfYear(end), b -> b.plusYears(1), reducer, totalValue); }
 
     /**
@@ -1225,7 +1226,7 @@ public final class DateTimeUtil {
      * @return 执行完聚合函数后的总值
      */
     public static <T> T reduceMonths(
-        LocalDate begin, LocalDate end, TableIntConsumer<? super T, LocalDate> reducer, T totalValue
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, T> reducer, T totalValue
     ) { return reduce(startOfMonth(begin), startOfMonth(end), b -> b.plusMonths(1), reducer, totalValue); }
 
     /**
@@ -1240,7 +1241,7 @@ public final class DateTimeUtil {
      * @return 执行完聚合函数后的总值
      */
     public static <T> T reduceWeeks(
-        LocalDate begin, LocalDate end, TableIntConsumer<? super T, LocalDate> reducer, T totalValue
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, T> reducer, T totalValue
     ) { return reduce(begin, end, b -> b.plusWeeks(1), reducer, totalValue); }
 
     /**
@@ -1266,7 +1267,7 @@ public final class DateTimeUtil {
      * @return 执行完聚合函数后的总值
      */
     public static <T> T reduceDays(
-        LocalDate begin, LocalDate end, TableIntConsumer<? super T, LocalDate> reducer, T totalValue
+        LocalDate begin, LocalDate end, TableIntFunction<? super T, LocalDate, T> reducer, T totalValue
     ) { return reduce(begin, end, b -> b.plusDays(1), reducer, totalValue); }
 
     /**
@@ -1285,10 +1286,10 @@ public final class DateTimeUtil {
      */
     public static <T> T reduce(
         LocalDate begin, LocalDate end, Function<LocalDate, LocalDate> addr,//
-        TableIntConsumer<? super T, LocalDate> reducer, T totalValue
+        TableIntFunction<? super T, LocalDate, T> reducer, T totalValue
     ) {
         for (int i = 0; begin.isBefore(end); begin = addr.apply(begin)) {
-            reducer.accept(totalValue, begin, i++);
+            totalValue = reducer.apply(totalValue, begin, i++);
         }
         return totalValue;
     }
@@ -1309,10 +1310,10 @@ public final class DateTimeUtil {
      */
     public static <T> T reduce(
         LocalTime begin, LocalTime end, Function<LocalTime, LocalTime> addr,//
-        TableIntConsumer<? super T, LocalTime> reducer, T totalValue
+        TableIntFunction<? super T, LocalTime, T> reducer, T totalValue
     ) {
         for (int i = 0; begin.isBefore(end); begin = addr.apply(begin)) {
-            reducer.accept(totalValue, begin, i++);
+            totalValue = reducer.apply(totalValue, begin, i++);
         }
         return totalValue;
     }
@@ -1333,10 +1334,10 @@ public final class DateTimeUtil {
      */
     public static <T> T reduce(
         LocalDateTime begin, LocalDateTime end, Function<LocalDateTime, LocalDateTime> addr,//
-        TableIntConsumer<? super T, LocalDateTime> reducer, T totalValue
+        TableIntFunction<? super T, LocalDateTime, T> reducer, T totalValue
     ) {
         for (int i = 0; begin.isBefore(end); begin = addr.apply(begin)) {
-            reducer.accept(totalValue, begin, i++);
+            totalValue = reducer.apply(totalValue, begin, i++);
         }
         return totalValue;
     }

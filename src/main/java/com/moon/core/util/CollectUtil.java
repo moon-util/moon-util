@@ -356,17 +356,17 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Iterator, TableIntConsumer, Object)
+     * @see #reduce(Iterator, TableIntFunction, Object)
      * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterable<? extends E> iterable, TableIntConsumer<? super T, ? super E> reducer, T totalValue
+        Iterable<? extends E> iterable, TableIntFunction<? super T, ? super E, T> reducer, T totalValue
     ) {
         if (iterable != null) {
             int index = 0;
             for (E item : iterable) {
-                reducer.accept(totalValue, item, index++);
+                totalValue = reducer.apply(totalValue, item, index++);
             }
         }
         return totalValue;
@@ -388,16 +388,16 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Iterable, TableIntConsumer, Object)
+     * @see #reduce(Iterable, TableIntFunction, Object)
      * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
      * @see ArrayUtil#reduce(int, BiIntFunction, Object)
      */
     public final static <T, E> T reduce(
-        Iterator<? extends E> iterator, TableIntConsumer<? super T, ? super E> reducer, T totalValue
+        Iterator<? extends E> iterator, TableIntFunction<? super T, ? super E, T> reducer, T totalValue
     ) {
         if (iterator != null) {
             for (int i = 0; iterator.hasNext(); i++) {
-                reducer.accept(totalValue, iterator.next(), i);
+                totalValue = reducer.apply(totalValue, iterator.next(), i);
             }
         }
         return totalValue;

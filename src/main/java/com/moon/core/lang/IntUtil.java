@@ -1,8 +1,8 @@
 package com.moon.core.lang;
 
 import com.moon.core.util.CollectUtil;
-import com.moon.core.util.function.BiIntConsumer;
-import com.moon.core.util.function.TableIntConsumer;
+import com.moon.core.util.function.BiIntFunction;
+import com.moon.core.util.function.TableIntFunction;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -271,26 +271,26 @@ public final class IntUtil {
      * <pre>
      * 1. 接受一个数组作为源数据；
      * 2. 一个处理器，处理器接收两个参数（总值, 当前项），然后返回总值，下一次迭代接受到的总值是上一次的返回结果；
-     *       其中当前项也是索引，索引相对{@link #reduce(int, BiIntConsumer, Object)}少一个参数
+     *       其中当前项也是索引，索引相对{@link #reduce(int, BiIntFunction, Object)}少一个参数
      * 3. 初始值，作为第一次传入处理器的参数
      * </pre>
      *
-     * @param count   迭代次数
-     * @param reducer 聚合函数
-     * @param result  返回结果
-     * @param <T>     返回值类型
+     * @param count      迭代次数
+     * @param reducer    聚合函数
+     * @param totalValue 返回结果
+     * @param <T>        返回值类型
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see ArrayUtil#reduce(Object[], TableIntConsumer, Object)
-     * @see CollectUtil#reduce(Iterable, TableIntConsumer, Object)
-     * @see CollectUtil#reduce(Iterator, TableIntConsumer, Object)
+     * @see ArrayUtil#reduce(Object[], TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
      */
-    public static <T> T reduce(int count, BiIntConsumer<? super T> reducer, T result) {
+    public static <T> T reduce(int count, BiIntFunction<? super T, T> reducer, T totalValue) {
         for (int i = 0; i < count; i++) {
-            reducer.accept(result, i);
+            totalValue = reducer.apply(totalValue, i);
         }
-        return result;
+        return totalValue;
     }
 
     final static char[] DIGITS = toCharArray(NUMBERS, UPPERS, LOWERS);

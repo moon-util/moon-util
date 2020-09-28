@@ -1,6 +1,5 @@
 package com.moon.core.lang;
 
-import com.moon.core.enums.Systems;
 import com.moon.core.util.CollectUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.function.BiIntConsumer;
@@ -640,7 +639,7 @@ public final class ArrayUtil {
      * <pre>
      * 1. 接受一个数组作为源数据；
      * 2. 一个处理器，处理器接收两个参数（总值, 当前项）；
-     *       其中当前项也是索引，索引相对{@link #reduce(int, BiIntConsumer, Object)}少一个参数
+     *       其中当前项也是索引，索引相对{@link #reduce(int, BiIntFunction, Object)}少一个参数
      * 3. 初始值，作为第一次传入处理器的参数，也是最后返回结果
      * </pre>
      *
@@ -651,11 +650,11 @@ public final class ArrayUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(Object[], TableIntConsumer, Object)
-     * @see CollectUtil#reduce(Iterable, TableIntConsumer, Object)
-     * @see CollectUtil#reduce(Iterator, TableIntConsumer, Object)
+     * @see #reduce(Object[], TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
      */
-    public static <T> T reduce(int count, BiIntConsumer<? super T> reducer, T totalValue) {
+    public static <T> T reduce(int count, BiIntFunction<? super T, T> reducer, T totalValue) {
         return IntUtil.reduce(count, reducer, totalValue);
     }
 
@@ -663,7 +662,7 @@ public final class ArrayUtil {
      * 聚合函数，参照 JavaScript 中 Array.reduce(..) 实现
      * <pre>
      * 1. 接受一个数组作为源数据；
-     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引）；
+     * 2. 一个处理器，处理器接收三个参数（总值, 当前项, 索引），返回值作为下一次的总值，最终返回值是函数返回值；
      * 3. 初始值，作为第一次传入处理器的参数，也是最后返回结果
      * </pre>
      *
@@ -675,14 +674,14 @@ public final class ArrayUtil {
      *
      * @return 返回最后一项处理完后的结果
      *
-     * @see #reduce(int, BiIntConsumer, Object)
-     * @see CollectUtil#reduce(Iterable, TableIntConsumer, Object)
-     * @see CollectUtil#reduce(Iterator, TableIntConsumer, Object)
+     * @see #reduce(int, BiIntFunction, Object)
+     * @see CollectUtil#reduce(Iterable, TableIntFunction, Object)
+     * @see CollectUtil#reduce(Iterator, TableIntFunction, Object)
      */
-    public static <T, E> T reduce(E[] arr, TableIntConsumer<? super T, ? super E> reducer, T totalValue) {
+    public static <T, E> T reduce(E[] arr, TableIntFunction<? super T, ? super E, T> reducer, T totalValue) {
         if (arr != null) {
             for (int i = 0, len = arr.length; i < len; i++) {
-                reducer.accept(totalValue, arr[i], i);
+                totalValue = reducer.apply(totalValue, arr[i], i);
             }
         }
         return totalValue;

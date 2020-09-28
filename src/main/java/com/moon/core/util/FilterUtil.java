@@ -86,7 +86,7 @@ public final class FilterUtil {
      *
      * @return 返回 optional
      */
-    public static <T> java.util.Optional<T> findAsOptional(T[] arr, Predicate<? super T> tester) {
+    public static <T> java.util.Optional<T> findAsUtilOptional(T[] arr, Predicate<? super T> tester) {
         return java.util.Optional.ofNullable(nullableFind(arr, tester));
     }
 
@@ -99,8 +99,103 @@ public final class FilterUtil {
      *
      * @return 返回 optional
      */
-    public static <T> java.util.Optional<T> findAsOptional(Iterable<T> iterable, Predicate<? super T> tester) {
+    public static <T> java.util.Optional<T> findAsUtilOptional(Iterable<T> iterable, Predicate<? super T> tester) {
         return java.util.Optional.ofNullable(nullableFind(iterable, tester));
+    }
+
+    /**
+     * 在数组中查找符合条件的第一项
+     *
+     * @param arr    查找范围数组
+     * @param tester 匹配条件
+     * @param <T>    数组单项数据类型
+     *
+     * @return 返回 optional
+     */
+    public static <T> Optional<T> find(T[] arr, Predicate<? super T> tester) {
+        return Optional.ofNullable(nullableFind(arr, tester));
+    }
+
+    /**
+     * 在集合中查找符合条件的第一项
+     *
+     * @param iterable 查找范围集合
+     * @param tester   匹配条件
+     * @param <T>      集合单项数据类型
+     *
+     * @return 返回 optional
+     */
+    public static <T> Optional<T> find(Iterable<T> iterable, Predicate<? super T> tester) {
+        return Optional.ofNullable(nullableFind(iterable, tester));
+    }
+
+    /**
+     * 在集合中查找符合条件的第一项
+     *
+     * @param iterable             查找范围集合
+     * @param tester               匹配条件
+     * @param defaultValueSupplier 默认值
+     * @param <T>                  集合单项数据类型
+     *
+     * @return 如果集合中存在符合条件的数据，则返回对应数据；否则返回默认值 defaultValue
+     */
+    public static <T> T findOrPull(
+        Iterable<T> iterable, Predicate<? super T> tester, Supplier<T> defaultValueSupplier
+    ) {
+        if (iterable == null) {
+            return defaultValueSupplier.get();
+        }
+        for (T item : iterable) {
+            if (tester.test(item)) {
+                return item;
+            }
+        }
+        return defaultValueSupplier.get();
+    }
+
+    /**
+     * 在数组中查找符合条件的第一项
+     *
+     * @param arr          查找范围数组
+     * @param tester       匹配条件
+     * @param defaultValue 默认值
+     * @param <T>          数组单项数据类型
+     *
+     * @return 如果数据中存在符合条件的数据，则返回对应数据；否则返回默认值 defaultValue
+     */
+    public static <T> T findOrDefault(T[] arr, Predicate<? super T> tester, T defaultValue) {
+        if (arr == null) {
+            return defaultValue;
+        }
+        for (T item : arr) {
+            if (tester.test(item)) {
+                return item;
+            }
+        }
+        return defaultValue;
+    }
+
+
+    /**
+     * 在集合中查找符合条件的第一项
+     *
+     * @param iterable     查找范围集合
+     * @param tester       匹配条件
+     * @param defaultValue 默认值
+     * @param <T>          集合单项数据类型
+     *
+     * @return 如果集合中存在符合条件的数据，则返回对应数据；否则返回默认值 defaultValue
+     */
+    public static <T> T findOrDefault(Iterable<T> iterable, Predicate<? super T> tester, T defaultValue) {
+        if (iterable == null) {
+            return defaultValue;
+        }
+        for (T item : iterable) {
+            if (tester.test(item)) {
+                return item;
+            }
+        }
+        return defaultValue;
     }
 
     /**
@@ -113,15 +208,7 @@ public final class FilterUtil {
      * @return 如果数据中存在符合条件的数据，则返回对应数据；否则返回 null
      */
     public static <T> T nullableFind(T[] arr, Predicate<? super T> tester) {
-        if (arr == null) {
-            return null;
-        }
-        for (T item : arr) {
-            if (tester.test(item)) {
-                return item;
-            }
-        }
-        return null;
+        return findOrDefault(arr, tester, null);
     }
 
     /**
@@ -134,15 +221,7 @@ public final class FilterUtil {
      * @return 如果集合中存在符合条件的数据，则返回对应数据；否则返回 null
      */
     public static <T> T nullableFind(Iterable<T> iterable, Predicate<? super T> tester) {
-        if (iterable == null) {
-            return null;
-        }
-        for (T item : iterable) {
-            if (tester.test(item)) {
-                return item;
-            }
-        }
-        return null;
+        return findOrDefault(iterable, tester, null);
     }
 
     /**
@@ -157,15 +236,31 @@ public final class FilterUtil {
      * @throws IllegalArgumentException 当数组中不存在符合条件的数据时抛出异常
      */
     public static <T> T requireFind(T[] arr, Predicate<? super T> tester) {
+        return requireFind(arr, tester, "Can not find matches item");
+    }
+
+    /**
+     * 在数组中查找符合条件的数据，要求必须存在，否则抛出异常
+     *
+     * @param arr          查找范围数组
+     * @param tester       匹配条件
+     * @param errorMessage 错误消息
+     * @param <T>          集合单项数据类型
+     *
+     * @return 如果数组中存在符合条件的数据，则返回第一个匹配数据；否则抛出异常
+     *
+     * @throws IllegalArgumentException 当数组中不存在符合条件的数据时抛出异常
+     */
+    public static <T> T requireFind(T[] arr, Predicate<? super T> tester, String errorMessage) {
         if (arr == null) {
-            throw new IllegalArgumentException("Can not find matches item");
+            throw new IllegalArgumentException(errorMessage);
         }
         for (T item : arr) {
             if (tester.test(item)) {
                 return item;
             }
         }
-        throw new IllegalArgumentException("Can not find matches item");
+        throw new IllegalArgumentException(errorMessage);
     }
 
     /**
@@ -180,15 +275,57 @@ public final class FilterUtil {
      * @throws IllegalArgumentException 当集合中不存在符合条件的数据时抛出异常
      */
     public static <T> T requireFind(Iterable<T> iterable, Predicate<? super T> tester) {
+        return requireFind(iterable, tester, "Can not find matches item");
+    }
+
+    /**
+     * 在集合中查找符合条件的数据，要求必须存在，否则抛出异常
+     *
+     * @param iterable     查找范围集合
+     * @param tester       匹配条件
+     * @param errorMessage 错误消息
+     * @param <T>          集合单项数据类型
+     *
+     * @return 如果集合中存在符合条件的数据，则返回第一个匹配数据；否则抛出异常
+     *
+     * @throws IllegalArgumentException 当集合中不存在符合条件的数据时抛出异常
+     */
+    public static <T> T requireFind(Iterable<T> iterable, Predicate<? super T> tester, String errorMessage) {
         if (iterable == null) {
-            throw new IllegalArgumentException("Can not find matches item");
+            throw new IllegalArgumentException(errorMessage);
         }
         for (T item : iterable) {
             if (tester.test(item)) {
                 return item;
             }
         }
-        throw new IllegalArgumentException("Can not find matches item");
+        throw new IllegalArgumentException(errorMessage);
+    }
+
+    /**
+     * 在集合中查找符合条件的数据，要求必须存在，否则抛出异常
+     *
+     * @param iterable          查找范围集合
+     * @param tester            匹配条件
+     * @param throwableSupplier 错误消息
+     * @param <T>               集合单项数据类型
+     *
+     * @return 如果集合中存在符合条件的数据，则返回第一个匹配数据；否则抛出异常
+     *
+     * @throws IllegalArgumentException 当集合中不存在符合条件的数据时抛出异常
+     */
+    public static <T, EX extends Throwable> T requireFind(
+        Iterable<T> iterable, Predicate<? super T> tester, Supplier<EX> throwableSupplier
+    ) throws EX {
+        if (iterable == null) {
+            throw throwableSupplier.get();
+        }
+        for (T item : iterable) {
+            if (tester.test(item)) {
+                return item;
+            }
+        }
+        throw throwableSupplier.get();
     }
 
     /*
