@@ -39,6 +39,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
                 String property = violation.getPropertyPath().toString();
                 String message = violation.getMessage();
                 messages.put(property, message);
+                return messages;
             }, MapUtil.newHashMap());
         }
     },

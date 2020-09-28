@@ -550,4 +550,15 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
         consumer.accept(getCell());
         return this;
     }
+
+    /**
+     * 完全控制当前 cell, 并返回一个值
+     *
+     * @param transformer transformer 转换器
+     *
+     * @return 转换后的值
+     */
+    public <T> T transform(Function<? super Cell, T> transformer) {
+        return transformer.apply(getCell());
+    }
 }

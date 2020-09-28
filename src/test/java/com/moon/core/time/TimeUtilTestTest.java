@@ -28,6 +28,7 @@ class TimeUtilTestTest {
         // });
         DateTimeUtil.reduce(date, end, d -> d.plusDays(1), (total, thisDate, idx) -> {
             total.add(DateTimeUtil.format(thisDate, "yyyy-MM-dd"));
+            return total;
         }, new ArrayList()).forEach(dateStr -> {
             System.out.println(dateStr);
         });

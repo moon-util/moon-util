@@ -65,9 +65,7 @@ public class ArrayUtilTest {
     void testSum() throws Exception {
         int[] ints = {};
 
-        Map<String, Object> resultMap = ArrayUtil.reduce(20, (map, idx) -> {
-
-        }, MapUtil.newHashMap());
+        Map<String, Object> resultMap = ArrayUtil.reduce(20, (map, idx) -> map, MapUtil.newHashMap());
     }
 
     @Test

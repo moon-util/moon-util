@@ -47,7 +47,10 @@ public class DateTimeUtilTest {
     void testNowDate() throws Exception {
         List<String> formatted = DateTimeUtil.reduceMonths(LocalDate.now(),
             LocalDate.now().plusYears(1),
-            (total, date, idx) -> total.add(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date)),
+            (total, date, idx) -> {
+                total.add(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date));
+                return total;
+            },
             new ArrayList());
         Assertions.assertEquals(formatted.size(), 12);
     }
@@ -64,8 +67,7 @@ public class DateTimeUtilTest {
 
     @Test
     void testNowDateTime() throws Exception {
-        String body = Jsoup.connect("http://60.205.182.215/cyhr/main/wechat/registerBaseInfo/register-invite.jsp")
-            .get()
+        String body = Jsoup.connect("http://60.205.182.215/cyhr/main/wechat/registerBaseInfo/register-invite.jsp").get()
             // .body()
             .outerHtml();
         System.out.println(body);
