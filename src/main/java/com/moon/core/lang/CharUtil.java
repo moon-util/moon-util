@@ -178,22 +178,13 @@ public final class CharUtil {
     public static boolean isDigit(int ch) { return ch > 47 && ch < 58; }
 
     public static boolean equalsIgnoreCase(int ch1, int ch2) {
-        if (ch1 == ch2) {
-            return true;
-        }
-        if (isLowerCase(ch1) && isUpperCase(ch2)) {
-            return ch1 - 32 == ch2;
-        }
-        if (isUpperCase(ch1) && isLowerCase(ch2)) {
-            return ch2 - 32 == ch1;
-        }
-        return false;
+        return ch1 == ch2 || (isLowerCase(ch1) ? ch1 - 32 == ch2 : (isUpperCase(ch1) && ch2 - 32 == ch1));
     }
 
     public static boolean isASCIICode(int ch) { return ch < 128; }
 
     public static boolean isChar(Object o) {
-        if (o != null && (o.getClass() == Character.class)) {
+        if (o instanceof Character) {
             return true;
         }
         if (o instanceof Integer) {

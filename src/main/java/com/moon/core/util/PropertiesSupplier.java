@@ -6,7 +6,7 @@ import com.moon.core.lang.LongUtil;
 import java.util.function.Function;
 
 import static com.moon.core.lang.IntUtil.defaultIfInvalid;
-import static com.moon.core.lang.StringUtil.defaultIfNullString;
+import static com.moon.core.lang.StringUtil.defaultIfWebNull;
 import static com.moon.core.lang.StringUtil.trimToNull;
 
 /**
@@ -42,7 +42,7 @@ public interface PropertiesSupplier<V> {
      *
      * @return
      */
-    default String getOrEmpty(String key) { return defaultIfNullString(getString(key), Const.EMPTY); }
+    default String getOrEmpty(String key) { return defaultIfWebNull(getString(key), Const.EMPTY); }
 
     /**
      * 返回一个字符串或 null

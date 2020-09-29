@@ -2,7 +2,6 @@ package com.moon.core.io;
 
 import com.moon.core.lang.LangUtil;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.function.ThrowingConsumer;
@@ -463,6 +462,14 @@ public final class FileUtil {
      */
     public static final char APP_FileSeparator_Char = (char) 47;
 
+    /**
+     * 格式化文件名，确保文件名是指定扩展名（扩展名忽略大小写）
+     *
+     * @param filename  文件名
+     * @param extension 扩展名
+     *
+     * @return 一定包含指定扩展名后缀的文件名
+     */
     public final static String formatFilename(String filename, String extension) {
         char dot = '.';
         String dotExtension = extension.charAt(0) == dot ? extension : dot + extension;
@@ -471,19 +478,17 @@ public final class FileUtil {
             .equalsIgnoreCase(dotExtension)) ? filename : (filename + dotExtension);
     }
 
+    /**
+     * 格式化文件路径，确保文件路径分隔符符合所有系统
+     * <p>
+     * 主要是路径分割符反斜线“\”只在 windows 系统有效，将其替换为正斜线“/”
+     *
+     * @param filepath 文件原路径
+     *
+     * @return 符合所有系统的格式化路径
+     */
     public final static String formatFilepath(String filepath) {
-        if (filepath != null) {
-            int index = 0;
-            char[] chars = null;
-            char WIN = WIN_FileSeparator_Char;
-            char DFT = APP_FileSeparator_Char;
-            for (int i = 0, len = filepath.length(); i < len; i++) {
-                char ch = filepath.charAt(i);
-                chars = ParseSupportUtil.setChar(chars, index++, ch == WIN ? DFT : ch);
-            }
-            return chars == null ? null : new String(chars, 0, index);
-        }
-        return null;
+        return StringUtil.replace(filepath, WIN_FileSeparator_Char, APP_FileSeparator_Char);
     }
 
     public static boolean exists(File file) { return file != null && file.exists(); }

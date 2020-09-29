@@ -6,6 +6,7 @@ import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.validator.Validator;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -257,28 +258,28 @@ class StringUtilTestTest {
 
     @Test
     void testIsNullString() {
-        assertTrue(StringUtil.isNullString(null));
-        assertTrue(StringUtil.isNullString("null"));
-        assertTrue(StringUtil.isNullString(""));
+        assertTrue(StringUtil.isWebNull(null));
+        assertTrue(StringUtil.isWebNull("null"));
+        assertTrue(StringUtil.isWebNull(""));
 
-        assertFalse(StringUtil.isNullString("undefined"));
-        assertFalse(StringUtil.isNullString(" "));
-        assertFalse(StringUtil.isNullString("a"));
-        assertFalse(StringUtil.isNullString("abc"));
-        assertFalse(StringUtil.isNullString(" a b c "));
+        assertFalse(StringUtil.isWebNull("undefined"));
+        assertFalse(StringUtil.isWebNull(" "));
+        assertFalse(StringUtil.isWebNull("a"));
+        assertFalse(StringUtil.isWebNull("abc"));
+        assertFalse(StringUtil.isWebNull(" a b c "));
     }
 
     @Test
     void testIsUndefined() {
-        assertTrue(StringUtil.isUndefined(null));
-        assertTrue(StringUtil.isUndefined("null"));
-        assertTrue(StringUtil.isUndefined("undefined"));
+        assertTrue(StringUtil.isWebUndefined(null));
+        assertTrue(StringUtil.isWebUndefined("null"));
+        assertTrue(StringUtil.isWebUndefined("undefined"));
 
-        assertTrue(StringUtil.isUndefined(""));
-        assertFalse(StringUtil.isUndefined(" "));
-        assertFalse(StringUtil.isUndefined("a"));
-        assertFalse(StringUtil.isUndefined("abc"));
-        assertFalse(StringUtil.isUndefined(" a b c "));
+        assertTrue(StringUtil.isWebUndefined(""));
+        assertFalse(StringUtil.isWebUndefined(" "));
+        assertFalse(StringUtil.isWebUndefined("a"));
+        assertFalse(StringUtil.isWebUndefined("abc"));
+        assertFalse(StringUtil.isWebUndefined(" a b c "));
     }
 
     @Test
@@ -379,6 +380,7 @@ class StringUtilTestTest {
 
     @Test
     void testRepeat() {
+        assertEquals("?,?,?", StringUtil.repeat('?', 3, ','));
     }
 
     @Test
@@ -1028,5 +1030,27 @@ class StringUtilTestTest {
 
     @Test
     void testTestSplit() throws Exception {
+    }
+
+    @Test
+    void testEndsWithIgnoreCase() throws Exception {
+        String origin = "1234567890", suffix = "890";
+        assertTrue(StringUtil.endsWithIgnoreCase(origin, suffix));
+        origin = "1234567890abc";
+        suffix = "abc";
+        assertTrue(StringUtil.endsWithIgnoreCase(origin, suffix));
+        suffix = "0AbC";
+        assertTrue(StringUtil.endsWithIgnoreCase(origin, suffix));
+    }
+
+    @Test
+    void testStartsWithIgnoreCase() throws Exception {
+        String origin = "1234567890", prefix = "123";
+        assertTrue(StringUtil.startsWithIgnoreCase(origin, prefix));
+        origin = "abc1234567890";
+        prefix = "abc";
+        assertTrue(StringUtil.startsWithIgnoreCase(origin, prefix));
+        prefix = "AbC1";
+        assertTrue(StringUtil.startsWithIgnoreCase(origin, prefix));
     }
 }

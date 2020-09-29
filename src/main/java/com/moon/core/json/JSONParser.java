@@ -48,7 +48,7 @@ final class JSONParser {
 
     public JSONParser(String source) {
         this.source = source;
-        if (StringUtil.isUndefined(source)) {
+        if (StringUtil.isWebUndefined(source)) {
             this.data = JSONNull.NULL;
         } else {
             this.length = source.length();

@@ -37,15 +37,11 @@ public final class BooleanUtil {
 
     public static boolean toBoolean(int value) { return value != 0; }
 
-    public static boolean toBoolean(char ch) {
-        return ch != 48 && ch != 0x00000001 && !Character.isWhitespace(ch);
-    }
+    public static boolean toBoolean(char ch) { return ch != 48 && ch != 0x00000001 && !Character.isWhitespace(ch); }
 
     public static boolean toBoolean(Number value) { return value != null && value.doubleValue() != 0; }
 
-    public static boolean toBoolean(CharSequence cs) {
-        return isTrue(cs);
-    }
+    public static boolean toBoolean(CharSequence cs) { return isTrue(cs); }
 
     /**
      * @param o 待转换值
@@ -104,15 +100,21 @@ public final class BooleanUtil {
 
     public static boolean isNotFalse(Boolean value) { return !isFalse(value); }
 
-    public static boolean isTrue(Object value) {return Boolean.TRUE.equals(value);}
+    public static boolean isTrue(Object value) {
+        return value instanceof CharSequence ? isTrue(value.toString()) : Boolean.TRUE.equals(value);
+    }
 
-    public static boolean isNotTrue(Object value) {return !Boolean.TRUE.equals(value);}
+    public static boolean isNotTrue(Object value) { return !isTrue(value); }
 
-    public static boolean isFalse(Object value) {return Boolean.FALSE.equals(value);}
+    public static boolean isFalse(Object value) {
+        return value instanceof CharSequence ? isFalse(value.toString()) : Boolean.FALSE.equals(value);
+    }
 
-    public static boolean isNotFalse(Object value) {return !Boolean.FALSE.equals(value);}
+    public static boolean isNotFalse(Object value) { return !isFalse(value); }
 
     public static boolean isTrue(CharSequence sequence) { return falseIfInvalid(sequence); }
+
+    public static boolean isFalse(CharSequence sequence) { return !isTrue(sequence); }
 
     public static boolean trueIfInvalid(CharSequence sequence) { return defaultIfInvalid(sequence, true); }
 
@@ -122,30 +124,22 @@ public final class BooleanUtil {
         if (sequence == null) {
             return defaultValue;
         }
-        switch (sequence.toString()) {
+        switch (sequence.toString().toLowerCase()) {
             case "true":
-            case "TRUE":
             case "yes":
-            case "YES":
             case "1":
             case "on":
-            case "ON":
             case "enable":
             case "enabled":
-            case "ENABLE":
-            case "ENABLED":
                 return true;
+            case "null":
+            case "undefined":
             case "false":
-            case "FALSE":
             case "no":
-            case "NO":
             case "0":
             case "off":
-            case "OFF":
             case "disable":
             case "disabled":
-            case "DISABLE":
-            case "DISABLED":
                 return false;
             default:
                 return defaultValue;
@@ -154,21 +148,29 @@ public final class BooleanUtil {
 
     public static int toInt(boolean value) { return value ? 1 : 0; }
 
-    public static String toLowerYesNoString(boolean value) {
-        return toString(value, "yes", "no", false);
+    public static String toString(boolean value) { return Boolean.toString(value); }
+
+    public static String toLowerYesNoString(boolean value) { return toString(value, "yes", "no"); }
+
+    public static String toLowerOnOffString(boolean value) { return toString(value, "on", "off"); }
+
+    public static String toString(boolean value, String trueStringVal, String falseStringVal) {
+        return toString(value, trueStringVal, falseStringVal, false);
     }
 
-    public static String toString(boolean value) {
-        return Boolean.toString(value);
-    }
-
-    public static String toLowerOnOffString(boolean value) {
-        return toString(value, "on", "off", false);
-    }
-
+    /**
+     * to String
+     *
+     * @param value          boolean value
+     * @param trueStringVal  真值字符串
+     * @param falseStringVal 假值字符串
+     * @param upper          是否大写化
+     *
+     * @return 当 value == true 时返回 trueStringVal，否则返回 falseStringVal，upper 决定返回值最终是否转换为大写
+     */
     public static String toString(boolean value, String trueStringVal, String falseStringVal, boolean upper) {
         return upper //
-               ? (value ? trueStringVal : falseStringVal).toLowerCase()//
-               : (value ? trueStringVal : falseStringVal).toUpperCase();
+               ? (value ? trueStringVal : falseStringVal).toUpperCase()//
+               : (value ? trueStringVal : falseStringVal);
     }
 }

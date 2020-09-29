@@ -254,27 +254,6 @@ public final class StringUtil {
     public static boolean isEmpty(CharSequence string) { return string == null || string.length() == 0; }
 
     /**
-     * 是否包含空字符串
-     *
-     * @param values
-     *
-     * @return
-     */
-    public static boolean isAnyEmpty(CharSequence... values) {
-        if (values == null || values.length == 0) {
-            return true;
-        }
-        for (CharSequence value : values) {
-            if (isEmpty(value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isNoneEmpty(CharSequence... values) { return !isAnyEmpty(values); }
-
-    /**
      * @param string 待测字符串
      *
      * @return 是否不为空
@@ -318,6 +297,27 @@ public final class StringUtil {
      *
      * @return
      */
+    public static boolean isAnyEmpty(CharSequence... values) {
+        if (values == null || values.length == 0) {
+            return true;
+        }
+        for (CharSequence value : values) {
+            if (isEmpty(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isNoneEmpty(CharSequence... values) { return !isAnyEmpty(values); }
+
+    /**
+     * 是否包含空字符串
+     *
+     * @param values
+     *
+     * @return
+     */
     public static boolean isAnyBlank(CharSequence... values) {
         if (values == null || values.length == 0) {
             return true;
@@ -345,6 +345,33 @@ public final class StringUtil {
     }
 
     /**
+     * 忽略字符大小写判断字符串是否以指定前缀结尾
+     *
+     * @param cs     待测字符串
+     * @param prefix 期望的前缀（忽略大小写）
+     *
+     * @return 如果待测字符串以期望的前缀结尾返回 true，否则返回 false
+     */
+    public static boolean startsWithIgnoreCase(CharSequence cs, CharSequence prefix) {
+        if (cs == null) {
+            return prefix == null;
+        }
+        if (prefix == null) {
+            return false;
+        }
+        int len1 = cs.length(), len2 = prefix.length();
+        if (len2 > len1) {
+            return false;
+        }
+        for (int i = 0; i < len2; i++) {
+            if (!CharUtil.equalsIgnoreCase(cs.charAt(i), prefix.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * 返回字符串是否包含指定后缀
      *
      * @param cs     待测字符串
@@ -354,6 +381,34 @@ public final class StringUtil {
      */
     public static boolean endsWith(CharSequence cs, CharSequence suffix) {
         return (cs == suffix) || (cs != null && suffix != null && cs.toString().endsWith(suffix.toString()));
+    }
+
+    /**
+     * 忽略字符大小写判断字符串是否以指定后缀结尾
+     *
+     * @param cs     待测字符串
+     * @param suffix 期望的后缀（忽略大小写）
+     *
+     * @return 如果待测字符串以期望的后缀结尾返回 true，否则返回 false
+     */
+    public static boolean endsWithIgnoreCase(CharSequence cs, CharSequence suffix) {
+        if (cs == null) {
+            return suffix == null;
+        }
+        if (suffix == null) {
+            return false;
+        }
+        int len1 = cs.length(), len2 = suffix.length();
+        int lenOfDiff = len1 - len2;
+        if (lenOfDiff < 0) {
+            return false;
+        }
+        for (int i = len2 - 1; i > -1; i--) {
+            if (!CharUtil.equalsIgnoreCase(cs.charAt(i + lenOfDiff), suffix.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -374,7 +429,7 @@ public final class StringUtil {
      *
      * @return 是否是空或 null、undefined
      */
-    public static boolean isNullString(CharSequence cs) {
+    public static boolean isWebNull(CharSequence cs) {
         if (isEmpty(cs)) {
             return true;
         }
@@ -409,12 +464,12 @@ public final class StringUtil {
      *
      * @return 是否是空或 null 字符串
      */
-    public static boolean isUndefined(CharSequence cs) {
+    public static boolean isWebUndefined(CharSequence cs) {
         return isEmpty(cs) || (cs instanceof StringBuffer ? "undefined".equals(cs.toString()) : (cs.length() == 9 && safeIsUndefined(
             cs)));
     }
 
-    private static boolean safeIsUndefined(CharSequence cs) {
+    public static boolean safeIsUndefined(CharSequence cs) {
         return cs.charAt(0) == 'u' && cs.charAt(1) == 'n' && cs.charAt(2) == 'd' && cs.charAt(3) == 'e' && cs.charAt(4) == 'f' && cs
             .charAt(5) == 'i' && cs.charAt(6) == 'n' && cs.charAt(7) == 'e' && cs.charAt(8) == 'd';
     }
@@ -452,7 +507,7 @@ public final class StringUtil {
      * @param cs     待测字符串
      * @param tester 依次接受 cs 中的字符为参数，返回是否符合条件
      *
-     * @return 全部都符合条件返回 true
+     * @return 字符串全部都符合条件返回 true；如果字符串为空
      *
      * @see IntTesters
      */
@@ -532,14 +587,14 @@ public final class StringUtil {
      *
      * @return 测试后的值
      *
-     * @see #isNullString(CharSequence)
+     * @see #isWebNull(CharSequence)
      */
-    public static <T extends CharSequence> T defaultIfNullString(T cs, T defaultValue) {
-        return isNullString(cs) ? defaultValue : cs;
+    public static <T extends CharSequence> T defaultIfWebNull(T cs, T defaultValue) {
+        return isWebNull(cs) ? defaultValue : cs;
     }
 
-    public static <T extends CharSequence> T defaultIfUndefined(T cs, T defaultValue) {
-        return isUndefined(cs) ? defaultValue : cs;
+    public static <T extends CharSequence> T defaultIfWebUndefined(T cs, T defaultValue) {
+        return isWebUndefined(cs) ? defaultValue : cs;
     }
 
     public static <T> T elseIfNull(T cs, Supplier<T> elseBuilder) { return cs == null ? elseBuilder.get() : cs; }
@@ -636,9 +691,7 @@ public final class StringUtil {
         return value == null ? defaultValue : value.toString();
     }
 
-    public static String toStringOrNull(Object value) {
-        return toStringOrDefaultIfNull(value, null);
-    }
+    public static String toStringOrNull(Object value) { return stringify(value); }
 
     public static String stringify(Object value) { return toStringOrDefaultIfNull(value, null); }
 
@@ -649,20 +702,38 @@ public final class StringUtil {
      */
 
     /**
-     * StringUtil.repeat('?', 5, ',')    ====> "?,?,?,?,?"
+     * StringUtil.repeat('?', 5)    ====> "?????"
      *
      * @param ch
+     * @param count
+     *
+     * @return
+     */
+    public static String repeat(char ch, int count) {
+        char[] chars = new char[count];
+        for (int i = 0; i < count; i++) {
+            chars[i] = ch;
+        }
+        return new String(chars);
+    }
+
+    /**
+     * StringUtil.repeat('?', 5, ',')    ====> "?,?,?,?,?"
+     *
+     * @param ch         要重复
      * @param count
      * @param joinedChar
      *
      * @return
      */
     public static String repeat(char ch, int count, char joinedChar) {
-        StringBuilder builder = new StringBuilder(count * 2);
-        for (int i = 0; i < count; i++) {
-            builder.append(ch).append(joinedChar);
+        int length = count * 2, i = 0;
+        char[] chars = new char[length];
+        while (i < length) {
+            chars[i++] = ch;
+            chars[i++] = joinedChar;
         }
-        return builder.deleteCharAt(builder.length()).toString();
+        return new String(chars, 0, length - 1);
     }
 
     public static String repeat(CharSequence str, int count, String joinedStr) {
@@ -677,14 +748,6 @@ public final class StringUtil {
             builder.append(str).append(joinedStr);
         }
         return builder.substring(0, builder.length() - strLen);
-    }
-
-    public static String repeat(char ch, int count) {
-        char[] chars = new char[count];
-        for (int i = 0; i < count; i++) {
-            chars[i] = ch;
-        }
-        return new String(chars);
     }
 
     public static String repeat(CharSequence cs, int count) {
@@ -807,8 +870,7 @@ public final class StringUtil {
         if (str == null) {
             return null;
         }
-        int length = str.length();
-        for (int i = length - 1; i >= 0; i--) {
+        for (int i = str.length() - 1; i > -1; i--) {
             if (!Character.isWhitespace(str.charAt(i))) {
                 return str.substring(0, i + 1);
             }
@@ -1287,7 +1349,7 @@ public final class StringUtil {
      *
      * @param cs CharSequence 序列
      *
-     * @return 字符数组
+     * @return 字符数组，如果输入字符串为 null，则返回 null
      */
     public static char[] toCharArray(CharSequence cs) { return toCharArray(cs, false); }
 
@@ -1875,9 +1937,7 @@ public final class StringUtil {
      *
      * @return
      */
-    public static String discardAfter(String str, String search) {
-        return discardAfter(str, search, false);
-    }
+    public static String discardAfter(String str, String search) { return discardAfter(str, search, false); }
 
     /**
      * 丢弃匹配内容之后的字符串
@@ -1915,9 +1975,7 @@ public final class StringUtil {
      *
      * @return
      */
-    public static String discardAfterLast(String str, String search) {
-        return discardAfterLast(str, search, false);
-    }
+    public static String discardAfterLast(String str, String search) { return discardAfterLast(str, search, false); }
 
     /**
      * 丢弃最后一个匹配字符串之后的内容
@@ -1958,9 +2016,7 @@ public final class StringUtil {
      *
      * @return 处理完成的字符串
      */
-    public static String discardBefore(String str, String search) {
-        return discardBefore(str, search, false);
-    }
+    public static String discardBefore(String str, String search) { return discardBefore(str, search, false); }
 
     /**
      * 丢弃匹配字符串之前的内容
@@ -1998,9 +2054,7 @@ public final class StringUtil {
      *
      * @return 处理完成的字符串
      */
-    public static String discardBeforeLast(String str, String search) {
-        return discardBeforeLast(str, search, false);
-    }
+    public static String discardBeforeLast(String str, String search) { return discardBeforeLast(str, search, false); }
 
     /**
      * 丢弃最后一个匹配字符串之前的内容
