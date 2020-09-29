@@ -230,66 +230,6 @@ public final class JoinerUtil {
         return null;
     }
 
-    public static <T> String joinRequireNonNull(T[] array) { return joinRequireNonNull(array, DFT_SEP); }
-
-    public static <T> String joinRequireNonNull(T[] array, String separator) {
-        requireNonNull(array);
-        int len = array.length;
-        if (len > 0) {
-            int sepLen = separatorLength(requireNonNull(separator));
-            StringBuilder sb = new StringBuilder((sepLen + 5) * len);
-            for (int i = 0; i < len; i++) {
-                sb.append(separator).append(requireNonNull(array[i]));
-            }
-            return sb.substring(sepLen);
-        }
-        return EMPTY;
-    }
-
-    public static <T> String joinSkipNulls(T[] array) { return joinSkipNulls(array, DFT_SEP); }
-
-    public static <T> String joinSkipNulls(T[] array, String separator) {
-        if (array != null) {
-            int len = array.length;
-            if (len > 0) {
-                int sepLen = separatorLength(requireNonNull(separator));
-                StringBuilder sb = new StringBuilder((sepLen + 5) * len);
-                int mark = 0;
-                for (int i = 0; i < len; i++) {
-                    if (array[i] != null) {
-                        sb.append(separator).append(array[i]);
-                        mark = 1;
-                    }
-                }
-                return mark == 1 ? sb.substring(sepLen) : EMPTY;
-            }
-            return EMPTY;
-        }
-        return null;
-    }
-
-    public static <T> String joinUseForNull(T[] array, T forNull) { return joinUseForNull(array, forNull, DFT_SEP); }
-
-    public static <T> String joinUseForNull(T[] array, T forNull, String separator) {
-        if (array != null) {
-            int len = array.length;
-            if (len > 0) {
-                int sepLen = separatorLength(requireNonNull(separator));
-                StringBuilder sb = new StringBuilder((sepLen + 5) * len);
-                for (int i = 0; i < len; i++) {
-                    if (array[i] == null) {
-                        sb.append(separator).append(forNull);
-                    } else {
-                        sb.append(separator).append(array[i]);
-                    }
-                }
-                return sb.substring(sepLen);
-            }
-            return EMPTY;
-        }
-        return null;
-    }
-
     /*
      * ---------------------------------------------------------------------------
      * collection joiner.
@@ -308,37 +248,6 @@ public final class JoinerUtil {
                     sb.append(separator).append(item);
                 }
                 return sb.substring(sepLen);
-            }
-            return EMPTY;
-        }
-        return null;
-    }
-
-    public static <T> String joinRequireNonNull(Collection<T> collection) {
-        return joinRequireNonNull(collection, DFT_SEP);
-    }
-
-    public static <T> String joinRequireNonNull(Collection<T> collection, String separator) {
-        Iterable<T> iterable = collection;
-        return joinRequireNonNull(iterable, separator);
-    }
-
-    public static <T> String joinSkipNulls(Collection<T> collection) { return joinSkipNulls(collection, DFT_SEP); }
-
-    public static <T> String joinSkipNulls(Collection<T> collection, String separator) {
-        if (collection != null) {
-            int size = collection.size();
-            if (size > 0) {
-                int sepLen = separatorLength(requireNonNull(separator));
-                StringBuilder sb = new StringBuilder((sepLen + DFT_LEN) * size);
-                int mark = 0;
-                for (T item : collection) {
-                    if (item != null) {
-                        sb.append(separator).append(item);
-                        mark = 1;
-                    }
-                }
-                return mark == 1 ? sb.substring(sepLen) : EMPTY;
             }
             return EMPTY;
         }
@@ -364,49 +273,6 @@ public final class JoinerUtil {
         return null;
     }
 
-    public static <T> String joinRequireNonNull(Iterable<T> iterable) { return joinRequireNonNull(iterable, DFT_SEP); }
-
-    public static <T> String joinRequireNonNull(Iterable<T> iterable, String separator) {
-        requireNonNull(iterable);
-        StringBuilder joiner = joinerBySeparator(separator);
-        for (T item : iterable) {
-            joiner.append(separator).append(requireNonNull(item));
-        }
-        return joiner.substring(separatorLength(separator));
-    }
-
-    public static <T> String joinSkipNulls(Iterable<T> iterable) { return joinSkipNulls(iterable, DFT_SEP); }
-
-    public static <T> String joinSkipNulls(Iterable<T> iterable, String separator) {
-        if (iterable != null) {
-            StringBuilder joiner = joinerBySeparator(separator);
-            int mark = 0;
-            for (T item : iterable) {
-                if (item != null) {
-                    joiner.append(separator).append(item);
-                    mark = 1;
-                }
-            }
-            return mark == 1 ? joiner.substring(separatorLength(separator)) : EMPTY;
-        }
-        return null;
-    }
-
-    public static <T> String joinUseForNull(Iterable<T> iterable, String forNull) {
-        return joinUseForNull(iterable, forNull, DFT_SEP);
-    }
-
-    public static <T> String joinUseForNull(Iterable<T> iterable, String forNull, String separator) {
-        if (iterable != null) {
-            StringBuilder joiner = joinerBySeparator(separator);
-            for (T item : iterable) {
-                joiner.append(separator).append(item == null ? forNull : item);
-            }
-            return joiner.substring(separatorLength(separator));
-        }
-        return null;
-    }
-
     /*
      * ---------------------------------------------------------------------------
      * iterator joiner.
@@ -420,49 +286,6 @@ public final class JoinerUtil {
             StringBuilder joiner = joinerBySeparator(separator);
             while (iterator.hasNext()) {
                 joiner.append(separator).append(iterator.next());
-            }
-            return joiner.substring(separatorLength(separator));
-        }
-        return null;
-    }
-
-    public static <T> String joinRequireNonNull(Iterator<T> iterator) { return joinRequireNonNull(iterator, DFT_SEP); }
-
-    public static <T> String joinRequireNonNull(Iterator<T> iterator, String separator) {
-        requireNonNull(iterator);
-        StringBuilder joiner = joinerBySeparator(separator);
-        while (iterator.hasNext()) {
-            joiner.append(separator).append(requireNonNull(iterator.next()));
-        }
-        return joiner.substring(separatorLength(separator));
-    }
-
-    public static <T> String joinSkipNulls(Iterator<T> iterator) { return joinSkipNulls(iterator, DFT_SEP); }
-
-    public static <T> String joinSkipNulls(Iterator<T> iterator, String separator) {
-        if (iterator != null) {
-            StringBuilder joiner = joinerBySeparator(separator);
-            while (iterator.hasNext()) {
-                T item = iterator.next();
-                if (item != null) {
-                    joiner.append(separator).append(item);
-                }
-            }
-            return joiner.substring(separatorLength(separator));
-        }
-        return null;
-    }
-
-    public static <T> String joinUseForNull(Iterator<T> iterator, String forNull) {
-        return joinUseForNull(iterator, forNull, DFT_SEP);
-    }
-
-    public static <T> String joinUseForNull(Iterator<T> iterator, String forNull, String separator) {
-        if (iterator != null) {
-            StringBuilder joiner = joinerBySeparator(separator);
-            while (iterator.hasNext()) {
-                T item = iterator.next();
-                joiner.append(separator).append(item == null ? forNull : item);
             }
             return joiner.substring(separatorLength(separator));
         }

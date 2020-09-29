@@ -52,7 +52,7 @@ public final class BooleanUtil {
      */
     public static boolean toBooleanValue(Object o) {
         Boolean bool = toBoolean(o);
-        return bool == null ? false : bool;
+        return bool != null && bool;
     }
 
     /**
@@ -172,5 +172,9 @@ public final class BooleanUtil {
         return upper //
                ? (value ? trueStringVal : falseStringVal).toUpperCase()//
                : (value ? trueStringVal : falseStringVal);
+    }
+
+    public static <T> T transform(boolean value, T trueValue, T falseValue) {
+        return value ? trueValue : falseValue;
     }
 }

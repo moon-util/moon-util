@@ -114,8 +114,8 @@ public final class EnumUtil {
         T[] enums = values(enumType);
         int length = enums.length;
         Map<String, T> ret = new HashMap<>(length);
-        for (int i = 0; i < length; i++) {
-            ret.put(enums[i].name(), enums[i]);
+        for (T anEnum : enums) {
+            ret.put(anEnum.name(), anEnum);
         }
         return ret;
     }
