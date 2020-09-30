@@ -67,7 +67,7 @@ public final class BigIntegerUtil extends NumberUtil {
             return new BigInteger(value.toString());
         }
         try {
-            Object firstItem = ParseSupportUtil.onlyOneItemOrSize(value);
+            Object firstItem = ParseSupportUtil.unboxing(value);
             return toBigInteger(firstItem);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Can not cast to BigInteger of: %s", value), e);

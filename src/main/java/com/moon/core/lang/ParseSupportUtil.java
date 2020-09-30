@@ -2,6 +2,9 @@ package com.moon.core.lang;
 
 import com.moon.core.enums.Arrays2;
 import com.moon.core.lang.ref.IntAccessor;
+import com.moon.core.util.Optional;
+import com.moon.core.util.TypeofOptional;
+import com.moon.core.util.function.NullableFunction;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -220,6 +223,26 @@ public final class ParseSupportUtil {
     }
 
     /**
+     * 将 Optional、Iterable、Collection、Map 等拆箱
+     *
+     * @param object
+     *
+     * @return
+     */
+    public static Object unboxing(Object object) {
+        NullableFunction resolver = TypeofOptional.resolveByObject(object);
+        if (resolver == null) {
+            if (object instanceof Optional) {
+                return ((Optional<?>) object).getOrNull();
+            } else {
+                return onlyItemOrSize(object);
+            }
+        } else {
+            return resolver.nullableApply(object);
+        }
+    }
+
+    /**
      * 当数组或集合只有一项时，返回第一项，否则返回数组长度或集合 size
      * 其他自定义对象或集合均抛出异常
      *
@@ -227,7 +250,7 @@ public final class ParseSupportUtil {
      *
      * @return 第一项或集合长度
      */
-    public static Object onlyOneItemOrSize(Object o) {
+    public static Object onlyItemOrSize(Object o) {
         if (o == null) { return null; }
         int size;
         if (o.getClass().isArray()) { return ((size = Array.getLength(o)) == 1) ? Array.get(o, 0) : size; }

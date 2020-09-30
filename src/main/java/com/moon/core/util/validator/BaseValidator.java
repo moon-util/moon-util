@@ -194,7 +194,9 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      *
      * @return 错误消息内容
      */
-    public final String getMessage(String separator) { return JoinerUtil.joinSkipNulls(ensureMessages(), separator); }
+    public final String getMessage(String separator) {
+        return JoinerUtil.of(separator).skipNulls().join(ensureMessages()).toString();
+    }
 
     @Override
     public final String toString() { return getMessage(); }

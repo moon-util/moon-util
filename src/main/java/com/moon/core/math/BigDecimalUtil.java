@@ -62,7 +62,7 @@ public final class BigDecimalUtil extends NumberUtil {
             return valueOf(value.toString());
         }
         try {
-            return toBigDecimal(ParseSupportUtil.onlyOneItemOrSize(value));
+            return toBigDecimal(ParseSupportUtil.unboxing(value));
         } catch (Exception e) {
             return runtime(e, String.format("Can not cast to BigDecimal of: %s", value));
         }

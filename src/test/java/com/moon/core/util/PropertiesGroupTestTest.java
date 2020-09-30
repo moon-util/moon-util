@@ -1,7 +1,7 @@
 package com.moon.core.util;
 
-import com.moon.core.util.runner.Runner;
-import com.moon.core.util.runner.RunnerUtil;
+import com.moon.runner.Runner;
+import com.moon.runner.RunnerUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

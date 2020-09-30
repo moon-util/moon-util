@@ -71,7 +71,7 @@ public interface AttrOperator<T extends AttrOperator<T>> {
      * @return
      */
     default String attrOrElse(String name, Supplier<String> getter) {
-        return OptionalUtil.getOrElse(attr(name), getter);
+        return OptionalUtil.orElseGet(attr(name), getter);
     }
 
     /**

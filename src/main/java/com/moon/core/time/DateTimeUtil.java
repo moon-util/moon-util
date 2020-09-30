@@ -1145,7 +1145,7 @@ public final class DateTimeUtil {
             return LocalDateTime.of(LocalDate.now(), (LocalTime) obj);
         }
         try {
-            return toDateTime(ParseSupportUtil.onlyOneItemOrSize(obj));
+            return toDateTime(ParseSupportUtil.unboxing(obj));
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(String.format("Can not cast to LocalDateTime of: %s", obj.toString()),
                 e);

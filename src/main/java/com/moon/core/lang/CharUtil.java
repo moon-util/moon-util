@@ -194,6 +194,19 @@ public final class CharUtil {
         return false;
     }
 
+    /**
+     * 字符转换为数字
+     * <pre>
+     * 0-9:  0 -  9;
+     * A-Z: 10 - 36;
+     * a-z: 37 - 61;
+     * (other): -1
+     * </pre>
+     *
+     * @param codePoint
+     *
+     * @return
+     */
     public static int toDigitMaxAs62(int codePoint) {
         if (isDigit(codePoint)) {
             return codePoint - 48;
@@ -207,6 +220,15 @@ public final class CharUtil {
         return -1;
     }
 
+    /**
+     * null   : '0'
+     * false  : '0'
+     * (other): '1'
+     *
+     * @param bool
+     *
+     * @return
+     */
     public static char toCharValue(Boolean bool) { return (char) (bool == null || !bool ? 48 : 49); }
 
     public static char toCharValue(long value) { return (char) value; }
@@ -215,6 +237,16 @@ public final class CharUtil {
 
     public static char toCharValue(double value) { return (char) value; }
 
+    /**
+     * 当且仅当字符串包含一个字符时，返回这个字符，否则抛出异常
+     *
+     * @param cs
+     *
+     * @return 字符串中仅有的一个字符
+     *
+     * @throws NullPointerException     当 cs == null 时，空指针异常
+     * @throws IllegalArgumentException 当 cs 长度不符合要求 1 时抛出异常
+     */
     public static char toCharValue(CharSequence cs) {
         Objects.requireNonNull(cs, "Can not cast to char from a null value.");
         if (cs.length() == 1) {
@@ -244,12 +276,10 @@ public final class CharUtil {
             return toCharValue(o.toString());
         }
         if (o instanceof Boolean) {
-            boolean bool = (boolean) o;
-            return (char) (bool ? 49 : 48);
+            return toCharValue((Boolean) o);
         }
         try {
-            Object firstItem = ParseSupportUtil.onlyOneItemOrSize(o);
-            return toCharValue(firstItem);
+            return toCharValue(ParseSupportUtil.unboxing(o));
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Can not cast to char of: %s", o), e);
         }

@@ -5,6 +5,7 @@ import com.moon.core.util.function.ThrowingRunnable;
 import com.moon.core.util.function.ThrowingSupplier;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
  * 条件执行
@@ -42,6 +43,7 @@ public interface Conditional extends BooleanSupplier {
      * @param dynamicCondition 动态条件
      *
      * @return 动态条件执行器
+     * @see FinallyCondition#FinallyCondition(Supplier) 也可实现固定条件
      */
     static Conditional ofDynamic(BooleanSupplier dynamicCondition) {
         return DynamicCondition.of(dynamicCondition);

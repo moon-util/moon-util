@@ -132,7 +132,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public Datetime(CharSequence date) { this(DateUtil.toCalendar(date)); }
 
-    public Datetime(Date date) { this((date == null ? new Date() : date).getTime()); }
+    public Datetime(Date date) { this(date.getTime()); }
 
     public Datetime(LocalDate localDate) { this(DateUtil.toCalendar(localDate)); }
 
@@ -495,6 +495,20 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return field == Calendar.MONTH ? calendar.get(field) + 1 : calendar.get(field);
     }
 
+    /**
+     * 返回一周第一天是星期几
+     *
+     * @return 一周的第一天
+     */
+    public DayOfWeek getFirstDayOfWeek() { return DayOfWeek.of(getFirstDayOfWeekValue()); }
+
+    /**
+     * 返回一周第一天是星期几( 0 ~ 6 )
+     *
+     * @return 一周的第一天序号
+     */
+    public int getFirstDayOfWeekValue() { return calendar.getFirstDayOfWeek(); }
+
     /*
      * ****************************************************************************
      * * 设置日期数据 ***************************************************************
@@ -661,20 +675,6 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     }
 
     /**
-     * 返回一周第一天是星期几
-     *
-     * @return 一周的第一天
-     */
-    public DayOfWeek getFirstDayOfWeek() { return DayOfWeek.of(getFirstDayOfWeekValue()); }
-
-    /**
-     * 返回一周第一天是星期几( 0 ~ 6 )
-     *
-     * @return 一周的第一天序号
-     */
-    public int getFirstDayOfWeekValue() { return calendar.getFirstDayOfWeek(); }
-
-    /**
      * 设置一周的第一天是星期几
      *
      * @param firstDayOfWeek 给定一周的第一天
@@ -827,7 +827,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         public int getFieldMaxVal(Calendar c) { return max; }
     }
 
-    private Datetime startingOrEndingOf(CalendarField ending, ToIntBiFunction<Calendar, CalendarField> getter) {
+    private Datetime boundaryOf(CalendarField ending, ToIntBiFunction<Calendar, CalendarField> getter) {
         CalendarField[] values = CalendarField.FIELDS;
         CalendarField field;
         Calendar calendar = obtainCalendar();
@@ -840,11 +840,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     }
 
     private Datetime startingOf(CalendarField ending) {
-        return startingOrEndingOf(ending, (c, field) -> field.min);
+        return boundaryOf(ending, (c, field) -> field.min);
     }
 
     private Datetime endingOf(CalendarField ending) {
-        return startingOrEndingOf(ending, (c, f) -> f.getFieldMaxVal(c));
+        return boundaryOf(ending, (c, f) -> f.getFieldMaxVal(c));
     }
 
     /**
@@ -888,7 +888,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     /**
      * 当前星期的最初时刻
      *
-     * @param firstDayOfWeek 指定星期几为一周第一天
+     * @param firstDayOfWeek 指定星期几为一周第一天，这里不会修改当前对象的设置，
+     *                       只是根据给定的每周第一天设置数据
      *
      * @return Datetime
      */

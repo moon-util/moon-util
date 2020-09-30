@@ -260,7 +260,7 @@ public final class IntUtil {
             return (boolean) o ? 1 : 0;
         }
         try {
-            return toIntValue(ParseSupportUtil.onlyOneItemOrSize(o));
+            return toIntValue(ParseSupportUtil.unboxing(o));
         } catch (Exception e) {
             throw new IllegalArgumentException(format("Can not cast to int of: %s", o), e);
         }

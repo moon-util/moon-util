@@ -115,8 +115,7 @@ public final class FloatUtil {
             return (float) ((boolean) object ? 1 : 0);
         }
         try {
-            Object firstItem = ParseSupportUtil.onlyOneItemOrSize(object);
-            return toFloat(firstItem);
+            return toFloat(ParseSupportUtil.unboxing(object));
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format("Can not cast to int of: %s", object), e);
         }

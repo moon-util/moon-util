@@ -6,16 +6,18 @@ import com.moon.core.util.concurrent.SynchronizationFuture;
 import com.sun.mail.util.MailSSLSocketFactory;
 
 import javax.mail.*;
+import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * @author moonsky
  * @see EmailUtil
  */
-public class EmailAccount implements Cloneable {
+public class EmailAccount implements Cloneable, Serializable {
 
     private static final String NULL = null;
 

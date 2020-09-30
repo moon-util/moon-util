@@ -35,10 +35,6 @@ public enum Dependencies {
      */
     XLSX(strs("org.apache.poi:poi:4.x+", "org.apache.poi:poi-ooxml:4.x+")),
     /**
-     * redisson
-     */
-    REDISSON(strs("org.redisson:redisson:3.6+"), strs("org.redisson:redisson-spring-boot-starter:3.6+")),
-    /**
      * uuid 生成器
      */
     UUID_GENERATOR(strs("com.fasterxml.uuid:java-uuid-generator:4.x+")),

@@ -5,8 +5,6 @@ import com.moon.core.util.function.*;
 
 import java.util.function.Supplier;
 
-import static com.moon.core.lang.IntUtil.DIGITS;
-import static com.moon.core.lang.IntUtil.TEN;
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static com.moon.core.lang.ThrowUtil.runtime;
 
@@ -56,7 +54,7 @@ public final class LangUtil {
 
     public static <T> T getOrDefault(ThrowingSupplier<T> supplier, T defaultValue) {
         try {
-            return OptionalUtil.getOrDefault(supplier.get(), defaultValue);
+            return OptionalUtil.orElse(supplier.get(), defaultValue);
         } catch (Throwable t) {
             return defaultValue;
         }

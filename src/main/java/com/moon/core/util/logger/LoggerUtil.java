@@ -34,6 +34,9 @@ public final class LoggerUtil {
         }
     }
 
+    /**
+     * 默认使用的日志
+     */
     static {
         tryImplementation(LoggerUtil::useSlf4jImplementation);
         tryImplementation(LoggerUtil::useLog4jImplementation);
@@ -42,6 +45,10 @@ public final class LoggerUtil {
         tryImplementation(LoggerUtil::useJdk14Implementation);
         tryImplementation(LoggerUtil::useNoLogImplementation);
     }
+
+    /*
+     * 可指定使用某种日志，指定方式是全局的
+     */
 
     public static void useSlf4jImplementation() { setImplementation(Slf4jImpl::new); }
 
@@ -57,11 +64,45 @@ public final class LoggerUtil {
 
     private LoggerUtil() { noInstanceError(); }
 
+    /**
+     * 自动推断日志类，示例：
+     * <pre>
+     * package com.example;
+     *
+     * import com.moon.core.util.logger.Logger;
+     * import com.moon.core.util.logger.LoggerUtil;
+     *
+     * public class DemoLogger {
+     *     // 自动推断 logger 名 com.example.DemoLogger；
+     *     // 由于是静态字段，所以并不会影响运行性能；
+     *     // 所有 Logger 字段建议均设为静态字段；
+     *     private final static Logger logger = LoggerUtil.getLogger();
+     *
+     *     // other coding
+     * }
+     * </pre>
+     *
+     * @return Logger
+     */
     public static Logger getLogger() {
         return getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
     }
 
+    /**
+     * 指定类名 logger
+     *
+     * @param type 指定类
+     *
+     * @return Logger
+     */
     public static Logger getLogger(Class type) { return getLogger(type.getName()); }
 
+    /**
+     * 指定类名 logger
+     *
+     * @param loggerName 指定 logger 名
+     *
+     * @return Logger
+     */
     public static Logger getLogger(String loggerName) { return LOG_CREATOR.apply(loggerName); }
 }

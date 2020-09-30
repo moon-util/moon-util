@@ -13,6 +13,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +23,7 @@ import java.util.concurrent.Future;
  * @author moonsky
  * @see EmailUtil
  */
-public class Email implements Cloneable {
+public class Email implements Cloneable, Serializable {
 
     private EmailAccount account;
     /**

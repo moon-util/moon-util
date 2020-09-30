@@ -1,6 +1,5 @@
 package com.moon.core.lang;
 
-import com.moon.core.util.FilterUtil;
 import com.moon.core.util.OSUtil;
 
 import java.io.IOException;
