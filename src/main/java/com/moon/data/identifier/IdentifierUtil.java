@@ -8,11 +8,18 @@ import com.moon.core.util.SetUtil;
 import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
 import com.moon.data.IdentifierGenerator;
+import com.moon.data.exception.UnknownIdentifierTypeException;
+import com.moon.data.jpa.factory.TypedRepositoryBuilder;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 
+import javax.persistence.EntityManager;
 import java.lang.reflect.Constructor;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author moonsky
@@ -21,6 +28,8 @@ import java.util.Set;
 public final class IdentifierUtil {
 
     private final static String packageName = IdentifierUtil.class.getPackage().getName();
+
+    private final static Map<Class, TypedRepositoryBuilder> BUILDER_MAP = new ConcurrentHashMap<>();
 
     private final static Set<Class> identifierTypes = new HashSet<>();
 
@@ -57,9 +66,22 @@ public final class IdentifierUtil {
         return Objects.requireNonNull(type);
     }
 
-    public static synchronized void addIdentifierType(Class identifierClass) {
+    public static synchronized JpaRepositoryImplementation newRepositoryByIdentifierType(
+        Class identifierClass,
+        JpaEntityInformation information,
+        EntityManager em
+    ) {
         identifierTypes.add(identifierClass);
+        try {
+            return BUILDER_MAP.get(identifierClass).newRepository(information, em);
+        } catch (NullPointerException e) {
+            throw new UnknownIdentifierTypeException(identifierClass);
+        }
     }
+
+    public static void registerTypedRepositoryBuilderByIdentifierType(
+        Class identifierClass, TypedRepositoryBuilder repositoryBuilder
+    ) { BUILDER_MAP.put(identifierClass, repositoryBuilder); }
 
     public static IdentifierGenerator newInstance(String description, String key) {
         if (StringUtil.isBlank(description)) {

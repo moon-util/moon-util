@@ -288,14 +288,14 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * 获取年龄（周岁），假设当前{@code Datetime}是某一对象的生日
      * 返回到当前时刻的年数
      *
-     * @return
+     * @return 返回周岁年龄
      */
     public int getAge() { return CalendarUtil.getAge(originCalendar()); }
 
     /**
      * 获取年龄（虚岁）
      *
-     * @return
+     * @return 返回虚岁年龄
      */
     public int getNominalAge() { return getAge() + 1; }
 
@@ -963,7 +963,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public Datetime endOfWeek(DayOfWeek firstDayOfWeek) {
         Datetime datetime = endOfDay();
         int diffDays = firstDayOfWeek.ordinal() - datetime.getDayOfWeek().ordinal();
-        changeCalendarOf(datetime.originCalendar(), Calendar.DAY_OF_MONTH,
+        changeCalendarOf(datetime.originCalendar(),
+            Calendar.DAY_OF_MONTH,
             (diffDays <= 0 ? diffDays + 6 : diffDays - 1));
         return datetime;
     }
@@ -1035,16 +1036,16 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     /**
      * 是否是指定年份
      *
-     * @param year
+     * @param year 指定年份
      *
-     * @return
+     * @return this
      */
     public boolean isYearOf(int year) { return getYearValue() == year; }
 
     /**
      * 是否在指定年份之前
      *
-     * @param year
+     * @param year 指定年份
      *
      * @return 当日期所代表的年份在待测年份之前时返回 true，否则返回 false
      */

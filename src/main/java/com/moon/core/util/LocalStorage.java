@@ -8,7 +8,8 @@ import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.FinalAccessor;
 
 import java.io.*;
-import java.util.Objects;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -23,25 +24,21 @@ public class LocalStorage<T> {
 
     private final static Function<Object, byte[]> SERIALIZER = IOUtil::serialize;
     private final static Function<byte[], Object> DESERIALIZER = IOUtil::deserialize;
-    private final static LocalStorage STORAGE;
+    private final static LocalStorage DEFAULT;
+    private final static Map<String, LocalStorage> storageMap = new ConcurrentHashMap<>();
 
     static {
         String namespace = ".java-imoon/localStorage/";
         File file = new File(SystemUtil.getTempDir(), namespace);
         PATH_NAMESPACE = FileUtil.formatFilepath(file.getAbsolutePath());
-        STORAGE = new LocalStorage(null, SERIALIZER, DESERIALIZER);
+        DEFAULT = new LocalStorage(null);
     }
 
     private final String namespace;
-    private final Function<T, byte[]> serializer;
-    private final Function<byte[], T> deserializer;
 
-    public LocalStorage(
-        String namespace, Function<T, byte[]> serializer, Function<byte[], T> deserializer
-    ) {
-        this.deserializer = Objects.requireNonNull(deserializer);
-        this.serializer = Objects.requireNonNull(serializer);
+    private final Map<String, T> localCached = new ConcurrentHashMap<>();
 
+    public LocalStorage(String namespace) {
         namespace = StringUtil.defaultIfBlank(namespace, "default");
         namespace = StringUtil.replace(namespace, '\\', CHAR_WAVE);
         namespace = StringUtil.replace(namespace, '/', CHAR_HYPHEN);
@@ -51,17 +48,21 @@ public class LocalStorage<T> {
         } else {
             this.namespace = PATH_NAMESPACE + namespace;
         }
+        storageMap.put(namespace, this);
     }
 
-    public static <T extends Serializable> LocalStorage<T> of() { return STORAGE; }
+    public static <T extends Serializable> LocalStorage<T> of() { return DEFAULT; }
 
     public static <T extends Serializable> LocalStorage<T> of(String namespace) {
-        LocalStorage storage = new LocalStorage<>(namespace, SERIALIZER, DESERIALIZER);
-        return storage;
+        return storageMap.computeIfAbsent(namespace, LocalStorage::new);
     }
 
     public void set(String key, T value) {
-        byte[] serialized = serializer.apply(value);
+        set(key, value, false);
+    }
+
+    public void set(String key, T value, boolean forceCache) {
+        byte[] serialized = getSerializer().apply(value);
         char[] chars = new char[serialized.length];
         for (int i = 0; i < serialized.length; i++) {
             chars[i] = (char) (serialized[i] + FACTOR);
@@ -75,6 +76,9 @@ public class LocalStorage<T> {
         try (Writer writer = IOUtil.getWriter(enduranceFile)) {
             writer.write(serializedStr);
             writer.flush();
+            if (forceCache || chars.length <= getCacheMemoryLimit()) {
+                localCached.put(key, value);
+            }
         } catch (IOException e) {
             ThrowUtil.unchecked(e);
         }
@@ -83,10 +87,14 @@ public class LocalStorage<T> {
     public T get(String key) { return getNullable(key); }
 
     private T getNullable(String key) {
+        T cached = localCached.get(key);
+        if (cached != null) {
+            return cached;
+        }
         File enduranceFile = new File(namespace, key);
         if (enduranceFile.exists()) {
             FinalAccessor<String> accessor = FinalAccessor.of();
-            try (FileReader reader = new FileReader(enduranceFile)){
+            try (FileReader reader = new FileReader(enduranceFile)) {
                 IteratorUtil.forEachLines(reader, line -> {
                     accessor.set(line);
                 });
@@ -98,7 +106,7 @@ public class LocalStorage<T> {
                 for (int i = 0; i < line.length; i++) {
                     serialized[i] = (byte) (line[i] - FACTOR);
                 }
-                return deserializer.apply(serialized);
+                return getDeserializer().apply(serialized);
             } catch (IOException e) {
                 ThrowUtil.unchecked(e);
             }
@@ -107,16 +115,31 @@ public class LocalStorage<T> {
     }
 
     public void remove(String key) {
+        localCached.remove(key);
         FileUtil.delete(new File(namespace, key));
     }
 
     public void clear() {
+        localCached.clear();
         FileUtil.deleteAllFiles(new File(namespace));
     }
 
-    public boolean has(String key) { return new File(namespace, key).exists(); }
+    public boolean contains(String key) {
+        return localCached.containsKey(key) || new File(namespace, key).exists();
+    }
 
     public final static void clearAll() {
+        storageMap.forEach((s, localStorage) -> localStorage.clear());
         FileUtil.deleteAllFiles(new File(PATH_NAMESPACE));
     }
+
+    protected Function<T, byte[]> getSerializer() {
+        return (Function<T, byte[]>) SERIALIZER;
+    }
+
+    protected Function<byte[], T> getDeserializer() {
+        return (Function<byte[], T>) DESERIALIZER;
+    }
+
+    protected int getCacheMemoryLimit() { return 20480; }
 }

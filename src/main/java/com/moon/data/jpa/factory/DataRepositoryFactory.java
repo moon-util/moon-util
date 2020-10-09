@@ -44,7 +44,7 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
     ) {
         JpaEntityInformation ei = getEntityInformation(information.getDomainType());
         Class idType = information.getIdType();
-        IdentifierUtil.addIdentifierType(idType);
+        IdentifierUtil.newRepositoryByIdentifierType(idType, ei, em);
         if (idType == String.class) {
             return new DataStringRepositoryImpl<>(ei, em);
         } else if (idType == Long.class) {
