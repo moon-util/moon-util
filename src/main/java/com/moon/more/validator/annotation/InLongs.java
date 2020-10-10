@@ -10,6 +10,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 只能使用在{@link Long}或{@code long}字段上
+ *
  * @author moonsky
  * @see InInts
  */

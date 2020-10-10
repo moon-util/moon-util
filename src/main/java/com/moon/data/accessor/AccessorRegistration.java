@@ -1,6 +1,6 @@
 package com.moon.data.accessor;
 
-import com.moon.more.RunnerRegistration;
+import com.moon.core.util.RunnerRegistration;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 

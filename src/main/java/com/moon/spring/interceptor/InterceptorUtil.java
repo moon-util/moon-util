@@ -23,7 +23,7 @@ import java.util.function.BiPredicate;
  */
 public final class InterceptorUtil {
 
-    private static volatile Map<Class, Map<Method, Object>> CACHE = new HashMap<>();
+    private static final Map<Class, Map<Method, Object>> CACHE = new HashMap<>();
 
     private static Map<Method, Object> ensureGet(Class type) {
         Map<Method, Object> map = CACHE.get(type);
@@ -108,6 +108,7 @@ public final class InterceptorUtil {
      * 幂等性校验拦截器
      *
      * @param tester 测试是否通过幂等性校验，接收两个参数：request 和 idempotentTokenValue
+     *               idempotentTokenValue 是在 request 中携带的参数（或请求头）
      *
      * @return 幂等性校验是否通过
      *
@@ -121,6 +122,7 @@ public final class InterceptorUtil {
      * 图片验证码校验拦截器
      *
      * @param tester 测试是否通过幂等性校验，接收两个参数：request 和 idempotentTokenValue
+     *               idempotentTokenValue 是在 request 中携带的参数（或请求头）
      *
      * @return 幂等性校验是否通过
      *
@@ -134,6 +136,7 @@ public final class InterceptorUtil {
      * 短信验证码校验拦截器
      *
      * @param tester 测试是否通过幂等性校验，接收两个参数：request 和 idempotentTokenValue
+     *               idempotentTokenValue 是在 request 中携带的参数（或请求头）
      *
      * @return 幂等性校验是否通过
      *

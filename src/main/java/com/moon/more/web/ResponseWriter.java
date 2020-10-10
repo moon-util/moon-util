@@ -71,6 +71,8 @@ public final class ResponseWriter {
 
     public ResponseWriter status500() { return status(500); }
 
+    public ResponseWriter ok() { return status200(); }
+
     public ResponseWriter config(Consumer<HttpServletResponse> configurer) {
         configurer.accept(response);
         return this;

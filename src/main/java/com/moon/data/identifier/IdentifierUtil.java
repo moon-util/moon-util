@@ -1,7 +1,6 @@
 package com.moon.data.identifier;
 
 import com.moon.core.lang.ClassUtil;
-import com.moon.core.lang.JoinerUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
@@ -10,21 +9,11 @@ import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
 import com.moon.data.IdentifierGenerator;
 import com.moon.data.Record;
-import com.moon.data.exception.UnknownIdentifierTypeException;
-import com.moon.data.jpa.JpaRecord;
-import com.moon.data.jpa.factory.AbstractRepositoryImpl;
-import com.moon.data.jpa.factory.RepositoryBuilder;
-import org.springframework.data.jpa.repository.support.JpaEntityInformation;
-import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 
-import javax.persistence.EntityManager;
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 /**
@@ -34,9 +23,6 @@ import java.util.function.BiFunction;
 public final class IdentifierUtil {
 
     private final static String packageName = IdentifierUtil.class.getPackage().getName();
-
-    private final static Map<Class, RepositoryBuilder> REGISTERED_IDENTIFIER_TYPED_REPOSITORY_BUILDER_MAP = new ConcurrentHashMap<>();
-
     private final static Set<Class> USED_IDENTIFIER_TYPES = new HashSet<>();
 
     private IdentifierUtil() { ThrowUtil.noInstanceError(); }
@@ -108,47 +94,7 @@ public final class IdentifierUtil {
      * **********************************************************************************************
      */
 
-    /**
-     * 默认实现: 仅支持主键时 Long 或 String 类型
-     *
-     * @param <T> 实体类型
-     */
-    private final static class DefaultRepositoryImpl<T extends JpaRecord<Serializable>>
-        extends AbstractRepositoryImpl<T, Serializable> {
-
-        public DefaultRepositoryImpl(JpaEntityInformation ei, EntityManager em) { super(ei, em); }
-
-        public DefaultRepositoryImpl(Class domainClass, EntityManager em) { super(domainClass, em); }
-    }
-
-    /**
-     * 默认 Builder
-     */
-    private final static RepositoryBuilder BUILDER = DefaultRepositoryImpl::new;
-
-    public static synchronized JpaRepositoryImplementation newRepositoryByIdentifierType(
-        JpaEntityInformation information, EntityManager em
-    ) {
-        Class identifierClass = information.getIdType();
-        USED_IDENTIFIER_TYPES.add(identifierClass);
-        Map<Class, RepositoryBuilder> builderMap = REGISTERED_IDENTIFIER_TYPED_REPOSITORY_BUILDER_MAP;
-        try {
-            return builderMap.getOrDefault(identifierClass, BUILDER).newRepository(information, em);
-        } catch (NullPointerException e) {
-            throw new UnknownIdentifierTypeException("未知主键数据类型: " + identifierClass +//
-                ", 支持的类型有: \n\t" + JoinerUtil.join(builderMap.keySet(), "\n\t"));
-        }
-    }
-
-    /**
-     * 注册
-     *
-     * @param identifierClass
-     * @param repositoryBuilder
-     */
-    public static void registerIdentifierTypedRepositoryBuilder(
-        Class identifierClass, RepositoryBuilder repositoryBuilder
-    ) { REGISTERED_IDENTIFIER_TYPED_REPOSITORY_BUILDER_MAP.put(identifierClass, repositoryBuilder); }
+    public static void addUsedIdentifierType(Class idType) { USED_IDENTIFIER_TYPES.add(idType); }
 
     /**
      * 创建 id 生成器

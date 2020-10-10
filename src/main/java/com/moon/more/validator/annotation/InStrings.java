@@ -11,9 +11,11 @@ import java.lang.annotation.Target;
 
 /**
  * 要求字符串或者枚举值必须是指定列表中的值之一
+ * <p>
  * 通过字段值的{@link Object#toString()}后的字符串在指定区间匹配
  * <p>
  * 比如：枚举包括：ENUM1,ENUM2,ENUM3,ENUM4；
+ * <p>
  * 但是字段要求只能是 ENUM1 或 ENUM2，那么可以这样用：
  * <pre>
  *     public enum EnumType {
@@ -24,7 +26,7 @@ import java.lang.annotation.Target;
  *     private EnumType value;
  *
  *     // 声明 trimmed = true 后会进行一次 String.trim() 操作，这样就可以有多余的空格
- *     @ InStrings(values = "ENUM1,ENUM2", trimmed = true)
+ *     @ InStrings(values = "ENUM1 , ENUM2", trimmed = true)
  *     private EnumType type;
  *
  *     // 自定义分隔符

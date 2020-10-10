@@ -13,7 +13,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * 中国 18 为居民身份证号验证
+ * 验证中国 18 为居民身份证号
  * <p>
  * 不验证值为 null 的情况，如果要求非 null 使用{@link NotNull}
  *
@@ -24,7 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = ResidentID18Validation.class)
 public @interface ResidentID18 {
 
-    String message() default "18 位身份证号码错误";
+    String message() default "18 位居民身份证号码错误";
 
     Class<?>[] groups() default {};
 

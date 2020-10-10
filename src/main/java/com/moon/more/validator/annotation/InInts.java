@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 限制输入的 int 型数字
+ * 限制输入的 int 型数字，只能使用在{@link Integer}或{@code int}字段上
  * <p>
  * 默认允许 null 值（当字段类型是{@link Integer}时）
  * <p>

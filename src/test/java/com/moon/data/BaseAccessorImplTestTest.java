@@ -1,6 +1,6 @@
 package com.moon.data;
 
-import com.moon.data.jpa.domain.BaseStringAuditRecord;
+import com.moon.spring.data.jpa.domain.BaseStringAuditRecord;
 import com.moon.data.service.BaseStringServiceImpl;
 import com.moon.data.service.DataStringServiceImpl;
 import lombok.Data;
