@@ -1,6 +1,7 @@
 package com.moon.data.identifier;
 
 import com.moon.core.lang.ClassUtil;
+import com.moon.core.lang.JoinerUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
@@ -8,18 +9,23 @@ import com.moon.core.util.SetUtil;
 import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
 import com.moon.data.IdentifierGenerator;
+import com.moon.data.Record;
 import com.moon.data.exception.UnknownIdentifierTypeException;
-import com.moon.data.jpa.factory.TypedRepositoryBuilder;
+import com.moon.data.jpa.JpaRecord;
+import com.moon.data.jpa.factory.AbstractRepositoryImpl;
+import com.moon.data.jpa.factory.RepositoryBuilder;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 
 import javax.persistence.EntityManager;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 /**
  * @author moonsky
@@ -29,9 +35,9 @@ public final class IdentifierUtil {
 
     private final static String packageName = IdentifierUtil.class.getPackage().getName();
 
-    private final static Map<Class, TypedRepositoryBuilder> BUILDER_MAP = new ConcurrentHashMap<>();
+    private final static Map<Class, RepositoryBuilder> REGISTERED_IDENTIFIER_TYPED_REPOSITORY_BUILDER_MAP = new ConcurrentHashMap<>();
 
-    private final static Set<Class> identifierTypes = new HashSet<>();
+    private final static Set<Class> USED_IDENTIFIER_TYPES = new HashSet<>();
 
     private IdentifierUtil() { ThrowUtil.noInstanceError(); }
 
@@ -66,26 +72,96 @@ public final class IdentifierUtil {
         return Objects.requireNonNull(type);
     }
 
+    /*
+     * **********************************************************************************************
+     * * default methods ****************************************************************************
+     * **********************************************************************************************
+     */
+
+    static <T> T returnIfRecordIdNotNull(Object entity, Object o, BiFunction<Object, Object, T> generator) {
+        if (entity instanceof Record) {
+            Object id = ((Record<?>) entity).getId();
+            if (id != null) {
+                return (T) id;
+            }
+        }
+        return generator.apply(entity, o);
+    }
+
+    static String returnIfRecordIdNotEmpty(Object entity, Object o, BiFunction<Object, Object, String> generator) {
+        if (entity instanceof Record) {
+            Object id = ((Record<?>) entity).getId();
+            if (id instanceof CharSequence) {
+                String strId = id.toString();
+                if (!strId.isEmpty()) {
+                    return strId;
+                }
+            }
+        }
+        return generator.apply(entity, o);
+    }
+
+
+    /*
+     * **********************************************************************************************
+     * * public methods *****************************************************************************
+     * **********************************************************************************************
+     */
+
+    /**
+     * 默认实现: 仅支持主键时 Long 或 String 类型
+     *
+     * @param <T> 实体类型
+     */
+    private final static class DefaultRepositoryImpl<T extends JpaRecord<Serializable>>
+        extends AbstractRepositoryImpl<T, Serializable> {
+
+        public DefaultRepositoryImpl(JpaEntityInformation ei, EntityManager em) { super(ei, em); }
+
+        public DefaultRepositoryImpl(Class domainClass, EntityManager em) { super(domainClass, em); }
+    }
+
+    /**
+     * 默认 Builder
+     */
+    private final static RepositoryBuilder BUILDER = DefaultRepositoryImpl::new;
+
     public static synchronized JpaRepositoryImplementation newRepositoryByIdentifierType(
-        Class identifierClass,
-        JpaEntityInformation information,
-        EntityManager em
+        JpaEntityInformation information, EntityManager em
     ) {
-        identifierTypes.add(identifierClass);
+        Class identifierClass = information.getIdType();
+        USED_IDENTIFIER_TYPES.add(identifierClass);
+        Map<Class, RepositoryBuilder> builderMap = REGISTERED_IDENTIFIER_TYPED_REPOSITORY_BUILDER_MAP;
         try {
-            return BUILDER_MAP.get(identifierClass).newRepository(information, em);
+            return builderMap.getOrDefault(identifierClass, BUILDER).newRepository(information, em);
         } catch (NullPointerException e) {
-            throw new UnknownIdentifierTypeException(identifierClass);
+            throw new UnknownIdentifierTypeException("未知主键数据类型: " + identifierClass +//
+                ", 支持的类型有: \n\t" + JoinerUtil.join(builderMap.keySet(), "\n\t"));
         }
     }
 
-    public static void registerTypedRepositoryBuilderByIdentifierType(
-        Class identifierClass, TypedRepositoryBuilder repositoryBuilder
-    ) { BUILDER_MAP.put(identifierClass, repositoryBuilder); }
+    /**
+     * 注册
+     *
+     * @param identifierClass
+     * @param repositoryBuilder
+     */
+    public static void registerIdentifierTypedRepositoryBuilder(
+        Class identifierClass, RepositoryBuilder repositoryBuilder
+    ) { REGISTERED_IDENTIFIER_TYPED_REPOSITORY_BUILDER_MAP.put(identifierClass, repositoryBuilder); }
 
-    public static IdentifierGenerator newInstance(String description, String key) {
+    /**
+     * 创建 id 生成器
+     *
+     * @param description 描述
+     * @param key         spring properties key
+     *
+     * @return ID 生成器
+     */
+    public static IdentifierGenerator newIdentifierGenerator(String description, String key) {
+        // 默认雪花算法
         if (StringUtil.isBlank(description)) {
-            Set<Class> types = identifierTypes;
+            Set<Class> types = USED_IDENTIFIER_TYPES;
             if (types.size() == 1) {
                 Class type = SetUtil.requireGet(types, 0);
                 if (type == Long.class) {
@@ -97,6 +173,7 @@ public final class IdentifierUtil {
             }
             throw new IllegalStateException("Unknown identifier type, you must assign spring property of: " + key);
         }
+        // 其他方式主键策略
         String[] descriptions = description.split(":");
         Class type = toIdentifierClass(descriptions[0]);
         final int length = descriptions.length;

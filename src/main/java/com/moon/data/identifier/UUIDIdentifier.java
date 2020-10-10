@@ -19,6 +19,10 @@ public class UUIDIdentifier implements IdentifierGenerator<String, Object> {
      */
     @Override
     public String generateId(Object entity, Object o) {
+        return IdentifierUtil.returnIfRecordIdNotEmpty(entity, o, this::apply);
+    }
+
+    private String apply(Object e, Object i) {
         return UUID.randomUUID().toString();
     }
 }

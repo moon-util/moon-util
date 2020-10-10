@@ -1,4 +1,4 @@
-package com.moon.spring.web;
+package com.moon.spring;
 
 import com.moon.more.web.CookieUtil;
 import com.moon.more.web.RequestUtil;
@@ -30,9 +30,9 @@ import static org.springframework.core.annotation.AnnotatedElementUtils.findMerg
  * @see RequestUtil
  * @see ResponseUtil
  */
-public final class WebUtil {
+public final class SpringWebUtil {
 
-    private WebUtil() { noInstanceError(); }
+    private SpringWebUtil() { noInstanceError(); }
 
     /**
      * 是否是明确的 ajax json 类型数据返回

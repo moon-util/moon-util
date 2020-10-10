@@ -28,7 +28,7 @@ public @interface VerifySmsCaptcha {
      *
      * @see HttpServletRequest#getParameter(String)
      */
-    String value() default "captchaValue";
+    String value() default "smsCaptcha";
 
     /**
      * 获取方式

@@ -1,7 +1,9 @@
 package com.moon.data.jpa.factory;
 
+import com.moon.data.accessor.BaseAccessor;
 import com.moon.data.jpa.JpaRecord;
-import com.moon.data.jpa.repository.DataLongRepository;
+import com.moon.data.jpa.repository.BaseRepository;
+import com.moon.data.jpa.repository.DataRepository;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +17,7 @@ import javax.persistence.EntityManager;
 @NoRepositoryBean
 @Transactional(readOnly = true)
 final class DataLongRepositoryImpl<T extends JpaRecord<Long>> extends AbstractRepositoryImpl<T, Long>
-    implements DataLongRepository<T> {
+    implements DataRepository<T, Long>, BaseRepository<T, Long>, BaseAccessor<T, Long> {
 
     public DataLongRepositoryImpl(JpaEntityInformation<T, ?> ei, EntityManager em) { super(ei, em); }
 

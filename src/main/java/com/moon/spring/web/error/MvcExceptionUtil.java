@@ -1,6 +1,6 @@
 package com.moon.spring.web.error;
 
-import com.moon.spring.web.WebUtil;
+import com.moon.spring.SpringWebUtil;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author benshaoye
- * @see WebUtil#onThrowable(Throwable)
- * @see WebUtil#onThrowable(HttpServletRequest, HttpServletResponse, Throwable)
+ * @see SpringWebUtil#onThrowable(Throwable)
+ * @see SpringWebUtil#onThrowable(HttpServletRequest, HttpServletResponse, Throwable)
  * @see ExceptionCache#newExceptionService()
  * @see ExceptionCache#getDefaultInstance()
  */
@@ -24,7 +24,7 @@ public final class MvcExceptionUtil extends ExceptionCache {
      * @return ResponseEntity
      *
      * @throws Throwable 当不能正确处理异常时，抛出原异常
-     * @see WebUtil#onThrowable(Throwable)
+     * @see SpringWebUtil#onThrowable(Throwable)
      */
     public static ResponseEntity onThrowable(Throwable root) throws Throwable {
         return getDefaultInstance().onThrowable(root);
@@ -42,7 +42,7 @@ public final class MvcExceptionUtil extends ExceptionCache {
      * @throws Throwable
      * @see MvcExceptionUtil
      * @see RestExceptionEnum
-     * @see WebUtil#onThrowable(HttpServletRequest, HttpServletResponse, Throwable)
+     * @see SpringWebUtil#onThrowable(HttpServletRequest, HttpServletResponse, Throwable)
      */
     public static ResponseEntity onThrowable(HttpServletRequest request, HttpServletResponse response, Throwable root)
         throws Throwable {

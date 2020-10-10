@@ -43,14 +43,7 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
         RepositoryInformation information, EntityManager em
     ) {
         JpaEntityInformation ei = getEntityInformation(information.getDomainType());
-        Class idType = information.getIdType();
-        IdentifierUtil.newRepositoryByIdentifierType(idType, ei, em);
-        if (idType == String.class) {
-            return new DataStringRepositoryImpl<>(ei, em);
-        } else if (idType == Long.class) {
-            return new DataLongRepositoryImpl<>(ei, em);
-        }
-        throw new UnsupportedOperationException("Unsupported id type of: " + idType);
+        return IdentifierUtil.newRepositoryByIdentifierType(ei, em);
     }
 
     @Override

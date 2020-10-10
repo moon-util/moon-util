@@ -22,7 +22,7 @@ public class RecordIdentifierGenerator implements IdentifierGenerator {
     private final LazyAccessor<IdentifierGenerator> accessor = LazyAccessor.of(() -> {
         String key = MoonKey.Data.Jpa.IDENTIFIER;
         String value = SpringUtil.getProperty(key);
-        com.moon.data.IdentifierGenerator identifier = IdentifierUtil.newInstance(value, key);
+        com.moon.data.IdentifierGenerator identifier = IdentifierUtil.newIdentifierGenerator(value, key);
         InvocationHandler handler = new ProxiedIdentifierGenerator(identifier);
         return ProxyUtil.newProxyInstance(handler, IdentifierGenerator.class);
     });

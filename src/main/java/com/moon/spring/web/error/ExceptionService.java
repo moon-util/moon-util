@@ -2,7 +2,7 @@ package com.moon.spring.web.error;
 
 import com.moon.core.enums.Maps;
 import com.moon.core.lang.ClassUtil;
-import com.moon.spring.web.WebUtil;
+import com.moon.spring.SpringWebUtil;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -133,7 +133,7 @@ public class ExceptionService {
      * @return ResponseEntity
      *
      * @throws Throwable 当不存在对应异常处理器或不能正确处理异常时，抛出原异常
-     * @see WebUtil#onThrowable(Throwable)
+     * @see SpringWebUtil#onThrowable(Throwable)
      */
     public ResponseEntity onThrowable(Throwable root) throws Throwable {
         ResponseEntity result = doThrowable(root);
@@ -155,7 +155,7 @@ public class ExceptionService {
      * @throws Throwable 当不存在对应异常处理器或不能正确处理异常时，抛出原异常
      * @see MvcExceptionUtil
      * @see RestExceptionEnum
-     * @see WebUtil#onThrowable(HttpServletRequest, HttpServletResponse, Throwable)
+     * @see SpringWebUtil#onThrowable(HttpServletRequest, HttpServletResponse, Throwable)
      */
     public ResponseEntity onThrowable(HttpServletRequest request, HttpServletResponse response, Throwable root)
         throws Throwable {

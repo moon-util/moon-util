@@ -33,6 +33,10 @@ public class StringSnowflakeIdentifier implements IdentifierGenerator<String, Ob
      */
     @Override
     public String generateId(Object entity, Object o) {
-        return identifier.generateId(entity, o).toString();
+        return IdentifierUtil.returnIfRecordIdNotEmpty(entity,o, this::apply);
+    }
+
+    private String apply(Object e, Object i) {
+        return identifier.originGenerateId(e, i).toString();
     }
 }

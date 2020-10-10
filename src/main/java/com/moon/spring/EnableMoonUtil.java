@@ -1,5 +1,6 @@
-package com.moon.spring.config;
+package com.moon.spring;
 
+import com.moon.spring.config.MoonUtilConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
@@ -13,7 +14,4 @@ import java.lang.annotation.Target;
 @Import({MoonUtilConfiguration.class})
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EnableMoonUtil {
-
-    int value() default 15;
-}
+public @interface EnableMoonUtil {}

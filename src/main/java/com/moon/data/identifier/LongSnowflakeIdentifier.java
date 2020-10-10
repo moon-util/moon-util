@@ -182,6 +182,10 @@ public class LongSnowflakeIdentifier implements IdentifierGenerator<Long, Object
         return FastTimestamp.currentTimeMillis();
     }
 
+    final Long originGenerateId(Object entity, Object o) {
+        return nextId();
+    }
+
     /**
      * 生成 ID
      *
@@ -191,5 +195,7 @@ public class LongSnowflakeIdentifier implements IdentifierGenerator<Long, Object
      * @return id
      */
     @Override
-    public Long generateId(Object entity, Object o) { return nextId(); }
+    public Long generateId(Object entity, Object o) {
+        return IdentifierUtil.returnIfRecordIdNotNull(entity, o, this::originGenerateId);
+    }
 }

@@ -28,7 +28,7 @@ public @interface VerifyImgCaptcha {
      *
      * @see HttpServletRequest#getParameter(String)
      */
-    String value() default "captchaValue";
+    String value() default "imgCaptcha";
 
     /**
      * 获取方式
