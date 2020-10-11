@@ -18,52 +18,67 @@ public class RedisAccessor<K, V> {
     private final RedisTemplate<K, V> template;
     private final ExceptionHandler strategy;
 
-    public RedisAccessor(RedisTemplate<K, V> redisTemplate) { this(redisTemplate, ExceptionStrategy.IGNORE); }
+    public RedisAccessor(RedisTemplate<K, V> redisTemplate) { this(redisTemplate, null); }
 
     public RedisAccessor(RedisTemplate<K, V> redisTemplate, ExceptionStrategy exceptionStrategy) {
         this(redisTemplate, (ExceptionHandler) exceptionStrategy);
     }
 
     public RedisAccessor(RedisTemplate<K, V> redisTemplate, ExceptionHandler exceptionStrategy) {
-        this.strategy = exceptionStrategy == null ? ExceptionStrategy.IGNORE : exceptionStrategy;
+        this.strategy = exceptionStrategy == null ? ExceptionStrategy.LOGGER_INFO : exceptionStrategy;
         this.template = redisTemplate;
     }
 
-    private void onCanIgnoreException(Exception ex) { strategy.onException(ex); }
+    private void onException(Exception ex) {
+        strategy.onException(ex);
+    }
+
+    private boolean onExceptionThenFalse(Exception ex) {
+        onException(ex);
+        return false;
+    }
+
+    private long onExceptionThenZero(Exception ex) {
+        onException(ex);
+        return 0;
+    }
+
+    private <T> T onExceptionThen(Exception ex, T result) {
+        onException(ex);
+        return result;
+    }
 
     // ============================= ops ===============================
 
-    public ValueOperations value() { return template.opsForValue(); }
+    public ValueOperations<K, V> value() { return template.opsForValue(); }
 
-    public ClusterOperations cluster() { return template.opsForCluster(); }
+    public ClusterOperations<K, V> cluster() { return template.opsForCluster(); }
 
-    public GeoOperations geo() { return template.opsForGeo(); }
+    public GeoOperations<K, V> geo() { return template.opsForGeo(); }
 
-    public HashOperations hash() { return template.opsForHash(); }
+    public HashOperations<K, Object, Object> hash() { return template.opsForHash(); }
 
-    public ListOperations list() { return template.opsForList(); }
+    public ListOperations<K, V> list() { return template.opsForList(); }
 
-    public SetOperations set() { return template.opsForSet(); }
+    public SetOperations<K, V> set() { return template.opsForSet(); }
 
-    public StreamOperations stream() { return template.opsForStream(); }
+    public StreamOperations<K, Object, Object> stream() { return template.opsForStream(); }
 
-    public ZSetOperations zset() { return template.opsForZSet(); }
+    public ZSetOperations<K, V> zset() { return template.opsForZSet(); }
 
-    public BoundGeoOperations geo(K key) { return template.boundGeoOps(key); }
+    public BoundGeoOperations<K, V> geo(K key) { return template.boundGeoOps(key); }
 
-    public BoundHashOperations hash(K key) { return template.boundHashOps(key); }
+    public BoundHashOperations<K, Object, Object> hash(K key) { return template.boundHashOps(key); }
 
-    public BoundListOperations list(K key) { return template.boundListOps(key); }
+    public BoundListOperations<K, V> list(K key) { return template.boundListOps(key); }
 
-    public BoundSetOperations collect(K key) { return template.boundSetOps(key); }
+    public BoundSetOperations<K, V> collect(K key) { return template.boundSetOps(key); }
 
-    public BoundStreamOperations stream(K key) { return template.boundStreamOps(key); }
+    public BoundStreamOperations<K, Object, Object> stream(K key) { return template.boundStreamOps(key); }
 
-    public BoundValueOperations value(K key) { return template.boundValueOps(key); }
+    public BoundValueOperations<K, V> value(K key) { return template.boundValueOps(key); }
 
-    public BoundZSetOperations zset(K key) { return template.boundZSetOps(key); }
-
-    // ============================= common ============================
+    public BoundZSetOperations<K, V> zset(K key) { return template.boundZSetOps(key); }
 
     /**
      * 指定缓存失效时间
@@ -71,17 +86,13 @@ public class RedisAccessor<K, V> {
      * @param key  键
      * @param time 时间(秒)
      *
-     * @return boolean
+     * @return 返回是否设置成功
      */
     public boolean expire(K key, long time) {
         try {
-            if (time > 0) {
-                template.expire(key, time, TimeUnit.SECONDS);
-            }
-            return true;
+            return time > 0 && falseIfNull(template.expire(key, time, TimeUnit.SECONDS));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -92,7 +103,7 @@ public class RedisAccessor<K, V> {
      *
      * @return 时间(秒) 返回0代表为永久有效
      */
-    public long getExpire(K key) { return template.getExpire(key, TimeUnit.SECONDS); }
+    public long getExpire(K key) { return zeroIfNull(template.getExpire(key, TimeUnit.SECONDS)); }
 
     /**
      * 判断key是否存在
@@ -103,10 +114,9 @@ public class RedisAccessor<K, V> {
      */
     public boolean hasKey(K key) {
         try {
-            return template.hasKey(key);
+            return falseIfNull(template.hasKey(key));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -114,12 +124,10 @@ public class RedisAccessor<K, V> {
      * 删除缓存
      *
      * @param key 指定 key
+     *
+     * @return 返回缓存中是否存在 key 对应的值
      */
-    public void delete(K key) {
-        if (key != null) {
-            template.delete(key);
-        }
-    }
+    public boolean delete(K key) { return key == null || falseIfNull(template.delete(key)); }
 
     /**
      * 删除缓存
@@ -127,17 +135,22 @@ public class RedisAccessor<K, V> {
      * @param keys 可以传一个值 或多个
      */
     @SafeVarargs
-    public final void delete(K... keys) {
+    public final long delete(K... keys) {
         if (keys != null && keys.length > 0) {
             if (keys.length == 1) {
-                delete(keys[0]);
+                return delete(keys[0]) ? 1 : 0;
             } else {
-                template.delete(ListUtil.toList(keys));
+                return zeroIfNull(template.delete(ListUtil.toList(keys)));
             }
         }
+        return 0;
     }
 
-    //============================String=============================
+    /*
+     * ***********************************************************************************************************
+     * * value ***************************************************************************************************
+     * ***********************************************************************************************************
+     */
 
     /**
      * 普通缓存获取
@@ -146,7 +159,7 @@ public class RedisAccessor<K, V> {
      *
      * @return 值
      */
-    public V get(K key) { return key == null ? null : template.opsForValue().get(key); }
+    public V get(K key) { return key == null ? null : value().get(key); }
 
     /**
      * 普通缓存放入
@@ -158,11 +171,10 @@ public class RedisAccessor<K, V> {
      */
     public boolean set(K key, V value) {
         try {
-            template.opsForValue().set(key, value);
+            value().set(key, value);
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -175,7 +187,7 @@ public class RedisAccessor<K, V> {
      * @return 值
      */
     public V getOrPull(K key, Supplier<V> puller) {
-        V cached = (V) get(key);
+        V cached = get(key);
         if (cached == null) {
             cached = puller.get();
             set(key, cached);
@@ -195,14 +207,13 @@ public class RedisAccessor<K, V> {
     public boolean set(K key, V value, long expireOfSeconds) {
         try {
             if (expireOfSeconds > 0) {
-                template.opsForValue().set(key, value, expireOfSeconds, TimeUnit.SECONDS);
+                value().set(key, value, expireOfSeconds, TimeUnit.SECONDS);
             } else {
                 set(key, value);
             }
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -219,14 +230,13 @@ public class RedisAccessor<K, V> {
     public boolean set(K key, V value, long time, TimeUnit timeUnit) {
         try {
             if (time > 0) {
-                template.opsForValue().set(key, value, time, timeUnit);
+                value().set(key, value, time, timeUnit);
             } else {
                 set(key, value);
             }
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -240,7 +250,7 @@ public class RedisAccessor<K, V> {
      * @return 值
      */
     public V getOrPull(K key, Supplier<V> puller, long expireOfSeconds) {
-        V cached = (V) get(key);
+        V cached = get(key);
         if (cached == null) {
             cached = puller.get();
             set(key, cached, expireOfSeconds);
@@ -275,7 +285,7 @@ public class RedisAccessor<K, V> {
      *
      * @return long
      */
-    public long increment(K key, long delta) { return template.opsForValue().increment(key, delta); }
+    public long increment(K key, long delta) { return zeroIfNull(value().increment(key, delta)); }
 
     /**
      * 递减
@@ -285,9 +295,13 @@ public class RedisAccessor<K, V> {
      *
      * @return long
      */
-    public long decrement(K key, long delta) { return template.opsForValue().increment(key, -delta); }
+    public long decrement(K key, long delta) { return zeroIfNull(value().increment(key, -delta)); }
 
-    //================================Map=================================
+    /*
+     * ***********************************************************************************************************
+     * * hash ****************************************************************************************************
+     * ***********************************************************************************************************
+     */
 
     /**
      * HashGet
@@ -297,7 +311,7 @@ public class RedisAccessor<K, V> {
      *
      * @return 值
      */
-    public Object hashGet(K key, String item) { return template.opsForHash().get(key, item); }
+    public Object hashGet(K key, String item) { return hash().get(key, item); }
 
     /**
      * 获取hashKey对应的所有键值
@@ -306,7 +320,7 @@ public class RedisAccessor<K, V> {
      *
      * @return 对应的多个键值
      */
-    public Map<Object, Object> hashEntries(K key) { return template.opsForHash().entries(key); }
+    public Map<Object, Object> hashEntries(K key) { return hash().entries(key); }
 
     /**
      * HashSet
@@ -318,11 +332,10 @@ public class RedisAccessor<K, V> {
      */
     public boolean hashPutAll(K key, Map<K, V> map) {
         try {
-            template.opsForHash().putAll(key, map);
+            hash().putAll(key, map);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -337,14 +350,13 @@ public class RedisAccessor<K, V> {
      */
     public boolean hashPutAll(K key, Map<K, V> map, long time) {
         try {
-            template.opsForHash().putAll(key, map);
+            hash().putAll(key, map);
             if (time > 0) {
                 expire(key, time);
             }
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -359,11 +371,10 @@ public class RedisAccessor<K, V> {
      */
     public boolean hashPut(K key, Object item, Object value) {
         try {
-            template.opsForHash().put(key, item, value);
+            hash().put(key, item, value);
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -379,14 +390,13 @@ public class RedisAccessor<K, V> {
      */
     public boolean hashPut(K key, Object item, Object value, long time) {
         try {
-            template.opsForHash().put(key, item, value);
+            hash().put(key, item, value);
             if (time > 0) {
                 expire(key, time);
             }
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -396,7 +406,7 @@ public class RedisAccessor<K, V> {
      * @param key  键 不能为null
      * @param item 项 可以使多个 不能为null
      */
-    public void hashDelete(K key, Object... item) { template.opsForHash().delete(key, item); }
+    public long hashDelete(K key, Object... item) { return zeroIfNull(hash().delete(key, item)); }
 
     /**
      * 判断hash表中是否有该项的值
@@ -406,7 +416,7 @@ public class RedisAccessor<K, V> {
      *
      * @return true 存在 false不存在
      */
-    public boolean hashHasKey(K key, Object item) { return template.opsForHash().hasKey(key, item); }
+    public boolean hashHasKey(K key, Object item) { return hash().hasKey(key, item); }
 
     /**
      * hash递增 如果不存在,就会创建一个 并把新增后的值返回
@@ -418,7 +428,7 @@ public class RedisAccessor<K, V> {
      * @return double
      */
     public double hashIncrement(K key, Object item, double delta) {
-        return template.opsForHash().increment(key, item, delta);
+        return hash().increment(key, item, delta);
     }
 
     /**
@@ -431,10 +441,14 @@ public class RedisAccessor<K, V> {
      * @return double
      */
     public double hashDecrement(K key, Object item, double delta) {
-        return template.opsForHash().increment(key, item, -delta);
+        return hash().increment(key, item, -delta);
     }
 
-    // ============================ set =============================
+    /*
+     * ***********************************************************************************************************
+     * * set *****************************************************************************************************
+     * ***********************************************************************************************************
+     */
 
     /**
      * 根据key获取Set中的所有值
@@ -445,10 +459,9 @@ public class RedisAccessor<K, V> {
      */
     public Set<V> collectGet(K key) {
         try {
-            return template.opsForSet().members(key);
+            return set().members(key);
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return Collections.emptySet();
+            return onExceptionThen(e, Collections.emptySet());
         }
     }
 
@@ -462,10 +475,9 @@ public class RedisAccessor<K, V> {
      */
     public boolean collectHasKey(K key, Object value) {
         try {
-            return template.opsForSet().isMember(key, value);
+            return falseIfNull(set().isMember(key, value));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -477,12 +489,12 @@ public class RedisAccessor<K, V> {
      *
      * @return 成功个数
      */
-    public long collectAdd(K key, V... values) {
+    @SafeVarargs
+    public final long collectAdd(K key, V... values) {
         try {
-            return template.opsForSet().add(key, values);
+            return zeroIfNull(set().add(key, values));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return 0;
+            return onExceptionThenZero(e);
         }
     }
 
@@ -495,16 +507,16 @@ public class RedisAccessor<K, V> {
      *
      * @return 成功个数
      */
-    public long collectAdd(K key, long time, V... values) {
+    @SafeVarargs
+    public final long collectAdd(K key, long time, V... values) {
         try {
-            Long count = template.opsForSet().add(key, values);
+            Long count = set().add(key, values);
             if (time > 0) {
                 expire(key, time);
             }
-            return count;
+            return zeroIfNull(count);
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return 0;
+            return onExceptionThenZero(e);
         }
     }
 
@@ -517,10 +529,9 @@ public class RedisAccessor<K, V> {
      */
     public long collectSize(K key) {
         try {
-            return template.opsForSet().size(key);
+            return zeroIfNull(set().size(key));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return 0;
+            return onExceptionThenZero(e);
         }
     }
 
@@ -534,15 +545,17 @@ public class RedisAccessor<K, V> {
      */
     public long collectRemove(K key, Object... values) {
         try {
-            Long count = template.opsForSet().remove(key, values);
-            return count;
+            return zeroIfNull(set().remove(key, values));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return 0;
+            return onExceptionThenZero(e);
         }
     }
 
-    //===============================list=================================
+    /*
+     * ***********************************************************************************************************
+     * * list ****************************************************************************************************
+     * ***********************************************************************************************************
+     */
 
     /**
      * 获取list缓存的内容
@@ -555,10 +568,9 @@ public class RedisAccessor<K, V> {
      */
     public List<V> listGet(K key, long start, long end) {
         try {
-            return template.opsForList().range(key, start, end);
+            return list().range(key, start, end);
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return Collections.emptyList();
+            return onExceptionThen(e, Collections.emptyList());
         }
     }
 
@@ -571,10 +583,9 @@ public class RedisAccessor<K, V> {
      */
     public long listSize(K key) {
         try {
-            return template.opsForList().size(key);
+            return zeroIfNull(list().size(key));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return 0;
+            return onExceptionThenZero(e);
         }
     }
 
@@ -588,10 +599,9 @@ public class RedisAccessor<K, V> {
      */
     public Object listGet(K key, long index) {
         try {
-            return template.opsForList().index(key, index);
+            return list().index(key, index);
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return null;
+            return onExceptionThen(e, null);
         }
     }
 
@@ -605,11 +615,10 @@ public class RedisAccessor<K, V> {
      */
     public boolean listAdd(K key, V value) {
         try {
-            template.opsForList().rightPush(key, value);
+            list().rightPush(key, value);
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -624,14 +633,13 @@ public class RedisAccessor<K, V> {
      */
     public boolean listAdd(K key, V value, long time) {
         try {
-            template.opsForList().rightPush(key, value);
+            list().rightPush(key, value);
             if (time > 0) {
                 expire(key, time);
             }
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -645,11 +653,10 @@ public class RedisAccessor<K, V> {
      */
     public boolean listAddAll(K key, List<V> value) {
         try {
-            template.opsForList().rightPushAll(key, value);
+            list().rightPushAll(key, value);
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -664,14 +671,13 @@ public class RedisAccessor<K, V> {
      */
     public boolean listAddAll(K key, List<V> value, long time) {
         try {
-            template.opsForList().rightPushAll(key, value);
+            list().rightPushAll(key, value);
             if (time > 0) {
                 expire(key, time);
             }
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -686,11 +692,10 @@ public class RedisAccessor<K, V> {
      */
     public boolean listSet(K key, long index, V value) {
         try {
-            template.opsForList().set(key, index, value);
+            list().set(key, index, value);
             return true;
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return false;
+            return onExceptionThenFalse(e);
         }
     }
 
@@ -705,11 +710,13 @@ public class RedisAccessor<K, V> {
      */
     public long listRemove(K key, long count, Object value) {
         try {
-            Long removed = template.opsForList().remove(key, count, value);
-            return removed == null ? 0 : removed;
+            return zeroIfNull(list().remove(key, count, value));
         } catch (Exception e) {
-            onCanIgnoreException(e);
-            return 0;
+            return onExceptionThenZero(e);
         }
     }
+
+    private static long zeroIfNull(Long value) { return value == null ? 0 : value; }
+
+    private static boolean falseIfNull(Boolean value) { return value != null && value; }
 }

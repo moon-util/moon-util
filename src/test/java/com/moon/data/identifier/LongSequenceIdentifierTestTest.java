@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * @author moonsky
  */
-class LongSnowflakeIdentifierTestTest {
+class LongSequenceIdentifierTestTest {
 
     enum LibraryEnum {
         厚泽("HOUZE"),
@@ -69,7 +69,7 @@ class LongSnowflakeIdentifierTestTest {
     @Test
     void testNextId() throws Exception {
         long prevId = Long.MIN_VALUE;
-        LongSnowflakeIdentifier identifier = LongSnowflakeIdentifier.of();
+        LongSequenceIdentifier identifier = LongSequenceIdentifier.of();
         for (int i = 0; i < 15151514; i++) {
             long thisId = identifier.nextId();
             assert thisId > prevId;

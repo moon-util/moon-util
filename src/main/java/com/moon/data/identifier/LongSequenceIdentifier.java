@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @author moonsky
  */
-public class LongSnowflakeIdentifier implements IdentifierGenerator<Long, Object> {
+public final class LongSequenceIdentifier implements IdentifierGenerator<Long, Object> {
 
     /**
      * 时间起始标记点，作为基准，一般取系统的最近时间（一旦确定不能变动）
@@ -59,7 +59,7 @@ public class LongSnowflakeIdentifier implements IdentifierGenerator<Long, Object
      */
     private long lastTimestamp = -1L;
 
-    public LongSnowflakeIdentifier() {
+    public LongSequenceIdentifier() {
         this.datacenterId = getDatacenterId(maxDatacenterId);
         this.workerId = getMaxWorkerId(datacenterId, maxWorkerId);
     }
@@ -70,7 +70,7 @@ public class LongSnowflakeIdentifier implements IdentifierGenerator<Long, Object
      * @param workerId     工作机器 ID
      * @param datacenterId 序列号
      */
-    public LongSnowflakeIdentifier(long workerId, long datacenterId) {
+    public LongSequenceIdentifier(long workerId, long datacenterId) {
         ValidationUtil.requireFalse(workerId > maxWorkerId || workerId < 0,
             String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         ValidationUtil.requireFalse(datacenterId > maxDatacenterId || datacenterId < 0,
@@ -79,12 +79,12 @@ public class LongSnowflakeIdentifier implements IdentifierGenerator<Long, Object
         this.workerId = workerId;
     }
 
-    public static LongSnowflakeIdentifier of() {
-        return new LongSnowflakeIdentifier();
+    public static LongSequenceIdentifier of() {
+        return new LongSequenceIdentifier();
     }
 
-    public static LongSnowflakeIdentifier of(long workerId, long datacenterId) {
-        return new LongSnowflakeIdentifier(workerId, datacenterId);
+    public static LongSequenceIdentifier of(long workerId, long datacenterId) {
+        return new LongSequenceIdentifier(workerId, datacenterId);
     }
 
     /**

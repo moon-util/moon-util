@@ -3,7 +3,7 @@ package com.moon.spring.web.error;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.SetUtil;
-import com.moon.data.identifier.LongSnowflakeIdentifier;
+import com.moon.data.identifier.LongSequenceIdentifier;
 import org.hibernate.TransientObjectException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -85,7 +85,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     onNullPointerException(NullPointerException.class, "参数或内部数据错误(NPE): null."),
     ;
 
-    private final static transient LongSnowflakeIdentifier worker = LongSnowflakeIdentifier.of(29, 29);
+    private final static transient LongSequenceIdentifier worker = LongSequenceIdentifier.of(29, 29);
 
     public static String nextSerialAsString() {
         return String.valueOf(worker.nextId());

@@ -66,8 +66,9 @@ public final class IdentifierUtil {
 
     static <T> T returnIfRecordIdNotNull(Object entity, Object o, BiFunction<Object, Object, T> generator) {
         if (entity instanceof Record) {
-            Object id = ((Record<?>) entity).getId();
-            if (id != null) {
+            Record record = (Record) entity;
+            Object id = record.getId();
+            if (id != null || !record.isNew()) {
                 return (T) id;
             }
         }
@@ -76,12 +77,16 @@ public final class IdentifierUtil {
 
     static String returnIfRecordIdNotEmpty(Object entity, Object o, BiFunction<Object, Object, String> generator) {
         if (entity instanceof Record) {
-            Object id = ((Record<?>) entity).getId();
+            Record record = (Record) entity;
+            Object id = record.getId();
             if (id instanceof CharSequence) {
                 String strId = id.toString();
                 if (!strId.isEmpty()) {
                     return strId;
                 }
+            }
+            if (!record.isNew()) {
+                return id == null ? null : id.toString();
             }
         }
         return generator.apply(entity, o);
@@ -111,10 +116,10 @@ public final class IdentifierUtil {
             if (types.size() == 1) {
                 Class type = SetUtil.requireGet(types, 0);
                 if (type == Long.class) {
-                    return new LongSnowflakeIdentifier();
+                    return new LongSequenceIdentifier();
                 }
                 if (type == String.class) {
-                    return new StringSnowflakeIdentifier();
+                    return new StringSequenceIdentifier();
                 }
             }
             throw new IllegalStateException("Unknown identifier type, you must assign spring property of: " + key);
