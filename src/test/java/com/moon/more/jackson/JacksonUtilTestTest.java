@@ -11,10 +11,10 @@ class JacksonUtilTestTest {
 
     @Test
     void testStringify() throws Exception {
-        int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        System.out.println(JacksonUtil.stringify(values));
-
-        String[] strs = {"123", "456", null};
-        System.out.println(JacksonUtil.stringify(strs));
+        // int[] values = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        // System.out.println(JacksonUtil.stringify(values));
+        //
+        // String[] strs = {"123", "456", null};
+        // System.out.println(JacksonUtil.stringify(strs));
     }
 }

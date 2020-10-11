@@ -1037,11 +1037,11 @@ public final class DateTimeUtil {
         return instant == null ? null : safeToDateTime(instant);
     }
 
-    public static LocalDate toDate(CharSequence date) { return LocalDate.parse(date); }
+    public static LocalDate toDate(CharSequence date) { return parseToDate(date); }
 
-    public static LocalTime toTime(CharSequence date) { return LocalTime.parse(date); }
+    public static LocalTime toTime(CharSequence date) { return parseToTime(date); }
 
-    public static LocalDateTime toDateTime(CharSequence date) { return LocalDateTime.parse(date); }
+    public static LocalDateTime toDateTime(CharSequence date) { return parseToDateTime(date); }
 
     public static LocalDate toDate(long milliseconds) { return toDateTime(milliseconds).toLocalDate(); }
 
@@ -1051,9 +1051,9 @@ public final class DateTimeUtil {
 
     public static LocalDate toDate(int... values) {
         int i = 0;
-        switch (values.length) {
+        switch (values == null ? 0 : values.length) {
             case 0:
-                return LocalDate.now();
+                return null;
             case 1:
                 return LocalDate.of(values[i], 1, 1);
             case 2:
@@ -1065,9 +1065,9 @@ public final class DateTimeUtil {
 
     public static LocalTime toTime(int... values) {
         int i = 0;
-        switch (values.length) {
+        switch (values == null ? 0 : values.length) {
             case 0:
-                return LocalTime.now();
+                return null;
             case 1:
                 return LocalTime.of(values[i], 0);
             case 2:
@@ -1083,9 +1083,9 @@ public final class DateTimeUtil {
     public static LocalDateTime toDateTime(int... parts) {
         int[] vs = parts;
         int i = 0;
-        switch (parts.length) {
+        switch (parts == null ? 0 : parts.length) {
             case 0:
-                return LocalDateTime.now();
+                return null;
             case 1:
                 return LocalDateTime.of(vs[i], 1, 1, 0, 0);
             case 2:
@@ -1163,7 +1163,7 @@ public final class DateTimeUtil {
     }
 
     public static LocalDate parseToDate(CharSequence dateString) {
-        return dateString == null ? null : toDate(CalendarUtil.parseToCalendar(dateString.toString()));
+        return dateString == null ? null : toDate(CalendarUtil.extractDateFields(dateString.toString()));
     }
 
     public static LocalTime parseToTime(CharSequence dateString) {
