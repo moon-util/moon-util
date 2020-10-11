@@ -7,7 +7,7 @@ import java.util.Calendar;
 /**
  * @author moonsky
  */
-public enum DatetimeField implements EnumDescriptor {
+public enum DateTimeField implements EnumDescriptor {
     /**
      * 毫秒
      */
@@ -59,7 +59,7 @@ public enum DatetimeField implements EnumDescriptor {
     ;
     public final int value;
 
-    DatetimeField(int value) { this.value = value; }
+    DateTimeField(int value) { this.value = value; }
 
     /**
      * 枚举信息

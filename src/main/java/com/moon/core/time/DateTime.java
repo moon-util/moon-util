@@ -14,7 +14,7 @@ import java.util.function.ToIntBiFunction;
 
 import static com.moon.core.time.CalendarUtil.copy;
 import static com.moon.core.time.CalendarUtil.overrideCalendar;
-import static com.moon.core.time.DatetimeField.*;
+import static com.moon.core.time.DateTimeField.*;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 import static java.time.temporal.ChronoField.NANO_OF_DAY;
 
@@ -46,7 +46,7 @@ import static java.time.temporal.ChronoField.NANO_OF_DAY;
  *
  * @author moonsky
  */
-public final class Datetime extends Date implements TemporalAccessor, TemporalAdjuster, Temporal {
+public final class DateTime extends Date implements TemporalAccessor, TemporalAdjuster, Temporal {
 
     /**
      * 纳秒
@@ -108,7 +108,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     Calendar originCalendar() { return calendar; }
 
-    private Datetime obtainReturning(Calendar calendar) { return immutable ? new Datetime(calendar, true) : this; }
+    private DateTime obtainReturning(Calendar calendar) { return immutable ? new DateTime(calendar, true) : this; }
 
     private Calendar obtainCalendar() { return immutable ? copy(calendar) : calendar; }
 
@@ -118,37 +118,37 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * *********************************************************************************************
      */
 
-    public Datetime(Calendar originCalendar, boolean immutable) {
+    public DateTime(Calendar originCalendar, boolean immutable) {
         super(originCalendar.getTimeInMillis());
         this.calendar = originCalendar;
         this.immutable = immutable;
     }
 
-    public Datetime(long timeMillis) { this(DateUtil.toCalendar(timeMillis)); }
+    public DateTime(long timeMillis) { this(DateUtil.toCalendar(timeMillis)); }
 
-    public Datetime(Calendar calendar) { this(calendar, false); }
+    public DateTime(Calendar calendar) { this(calendar, false); }
 
-    public Datetime(String date) { this(DateUtil.toCalendar(date)); }
+    public DateTime(String date) { this(DateUtil.toCalendar(date)); }
 
-    public Datetime(CharSequence date) { this(DateUtil.toCalendar(date)); }
+    public DateTime(CharSequence date) { this(DateUtil.toCalendar(date)); }
 
-    public Datetime(Date date) { this(date.getTime()); }
+    public DateTime(Date date) { this(date.getTime()); }
 
-    public Datetime(LocalDate localDate) { this(DateUtil.toCalendar(localDate)); }
+    public DateTime(LocalDate localDate) { this(DateUtil.toCalendar(localDate)); }
 
-    public Datetime(LocalDateTime datetime) { this(DateUtil.toCalendar(datetime)); }
+    public DateTime(LocalDateTime datetime) { this(DateUtil.toCalendar(datetime)); }
 
-    public Datetime(Datetime datetime) { this(copy(datetime.calendar), datetime.immutable); }
+    public DateTime(DateTime datetime) { this(copy(datetime.calendar), datetime.immutable); }
 
-    public Datetime(Instant instant) { this(instant.toEpochMilli()); }
+    public DateTime(Instant instant) { this(instant.toEpochMilli()); }
 
-    public Datetime(org.joda.time.DateTime datetime) { this(datetime.toDate()); }
+    public DateTime(org.joda.time.DateTime datetime) { this(datetime.toDate()); }
 
-    public Datetime(org.joda.time.LocalDate date) { this(date.toDate()); }
+    public DateTime(org.joda.time.LocalDate date) { this(date.toDate()); }
 
-    public Datetime(org.joda.time.LocalDateTime datetime) { this(datetime.toDate()); }
+    public DateTime(org.joda.time.LocalDateTime datetime) { this(datetime.toDate()); }
 
-    public Datetime() { this(System.currentTimeMillis()); }
+    public DateTime() { this(System.currentTimeMillis()); }
 
     /*
      * **************************************************************************************
@@ -156,45 +156,45 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * **************************************************************************************
      */
 
-    public static Datetime now() { return new Datetime(); }
+    public static DateTime now() { return new DateTime(); }
 
-    public static Datetime of() { return now(); }
+    public static DateTime of() { return now(); }
 
-    public static Datetime of(Date date) { return new Datetime(date); }
+    public static DateTime of(Date date) { return new DateTime(date); }
 
-    public static Datetime of(Calendar calendar) { return new Datetime(calendar); }
+    public static DateTime of(Calendar calendar) { return new DateTime(calendar); }
 
-    public static Datetime of(long timeOfMillis) { return new Datetime(timeOfMillis); }
+    public static DateTime of(long timeOfMillis) { return new DateTime(timeOfMillis); }
 
-    public static Datetime of(CharSequence dateStr) { return new Datetime(dateStr); }
+    public static DateTime of(CharSequence dateStr) { return new DateTime(dateStr); }
 
-    public static Datetime of(int... fields) { return new Datetime(DateUtil.toCalendar(fields)); }
+    public static DateTime of(int... fields) { return new DateTime(DateUtil.toCalendar(fields)); }
 
-    public static Datetime ofToday(LocalTime time) { return new Datetime(time.atDate(LocalDate.now())); }
+    public static DateTime ofToday(LocalTime time) { return new DateTime(time.atDate(LocalDate.now())); }
 
-    public static Datetime of(LocalDate date) { return new Datetime(date); }
+    public static DateTime of(LocalDate date) { return new DateTime(date); }
 
-    public static Datetime of(LocalDateTime datetime) { return new Datetime(datetime); }
+    public static DateTime of(LocalDateTime datetime) { return new DateTime(datetime); }
 
     /*
      * 构造不可变对象 ***************************************************************************************
      */
 
-    public static Datetime ofImmutable() { return ofImmutable(DateUtil.getInstance()); }
+    public static DateTime ofImmutable() { return ofImmutable(DateUtil.getInstance()); }
 
-    public static Datetime ofImmutable(Date date) { return ofImmutable(DateUtil.toCalendar(date)); }
+    public static DateTime ofImmutable(Date date) { return ofImmutable(DateUtil.toCalendar(date)); }
 
-    public static Datetime ofImmutable(Calendar calendar) { return new Datetime(calendar, true); }
+    public static DateTime ofImmutable(Calendar calendar) { return new DateTime(calendar, true); }
 
-    public static Datetime ofImmutable(long timeOfMillis) { return ofImmutable(DateUtil.toCalendar(timeOfMillis)); }
+    public static DateTime ofImmutable(long timeOfMillis) { return ofImmutable(DateUtil.toCalendar(timeOfMillis)); }
 
-    public static Datetime ofImmutable(CharSequence dateStr) { return ofImmutable(DateUtil.toCalendar(dateStr)); }
+    public static DateTime ofImmutable(CharSequence dateStr) { return ofImmutable(DateUtil.toCalendar(dateStr)); }
 
-    public static Datetime ofImmutable(int... fields) { return ofImmutable(DateUtil.toCalendar(fields)); }
+    public static DateTime ofImmutable(int... fields) { return ofImmutable(DateUtil.toCalendar(fields)); }
 
-    public static Datetime ofImmutable(LocalDate date) { return ofImmutable(DateUtil.toCalendar(date)); }
+    public static DateTime ofImmutable(LocalDate date) { return ofImmutable(DateUtil.toCalendar(date)); }
 
-    public static Datetime ofImmutable(LocalDateTime datetime) { return ofImmutable(DateUtil.toCalendar(datetime)); }
+    public static DateTime ofImmutable(LocalDateTime datetime) { return ofImmutable(DateUtil.toCalendar(datetime)); }
 
     /*
      * ************************************************************************************************
@@ -216,14 +216,14 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @see #obtainReturning(Calendar)
      */
-    public Datetime asImmutable() { return immutable ? this : new Datetime(copy(calendar), true); }
+    public DateTime asImmutable() { return immutable ? this : new DateTime(copy(calendar), true); }
 
     /**
      * 设置为可变数据，可变数据操作的是同一个对象
      *
      * @see #obtainReturning(Calendar)
      */
-    public Datetime asMutable() { return immutable ? new Datetime(copy(calendar), false) : this; }
+    public DateTime asMutable() { return immutable ? new DateTime(copy(calendar), false) : this; }
 
     /*
      * *********************************************************************
@@ -273,7 +273,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @see Month
      */
-    public DatetimeMonth getMonthOfYear() { return DatetimeMonth.of(getMonthValue()); }
+    public DateTimeMonth getMonthOfYear() { return DateTimeMonth.of(getMonthValue()); }
 
     /**
      * 获取星座
@@ -304,21 +304,21 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return N
      */
-    public int getWeekOfYear() { return getField(DatetimeField.WEEK_OF_YEAR); }
+    public int getWeekOfYear() { return getField(DateTimeField.WEEK_OF_YEAR); }
 
     /**
      * 返回当前日期是当前月中的第 N 个星期
      *
      * @return N
      */
-    public int getWeekOfMonth() { return getField(DatetimeField.WEEK_OF_MONTH); }
+    public int getWeekOfMonth() { return getField(DateTimeField.WEEK_OF_MONTH); }
 
     /**
      * 返回当前是一年中的第 N 天
      *
      * @return N
      */
-    public int getDayOfYear() { return getField(DatetimeField.DAY_OF_YEAR); }
+    public int getDayOfYear() { return getField(DateTimeField.DAY_OF_YEAR); }
 
     /**
      * 返回当前日期是当前月中的第 N 天
@@ -332,7 +332,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 0 * 6
      */
-    public int getDayOfWeekValue() { return getField(DatetimeField.DAY_OF_WEEK); }
+    public int getDayOfWeekValue() { return getField(DateTimeField.DAY_OF_WEEK); }
 
     /**
      * 返回当前是星期几
@@ -478,7 +478,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 字段值
      */
-    public int getField(DatetimeField field) { return get(field.value); }
+    public int getField(DateTimeField field) { return get(field.value); }
 
     /**
      * 获取指定字段值
@@ -522,7 +522,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 时间对象
      */
-    public Datetime withTimeInMillis(long timeInMillis) {
+    public DateTime withTimeInMillis(long timeInMillis) {
         Calendar calendar = obtainCalendar();
         calendar.setTimeInMillis(timeInMillis);
         return obtainReturning(calendar);
@@ -535,7 +535,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withSecond(int value) { return withField(SECOND, value); }
+    public DateTime withSecond(int value) { return withField(SECOND, value); }
 
     /**
      * 设置分钟数
@@ -544,7 +544,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withMinute(int value) { return withField(MINUTE, value); }
+    public DateTime withMinute(int value) { return withField(MINUTE, value); }
 
     /**
      * 设置小时数（12 小时制）
@@ -553,7 +553,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withHour(int value) { return withField(DatetimeField.HOUR, value); }
+    public DateTime withHour(int value) { return withField(DateTimeField.HOUR, value); }
 
     /**
      * 设置小时数（24 小时制）
@@ -562,7 +562,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withHourOfDay(int value) { return withField(HOUR_OF_DAY, value); }
+    public DateTime withHourOfDay(int value) { return withField(HOUR_OF_DAY, value); }
 
     /**
      * 设置星期
@@ -571,7 +571,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withDayOfWeek(int value) { return withField(DatetimeField.DAY_OF_WEEK, value); }
+    public DateTime withDayOfWeek(int value) { return withField(DateTimeField.DAY_OF_WEEK, value); }
 
     /**
      * 设置星期
@@ -580,8 +580,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withDayOfWeek(DayOfWeek dayOfWeek) {
-        return withField(DatetimeField.DAY_OF_WEEK, dayOfWeek == DayOfWeek.SUNDAY ? 1 : dayOfWeek.getValue() + 1);
+    public DateTime withDayOfWeek(DayOfWeek dayOfWeek) {
+        return withField(DateTimeField.DAY_OF_WEEK, dayOfWeek == DayOfWeek.SUNDAY ? 1 : dayOfWeek.getValue() + 1);
     }
 
     /**
@@ -591,7 +591,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withDayOfMonth(int value) { return withField(DAY_OF_MONTH, value); }
+    public DateTime withDayOfMonth(int value) { return withField(DAY_OF_MONTH, value); }
 
     /**
      * 设置当前年的第几天
@@ -600,7 +600,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withDayOfYear(int value) { return withField(DatetimeField.DAY_OF_YEAR, value); }
+    public DateTime withDayOfYear(int value) { return withField(DateTimeField.DAY_OF_YEAR, value); }
 
     /**
      * 设置当前月份，1 * 12
@@ -609,7 +609,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withMonth(int value) { return withField(MONTH, value); }
+    public DateTime withMonth(int value) { return withField(MONTH, value); }
 
     /**
      * 设置当前月份，0 * 11
@@ -618,7 +618,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withMonthIndex(int index) { return withMonth(index + 1); }
+    public DateTime withMonthIndex(int index) { return withMonth(index + 1); }
 
     /**
      * 设置月份，1 * 12
@@ -627,7 +627,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withMonth(DatetimeMonth month) { return withMonth(month.getValue()); }
+    public DateTime withMonth(DateTimeMonth month) { return withMonth(month.getValue()); }
 
     /**
      * 设置月份，1 * 12
@@ -636,7 +636,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withMonth(Month month) { return withMonth(month.getValue()); }
+    public DateTime withMonth(Month month) { return withMonth(month.getValue()); }
 
     /**
      * 设置年份
@@ -645,7 +645,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withYear(int value) { return withField(YEAR, value); }
+    public DateTime withYear(int value) { return withField(YEAR, value); }
 
     /**
      * 设置指定字段值
@@ -655,7 +655,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime withField(DatetimeField field, int value) { return with(field.value, value); }
+    public DateTime withField(DateTimeField field, int value) { return with(field.value, value); }
 
     /**
      * 设置指定字段值
@@ -665,7 +665,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime with(int field, int value) {
+    public DateTime with(int field, int value) {
         return obtainReturning(setFieldVal(obtainCalendar(), field, value));
     }
 
@@ -684,7 +684,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @see #startOfWeek(DayOfWeek)
      * @see #endOfWeek(DayOfWeek)
      */
-    public Datetime setFirstDayOfWeek(DayOfWeek firstDayOfWeek) { return setFirstDayOfWeek(firstDayOfWeek.getValue()); }
+    public DateTime setFirstDayOfWeek(DayOfWeek firstDayOfWeek) { return setFirstDayOfWeek(firstDayOfWeek.getValue()); }
 
     /**
      * 设置一周的第一天是星期几
@@ -693,7 +693,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return 当前对象
      */
-    public Datetime setFirstDayOfWeek(int firstDayOfWeek) {
+    public DateTime setFirstDayOfWeek(int firstDayOfWeek) {
         Calendar calendar = obtainCalendar();
         calendar.setFirstDayOfWeek(firstDayOfWeek);
         return obtainReturning(calendar);
@@ -706,7 +706,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return Datetime
      */
-    public Datetime setMinimalDaysInFirstWeek(int value) {
+    public DateTime setMinimalDaysInFirstWeek(int value) {
         Calendar calendar = obtainCalendar();
         calendar.setMinimalDaysInFirstWeek(value);
         return obtainReturning(calendar);
@@ -718,25 +718,25 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * ****************************************************************************
      */
 
-    public Datetime plusYears(int amount) { return plusField(YEAR, amount); }
+    public DateTime plusYears(int amount) { return plusField(YEAR, amount); }
 
-    public Datetime plusMonths(int amount) { return plusField(MONTH, amount); }
+    public DateTime plusMonths(int amount) { return plusField(MONTH, amount); }
 
-    public Datetime plusWeeks(int amount) { return plusField(WEEK_OF_YEAR, amount); }
+    public DateTime plusWeeks(int amount) { return plusField(WEEK_OF_YEAR, amount); }
 
-    public Datetime plusDays(int amount) { return plusField(DAY_OF_YEAR, amount); }
+    public DateTime plusDays(int amount) { return plusField(DAY_OF_YEAR, amount); }
 
-    public Datetime plusHours(int amount) { return plusField(HOUR_OF_DAY, amount); }
+    public DateTime plusHours(int amount) { return plusField(HOUR_OF_DAY, amount); }
 
-    public Datetime plusMinutes(int amount) { return plusField(MINUTE, amount); }
+    public DateTime plusMinutes(int amount) { return plusField(MINUTE, amount); }
 
-    public Datetime plusSeconds(int amount) { return plusField(SECOND, amount); }
+    public DateTime plusSeconds(int amount) { return plusField(SECOND, amount); }
 
-    public Datetime plusMillis(int amount) { return plusField(MILLISECOND, amount); }
+    public DateTime plusMillis(int amount) { return plusField(MILLISECOND, amount); }
 
-    public Datetime plusField(DatetimeField field, int amount) { return plus(field.value, amount); }
+    public DateTime plusField(DateTimeField field, int amount) { return plus(field.value, amount); }
 
-    public Datetime plus(int field, int amount) { return change(field, amount); }
+    public DateTime plus(int field, int amount) { return change(field, amount); }
 
     /*
      * ****************************************************************************
@@ -744,27 +744,27 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * ****************************************************************************
      */
 
-    public Datetime minusYears(int amount) { return minusField(YEAR, amount); }
+    public DateTime minusYears(int amount) { return minusField(YEAR, amount); }
 
-    public Datetime minusMonths(int amount) { return minusField(MONTH, amount); }
+    public DateTime minusMonths(int amount) { return minusField(MONTH, amount); }
 
-    public Datetime minusWeeks(int amount) { return minusField(WEEK_OF_YEAR, amount); }
+    public DateTime minusWeeks(int amount) { return minusField(WEEK_OF_YEAR, amount); }
 
-    public Datetime minusDays(int amount) { return minusField(DAY_OF_MONTH, amount); }
+    public DateTime minusDays(int amount) { return minusField(DAY_OF_MONTH, amount); }
 
-    public Datetime minusHours(int amount) { return minusField(HOUR_OF_DAY, amount); }
+    public DateTime minusHours(int amount) { return minusField(HOUR_OF_DAY, amount); }
 
-    public Datetime minusMinutes(int amount) { return minusField(MINUTE, amount); }
+    public DateTime minusMinutes(int amount) { return minusField(MINUTE, amount); }
 
-    public Datetime minusSeconds(int amount) { return minusField(SECOND, amount); }
+    public DateTime minusSeconds(int amount) { return minusField(SECOND, amount); }
 
-    public Datetime minusMillis(int amount) { return minusField(MILLISECOND, amount); }
+    public DateTime minusMillis(int amount) { return minusField(MILLISECOND, amount); }
 
-    public Datetime minusField(DatetimeField field, int amount) { return minus(field.value, amount); }
+    public DateTime minusField(DateTimeField field, int amount) { return minus(field.value, amount); }
 
-    public Datetime minus(int field, int amount) { return change(field, -amount); }
+    public DateTime minus(int field, int amount) { return change(field, -amount); }
 
-    private Datetime change(int field, int amount) {
+    private DateTime change(int field, int amount) {
         return obtainReturning(changeCalendarOf(obtainCalendar(), field, amount));
     }
 
@@ -777,13 +777,13 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
     public boolean isSupported(TemporalUnit unit) { return toInstant().isSupported(unit); }
 
     @Override
-    public Datetime with(TemporalField field, long newValue) {
+    public DateTime with(TemporalField field, long newValue) {
         LocalDateTime datetime = toLocalDateTime().with(field, newValue);
         return obtainReturning(overrideCalendar(obtainCalendar(), datetime));
     }
 
     @Override
-    public Datetime plus(long amountToAdd, TemporalUnit unit) {
+    public DateTime plus(long amountToAdd, TemporalUnit unit) {
         LocalDateTime datetime = toLocalDateTime().plus(amountToAdd, unit);
         return obtainReturning(overrideCalendar(obtainCalendar(), datetime));
     }
@@ -827,7 +827,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         public int getFieldMaxVal(Calendar c) { return max; }
     }
 
-    private Datetime boundaryOf(CalendarField ending, ToIntBiFunction<Calendar, CalendarField> getter) {
+    private DateTime boundaryOf(CalendarField ending, ToIntBiFunction<Calendar, CalendarField> getter) {
         CalendarField[] values = CalendarField.FIELDS;
         CalendarField field;
         Calendar calendar = obtainCalendar();
@@ -839,11 +839,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return obtainReturning(calendar);
     }
 
-    private Datetime startingOf(CalendarField ending) {
+    private DateTime startingOf(CalendarField ending) {
         return boundaryOf(ending, (c, field) -> field.min);
     }
 
-    private Datetime endingOf(CalendarField ending) {
+    private DateTime endingOf(CalendarField ending) {
         return boundaryOf(ending, (c, f) -> f.getFieldMaxVal(c));
     }
 
@@ -852,28 +852,28 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return Datetime
      */
-    public Datetime startOfSecond() { return startingOf(CalendarField.MILLISECOND); }
+    public DateTime startOfSecond() { return startingOf(CalendarField.MILLISECOND); }
 
     /**
      * 清除秒
      *
      * @return Datetime
      */
-    public Datetime startOfMinute() { return startingOf(CalendarField.SECOND); }
+    public DateTime startOfMinute() { return startingOf(CalendarField.SECOND); }
 
     /**
      * 清除分钟
      *
      * @return Datetime
      */
-    public Datetime startOfHour() { return startingOf(CalendarField.MINUTE); }
+    public DateTime startOfHour() { return startingOf(CalendarField.MINUTE); }
 
     /**
      * 凌晨 00:00:00
      *
      * @return Datetime
      */
-    public Datetime startOfDay() { return startingOf(CalendarField.HOUR_OF_DAY); }
+    public DateTime startOfDay() { return startingOf(CalendarField.HOUR_OF_DAY); }
 
     /**
      * 当前星期的最初时刻
@@ -883,7 +883,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @see #getFirstDayOfWeek()
      * @see #getFirstDayOfWeekValue()
      */
-    public Datetime startOfWeek() { return startOfWeek(getFirstDayOfWeek()); }
+    public DateTime startOfWeek() { return startOfWeek(getFirstDayOfWeek()); }
 
     /**
      * 当前星期的最初时刻
@@ -893,8 +893,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return Datetime
      */
-    public Datetime startOfWeek(DayOfWeek firstDayOfWeek) {
-        Datetime datetime = startOfDay();
+    public DateTime startOfWeek(DayOfWeek firstDayOfWeek) {
+        DateTime datetime = startOfDay();
         int diffDays = datetime.getDayOfWeek().ordinal() - firstDayOfWeek.ordinal();
         Calendar calendar = datetime.originCalendar();
         changeCalendarOf(calendar, Calendar.DAY_OF_MONTH, -(diffDays < 0 ? diffDays + 7 : diffDays));
@@ -906,49 +906,49 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return Datetime
      */
-    public Datetime startOfMonth() { return startingOf(CalendarField.DAY_OF_MONTH); }
+    public DateTime startOfMonth() { return startingOf(CalendarField.DAY_OF_MONTH); }
 
     /**
      * 年初
      *
      * @return Datetime
      */
-    public Datetime startOfYear() { return startingOf(CalendarField.MONTH); }
+    public DateTime startOfYear() { return startingOf(CalendarField.MONTH); }
 
     /**
      * 秒末
      *
      * @return Datetime
      */
-    public Datetime endOfSecond() { return endingOf(CalendarField.MILLISECOND); }
+    public DateTime endOfSecond() { return endingOf(CalendarField.MILLISECOND); }
 
     /**
      * 分末
      *
      * @return Datetime
      */
-    public Datetime endOfMinute() { return endingOf(CalendarField.SECOND); }
+    public DateTime endOfMinute() { return endingOf(CalendarField.SECOND); }
 
     /**
      * 时末
      *
      * @return Datetime
      */
-    public Datetime endOfHour() { return endingOf(CalendarField.MINUTE); }
+    public DateTime endOfHour() { return endingOf(CalendarField.MINUTE); }
 
     /**
      * 深夜，23:59:59:999
      *
      * @return Datetime
      */
-    public Datetime endOfDay() { return endingOf(CalendarField.HOUR_OF_DAY); }
+    public DateTime endOfDay() { return endingOf(CalendarField.HOUR_OF_DAY); }
 
     /**
      * 本周最末时刻
      *
      * @return Datetime
      */
-    public Datetime endOfWeek() { return endOfWeek(getFirstDayOfWeek()); }
+    public DateTime endOfWeek() { return endOfWeek(getFirstDayOfWeek()); }
 
     /**
      * 本周最末时刻
@@ -960,8 +960,8 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      * @see #setFirstDayOfWeek(int)
      * @see #setFirstDayOfWeek(DayOfWeek)
      */
-    public Datetime endOfWeek(DayOfWeek firstDayOfWeek) {
-        Datetime datetime = endOfDay();
+    public DateTime endOfWeek(DayOfWeek firstDayOfWeek) {
+        DateTime datetime = endOfDay();
         int diffDays = firstDayOfWeek.ordinal() - datetime.getDayOfWeek().ordinal();
         changeCalendarOf(datetime.originCalendar(),
             Calendar.DAY_OF_MONTH,
@@ -974,15 +974,15 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *
      * @return Datetime
      */
-    public Datetime endOfMonth() { return endingOf(CalendarField.DAY_OF_MONTH); }
+    public DateTime endOfMonth() { return endingOf(CalendarField.DAY_OF_MONTH); }
 
     /**
      * 年末
      *
      * @return Datetime
      */
-    public Datetime endOfYear() {
-        Datetime datetime = endOfDay();
+    public DateTime endOfYear() {
+        DateTime datetime = endOfDay();
         Calendar calendar = datetime.originCalendar();
         setFieldVal(calendar, Calendar.DAY_OF_MONTH, 31);
         setFieldVal(calendar, Calendar.MONTH, 12);
@@ -1053,11 +1053,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public boolean isYearAfter(int year) { return getYearValue() > year; }
 
-    public boolean isYearOf(Datetime date) { return date != null && isYearOf(date.getYearValue()); }
+    public boolean isYearOf(DateTime date) { return date != null && isYearOf(date.getYearValue()); }
 
-    public boolean isYearBefore(Datetime date) { return date != null && isYearBefore(date.getYearValue()); }
+    public boolean isYearBefore(DateTime date) { return date != null && isYearBefore(date.getYearValue()); }
 
-    public boolean isYearAfter(Datetime date) { return date != null && isYearAfter(date.getYearValue()); }
+    public boolean isYearAfter(DateTime date) { return date != null && isYearAfter(date.getYearValue()); }
 
     public boolean isMonthOf(int year, int month) { return isYearOf(year) && isMonthAt(month); }
 
@@ -1071,15 +1071,15 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return isYearAfter(year) || (isYearOf(year) && getMonthValue() > month);
     }
 
-    public boolean isMonthOf(Datetime date) {
+    public boolean isMonthOf(DateTime date) {
         return date != null && isMonthOf(date.getYearValue(), date.getMonthValue());
     }
 
-    public boolean isMonthBefore(Datetime date) {
+    public boolean isMonthBefore(DateTime date) {
         return date != null && isMonthBefore(date.getYearValue(), date.getMonthValue());
     }
 
-    public boolean isMonthAfter(Datetime date) {
+    public boolean isMonthAfter(DateTime date) {
         return date != null && isMonthAfter(date.getYearValue(), date.getMonthValue());
     }
 
@@ -1097,15 +1097,15 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return isMonthAfter(year, month) || (isMonthOf(year, month) && getDayOfMonth() > dayOfMonth);
     }
 
-    public boolean isDateOf(Datetime date) {
+    public boolean isDateOf(DateTime date) {
         return date != null && isDateOf(date.getYearValue(), date.getMonthValue(), date.getDayOfMonth());
     }
 
-    public boolean isDateBefore(Datetime date) {
+    public boolean isDateBefore(DateTime date) {
         return date != null && isDateBefore(date.getYearValue(), date.getMonthValue(), date.getDayOfMonth());
     }
 
-    public boolean isDateAfter(Datetime date) {
+    public boolean isDateAfter(DateTime date) {
         return date != null && isDateAfter(date.getYearValue(), date.getMonthValue(), date.getDayOfMonth());
     }
 
@@ -1115,11 +1115,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     public boolean isHourAfter(int hour) { return getHourOfDay() > hour; }
 
-    public boolean isHourOf(Datetime hour) { return hour != null && isHourOf(hour.getHourOfDay()); }
+    public boolean isHourOf(DateTime hour) { return hour != null && isHourOf(hour.getHourOfDay()); }
 
-    public boolean isHourBefore(Datetime hour) { return hour != null && isHourBefore(hour.getHourOfDay()); }
+    public boolean isHourBefore(DateTime hour) { return hour != null && isHourBefore(hour.getHourOfDay()); }
 
-    public boolean isHourAfter(Datetime hour) { return hour != null && isHourAfter(hour.getHourOfDay()); }
+    public boolean isHourAfter(DateTime hour) { return hour != null && isHourAfter(hour.getHourOfDay()); }
 
     public boolean isMinuteOf(int hour, int minute) { return isHourOf(hour) && isMinuteAt(minute); }
 
@@ -1133,15 +1133,15 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return isHourAfter(hour) || (isHourOf(hour) && getMinuteOfHour() > minute);
     }
 
-    public boolean isMinuteOf(Datetime datetime) {
+    public boolean isMinuteOf(DateTime datetime) {
         return datetime != null && isMinuteOf(datetime.getHourOfDay(), datetime.getMinuteOfHour());
     }
 
-    public boolean isMinuteBefore(Datetime datetime) {
+    public boolean isMinuteBefore(DateTime datetime) {
         return datetime != null && isMinuteBefore(datetime.getHourOfDay(), datetime.getMinuteOfHour());
     }
 
-    public boolean isMinuteAfter(Datetime datetime) {
+    public boolean isMinuteAfter(DateTime datetime) {
         return datetime != null && isMinuteAfter(datetime.getHourOfDay(), datetime.getMinuteOfHour());
     }
 
@@ -1159,33 +1159,33 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         return isMinuteAfter(hour, minute) || (isMinuteOf(hour, minute) && getSecondOfMinute() > second);
     }
 
-    public boolean isSecondOf(Datetime time) {
+    public boolean isSecondOf(DateTime time) {
         return time != null && isSecondOf(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute());
     }
 
-    public boolean isSecondBefore(Datetime time) {
+    public boolean isSecondBefore(DateTime time) {
         return time != null && isSecondBefore(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute());
     }
 
-    public boolean isSecondAfter(Datetime time) {
+    public boolean isSecondAfter(DateTime time) {
         return time != null && isSecondAfter(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute());
     }
 
-    private final static DatetimeField[] FIELDS = {
+    private final static DateTimeField[] FIELDS = {
         YEAR, MONTH, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE, SECOND, MILLISECOND
     };
 
-    public boolean isDatetimeOf(Datetime datetime) { return equals(datetime); }
+    public boolean isDatetimeOf(DateTime datetime) { return equals(datetime); }
 
-    public boolean isDatetimeBefore(Datetime datetime) { return before(datetime); }
+    public boolean isDatetimeBefore(DateTime datetime) { return before(datetime); }
 
-    public boolean isDatetimeAfter(Datetime datetime) { return after(datetime); }
+    public boolean isDatetimeAfter(DateTime datetime) { return after(datetime); }
 
     public boolean isDatetimeOf(int... values) {
         if (values == null) {
             return false;
         }
-        DatetimeField[] fields = FIELDS;
+        DateTimeField[] fields = FIELDS;
         final int length = Math.min(values.length, fields.length);
         for (int i = 0; i < length; i++) {
             if (getField(fields[i]) != values[i]) {
@@ -1199,7 +1199,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         if (values == null) {
             return false;
         }
-        DatetimeField[] fields = FIELDS;
+        DateTimeField[] fields = FIELDS;
         final int length = Math.min(values.length, fields.length);
         for (int i = 0; i < length; i++) {
             int thisVal = getField(fields[i]);
@@ -1218,7 +1218,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         if (values == null) {
             return false;
         }
-        DatetimeField[] fields = FIELDS;
+        DateTimeField[] fields = FIELDS;
         final int length = Math.min(values.length, fields.length);
         for (int i = 0; i < length; i++) {
             int thisVal = getField(fields[i]);
@@ -1237,7 +1237,7 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
         if (values == null) {
             return false;
         }
-        DatetimeField[] fields = FIELDS;
+        DateTimeField[] fields = FIELDS;
         final int length = Math.min(values.length, fields.length);
         for (int i = 0; i < length; i++) {
             if (Objects.equals(getField(fields[i]), Integer.parseInt(values[i]))) {
@@ -1395,11 +1395,11 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Datetime && ((Datetime) obj).getTime() == getTime();
+        return obj instanceof DateTime && ((DateTime) obj).getTime() == getTime();
     }
 
     @Override
-    public Datetime clone() { return new Datetime(this); }
+    public DateTime clone() { return new DateTime(this); }
 
     @Override
     public String toString() { return toString(DateUtil.PATTERN); }
@@ -1416,13 +1416,13 @@ public final class Datetime extends Date implements TemporalAccessor, TemporalAd
      *************************************************************************
      */
 
-    public Datetime(int year, int month) { this(year, month, 1); }
+    public DateTime(int year, int month) { this(year, month, 1); }
 
-    public Datetime(int year, int month, int date) { this(year, month, date, 0, 0); }
+    public DateTime(int year, int month, int date) { this(year, month, date, 0, 0); }
 
-    public Datetime(int year, int month, int date, int hrs, int min) { this(year, month, date, hrs, min, 0); }
+    public DateTime(int year, int month, int date, int hrs, int min) { this(year, month, date, hrs, min, 0); }
 
-    public Datetime(int year, int month, int date, int hrs, int min, int sec) {
+    public DateTime(int year, int month, int date, int hrs, int min, int sec) {
         this(DateUtil.toCalendar(year, month, date, hrs, min, sec));
     }
 

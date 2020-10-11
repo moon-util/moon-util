@@ -18,7 +18,7 @@ import java.util.Calendar;
  * @see java.util.Calendar
  * @see java.util.Calendar#JANUARY
  */
-public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster, EnumDescriptor {
+public enum DateTimeMonth implements TemporalAccessor, TemporalAdjuster, EnumDescriptor {
     /**
      * 一月
      */
@@ -57,13 +57,13 @@ public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster, EnumDes
 
     DECEMBER(Calendar.DECEMBER, "十二月");
 
-    private final static DatetimeMonth[] MONTHS = values();
+    private final static DateTimeMonth[] MONTHS = values();
 
     private final int calendarValue;
     private final Month month;
     private final String ChineseText;
 
-    DatetimeMonth(int month, String ChineseText) {
+    DateTimeMonth(int month, String ChineseText) {
         this.ChineseText = ChineseText;
         this.calendarValue = month;
         this.month = Month.of(getValue());
@@ -101,7 +101,7 @@ public enum DatetimeMonth implements TemporalAccessor, TemporalAdjuster, EnumDes
      */
     public String getEnglishShortText() { return name().substring(0, 3); }
 
-    public static DatetimeMonth of(int month) {
+    public static DateTimeMonth of(int month) {
         if (month < 1 || month > 12) {
             throw new DateTimeException("Invalid value for MonthOfYear: " + month);
         }

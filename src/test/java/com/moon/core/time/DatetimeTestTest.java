@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class DatetimeTestTest {
 
-    String fullStringify(Datetime datetime) {
+    String fullStringify(DateTime datetime) {
         return datetime.toString(DateUtil.yyyy_MM_dd_HH_mm_ss_SSS);
     }
 
     @Test
     void testEndOfYear() throws Exception {
-        Datetime datetime = Datetime.ofImmutable(2019, 8, 9, 12, 58, 59, 12, 26);
+        DateTime datetime = DateTime.ofImmutable(2019, 8, 9, 12, 58, 59, 12, 26);
         assertEquals("2019-08-09 12:58:59 012", fullStringify(datetime));
 
         assertEquals("2019-01-01 00:00:00 000", fullStringify(datetime.startOfYear()));

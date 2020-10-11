@@ -1,7 +1,7 @@
 package com.moon.core.lang;
 
 import com.moon.core.time.DateUtil;
-import com.moon.core.time.Datetime;
+import com.moon.core.time.DateTime;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -30,7 +30,7 @@ class LongUtilTestTest {
         System.out.println(DateUtil.format());
 
         Date date = new Date();
-        Datetime datetime = new Datetime(date);
+        DateTime datetime = new DateTime(date);
 
         assertTrue(date.equals(datetime));
     }

@@ -1,7 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.time.CalendarUtil;
-import com.moon.core.time.Datetime;
+import com.moon.core.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,18 +31,18 @@ public class DatetimeTest {
 
     @Test
     void testNow() throws Exception {
-        System.out.println(Datetime.now());
+        System.out.println(DateTime.now());
         System.out.println(CalendarUtil.get(CalendarUtil.getCalendar(), Calendar.ERA));
     }
 
     @Test
     void testOf() throws Exception {
-        System.out.println(Datetime.of());
+        System.out.println(DateTime.of());
     }
 
     @Test
     void testTestOf() throws Exception {
-        Datetime datetime = Datetime.of("2020-10-24 15:23:14");
+        DateTime datetime = DateTime.of("2020-10-24 15:23:14");
         assertEquals(datetime.startOfMinute().toString(), "2020-10-24 15:23:00");
         assertEquals(datetime.plusSeconds(15).toString(), "2020-10-24 15:23:15");
         assertEquals(datetime.startOfHour().toString(), "2020-10-24 15:00:00");
@@ -52,8 +52,8 @@ public class DatetimeTest {
     void testTestOf1() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
         String date = FULL_DATE;
-        assertEquals(DATE, Datetime.of(date).toString());
-        assertEquals(FULL_DATE, Datetime.of(date).toString("yyyy-MM-dd HH:mm:ss SSS"));
+        assertEquals(DATE, DateTime.of(date).toString());
+        assertEquals(FULL_DATE, DateTime.of(date).toString("yyyy-MM-dd HH:mm:ss SSS"));
     }
 
     @Test
@@ -78,19 +78,19 @@ public class DatetimeTest {
 
     @Test
     void testGetYearLength() throws Exception {
-        assertTrue(Datetime.of(2020, 12, 30).isLeapYear());
-        assertTrue(Datetime.of(2020, 12, 30).getYearLength() == 366);
-        assertTrue(Datetime.of(2016, 12, 30).isLeapYear());
-        assertTrue(Datetime.of(2000, 12, 30).isLeapYear());
-        assertFalse(Datetime.of(1900, 12, 30).isLeapYear());
+        assertTrue(DateTime.of(2020, 12, 30).isLeapYear());
+        assertTrue(DateTime.of(2020, 12, 30).getYearLength() == 366);
+        assertTrue(DateTime.of(2016, 12, 30).isLeapYear());
+        assertTrue(DateTime.of(2000, 12, 30).isLeapYear());
+        assertFalse(DateTime.of(1900, 12, 30).isLeapYear());
     }
 
     @Test
     void testGetYearValue() throws Exception {
-        assertTrue(Datetime.of(2020, 12, 30).isLeapYear());
-        assertTrue(Datetime.of(2016, 12, 30).isLeapYear());
-        assertTrue(Datetime.of(2000, 12, 30).isLeapYear());
-        assertFalse(Datetime.of(1900, 12, 30).isLeapYear());
+        assertTrue(DateTime.of(2020, 12, 30).isLeapYear());
+        assertTrue(DateTime.of(2016, 12, 30).isLeapYear());
+        assertTrue(DateTime.of(2000, 12, 30).isLeapYear());
+        assertFalse(DateTime.of(1900, 12, 30).isLeapYear());
     }
 
     @Test
@@ -187,7 +187,7 @@ public class DatetimeTest {
 
     @Test
     void testGet() throws Exception {
-        Datetime datetime = Datetime.now();
+        DateTime datetime = DateTime.now();
         System.out.println(datetime);
         // datetime.with(ChronoField.DAY_OF_MONTH, 20);
         for (ChronoField value : ChronoField.values()) {
@@ -197,13 +197,13 @@ public class DatetimeTest {
 
     @Test
     void testWithTimeInMillis() throws Exception {
-        Datetime datetime = Datetime.now();
+        DateTime datetime = DateTime.now();
         LocalDateTime dateTime0 = datetime.toLocalDateTime();
         System.out.println(dateTime0);
         LocalDateTime dateTime1 = dateTime0.with(ChronoField.DAY_OF_MONTH, 12);
         System.out.println(dateTime1);
         System.out.println(dateTime1.getDayOfMonth());
-        System.out.println(Datetime.of(dateTime1));
+        System.out.println(DateTime.of(dateTime1));
     }
 
     @Test
@@ -361,7 +361,7 @@ public class DatetimeTest {
     @Test
     void testStartOfSecond() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String start = datetime.startOfSecond().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 15:26:48 000", start);
         System.out.println(start);
@@ -370,7 +370,7 @@ public class DatetimeTest {
     @Test
     void testStartOfMinute() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String start = datetime.startOfMinute().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 15:26:00 000", start);
         System.out.println(start);
@@ -379,7 +379,7 @@ public class DatetimeTest {
     @Test
     void testStartOfHour() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String start = datetime.startOfHour().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 15:00:00 000", start);
         System.out.println(start);
@@ -388,7 +388,7 @@ public class DatetimeTest {
     @Test
     void testStartOfDay() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String start = datetime.startOfDay().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 00:00:00 000", start);
         System.out.println(start);
@@ -400,16 +400,16 @@ public class DatetimeTest {
 
     @Test
     void testTestStartOfWeek() throws Exception {
-        Datetime datetime = Datetime.of(2020, 7, 25, 10, 29, 25);
+        DateTime datetime = DateTime.of(2020, 7, 25, 10, 29, 25);
         System.out.println(datetime);
         System.out.println(datetime.startOfWeek());
         System.out.println(datetime.endOfWeek());
 
-        datetime = Datetime.of(2020, 7, 25, 10, 29, 25);
+        datetime = DateTime.of(2020, 7, 25, 10, 29, 25);
         System.out.println(datetime.startOfWeek(DayOfWeek.SUNDAY));
         System.out.println(datetime.endOfWeek(DayOfWeek.SUNDAY));
 
-        datetime = Datetime.of(2020, 7, 25, 10, 29, 25);
+        datetime = DateTime.of(2020, 7, 25, 10, 29, 25);
         System.out.println(datetime.startOfWeek(DayOfWeek.TUESDAY));
         System.out.println(datetime.endOfWeek(DayOfWeek.TUESDAY));
     }
@@ -417,7 +417,7 @@ public class DatetimeTest {
     @Test
     void testStartOfMonth() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String start = datetime.startOfMonth().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-01 00:00:00 000", start);
         System.out.println(start);
@@ -426,7 +426,7 @@ public class DatetimeTest {
     @Test
     void testStartOfYear() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String start = datetime.startOfYear().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-01-01 00:00:00 000", start);
         System.out.println(start);
@@ -435,7 +435,7 @@ public class DatetimeTest {
     @Test
     void testEndOfSecond() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String end = datetime.endOfSecond().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 15:26:48 999", end);
         System.out.println(end);
@@ -444,7 +444,7 @@ public class DatetimeTest {
     @Test
     void testEndOfMinute() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String end = datetime.endOfMinute().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 15:26:59 999", end);
         System.out.println(end);
@@ -453,7 +453,7 @@ public class DatetimeTest {
     @Test
     void testEndOfHour() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String end = datetime.endOfHour().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 15:59:59 999", end);
         System.out.println(end);
@@ -462,7 +462,7 @@ public class DatetimeTest {
     @Test
     void testEndOfDay() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String end = datetime.endOfDay().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-23 23:59:59 999", end);
         System.out.println(end);
@@ -479,7 +479,7 @@ public class DatetimeTest {
     @Test
     void testEndOfMonth() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String end = datetime.endOfMonth().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-08-31 23:59:59 999", end);
         System.out.println(end);
@@ -488,7 +488,7 @@ public class DatetimeTest {
     @Test
     void testEndOfYear() throws Exception {
         String FULL_DATE = "2019-08-23 15:26:48 125";
-        Datetime datetime = Datetime.of(FULL_DATE);
+        DateTime datetime = DateTime.of(FULL_DATE);
         String endOfYear = datetime.endOfYear().toString("yyyy-MM-dd HH:mm:ss SSS");
         assertEquals("2019-12-31 23:59:59 999", endOfYear);
         System.out.println(endOfYear);

@@ -9,11 +9,10 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.LongAccessor;
 import com.moon.core.time.DateTimeUtil;
 import com.moon.core.time.DateUtil;
-import com.moon.core.time.Datetime;
+import com.moon.core.time.DateTime;
 import com.moon.core.util.SetUtil;
 import com.moon.core.util.function.TableConsumer;
 import com.moon.core.util.interfaces.Stringify;
-import org.joda.time.DateTime;
 import org.joda.time.MutableDateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
@@ -254,7 +253,7 @@ class JSONStringer implements Stringify {
 
             @Override
             public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(Date.class, Time.class, java.sql.Date.class, Timestamp.class, Datetime.class);
+                return SetUtil.newSet(Date.class, Time.class, java.sql.Date.class, Timestamp.class, DateTime.class);
             }
         },
         JDK8_DATE {
@@ -637,7 +636,7 @@ class JSONStringer implements Stringify {
 
             @Override
             public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(DateTime.class,
+                return SetUtil.newSet(org.joda.time.DateTime.class,
                     org.joda.time.Instant.class,
                     org.joda.time.LocalDateTime.class,
                     MutableDateTime.class);

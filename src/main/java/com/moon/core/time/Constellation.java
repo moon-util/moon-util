@@ -54,7 +54,7 @@ public enum Constellation implements EnumDescriptor {
     @Override
     public String getText() { return text; }
 
-    public boolean isMatches(Datetime datetime) {
+    public boolean isMatches(DateTime datetime) {
         int month = datetime.getMonthValue();
         int day = datetime.getDayOfMonth();
         MonthDay start = MonthDay.of(startMonth, startDayOfMonth);

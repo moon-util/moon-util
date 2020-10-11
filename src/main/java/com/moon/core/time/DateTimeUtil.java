@@ -1159,16 +1159,15 @@ public final class DateTimeUtil {
      */
 
     public static LocalDateTime parseToDateTime(CharSequence dateString) {
-        return dateString == null ? null : toDateTime(CalendarUtil.parseToCalendar(dateString.toString()));
+        return dateString == null ? null : toDateTime(CalendarUtil.extractDateTimeFields(dateString));
     }
 
     public static LocalDate parseToDate(CharSequence dateString) {
-        return dateString == null ? null : toDate(CalendarUtil.extractDateFields(dateString.toString()));
+        return dateString == null ? null : toDate(CalendarUtil.extractDateTimeFields(dateString));
     }
 
-    public static LocalTime parseToTime(CharSequence dateString) {
-        List<String> numerics = StringUtil.extractNumerics(dateString);
-        return numerics.isEmpty() ? null : toTime(IntUtil.toInts(numerics, Integer::parseInt));
+    public static LocalTime parseToTime(CharSequence timeString) {
+        return timeString == null ? null : toTime(CalendarUtil.extractTimeFields(timeString));
     }
 
     /*

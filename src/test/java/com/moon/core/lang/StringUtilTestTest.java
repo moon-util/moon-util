@@ -1,12 +1,11 @@
 package com.moon.core.lang;
 
-import com.moon.core.time.Datetime;
+import com.moon.core.time.DateTime;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.validator.Validator;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -888,9 +887,9 @@ class StringUtilTestTest {
 
     @Test
     void testDatetime() throws Exception {
-        String date = Datetime.now().toString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        String date = DateTime.now().toString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         System.out.println(date);
-        date = Datetime.now().toString(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        date = DateTime.now().toString(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         System.out.println(date);
     }
 

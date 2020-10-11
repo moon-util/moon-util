@@ -1,7 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.time.CalendarUtil;
-import com.moon.core.time.Datetime;
+import com.moon.core.time.DateTime;
 import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
@@ -20,7 +20,7 @@ class DatetimeTestTest {
     @Test
     void testOf() {
         Calendar calendar = CalendarUtil.getCalendar();
-        Datetime datetime = new Datetime(calendar);
+        DateTime datetime = new DateTime(calendar);
         for (DayOfWeek value : DayOfWeek.values()) {
             datetime.setFirstDayOfWeek(value);
             assertEquals(datetime.getFirstDayOfWeek(), value);
@@ -36,10 +36,10 @@ class DatetimeTestTest {
 
         LocalTime time = LocalTime.now();
         System.out.println(time.toNanoOfDay());
-        Datetime datenow = Datetime.ofToday(time);
+        DateTime datenow = DateTime.ofToday(time);
         System.out.println(datenow.getNanoOfDay());
         assertEquals(time.toNanoOfDay(), datenow.getNanoOfDay());
-        String fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(Datetime.now());
+        String fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         System.out.println(fmt);
 
         System.out.println("======================================");
@@ -49,11 +49,11 @@ class DatetimeTestTest {
             assertEquals(value, datetime.getDayOfWeek());
         }
 
-        System.out.println(Datetime.now().getDayOfWeek());
+        System.out.println(DateTime.now().getDayOfWeek());
 
-        String endOfMonth = Datetime.now().endOfMonth().toString();
+        String endOfMonth = DateTime.now().endOfMonth().toString();
         System.out.println(endOfMonth);
-        Datetime dt = Datetime.of(2000, 2, 12);
+        DateTime dt = DateTime.of(2000, 2, 12);
         System.out.println(dt.endOfMonth().toString());
     }
 }

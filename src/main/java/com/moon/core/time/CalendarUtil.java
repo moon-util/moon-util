@@ -3,16 +3,14 @@ package com.moon.core.time;
 import com.moon.core.lang.LongUtil;
 import com.moon.core.util.TestUtil;
 import com.moon.core.util.validator.ResidentID18Validator;
-import org.joda.time.DateTime;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.lang.Integer.parseInt;
@@ -42,7 +40,7 @@ public class CalendarUtil {
         static {
             boolean importedJoda;
             try {
-                DateTime.now();
+                org.joda.time.DateTime.now();
                 importedJoda = true;
             } catch (Throwable t) {
                 importedJoda = false;
@@ -52,6 +50,16 @@ public class CalendarUtil {
     }
 
     protected CalendarUtil() { noInstanceError(); }
+
+    /**
+     * 最小毫秒数：1970-01-01 08:00:00 000
+     */
+    public final static long MIN_TIME_IN_MILLIS = 0;
+
+    /**
+     * 最大毫秒数：9999-12-31 23:59:59 999
+     */
+    public final static long MAX_TIME_IN_MILLIS = 253402271999999L;
 
     public final static String yyyy_MM_dd_HH_mm_ss_SSS = "yyyy-MM-dd HH:mm:ss SSS";
     public final static String yyyy_MM_dd_hh_mm_ss_SSS = "yyyy-MM-dd hh:mm:ss SSS";
@@ -229,7 +237,7 @@ public class CalendarUtil {
     public final static Calendar startOfYear(Calendar calendar) { return toCalendar(getYear(calendar)); }
 
     public final static Calendar endOfYear(Calendar calendar) {
-        return new Datetime(calendar).endOfYear().originCalendar();
+        return new DateTime(calendar).endOfYear().originCalendar();
     }
 
     /*
@@ -661,10 +669,10 @@ public class CalendarUtil {
      *
      * @param dateString 符合格式 "yyyy-MM-dd HH:mm:ss SSS" 的字符串
      *
-     * @see #extractDateFields(String)
+     * @see #extractDateTimeFields(CharSequence)
      */
     public static Calendar parseToCalendar(String dateString) {
-        return toCalendar(extractDateFields(dateString));
+        return toCalendar(extractDateTimeFields(dateString));
     }
 
     public static <T> T parseDateString(String dateString, Function<Calendar, T> transformer) {
@@ -672,15 +680,17 @@ public class CalendarUtil {
     }
 
     /**
-     * 提取日期字段
+     * 提取日期各个字段值
      * <p>
      * 要求符合格式：yyyy-MM-dd HH:mm:ss SSS 的一个或多个字段，并且每个字段的位数一致
-     * 1. 超出部分将忽略
-     * 2. 不足部分用该字段初始值填充，月日填充 1，时间各字段填充 0；
-     * 3. 如果各字段之间有有效的非数字符号（汉字、- 号、/ 号、: 号、. 号等）间隔，间隔符号之间的数字就是字段值，格式无特殊要求
-     * 4. 如果只有连续的数字则严格要求年份是 4 位，月日时分秒字段都是两位，最后紧接的最多三位连续数字是毫秒数
-     * <p>
+     * <ul>
+     * <li>1. 超出部分将忽略</li>
+     * <li>2. 不足部分用该字段初始值填充，月日填充 1，时间各字段填充 0；</li>
+     * <li>3. 如果各字段之间有有效的非数字符号（汉字、- 号、/ 号、: 号、. 号等）间隔，间隔符号之间的数字就是字段值，格式无特殊要求</li>
+     * <li>4. 如果只有连续的数字则严格要求年份是 4 位，月日时分秒字段都是两位，最后紧接的最多三位连续数字是毫秒数</li>
+     * </ul>
      * 示例：
+     * <pre>
      * |-----------------------------------------------------------------------------------|
      * | Date String                 | Year | Month | Day | Hour | Minute | Second | Micro |
      * |-----------------------------|------|-------|-----|------|--------|--------|-------|
@@ -699,24 +709,52 @@ public class CalendarUtil {
      * | 999                         | 999  | 01    | 01  | 00   | 00     | 00     | 00    |
      * | 1                           | 1    | 01    | 01  | 00   | 00     | 00     | 00    |
      * |-----------------------------------------------------------------------------------|
+     * </pre>
      *
-     * @param dateString 输入的日期字符串
+     * @param datetimeString 输入的日期字符串
      *
-     * @return 日期年月日时分秒毫秒各字段的值或如果字符串中不包含任何数字时返回 null
+     * @return 日期年、月、日、时、分、秒、毫秒各字段的值或如果字符串中不包含任何数字时返回 null
      */
-    @SuppressWarnings("all")
-    public final static int[] extractDateFields(String dateString) {
-        if (dateString == null || dateString.length() == 0) {
+    public final static int[] extractDateTimeFields(CharSequence datetimeString) {
+        return doExtractFields(datetimeString, () -> new int[]{1970, 1, 1, 0, 0, 0, 0}, 4, 4);
+    }
+
+    /**
+     * 提取时间各个字段值，参考{@link #extractDateTimeFields(CharSequence)}
+     * <p>
+     * 要求符合格式：HH:mm:ss SSS 的一个或多个字段，并且每个字段的位数一致
+     *
+     * @param timeString 时间字符串
+     *
+     * @return 时间时、分、秒、毫秒各字段的值或如果字符串中不包含任何数字时返回 null
+     */
+    public final static int[] extractTimeFields(CharSequence timeString) {
+        return doExtractFields(timeString, () -> new int[]{0, 0, 0, 0}, 3, 2);
+    }
+
+    /**
+     * 提前时间日期各字段值
+     *
+     * @param datetimeString      日期字符串
+     * @param resultValuesBuilder 返回值构造器
+     * @param sliceMaxLength      所有字段片段最大长度
+     * @param firstSliceMaxLength 第一项字段片段最大长度
+     *
+     * @return 日期各字段值组成的数组
+     */
+    protected static int[] doExtractFields(
+        CharSequence datetimeString, Supplier<int[]> resultValuesBuilder, int sliceMaxLength, int firstSliceMaxLength
+    ) {
+        if (datetimeString == null || datetimeString.length() == 0) {
             return null;
         }
-        int maxIdx = 4, fieldIdx = 0, valuesIdx = 0;
-        char[] chars = dateString.toCharArray(), field = new char[maxIdx];
-        int strLen = chars.length, strIdx = skipNonNumeric(chars, 0, strLen);
+        char[] chars = datetimeString.toString().toCharArray(), field = new char[sliceMaxLength];
+        int fieldIdx = 0, valuesIdx = 0, strLen = chars.length, strIdx = skipNonNumeric(chars, 0, strLen);
         if (strIdx == strLen) {
             return null;
         }
-        final int[] values = {1970, 1, 1, 0, 0, 0, 0};
-        int last = Math.min(strLen, maxIdx), vLastIdx = values.length - 1;
+        final int[] values = resultValuesBuilder.get();
+        int last = Math.min(strLen, firstSliceMaxLength), vLastIdx = values.length - 1;
 
         for (char ch; strIdx < strLen; ) {
             if ((ch = chars[strIdx++]) > 47 && ch < 58) {
@@ -737,13 +775,93 @@ public class CalendarUtil {
             return null;
         }
         if (fieldIdx > 0) {
-            values[valuesIdx++] = toInt(field, fieldIdx);
+            values[valuesIdx] = toInt(field, fieldIdx);
         }
         return values;
     }
 
     private final static int toInt(char[] chars, int lastIdx) {
         return Integer.parseInt(new String(chars, 0, lastIdx));
+    }
+
+    /**
+     * 是否是合法的日期字段列表
+     *
+     * @param values 日期各字段值按顺序列表
+     *
+     * @return 日期各字段值符合要求范围值时返回 true，否则返回 false
+     */
+    public final static boolean isValidDateTimeFields(int... values) {
+        return isValidDateTimeFields(0, 9999, false, values);
+    }
+
+    /**
+     * 是否是合法的日期字段列表
+     *
+     * @param minYear    最小年份
+     * @param maxYear    最大年份
+     * @param leapSecond 是否闰秒（通常都是 false）
+     * @param values     日期各字段值按顺序列表
+     *
+     * @return 日期各字段值符合要求范围值时返回 true，否则返回 false
+     */
+    @SuppressWarnings("all")
+    public final static boolean isValidDateTimeFields(int minYear, int maxYear, boolean leapSecond, int... values) {
+        boolean validated = true;
+        int field, length = Math.max(values == null ? 0 : values.length, 7);
+        switch (length) {
+            case 0:
+                return false;
+            case 7:
+                // 毫秒
+                if ((field = values[6]) < 0 || field > 999) {
+                    validated = false;
+                    break;
+                }
+            case 6:
+                // 秒
+                if ((field = values[5]) < 0 || field > (leapSecond ? 60 : 59)) {
+                    validated = false;
+                    break;
+                }
+            case 5:
+                // 分
+                if ((field = values[4]) < 0 || field > 59) {
+                    validated = false;
+                    break;
+                }
+            case 4:
+                // 时
+                if ((field = values[3]) < 0 || field > 23) {
+                    validated = false;
+                    break;
+                }
+            case 3:
+                // 日
+                if ((field = values[1]) < 1 || field > 12) {
+                    validated = false;
+                    break;
+                } else {
+                    int lengthOfMonth = Month.of(field).length(Year.isLeap(values[0]));
+                    if ((field = values[2]) < 1 || field > lengthOfMonth) {
+                        validated = false;
+                        break;
+                    }
+                }
+            case 2:
+                // 月
+                if ((field = values[1]) < 1 || field > 12) {
+                    validated = false;
+                    break;
+                }
+            case 1:
+                // 年
+                if ((field = values[0]) < minYear || field > maxYear) {
+                    validated = false;
+                    break;
+                }
+        }
+        return validated;
     }
 
     /**

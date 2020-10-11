@@ -1,6 +1,6 @@
 package com.moon.core.util;
 
-import com.moon.core.time.Datetime;
+import com.moon.core.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ class DateTimeFieldTestTest {
 
     @Test
     void testName() throws Exception {
-        Datetime datetime = Datetime.of();
+        DateTime datetime = DateTime.of();
         LocalTime time = datetime.toLocalTime();
         System.out.println(datetime.getNanoOfSecond());
         System.out.println(time.getNano());

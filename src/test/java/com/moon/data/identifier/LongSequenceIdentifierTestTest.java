@@ -3,7 +3,7 @@ package com.moon.data.identifier;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.time.DatePatternConst;
 import com.moon.core.time.DateUtil;
-import com.moon.core.time.Datetime;
+import com.moon.core.time.DateTime;
 import com.moon.poi.excel.ExcelUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -81,7 +81,7 @@ class LongSequenceIdentifierTestTest {
 
     @Test
     void testStartTime() throws Exception {
-        System.out.println(Datetime.of(2020, 9, 1, 0, 0, 0, 0, 0).getTime());
+        System.out.println(DateTime.of(2020, 9, 1, 0, 0, 0, 0, 0).getTime());
         ;
 
         final long twepoch = 1288834974657L;

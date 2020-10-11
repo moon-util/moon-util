@@ -2,13 +2,13 @@ package com.moon.core.util;
 
 import com.moon.core.time.CalendarUtil;
 import com.moon.core.time.DateUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Calendar;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author moonsky
@@ -68,36 +68,55 @@ class CalendarUtilTestTest {
     @Test
     void testExtractDateFields() {
         int[] excepted0 = {1980, 2, 3, 8, 9, 59, 23}, parsed;
-        parsed = CalendarUtil.extractDateFields("1980-02/03 08.09*59 23");
+        parsed = CalendarUtil.extractDateTimeFields("1980-02/03 08.09*59 23");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980-2/3 8.9*59 023");
+        parsed = CalendarUtil.extractDateTimeFields("1980-2/3 8.9*59 023");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980 02 03 08 09 59 23");
+        parsed = CalendarUtil.extractDateTimeFields("1980 02 03 08 09 59 23");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980 2 3 8 09 59 023");
+        parsed = CalendarUtil.extractDateTimeFields("1980 2 3 8 09 59 023");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980年02月03日08095923");
+        parsed = CalendarUtil.extractDateTimeFields("1980年02月03日08095923");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980年02月3日080959023");
+        parsed = CalendarUtil.extractDateTimeFields("1980年02月3日080959023");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980-02-03 08:09:59.23");
+        parsed = CalendarUtil.extractDateTimeFields("1980-02-03 08:09:59.23");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980-2-03 08:9:59.23");
+        parsed = CalendarUtil.extractDateTimeFields("1980-2-03 08:9:59.23");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980年02月03日08时09分59秒23");
+        parsed = CalendarUtil.extractDateTimeFields("1980年02月03日08时09分59秒23");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980年2月03日8时09分59秒023");
+        parsed = CalendarUtil.extractDateTimeFields("1980年2月03日8时09分59秒023");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980 020308 095923");
+        parsed = CalendarUtil.extractDateTimeFields("1980 020308 095923");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980年2月3日8时9分59秒23");
+        parsed = CalendarUtil.extractDateTimeFields("1980年2月3日8时9分59秒23");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("日期19800203时间080959毫秒23");
+        parsed = CalendarUtil.extractDateTimeFields("日期19800203时间080959毫秒23");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("日期1980023时间080959毫秒023");
+        parsed = CalendarUtil.extractDateTimeFields("日期1980023时间080959毫秒023");
         assertArrayEquals(excepted0, parsed);
-        parsed = CalendarUtil.extractDateFields("1980020308095923");
+        parsed = CalendarUtil.extractDateTimeFields("1980020308095923");
         assertArrayEquals(excepted0, parsed);
         System.out.println(Arrays.toString(parsed));
+    }
+
+    @Test
+    void testParseDateTime() {
+        assertFalse(CalendarUtil.isValidDateTimeFields(CalendarUtil.extractDateTimeFields("1602411650738")));
+        System.out.println("1602411650738");
+        String newStr = Arrays.toString(CalendarUtil.extractDateTimeFields("1602411650738"));
+        System.out.println(newStr);
+        System.out.println("===================================================");
+        System.out.println("253402271999999" + "\t" + Long.MAX_VALUE);
+        newStr = Arrays.toString(CalendarUtil.extractDateTimeFields("253402271999999"));
+        System.out.println(newStr);
+        System.out.println("===================================================");
+        Calendar start = CalendarUtil.toCalendar(1970, 1, 1, 8, 0, 0, 0);
+        Calendar end = CalendarUtil.toCalendar(9999, 12, 31, 23, 59, 59, 999);
+        System.out
+            .println(CalendarUtil.format(start, CalendarUtil.yyyy_MM_dd_HH_mm_ss_SSS) + "\t" + start.getTimeInMillis());
+        System.out
+            .println(CalendarUtil.format(end, CalendarUtil.yyyy_MM_dd_HH_mm_ss_SSS) + "\t" + end.getTimeInMillis());
     }
 }
