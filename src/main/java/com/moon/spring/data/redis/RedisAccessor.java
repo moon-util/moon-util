@@ -1,6 +1,7 @@
 package com.moon.spring.data.redis;
 
 import com.moon.core.util.ListUtil;
+import com.moon.core.util.Storage;
 import org.springframework.data.redis.core.*;
 
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public class RedisAccessor<K, V> {
+public class RedisAccessor<K, V> implements Storage<K, V> {
 
     private final RedisTemplate<K, V> template;
     private final ExceptionHandler strategy;
@@ -112,6 +113,7 @@ public class RedisAccessor<K, V> {
      *
      * @return true 存在 false不存在
      */
+    @Override
     public boolean hasKey(K key) {
         try {
             return falseIfNull(template.hasKey(key));
@@ -159,7 +161,16 @@ public class RedisAccessor<K, V> {
      *
      * @return 值
      */
+    @Override
     public V get(K key) { return key == null ? null : value().get(key); }
+
+    /**
+     * 删除缓存
+     *
+     * @param key 指定 key
+     */
+    @Override
+    public void remove(K key) { delete(key); }
 
     /**
      * 普通缓存放入
@@ -169,12 +180,12 @@ public class RedisAccessor<K, V> {
      *
      * @return true 成功 false失败
      */
-    public boolean set(K key, V value) {
+    @Override
+    public void set(K key, V value) {
         try {
             value().set(key, value);
-            return true;
         } catch (Exception e) {
-            return onExceptionThenFalse(e);
+            onExceptionThenFalse(e);
         }
     }
 

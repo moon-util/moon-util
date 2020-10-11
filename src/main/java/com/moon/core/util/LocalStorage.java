@@ -15,7 +15,7 @@ import java.util.function.Function;
 /**
  * @author moonsky
  */
-public class LocalStorage<T> {
+public class LocalStorage<T> implements Storage<String, T> {
 
     private final static String PATH_NAMESPACE;
     private final static char CHAR_HYPHEN = '-';
@@ -57,6 +57,7 @@ public class LocalStorage<T> {
         return storageMap.computeIfAbsent(namespace, LocalStorage::new);
     }
 
+    @Override
     public void set(String key, T value) {
         set(key, value, false);
     }
@@ -84,6 +85,7 @@ public class LocalStorage<T> {
         }
     }
 
+    @Override
     public T get(String key) { return getNullable(key); }
 
     private T getNullable(String key) {
@@ -95,9 +97,7 @@ public class LocalStorage<T> {
         if (enduranceFile.exists()) {
             FinalAccessor<String> accessor = FinalAccessor.of();
             try (FileReader reader = new FileReader(enduranceFile)) {
-                IteratorUtil.forEachLines(reader, line -> {
-                    accessor.set(line);
-                });
+                IteratorUtil.forEachLines(reader, accessor::set);
                 if (accessor.isAbsent()) {
                     return null;
                 }
@@ -108,12 +108,13 @@ public class LocalStorage<T> {
                 }
                 return getDeserializer().apply(serialized);
             } catch (IOException e) {
-                ThrowUtil.unchecked(e);
+                return ThrowUtil.unchecked(e);
             }
         }
         return null;
     }
 
+    @Override
     public void remove(String key) {
         localCached.remove(key);
         FileUtil.delete(new File(namespace, key));
@@ -124,7 +125,8 @@ public class LocalStorage<T> {
         FileUtil.deleteAllFiles(new File(namespace));
     }
 
-    public boolean contains(String key) {
+    @Override
+    public boolean hasKey(String key) {
         return localCached.containsKey(key) || new File(namespace, key).exists();
     }
 
@@ -141,5 +143,5 @@ public class LocalStorage<T> {
         return (Function<byte[], T>) DESERIALIZER;
     }
 
-    protected int getCacheMemoryLimit() { return 20480; }
+    protected int getCacheMemoryLimit() { return 10240; }
 }
