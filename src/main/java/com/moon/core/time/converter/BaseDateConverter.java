@@ -1,5 +1,7 @@
 package com.moon.core.time.converter;
 
+import com.moon.core.time.DateUtil;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -161,14 +163,14 @@ public abstract class BaseDateConverter {
     protected final static Date parseToDate(CharSequence value) {
         String dateStr = value.toString().trim();
         DateFormat format = getFormat(dateStr);
-        if (format != null) {
-            try {
-                return format.parse(dateStr);
-            } catch (ParseException e) {
-                return null;
-            }
+        if (format == null) {
+            return DateUtil.parseToDate(dateStr);
         }
-        return null;
+        try {
+            return format.parse(dateStr);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     protected static DateFormat getFormat(String value) { return findFormat(value); }

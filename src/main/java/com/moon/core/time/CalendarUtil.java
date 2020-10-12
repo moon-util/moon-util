@@ -7,9 +7,11 @@ import com.moon.core.util.validator.ResidentID18Validator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 import java.util.function.Supplier;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
@@ -110,20 +112,14 @@ public class CalendarUtil {
     public final static boolean isToday(Calendar value) { return value != null && isSameDay(value, getInstance()); }
 
     public final static boolean isSameDay(Calendar value, Calendar other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other);
+        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
+            value) == getDayOfMonth(other);
     }
 
     public final static boolean isSameTime(Calendar value, Calendar other) {
-        return value != null &&
-            getYear(value) == getYear(other) &&
-            getMonth(value) == getMonth(other) &&
-            getDayOfMonth(value) == getDayOfMonth(other) &&
-            getHour(value) == getHour(other) &&
-            getMinute(value) == getMinute(other) &&
-            getSecond(value) == getSecond(other);
+        return value != null && getYear(value) == getYear(other) && getMonth(value) == getMonth(other) && getDayOfMonth(
+            value) == getDayOfMonth(other) && getHour(value) == getHour(other) && getMinute(value) == getMinute(other) && getSecond(
+            value) == getSecond(other);
     }
 
     public final static boolean isBefore(Calendar value, Calendar other) {
@@ -957,28 +953,43 @@ public class CalendarUtil {
     }
 
     /**
-     * 字符串解析为 Calendar
-     * 1. 如果字符串是数字：
-     * 1.1 位数小于 5，则认为是一个年份，解析为{@code value}年最初时刻
-     * 1.2 位数大于 4，则认为是时间戳，解析为时间戳对应的{@code Calendar}
-     * 2. 其他情况则认为是符合：yyyy-MM-dd HH:mm:ss SSS 一个或多个字段的日期字符串
+     * 这里不需要检查 null：因为{@code extractDateTimeFields}、{@code isValidDateTimeFields}、
+     * {@code TestUtil.isDigit}、{@code StringUtil.isAllMatches}均有检查
      *
-     * @param value
+     * @param datetimeString
+     * @param fieldsValueTransformer
+     * @param timestampTransformer
+     * @param <T>
      *
      * @return
      */
-    public final static Calendar toCalendar(CharSequence value) {
-        if (value == null) { return null; }
-        String temp = value.toString();
-        if (TestUtil.isDigit(temp)) {
-            if (temp.length() < 5) {
-                int[] values = {parseInt(temp)};
-                return toCalendar(values);
-            } else {
-                return toCalendar(LongUtil.toLong(temp));
-            }
+    final static <T> T transformDateTimeString(
+        CharSequence datetimeString, Function<int[], T> fieldsValueTransformer, LongFunction<T> timestampTransformer
+    ) {
+        int[] fields = extractDateTimeFields(datetimeString);
+        if (isValidDateTimeFields(fields)) {
+            return fieldsValueTransformer.apply(fields);
+        } else if (TestUtil.isDigit(datetimeString)) {
+            return timestampTransformer.apply(Long.parseLong(datetimeString.toString()));
         }
-        return parseToCalendar(temp);
+        throw new DateTimeParseException("不识别日期格式: " + datetimeString, datetimeString, 0);
+    }
+
+    /**
+     * 字符串解析为 Calendar
+     * 1. 首先认为是符合：yyyy-MM-dd HH:mm:ss SSS 一个或多个字段的日期字符串
+     * 2. 其次如果字符串是连续数字，则认为是时间戳毫秒数解析
+     * <p>
+     * 3. 如果是连续数字，且是日期字符串类似 yyyyMMddHHmmssSSS 的一个或多个字段值，请手动调用方法{@link #parseToCalendar(String)}
+     *
+     * @param value 日期时间字符串
+     *
+     * @return Calendar 对象
+     *
+     * @see #transformDateTimeString(CharSequence, Function, LongFunction)
+     */
+    public final static Calendar toCalendar(CharSequence value) {
+        return transformDateTimeString(value, CalendarUtil::toCalendar, CalendarUtil::toCalendar);
     }
 
     public final static Calendar toCalendar(Object value) {
@@ -1023,13 +1034,19 @@ public class CalendarUtil {
                 calendar.set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i], minute);
                 break;
             case 5:
-                calendar
-                    .set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i++], fieldsValue[i++]);
+                calendar.set(fieldsValue[i++],
+                    fieldsValue[i++] - 1,
+                    fieldsValue[i++],
+                    fieldsValue[i++],
+                    fieldsValue[i++]);
                 break;
             default:
-                calendar
-                    .set(fieldsValue[i++], fieldsValue[i++] - 1, fieldsValue[i++], fieldsValue[i++], fieldsValue[i++],
-                        fieldsValue[i++]);
+                calendar.set(fieldsValue[i++],
+                    fieldsValue[i++] - 1,
+                    fieldsValue[i++],
+                    fieldsValue[i++],
+                    fieldsValue[i++],
+                    fieldsValue[i++]);
                 if (len > max) {
                     calendar.set(MILLISECOND, fieldsValue[i]);
                 }
@@ -1043,7 +1060,13 @@ public class CalendarUtil {
     }
 
     public final static Calendar overrideCalendar(Calendar calendar, LocalDate date, LocalTime time) {
-        return overrideCalendar(calendar, date.getYear(), date.getMonthValue(), date.getDayOfMonth(), time.getHour(),
-            time.getMinute(), time.getSecond(), time.getNano() / 1000000);
+        return overrideCalendar(calendar,
+            date.getYear(),
+            date.getMonthValue(),
+            date.getDayOfMonth(),
+            time.getHour(),
+            time.getMinute(),
+            time.getSecond(),
+            time.getNano() / 1000000);
     }
 }

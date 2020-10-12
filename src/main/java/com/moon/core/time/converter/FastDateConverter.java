@@ -8,6 +8,7 @@ import com.alibaba.fastjson.parser.deserializer.Jdk8DateCodec;
 import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import com.alibaba.fastjson.serializer.DateCodec;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.moon.core.time.DateUtil;
 import org.joda.time.DateTime;
 
 import java.lang.reflect.Type;
@@ -42,12 +43,15 @@ public class FastDateConverter extends BaseDateConverter {
      */
     public static ParserConfig getParserConfig(ParserConfig config) {
         config.putDeserializer(LocalDateTime.class, new FastDateTimeDeserializer());
+        config.putDeserializer(LocalDate.class, new FastDateTimeDeserializer());
         config.putDeserializer(java.sql.Date.class, new FastSqlDateDeserializer());
         config.putDeserializer(Timestamp.class, new FastTimestampDeserializer());
         config.putDeserializer(Calendar.class, new FastCalendarDeserializer());
         config.putDeserializer(Time.class, new FastSqlTimeDeserializer());
         config.putDeserializer(Date.class, new FastDateDeserializer());
-        config.putDeserializer(DateTime.class, new FastJodaDateTimeParser());
+        if (DateUtil.isImportedJodaTime()) {
+            config.putDeserializer(DateTime.class, new FastJodaDateTimeParser());
+        }
         return config;
     }
 

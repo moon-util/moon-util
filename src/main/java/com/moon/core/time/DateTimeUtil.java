@@ -1158,14 +1158,47 @@ public final class DateTimeUtil {
      * ----------------------------------------------------------------------------------
      */
 
+    /**
+     * 将时间字符串中解析为{@link LocalDateTime}
+     * <p>
+     * 要求符合格式：yyyy-MM-dd HH:mm:ss SSS 的一个或多个字段，并且每个字段的位数一致
+     *
+     * @param dateString 日期字符串
+     *
+     * @return 如果能正常解析返回 LocalDateTime 实例，否则返回 null
+     *
+     * @see CalendarUtil#extractDateTimeFields(CharSequence)
+     */
     public static LocalDateTime parseToDateTime(CharSequence dateString) {
-        return dateString == null ? null : toDateTime(CalendarUtil.extractDateTimeFields(dateString));
+        return CalendarUtil.transformDateTimeString(dateString, DateTimeUtil::toDateTime, DateTimeUtil::toDateTime);
     }
 
+    /**
+     * 将时间字符串中解析为{@link LocalDate}
+     * <p>
+     * 要求符合格式：yyyy-MM-dd 的一个或多个字段，并且每个字段的位数一致
+     *
+     * @param dateString 日期字符串
+     *
+     * @return 如果能正常解析返回 LocalDate 实例，否则返回 null
+     *
+     * @see CalendarUtil#extractDateTimeFields(CharSequence)
+     */
     public static LocalDate parseToDate(CharSequence dateString) {
-        return dateString == null ? null : toDate(CalendarUtil.extractDateTimeFields(dateString));
+        return CalendarUtil.transformDateTimeString(dateString, DateTimeUtil::toDate, DateTimeUtil::toDate);
     }
 
+    /**
+     * 将时间字符串中解析为{@link LocalTime}
+     * <p>
+     * 要求符合格式：HH:mm:ss SSS 的一个或多个字段，并且每个字段的位数一致
+     *
+     * @param timeString 时间字符串
+     *
+     * @return 如果能正常解析返回 LocalTime 实例，否则返回 null
+     *
+     * @see CalendarUtil#extractTimeFields(CharSequence)
+     */
     public static LocalTime parseToTime(CharSequence timeString) {
         return timeString == null ? null : toTime(CalendarUtil.extractTimeFields(timeString));
     }
