@@ -4,8 +4,8 @@ import com.moon.core.util.logger.Logger;
 import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.accessor.AccessorRegistration;
 import com.moon.spring.data.redis.ExceptionHandler;
-import com.moon.spring.data.redis.RedisAccessor;
-import com.moon.spring.data.redis.StringRedisAccessor;
+import com.moon.spring.data.redis.RedisService;
+import com.moon.spring.data.redis.StringRedisService;
 import com.moon.spring.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportSelector;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -44,7 +45,7 @@ public class MoonUtilConfiguration implements ImportSelector {
         try {
             ApplicationRunner.class.toString();
             classes.add(RecordableApplicationRunner.class.getName());
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {
             if (logger.isInfoEnabled()) {
                 logger.info("可能存在未注册服务影响使用");
             }
@@ -52,27 +53,27 @@ public class MoonUtilConfiguration implements ImportSelector {
         try {
             RedisTemplate.class.toString();
             classes.add(RedisConfiguration.class.getName());
-        } catch (Throwable t) {
-            // ignore
+        } catch (Throwable ignored) {
         }
         return classes.toArray(new String[classes.size()]);
     }
 
     @ConditionalOnBean(name = "redisTemplate")
-    @ConditionalOnClass({RedisTemplate.class})
     public static class RedisConfiguration {
 
         @Autowired(required = false)
         private ExceptionHandler exceptionHandler;
 
         @Bean
-        public RedisAccessor redisAccessor(RedisTemplate redisTemplate) {
-            return new RedisAccessor(redisTemplate, exceptionHandler);
+        @ConditionalOnMissingBean
+        public RedisService redisService(RedisTemplate redisTemplate) {
+            return new RedisService(redisTemplate, exceptionHandler);
         }
 
         @Bean
-        public StringRedisAccessor stringRedisAccessor(RedisTemplate redisTemplate) {
-            return new StringRedisAccessor(redisTemplate, exceptionHandler);
+        @ConditionalOnMissingBean
+        public StringRedisService stringRedisService(RedisTemplate redisTemplate) {
+            return new StringRedisService(redisTemplate, exceptionHandler);
         }
 
         @Bean
@@ -82,12 +83,13 @@ public class MoonUtilConfiguration implements ImportSelector {
         }
     }
 
-    @Order(Integer.MAX_VALUE - 1)
+    /**
+     * Record 相关的 service、controller、repository 自动注册
+     */
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     public final static class RecordableApplicationRunner implements ApplicationRunner {
 
         @Override
-        public void run(ApplicationArguments args) {
-            AccessorRegistration.runningTakeAll();
-        }
+        public void run(ApplicationArguments args) { AccessorRegistration.runningTakeAll(); }
     }
 }

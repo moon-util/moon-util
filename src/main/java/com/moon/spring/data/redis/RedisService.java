@@ -2,6 +2,9 @@ package com.moon.spring.data.redis;
 
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.Storage;
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.*;
 
 import java.util.Collections;
@@ -14,25 +17,23 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public class RedisAccessor<K, V> implements Storage<K, V> {
+public class RedisService<K, V> implements Storage<K, V> {
 
     private final RedisTemplate<K, V> template;
     private final ExceptionHandler strategy;
 
-    public RedisAccessor(RedisTemplate<K, V> redisTemplate) { this(redisTemplate, null); }
+    public RedisService(RedisTemplate<K, V> redisTemplate) { this(redisTemplate, null); }
 
-    public RedisAccessor(RedisTemplate<K, V> redisTemplate, ExceptionStrategy exceptionStrategy) {
+    public RedisService(RedisTemplate<K, V> redisTemplate, ExceptionStrategy exceptionStrategy) {
         this(redisTemplate, (ExceptionHandler) exceptionStrategy);
     }
 
-    public RedisAccessor(RedisTemplate<K, V> redisTemplate, ExceptionHandler exceptionStrategy) {
+    public RedisService(RedisTemplate<K, V> redisTemplate, ExceptionHandler exceptionStrategy) {
         this.strategy = exceptionStrategy == null ? ExceptionStrategy.LOGGER_INFO : exceptionStrategy;
         this.template = redisTemplate;
     }
 
-    private void onException(Exception ex) {
-        strategy.onException(ex);
-    }
+    private void onException(Exception ex) { strategy.onException(ex); }
 
     private boolean onExceptionThenFalse(Exception ex) {
         onException(ex);
@@ -155,24 +156,6 @@ public class RedisAccessor<K, V> implements Storage<K, V> {
      */
 
     /**
-     * 普通缓存获取
-     *
-     * @param key 键
-     *
-     * @return 值
-     */
-    @Override
-    public V get(K key) { return key == null ? null : value().get(key); }
-
-    /**
-     * 删除缓存
-     *
-     * @param key 指定 key
-     */
-    @Override
-    public void remove(K key) { delete(key); }
-
-    /**
      * 普通缓存放入
      *
      * @param key   键
@@ -190,42 +173,16 @@ public class RedisAccessor<K, V> implements Storage<K, V> {
     }
 
     /**
-     * 从缓存中获取，获取为 null 则加载，并缓存
-     *
-     * @param key    键
-     * @param puller 加载器
-     *
-     * @return 值
-     */
-    public V getOrPull(K key, Supplier<V> puller) {
-        V cached = get(key);
-        if (cached == null) {
-            cached = puller.get();
-            set(key, cached);
-        }
-        return cached;
-    }
-
-    /**
      * 普通缓存放入并设置时间
      *
-     * @param key             键
-     * @param value           值
-     * @param expireOfSeconds 时间(秒) time要大于0 如果time小于等于0 将设置无限期
+     * @param key                  键
+     * @param value                值
+     * @param expireOfMilliseconds 时间(秒) time要大于0 如果time小于等于0 将设置无限期
      *
      * @return true成功 false 失败
      */
-    public boolean set(K key, V value, long expireOfSeconds) {
-        try {
-            if (expireOfSeconds > 0) {
-                value().set(key, value, expireOfSeconds, TimeUnit.SECONDS);
-            } else {
-                set(key, value);
-            }
-            return true;
-        } catch (Exception e) {
-            return onExceptionThenFalse(e);
-        }
+    public boolean set(K key, V value, long expireOfMilliseconds) {
+        return set(key, value, expireOfMilliseconds, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -252,19 +209,46 @@ public class RedisAccessor<K, V> implements Storage<K, V> {
     }
 
     /**
-     * 从缓存中获取，获取为 null 则加载，并指定缓存时间缓存
+     * 普通缓存获取
      *
-     * @param key             键
-     * @param puller          加载器
-     * @param expireOfSeconds 时间
+     * @param key 键
      *
      * @return 值
      */
-    public V getOrPull(K key, Supplier<V> puller, long expireOfSeconds) {
+    @Override
+    public V get(K key) { return key == null ? null : value().get(key); }
+
+    /**
+     * 从缓存中获取，获取为 null 则加载，并缓存
+     *
+     * @param key    键
+     * @param puller 加载器
+     *
+     * @return 值
+     */
+    public V getOrPull(K key, Supplier<V> puller) {
         V cached = get(key);
         if (cached == null) {
             cached = puller.get();
-            set(key, cached, expireOfSeconds);
+            set(key, cached);
+        }
+        return cached;
+    }
+
+    /**
+     * 从缓存中获取，获取为 null 则加载，并指定缓存时间缓存
+     *
+     * @param key                  键
+     * @param puller               加载器
+     * @param expireOfMilliseconds 时间
+     *
+     * @return 值
+     */
+    public V getOrPull(K key, Supplier<V> puller, long expireOfMilliseconds) {
+        V cached = get(key);
+        if (cached == null) {
+            cached = puller.get();
+            set(key, cached, expireOfMilliseconds);
         }
         return cached;
     }
@@ -289,10 +273,27 @@ public class RedisAccessor<K, V> implements Storage<K, V> {
     }
 
     /**
+     * 删除缓存
+     *
+     * @param key 指定 key
+     */
+    @Override
+    public void remove(K key) { delete(key); }
+
+    /**
+     * 递增
+     *
+     * @param key 键
+     *
+     * @return long
+     */
+    public long increment(K key) { return zeroIfNull(value().increment(key)); }
+
+    /**
      * 递增
      *
      * @param key   键
-     * @param delta 增量(大于0)
+     * @param delta 增量(建议大于0，若小于 0 等价于 decrement)
      *
      * @return long
      */
@@ -302,7 +303,16 @@ public class RedisAccessor<K, V> implements Storage<K, V> {
      * 递减
      *
      * @param key   键
-     * @param delta 增量(小于0)
+     *
+     * @return long
+     */
+    public long decrement(K key) { return zeroIfNull(value().decrement(key)); }
+
+    /**
+     * 递减
+     *
+     * @param key   键
+     * @param delta 增量(建议小于0，若大于 0 等价于 increment)
      *
      * @return long
      */
@@ -556,6 +566,11 @@ public class RedisAccessor<K, V> implements Storage<K, V> {
      */
     public long collectRemove(K key, Object... values) {
         try {
+            RedissonClient client = Redisson.create();
+            // RLock lock =
+            RLock lock = client.getLock("");
+            lock.lock();
+
             return zeroIfNull(set().remove(key, values));
         } catch (Exception e) {
             return onExceptionThenZero(e);

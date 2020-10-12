@@ -77,7 +77,7 @@ public enum ExceptionStrategy implements ExceptionHandler {
         public void onException(Exception ex) { throw new MoonRedisAccessException(ex); }
     };
 
-    private final static Logger logger = LoggerUtil.getLogger(RedisAccessor.class);
+    private final static Logger logger = LoggerUtil.getLogger(RedisService.class);
 
     @Override
     public void onException(Exception ex) {}
