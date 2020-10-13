@@ -3,9 +3,9 @@ package com.moon.spring.data.jpa.factory;
 import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.core.util.ListUtil;
 import com.moon.data.DataRecord;
+import com.moon.data.registry.LayerRegistry;
 import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.repository.DataRepository;
-import com.moon.data.registry.LayerRegistry;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.support.NoOpCacheManager;
@@ -157,8 +157,16 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
     @Override
     @Transactional
     public <S extends T> S insert(S entity) {
-        em.persist(entity);
-        return entity;
+        if (entity.isNew()) {
+            return this.save(entity);
+        } else {
+            em.persist(JpaIdentifierUtil.putJpaRecordPresetPrimaryKey(entity));
+            ID id = entity.getId();
+            Cache cache = getCache();
+            cache.put(id, entity);
+            onCachedEntity(cache, id, getDomainClass(), entity);
+            return entity;
+        }
     }
 
     @Override

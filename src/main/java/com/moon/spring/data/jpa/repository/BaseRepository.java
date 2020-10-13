@@ -21,6 +21,18 @@ import java.util.function.Supplier;
 public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaRepository<T, ID>, BaseAccessor<T, ID> {
 
     /**
+     * Always insert a given entity
+     *
+     * @param entity must not be {@literal null}.
+     *
+     * @return the saved entity; will never be {@literal null}.
+     *
+     * @throws IllegalArgumentException in case the given {@literal entity} is {@literal null}.
+     */
+    @Override
+    <S extends T> S insert(S entity);
+
+    /**
      * 保存
      *
      * @param first    将要保存的对象

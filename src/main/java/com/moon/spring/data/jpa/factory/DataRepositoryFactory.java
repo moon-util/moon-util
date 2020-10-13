@@ -42,8 +42,9 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
     protected JpaRepositoryImplementation<?, ?> getTargetRepository(
         RepositoryInformation information, EntityManager em
     ) {
+        Class identifierClass = information.getIdType();
         JpaEntityInformation ei = getEntityInformation(information.getDomainType());
-        return JpaIdentifierUtil.newRepositoryByIdentifierType(ei, em);
+        return JpaIdentifierUtil.newRepositoryByIdentifierType(identifierClass, ei, em);
     }
 
     @Override

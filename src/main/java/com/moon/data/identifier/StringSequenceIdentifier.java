@@ -32,15 +32,11 @@ public class StringSequenceIdentifier implements IdentifierGenerator<String, Obj
      * @return id
      */
     @Override
-    public final String generateId(Object entity, Object o) {
-        return IdentifierUtil.returnIfRecordIdNotEmpty(entity, o, this::apply);
+    public String generateId(Object entity, Object o) {
+        return originGenerateId(entity, o).toString();
     }
 
     protected final Long originGenerateId(Object e, Object i) {
         return identifier.originGenerateId(e, i);
-    }
-
-    protected String apply(Object e, Object i) {
-        return originGenerateId(e, i).toString();
     }
 }

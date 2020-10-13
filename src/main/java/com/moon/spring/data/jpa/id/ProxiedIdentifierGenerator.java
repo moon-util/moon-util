@@ -1,6 +1,7 @@
 package com.moon.spring.data.jpa.id;
 
 import com.moon.data.IdentifierGenerator;
+import com.moon.data.identifier.IdentifierUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
@@ -11,9 +12,9 @@ import java.lang.reflect.Method;
 /**
  * @author moonsky
  */
-public class ProxiedIdentifierGenerator implements org.hibernate.id.IdentifierGenerator,
-                                                   InvocationHandler,
-                                                   IdentifierGenerator<Serializable, SharedSessionContractImplementor> {
+public class ProxiedIdentifierGenerator extends IdentifierUtil implements org.hibernate.id.IdentifierGenerator,
+                                                                          InvocationHandler,
+                                                                          IdentifierGenerator<Serializable, SharedSessionContractImplementor> {
 
     private IdentifierGenerator identifier;
 
@@ -42,5 +43,9 @@ public class ProxiedIdentifierGenerator implements org.hibernate.id.IdentifierGe
     @Override
     public Serializable generateId(
         Object entity, SharedSessionContractImplementor session
-    ) { return identifier.generateId(entity, session); }
+    ) {
+        return returnIfRecordIdNotEmpty(entity, session, (entityVal, s) -> {
+            return identifier.generateId(entityVal, s);
+        });
+    }
 }

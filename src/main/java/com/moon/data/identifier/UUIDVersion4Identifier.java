@@ -39,10 +39,6 @@ public class UUIDVersion4Identifier implements IdentifierGenerator<String, Objec
      */
     @Override
     public String generateId(Object entity, Object o) {
-        return IdentifierUtil.returnIfRecordIdNotEmpty(entity, o, this::apply);
-    }
-
-    private String apply(Object e, Object i) {
         return generator.generate().toString();
     }
 }

@@ -2,30 +2,29 @@ package com.moon.data.identifier;
 
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.reflect.ConstructorUtil;
 import com.moon.core.util.SetUtil;
 import com.moon.core.util.TypeUtil;
 import com.moon.core.util.converter.TypeCaster;
 import com.moon.data.IdentifierGenerator;
 import com.moon.data.Record;
+import com.moon.spring.data.jpa.JpaRecord;
+import com.moon.spring.data.jpa.factory.AbstractRepositoryImpl;
 
 import java.lang.reflect.Constructor;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 
 /**
  * @author moonsky
  */
 @SuppressWarnings("all")
-public final class IdentifierUtil {
+public class IdentifierUtil {
 
     private final static String packageName = IdentifierUtil.class.getPackage().getName();
     private final static Set<Class> USED_IDENTIFIER_TYPES = new HashSet<>();
 
-    private IdentifierUtil() { ThrowUtil.noInstanceError(); }
+    protected IdentifierUtil() { }
 
     private static void assertNot(String classname, Class<?> type) {
         if (type.getName().equals(classname)) {
@@ -63,33 +62,59 @@ public final class IdentifierUtil {
      * * default methods ****************************************************************************
      * **********************************************************************************************
      */
+    /**
+     * 这是给缓存主键用的，KEY 是将要保存对象的内存地址，VALUE 是对象预设的 ID 值
+     * <p>
+     * {@link AbstractRepositoryImpl#insert(JpaRecord)}这个方法是给手动设置主键用的
+     * <p>
+     * 手动设置的主键值会先缓存在这里，并设为 null，后续通过 IdentifierGenerator 获取主键时，
+     * <p>
+     * 通过{@link #returnIfRecordIdNotEmpty(Object, Object, BiFunction)}优先获取预设的主键
+     * <p>
+     * <p>
+     * 一般预设主键都是极少数情况，也不建议这样做，通常也只是在启动时添加一些基础数据等，此种情况系统基本处于稳定状态
+     * <p>
+     * 整个系统运行期间也不会很多，故这里未考虑超大数据量、并发以及异常（异常会产生少量垃圾数据）等情况，如确有必要，请自行处理
+     */
+    private final static Map<Integer, Object> temporaryIdMap = new HashMap<>();
 
-    static <T> T returnIfRecordIdNotNull(Object entity, Object o, BiFunction<Object, Object, T> generator) {
-        if (entity instanceof Record) {
-            Record record = (Record) entity;
-            Object id = record.getId();
-            if (id != null || !record.isNew()) {
-                return (T) id;
-            }
-        }
-        return generator.apply(entity, o);
-    }
-
-    static String returnIfRecordIdNotEmpty(Object entity, Object o, BiFunction<Object, Object, String> generator) {
-        if (entity instanceof Record) {
-            Record record = (Record) entity;
+    protected final static <T extends Record<?>> T putRecordPresetPrimaryKey(T record) {
+        if (record != null) {
             Object id = record.getId();
             if (id instanceof CharSequence) {
-                String strId = id.toString();
-                if (!strId.isEmpty()) {
-                    return strId;
+                if (!id.toString().isEmpty()) {
+                    temporaryIdMap.put(System.identityHashCode(record), id);
+                    record.setId(null);
                 }
-            }
-            if (!record.isNew()) {
-                return id == null ? null : id.toString();
+            } else if (id != null) {
+                temporaryIdMap.put(System.identityHashCode(record), id);
+                record.setId(null);
             }
         }
-        return generator.apply(entity, o);
+        return record;
+    }
+
+    private final static Object obtainRecordId(Object entity) {
+        return temporaryIdMap.remove(System.identityHashCode(entity));
+    }
+
+    /**
+     * 当 Record 字符串形式主键不为空（null或 ""）时返回已存在的主键，否则按主键策略生成主键
+     *
+     * @param entity
+     * @param o
+     * @param generator
+     *
+     * @return
+     */
+    protected final static <T> T returnIfRecordIdNotEmpty(
+        Object entity, Object o, BiFunction<Object, Object, T> generator
+    ) {
+        Object id = obtainRecordId(entity);
+        if (id instanceof CharSequence) {
+            return ((CharSequence) id).length() > 0 ? (T) id : generator.apply(entity, o);
+        }
+        return id == null ? generator.apply(entity, o) : (T) id;
     }
 
 
@@ -99,7 +124,7 @@ public final class IdentifierUtil {
      * **********************************************************************************************
      */
 
-    public static void addUsedIdentifierType(Class idType) { USED_IDENTIFIER_TYPES.add(idType); }
+    protected static void addUsedIdentifierType(Class idType) { USED_IDENTIFIER_TYPES.add(idType); }
 
     /**
      * 创建 id 生成器

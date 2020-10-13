@@ -196,6 +196,6 @@ public final class LongSequenceIdentifier implements IdentifierGenerator<Long, O
      */
     @Override
     public Long generateId(Object entity, Object o) {
-        return IdentifierUtil.returnIfRecordIdNotNull(entity, o, this::originGenerateId);
+        return this.originGenerateId(entity, o);
     }
 }

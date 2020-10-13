@@ -12,10 +12,14 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.moon.core.lang.ThrowUtil.noInstanceError;
+
 /**
  * @author moonsky
  */
-public final class JpaIdentifierUtil {
+public final class JpaIdentifierUtil extends IdentifierUtil {
+
+    private JpaIdentifierUtil() { noInstanceError(); }
 
     private final static Map<Class, RepositoryBuilder> IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY = new ConcurrentHashMap<>();
 
@@ -30,11 +34,14 @@ public final class JpaIdentifierUtil {
         public DefaultRepositoryImpl(JpaEntityInformation ei, EntityManager em) { super(ei, em); }
     }
 
+    final static <T extends JpaRecord<?>> T putJpaRecordPresetPrimaryKey(T record) {
+        return putRecordPresetPrimaryKey(record);
+    }
+
     @SuppressWarnings("all")
     public static JpaRepositoryImplementation newRepositoryByIdentifierType(
-        JpaEntityInformation information, EntityManager em
+        Class identifierClass, JpaEntityInformation information, EntityManager em
     ) {
-        Class identifierClass = information.getIdType();
         IdentifierUtil.addUsedIdentifierType(identifierClass);
         Map<Class, RepositoryBuilder> registry = IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY;
         try {
