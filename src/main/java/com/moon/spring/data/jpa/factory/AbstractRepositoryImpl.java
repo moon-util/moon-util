@@ -68,6 +68,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         this.domainClass = ei.getJavaType();
         LayerRegistry.registerRepository(domainClass, this);
         this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
+        // 这里需要考虑下唯一性
         this.cacheNamespace = domainClass.getSimpleName();
     }
 
@@ -77,6 +78,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         this.domainClass = domainClass;
         LayerRegistry.registerRepository(domainClass, this);
         this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
+        // 这里需要考虑下唯一性
         this.cacheNamespace = domainClass.getSimpleName();
     }
 
@@ -351,7 +353,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
     }
 
     protected Cache getCache() {
-        return getCache(getDomainClass().getName());
+        return getCache(cacheNamespace);
     }
 
     protected Cache getCache(String namespace) {

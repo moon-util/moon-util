@@ -15,7 +15,16 @@ import java.util.function.Supplier;
 public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
 
     /**
-     * 总是用 insert 语句插入一条数据
+     * 总是用 insert 语句插入一条数据，这是为了支持手动指定 ID 而设计的
+     * <p>
+     * 有些少数场景可能希望不使用全局 ID 策略，而自己指定一个特殊的主键值，此时可以通过
+     * <p>
+     * 调用此方法达到目的，同时由于{@code insert}方法的开放性，也有些需要注意的：
+     *
+     * <pre>
+     * 1. 全局主键策略一般会自带唯一性，手动指定也需要手动控制主键唯一，否则会主键冲突；
+     * 2. 此方法也可以不用指定主键，此时应等价于{@link #save(Record)}（实际上也是 insert）；
+     * </pre>
      *
      * @param entity 将要插入的对象
      * @param <S>    数据类型
