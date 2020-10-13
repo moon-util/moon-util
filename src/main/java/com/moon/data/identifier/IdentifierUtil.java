@@ -11,6 +11,7 @@ import com.moon.data.Record;
 import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.factory.AbstractRepositoryImpl;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -107,14 +108,14 @@ public class IdentifierUtil {
      *
      * @return
      */
-    protected final static <T> T returnIfRecordIdNotEmpty(
-        Object entity, Object o, BiFunction<Object, Object, T> generator
+    protected final static <ID, METADATA> ID returnIfRecordIdNotEmpty(
+        Object entity, METADATA o, BiFunction<Object, METADATA, ID> generator
     ) {
         Object id = obtainRecordId(entity);
         if (id instanceof CharSequence) {
-            return ((CharSequence) id).length() > 0 ? (T) id : generator.apply(entity, o);
+            return ((CharSequence) id).length() > 0 ? (ID) id : generator.apply(entity, o);
         }
-        return id == null ? generator.apply(entity, o) : (T) id;
+        return id == null ? generator.apply(entity, o) : (ID) id;
     }
 
 
@@ -134,7 +135,9 @@ public class IdentifierUtil {
      *
      * @return ID 生成器
      */
-    public static IdentifierGenerator newIdentifierGenerator(String description, String key) {
+    public static IdentifierGenerator<? extends Serializable, Object> newIdentifierGenerator(
+        String description, String key
+    ) {
         // 默认雪花算法
         if (StringUtil.isBlank(description)) {
             Set<Class> types = USED_IDENTIFIER_TYPES;

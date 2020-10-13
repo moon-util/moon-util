@@ -269,17 +269,39 @@ public final class ClassUtil {
      *
      * @return 类的短名称
      */
-    public static String getShortName(Class type) {
+    public static String getShortName(Class type) { return getShortName(type, '.'); }
+
+    /**
+     * 获取短名称，如：
+     * com.moon.core.lang.ClassUtil  =>  c.m.c.l.ClassUtil
+     *
+     * @param type      目标类
+     * @param delimiter 自定义分隔符
+     *
+     * @return 类的短名称
+     */
+    public static String getShortName(Class type, char delimiter) {
+        return getShortName(type, String.valueOf(delimiter));
+    }
+
+    /**
+     * 获取短名称，如：
+     * com.moon.core.lang.ClassUtil  =>  c.m.c.l.ClassUtil
+     *
+     * @param type      目标类
+     * @param delimiter 自定义分隔符
+     *
+     * @return 类的短名称
+     */
+    public static String getShortName(Class type, String delimiter) {
         final String name = type.getName();
-        final int totalLength = name.length();
-        final char dot = Chars.DOT.value;
         final StringBuilder builder = new StringBuilder();
-        int beginIndex = 0;
-        int index = name.indexOf(dot, beginIndex);
+        int beginIndex = 0, totalLength = name.length();
+        int index = name.indexOf(delimiter, beginIndex);
         while (index >= 0) {
-            builder.append(name.charAt(beginIndex)).append(dot);
+            builder.append(name.charAt(beginIndex)).append(delimiter);
             beginIndex = index + 1;
-            index = name.indexOf(dot, beginIndex);
+            index = name.indexOf(delimiter, beginIndex);
         }
         builder.append(name, beginIndex, totalLength);
         return builder.toString();

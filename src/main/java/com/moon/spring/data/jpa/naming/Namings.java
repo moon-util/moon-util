@@ -33,7 +33,7 @@ class Namings {
         if (user == null) {
             List<Identifier> identifiers = newList(table);
             identifiers.addAll(columns);
-            List<String> names = identifiers.stream().map(id -> id.toString()).collect(toList());
+            List<String> names = identifiers.stream().map(Identifier::toString).collect(toList());
             return toIdentifier(key + "_" + JoinerUtil.join(names, "_"), context);
         }
         return user;
