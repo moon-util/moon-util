@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -302,6 +303,28 @@ public class ValidationUtil extends TestUtil {
             return data;
         }
         throw new RequireValidateException(message, data);
+    }
+
+    /**
+     * 要求数据符合自定义判断条件
+     *
+     * @param data             待测数据
+     * @param tester           自定义判断逻辑
+     * @param throwableBuilder 自定义异常
+     * @param <T>              待测数据类型
+     * @param <EX>             自定义异常类型
+     *
+     * @return 如果匹配成功返回数据本身
+     *
+     * @throws EX 当数据与判断逻辑不匹配时抛出异常
+     */
+    public final static <T, EX extends Throwable> T require(
+        T data, Predicate<? super T> tester, Function<? super T, EX> throwableBuilder
+    ) throws EX {
+        if (isMatchOf(data, tester)) {
+            return data;
+        }
+        throw throwableBuilder.apply(data);
     }
 
     /**

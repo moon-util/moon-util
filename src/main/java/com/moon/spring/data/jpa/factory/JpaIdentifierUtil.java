@@ -34,7 +34,7 @@ public final class JpaIdentifierUtil extends IdentifierUtil {
         public DefaultRepositoryImpl(JpaEntityInformation ei, EntityManager em) { super(ei, em); }
     }
 
-    final static <T extends JpaRecord<?>> T putJpaRecordPresetPrimaryKey(T record) {
+    final static <T extends JpaRecord<?>> T extractPresetPrimaryKey(T record) {
         return putRecordPresetPrimaryKey(record);
     }
 
