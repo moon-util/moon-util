@@ -720,32 +720,32 @@ public final class StringUtil {
     /**
      * StringUtil.repeat('?', 5, ',')    ====> "?,?,?,?,?"
      *
-     * @param ch         要重复
+     * @param ch        要重复
      * @param count
-     * @param joinedChar
+     * @param separator
      *
      * @return
      */
-    public static String repeat(char ch, int count, char joinedChar) {
+    public static String repeat(char ch, int count, char separator) {
         int length = count * 2, i = 0;
         char[] chars = new char[length];
         while (i < length) {
             chars[i++] = ch;
-            chars[i++] = joinedChar;
+            chars[i++] = separator;
         }
         return new String(chars, 0, length - 1);
     }
 
-    public static String repeat(CharSequence str, int count, String joinedStr) {
+    public static String repeat(CharSequence str, int count, String separator) {
         if (str == null) {
             return null;
         }
-        joinedStr = emptyIfNull(joinedStr);
+        separator = emptyIfNull(separator);
         int length = str.length();
-        int strLen = joinedStr.length();
+        int strLen = separator.length();
         StringBuilder builder = new StringBuilder((length + strLen) * count);
         for (int i = 0; i < count; i++) {
-            builder.append(str).append(joinedStr);
+            builder.append(str).append(separator);
         }
         return builder.substring(0, builder.length() - strLen);
     }
@@ -1628,16 +1628,13 @@ public final class StringUtil {
             return null;
         }
         int index = 0, start = 0;
-        StringBuilder builder = null;
         final String oldVal = String.valueOf(old);
         final int srcLen = src.length();
         index = src.indexOf(oldVal, index);
         if (index < 0) {
             return src;
         } else {
-            if (builder == null) {
-                builder = new StringBuilder(srcLen);
-            }
+            StringBuilder builder = new StringBuilder(srcLen);
             builder.append(src, start, index).append(now);
             start = index + oldVal.length();
             builder.append(src, start, srcLen);
@@ -1647,9 +1644,11 @@ public final class StringUtil {
 
     /**
      * 替换所有存在的子字符串
+     *
      * @param src 源字符串
      * @param old 搜索子字符串
      * @param now 替换子串
+     *
      * @return 替换后的子串；如果 str == null，则返回 null
      */
     public static String replaceAll(String src, String old, Object now) {

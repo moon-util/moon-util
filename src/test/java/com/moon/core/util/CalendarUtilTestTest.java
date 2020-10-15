@@ -82,6 +82,10 @@ class CalendarUtilTestTest {
         assertArrayEquals(excepted0, parsed);
         parsed = CalendarUtil.extractDateTimeFields("1980-02-03 08:09:59.23");
         assertArrayEquals(excepted0, parsed);
+        parsed = CalendarUtil.extractDateTimeFields("1980 023 08 09 59 23");
+        assertArrayEquals(excepted0, parsed);
+        parsed = CalendarUtil.extractDateTimeFields("19802 3 08 09 59 23");
+        assertArrayEquals(excepted0, parsed);
         parsed = CalendarUtil.extractDateTimeFields("1980-2-03 08:9:59.23");
         assertArrayEquals(excepted0, parsed);
         parsed = CalendarUtil.extractDateTimeFields("1980年02月03日08时09分59秒23");

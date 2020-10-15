@@ -294,33 +294,6 @@ public final class JoinerUtil {
 
     /*
      * ---------------------------------------------------------------------------
-     * apply function joiner.
-     * ---------------------------------------------------------------------------
-     */
-
-    public static <T> String joinWithMapper(Iterable<T> iterable, Function<T, String> func) {
-        return joinWithMapper(iterable, func, DFT_SEP);
-    }
-
-    public static <T> String joinWithMapper(Iterable<T> iterable, Function<T, String> func, String separator) {
-        return iterable == null ? null : joinWithMapper(iterable.iterator(), func, separator);
-    }
-
-    public static <T> String joinWithMapper(Iterator<T> iterator, Function<T, String> func) {
-        return joinWithMapper(iterator, func, DFT_SEP);
-    }
-
-    public static <T> String joinWithMapper(Iterator<T> iterator, Function<T, String> func, String separator) {
-        int sepLen = separator.length();
-        StringBuilder sb = new StringBuilder((sepLen + DFT_LEN) * 16);
-        while (iterator.hasNext()) {
-            sb.append(separator).append(func.apply(iterator.next()));
-        }
-        return sb.substring(sepLen);
-    }
-
-    /*
-     * ---------------------------------------------------------------------------
      * inner methods
      * ---------------------------------------------------------------------------
      */

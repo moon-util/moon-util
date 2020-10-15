@@ -116,6 +116,8 @@ public class Joiner
         String old = this.prefix, now = this.prefix = emptyIfNull(prefix);
         if (old != null) {
             container.replace(0, old.length(), now);
+        } else {
+            container.delete(0, old.length());
         }
         return this;
     }

@@ -695,10 +695,13 @@ public class CalendarUtil {
      * | 1980-02-03 08:09:59.23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
      * | 1980-02/03 08.09*59 23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
      * | 1980 02 03 08 09 59 23      | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 1980 023 08 09 59 23        | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 19802 3 08 09 59 23         | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
+     * | 198023 08 09 59 23          | 1980 | 23    | 08  | 09   | 59     | 23     | 00    | 注
      * | 1980 02 03 08 09 59         | 1980 | 02    | 03  | 08   | 09     | 59     | 00    |
      * | 1980020308095923            | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
      * | 1980 020308 095923          | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
-     * | 19800203                    | 1980 | 02    | 03  | 00   | 00     | 00     | 00    |
+     * | 19800203                    | 1980 | 02    | 03  | 00   | 00     | 00     | 00    | 注
      * | 日期19800203时间080959毫秒23  | 1980 | 02    | 03  | 08   | 09     | 59     | 23    |
      * |-----------------------------|------|-------|-----|------|--------|--------|-------|
      * | 999                         | 999  | 01    | 01  | 00   | 00     | 00     | 00    |
@@ -736,7 +739,7 @@ public class CalendarUtil {
      *
      * @param datetimeString          日期时间字符串
      * @param initResultFieldsCreator 返回值各字段初始化构造器
-     * @param maxLengthOfEachField    各个字段的最大长度（这个数组的长度要和{@code initializeResultFieldsCreator}返回值长度相同）
+     * @param maxLengthOfEachField    各个字段的最大长度（这个数组的长度要和{@code initResultFieldsCreator}返回值长度相同）
      * @param maxLengthInAllFields    所有字段长度的最大值，这个是{@code maxLengthOfEachField}里的最大值，手动输入，避免一次循环判断
      *
      * @return 日期各字段值组成的数组
@@ -760,7 +763,7 @@ public class CalendarUtil {
      * @param datetimeString          日期时间字符串
      * @param tester                  判断器，判断是否符合条件，符合条件的字符属于字段的组成部分
      * @param initResultFieldsCreator 返回值各字段初始化构造器
-     * @param maxLengthOfEachField    各个字段的最大长度（这个数组的长度要和{@code initializeResultFieldsCreator}返回值长度相同）
+     * @param maxLengthOfEachField    各个字段的最大长度（这个数组的长度要和{@code initResultFieldsCreator}返回值长度相同）
      * @param maxLengthInAllFields    所有字段长度的最大值，这个是{@code maxLengthOfEachField}里的最大值，手动输入，避免一次循环判断
      *
      * @return 日期各字段值组成的数组

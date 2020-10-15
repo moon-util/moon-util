@@ -1,6 +1,5 @@
 package com.moon.core.lang;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -167,11 +166,6 @@ class StringJoinerTestTest {
         assertThrows(StringIndexOutOfBoundsException.class, () -> joiner.charAt(currIndex), () -> String.valueOf(currIndex));
         assertThrows(StringIndexOutOfBoundsException.class, () -> joiner.charAt(len));
         assertThrows(StringIndexOutOfBoundsException.class, () -> joiner.charAt(len), () -> String.valueOf(len));
-    }
-
-    @Ignore
-    @Test
-    void testSubSequence() {
     }
 
     @Test
