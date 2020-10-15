@@ -19,7 +19,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
      * <p>
      * 有些少数场景可能希望不使用全局 ID 策略，而自己指定一个特殊的主键值，此时可以通过
      * <p>
-     * 调用此方法达到目的，同时由于{@code insert}方法的开放性，也有些需要注意的：
+     * 调用此方法达到目的，同时由于{@code persist}方法的开放性，也有些需要注意的：
      *
      * <pre>
      * 1. 全局主键策略一般会自带唯一性，手动指定也需要手动控制主键唯一，否则会主键冲突；
@@ -31,7 +31,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
      *
      * @return 返回插入数据后的对象
      */
-    <S extends T> S insert(S entity);
+    <S extends T> S persist(S entity);
 
     /**
      * 保存

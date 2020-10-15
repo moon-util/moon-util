@@ -183,7 +183,7 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements Base
      */
     @Override
     @Transactional
-    public <S extends T> S insert(S entity) { return getAccessor().insert(entity); }
+    public <S extends T> S persist(S entity) { return getAccessor().persist(entity); }
 
     /**
      * 保存

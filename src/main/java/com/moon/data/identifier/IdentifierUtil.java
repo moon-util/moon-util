@@ -66,7 +66,7 @@ public class IdentifierUtil {
     /**
      * 这是给缓存主键用的，KEY 是将要保存对象的内存地址，VALUE 是对象预设的 ID 值
      * <p>
-     * {@link AbstractRepositoryImpl#insert(JpaRecord)}这个方法是给手动设置主键用的
+     * {@link AbstractRepositoryImpl#persist(JpaRecord)}这个方法是给手动设置主键用的
      * <p>
      * 手动设置的主键值会先缓存在这里，并设为 null，后续通过 IdentifierGenerator 获取主键时，
      * <p>

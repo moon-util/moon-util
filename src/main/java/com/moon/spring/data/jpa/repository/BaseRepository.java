@@ -30,7 +30,7 @@ public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaReposito
      * @throws IllegalArgumentException in case the given {@literal entity} is {@literal null}.
      */
     @Override
-    <S extends T> S insert(S entity);
+    <S extends T> S persist(S entity);
 
     /**
      * 保存

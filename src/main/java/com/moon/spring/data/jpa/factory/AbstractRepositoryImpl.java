@@ -125,7 +125,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     @Override
     @Transactional
-    public <S extends T> S insert(S entity) {
+    public <S extends T> S persist(S entity) {
         if (entity.isNew()) {
             return this.save(entity);
         } else {
