@@ -2,6 +2,7 @@ package com.moon.core.util.convert;
 
 import com.moon.core.json.JSONNumber;
 import com.moon.core.json.JSONString;
+import com.moon.core.lang.Joiner;
 import com.moon.core.lang.ref.DoubleAccessor;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.LongAccessor;
@@ -54,6 +55,6 @@ final class Types {
         StringJoiner.class,
         // from moon util
         JSONString.class,
-        com.moon.core.lang.StringJoiner.class,
+        Joiner.class,
     };
 }

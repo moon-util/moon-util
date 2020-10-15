@@ -71,7 +71,7 @@ public enum Patterns implements Predicate<CharSequence> {
      */
     CHINESE_ZIP_CODE(Pattern.compile("[1-9]\\d{5}(?!\\d)")),
     /**
-     * 电子邮箱
+     * 电子邮箱（是从哪找到的？忘了...）
      */
     EMAIL(Pattern.compile(
         "^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$")),
@@ -139,6 +139,14 @@ public enum Patterns implements Predicate<CharSequence> {
      * Ref: http://www.qilin668.com/a/5e78a58c99d3cl5.html
      */
     TAXPAYER_CODE(Pattern.compile("^[0-9A-HJ-NPQRTUWXY]{2}\\d{6}[0-9A-HJ-NPQRTUWXY]{10}$")),
+    /**
+     * 十六进制字符串
+     */
+    HEX(Pattern.compile("^[a-f0-9]+$", Pattern.CASE_INSENSITIVE)),
+    /**
+     * 银联卡号
+     */
+    UNION_PAY_CARD_NO(Pattern.compile("^62[0-9]{14}(\\d{3})?$")),
     ;
 
     private final static class Cached {

@@ -64,19 +64,19 @@ public class MoonUtilConfiguration implements ImportSelector {
         private ExceptionHandler exceptionHandler;
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(value = {RedisService.class}, name = "redisService")
         public RedisService redisService(RedisTemplate redisTemplate) {
             return new RedisService(redisTemplate, exceptionHandler);
         }
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(value = {StringRedisService.class}, name = "stringRedisService")
         public StringRedisService stringRedisService(RedisTemplate redisTemplate) {
             return new StringRedisService(redisTemplate, exceptionHandler);
         }
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(value = {RedisCacheManager.class}, name = "redisCacheManager")
         public RedisCacheManager redisCacheManager(RedisConnectionFactory factory) {
             return RedisCacheManager.create(factory);
         }

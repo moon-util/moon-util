@@ -1623,8 +1623,61 @@ public final class StringUtil {
      *
      * @return 替换后的子串；如果 str == null，则返回 null
      */
-    public static String replaceFirst(String src, String old, String now) {
-        return src == null ? null : src.replaceFirst(old, now);
+    public static String replaceFirst(String src, String old, Object now) {
+        if (src == null) {
+            return null;
+        }
+        int index = 0, start = 0;
+        StringBuilder builder = null;
+        final String oldVal = String.valueOf(old);
+        final int srcLen = src.length();
+        index = src.indexOf(oldVal, index);
+        if (index < 0) {
+            return src;
+        } else {
+            if (builder == null) {
+                builder = new StringBuilder(srcLen);
+            }
+            builder.append(src, start, index).append(now);
+            start = index + oldVal.length();
+            builder.append(src, start, srcLen);
+            return builder.toString();
+        }
+    }
+
+    /**
+     * 替换所有存在的子字符串
+     * @param src 源字符串
+     * @param old 搜索子字符串
+     * @param now 替换子串
+     * @return 替换后的子串；如果 str == null，则返回 null
+     */
+    public static String replaceAll(String src, String old, Object now) {
+        if (src == null) {
+            return null;
+        }
+        int index = 0, start = 0;
+        StringBuilder builder = null;
+        final String oldVal = String.valueOf(old);
+        final int oldLen = oldVal.length(), srcLen = src.length();
+        do {
+            index = src.indexOf(oldVal, index);
+            if (index < 0) {
+                if (builder == null) {
+                    return src;
+                }
+                if (start < srcLen) {
+                    builder.append(src, start, srcLen);
+                }
+                return builder.toString();
+            } else {
+                if (builder == null) {
+                    builder = new StringBuilder(srcLen);
+                }
+                builder.append(src, start, index).append(now);
+                start = index = index + oldLen;
+            }
+        } while (true);
     }
 
     /**

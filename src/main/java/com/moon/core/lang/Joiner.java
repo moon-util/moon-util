@@ -17,7 +17,7 @@ import static com.moon.core.util.IteratorUtil.forEach;
 /**
  * @author moonsky
  */
-public class StringJoiner
+public class Joiner
     implements Supplier<String>, ValueSupplier<String>, Appendable, CharSequence, Cloneable, Serializable {
 
     private static final long serialVersionUID = 6428348081105594320L;
@@ -48,13 +48,13 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    public StringJoiner(CharSequence delimiter) { this(delimiter, null, null); }
+    public Joiner(CharSequence delimiter) { this(delimiter, null, null); }
 
-    public StringJoiner(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
+    public Joiner(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
         this(defaultStringifier(), prefix, delimiter, suffix, Const.STR_NULL, false, prefix);
     }
 
-    private StringJoiner(
+    private Joiner(
         Function<Object, String> stringifier,
         CharSequence prefix,
         CharSequence delimiter,
@@ -64,14 +64,18 @@ public class StringJoiner
         CharSequence value
     ) {
         this.useForNull = useForNull == null ? null : useForNull.toString();
-        this.setStringifier(stringifier).setPrefix(prefix).setDelimiter(delimiter).setSuffix(suffix)
-            .requireNonNull(requireNonNull).clear(value);
+        this.setStringifier(stringifier)
+            .setPrefix(prefix)
+            .setDelimiter(delimiter)
+            .setSuffix(suffix)
+            .requireNonNull(requireNonNull)
+            .clear(value);
     }
 
-    public final static StringJoiner of(CharSequence delimiter) {return new StringJoiner(delimiter);}
+    public final static Joiner of(CharSequence delimiter) {return new Joiner(delimiter);}
 
-    public final static StringJoiner of(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
-        return new StringJoiner(delimiter, prefix, suffix);
+    public final static Joiner of(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
+        return new Joiner(delimiter, prefix, suffix);
     }
 
     /*
@@ -80,35 +84,35 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    public StringJoiner skipNulls() {
+    public Joiner skipNulls() {
         this.useForNull = null;
         return this;
     }
 
-    public StringJoiner useEmptyForNull() { return useForNull(EMPTY); }
+    public Joiner useEmptyForNull() { return useForNull(EMPTY); }
 
-    public StringJoiner useForNull(CharSequence cs) {
+    public Joiner useForNull(CharSequence cs) {
         this.useForNull = String.valueOf(cs);
         return this;
     }
 
-    public StringJoiner requireNonNull() { return requireNonNull(true); }
+    public Joiner requireNonNull() { return requireNonNull(true); }
 
-    public StringJoiner requireNonNull(boolean requireNonNull) {
+    public Joiner requireNonNull(boolean requireNonNull) {
         this.requireNonNull = requireNonNull;
         return this;
     }
 
-    public StringJoiner setDefaultStringifier() { return setStringifier(defaultStringifier()); }
+    public Joiner setDefaultStringifier() { return setStringifier(defaultStringifier()); }
 
-    public StringJoiner setStringifier(Function<Object, String> stringifier) {
+    public Joiner setStringifier(Function<Object, String> stringifier) {
         this.stringifier = Objects.requireNonNull(stringifier);
         return this;
     }
 
     public Function<Object, String> getStringifier() { return stringifier; }
 
-    public StringJoiner setPrefix(CharSequence prefix) {
+    public Joiner setPrefix(CharSequence prefix) {
         String old = this.prefix, now = this.prefix = emptyIfNull(prefix);
         if (old != null) {
             container.replace(0, old.length(), now);
@@ -118,14 +122,14 @@ public class StringJoiner
 
     public String getPrefix() { return prefix; }
 
-    public StringJoiner setSuffix(CharSequence suffix) {
+    public Joiner setSuffix(CharSequence suffix) {
         this.suffix = emptyIfNull(suffix);
         return this;
     }
 
     public String getSuffix() { return suffix; }
 
-    public StringJoiner setDelimiter(CharSequence delimiter) {
+    public Joiner setDelimiter(CharSequence delimiter) {
         this.delimiter = emptyIfNull(delimiter);
         return this;
     }
@@ -138,7 +142,7 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    private final StringJoiner counter() {
+    private final Joiner counter() {
         itemCount++;
         return this;
     }
@@ -149,7 +153,7 @@ public class StringJoiner
         return requireNonNull ? (item == null ? ThrowUtil.unchecked(null) : item) : item;
     }
 
-    private <T> StringJoiner ifChecked(T val, Consumer<T> consumer) {
+    private <T> Joiner ifChecked(T val, Consumer<T> consumer) {
         if ((val = isAllowNull(val)) == null) {
             if (useForNull != null) {
                 return add(useForNull);
@@ -160,7 +164,7 @@ public class StringJoiner
         return this;
     }
 
-    private StringJoiner addStringify(Object item) { return addDelimiter().append(stringify(item)).counter(); }
+    private Joiner addStringify(Object item) { return addDelimiter().append(stringify(item)).counter(); }
 
     /*
      * -------------------------------------------------------
@@ -168,39 +172,39 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    public <T> StringJoiner join(T... arr) {
+    public <T> Joiner join(T... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(boolean... arr) {
+    public Joiner joinValues(boolean... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(char... arr) {
+    public Joiner joinValues(char... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(byte... arr) {
+    public Joiner joinValues(byte... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(short... arr) {
+    public Joiner joinValues(short... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(int... arr) {
+    public Joiner joinValues(int... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(long... arr) {
+    public Joiner joinValues(long... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(float... arr) {
+    public Joiner joinValues(float... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(double... arr) {
+    public Joiner joinValues(double... arr) {
         return ensure(ArrayUtil.length(arr)).ifChecked(arr, values -> forEach(values, this::add));
     }
 
@@ -210,19 +214,19 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    public StringJoiner join(Collection collect) {
+    public Joiner join(Collection collect) {
         return ensure(size(collect)).ifChecked(collect, values -> forEach(values, this::add));
     }
 
-    public StringJoiner join(Iterable iterable) { return ifChecked(iterable, values -> forEach(values, this::add)); }
+    public Joiner join(Iterable iterable) { return ifChecked(iterable, values -> forEach(values, this::add)); }
 
-    public StringJoiner join(Iterator iterator) { return ifChecked(iterator, values -> forEach(values, this::add)); }
+    public Joiner join(Iterator iterator) { return ifChecked(iterator, values -> forEach(values, this::add)); }
 
-    public StringJoiner join(Enumeration enumeration) {
+    public Joiner join(Enumeration enumeration) {
         return ifChecked(enumeration, values -> forEach(values, this::add));
     }
 
-    public <K, V> StringJoiner join(Map<K, V> map, BiFunction<? super K, ? super V, CharSequence> merger) {
+    public <K, V> Joiner join(Map<K, V> map, BiFunction<? super K, ? super V, CharSequence> merger) {
         return ifChecked(map, values -> values.forEach((key, value) -> add(merger.apply(key, value))));
     }
 
@@ -232,9 +236,9 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    public StringJoiner merge(StringJoiner joiner) { return add(joiner); }
+    public Joiner merge(Joiner joiner) { return add(joiner); }
 
-    public StringJoiner merge(java.util.StringJoiner joiner) { return add(joiner); }
+    public Joiner merge(java.util.StringJoiner joiner) { return add(joiner); }
 
     /*
      * -------------------------------------------------------
@@ -242,23 +246,23 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    private StringJoiner addDelimiter() { return itemCount > 0 ? appendDelimiter() : this; }
+    private Joiner addDelimiter() { return itemCount > 0 ? appendDelimiter() : this; }
 
-    public StringJoiner add(CharSequence csq) { return ifChecked(csq, this::addStringify); }
+    public Joiner add(CharSequence csq) { return ifChecked(csq, this::addStringify); }
 
-    public StringJoiner add(Object csq) { return ifChecked(csq, this::addStringify); }
+    public Joiner add(Object csq) { return ifChecked(csq, this::addStringify); }
 
-    public StringJoiner add(char value) { return addDelimiter().append(value).counter(); }
+    public Joiner add(char value) { return addDelimiter().append(value).counter(); }
 
-    public StringJoiner add(int value) { return addDelimiter().append(value).counter(); }
+    public Joiner add(int value) { return addDelimiter().append(value).counter(); }
 
-    public StringJoiner add(long value) { return addDelimiter().append(value).counter(); }
+    public Joiner add(long value) { return addDelimiter().append(value).counter(); }
 
-    public StringJoiner add(float value) { return addDelimiter().append(value).counter(); }
+    public Joiner add(float value) { return addDelimiter().append(value).counter(); }
 
-    public StringJoiner add(double value) { return addDelimiter().append(value).counter(); }
+    public Joiner add(double value) { return addDelimiter().append(value).counter(); }
 
-    public StringJoiner add(boolean value) { return addDelimiter().append(value).counter(); }
+    public Joiner add(boolean value) { return addDelimiter().append(value).counter(); }
 
     /*
      * -------------------------------------------------------
@@ -282,52 +286,122 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    public StringJoiner appendDelimiter() { return append(delimiter); }
+    /**
+     * 直接追加一个分隔符
+     *
+     * @return 当前 Joiner
+     */
+    public Joiner appendDelimiter() { return append(delimiter); }
 
-    public StringJoiner append(Object value) {
+    /**
+     * 直接追加一个值
+     *
+     * @param value 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
+    public Joiner append(Object value) {
         container.append(value);
         return this;
     }
 
+    /**
+     * 直接追加一个值
+     *
+     * @param csq 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
     @Override
-    public StringJoiner append(CharSequence csq) {
+    public Joiner append(CharSequence csq) {
         container.append(csq);
         return this;
     }
 
+    /**
+     * 直接追加一个值
+     *
+     * @param csq   将要追加的值
+     * @param start 起始位置
+     * @param end   结束位置
+     *
+     * @return 当前 Joiner
+     */
     @Override
-    public StringJoiner append(CharSequence csq, int start, int end) {
+    public Joiner append(CharSequence csq, int start, int end) {
         container.append(csq, start, end);
         return this;
     }
 
+    /**
+     * 直接追加一个值
+     *
+     * @param value 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
     @Override
-    public StringJoiner append(char value) {
+    public Joiner append(char value) {
         container.append(value);
         return this;
     }
 
-    public StringJoiner append(int value) {
+    /**
+     * 直接追加一个值
+     *
+     * @param value 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
+    public Joiner append(int value) {
         container.append(value);
         return this;
     }
 
-    public StringJoiner append(long value) {
+    /**
+     * 直接追加一个值
+     *
+     * @param value 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
+    public Joiner append(long value) {
         container.append(value);
         return this;
     }
 
-    public StringJoiner append(float value) {
+    /**
+     * 直接追加一个值
+     *
+     * @param value 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
+    public Joiner append(float value) {
         container.append(value);
         return this;
     }
 
-    public StringJoiner append(double value) {
+    /**
+     * 直接追加一个值
+     *
+     * @param value 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
+    public Joiner append(double value) {
         container.append(value);
         return this;
     }
 
-    public StringJoiner append(boolean value) {
+    /**
+     * 直接追加一个值
+     *
+     * @param value 将要追加的值
+     *
+     * @return 当前 Joiner
+     */
+    public Joiner append(boolean value) {
         container.append(value);
         return this;
     }
@@ -338,20 +412,20 @@ public class StringJoiner
      * -------------------------------------------------------
      */
 
-    private StringJoiner clear(CharSequence defaultValue) {
+    private Joiner clear(CharSequence defaultValue) {
         this.container = defaultValue == null ? new StringBuilder() : new StringBuilder(defaultValue);
         this.itemCount = 0;
         return this;
     }
 
-    private StringJoiner ensure(int size) { return ensureCapacity(size * DFT_LEN); }
+    private Joiner ensure(int size) { return ensureCapacity(size * DFT_LEN); }
 
-    public StringJoiner ensureCapacity(int minCapacity) {
+    public Joiner ensureCapacity(int minCapacity) {
         container.ensureCapacity(minCapacity);
         return this;
     }
 
-    public StringJoiner clear() { return clear(prefix); }
+    public Joiner clear() { return clear(prefix); }
 
     public int contentLength() { return container.length() - prefix.length(); }
 
@@ -359,8 +433,8 @@ public class StringJoiner
     public int length() { return container.length() + suffix.length(); }
 
     @Override
-    public StringJoiner clone() {
-        return new StringJoiner(stringifier, prefix, delimiter, suffix, useForNull, requireNonNull, container);
+    public Joiner clone() {
+        return new Joiner(stringifier, prefix, delimiter, suffix, useForNull, requireNonNull, container);
     }
 
     @Override
@@ -370,7 +444,7 @@ public class StringJoiner
     }
 
     @Override
-    public StringJoiner subSequence(int start, int end) {
+    public Joiner subSequence(int start, int end) {
         throw new UnsupportedOperationException();
     }
 

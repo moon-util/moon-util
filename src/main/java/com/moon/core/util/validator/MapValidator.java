@@ -4,9 +4,7 @@ import com.moon.core.util.MapUtil;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 /**
  * @author moonsky
@@ -57,9 +55,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前 Validator 对象
      */
     @Override
-    public MapValidator<M, K, V> ifValid(Consumer<? super M> consumer) {
-        return super.ifValid(consumer);
-    }
+    public MapValidator<M, K, V> ifValid(Consumer<? super M> consumer) { return super.ifValid(consumer); }
 
     /**
      * 当验证不通过时执行处理
@@ -69,9 +65,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前 Validator 对象
      */
     @Override
-    public MapValidator<M, K, V> ifInvalid(Consumer<? super M> consumer) {
-        return super.ifInvalid(consumer);
-    }
+    public MapValidator<M, K, V> ifInvalid(Consumer<? super M> consumer) { return super.ifInvalid(consumer); }
 
     /**
      * 直接添加一条错误消息
@@ -81,9 +75,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前 Validator 实例
      */
     @Override
-    public MapValidator<M, K, V> addErrorMessage(String message) {
-        return super.addErrorMessage(message);
-    }
+    public MapValidator<M, K, V> addErrorMessage(String message) { return super.addErrorMessage(message); }
 
     /**
      * 可用于在后面条件验证前预先设置一部分默认值
@@ -95,9 +87,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前 Validator 实例
      */
     @Override
-    public MapValidator<M, K, V> preset(Consumer<? super M> consumer) {
-        return super.preset(consumer);
-    }
+    public MapValidator<M, K, V> preset(Consumer<? super M> consumer) { return super.preset(consumer); }
 
     /**
      * 设置是否立即终止，如果设置了即时终止，那么在设置之后第一个验证不通过会立即抛出异常
@@ -109,9 +99,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前 Validator 实例
      */
     @Override
-    public MapValidator<M, K, V> setImmediate(boolean immediate) {
-        return super.setImmediate(immediate);
-    }
+    public MapValidator<M, K, V> setImmediate(boolean immediate) { return super.setImmediate(immediate); }
 
     /**
      * 设置错误信息分隔符，不能为 null
@@ -121,8 +109,18 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前 Validator 实例
      */
     @Override
-    public MapValidator<M, K, V> setSeparator(String separator) {
-        return super.setSeparator(separator);
+    public MapValidator<M, K, V> setSeparator(String separator) { return super.setSeparator(separator); }
+
+    /**
+     * 异常构造器
+     *
+     * @param exceptionBuilder 异常构造器
+     *
+     * @return 当前对象
+     */
+    @Override
+    public MapValidator<M, K, V> setExceptionBuilder(Function<String, ? extends RuntimeException> exceptionBuilder) {
+        return super.setExceptionBuilder(exceptionBuilder);
     }
 
     /**
@@ -154,7 +152,32 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
     }
 
     /**
-     * 要求当存在指定映射时应该符合验证，使用指定错误信息
+     * 要求存在指定 KEY
+     *
+     * @param key 指定 key
+     *
+     * @return 当前验证对象
+     */
+    @Override
+    public MapValidator<M, K, V> requirePresentKey(K key) {
+        return requirePresentKey(key, requirePresentKey);
+    }
+
+    /**
+     * 要求存在指定 KEY
+     *
+     * @param key     指定 key
+     * @param message 错误消息模板
+     *
+     * @return 当前验证对象
+     */
+    @Override
+    public MapValidator<M, K, V> requirePresentKey(K key, String message) {
+        return super.useEffective(getValue().containsKey(key), key, message);
+    }
+
+    /**
+     * 要求在存在某个映射时，其对应的值应该符合验证，使用指定错误信息模板
      *
      * @param key     存在指定键时验证对应项目
      * @param tester  验证函数
@@ -163,16 +186,12 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前验证对象
      */
     @Override
-    public MapValidator<M, K, V> requireKeyOf(K key, Predicate<? super V> tester, String message) {
-        M map = getValue();
-        if (map.containsKey(key) && !tester.test(map.get(key))) {
-            addErrorMessage(message);
-        }
-        return current();
+    public MapValidator<M, K, V> requireValueOf(K key, Predicate<? super V> tester, String message) {
+        return super.useEffective(getValue().get(key), tester, message);
     }
 
     /**
-     * 要求在存在某个映射时应该符合验证
+     * 要求在存在某个映射时，其对应的值应该符合验证
      *
      * @param key    存在指定键时验证对应项目
      * @param tester 验证函数
@@ -180,8 +199,28 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前验证对象
      */
     @Override
-    public MapValidator<M, K, V> requireKeyOf(K key, Predicate<? super V> tester) {
-        return requireKeyOf(key, tester, Value.NONE);
+    public MapValidator<M, K, V> requireValueOf(K key, Predicate<? super V> tester) {
+        return requireValueOf(key, tester, invalidValue);
+    }
+
+    public MapValidator<M, K, V> ifPresentKey(
+        K key, BiConsumer<? super K, Validator<V>> scopedValidator
+    ) {
+        V collect = getValue().get(key);
+        if (collect != null) {
+            scopedValidator.accept(key,
+                new Validator<>(collect, isNullable(), ensureMessages(), getSeparator(), isImmediate()));
+        }
+        return current();
+    }
+
+    public MapValidator<M, K, V> forEach(BiConsumer<? super K, Validator<? super V>> scopedValidator) {
+        final M value = getValue();
+        for (Map.Entry<K, V> kvEntry : value.entrySet()) {
+            scopedValidator.accept(kvEntry.getKey(),
+                new Validator<>(kvEntry.getValue(), isNullable(), ensureMessages(), getSeparator(), isImmediate()));
+        }
+        return current();
     }
 
     /**
@@ -193,7 +232,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireEvery(BiPredicate<? super K, ? super V> tester) {
-        return requireEvery(tester, Value.NONE);
+        return requireEvery(tester, requireEvery);
     }
 
     /**
@@ -218,7 +257,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireAtLeast1(BiPredicate<? super K, ? super V> tester) {
-        return requireAtLeast1(tester, Value.NONE);
+        return requireAtLeast1(tester, requireAtLeast);
     }
 
     /**
@@ -244,7 +283,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireAtLeastOf(int count, BiPredicate<? super K, ? super V> tester) {
-        return requireAtLeastOf(count, tester, Value.NONE);
+        return requireAtLeastOf(count, tester, requireAtLeast);
     }
 
     /**
@@ -256,7 +295,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireNone(BiPredicate<? super K, ? super V> tester) {
-        return requireNone(tester, Value.NONE);
+        return requireNone(tester, requireNone);
     }
 
     /**
@@ -281,7 +320,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireAtMost1(BiPredicate<? super K, ? super V> tester) {
-        return requireAtMost1(tester, Value.NONE);
+        return requireAtMost1(tester, requireAtMost);
     }
 
     /**
@@ -307,7 +346,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireAtMostOf(int count, BiPredicate<? super K, ? super V> tester) {
-        return requireAtMostOf(count, tester, Value.NONE);
+        return requireAtMostOf(count, tester, requireAtMost);
     }
 
     /**
@@ -319,7 +358,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireOnly(BiPredicate<? super K, ? super V> tester) {
-        return requireOnly(tester, Value.NONE);
+        return requireOnly(tester, requireOnly);
     }
 
     /**
@@ -345,7 +384,7 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      */
     @Override
     public MapValidator<M, K, V> requireCountOf(int count, BiPredicate<? super K, ? super V> tester) {
-        return requireCountOf(count, tester, Value.NONE);
+        return requireCountOf(count, tester, requireCountOf);
     }
 
     /**
@@ -356,7 +395,5 @@ public final class MapValidator<M extends Map<K, V>, K, V> extends BaseValidator
      * @return 当前 IValidator 对象
      */
     @Override
-    public MapValidator<M, K, V> require(Predicate<? super M> tester) {
-        return require(tester, Value.NONE);
-    }
+    public MapValidator<M, K, V> require(Predicate<? super M> tester) { return require(tester, invalidValue); }
 }

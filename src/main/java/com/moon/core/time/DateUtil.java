@@ -227,6 +227,8 @@ public final class DateUtil extends CalendarUtil {
      * to java.util.Date ============================================
      */
 
+    public static Date toDate(long timestamp) { return new Date(timestamp); }
+
     public static Date toDate(Object value) {
         if (value == null) { return null; }
         if (value instanceof Date) { return (Date) value; }

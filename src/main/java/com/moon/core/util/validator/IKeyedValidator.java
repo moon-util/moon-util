@@ -4,6 +4,7 @@ import com.moon.core.util.MapUtil;
 
 import java.util.Map;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -52,7 +53,28 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL extends IKeyedValidato
      */
 
     /**
-     * 要求当存在指定映射时应该符合验证，使用指定错误信息
+     * 要求存在指定 KEY
+     *
+     * @param key 指定 key
+     *
+     * @return 当前验证对象
+     */
+    default IMPL requirePresentKey(K key) {
+        return requirePresentKey(key, "Require present key of: {}");
+    }
+
+    /**
+     * 要求存在指定 KEY
+     *
+     * @param key     指定 key
+     * @param message 错误消息模板
+     *
+     * @return 当前验证对象
+     */
+    IMPL requirePresentKey(K key, String message);
+
+    /**
+     * 要求在存在某个键对应映射值应该符合验证，使用指定错误信息模板
      *
      * @param key     存在指定键时验证对应项目
      * @param tester  验证函数
@@ -60,24 +82,24 @@ interface IKeyedValidator<M extends Map<K, V>, K, V, IMPL extends IKeyedValidato
      *
      * @return 当前验证对象
      */
-    default IMPL requireKeyOf(K key, Predicate<? super V> tester, String message) {
+    default IMPL requireValueOf(K key, Predicate<? super V> tester, String message) {
         M map = getValue();
-        if (map.containsKey(key) && !tester.test(map.get(key))) {
+        if (!tester.test(map.get(key))) {
             addErrorMessage(message);
         }
         return (IMPL) this;
     }
 
     /**
-     * 要求在存在某个映射时应该符合验证
+     * 要求在存在某个键对应映射值应该符合验证
      *
      * @param key    存在指定键时验证对应项目
      * @param tester 验证函数
      *
      * @return 当前验证对象
      */
-    default IMPL requireKeyOf(K key, Predicate<? super V> tester) {
-        return requireKeyOf(key, tester, Value.NONE);
+    default IMPL requireValueOf(K key, Predicate<? super V> tester) {
+        return requireValueOf(key, tester, Value.NONE);
     }
 
     /*

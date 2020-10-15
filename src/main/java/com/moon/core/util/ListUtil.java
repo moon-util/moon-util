@@ -6,6 +6,7 @@ import com.moon.core.lang.ThrowUtil;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -84,8 +85,7 @@ public final class ListUtil extends CollectUtil {
     }
 
     public static <T> ArrayList<T> newArrayList(Iterator<? extends T> iterator) {
-        return addAll(newArrayList(),
-            iterator);
+        return addAll(newArrayList(), iterator);
     }
 
     /*
@@ -158,7 +158,19 @@ public final class ListUtil extends CollectUtil {
      *
      * @return empty ArrayList if null
      */
-    public static <T> List<T> newIfNull(List<T> list) { return list == null ? newList() : list; }
+    public static <T> List<T> newIfNull(List<T> list) { return newIfNull(list, ListUtil::newList); }
+
+    /**
+     * 确保返回集合是可操作的{@code List}，用于规避{@link Collections#emptyList()}
+     *
+     * @param list list
+     * @param <T>  list 元素类型
+     *
+     * @return empty ArrayList if null
+     */
+    public static <T> List<T> newIfNull(List<T> list, Supplier<? extends List<T>> creator) {
+        return list == null ? creator.get() : list;
+    }
 
     /**
      * 有时候操作的集合可能是{@link Collections#EMPTY_LIST}（某些方法要求返回值为集合是不能为 null）、{@link Arrays#asList(Object[])}
@@ -169,18 +181,18 @@ public final class ListUtil extends CollectUtil {
      *
      * @return empty ArrayList if list is null
      */
-    public static <T> List<T> newIfEmpty(List<T> list) { return isEmpty(list) ? newList() : list; }
+    public static <T> List<T> newIfEmpty(List<T> list) { return newIfEmpty(list, ListUtil::newList); }
 
     /**
-     * 确保返回集合不为 null
+     * 确保返回集合是可操作的{@code List}，用于规避{@link Collections#emptyList()}
      *
      * @param list list
      * @param <T>  list 元素类型
      *
      * @return empty ArrayList if null
      */
-    public static <T> List<T> newLinkedListIfNull(List<T> list) {
-        return list == null ? newLinkedList() : list;
+    public static <T> List<T> newIfEmpty(List<T> list, Supplier<? extends List<T>> creator) {
+        return isEmpty(list) ? creator.get() : list;
     }
 
     /**

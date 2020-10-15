@@ -31,12 +31,12 @@ public final class JoinerUtil {
      * ---------------------------------------------------------------------------
      */
 
-    public static StringJoiner of() { return of(DFT_SEP); }
+    public static Joiner of() { return of(DFT_SEP); }
 
-    public static StringJoiner of(CharSequence delimiter) { return StringJoiner.of(delimiter); }
+    public static Joiner of(CharSequence delimiter) { return Joiner.of(delimiter); }
 
-    public static StringJoiner of(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
-        return StringJoiner.of(delimiter, prefix, suffix);
+    public static Joiner of(CharSequence delimiter, CharSequence prefix, CharSequence suffix) {
+        return Joiner.of(delimiter, prefix, suffix);
     }
 
     /*

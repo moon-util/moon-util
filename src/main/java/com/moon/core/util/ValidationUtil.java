@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 public class ValidationUtil extends TestUtil {
 
     /**
-     * 集合验证器
+     * 集合多条件验证器
      *
      * @param collect 待验证集合
      * @param <C>     集合类型
@@ -60,7 +60,20 @@ public class ValidationUtil extends TestUtil {
     }
 
     /**
-     * Map 验证器
+     * 集合多条件验证器，集合对象可为空
+     *
+     * @param collect 待验证集合
+     * @param <C>     集合类型
+     * @param <E>     集合数据项类型
+     *
+     * @return 集合验证器
+     */
+    public final static <C extends Collection<E>, E> CollectValidator<C, E> ofNullableCollect(C collect) {
+        return CollectValidator.ofNullable(collect);
+    }
+
+    /**
+     * Map 多条件验证器
      *
      * @param map 待验证 Map
      * @param <M> Map 类型
@@ -72,6 +85,20 @@ public class ValidationUtil extends TestUtil {
     public final static <M extends Map<K, V>, K, V> MapValidator<M, K, V> ofMap(M map) { return MapValidator.of(map); }
 
     /**
+     * Map 多条件验证器，Map 对象可为空
+     *
+     * @param map 待验证 Map
+     * @param <M> Map 类型
+     * @param <K> Map 键类型
+     * @param <V> Map 值类型
+     *
+     * @return Map 验证器
+     */
+    public final static <M extends Map<K, V>, K, V> MapValidator<M, K, V> ofNullableMap(M map) {
+        return MapValidator.ofNullable(map);
+    }
+
+    /**
      * 对象多条件验证器
      *
      * @param data 待验证对象
@@ -80,6 +107,16 @@ public class ValidationUtil extends TestUtil {
      * @return 验证器
      */
     public final static <T> Validator<T> of(T data) { return Validator.of(data); }
+
+    /**
+     * 对象多条件验证器，数据对象可为空
+     *
+     * @param data 待验证对象
+     * @param <T>  对象数据类型
+     *
+     * @return 验证器
+     */
+    public final static <T> Validator<T> ofNullable(T data) { return Validator.ofNullable(data); }
 
     /**
      * 18 位居民身份证号验证器

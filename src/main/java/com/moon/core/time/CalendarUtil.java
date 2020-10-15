@@ -1,5 +1,7 @@
 package com.moon.core.time;
 
+import com.moon.core.enums.IntTesters;
+import com.moon.core.enums.Testers;
 import com.moon.core.lang.LongUtil;
 import com.moon.core.util.TestUtil;
 import com.moon.core.util.validator.ResidentID18Validator;
@@ -11,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 
@@ -663,16 +666,12 @@ public class CalendarUtil {
      * 1. 超出部分将忽略
      * 2. 不足部分将用该字段的默认值填充，比如：月、日填充为 1，时间的各字段填充为 0
      *
-     * @param dateString 符合格式 "yyyy-MM-dd HH:mm:ss SSS" 的字符串
+     * @param datetimeString 符合格式 "yyyy-MM-dd HH:mm:ss SSS" 一个或多个字段的字符串
      *
      * @see #extractDateTimeFields(CharSequence)
      */
-    public static Calendar parseToCalendar(String dateString) {
-        return toCalendar(extractDateTimeFields(dateString));
-    }
-
-    public static <T> T parseDateString(String dateString, Function<Calendar, T> transformer) {
-        return transformer.apply(parseToCalendar(dateString));
+    public static Calendar parseToCalendar(String datetimeString) {
+        return transformDateTimeString(datetimeString, CalendarUtil::toCalendar, CalendarUtil::toCalendar);
     }
 
     /**
@@ -712,8 +711,12 @@ public class CalendarUtil {
      * @return 日期年、月、日、时、分、秒、毫秒各字段的值或如果字符串中不包含任何数字时返回 null
      */
     public final static int[] extractDateTimeFields(CharSequence datetimeString) {
-        return doExtractFields(datetimeString, () -> new int[]{1970, 1, 1, 0, 0, 0, 0}, 4, 4);
+        return doExtractDateTimeFields(datetimeString, DATETIME_BUILDER, FIELDS_LENGTH_DATE_TIME, 4);
     }
+
+    private final static Supplier<int[]> DATETIME_BUILDER = () -> new int[]{1970, 1, 1, 0, 0, 0, 0};
+    private final static byte[] FIELDS_LENGTH_DATE_TIME = {4, 2, 2, 2, 2, 2, 3};
+    private final static byte[] FIELDS_LENGTH_TIME = {2, 2, 2, 3};
 
     /**
      * 提取时间各个字段值，参考{@link #extractDateTimeFields(CharSequence)}
@@ -725,35 +728,63 @@ public class CalendarUtil {
      * @return 时间时、分、秒、毫秒各字段的值或如果字符串中不包含任何数字时返回 null
      */
     public final static int[] extractTimeFields(CharSequence timeString) {
-        return doExtractFields(timeString, () -> new int[]{0, 0, 0, 0}, 3, 2);
+        return doExtractDateTimeFields(timeString, () -> new int[]{0, 0, 0, 0}, FIELDS_LENGTH_TIME, 3);
     }
 
     /**
-     * 提前时间日期各字段值
+     * 提取时间日期各字段值
      *
-     * @param datetimeString      日期字符串
-     * @param resultValuesBuilder 返回值构造器
-     * @param sliceMaxLength      所有字段片段最大长度
-     * @param firstSliceMaxLength 第一项字段片段最大长度
+     * @param datetimeString          日期时间字符串
+     * @param initResultFieldsCreator 返回值各字段初始化构造器
+     * @param maxLengthOfEachField    各个字段的最大长度（这个数组的长度要和{@code initializeResultFieldsCreator}返回值长度相同）
+     * @param maxLengthInAllFields    所有字段长度的最大值，这个是{@code maxLengthOfEachField}里的最大值，手动输入，避免一次循环判断
+     *
+     * @return 日期各字段值组成的数组
+     */
+    protected static int[] doExtractDateTimeFields(
+        CharSequence datetimeString,
+        Supplier<int[]> initResultFieldsCreator,
+        byte[] maxLengthOfEachField,
+        int maxLengthInAllFields
+    ) {
+        return doExtractFields(datetimeString,
+            IntTesters.DIGIT,
+            initResultFieldsCreator,
+            maxLengthOfEachField,
+            maxLengthInAllFields);
+    }
+
+    /**
+     * 提取时间日期各字段值
+     *
+     * @param datetimeString          日期时间字符串
+     * @param tester                  判断器，判断是否符合条件，符合条件的字符属于字段的组成部分
+     * @param initResultFieldsCreator 返回值各字段初始化构造器
+     * @param maxLengthOfEachField    各个字段的最大长度（这个数组的长度要和{@code initializeResultFieldsCreator}返回值长度相同）
+     * @param maxLengthInAllFields    所有字段长度的最大值，这个是{@code maxLengthOfEachField}里的最大值，手动输入，避免一次循环判断
      *
      * @return 日期各字段值组成的数组
      */
     protected static int[] doExtractFields(
-        CharSequence datetimeString, Supplier<int[]> resultValuesBuilder, int sliceMaxLength, int firstSliceMaxLength
+        CharSequence datetimeString,
+        IntPredicate tester,
+        Supplier<int[]> initResultFieldsCreator,
+        byte[] maxLengthOfEachField,
+        int maxLengthInAllFields
     ) {
         if (datetimeString == null || datetimeString.length() == 0) {
             return null;
         }
-        char[] chars = datetimeString.toString().toCharArray(), field = new char[sliceMaxLength];
+        char[] chars = datetimeString.toString().toCharArray(), field = new char[maxLengthInAllFields];
         int fieldIdx = 0, valuesIdx = 0, strLen = chars.length, strIdx = skipNonNumeric(chars, 0, strLen);
         if (strIdx == strLen) {
             return null;
         }
-        final int[] values = resultValuesBuilder.get();
-        int last = Math.min(strLen, firstSliceMaxLength), vLastIdx = values.length - 1;
+        final int[] values = initResultFieldsCreator.get();
+        int last = Math.min(strLen, maxLengthOfEachField[0]), vLastIdx = values.length - 1;
 
         for (char ch; strIdx < strLen; ) {
-            if ((ch = chars[strIdx++]) > 47 && ch < 58) {
+            if (tester.test(ch = chars[strIdx++])) {
                 field[fieldIdx++] = ch;
                 if (fieldIdx < last) {
                     continue;
@@ -764,7 +795,7 @@ public class CalendarUtil {
                 return values;
             }
             strIdx = skipNonNumeric(chars, strIdx, strLen);
-            last = valuesIdx == vLastIdx ? 3 : 2;
+            last = maxLengthOfEachField[valuesIdx];
             fieldIdx = 0;
         }
         if (valuesIdx == 0) {
@@ -801,9 +832,7 @@ public class CalendarUtil {
      *
      * @return 日期各字段值符合要求范围值时返回 true，否则返回 false
      */
-    @SuppressWarnings("all")
     public final static boolean isValidDateTimeFields(int minYear, int maxYear, boolean leapSecond, int... values) {
-        boolean validated = true;
         int field, length = Math.max(values == null ? 0 : values.length, 7);
         switch (length) {
             case 0:
@@ -811,53 +840,45 @@ public class CalendarUtil {
             case 7:
                 // 毫秒
                 if ((field = values[6]) < 0 || field > 999) {
-                    validated = false;
-                    break;
+                    return false;
                 }
             case 6:
                 // 秒
                 if ((field = values[5]) < 0 || field > (leapSecond ? 60 : 59)) {
-                    validated = false;
-                    break;
+                    return false;
                 }
             case 5:
                 // 分
                 if ((field = values[4]) < 0 || field > 59) {
-                    validated = false;
-                    break;
+                    return false;
                 }
             case 4:
                 // 时
                 if ((field = values[3]) < 0 || field > 23) {
-                    validated = false;
-                    break;
+                    return false;
                 }
             case 3:
                 // 日
                 if ((field = values[1]) < 1 || field > 12) {
-                    validated = false;
-                    break;
+                    return false;
                 } else {
                     int lengthOfMonth = Month.of(field).length(Year.isLeap(values[0]));
                     if ((field = values[2]) < 1 || field > lengthOfMonth) {
-                        validated = false;
-                        break;
+                        return false;
                     }
                 }
             case 2:
                 // 月
                 if ((field = values[1]) < 1 || field > 12) {
-                    validated = false;
-                    break;
+                    return false;
                 }
             case 1:
                 // 年
                 if ((field = values[0]) < minYear || field > maxYear) {
-                    validated = false;
-                    break;
+                    return false;
                 }
         }
-        return validated;
+        return true;
     }
 
     /**
@@ -927,10 +948,6 @@ public class CalendarUtil {
     public final static Calendar toCalendar(Number num) { return num == null ? null : toCalendar(num.longValue()); }
 
     public final static Calendar toCalendar(long timeMillis) {
-        if (timeMillis < 10000) {
-            int[] values = {(int) timeMillis};
-            return toCalendar(values);
-        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeMillis);
         return calendar;
@@ -973,6 +990,25 @@ public class CalendarUtil {
             return timestampTransformer.apply(Long.parseLong(datetimeString.toString()));
         }
         throw new DateTimeParseException("不识别日期格式: " + datetimeString, datetimeString, 0);
+    }
+
+    /**
+     * 暂时没有使用这种方式，增加复杂度
+     * @param timestamp
+     * @param fieldsValueTransformer
+     * @param timestampTransformer
+     * @param <T>
+     * @return
+     */
+    @SuppressWarnings("all")
+    final static <T> T transformLongTimestamp(
+        long timestamp, Function<int[], T> fieldsValueTransformer, LongFunction<T> timestampTransformer
+    ) {
+        if (timestamp < 10000) {
+            int[] values = {(int) timestamp};
+            return fieldsValueTransformer.apply(values);
+        }
+        return timestampTransformer.apply(timestamp);
     }
 
     /**

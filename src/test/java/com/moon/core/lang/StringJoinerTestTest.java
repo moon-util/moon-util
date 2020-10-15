@@ -16,14 +16,14 @@ class StringJoinerTestTest {
     @Test
     void testOf() {
         assertDoesNotThrow(() -> {
-            StringJoiner.of("");
+            Joiner.of("");
         });
     }
 
     @Test
     void testAdd() {
         Object obj = null;
-        StringJoiner joiner = JoinerUtil.of(",", "(", ")").add("aaa").add(obj).add("bbb").add(null);
+        Joiner joiner = JoinerUtil.of(",", "(", ")").add("aaa").add(obj).add("bbb").add(null);
         assertEquals(joiner.toString(), "(aaa,null,bbb,null)");
 
         int[] array = null;
@@ -41,7 +41,7 @@ class StringJoinerTestTest {
             add("dddd");
             add("eeee");
         }};
-        StringJoiner joiner = JoinerUtil.of(",", "( ", " )")
+        Joiner joiner = JoinerUtil.of(",", "( ", " )")
             .useForNull("本少爷")
             .add("aaa").add(obj).add("bbb").add(null)
             .appendDelimiter().setDelimiter("|")
@@ -135,7 +135,7 @@ class StringJoinerTestTest {
     void testCharAt() {
         String prefix = "123", suffix = "789";
 
-        StringJoiner joiner = JoinerUtil.of(",", prefix, suffix);
+        Joiner joiner = JoinerUtil.of(",", prefix, suffix);
         assertion(joiner, prefix + suffix);
 
         joiner = JoinerUtil.of(",", "123", "567").add("abcd");
@@ -149,7 +149,7 @@ class StringJoinerTestTest {
         assertion(joiner, "123aaaa,1,2,3,4,5,6,7,8,ccc567");
     }
 
-    void assertion(StringJoiner joiner, String str) {
+    void assertion(Joiner joiner, String str) {
         int len = str.length(), index = 0;
         assertEquals(joiner.length(), len);
         assertEquals(joiner.get(), str);
@@ -178,8 +178,8 @@ class StringJoinerTestTest {
     void testGet() {
         int count = 10000000;
         StringBuilder sb = new StringBuilder();
-        StringJoiner joiner = JoinerUtil.of(null);
-        StringJoiner adder = StringJoiner.of(",");
+        Joiner joiner = JoinerUtil.of(null);
+        Joiner adder = Joiner.of(",");
 
         for (int i = 0; i < 500; i++) {
             sb.append("500");
@@ -188,7 +188,7 @@ class StringJoinerTestTest {
         }
         sb = new StringBuilder();
         joiner = JoinerUtil.of(null);
-        adder = StringJoiner.of(",");
+        adder = Joiner.of(",");
         long v1 = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             sb.append("500");

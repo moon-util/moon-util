@@ -2,6 +2,7 @@ package com.moon.poi.excel.table;
 
 import com.moon.core.json.JSONNumber;
 import com.moon.core.lang.DoubleUtil;
+import com.moon.core.lang.Joiner;
 import com.moon.core.lang.ref.DoubleAccessor;
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.LongAccessor;
@@ -71,7 +72,7 @@ enum TransferForGet implements GetTransfer {
         StringBuilder.class,
         StringBuffer.class,
         StringJoiner.class,
-        com.moon.core.lang.StringJoiner.class,
+        Joiner.class,
         Character.class,
         char.class) {
         @Override

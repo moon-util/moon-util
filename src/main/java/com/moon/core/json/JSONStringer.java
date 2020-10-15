@@ -2,7 +2,7 @@ package com.moon.core.json;
 
 import com.moon.core.beans.BeanInfoUtil;
 import com.moon.core.enums.Const;
-import com.moon.core.lang.StringJoiner;
+import com.moon.core.lang.Joiner;
 import com.moon.core.lang.ref.BooleanAccessor;
 import com.moon.core.lang.ref.DoubleAccessor;
 import com.moon.core.lang.ref.IntAccessor;
@@ -324,7 +324,7 @@ class JSONStringer implements Stringify {
                     java.util.StringJoiner.class,
                     StringBuilder.class,
                     StringBuffer.class,
-                    StringJoiner.class,
+                    Joiner.class,
                     JSONString.class,
                     CharBuffer.class,
                     String.class,
@@ -386,7 +386,7 @@ class JSONStringer implements Stringify {
                     java.util.StringJoiner[].class,
                     StringBuilder[].class,
                     StringBuffer[].class,
-                    StringJoiner[].class,
+                    Joiner[].class,
                     String[].class);
             }
 

@@ -17,9 +17,13 @@ import java.util.function.*;
 abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Value<T>
     implements Cloneable, Serializable, IValidator<T, IMPL>, Supplier<T> {
 
+    static final Function<String, ? extends RuntimeException> EXCEPTION_BUILDER = RequireValidateException::new;
+
     static final long serialVersionUID = 1L;
 
     static final String SEPARATOR = "; ";
+
+    private Function<String, ? extends RuntimeException> exceptionBuilder;
 
     private List<String> messages;
 
@@ -32,6 +36,79 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
         this.separator = separator;
         this.immediate = immediate;
         this.messages = messages;
+    }
+
+    /*
+     * -----------------------------------------------------------------
+     * format messages
+     * -----------------------------------------------------------------
+     */
+
+    final static String KEY = "{key}", VALUE = "{value}", PLACEHOLDER = "{}", DIGIT = "%d", COUNT = "{count}";
+
+    final static String requireCountOf = "Require count of: {count}.";
+    final static String requireAtLeast = "Require count at least of: {count}.";
+    final static String requireAtMost = "Require count at most of: {count}.";
+    final static String requireOnly = "Require unique items.";
+    final static String requireNone = "Require none items.";
+    final static String requireEvery = "Require every item matches.";
+    final static String invalidValue = "Invalid value: {}.";
+    final static String requirePresentKey = "Require present key of : {}";
+
+    static <T> T dftIfNull(T obj, T defaultValue) { return obj == null ? defaultValue : obj; }
+
+    private static String doFormatValue(String template, Object value) {
+        String message = StringUtil.replaceAll(template, VALUE, value);
+        return StringUtil.replaceFirst(message, PLACEHOLDER, value);
+    }
+
+    private static String doFormatCount(String template, int count) {
+        String message = StringUtil.replaceAll(template, DIGIT, count);
+        return StringUtil.replaceAll(message, COUNT, count);
+    }
+
+    private static String doFormatEntry(String template, Object key, Object value) {
+        return StringUtil.replaceAll(doFormatValue(template, value), KEY, key);
+    }
+
+    private static String doFormatEntryCount(String template, Object key, Object value, int count) {
+        return doFormatEntry(doFormatCount(template, count), key, value);
+    }
+
+    final static String transform4Count(String template, int count) {
+        template = dftIfNull(template, "Invalid count: {}");
+        return doFormatCount(template, count);
+    }
+
+    final static String transform4Value(String template, Object value) {
+        template = dftIfNull(template, "Invalid value: {}");
+        String message = StringUtil.replaceAll(template, VALUE, value);
+        return StringUtil.replaceFirst(message, PLACEHOLDER, value);
+    }
+
+    final static String transform4Value(String template, Object value, int count) {
+        template = dftIfNull(template, "Invalid value: {}");
+        return doFormatValue(doFormatCount(template, count), value);
+    }
+
+    final static String transform4Entry(String template, Object key, Object value) {
+        template = dftIfNull(template, "Invalid entry: {key: '{key}', value: '{value}'}");
+        return doFormatEntry(template, key, value);
+    }
+
+    final static String transform4Entry(String template, Object key, Object value, int count) {
+        template = dftIfNull(template, "Invalid entry: {key: '{key}', value: '{value}'}");
+        return doFormatEntryCount(template, key, value, count);
+    }
+
+    final static String transform4Indexed(String template, Object index, Object value) {
+        template = dftIfNull(template, "Invalid data: {index: '{key}', value: '{value}'}");
+        return doFormatEntry(template, index, value);
+    }
+
+    final static String transform4Indexed(String template, Object index, Object value, int count) {
+        template = dftIfNull(template, "Invalid data: {index: '{key}', value: '{value}'}");
+        return doFormatEntryCount(template, index, value, count);
     }
 
     /*
@@ -49,29 +126,35 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      */
     final IMPL createMsg(String message) {
         if (immediate) {
-            throw new RequireValidateException(message);
+            throw getExceptionBuilder().apply(message);
         } else {
             ensureMessages().add(message);
         }
         return current();
     }
 
-    final IMPL createMsg(boolean tested, String message) { return tested ? current() : createMsg(message); }
-
-    final IMPL createMsgOfCount(String message, int count) {
-        return createMsg(message == null ? String.format("必须有 %d 项符合条件", count) : message);
+    final IMPL createMsg(String template, Object value) {
+        return createMsg(transform4Value(template, value));
     }
 
     final IMPL createMsgAtMost(String message, int count) {
-        return createMsg(message == null ? String.format("最多只能有 %d 项符合条件", count) : message);
+        return createMsg(transform4Count(dftIfNull(message, "最多只能有 %d 项符合条件"), count));
     }
 
     final IMPL createMsgAtLeast(String message, int count) {
-        return createMsg(message == null ? String.format("至少需要有 %d 项符合条件", count) : message);
+        return createMsg(transform4Count(dftIfNull(message, "至少需要有 %d 项符合条件"), count));
     }
 
     final IMPL createMsgCountOf(String message, int count) {
-        return createMsg(message == null ? String.format("只能有 %d 项符合条件", count) : message);
+        return createMsg(transform4Count(dftIfNull(message, "只能有 %d 项符合条件"), count));
+    }
+
+    final <V> IMPL useEffective(boolean matched, V value, String message) {
+        return matched ? current() : createMsg(message, value);
+    }
+
+    final <V> IMPL useEffective(V value, Predicate<? super V> tester, String message) {
+        return useEffective(tester.test(value), value, message);
     }
 
     /*
@@ -86,17 +169,6 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      * @return 错误消息集合
      */
     final List<String> ensureMessages() { return messages == null ? (messages = new ArrayList<>()) : messages; }
-
-    /**
-     * 是否符合条件，在条件内执行
-     * <p>
-     * 目前总是执行
-     *
-     * @param handler 处理器
-     *
-     * @return 当前对象 this
-     */
-    final IMPL ifCondition(Function<T, IMPL> handler) { return handler.apply(value); }
 
     /**
      * 当前对象
@@ -114,43 +186,40 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
     final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL requireAtMostCountOf(
         IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message
     ) {
-        return impl.ifCondition(value -> {
-            int amount = 0;
-            for (Map.Entry<K, V> item : value.entrySet()) {
-                if (tester.test(item.getKey(), item.getValue()) && (++amount > count)) {
-                    return impl.createMsgAtMost(message, count);
-                }
+        final M value = impl.getValue();
+        int amount = 0;
+        for (Map.Entry<K, V> item : value.entrySet()) {
+            if (tester.test(item.getKey(), item.getValue()) && (++amount > count)) {
+                return impl.createMsgAtMost(message, count);
             }
-            return amount > count ? impl.createMsgAtMost(message, count) : impl;
-        });
+        }
+        return amount > count ? impl.createMsgAtMost(message, count) : impl;
     }
 
     final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL requireAtLeastCountOf(
         IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message
     ) {
-        return impl.ifCondition(value -> {
-            int amount = 0;
-            for (Map.Entry<K, V> item : value.entrySet()) {
-                if (tester.test(item.getKey(), item.getValue()) && (++amount >= count)) {
-                    return impl;
-                }
+        final M value = impl.getValue();
+        int amount = 0;
+        for (Map.Entry<K, V> item : value.entrySet()) {
+            if (tester.test(item.getKey(), item.getValue()) && (++amount >= count)) {
+                return impl;
             }
-            return amount < count ? impl.createMsgAtLeast(message, count) : impl;
-        });
+        }
+        return amount < count ? impl.createMsgAtLeast(message, count) : impl;
     }
 
     final static <IMPL extends BaseValidator<M, IMPL>, M extends Map<K, V>, K, V> IMPL requireCountOf(
         IMPL impl, BiPredicate<? super K, ? super V> tester, int count, String message
     ) {
-        return impl.ifCondition(value -> {
-            int amount = 0;
-            for (Map.Entry<K, V> item : value.entrySet()) {
-                if (tester.test(item.getKey(), item.getValue()) && (++amount > count)) {
-                    return impl.createMsgCountOf(message, count);
-                }
+        final M value = impl.getValue();
+        int amount = 0;
+        for (Map.Entry<K, V> item : value.entrySet()) {
+            if (tester.test(item.getKey(), item.getValue()) && (++amount > count)) {
+                return impl.createMsgCountOf(message, count);
             }
-            return amount < count ? impl.createMsgCountOf(message, count) : impl;
-        });
+        }
+        return amount < count ? impl.createMsgCountOf(message, count) : impl;
     }
 
     /*
@@ -158,6 +227,22 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      * public methods
      * -----------------------------------------------------------------
      */
+
+    /**
+     * 异常构造器
+     *
+     * @param exceptionBuilder 异常构造器
+     *
+     * @return 当前对象
+     */
+    public IMPL setExceptionBuilder(Function<String, ? extends RuntimeException> exceptionBuilder) {
+        this.exceptionBuilder = exceptionBuilder;
+        return current();
+    }
+
+    public final Function<String, ? extends RuntimeException> getExceptionBuilder() {
+        return exceptionBuilder == null ? EXCEPTION_BUILDER : exceptionBuilder;
+    }
 
     /**
      * 错误消息集合
@@ -255,7 +340,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
         if (isValid()) {
             return value;
         }
-        throw new RequireValidateException(getMessage());
+        throw getExceptionBuilder().apply(getMessage());
     }
 
     /**
@@ -271,7 +356,7 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
         if (isValid()) {
             return value;
         }
-        throw new RequireValidateException(errorMessage);
+        throw getExceptionBuilder().apply(errorMessage);
     }
 
     /**
@@ -407,6 +492,17 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
         return current();
     }
 
+    /**
+     * 仅在{@link #getValue()}值不等于{@code null}时执行验证
+     *
+     * @param scopedValidator 验证函数
+     *
+     * @return 当前 IValidator 对象
+     */
+    protected IMPL ifNotNull(Consumer<IMPL> scopedValidator) {
+        return when(v -> v != null, scopedValidator);
+    }
+
     /*
      * -----------------------------------------------------------------
      * requires
@@ -423,6 +519,6 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
      */
     @Override
     public IMPL require(Predicate<? super T> tester, String message) {
-        return ifCondition(value -> createMsg(tester.test(value), message));
+        return useEffective(getValue(), tester, message);
     }
 }

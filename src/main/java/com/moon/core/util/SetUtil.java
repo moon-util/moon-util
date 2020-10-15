@@ -4,6 +4,7 @@ import com.moon.core.lang.ThrowUtil;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author moonsky
@@ -177,29 +178,45 @@ public final class SetUtil extends CollectUtil {
      * @param set set
      * @param <T> set 元素类型
      *
-     * @return empty ArrayList if null
+     * @return empty Set if null
      */
-    public static <T> Set<T> newIfNull(Set<T> set) { return set == null ? newSet() : set; }
+    public static <T> Set<T> newIfNull(Set<T> set) { return newIfNull(set, SetUtil::newSet); }
 
     /**
-     * 确保返回集合不为 null
+     * 通常用于确保返回集合不为 null
      *
-     * @param set set
-     * @param <T> set 元素类型
+     * @param set     set
+     * @param creator set 构建器
+     * @param <T>     set 元素类型
      *
-     * @return empty LinkedHashSet if null
+     * @return empty Set if null
      */
-    public static <T> Set<T> newLinkedHashSetIfNull(Set<T> set) { return set == null ? newLinkedHashSet() : set; }
+    public static <T> Set<T> newIfNull(
+        Set<T> set, Supplier<? extends Set<T>> creator
+    ) { return set == null ? creator.get() : set; }
 
     /**
-     * 确保返回集合不为 null
+     * 确保返回集合是可操作的{@code set}，用于规避{@link Collections#emptySet()}
      *
-     * @param set set
-     * @param <T> set 元素类型
+     * @param set
+     * @param <T>
      *
-     * @return empty TreeSet if null
+     * @return
      */
-    public static <T> Set<T> newTreeSetIfNull(Set<T> set) { return set == null ? newTreeSet() : set; }
+    public static <T> Set<T> newIfEmpty(Set<T> set) { return newIfEmpty(set, SetUtil::newSet); }
+
+    /**
+     * 通常用于确保返回集合可操作的{@code set}
+     *
+     * @param set     set
+     * @param creator set 构建器
+     * @param <T>     set 元素类型
+     *
+     * @return empty Set if null
+     */
+    public static <T> Set<T> newIfEmpty(Set<T> set, Supplier<? extends Set<T>> creator) {
+        return isEmpty(set) ? creator.get() : set;
+    }
 
     /**
      * 连接多个集合，返回新集合

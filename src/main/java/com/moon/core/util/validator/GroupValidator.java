@@ -5,10 +5,7 @@ import com.moon.core.util.MapUtil;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.*;
 
 /**
  * @author moonsky
@@ -56,13 +53,12 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
 
     @Override
     public GroupValidator<M, K, C, E> forEach(BiConsumer<? super K, CollectValidator<C, E>> consumer) {
-        return ifCondition(value -> {
-            for (Map.Entry<K, C> item : value.entrySet()) {
-                consumer.accept(item.getKey(),
-                    new CollectValidator<>(item.getValue(), nullable, ensureMessages(), getSeparator(), isImmediate()));
-            }
-            return current();
-        });
+        final M value = getValue();
+        for (Map.Entry<K, C> item : value.entrySet()) {
+            consumer.accept(item.getKey(),
+                new CollectValidator<>(item.getValue(), isNullable(), ensureMessages(), getSeparator(), isImmediate()));
+        }
+        return current();
     }
 
     /**
@@ -73,9 +69,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前 Validator 对象
      */
     @Override
-    public GroupValidator<M, K, C, E> ifValid(Consumer<? super M> consumer) {
-        return super.ifValid(consumer);
-    }
+    public GroupValidator<M, K, C, E> ifValid(Consumer<? super M> consumer) { return super.ifValid(consumer); }
 
     /**
      * 当验证不通过时执行处理
@@ -85,9 +79,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前 Validator 对象
      */
     @Override
-    public GroupValidator<M, K, C, E> ifInvalid(Consumer<? super M> consumer) {
-        return super.ifInvalid(consumer);
-    }
+    public GroupValidator<M, K, C, E> ifInvalid(Consumer<? super M> consumer) { return super.ifInvalid(consumer); }
 
     /**
      * 直接添加一条错误消息
@@ -97,9 +89,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前 Validator 实例
      */
     @Override
-    public GroupValidator<M, K, C, E> addErrorMessage(String message) {
-        return super.addErrorMessage(message);
-    }
+    public GroupValidator<M, K, C, E> addErrorMessage(String message) { return super.addErrorMessage(message); }
 
     /**
      * 可用于在后面条件验证前预先设置一部分默认值
@@ -111,9 +101,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前 Validator 实例
      */
     @Override
-    public GroupValidator<M, K, C, E> preset(Consumer<? super M> consumer) {
-        return super.preset(consumer);
-    }
+    public GroupValidator<M, K, C, E> preset(Consumer<? super M> consumer) { return super.preset(consumer); }
 
     /**
      * 设置是否立即终止，如果设置了即时终止，那么在设置之后第一个验证不通过会立即抛出异常
@@ -125,9 +113,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前 Validator 实例
      */
     @Override
-    public GroupValidator<M, K, C, E> setImmediate(boolean immediate) {
-        return super.setImmediate(immediate);
-    }
+    public GroupValidator<M, K, C, E> setImmediate(boolean immediate) { return super.setImmediate(immediate); }
 
     /**
      * 设置错误信息分隔符，不能为 null
@@ -137,8 +123,18 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前 Validator 实例
      */
     @Override
-    public GroupValidator<M, K, C, E> setSeparator(String separator) {
-        return super.setSeparator(separator);
+    public GroupValidator<M, K, C, E> setSeparator(String separator) { return super.setSeparator(separator); }
+
+    /**
+     * 异常构造器
+     *
+     * @param exceptionBuilder 异常构造器
+     *
+     * @return 当前对象
+     */
+    @Override
+    public GroupValidator<M, K, C, E> setExceptionBuilder(Function<String, ? extends RuntimeException> exceptionBuilder) {
+        return super.setExceptionBuilder(exceptionBuilder);
     }
 
     /**
@@ -170,7 +166,32 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
     }
 
     /**
-     * 要求当存在指定映射时应该符合验证，使用指定错误信息
+     * 要求存在指定 KEY
+     *
+     * @param key 指定 key
+     *
+     * @return 当前验证对象
+     */
+    @Override
+    public GroupValidator<M, K, C, E> requirePresentKey(K key) {
+        return requirePresentKey(key, requirePresentKey);
+    }
+
+    /**
+     * 要求存在指定 KEY
+     *
+     * @param key     指定 key
+     * @param message 错误消息模板
+     *
+     * @return 当前验证对象
+     */
+    @Override
+    public GroupValidator<M, K, C, E> requirePresentKey(K key, String message) {
+        return super.useEffective(getValue().containsKey(key), key, message);
+    }
+
+    /**
+     * 要求在存在某个键对应映射值应该符合验证，使用指定错误信息模板
      *
      * @param key     存在指定键时验证对应项目
      * @param tester  验证函数
@@ -179,18 +200,23 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前验证对象
      */
     @Override
-    public GroupValidator<M, K, C, E> requireKeyOf(
+    public GroupValidator<M, K, C, E> requireValueOf(
         K key, Predicate<? super C> tester, String message
+    ) { return super.useEffective(getValue().get(key), tester, message); }
+
+    public GroupValidator<M, K, C, E> ifPresentKey(
+        K key, BiConsumer<? super K, CollectValidator<C, E>> scopedValidator
     ) {
-        M map = getValue();
-        if (map.containsKey(key) && !tester.test(map.get(key))) {
-            addErrorMessage(message);
+        C collect = getValue().get(key);
+        if (collect != null) {
+            scopedValidator.accept(key,
+                new CollectValidator<>(collect, isNullable(), ensureMessages(), getSeparator(), isImmediate()));
         }
         return current();
     }
 
     /**
-     * 要求在存在某个映射时应该符合验证
+     * 要求在存在某个键对应映射值应该符合验证
      *
      * @param key    存在指定键时验证对应项目
      * @param tester 验证函数
@@ -198,8 +224,8 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前验证对象
      */
     @Override
-    public GroupValidator<M, K, C, E> requireKeyOf(K key, Predicate<? super C> tester) {
-        return requireKeyOf(key, tester, Value.NONE);
+    public GroupValidator<M, K, C, E> requireValueOf(K key, Predicate<? super C> tester) {
+        return requireValueOf(key, tester, invalidValue);
     }
 
     /**
@@ -211,7 +237,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireEvery(BiPredicate<? super K, ? super C> tester) {
-        return requireEvery(tester, Value.NONE);
+        return requireEvery(tester, requireEvery);
     }
 
     /**
@@ -236,7 +262,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireAtLeast1(BiPredicate<? super K, ? super C> tester) {
-        return requireAtLeast1(tester, Value.NONE);
+        return requireAtLeast1(tester, requireAtLeast);
     }
 
     /**
@@ -262,7 +288,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireAtLeastOf(int count, BiPredicate<? super K, ? super C> tester) {
-        return requireAtLeastOf(count, tester, Value.NONE);
+        return requireAtLeastOf(count, tester, requireAtLeast);
     }
 
     /**
@@ -274,7 +300,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireNone(BiPredicate<? super K, ? super C> tester) {
-        return requireNone(tester, Value.NONE);
+        return requireNone(tester, requireNone);
     }
 
     /**
@@ -299,7 +325,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireAtMost1(BiPredicate<? super K, ? super C> tester) {
-        return requireAtMost1(tester, Value.NONE);
+        return requireAtMost1(tester, requireAtMost);
     }
 
     /**
@@ -325,7 +351,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireAtMostOf(int count, BiPredicate<? super K, ? super C> tester) {
-        return requireAtMostOf(count, tester, Value.NONE);
+        return requireAtMostOf(count, tester, requireAtMost);
     }
 
     /**
@@ -337,7 +363,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireOnly(BiPredicate<? super K, ? super C> tester) {
-        return requireOnly(tester, Value.NONE);
+        return requireOnly(tester, requireOnly);
     }
 
     /**
@@ -363,7 +389,7 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      */
     @Override
     public GroupValidator<M, K, C, E> requireCountOf(int count, BiPredicate<? super K, ? super C> tester) {
-        return requireCountOf(count, tester, Value.NONE);
+        return requireCountOf(count, tester, requireCountOf);
     }
 
     /**
@@ -374,7 +400,5 @@ public final class GroupValidator<M extends Map<K, C>, K, C extends Collection<E
      * @return 当前 IValidator 对象
      */
     @Override
-    public GroupValidator<M, K, C, E> require(Predicate<? super M> tester) {
-        return require(tester, Value.NONE);
-    }
+    public GroupValidator<M, K, C, E> require(Predicate<? super M> tester) { return require(tester, invalidValue); }
 }

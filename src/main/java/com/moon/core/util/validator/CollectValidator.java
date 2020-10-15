@@ -58,41 +58,38 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
 
     @Override
     public CollectValidator<C, E> requireAtLeastOf(int count, Predicate<? super E> tester, String message) {
-        return ifCondition(value -> {
-            int amount = 0;
-            for (E item : value) {
-                if (tester.test(item) && (++amount >= count)) {
-                    return this;
-                }
+        final C value = getValue();
+        int amount = 0;
+        for (E item : value) {
+            if (tester.test(item) && (++amount >= count)) {
+                return this;
             }
-            return amount < count ? createMsgAtLeast(message, count) : this;
-        });
+        }
+        return amount < count ? createMsgAtLeast(message, count) : this;
     }
 
     @Override
     public CollectValidator<C, E> requireAtMostOf(int count, Predicate<? super E> tester, String message) {
-        return ifCondition(value -> {
-            int amount = 0;
-            for (E item : value) {
-                if (tester.test(item) && (++amount > count)) {
-                    return createMsgAtMost(message, count);
-                }
+        final C value = getValue();
+        int amount = 0;
+        for (E item : value) {
+            if (tester.test(item) && (++amount > count)) {
+                return createMsgAtMost(message, count);
             }
-            return amount > count ? createMsgAtMost(message, count) : this;
-        });
+        }
+        return amount > count ? createMsgAtMost(message, count) : this;
     }
 
     @Override
     public CollectValidator<C, E> requireCountOf(int count, Predicate<? super E> tester, String message) {
-        return ifCondition(value -> {
-            int amount = 0;
-            for (E item : value) {
-                if (tester.test(item) && (++amount > count)) {
-                    return createMsgCountOf(message, count);
-                }
+        final C value = getValue();
+        int amount = 0;
+        for (E item : value) {
+            if (tester.test(item) && (++amount > count)) {
+                return createMsgCountOf(message, count);
             }
-            return amount < count ? createMsgCountOf(message, count) : this;
-        });
+        }
+        return amount < count ? createMsgCountOf(message, count) : this;
     }
 
     /*
@@ -102,7 +99,10 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
 
     public final <O> GroupValidator<Map<O, Collection<E>>, O, Collection<E>, E> groupBy(Function<? super E, O> grouper) {
-        return new GroupValidator<>(GroupUtil.groupBy(value, grouper), isNullable(), ensureMessages(), getSeparator(),
+        return new GroupValidator<>(GroupUtil.groupBy(value, grouper),
+            isNullable(),
+            ensureMessages(),
+            getSeparator(),
             isImmediate());
     }
 
@@ -125,9 +125,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      * @return 当前 Validator 对象
      */
     @Override
-    public CollectValidator<C, E> ifValid(Consumer<? super C> consumer) {
-        return super.ifValid(consumer);
-    }
+    public CollectValidator<C, E> ifValid(Consumer<? super C> consumer) { return super.ifValid(consumer); }
 
     /**
      * 当验证不通过时执行处理
@@ -137,9 +135,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      * @return 当前 Validator 对象
      */
     @Override
-    public CollectValidator<C, E> ifInvalid(Consumer<? super C> consumer) {
-        return super.ifInvalid(consumer);
-    }
+    public CollectValidator<C, E> ifInvalid(Consumer<? super C> consumer) { return super.ifInvalid(consumer); }
 
     /**
      * 直接添加一条错误消息
@@ -149,9 +145,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      * @return 当前 Validator 实例
      */
     @Override
-    public CollectValidator<C, E> addErrorMessage(String message) {
-        return super.addErrorMessage(message);
-    }
+    public CollectValidator<C, E> addErrorMessage(String message) { return super.addErrorMessage(message); }
 
     /**
      * 可用于在后面条件验证前预先设置一部分默认值
@@ -163,9 +157,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      * @return 当前 Validator 实例
      */
     @Override
-    public CollectValidator<C, E> preset(Consumer<? super C> consumer) {
-        return super.preset(consumer);
-    }
+    public CollectValidator<C, E> preset(Consumer<? super C> consumer) { return super.preset(consumer); }
 
     /**
      * 设置是否立即终止，如果设置了即时终止，那么在设置之后第一个验证不通过会立即抛出异常
@@ -177,9 +169,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      * @return 当前 Validator 实例
      */
     @Override
-    public CollectValidator<C, E> setImmediate(boolean immediate) {
-        return super.setImmediate(immediate);
-    }
+    public CollectValidator<C, E> setImmediate(boolean immediate) { return super.setImmediate(immediate); }
 
     /**
      * 设置错误信息分隔符，不能为 null
@@ -189,8 +179,18 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      * @return 当前 Validator 实例
      */
     @Override
-    public CollectValidator<C, E> setSeparator(String separator) {
-        return super.setSeparator(separator);
+    public CollectValidator<C, E> setSeparator(String separator) { return super.setSeparator(separator); }
+
+    /**
+     * 异常构造器
+     *
+     * @param exceptionBuilder 异常构造器
+     *
+     * @return 当前对象
+     */
+    @Override
+    public CollectValidator<C, E> setExceptionBuilder(Function<String, ? extends RuntimeException> exceptionBuilder) {
+        return super.setExceptionBuilder(exceptionBuilder);
     }
 
     /**
@@ -230,7 +230,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireEvery(Predicate<? super E> tester) {
-        return requireEvery(tester, "requireEvery");
+        return requireEvery(tester, requireEvery);
     }
 
     /**
@@ -255,7 +255,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireAtLeast1(Predicate<? super E> tester) {
-        return requireAtLeast1(tester, "requireAtLeast1");
+        return requireAtLeast1(tester, requireAtLeast);
     }
 
     /**
@@ -281,7 +281,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireAtLeastOf(int count, Predicate<? super E> tester) {
-        return requireAtLeastOf(count, tester, "requireAtLeastCountOf");
+        return requireAtLeastOf(count, tester, requireAtLeast);
     }
 
     /**
@@ -293,7 +293,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireNone(Predicate<? super E> tester) {
-        return requireNone(tester, "requireNone");
+        return requireNone(tester, requireNone);
     }
 
     /**
@@ -318,7 +318,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireAtMost1(Predicate<? super E> tester) {
-        return requireAtMost1(tester, "requireAtMost1");
+        return requireAtMost1(tester, requireAtMost);
     }
 
     /**
@@ -344,7 +344,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireAtMostOf(int count, Predicate<? super E> tester) {
-        return requireAtMostOf(count, tester, "requireAtMostCountOf");
+        return requireAtMostOf(count, tester, requireAtMost);
     }
 
     /**
@@ -356,7 +356,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireOnly(Predicate<? super E> tester) {
-        return requireOnly(tester, "requireOnly");
+        return requireOnly(tester, requireOnly);
     }
 
     /**
@@ -382,7 +382,7 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> requireCountOf(int count, Predicate<? super E> tester) {
-        return requireCountOf(count, tester, "requireCountOf");
+        return requireCountOf(count, tester, requireCountOf);
     }
 
     /**
@@ -394,6 +394,6 @@ public final class CollectValidator<C extends Collection<E>, E> extends BaseVali
      */
     @Override
     public CollectValidator<C, E> require(Predicate<? super C> tester) {
-        return require(tester, Value.NONE);
+        return require(tester, invalidValue);
     }
 }

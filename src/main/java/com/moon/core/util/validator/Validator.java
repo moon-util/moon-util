@@ -110,6 +110,18 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
     public Validator<T> setSeparator(String separator) { return super.setSeparator(separator); }
 
     /**
+     * 异常构造器
+     *
+     * @param exceptionBuilder 异常构造器
+     *
+     * @return 当前对象
+     */
+    @Override
+    public Validator<T> setExceptionBuilder(Function<String, ? extends RuntimeException> exceptionBuilder) {
+        return super.setExceptionBuilder(exceptionBuilder);
+    }
+
+    /**
      * 要求符合条件
      *
      * @param tester  断言函数
@@ -128,7 +140,7 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
      * @return 当前 Validator 对象
      */
     @Override
-    public Validator<T> require(Predicate<? super T> tester) { return this.require(tester, "Invalid data"); }
+    public Validator<T> require(Predicate<? super T> tester) { return this.require(tester, "Invalid value: {}"); }
 
     /**
      * 快速检测某个字段值，要去字段值复合指定要求
@@ -140,7 +152,7 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
      * @return 当前 Validator 对象
      */
     public <F> Validator<T> requireOnField(Function<? super T, ? extends F> getter, Predicate<? super F> tester) {
-        return requireOnField(getter, tester, "Invalid field value");
+        return requireOnField(getter, tester, "Invalid field value: {}");
     }
 
     /**
@@ -156,7 +168,7 @@ public final class Validator<T> extends BaseValidator<T, Validator<T>> {
     public <F> Validator<T> requireOnField(
         Function<? super T, ? extends F> getter, Predicate<? super F> tester, String message
     ) {
-        createMsg(tester.test(getter.apply(getValue())), message);
+        useEffective(getter.apply(getValue()), tester, message);
         return this;
     }
 

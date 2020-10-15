@@ -1,5 +1,9 @@
 package com.moon.more.util;
 
+import com.moon.core.enums.Testers;
+import com.moon.core.lang.StringUtil;
+import com.moon.core.model.KeyValue;
+import com.moon.core.util.RequireValidateException;
 import com.moon.more.validator.ValidatorUtil;
 import com.moon.more.validator.annotation.AllInInts;
 import com.moon.more.validator.annotation.InInts;
@@ -8,7 +12,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author moonsky
@@ -59,7 +68,7 @@ class ValidatorUtilTestTest {
         UserInfo info = new UserInfo();
 
         Set set = ValidatorUtil.validate(info);
-        Assertions.assertTrue(set.isEmpty());
+        assertTrue(set.isEmpty());
 
         info.certNo = "";
         set = ValidatorUtil.validate(info);
@@ -76,24 +85,33 @@ class ValidatorUtilTestTest {
 
         user.age0 = 19;
         validated = ValidatorUtil.validate(user);
-        Assertions.assertTrue(validated.isEmpty());
+        assertTrue(validated.isEmpty());
 
         User0 user0 = new User0();
         Set<ConstraintViolation<User0>> validated0 = ValidatorUtil.validate(user0);
-        Assertions.assertTrue(validated0.isEmpty());
+        assertTrue(validated0.isEmpty());
 
         User1 user1 = new User1();
         Set<ConstraintViolation<User1>> validated1 = ValidatorUtil.validate(user1);
-        Assertions.assertTrue(validated1.isEmpty());
+        assertTrue(validated1.isEmpty());
 
         User2 user2 = new User2();
         Set<ConstraintViolation<User2>> validated2 = ValidatorUtil.validate(user2);
-        Assertions.assertTrue(validated2.size() == 1);
+        assertTrue(validated2.size() == 1);
         System.out.println(validated2);
     }
 
     @Test
     void testValidateField() throws Exception {
+        assertThrows(IllegalArgumentException.class,() -> {
+            String validatedString = ValidatorUtil.of("123456").when(str -> str != null, validator -> {
+                validator.require(str -> str.length() > 6, "长度不能小于6");
+            }).setExceptionBuilder(RequireValidateException::new).get();
+            System.out.println(validatedString);
+        });
+        assertThrows(IllegalArgumentException.class,() -> {
+            ValidatorUtil.ofNullableCollect(new ArrayList<>()).requireCountOf(3, Testers.isNotNull).get();
+        });
     }
 
     @Test

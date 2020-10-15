@@ -1021,6 +1021,10 @@ class StringUtilTestTest {
 
     @Test
     void testExtractNumerics() throws Exception {
+        String result = StringUtil.replaceAll("123abc123234", "123", "456");
+        System.out.println(result);
+        result = StringUtil.replaceFirst("123abc123234", "123", "456");
+        System.out.println(result);
     }
 
     @Test
