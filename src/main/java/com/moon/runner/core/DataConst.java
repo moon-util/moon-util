@@ -94,7 +94,7 @@ abstract class DataConst<T> implements AsConst {
 
     public static final AsConst getOpposite(DataConst data) {
         BooleanUtil.requireTrue(data instanceof DataNum);
-        Number num = data.run(), value;
+        Number num = (Number) data.run(), value;
         if (num instanceof Double || num instanceof Float) {
             value = -num.doubleValue();
         } else if (num instanceof Long) {

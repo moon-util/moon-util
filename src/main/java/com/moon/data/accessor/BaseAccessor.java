@@ -31,7 +31,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
      *
      * @return 返回插入数据后的对象
      */
-    <S extends T> S persist(S entity);
+    <S extends T> S insert(S entity);
 
     /**
      * 保存

@@ -35,6 +35,7 @@ class ParseCall {
         Object runnerCache;
         int curr = nextVal(chars, indexer, len);
         if (ParseUtil.isVar(curr)) {
+            // 必须是符合变量名开头的名称
             String runnerName = parseVar(chars, indexer, len, curr).toString();
             runnerCache = tryLoaderOrSimpleFn(chars, indexer, len, settings, runnerName);
             if (runnerCache == null) {

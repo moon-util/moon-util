@@ -15,7 +15,7 @@ class PropertiesGroupTestTest {
     void testCreated() {
         String str = "{'conn.url':'localhost:8080','conn.username':'moonsky','conn.password':'123456'}";
         str = "{'conn.url':'localhost:8080','conn.username':'moonsky','conn.password':'123456', 'conn': true}";
-        Runner runner = RunnerUtil.parse(str);
+        Runner<Map<String, String>> runner = RunnerUtil.parse(str);
         Map<String, String> ret = runner.run();
 
         PropertiesGroup group = new PropertiesGroup(ret);

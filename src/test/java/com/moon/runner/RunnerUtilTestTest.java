@@ -27,6 +27,14 @@ class RunnerUtilTestTest extends AbstractTest {
     Runner runner, runner1;
 
     @Test
+    void testRunnerExpression() throws Exception {
+        String expression = "'12' + 36";
+        Runner runner = RunnerUtil.parse(expression);
+        Object result = runner.run();
+        System.out.println(result);
+    }
+
+    @Test
     void testRegex() {
         String expression = "'12'.matches('[\\d]+')";
 

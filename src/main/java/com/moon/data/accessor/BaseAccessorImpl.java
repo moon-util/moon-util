@@ -75,7 +75,9 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements Base
     ) {
         Class access = accessServeClass, domain = domainClass;
 
+        // 自动推测和交换领域实例类和数据访问类
         if (domain == null) {
+            // 根据泛型推断领域实体类型
             domain = deduceDomainClass();
         } else if (!isRecordableType(domain)) {
             if (isAccessorType(domain)) {
@@ -88,6 +90,7 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements Base
                     domain = tempClass;
                 }
             } else {
+                // 根据泛型推断领域实体类型
                 domain = deduceDomainClass();
             }
         }
@@ -104,6 +107,13 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements Base
         AccessorRegistration.registry(getInjectRunner(access));
     }
 
+    /**
+     * 自动注入任务
+     *
+     * @param accessServeClass
+     *
+     * @return
+     */
     protected Runnable getInjectRunner(Class<? extends BaseAccessor> accessServeClass) {
         return () -> {
             BaseAccessor accessor = provideDefaultAccessor();
@@ -183,7 +193,7 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements Base
      */
     @Override
     @Transactional
-    public <S extends T> S persist(S entity) { return getAccessor().persist(entity); }
+    public <S extends T> S insert(S entity) { return getAccessor().insert(entity); }
 
     /**
      * 保存

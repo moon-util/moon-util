@@ -21,6 +21,12 @@ class ParseCore {
 
     private ParseCore() { noInstanceError(); }
 
+    private static final RunnerSetting DEFAULT_SETTINGS = RunnerSetting.of();
+
+    static RunnerSetting toSettings(RunnerSetting argSettings) {
+        return argSettings == null ? DEFAULT_SETTINGS : argSettings;
+    }
+
     private final static Map<String, AsRunner> CACHE = ReferenceUtil.manageMap();
 
     private static final synchronized AsRunner putCache(String expression, AsRunner runner) {
@@ -41,11 +47,9 @@ class ParseCore {
         return runner == null ? (expression == null ? DataConst.NULL : parse(expression, null)) : runner;
     }
 
-    final static AsRunner parse(
-        String expression, RunnerSetting settings
-    ) {
+    final static AsRunner parse(String expression, RunnerSetting settings) {
         char[] chars = expression.trim().toCharArray();
-        AsRunner runner = parse(chars, IntAccessor.of(), chars.length, settings);
+        AsRunner runner = parse(chars, IntAccessor.of(), chars.length, toSettings(settings));
         return settings == null ? putCache(expression, runner) : runner;
     }
 
@@ -172,10 +176,13 @@ class ParseCore {
     ) {
         AsRunner run;
         if (ParseUtil.isStr(curr)) {
+            // 单引号或双引号
             values.add(run = ParseConst.parseStr(chars, indexer, curr));
         } else if (ParseUtil.isNum(curr)) {
+            // 数字
             values.add(run = ParseConst.parseNum(chars, indexer, len, curr));
         } else if (ParseUtil.isVar(curr)) {
+            // 变量名（关键字: null、true、false）
             values.add(run = ParseGetter.parseVar(chars, indexer, len, curr));
         } else {
             switch (curr) {

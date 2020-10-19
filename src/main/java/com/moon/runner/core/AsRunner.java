@@ -6,7 +6,7 @@ import com.moon.runner.Runner;
  * @author moonsky
  */
 @FunctionalInterface
-interface AsRunner extends Runner {
+interface AsRunner<T> extends Runner<T> {
 
     /**
      * 使用外部数据
@@ -16,7 +16,7 @@ interface AsRunner extends Runner {
      * @return 执行后的结果
      */
     @Override
-    default Object run(Object data) { throw new UnsupportedOperationException(); }
+    default T run(Object data) { throw new UnsupportedOperationException(); }
 
     /**
      * 计算

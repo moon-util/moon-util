@@ -1,10 +1,12 @@
 package com.moon.runner;
 
 /**
+ * @param <T> 期望的返回值类型，仅为了方便返回值类型推导，不对解析和执行表达式产生实际影响
+ *
  * @author moonsky
  */
 @FunctionalInterface
-public interface Runner {
+public interface Runner<T> {
 
     /**
      * 如果表达式是含有参数的，用指定参数运行
@@ -12,18 +14,17 @@ public interface Runner {
      * 如果表达式中含有 data 中不包含的变量名，将抛出异常
      *
      * @param data
-     * @param <T>
+     *
      * @return
      */
-    <T> T run(Object data);
+    T run(Object data);
 
     /**
      * 如果表达式不包含参数，运行无参表达式
      *
-     * @param <T>
      * @return
      */
-    default <T> T run() { return run(null); }
+    default T run() { return run(null); }
 
     /**
      * 如果需要使用多个参数，用指定的多参数列表运行解析的表达式
@@ -45,8 +46,8 @@ public interface Runner {
      * runner.runMulti(map1, map2); // 2
      *
      * @param data
-     * @param <T>
+     *
      * @return
      */
-    default <T> T runMulti(Object... data) { return run(new RunnerDataMap(data)); }
+    default T runMulti(Object... data) { return run(new RunnerDataMap(data)); }
 }

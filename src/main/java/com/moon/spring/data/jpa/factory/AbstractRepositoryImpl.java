@@ -9,11 +9,11 @@ import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.repository.DataRepository;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.support.NoOpCacheManager;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -30,17 +30,18 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
-import static org.springframework.data.jpa.convert.QueryByExamplePredicateBuilder.getPredicate;
 
 /**
  * @author moonsky
  */
 @NoRepositoryBean
+@SuppressWarnings("all")
 @Transactional(readOnly = true)
 public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extends SimpleJpaRepository<T, ID>
     implements DataRepository<T, ID> {
@@ -49,7 +50,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     final static Map<String, Object> CACHED_NAMESPACES = new ConcurrentHashMap<>();
 
-    final static CacheManager NO_OP = new NoOpCacheManager();
+    final static CacheManager NO_OP = NoOpCacheManager.MANAGER;
 
     final static Serializable PLACEHOLDER = new byte[0];
 
@@ -125,7 +126,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     @Override
     @Transactional
-    public <S extends T> S persist(S entity) {
+    public <S extends T> S insert(S entity) {
         if (entity.isNew()) {
             return this.save(entity);
         } else {
@@ -572,7 +573,98 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
         @Override
         public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-            return getPredicate(root, cb, example, escapeCharacter);
+            return QueryByExamplePredicateBuilder.getPredicate(root, cb, example, escapeCharacter);
         }
+    }
+
+    private static class NoOpCacheManager implements CacheManager {
+
+        private final static NoOpCacheManager MANAGER = new NoOpCacheManager();
+
+        @Override
+        public Cache getCache(String name) { return NoOpCache.CACHE; }
+
+        @Override
+        public Collection<String> getCacheNames() { return new NoOpSet<>(); }
+    }
+
+    private static class NoOpCache implements Cache {
+
+        private final static NoOpCache CACHE = new NoOpCache();
+
+        @Override
+        public String getName() { return null; }
+
+        @Override
+        public Object getNativeCache() { return null; }
+
+        @Override
+        public ValueWrapper get(Object key) { return null; }
+
+        @Override
+        public <T> T get(Object key, Class<T> type) { return null; }
+
+        @Override
+        public <T> T get(Object key, Callable<T> valueLoader) { return null; }
+
+        @Override
+        public void put(Object key, Object value) { }
+
+        @Override
+        public void evict(Object key) { }
+
+        @Override
+        public void clear() { }
+    }
+
+    private static class NoOpSet<T> implements Set<T> {
+
+        @Override
+        public int size() { return 0; }
+
+        @Override
+        public boolean isEmpty() { return true; }
+
+        @Override
+        public boolean contains(Object o) { return false; }
+
+        @Override
+        public Iterator<T> iterator() { return new NoOpItr(); }
+
+        @Override
+        public Object[] toArray() { return new Object[0]; }
+
+        @Override
+        public <T1> T1[] toArray(T1[] a) { return a; }
+
+        @Override
+        public boolean add(T t) { return false; }
+
+        @Override
+        public boolean remove(Object o) { return false; }
+
+        @Override
+        public boolean containsAll(Collection<?> c) { return false; }
+
+        @Override
+        public boolean addAll(Collection<? extends T> c) { return false; }
+
+        @Override
+        public boolean retainAll(Collection<?> c) { return false; }
+
+        @Override
+        public boolean removeAll(Collection<?> c) { return false; }
+
+        @Override
+        public void clear() { }
+    }
+
+    private static class NoOpItr implements Iterator {
+
+        @Override
+        public boolean hasNext() { return false; }
+
+        @Override
+        public Object next() { return null; }
     }
 }

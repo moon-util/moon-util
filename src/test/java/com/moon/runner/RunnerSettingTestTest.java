@@ -1,6 +1,7 @@
 package com.moon.runner;
 
 import org.junit.jupiter.api.Test;
+import org.objectweb.asm.ClassWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,6 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class RunnerSettingTestTest {
 
+    @Test
+    void testName() throws Exception {
+        ClassWriter writer = new ClassWriter(0);
+    }
 
     String str, name;
 

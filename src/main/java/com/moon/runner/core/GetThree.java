@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class GetThree implements AsGetter {
 
-    private final AsRunner assertRunner;
+    private final AsRunner<Boolean> assertRunner;
     private final AsRunner falseRunner;
     private final AsRunner trueRunner;
 
@@ -19,7 +19,7 @@ public class GetThree implements AsGetter {
 
     @Override
     public Object run(Object data) {
-        return (Boolean) assertRunner.run(data) ? trueRunner.run(data) : falseRunner.run(data);
+        return assertRunner.run(data) ? trueRunner.run(data) : falseRunner.run(data);
     }
 
     static class Builder {
