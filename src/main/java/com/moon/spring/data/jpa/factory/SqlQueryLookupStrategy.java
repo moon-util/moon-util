@@ -19,8 +19,15 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
     private final QueryLookupStrategy lookupStrategy;
     private final QueryExtractor extractor;
     private final EntityManager em;
+    private final RepositoryContextMetadata metadata;
 
-    public SqlQueryLookupStrategy(QueryLookupStrategy lookupStrategy, EntityManager em, QueryExtractor extractor) {
+    public SqlQueryLookupStrategy(
+        QueryLookupStrategy lookupStrategy,
+        EntityManager em,
+        QueryExtractor extractor,
+        RepositoryContextMetadata metadata
+    ) {
+        this.metadata = metadata;
         this.lookupStrategy = lookupStrategy;
         this.extractor = extractor;
         this.em = em;

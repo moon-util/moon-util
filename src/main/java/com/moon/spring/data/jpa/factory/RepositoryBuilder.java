@@ -16,6 +16,7 @@ public interface RepositoryBuilder {
      *
      * @param information 实体信息
      * @param em          实体管理器
+     * @param metadata    元数据：spring 上下文等
      *
      * @return Repository
      *
@@ -23,5 +24,7 @@ public interface RepositoryBuilder {
      * @see AbstractRepositoryImpl
      * @see DataStringRepositoryImpl
      */
-    JpaRepositoryImplementation newRepository(JpaEntityInformation information, EntityManager em);
+    JpaRepositoryImplementation newRepository(
+        JpaEntityInformation information, EntityManager em, RepositoryContextMetadata metadata
+    );
 }

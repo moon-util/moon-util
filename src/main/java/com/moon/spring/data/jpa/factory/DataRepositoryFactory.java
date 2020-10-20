@@ -1,5 +1,6 @@
 package com.moon.spring.data.jpa.factory;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
@@ -23,11 +24,13 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
 
     protected final EntityManager em;
     private final QueryExtractor extractor;
+    private final RepositoryContextMetadata repositoryContextMetadata;
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
-    public DataRepositoryFactory(EntityManager em) {
+    public DataRepositoryFactory(EntityManager em, RepositoryContextMetadata repositoryContextMetadata) {
         super(em);
         this.em = em;
+        this.repositoryContextMetadata = repositoryContextMetadata;
         this.extractor = PersistenceProvider.fromEntityManager(em);
     }
 
@@ -43,7 +46,7 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
     ) {
         Class identifierClass = information.getIdType();
         JpaEntityInformation ei = getEntityInformation(information.getDomainType());
-        return JpaIdentifierUtil.newRepositoryByIdentifierType(identifierClass, ei, em);
+        return JpaIdentifierUtil.newRepositoryByIdentifierType(identifierClass, ei, em, repositoryContextMetadata);
     }
 
     @Override
@@ -59,7 +62,7 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
     protected Optional<QueryLookupStrategy> getQueryLookupStrategy(
         QueryLookupStrategy.Key key, QueryMethodEvaluationContextProvider provider
     ) {
-        return Optional.of(create(em, key, extractor, provider, escapeCharacter));
+        return Optional.of(create(em, key, extractor, provider, escapeCharacter, repositoryContextMetadata));
     }
 
     /**
@@ -81,9 +84,10 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
         QueryLookupStrategy.Key key,
         QueryExtractor extractor,
         QueryMethodEvaluationContextProvider provider,
-        EscapeCharacter escape
+        EscapeCharacter escape,
+        RepositoryContextMetadata metadata
     ) {
         QueryLookupStrategy strategy = SqlQueryLookupStrategyCreator.create(em, key, extractor, provider, escape);
-        return new SqlQueryLookupStrategy(strategy, em, extractor);
+        return new SqlQueryLookupStrategy(strategy, em, extractor, metadata);
     }
 }

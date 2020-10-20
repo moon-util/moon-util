@@ -17,6 +17,8 @@ public final class RecordConst {
      */
     public final static String jpaIdentifierKey = MoonKey.Data.Jpa.IDENTIFIER;
 
+    public final static String CACHE_GROUP = "IM_RECORD";
+
     /**
      * 逻辑删除用
      *

@@ -1,9 +1,14 @@
 package com.moon.spring.data.jpa.factory;
 
 import com.moon.core.lang.ClassUtil;
+import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.core.util.ListUtil;
+import com.moon.core.util.logger.Logger;
+import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.DataRecord;
+import com.moon.data.RecordConst;
+import com.moon.data.annotation.RecordCacheNamespace;
 import com.moon.data.registry.LayerRegistry;
 import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.repository.DataRepository;
@@ -32,6 +37,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -45,6 +51,8 @@ import static java.util.Optional.ofNullable;
 @Transactional(readOnly = true)
 public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extends SimpleJpaRepository<T, ID>
     implements DataRepository<T, ID> {
+
+    protected final static Logger logger = LoggerUtil.getLogger();
 
     final static String[] DELIMITERS = {"", ".", "-", ">", ":", "_"};
 
@@ -60,43 +68,76 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     private final Function<ID, Object> NULL_FN = o -> null;
 
+    protected final RepositoryContextMetadata metadata;
     private final Class domainClass;
     private final EntityManager em;
     private final String cacheNamespace;
 
     public AbstractRepositoryImpl(
-        JpaEntityInformation<T, ?> ei, EntityManager em
+        JpaEntityInformation<T, ?> ei, EntityManager em, RepositoryContextMetadata metadata
     ) {
         super(ei, em);
         this.em = em;
+        this.metadata = metadata;
         this.domainClass = ei.getJavaType();
         LayerRegistry.registerRepository(domainClass, this);
         this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
         this.cacheNamespace = toSingletonNamespace(domainClass, PLACEHOLDER);
     }
 
-    public AbstractRepositoryImpl(Class<T> domainClass, EntityManager em) {
+    public AbstractRepositoryImpl(Class<T> domainClass, EntityManager em, RepositoryContextMetadata metadata) {
         super(domainClass, em);
         this.em = em;
+        this.metadata = metadata;
         this.domainClass = domainClass;
         LayerRegistry.registerRepository(domainClass, this);
         this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
         this.cacheNamespace = toSingletonNamespace(domainClass, PLACEHOLDER);
     }
 
-    protected static String toSingletonNamespace(Class domainClass, Object placeholder) {
-        String namespace = detectNamespace(domainClass.getSimpleName(), placeholder);
+    /**
+     * 这种实现方式当项目存在同名不同包实体类时，可能引起分布式数据不一致，这个问题可通过如下方式解决
+     * <pre>
+     * 在实体类上注解{@link RecordCacheNamespace}
+     * </pre>
+     *
+     * @param domainClass
+     * @param placeholder
+     *
+     * @return
+     */
+    protected static String toSingletonNamespace(Class<?> domainClass, Object placeholder) {
+        String group = RecordConst.CACHE_GROUP, value;
+        RecordCacheNamespace namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheNamespace.class);
+        if (namespaceCfg != null) {
+            group = namespaceCfg.group();
+            value = namespaceCfg.value();
+            // 如果自定义了 group 和 namespace 直接返回
+            if (StringUtil.isNotBlank(value)) {
+                String namespace = mergeNamespace(group, value);
+                CacheNamespace.putNamespace(domainClass, namespace);
+                return namespace;
+            }
+        }
+        // 否则自动推断：实体名、缩写实体名、完全限定名
+        String namespace = detectNamespace(group, domainClass.getSimpleName(), domainClass, placeholder);
         if (namespace != null) {
             return namespace;
         }
         for (String delimiter : DELIMITERS) {
-            String name = ClassUtil.getShortName(domainClass, delimiter);
-            namespace = detectNamespace(name, placeholder);
+            String tempName = ClassUtil.getShortName(domainClass, delimiter);
+            namespace = detectNamespace(group, tempName, domainClass, placeholder);
             if (namespace != null) {
                 return namespace;
             }
         }
-        return String.valueOf(detectNamespace(domainClass.getName(), placeholder));
+        // 完全限定名
+        return detectNamespace(group, domainClass.getName(), domainClass, placeholder);
+    }
+
+    private static String mergeNamespace(String group, String namespace) {
+        StringBuilder sb = new StringBuilder(group).append(' ').append(namespace);
+        return StringUtil.replace(sb.toString().trim(), ' ', ':');
     }
 
     /**
@@ -107,10 +148,12 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
      *
      * @return
      */
-    private static String detectNamespace(String namespace, Object placeholder) {
-        if (!CACHED_NAMESPACES.containsKey(namespace)) {
-            CACHED_NAMESPACES.put(namespace, placeholder);
-            return namespace;
+    private static String detectNamespace(String group, String namespace, Class domainClass, Object placeholder) {
+        String groupedNamespace = mergeNamespace(group, namespace);
+        if (!CACHED_NAMESPACES.containsKey(groupedNamespace)) {
+            CACHED_NAMESPACES.put(groupedNamespace, placeholder);
+            CacheNamespace.putNamespace(domainClass, namespace);
+            return groupedNamespace;
         }
         return null;
     }
@@ -585,7 +628,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         public Cache getCache(String name) { return NoOpCache.CACHE; }
 
         @Override
-        public Collection<String> getCacheNames() { return new NoOpSet<>(); }
+        public Collection<String> getCacheNames() { return NoOpSet.SET; }
     }
 
     private static class NoOpCache implements Cache {
@@ -619,6 +662,9 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     private static class NoOpSet<T> implements Set<T> {
 
+        private final static NoOpSet SET = new NoOpSet();
+        private final static Object[] OBJECTS = new Object[0];
+
         @Override
         public int size() { return 0; }
 
@@ -629,10 +675,10 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         public boolean contains(Object o) { return false; }
 
         @Override
-        public Iterator<T> iterator() { return new NoOpItr(); }
+        public Iterator<T> iterator() { return NoOpItr.ITR; }
 
         @Override
-        public Object[] toArray() { return new Object[0]; }
+        public Object[] toArray() { return OBJECTS; }
 
         @Override
         public <T1> T1[] toArray(T1[] a) { return a; }
@@ -657,14 +703,28 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
         @Override
         public void clear() { }
+
+        @Override
+        public boolean removeIf(java.util.function.Predicate<? super T> filter) { return false; }
+
+        @Override
+        public void forEach(Consumer<? super T> action) { }
     }
 
     private static class NoOpItr implements Iterator {
+
+        private final static NoOpItr ITR = new NoOpItr();
 
         @Override
         public boolean hasNext() { return false; }
 
         @Override
         public Object next() { return null; }
+
+        @Override
+        public void remove() { }
+
+        @Override
+        public void forEachRemaining(Consumer action) { }
     }
 }

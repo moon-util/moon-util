@@ -17,7 +17,11 @@ import javax.persistence.EntityManager;
 final class DataStringRepositoryImpl<T extends JpaRecord<String>> extends AbstractRepositoryImpl<T, String>
     implements DataStringRepository<T> {
 
-    public DataStringRepositoryImpl(JpaEntityInformation<T, ?> ei, EntityManager em) { super(ei, em); }
+    public DataStringRepositoryImpl(
+        JpaEntityInformation<T, ?> ei, EntityManager em, RepositoryContextMetadata metadata
+    ) { super(ei, em, metadata); }
 
-    public DataStringRepositoryImpl(Class<T> domainClass, EntityManager em) { super(domainClass, em); }
+    public DataStringRepositoryImpl(Class<T> domainClass, EntityManager em, RepositoryContextMetadata metadata) {
+        super(domainClass, em, metadata);
+    }
 }

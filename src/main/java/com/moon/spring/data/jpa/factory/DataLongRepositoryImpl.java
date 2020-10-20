@@ -19,7 +19,11 @@ import javax.persistence.EntityManager;
 final class DataLongRepositoryImpl<T extends JpaRecord<Long>> extends AbstractRepositoryImpl<T, Long>
     implements DataRepository<T, Long>, BaseRepository<T, Long>, BaseAccessor<T, Long> {
 
-    public DataLongRepositoryImpl(JpaEntityInformation<T, ?> ei, EntityManager em) { super(ei, em); }
+    public DataLongRepositoryImpl(
+        JpaEntityInformation<T, ?> ei, EntityManager em, RepositoryContextMetadata metadata
+    ) { super(ei, em, metadata); }
 
-    public DataLongRepositoryImpl(Class<T> domainClass, EntityManager em) { super(domainClass, em); }
+    public DataLongRepositoryImpl(Class<T> domainClass, EntityManager em, RepositoryContextMetadata metadata) {
+        super(domainClass, em, metadata);
+    }
 }

@@ -57,6 +57,7 @@ public class MoonUtilConfiguration implements ImportSelector {
         return classes.toArray(new String[classes.size()]);
     }
 
+    @ConditionalOnMissingBean(value = {RedisConfiguration.class})
     @ConditionalOnBean(name = "redisTemplate")
     public static class RedisConfiguration {
 
