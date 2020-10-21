@@ -17,11 +17,11 @@ import java.util.Map;
 public class JpaRecordCacheRegistrar implements ImportBeanDefinitionRegistrar {
 
     /**
-     * @see EnableJpaRecordCache#cacheManagerRef()
+     * @see EnableJpaRecordCaching#cacheManagerRef()
      */
     private final static String PROPERTY_FOR_CACHE_MANAGER_REF = "cacheManagerRef";
     /**
-     * @see EnableJpaRecordCache#group()
+     * @see EnableJpaRecordCaching#group()
      */
     private final static String PROPERTY_FOR_GROUP = "group";
     /**
@@ -37,10 +37,10 @@ public class JpaRecordCacheRegistrar implements ImportBeanDefinitionRegistrar {
         if (registry.containsBeanDefinition(CACHE_PROPERTIES_NAME)) {
             return;
         }
-        Map<String, Object> attributes = metadata.getAnnotationAttributes(EnableJpaRecordCache.class.getName());
+        Map<String, Object> attributes = metadata.getAnnotationAttributes(EnableJpaRecordCaching.class.getName());
         Object cacheManagerBeanName = attributes.get(PROPERTY_FOR_CACHE_MANAGER_REF);
         Object cacheGroupValue = attributes.get(PROPERTY_FOR_GROUP);
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(EnableJpaRecordCache.class,
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(EnableJpaRecordCaching.class,
             () -> new JpaRecordCacheProperties(cacheManagerBeanName, cacheGroupValue));
         registry.registerBeanDefinition(CACHE_PROPERTIES_NAME, builder.getBeanDefinition());
     }
@@ -49,7 +49,7 @@ public class JpaRecordCacheRegistrar implements ImportBeanDefinitionRegistrar {
         return value == null ? "" : value.toString();
     }
 
-    private static class JpaRecordCacheProperties implements EnableJpaRecordCache {
+    private static class JpaRecordCacheProperties implements EnableJpaRecordCaching {
 
         private final String cacheManagerRef;
         private final String group;
@@ -60,7 +60,7 @@ public class JpaRecordCacheRegistrar implements ImportBeanDefinitionRegistrar {
         }
 
         @Override
-        public Class<? extends Annotation> annotationType() { return EnableJpaRecordCache.class; }
+        public Class<? extends Annotation> annotationType() { return EnableJpaRecordCaching.class; }
 
         @Override
         public String cacheManagerRef() { return cacheManagerRef; }

@@ -13,7 +13,11 @@ import com.moon.spring.data.jpa.factory.AbstractRepositoryImpl;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 /**
@@ -77,7 +81,7 @@ public class IdentifierUtil {
      * <p>
      * 整个系统运行期间也不会很多，故这里未考虑超大数据量、并发以及异常（异常会产生少量垃圾数据堆积）等情况，如确有必要，请自行处理
      */
-    private final static Map<Integer, Object> temporaryIdMap = new HashMap<>();
+    private final static Map<Integer, Object> temporaryIdMap = new ConcurrentHashMap<>();
 
     protected final static <T extends Record<?>> T putRecordPresetPrimaryKey(T record) {
         if (record != null) {

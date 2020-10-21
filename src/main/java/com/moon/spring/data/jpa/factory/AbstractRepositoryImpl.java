@@ -6,11 +6,12 @@ import com.moon.core.util.ListUtil;
 import com.moon.core.util.logger.Logger;
 import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.DataRecord;
+import com.moon.data.RecordConst;
 import com.moon.data.annotation.RecordCacheNamespace;
 import com.moon.data.registry.LayerRegistry;
 import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.repository.DataRepository;
-import com.moon.spring.data.jpa.start.EnableJpaRecordCache;
+import com.moon.spring.data.jpa.start.EnableJpaRecordCaching;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
@@ -63,7 +64,13 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
     private final static String[] CACHE_DELIMITERS = {"", ".", "-", ">", ":", "_"};
 
     private final static Map<String, Object> CACHED_NAMESPACES = new ConcurrentHashMap<>();
-
+    /**
+     * 空字符串
+     * <p>
+     * 枚举序列化后可能导致多系统不能互相引用
+     *
+     * @see #isPlaceholder(Object)
+     */
     protected final static Serializable PLACEHOLDER = new byte[0];
 
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
@@ -102,14 +109,14 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     private static <T> T onEnabledRecordCacheOrDefault(
         RepositoryContextMetadata metadata,
-        BiFunction<ApplicationContext, EnableJpaRecordCache, T> converter,
+        BiFunction<ApplicationContext, EnableJpaRecordCaching, T> converter,
         T defaultValue
     ) {
         T resultValue = defaultValue;
         try {
             ApplicationContext context = metadata.getApplicationContext();
             if (context.containsBean(CACHE_PROPERTIES_NAME)) {
-                EnableJpaRecordCache cache = context.getBean(CACHE_PROPERTIES_NAME, EnableJpaRecordCache.class);
+                EnableJpaRecordCaching cache = context.getBean(CACHE_PROPERTIES_NAME, EnableJpaRecordCaching.class);
                 if (context.containsBeanDefinition(cache.cacheManagerRef())) {
                     resultValue = converter.apply(context, cache);
                 }
@@ -146,7 +153,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
      * @return
      */
     protected static String toCacheNamespace(String globalGroup, Class<?> domainClass, Object placeholder) {
-        String group = globalGroup, value;
+        String group = StringUtil.defaultIfBlank(globalGroup, RecordConst.CACHE_GROUP), value;
         RecordCacheNamespace namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheNamespace.class);
         if (namespaceCfg != null) {
             group = namespaceCfg.group();
@@ -569,7 +576,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
                 onCachedEntity(cache, id, getDomainClass(), value);
                 return (T) value;
             }
-        } else if (value == PLACEHOLDER) {
+        } else if (isPlaceholder(value)) {
             // 缓存过一个不存在的值
             Object converted = convertIdIfAbsent.apply(id);
             if (converted == null) {
@@ -586,6 +593,19 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
             // 命中缓存
             return (T) value;
         }
+    }
+
+    /**
+     * 是否是占位符
+     *
+     * @param value
+     *
+     * @return
+     *
+     * @see #PLACEHOLDER
+     */
+    protected boolean isPlaceholder(Object value) {
+        return value instanceof byte[] && ((byte[]) value).length == 0;
     }
 
     /*

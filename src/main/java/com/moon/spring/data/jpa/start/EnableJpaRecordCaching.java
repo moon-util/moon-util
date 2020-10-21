@@ -28,7 +28,7 @@ import java.util.function.Function;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import(JpaRecordCacheRegistrar.class)
-public @interface EnableJpaRecordCache {
+public @interface EnableJpaRecordCaching {
 
     /**
      * 缓存管理器{@link CacheManager}的 bean name
