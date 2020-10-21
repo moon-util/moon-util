@@ -7,6 +7,7 @@ import com.moon.spring.data.jpa.JpaRecord;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
+import org.springframework.data.repository.core.RepositoryInformation;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
@@ -33,8 +34,11 @@ public final class JpaIdentifierUtil extends IdentifierUtil {
         extends AbstractRepositoryImpl<T, Serializable> {
 
         public DefaultRepositoryImpl(
-            JpaEntityInformation ei, EntityManager em, RepositoryContextMetadata metadata
-        ) { super(ei, em, metadata); }
+            RepositoryInformation repositoryInformation,
+            JpaEntityInformation ei,
+            EntityManager em,
+            RepositoryContextMetadata metadata
+        ) { super(repositoryInformation, ei, em, metadata); }
     }
 
     final static <T extends JpaRecord<?>> T extractPresetPrimaryKey(T record) {
@@ -42,14 +46,18 @@ public final class JpaIdentifierUtil extends IdentifierUtil {
     }
 
     @SuppressWarnings("all")
-    public static JpaRepositoryImplementation newRepositoryByIdentifierType(
-        Class identifierClass, JpaEntityInformation information, EntityManager em,RepositoryContextMetadata metadata
+    public static JpaRepositoryImplementation newTargetRepository(
+        RepositoryInformation repositoryInformation,
+        JpaEntityInformation entityInformation,
+        EntityManager em,
+        RepositoryContextMetadata metadata
     ) {
+        Class identifierClass = repositoryInformation.getIdType();
         IdentifierUtil.addUsedIdentifierType(identifierClass);
         Map<Class, RepositoryBuilder> registry = IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY;
         try {
             return registry.getOrDefault(identifierClass, DefaultRepositoryImpl::new)
-                .newRepository(information, em, metadata);
+                .newRepository(repositoryInformation, entityInformation, em, metadata);
         } catch (NullPointerException e) {
             throw new UnknownIdentifierTypeException("未知主键类型: " + identifierClass +//
                 ", 支持的类型有: \n\t" + JoinerUtil.join(registry.keySet(), "\n\t"));

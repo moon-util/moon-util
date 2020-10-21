@@ -1,6 +1,5 @@
 package com.moon.spring.data.jpa.factory;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.jpa.repository.query.EscapeCharacter;
@@ -24,13 +23,13 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
 
     protected final EntityManager em;
     private final QueryExtractor extractor;
-    private final RepositoryContextMetadata repositoryContextMetadata;
+    private final RepositoryContextMetadata metadata;
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
-    public DataRepositoryFactory(EntityManager em, RepositoryContextMetadata repositoryContextMetadata) {
+    public DataRepositoryFactory(EntityManager em, RepositoryContextMetadata metadata) {
         super(em);
         this.em = em;
-        this.repositoryContextMetadata = repositoryContextMetadata;
+        this.metadata = metadata;
         this.extractor = PersistenceProvider.fromEntityManager(em);
     }
 
@@ -44,9 +43,8 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
     protected JpaRepositoryImplementation<?, ?> getTargetRepository(
         RepositoryInformation information, EntityManager em
     ) {
-        Class identifierClass = information.getIdType();
         JpaEntityInformation ei = getEntityInformation(information.getDomainType());
-        return JpaIdentifierUtil.newRepositoryByIdentifierType(identifierClass, ei, em, repositoryContextMetadata);
+        return JpaIdentifierUtil.newTargetRepository(information, ei, em, metadata);
     }
 
     @Override
@@ -62,7 +60,7 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
     protected Optional<QueryLookupStrategy> getQueryLookupStrategy(
         QueryLookupStrategy.Key key, QueryMethodEvaluationContextProvider provider
     ) {
-        return Optional.of(create(em, key, extractor, provider, escapeCharacter, repositoryContextMetadata));
+        return Optional.of(create(em, key, extractor, provider, escapeCharacter, metadata));
     }
 
     /**

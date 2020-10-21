@@ -13,7 +13,7 @@ public abstract class CacheNamespace {
     private final static Map<Class, String> CACHE_NAMESPACE = new HashMap<>();
 
     /**
-     * 只有在初始化时创建，直接加锁即可
+     * 只有在初始化时创建
      *
      * @param type
      * @param namespace
@@ -23,7 +23,8 @@ public abstract class CacheNamespace {
     }
 
     protected static String obtainCacheNamespace(Record record) {
-        Class thisClass = record.getClass();
+        final Class recordClass = record.getClass();
+        Class thisClass = recordClass;
         do {
             String namespace = CACHE_NAMESPACE.get(thisClass);
             if (namespace != null) {
@@ -31,8 +32,20 @@ public abstract class CacheNamespace {
             }
             thisClass = thisClass.getSuperclass();
             if (thisClass == Object.class || thisClass == null) {
-                return null;
+                break;
             }
         } while (true);
+        String implementationName = null;
+        for (Map.Entry<Class, String> entry : CACHE_NAMESPACE.entrySet()) {
+            Class presentClass = entry.getKey();
+            if (recordClass.isAssignableFrom(presentClass)) {
+                if (implementationName == null) {
+                    implementationName = entry.getValue();
+                } else {
+                    return null;
+                }
+            }
+        }
+        return implementationName;
     }
 }

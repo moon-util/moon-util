@@ -2,18 +2,18 @@ package com.moon.spring.data.jpa.factory;
 
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.StringUtil;
-import com.moon.core.lang.ref.LazyAccessor;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.logger.Logger;
 import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.DataRecord;
-import com.moon.data.RecordConst;
 import com.moon.data.annotation.RecordCacheNamespace;
 import com.moon.data.registry.LayerRegistry;
 import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.repository.DataRepository;
+import com.moon.spring.data.jpa.start.EnableJpaRecordCache;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -24,6 +24,7 @@ import org.springframework.data.jpa.repository.query.EscapeCharacter;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -37,6 +38,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -53,36 +55,39 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
     implements DataRepository<T, ID> {
 
     protected final static Logger logger = LoggerUtil.getLogger();
+    /**
+     * @see com.moon.spring.data.jpa.start.JpaRecordCacheRegistrar#CACHE_PROPERTIES_NAME
+     */
+    private final static String CACHE_PROPERTIES_NAME = "iMoonUtilJpaRecordRepositoryCacheProperties";
 
-    final static String[] DELIMITERS = {"", ".", "-", ">", ":", "_"};
+    private final static String[] CACHE_DELIMITERS = {"", ".", "-", ">", ":", "_"};
 
-    final static Map<String, Object> CACHED_NAMESPACES = new ConcurrentHashMap<>();
+    private final static Map<String, Object> CACHED_NAMESPACES = new ConcurrentHashMap<>();
 
-    final static CacheManager NO_OP = NoOpCacheManager.MANAGER;
-
-    final static Serializable PLACEHOLDER = new byte[0];
-
-    private final LazyAccessor<CacheManager> cacheManagerAccessor;
+    protected final static Serializable PLACEHOLDER = new byte[0];
 
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
     private final Function<ID, Object> NULL_FN = o -> null;
-
-    protected final RepositoryContextMetadata metadata;
+    private final RepositoryContextMetadata metadata;
+    private final CacheManager cacheManager;
+    private final String cacheNamespace;
     private final Class domainClass;
     private final EntityManager em;
-    private final String cacheNamespace;
 
     public AbstractRepositoryImpl(
-        JpaEntityInformation<T, ?> ei, EntityManager em, RepositoryContextMetadata metadata
+        RepositoryInformation repositoryInformation,
+        JpaEntityInformation<T, ?> ei,
+        EntityManager em,
+        RepositoryContextMetadata metadata
     ) {
         super(ei, em);
         this.em = em;
         this.metadata = metadata;
         this.domainClass = ei.getJavaType();
         LayerRegistry.registerRepository(domainClass, this);
-        this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
-        this.cacheNamespace = toSingletonNamespace(domainClass, PLACEHOLDER);
+        this.cacheManager = deduceCacheManager(metadata);
+        this.cacheNamespace = deduceCacheNamespace(metadata, domainClass, PLACEHOLDER);
     }
 
     public AbstractRepositoryImpl(Class<T> domainClass, EntityManager em, RepositoryContextMetadata metadata) {
@@ -91,8 +96,42 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         this.metadata = metadata;
         this.domainClass = domainClass;
         LayerRegistry.registerRepository(domainClass, this);
-        this.cacheManagerAccessor = LazyAccessor.of(NO_OP);
-        this.cacheNamespace = toSingletonNamespace(domainClass, PLACEHOLDER);
+        this.cacheManager = deduceCacheManager(metadata);
+        this.cacheNamespace = deduceCacheNamespace(metadata, domainClass, PLACEHOLDER);
+    }
+
+    private static <T> T onEnabledRecordCacheOrDefault(
+        RepositoryContextMetadata metadata,
+        BiFunction<ApplicationContext, EnableJpaRecordCache, T> converter,
+        T defaultValue
+    ) {
+        T resultValue = defaultValue;
+        try {
+            ApplicationContext context = metadata.getApplicationContext();
+            if (context.containsBean(CACHE_PROPERTIES_NAME)) {
+                EnableJpaRecordCache cache = context.getBean(CACHE_PROPERTIES_NAME, EnableJpaRecordCache.class);
+                if (context.containsBeanDefinition(cache.cacheManagerRef())) {
+                    resultValue = converter.apply(context, cache);
+                }
+            }
+        } catch (Throwable ignored) {
+            resultValue = defaultValue;
+        }
+        return resultValue == null ? defaultValue : resultValue;
+    }
+
+    protected static CacheManager deduceCacheManager(RepositoryContextMetadata metadata) {
+        return onEnabledRecordCacheOrDefault(metadata,
+            (ctx, cache) -> ctx.getBean(cache.cacheManagerRef(), CacheManager.class),
+            NoOpCacheManager.MANAGER);
+    }
+
+    protected static String deduceCacheNamespace(
+        RepositoryContextMetadata metadata, Class<?> domainClass, Object placeholder
+    ) {
+        return onEnabledRecordCacheOrDefault(metadata, (ctx, c) -> {
+            return toCacheNamespace(c.group(), domainClass, placeholder);
+        }, null);
     }
 
     /**
@@ -106,8 +145,8 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
      *
      * @return
      */
-    protected static String toSingletonNamespace(Class<?> domainClass, Object placeholder) {
-        String group = RecordConst.CACHE_GROUP, value;
+    protected static String toCacheNamespace(String globalGroup, Class<?> domainClass, Object placeholder) {
+        String group = globalGroup, value;
         RecordCacheNamespace namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheNamespace.class);
         if (namespaceCfg != null) {
             group = namespaceCfg.group();
@@ -124,7 +163,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         if (namespace != null) {
             return namespace;
         }
-        for (String delimiter : DELIMITERS) {
+        for (String delimiter : CACHE_DELIMITERS) {
             String tempName = ClassUtil.getShortName(domainClass, delimiter);
             namespace = detectNamespace(group, tempName, domainClass, placeholder);
             if (namespace != null) {
@@ -136,8 +175,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
     }
 
     private static String mergeNamespace(String group, String namespace) {
-        StringBuilder sb = new StringBuilder(group).append(' ').append(namespace);
-        return StringUtil.replace(sb.toString().trim(), ' ', ':');
+        return new StringBuilder(group).append(' ').append(namespace).toString().trim().replace(' ', ':');
     }
 
     /**
@@ -160,6 +198,13 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     @Override
     public void setEscapeCharacter(EscapeCharacter escapeCharacter) { this.escapeCharacter = escapeCharacter; }
+
+    protected RepositoryContextMetadata getMetadata() { return metadata; }
+
+    protected ApplicationContext getApplicationContext() {
+        RepositoryContextMetadata metadata = getMetadata();
+        return metadata == null ? null : metadata.getApplicationContext();
+    }
 
     /*
      * *****************************************************************************************************************
@@ -411,7 +456,9 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     protected Cache getCache() { return getCache(cacheNamespace); }
 
-    protected Cache getCache(String namespace) { return cacheManagerAccessor.get().getCache(namespace); }
+    protected CacheManager getCacheManager() { return cacheManager; }
+
+    protected Cache getCache(String namespace) { return getCacheManager().getCache(namespace); }
 
     /*
      * *****************************************************************************************************************

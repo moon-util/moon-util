@@ -3,6 +3,7 @@ package com.moon.spring.data.jpa.factory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.data.repository.core.RepositoryInformation;
 
 import javax.persistence.EntityManager;
 
@@ -25,6 +26,6 @@ public interface RepositoryBuilder {
      * @see DataStringRepositoryImpl
      */
     JpaRepositoryImplementation newRepository(
-        JpaEntityInformation information, EntityManager em, RepositoryContextMetadata metadata
+        RepositoryInformation repositoryInformation, JpaEntityInformation information, EntityManager em, RepositoryContextMetadata metadata
     );
 }

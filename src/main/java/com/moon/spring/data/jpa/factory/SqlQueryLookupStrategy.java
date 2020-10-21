@@ -1,6 +1,7 @@
 package com.moon.spring.data.jpa.factory;
 
 import com.moon.data.annotation.SqlSelect;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
@@ -33,6 +34,8 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
         this.em = em;
     }
 
+    public RepositoryContextMetadata getRepositoryContextMetadata() { return metadata; }
+
     @Override
     public RepositoryQuery resolveQuery(
         Method method, RepositoryMetadata metadata, ProjectionFactory factory, NamedQueries namedQueries
@@ -40,22 +43,29 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
         try {
             return lookupStrategy.resolveQuery(method, metadata, factory, namedQueries);
         } catch (RuntimeException e) {
-            RepositoryQuery query = resolveQuery4Sql(method, metadata, factory, namedQueries);
-            return query == null ? doThrowException(method, e) : query;
+            return resolveQuery4Sql(method, metadata, factory, namedQueries, e);
         }
     }
 
-    private SqlRepositoryQuery resolveQuery4Sql(
-        Method method, RepositoryMetadata metadata, ProjectionFactory factory, NamedQueries queries
+    private RepositoryQuery resolveQuery4Sql(
+        Method method, RepositoryMetadata metadata, ProjectionFactory factory, NamedQueries queries, Exception e
     ) {
         SqlSelect sql = method.getAnnotation(SqlSelect.class);
         sql = sql == null ? method.getDeclaredAnnotation(SqlSelect.class) : sql;
-        return sql == null ? null : new SqlRepositoryQuery(sql, method, metadata, factory, extractor, em);
+        requireAnnotated(sql == null, method, e);
+        RepositoryContextMetadata ctxMetadata = getRepositoryContextMetadata();
+        if (RepositoryUtil.isPresentJdbcTemplateBean(ctxMetadata)) {
+            return new JdbcRepositoryQuery(sql, method, metadata, factory, extractor, em, ctxMetadata);
+        }
+        return new JpaRepositoryQuery(sql, method, metadata, factory, extractor, em, ctxMetadata);
     }
 
-    private RepositoryQuery doThrowException(Method method, Exception e) {
-        String message = method.getDeclaringClass().getSimpleName() + "#" + method.getName();
-        message = "解析错误：" + message + ", 请检查语法或使用注解 @Sql(..).";
-        throw new IllegalArgumentException(message, e);
+    final static String MSG_TEMPLATE = "解析错误：{}, 请检查语法或使用注解 @" + SqlSelect.class.getSimpleName() + "(..).";
+
+    private void requireAnnotated(boolean doThrow, Method method, Exception e) {
+        if (doThrow) {
+            String message = method.getDeclaringClass().getSimpleName() + "#" + method.getName();
+            throw new IllegalArgumentException(MSG_TEMPLATE.replace("{}", message), e);
+        }
     }
 }

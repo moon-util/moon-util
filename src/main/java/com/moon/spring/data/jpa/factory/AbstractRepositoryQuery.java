@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * @author moonsky
  */
-public class SqlRepositoryQuery implements RepositoryQuery {
+public abstract class AbstractRepositoryQuery implements RepositoryQuery {
 
     private final RepositoryMetadata metadata;
     private final ProjectionFactory factory;
@@ -29,14 +29,16 @@ public class SqlRepositoryQuery implements RepositoryQuery {
     private final EntityManager em;
     private final Method method;
     private final SqlSelect sql;
+    private final RepositoryContextMetadata repositoryContextMetadata;
 
-    public SqlRepositoryQuery(
+    public AbstractRepositoryQuery(
         SqlSelect sql,
         Method method,
         RepositoryMetadata metadata,
         ProjectionFactory factory,
         QueryExtractor extractor,
-        EntityManager em
+        EntityManager em,
+        RepositoryContextMetadata repositoryContextMetadata
     ) {
         this.em = em;
         this.method = method;
@@ -45,7 +47,7 @@ public class SqlRepositoryQuery implements RepositoryQuery {
         this.extractor = extractor;
         this.sql = Objects.requireNonNull(sql);
         this.queryMethod = new QueryMethod(method, metadata, factory);
-
+        this.repositoryContextMetadata = repositoryContextMetadata;
         Class returnCls = method.getReturnType();
         Type returnType = method.getGenericReturnType();
         if (returnType instanceof ParameterizedType) {
