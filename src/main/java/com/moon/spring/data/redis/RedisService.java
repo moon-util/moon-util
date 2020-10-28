@@ -62,7 +62,7 @@ public class RedisService<K, V> implements Storage<K, V> {
 
     public ListOperations<K, V> list() { return template.opsForList(); }
 
-    public SetOperations<K, V> set() { return template.opsForSet(); }
+    public SetOperations<K, V> valueSet() { return template.opsForSet(); }
 
     public StreamOperations<K, Object, Object> stream() { return template.opsForStream(); }
 
@@ -165,6 +165,18 @@ public class RedisService<K, V> implements Storage<K, V> {
      */
     @Override
     public void set(K key, V value) {
+        valueSet(key, value);
+    }
+
+    /**
+     * 普通缓存放入
+     *
+     * @param key   键
+     * @param value 值
+     *
+     * @return true 成功 false失败
+     */
+    public void valueSet(K key, V value) {
         try {
             value().set(key, value);
         } catch (Exception e) {
@@ -181,8 +193,8 @@ public class RedisService<K, V> implements Storage<K, V> {
      *
      * @return true成功 false 失败
      */
-    public boolean set(K key, V value, long expireOfMilliseconds) {
-        return set(key, value, expireOfMilliseconds, TimeUnit.MILLISECONDS);
+    public boolean valueSet(K key, V value, long expireOfMilliseconds) {
+        return valueSet(key, value, expireOfMilliseconds, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -195,12 +207,12 @@ public class RedisService<K, V> implements Storage<K, V> {
      *
      * @return true成功 false 失败
      */
-    public boolean set(K key, V value, long time, TimeUnit timeUnit) {
+    public boolean valueSet(K key, V value, long time, TimeUnit timeUnit) {
         try {
             if (time > 0) {
                 value().set(key, value, time, timeUnit);
             } else {
-                set(key, value);
+                valueSet(key, value);
             }
             return true;
         } catch (Exception e) {
@@ -216,7 +228,29 @@ public class RedisService<K, V> implements Storage<K, V> {
      * @return 值
      */
     @Override
-    public V get(K key) { return key == null ? null : value().get(key); }
+    public V get(K key) { return valueGet(key); }
+
+    /**
+     * 普通缓存获取
+     *
+     * @param key 键
+     *
+     * @return 值
+     */
+    public V valueGet(K key) { return key == null ? null : value().get(key); }
+
+    /**
+     * 查找或返回默认值
+     *
+     * @param key          key
+     * @param defaultValue 默认值
+     *
+     * @return 查找或返回默认值
+     */
+    public V getOrDefault(K key, V defaultValue) {
+        V cached = get(key);
+        return cached == null ? defaultValue : cached;
+    }
 
     /**
      * 从缓存中获取，获取为 null 则加载，并缓存
@@ -230,7 +264,7 @@ public class RedisService<K, V> implements Storage<K, V> {
         V cached = get(key);
         if (cached == null) {
             cached = puller.get();
-            set(key, cached);
+            valueSet(key, cached);
         }
         return cached;
     }
@@ -248,7 +282,7 @@ public class RedisService<K, V> implements Storage<K, V> {
         V cached = get(key);
         if (cached == null) {
             cached = puller.get();
-            set(key, cached, expireOfMilliseconds);
+            valueSet(key, cached, expireOfMilliseconds);
         }
         return cached;
     }
@@ -267,7 +301,7 @@ public class RedisService<K, V> implements Storage<K, V> {
         V cached = get(key);
         if (cached == null) {
             cached = puller.get();
-            set(key, cached, time, timeUnit);
+            valueSet(key, cached, time, timeUnit);
         }
         return cached;
     }
@@ -302,7 +336,7 @@ public class RedisService<K, V> implements Storage<K, V> {
     /**
      * 递减
      *
-     * @param key   键
+     * @param key 键
      *
      * @return long
      */
@@ -480,7 +514,7 @@ public class RedisService<K, V> implements Storage<K, V> {
      */
     public Set<V> collectGet(K key) {
         try {
-            return set().members(key);
+            return valueSet().members(key);
         } catch (Exception e) {
             return onExceptionThen(e, Collections.emptySet());
         }
@@ -496,7 +530,7 @@ public class RedisService<K, V> implements Storage<K, V> {
      */
     public boolean collectHasKey(K key, Object value) {
         try {
-            return falseIfNull(set().isMember(key, value));
+            return falseIfNull(valueSet().isMember(key, value));
         } catch (Exception e) {
             return onExceptionThenFalse(e);
         }
@@ -513,7 +547,7 @@ public class RedisService<K, V> implements Storage<K, V> {
     @SafeVarargs
     public final long collectAdd(K key, V... values) {
         try {
-            return zeroIfNull(set().add(key, values));
+            return zeroIfNull(valueSet().add(key, values));
         } catch (Exception e) {
             return onExceptionThenZero(e);
         }
@@ -531,7 +565,7 @@ public class RedisService<K, V> implements Storage<K, V> {
     @SafeVarargs
     public final long collectAdd(K key, long time, V... values) {
         try {
-            Long count = set().add(key, values);
+            Long count = valueSet().add(key, values);
             if (time > 0) {
                 expire(key, time);
             }
@@ -550,7 +584,7 @@ public class RedisService<K, V> implements Storage<K, V> {
      */
     public long collectSize(K key) {
         try {
-            return zeroIfNull(set().size(key));
+            return zeroIfNull(valueSet().size(key));
         } catch (Exception e) {
             return onExceptionThenZero(e);
         }
@@ -571,7 +605,7 @@ public class RedisService<K, V> implements Storage<K, V> {
             RLock lock = client.getLock("");
             lock.lock();
 
-            return zeroIfNull(set().remove(key, values));
+            return zeroIfNull(valueSet().remove(key, values));
         } catch (Exception e) {
             return onExceptionThenZero(e);
         }

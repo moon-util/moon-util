@@ -41,6 +41,7 @@ public abstract class CacheNamespace {
                 break;
             }
         } while (true);
+        // 查找唯一子类
         String implementationName = null;
         for (Map.Entry<Class, String> entry : CACHE_NAMESPACE.entrySet()) {
             Class presentClass = entry.getKey();

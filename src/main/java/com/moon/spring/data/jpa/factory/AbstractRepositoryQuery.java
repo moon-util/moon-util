@@ -1,6 +1,5 @@
 package com.moon.spring.data.jpa.factory;
 
-import com.moon.spring.data.jpa.annotation.JdbcSelect;
 import org.hibernate.query.NativeQuery;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.projection.ProjectionFactory;
@@ -28,11 +27,11 @@ public abstract class AbstractRepositoryQuery implements RepositoryQuery {
     private final QueryMethod queryMethod;
     private final EntityManager em;
     private final Method method;
-    private final JdbcSelect sql;
+    private final JdbcAttributes sql;
     private final JpaRecordRepositoryMetadata repositoryContextMetadata;
 
     public AbstractRepositoryQuery(
-        JdbcSelect sql,
+        JdbcAttributes sql,
         Method method,
         RepositoryMetadata metadata,
         ProjectionFactory factory,
