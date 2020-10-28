@@ -1,6 +1,6 @@
 package com.moon.spring.data.jpa.factory;
 
-import com.moon.data.annotation.SqlSelect;
+import com.moon.spring.data.jpa.annotation.JdbcSelect;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
@@ -49,8 +49,8 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
     private RepositoryQuery resolveQuery4Sql(
         Method method, RepositoryMetadata metadata, ProjectionFactory factory, NamedQueries queries, Exception e
     ) {
-        SqlSelect sql = method.getAnnotation(SqlSelect.class);
-        sql = sql == null ? method.getDeclaredAnnotation(SqlSelect.class) : sql;
+        JdbcSelect sql = method.getAnnotation(JdbcSelect.class);
+        sql = sql == null ? method.getDeclaredAnnotation(JdbcSelect.class) : sql;
         requireAnnotated(sql == null, method, e);
         JpaRecordRepositoryMetadata ctxMetadata = getRepositoryContextMetadata();
         if (RepositoryUtil.isPresentJdbcTemplateBean(ctxMetadata)) {
@@ -59,7 +59,7 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
         return new RecordJpaRepositoryQuery(sql, method, metadata, factory, extractor, em, ctxMetadata);
     }
 
-    final static String MSG_TEMPLATE = "解析错误：{}, 请检查语法或使用注解 @" + SqlSelect.class.getSimpleName() + "(..).";
+    final static String MSG_TEMPLATE = "解析错误：{}, 请检查语法或使用注解 @" + JdbcSelect.class.getSimpleName() + "(..).";
 
     private void requireAnnotated(boolean doThrow, Method method, Exception e) {
         if (doThrow) {

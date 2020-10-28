@@ -1,4 +1,4 @@
-package com.moon.data.annotation;
+package com.moon.spring.data.jpa.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 禁用缓存
- *
- * @author moonsky
+ * @author benshaoye
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@interface RecordCacheDisable {}
+public @interface JdbcDelete {
+    String value();
+}

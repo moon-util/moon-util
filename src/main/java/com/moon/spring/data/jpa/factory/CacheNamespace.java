@@ -23,13 +23,19 @@ public abstract class CacheNamespace {
     }
 
     protected static String obtainCacheNamespace(Record record) {
+        return CACHE_NAMESPACE.get(record.getClass());
+    }
+
+    protected static String deduceCacheNamespace(Record record) {
         final Class recordClass = record.getClass();
         Class thisClass = recordClass;
         do {
+            // 优先直接获取
             String namespace = CACHE_NAMESPACE.get(thisClass);
             if (namespace != null) {
                 return namespace;
             }
+            // 或者从直接父类中获取
             thisClass = thisClass.getSuperclass();
             if (thisClass == Object.class || thisClass == null) {
                 break;

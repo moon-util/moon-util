@@ -25,7 +25,7 @@ public class JpaRecordCacheRegistrar implements ImportBeanDefinitionRegistrar {
      */
     private final static String PROPERTY_FOR_GROUP = "group";
     /**
-     * @see com.moon.spring.data.jpa.factory.JpaIdentifierUtil#CACHE_PROPERTIES_NAME
+     * @see com.moon.spring.data.jpa.factory.RecordCacheUtil#CACHE_PROPERTIES_NAME
      */
     @SuppressWarnings("all")
     private final static String CACHE_PROPERTIES_NAME = "iMoonUtilJpaRecordRepositoryCacheProperties";

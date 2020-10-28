@@ -1,4 +1,4 @@
-package com.moon.data.annotation;
+package com.moon.spring.data.jpa.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,11 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author moonsky
+ * @author benshaoye
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SqlSelect {
-
+public @interface JdbcUpdate {
     String value();
 }

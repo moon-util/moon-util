@@ -32,7 +32,6 @@ import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -42,21 +41,13 @@ import static java.util.Optional.ofNullable;
 /**
  * @author moonsky
  */
-@NoRepositoryBean
 @SuppressWarnings("all")
+@NoRepositoryBean
 @Transactional(readOnly = true)
 public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extends SimpleJpaRepository<T, ID>
     implements AbstractDataRepository<T, ID> {
 
     protected final static Logger logger = LoggerUtil.getLogger();
-    /**
-     * @see com.moon.spring.data.jpa.start.JpaRecordCacheRegistrar#CACHE_PROPERTIES_NAME
-     */
-    private final static String CACHE_PROPERTIES_NAME = "iMoonUtilJpaRecordRepositoryCacheProperties";
-
-    private final static String[] CACHE_DELIMITERS = {"", ".", "-", ">", ":", "_"};
-
-    private final static Map<String, Object> CACHED_NAMESPACES = new ConcurrentHashMap<>();
     /**
      * 空字符串
      * <p>
@@ -65,6 +56,19 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
      * @see #isPlaceholder(Object)
      */
     protected final static Serializable PLACEHOLDER = new byte[0];
+
+    /**
+     * 是否是占位符
+     *
+     * @param value
+     *
+     * @return
+     *
+     * @see #PLACEHOLDER
+     */
+    protected static boolean isPlaceholder(Object value) {
+        return value instanceof byte[] && ((byte[]) value).length == 0;
+    }
 
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
@@ -86,8 +90,8 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         this.metadata = metadata;
         this.domainClass = ei.getJavaType();
         LayerRegistry.registerRepository(domainClass, this);
-        this.cacheManager = JpaIdentifierUtil.deduceCacheManager(metadata, NoOpCacheManager.MANAGER);
-        this.cacheNamespace = JpaIdentifierUtil.deduceCacheNamespace(metadata, domainClass, PLACEHOLDER);
+        this.cacheManager = RecordCacheUtil.deduceCacheManager(metadata, domainClass, NoOpCacheManager.MANAGER);
+        this.cacheNamespace = RecordCacheUtil.deduceCacheNamespace(metadata, domainClass, PLACEHOLDER);
     }
 
     @Override
@@ -480,19 +484,6 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
             // 命中缓存
             return (T) value;
         }
-    }
-
-    /**
-     * 是否是占位符
-     *
-     * @param value
-     *
-     * @return
-     *
-     * @see #PLACEHOLDER
-     */
-    protected boolean isPlaceholder(Object value) {
-        return value instanceof byte[] && ((byte[]) value).length == 0;
     }
 
     /*

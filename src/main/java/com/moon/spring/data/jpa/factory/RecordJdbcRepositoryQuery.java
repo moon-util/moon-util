@@ -1,6 +1,6 @@
 package com.moon.spring.data.jpa.factory;
 
-import com.moon.data.annotation.SqlSelect;
+import com.moon.spring.data.jpa.annotation.JdbcSelect;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
@@ -17,7 +17,7 @@ public class RecordJdbcRepositoryQuery extends AbstractRepositoryQuery {
     private final JdbcTemplate jdbcTemplate;
 
     public RecordJdbcRepositoryQuery(
-        SqlSelect sql,
+        JdbcSelect sql,
         Method method,
         RepositoryMetadata metadata,
         ProjectionFactory factory,

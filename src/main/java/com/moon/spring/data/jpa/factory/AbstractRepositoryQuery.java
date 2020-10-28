@@ -1,6 +1,6 @@
 package com.moon.spring.data.jpa.factory;
 
-import com.moon.data.annotation.SqlSelect;
+import com.moon.spring.data.jpa.annotation.JdbcSelect;
 import org.hibernate.query.NativeQuery;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.projection.ProjectionFactory;
@@ -28,11 +28,11 @@ public abstract class AbstractRepositoryQuery implements RepositoryQuery {
     private final QueryMethod queryMethod;
     private final EntityManager em;
     private final Method method;
-    private final SqlSelect sql;
-    private final JpaRecordRepositoryMetadata jpaRecordRepositoryMetadata;
+    private final JdbcSelect sql;
+    private final JpaRecordRepositoryMetadata repositoryContextMetadata;
 
     public AbstractRepositoryQuery(
-        SqlSelect sql,
+        JdbcSelect sql,
         Method method,
         RepositoryMetadata metadata,
         ProjectionFactory factory,
@@ -47,7 +47,7 @@ public abstract class AbstractRepositoryQuery implements RepositoryQuery {
         this.extractor = extractor;
         this.sql = Objects.requireNonNull(sql);
         this.queryMethod = new QueryMethod(method, metadata, factory);
-        this.jpaRecordRepositoryMetadata = jpaRecordRepositoryMetadata;
+        this.repositoryContextMetadata = jpaRecordRepositoryMetadata;
         Class returnCls = method.getReturnType();
         Type returnType = method.getGenericReturnType();
         if (returnType instanceof ParameterizedType) {

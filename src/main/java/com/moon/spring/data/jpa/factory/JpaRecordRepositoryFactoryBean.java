@@ -5,8 +5,8 @@ import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.repository.BaseRepository;
 import com.moon.spring.data.jpa.repository.DataRepository;
 import com.moon.spring.data.jpa.repository.DataStringRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -20,7 +20,7 @@ import javax.persistence.EntityManager;
  * @author moonsky
  */
 public class JpaRecordRepositoryFactoryBean<ID, T extends BaseRepository<E, ID>, E extends JpaRecord<ID>>
-    extends JpaRepositoryFactoryBean<T, E, ID> implements ApplicationContextAware {
+    extends JpaRepositoryFactoryBean<T, E, ID> {
 
     static {
         JpaIdentifierUtil.registerIdentifierTypedRepositoryBuilder(Long.class,
@@ -37,12 +37,20 @@ public class JpaRecordRepositoryFactoryBean<ID, T extends BaseRepository<E, ID>,
 
     @Override
     protected RepositoryFactorySupport createRepositoryFactory(EntityManager em) {
-        return new JpaRecordRepositoryFactory(em, new JpaRecordRepositoryMetadata(applicationContext));
+        return new JpaRecordRepositoryFactory(em, getJpaMetadata());
     }
 
-    @Override
+    @Autowired
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    private JpaRecordRepositoryMetadata getJpaMetadata() {
+        try {
+            return new JpaRecordRepositoryMetadata(applicationContext);
+        } catch (Throwable t) {
+            return new JpaRecordRepositoryMetadata(RecordRepositoryNones.Ctx.CTX);
+        }
     }
 
     @NoRepositoryBean

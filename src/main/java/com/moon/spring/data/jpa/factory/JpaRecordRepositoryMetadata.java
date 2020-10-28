@@ -20,7 +20,7 @@ public class JpaRecordRepositoryMetadata {
 
     public Environment getEnvironment() {
         ApplicationContext ctx = getApplicationContext();
-        return ctx == null ? Zero.Env.ENV : ctx.getEnvironment();
+        return ctx == null ? RecordRepositoryNones.Env.ENV : ctx.getEnvironment();
     }
 
     public boolean containsBean(String beanName) {
