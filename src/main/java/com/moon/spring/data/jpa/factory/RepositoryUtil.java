@@ -11,8 +11,7 @@ final class RepositoryUtil {
 
     private RepositoryUtil() { ThrowUtil.noInstanceError(); }
 
-
-    public static boolean isPresentJdbcTemplateBean(RepositoryContextMetadata metadata) {
+    public static boolean isPresentJdbcTemplateBean(JpaRecordRepositoryMetadata metadata) {
         try {
             return isPresentJdbcTemplateBean(metadata.getApplicationContext());
         } catch (Throwable ignored) {

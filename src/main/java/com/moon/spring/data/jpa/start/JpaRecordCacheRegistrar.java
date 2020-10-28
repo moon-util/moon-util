@@ -25,8 +25,9 @@ public class JpaRecordCacheRegistrar implements ImportBeanDefinitionRegistrar {
      */
     private final static String PROPERTY_FOR_GROUP = "group";
     /**
-     * @see com.moon.spring.data.jpa.factory.AbstractRepositoryImpl#CACHE_PROPERTIES_NAME
+     * @see com.moon.spring.data.jpa.factory.JpaIdentifierUtil#CACHE_PROPERTIES_NAME
      */
+    @SuppressWarnings("all")
     private final static String CACHE_PROPERTIES_NAME = "iMoonUtilJpaRecordRepositoryCacheProperties";
 
     @Override
@@ -45,9 +46,7 @@ public class JpaRecordCacheRegistrar implements ImportBeanDefinitionRegistrar {
         registry.registerBeanDefinition(CACHE_PROPERTIES_NAME, builder.getBeanDefinition());
     }
 
-    private static String emptyIfNull(Object value) {
-        return value == null ? "" : value.toString();
-    }
+    private static String emptyIfNull(Object value) { return value == null ? "" : value.toString(); }
 
     private static class JpaRecordCacheProperties implements EnableJpaRecordCaching {
 

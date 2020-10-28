@@ -6,11 +6,11 @@ import org.springframework.core.env.Environment;
 /**
  * @author moonsky
  */
-public class RepositoryContextMetadata {
+public class JpaRecordRepositoryMetadata {
 
     private final ApplicationContext ctx;
 
-    RepositoryContextMetadata(ApplicationContext applicationContext) {
+    JpaRecordRepositoryMetadata(ApplicationContext applicationContext) {
         this.ctx = applicationContext;
     }
 

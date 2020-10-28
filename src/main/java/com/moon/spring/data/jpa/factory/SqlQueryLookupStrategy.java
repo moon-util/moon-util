@@ -1,7 +1,6 @@
 package com.moon.spring.data.jpa.factory;
 
 import com.moon.data.annotation.SqlSelect;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
@@ -20,13 +19,13 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
     private final QueryLookupStrategy lookupStrategy;
     private final QueryExtractor extractor;
     private final EntityManager em;
-    private final RepositoryContextMetadata metadata;
+    private final JpaRecordRepositoryMetadata metadata;
 
     public SqlQueryLookupStrategy(
         QueryLookupStrategy lookupStrategy,
         EntityManager em,
         QueryExtractor extractor,
-        RepositoryContextMetadata metadata
+        JpaRecordRepositoryMetadata metadata
     ) {
         this.metadata = metadata;
         this.lookupStrategy = lookupStrategy;
@@ -34,7 +33,7 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
         this.em = em;
     }
 
-    public RepositoryContextMetadata getRepositoryContextMetadata() { return metadata; }
+    public JpaRecordRepositoryMetadata getRepositoryContextMetadata() { return metadata; }
 
     @Override
     public RepositoryQuery resolveQuery(
@@ -53,11 +52,11 @@ public class SqlQueryLookupStrategy implements QueryLookupStrategy {
         SqlSelect sql = method.getAnnotation(SqlSelect.class);
         sql = sql == null ? method.getDeclaredAnnotation(SqlSelect.class) : sql;
         requireAnnotated(sql == null, method, e);
-        RepositoryContextMetadata ctxMetadata = getRepositoryContextMetadata();
+        JpaRecordRepositoryMetadata ctxMetadata = getRepositoryContextMetadata();
         if (RepositoryUtil.isPresentJdbcTemplateBean(ctxMetadata)) {
-            return new JdbcRepositoryQuery(sql, method, metadata, factory, extractor, em, ctxMetadata);
+            return new RecordJdbcRepositoryQuery(sql, method, metadata, factory, extractor, em, ctxMetadata);
         }
-        return new JpaRepositoryQuery(sql, method, metadata, factory, extractor, em, ctxMetadata);
+        return new RecordJpaRepositoryQuery(sql, method, metadata, factory, extractor, em, ctxMetadata);
     }
 
     final static String MSG_TEMPLATE = "解析错误：{}, 请检查语法或使用注解 @" + SqlSelect.class.getSimpleName() + "(..).";

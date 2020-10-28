@@ -29,7 +29,7 @@ public abstract class AbstractRepositoryQuery implements RepositoryQuery {
     private final EntityManager em;
     private final Method method;
     private final SqlSelect sql;
-    private final RepositoryContextMetadata repositoryContextMetadata;
+    private final JpaRecordRepositoryMetadata jpaRecordRepositoryMetadata;
 
     public AbstractRepositoryQuery(
         SqlSelect sql,
@@ -38,7 +38,7 @@ public abstract class AbstractRepositoryQuery implements RepositoryQuery {
         ProjectionFactory factory,
         QueryExtractor extractor,
         EntityManager em,
-        RepositoryContextMetadata repositoryContextMetadata
+        JpaRecordRepositoryMetadata jpaRecordRepositoryMetadata
     ) {
         this.em = em;
         this.method = method;
@@ -47,7 +47,7 @@ public abstract class AbstractRepositoryQuery implements RepositoryQuery {
         this.extractor = extractor;
         this.sql = Objects.requireNonNull(sql);
         this.queryMethod = new QueryMethod(method, metadata, factory);
-        this.repositoryContextMetadata = repositoryContextMetadata;
+        this.jpaRecordRepositoryMetadata = jpaRecordRepositoryMetadata;
         Class returnCls = method.getReturnType();
         Type returnType = method.getGenericReturnType();
         if (returnType instanceof ParameterizedType) {

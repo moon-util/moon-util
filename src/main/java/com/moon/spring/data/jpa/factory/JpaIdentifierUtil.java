@@ -1,9 +1,15 @@
 package com.moon.spring.data.jpa.factory;
 
+import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.JoinerUtil;
+import com.moon.core.lang.StringUtil;
+import com.moon.data.RecordConst;
+import com.moon.data.annotation.RecordCacheNamespace;
 import com.moon.data.exception.UnknownIdentifierTypeException;
 import com.moon.data.identifier.IdentifierUtil;
 import com.moon.spring.data.jpa.JpaRecord;
+import com.moon.spring.data.jpa.start.EnableJpaRecordCaching;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
@@ -13,6 +19,7 @@ import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -23,26 +30,139 @@ public final class JpaIdentifierUtil extends IdentifierUtil {
 
     private JpaIdentifierUtil() { noInstanceError(); }
 
-    private final static Map<Class, RepositoryBuilder> IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY = new ConcurrentHashMap<>();
+    /**
+     * @see com.moon.spring.data.jpa.start.JpaRecordCacheRegistrar#CACHE_PROPERTIES_NAME
+     */
+    private final static String CACHE_PROPERTIES_NAME = "iMoonUtilJpaRecordRepositoryCacheProperties";
+
+    private final static String[] CACHE_DELIMITERS = {"", ".", "-", ">", ":", "_"};
+
+    private final static Map<String, Object> CACHED_NAMESPACES = new ConcurrentHashMap<>();
+    /**
+     * 缓存两种类型键值队
+     * <p>
+     * class    : Class  ==> builder Function
+     * <p>
+     * classname: String ==> repository implementation class
+     */
+    private final static Map IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY = new ConcurrentHashMap<>();
+
+    private static <T> T onEnabledRecordCacheOrDefault(
+        JpaRecordRepositoryMetadata metadata,
+        BiFunction<ApplicationContext, EnableJpaRecordCaching, T> converter,
+        T defaultValue
+    ) {
+        T resultValue = defaultValue;
+        try {
+            ApplicationContext context = metadata.getApplicationContext();
+            if (context.containsBean(CACHE_PROPERTIES_NAME)) {
+                EnableJpaRecordCaching cache = context.getBean(CACHE_PROPERTIES_NAME, EnableJpaRecordCaching.class);
+                if (context.containsBeanDefinition(cache.cacheManagerRef())) {
+                    resultValue = converter.apply(context, cache);
+                }
+            }
+        } catch (Throwable ignored) {
+            resultValue = defaultValue;
+        }
+        return resultValue == null ? defaultValue : resultValue;
+    }
 
     /**
-     * 默认实现: 仅支持主键是 Long 或 String 类型
+     * 这种实现方式当项目存在同名不同包实体类时，可能引起分布式数据不一致，这个问题可通过如下方式解决
+     * <pre>
+     * 在实体类上注解{@link RecordCacheNamespace}
+     * </pre>
      *
-     * @param <T> 实体类型
+     * @param domainClass
+     * @param placeholder
+     *
+     * @return
      */
-    private final static class DefaultRepositoryImpl<T extends JpaRecord<Serializable>>
-        extends AbstractRepositoryImpl<T, Serializable> {
+    private static String toCacheNamespace(String globalGroup, Class<?> domainClass, Object placeholder) {
+        String group = StringUtil.defaultIfBlank(globalGroup, RecordConst.CACHE_GROUP), value;
+        RecordCacheNamespace namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheNamespace.class);
+        if (namespaceCfg != null) {
+            group = namespaceCfg.group();
+            value = namespaceCfg.value();
+            // 如果自定义了 group 和 namespace 直接返回
+            if (StringUtil.isNotBlank(value)) {
+                String namespace = mergeNamespace(group, value);
+                CacheNamespace.putNamespace(domainClass, namespace);
+                return namespace;
+            }
+        }
+        // 否则自动推断：实体名、缩写实体名、完全限定名
+        String namespace = detectNamespace(group, domainClass.getSimpleName(), domainClass, placeholder);
+        if (namespace != null) {
+            return namespace;
+        }
+        for (String delimiter : CACHE_DELIMITERS) {
+            String tempName = ClassUtil.getShortName(domainClass, delimiter);
+            namespace = detectNamespace(group, tempName, domainClass, placeholder);
+            if (namespace != null) {
+                return namespace;
+            }
+        }
+        // 完全限定名
+        return detectNamespace(group, domainClass.getName(), domainClass, placeholder);
+    }
 
-        public DefaultRepositoryImpl(
-            RepositoryInformation repositoryInformation,
-            JpaEntityInformation ei,
-            EntityManager em,
-            RepositoryContextMetadata metadata
-        ) { super(repositoryInformation, ei, em, metadata); }
+    private static String mergeNamespace(String group, String namespace) {
+        return new StringBuilder(group).append(' ').append(namespace).toString().trim().replace(' ', ':');
+    }
+
+    /**
+     * 检测当前缓存命名空间是否唯一，如果是就缓存并返回，否则直接返回 null
+     *
+     * @param namespace   命名空间
+     * @param placeholder 占位符
+     *
+     * @return
+     */
+    private static String detectNamespace(String group, String namespace, Class domainClass, Object placeholder) {
+        String groupedNamespace = mergeNamespace(group, namespace);
+        if (!CACHED_NAMESPACES.containsKey(groupedNamespace)) {
+            CACHED_NAMESPACES.put(groupedNamespace, placeholder);
+            CacheNamespace.putNamespace(domainClass, namespace);
+            return groupedNamespace;
+        }
+        return null;
+    }
+
+    final static CacheManager deduceCacheManager(JpaRecordRepositoryMetadata metadata, CacheManager defaultIfAbsent) {
+        return onEnabledRecordCacheOrDefault(metadata,
+            (ctx, cache) -> ctx.getBean(cache.cacheManagerRef(), CacheManager.class),
+            defaultIfAbsent);
+    }
+
+    final static String deduceCacheNamespace(
+        JpaRecordRepositoryMetadata metadata, Class<?> domainClass, Object placeholder
+    ) {
+        return onEnabledRecordCacheOrDefault(metadata,
+            (ctx, c) -> toCacheNamespace(c.group(), domainClass, placeholder),
+            null);
     }
 
     final static <T extends JpaRecord<?>> T extractPresetPrimaryKey(T record) {
         return putRecordPresetPrimaryKey(record);
+    }
+
+    /**
+     * 注册
+     *
+     * @param identifierClass
+     * @param repositoryBuilder
+     */
+    public static void registerIdentifierTypedRepositoryBuilder(
+        Class identifierClass, RepositoryBuilder repositoryBuilder, Class repositoryImplementationClass
+    ) {
+        IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY.put(identifierClass, repositoryBuilder);
+        IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY.put(identifierClass.getName(), repositoryImplementationClass);
+    }
+
+    public static Class getRepositoryImplementationClass(Class identifierClass, Class defaultIfAbsent) {
+        return (Class) IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY.getOrDefault(identifierClass.getName(),
+            defaultIfAbsent);
     }
 
     @SuppressWarnings("all")
@@ -50,7 +170,7 @@ public final class JpaIdentifierUtil extends IdentifierUtil {
         RepositoryInformation repositoryInformation,
         JpaEntityInformation entityInformation,
         EntityManager em,
-        RepositoryContextMetadata metadata
+        JpaRecordRepositoryMetadata metadata
     ) {
         Class identifierClass = repositoryInformation.getIdType();
         IdentifierUtil.addUsedIdentifierType(identifierClass);
@@ -65,12 +185,18 @@ public final class JpaIdentifierUtil extends IdentifierUtil {
     }
 
     /**
-     * 注册
+     * 默认实现
      *
-     * @param identifierClass
-     * @param repositoryBuilder
+     * @param <T> 实体类型
      */
-    public static void registerIdentifierTypedRepositoryBuilder(
-        Class identifierClass, RepositoryBuilder repositoryBuilder
-    ) { IDENTIFIER_TYPED_REPOSITORY_BUILDER_REGISTRY.put(identifierClass, repositoryBuilder); }
+    final static class DefaultRepositoryImpl<T extends JpaRecord<Serializable>>
+        extends AbstractRepositoryImpl<T, Serializable> {
+
+        public DefaultRepositoryImpl(
+            RepositoryInformation repositoryInformation,
+            JpaEntityInformation ei,
+            EntityManager em,
+            JpaRecordRepositoryMetadata metadata
+        ) { super(repositoryInformation, ei, em, metadata); }
+    }
 }

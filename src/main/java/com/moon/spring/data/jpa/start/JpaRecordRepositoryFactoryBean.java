@@ -1,11 +1,9 @@
 package com.moon.spring.data.jpa.start;
 
-import com.moon.spring.data.jpa.factory.DataRepositoryFactoryBean;
-
 /**
  * @author moonsky
  */
-public final class JpaRecordRepositoryFactoryBean extends DataRepositoryFactoryBean {
+public final class JpaRecordRepositoryFactoryBean extends com.moon.spring.data.jpa.factory.JpaRecordRepositoryFactoryBean {
 
     public JpaRecordRepositoryFactoryBean(Class ri) { super(ri); }
 }

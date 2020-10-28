@@ -19,14 +19,14 @@ import java.util.Optional;
 /**
  * @author moonsky
  */
-public class DataRepositoryFactory extends JpaRepositoryFactory {
+public class JpaRecordRepositoryFactory extends JpaRepositoryFactory {
 
     protected final EntityManager em;
     private final QueryExtractor extractor;
-    private final RepositoryContextMetadata metadata;
+    private final JpaRecordRepositoryMetadata metadata;
     private EscapeCharacter escapeCharacter = EscapeCharacter.DEFAULT;
 
-    public DataRepositoryFactory(EntityManager em, RepositoryContextMetadata metadata) {
+    public JpaRecordRepositoryFactory(EntityManager em, JpaRecordRepositoryMetadata metadata) {
         super(em);
         this.em = em;
         this.metadata = metadata;
@@ -48,7 +48,10 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
     }
 
     @Override
-    protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) { return DataStringRepositoryImpl.class; }
+    protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
+        return JpaIdentifierUtil.getRepositoryImplementationClass(metadata.getIdType(),
+            JpaIdentifierUtil.DefaultRepositoryImpl.class);
+    }
 
 
     @Override
@@ -83,7 +86,7 @@ public class DataRepositoryFactory extends JpaRepositoryFactory {
         QueryExtractor extractor,
         QueryMethodEvaluationContextProvider provider,
         EscapeCharacter escape,
-        RepositoryContextMetadata metadata
+        JpaRecordRepositoryMetadata metadata
     ) {
         QueryLookupStrategy strategy = SqlQueryLookupStrategyCreator.create(em, key, extractor, provider, escape);
         return new SqlQueryLookupStrategy(strategy, em, extractor, metadata);

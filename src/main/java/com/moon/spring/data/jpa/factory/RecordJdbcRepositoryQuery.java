@@ -4,6 +4,7 @@ import com.moon.data.annotation.SqlSelect;
 import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.persistence.EntityManager;
 import java.lang.reflect.Method;
@@ -11,15 +12,20 @@ import java.lang.reflect.Method;
 /**
  * @author moonsky
  */
-public class JpaRepositoryQuery extends AbstractRepositoryQuery {
+public class RecordJdbcRepositoryQuery extends AbstractRepositoryQuery {
 
-    public JpaRepositoryQuery(
+    private final JdbcTemplate jdbcTemplate;
+
+    public RecordJdbcRepositoryQuery(
         SqlSelect sql,
         Method method,
         RepositoryMetadata metadata,
         ProjectionFactory factory,
         QueryExtractor extractor,
         EntityManager em,
-        RepositoryContextMetadata repositoryContextMetadata
-    ) { super(sql, method, metadata, factory, extractor, em, repositoryContextMetadata); }
+        JpaRecordRepositoryMetadata jpaRecordRepositoryMetadata
+    ) {
+        super(sql, method, metadata, factory, extractor, em, jpaRecordRepositoryMetadata);
+        this.jdbcTemplate = jpaRecordRepositoryMetadata.getBean(JdbcTemplate.class);
+    }
 }
