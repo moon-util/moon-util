@@ -1,7 +1,7 @@
 package com.moon.spring.data.jpa.start;
 
 import com.moon.data.RecordConst;
-import com.moon.data.annotation.RecordCacheNamespace;
+import com.moon.data.annotation.RecordCacheable;
 import com.moon.spring.data.jpa.factory.AbstractRepositoryImpl;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -22,7 +22,7 @@ import java.util.function.Function;
  *
  * @author moonsky
  * @see AbstractRepositoryImpl#findFromCacheById(Object, Function, Cache)
- * @see RecordCacheNamespace 缓存命名空间
+ * @see RecordCacheable 缓存命名空间
  */
 @SuppressWarnings("all")
 @Target(ElementType.TYPE)

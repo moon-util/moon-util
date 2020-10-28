@@ -6,8 +6,8 @@ import com.moon.core.util.ListUtil;
 import com.moon.core.util.logger.Logger;
 import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.DataRecord;
-import com.moon.data.RecordConst;
-import com.moon.data.annotation.RecordCacheNamespace;
+import com.moon.data.annotation.RecordCacheGroup;
+import com.moon.data.annotation.RecordCacheable;
 import com.moon.data.registry.LayerRegistry;
 import com.moon.spring.data.jpa.JpaRecord;
 import com.moon.spring.data.jpa.repository.DataRepository;
@@ -93,7 +93,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         this.metadata = metadata;
         this.domainClass = ei.getJavaType();
         LayerRegistry.registerRepository(domainClass, this);
-        this.cacheManager = deduceCacheManager(metadata);
+        this.cacheManager = deduceCacheManager(metadata, domainClass);
         this.cacheNamespace = deduceCacheNamespace(metadata, domainClass, PLACEHOLDER);
     }
 
@@ -103,7 +103,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         this.metadata = metadata;
         this.domainClass = domainClass;
         LayerRegistry.registerRepository(domainClass, this);
-        this.cacheManager = deduceCacheManager(metadata);
+        this.cacheManager = deduceCacheManager(metadata, domainClass);
         this.cacheNamespace = deduceCacheNamespace(metadata, domainClass, PLACEHOLDER);
     }
 
@@ -127,24 +127,26 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         return resultValue == null ? defaultValue : resultValue;
     }
 
-    protected static CacheManager deduceCacheManager(RepositoryContextMetadata metadata) {
-        return onEnabledRecordCacheOrDefault(metadata,
-            (ctx, cache) -> ctx.getBean(cache.cacheManagerRef(), CacheManager.class),
-            NoOpCacheManager.MANAGER);
+    protected static CacheManager deduceCacheManager(RepositoryContextMetadata metadata, Class<?> domainClass) {
+        RecordCacheable namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheable.class);
+        return namespaceCfg.value() ? onEnabledRecordCacheOrDefault(metadata,
+            (ctx, cache) -> ctx.getBean(cache.cacheManagerRef(), CacheManager.class), NoOpCacheManager.MANAGER)
+            : NoOpCacheManager.MANAGER;
     }
 
     protected static String deduceCacheNamespace(
         RepositoryContextMetadata metadata, Class<?> domainClass, Object placeholder
     ) {
-        return onEnabledRecordCacheOrDefault(metadata, (ctx, c) -> {
+        RecordCacheable namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheable.class);
+        return namespaceCfg.value() ? onEnabledRecordCacheOrDefault(metadata, (ctx, c) -> {
             return toCacheNamespace(c.group(), domainClass, placeholder);
-        }, null);
+        }, null) : null;
     }
 
     /**
      * 这种实现方式当项目存在同名不同包实体类时，可能引起分布式数据不一致，这个问题可通过如下方式解决
      * <pre>
-     * 在实体类上注解{@link RecordCacheNamespace}
+     * 在实体类上注解{@link RecordCacheable}
      * </pre>
      *
      * @param domainClass
@@ -153,11 +155,12 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
      * @return
      */
     protected static String toCacheNamespace(String globalGroup, Class<?> domainClass, Object placeholder) {
-        String group = StringUtil.defaultIfBlank(globalGroup, RecordConst.CACHE_GROUP), value;
-        RecordCacheNamespace namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheNamespace.class);
+        // 局部分组覆盖全局分组
+        RecordCacheGroup cacheGroup = domainClass.getDeclaredAnnotation(RecordCacheGroup.class);
+        String group = cacheGroup == null ? globalGroup : cacheGroup.value(), value;
+        RecordCacheable namespaceCfg = domainClass.getDeclaredAnnotation(RecordCacheable.class);
         if (namespaceCfg != null) {
-            group = namespaceCfg.group();
-            value = namespaceCfg.value();
+            value = namespaceCfg.name();
             // 如果自定义了 group 和 namespace 直接返回
             if (StringUtil.isNotBlank(value)) {
                 String namespace = mergeNamespace(group, value);
@@ -315,8 +318,8 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     @Override
     public Slice<T> sliceAll(Pageable pageable) {
-        return pageable.isUnpaged() ? new SliceImpl<>(findAll()) : readSlicedEntities(getQuery(null, pageable),
-            pageable);
+        return pageable.isUnpaged() ? new SliceImpl<>(findAll())
+            : readSlicedEntities(getQuery(null, pageable), pageable);
     }
 
     @Override

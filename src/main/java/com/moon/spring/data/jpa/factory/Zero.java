@@ -8,7 +8,11 @@ import org.springframework.core.env.Profiles;
  */
 final class Zero {
 
+    @SuppressWarnings("all")
     enum Env implements Environment {
+        /**
+         * 单例
+         */
         ENV;
 
         static final String[] EMPTY = new String[0];
