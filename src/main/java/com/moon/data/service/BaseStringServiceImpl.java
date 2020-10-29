@@ -26,7 +26,4 @@ public abstract class BaseStringServiceImpl<T extends Record<String>> extends Ba
 
     @Override
     protected LayerEnum provideThisLayer() { return LayerEnum.SERVICE; }
-
-    @Override
-    protected LayerEnum pullingAccessLayer() { return LayerEnum.REPOSITORY; }
 }

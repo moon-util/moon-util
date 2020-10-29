@@ -122,14 +122,18 @@ public class IdentifierUtil {
         return id == null ? generator.apply(entity, o) : (ID) id;
     }
 
+    /**
+     * 添加已使用的{@code id}类型
+     *
+     * @param idType {@code id}类型
+     */
+    protected static void addUsedIdentifierType(Class idType) { USED_IDENTIFIER_TYPES.add(idType); }
 
     /*
      * **********************************************************************************************
      * * public methods *****************************************************************************
      * **********************************************************************************************
      */
-
-    protected static void addUsedIdentifierType(Class idType) { USED_IDENTIFIER_TYPES.add(idType); }
 
     /**
      * 创建 id 生成器
@@ -156,7 +160,7 @@ public class IdentifierUtil {
             }
             throw new IllegalStateException("Unknown identifier type, you must assign spring property of: " + key);
         }
-        // 其他方式主键策略
+        // 自定义主键策略
         String[] descriptions = description.split(":");
         Class type = toIdentifierClass(descriptions[0]);
         final int length = descriptions.length;

@@ -9,21 +9,21 @@ package com.moon.core.exception;
  *
  * @author moonsky
  */
-public class NonStackTraceRuntimeException extends RuntimeException {
+public class NoTraceException extends Exception {
 
-    public NonStackTraceRuntimeException() { this(null, null, true, false); }
+    public NoTraceException() { this(null, null, true, false); }
 
-    public NonStackTraceRuntimeException(String message) {
+    public NoTraceException(String message) {
         this(message, null, true, false);
     }
 
-    public NonStackTraceRuntimeException(String message, Throwable cause) {
+    public NoTraceException(String message, Throwable cause) {
         this(message, cause, true, false);
     }
 
-    public NonStackTraceRuntimeException(Throwable cause) { this(cause.getMessage(), cause); }
+    public NoTraceException(Throwable cause) { this(cause.getMessage(), cause); }
 
-    public NonStackTraceRuntimeException(
+    public NoTraceException(
         String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace
     ) { super(message, cause, enableSuppression, writableStackTrace); }
 }

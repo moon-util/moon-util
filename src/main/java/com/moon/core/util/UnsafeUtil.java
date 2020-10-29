@@ -11,7 +11,7 @@ import static java.util.Optional.ofNullable;
 /**
  * @author moonsky
  */
-public final class UnsafeUtil {
+public abstract class UnsafeUtil {
 
     private final static java.util.Optional<Unsafe> UNSAFE;
     private final static Optional<Unsafe> UNSAFE0;

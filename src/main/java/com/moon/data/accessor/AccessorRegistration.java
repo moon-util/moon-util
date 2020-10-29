@@ -2,6 +2,8 @@ package com.moon.data.accessor;
 
 import com.moon.core.util.RunnerRegistration;
 
+import java.util.LinkedList;
+
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
 /**
@@ -9,7 +11,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class AccessorRegistration {
 
-    private final static RunnerRegistration REGISTRATION = RunnerRegistration.newInstance();
+    private final static RunnerRegistration REGISTRATION = new RunnerRegistration(LinkedList::new);
 
     private AccessorRegistration() { noInstanceError(); }
 

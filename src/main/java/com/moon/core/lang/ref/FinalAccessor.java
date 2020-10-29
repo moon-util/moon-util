@@ -58,18 +58,18 @@ public class FinalAccessor<T> implements Supplier<T> {
 
     public T getOrElse(Supplier<T> supplier) { return isPresent() ? value : supplier.get(); }
 
-    public T getOrThrow() { return Objects.requireNonNull(value); }
+    public T requireGet() { return Objects.requireNonNull(value); }
 
-    public T getOrThrow(String exceptionMessage) { return Objects.requireNonNull(value, exceptionMessage); }
+    public T requireGet(String exceptionMessage) { return Objects.requireNonNull(value, exceptionMessage); }
 
-    public <EX extends Throwable> T getOrThrow(EX ex) {
+    public <EX extends Throwable> T requireGet(EX ex) {
         if (isAbsent()) {
             throw new IllegalArgumentException(ex);
         }
         return value;
     }
 
-    public <EX extends Throwable> T getOrThrow(Supplier<EX> supplier) throws EX {
+    public <EX extends Throwable> T requireGet(Supplier<EX> supplier) throws EX {
         if (isAbsent()) {
             throw supplier.get();
         }

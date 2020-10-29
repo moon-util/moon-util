@@ -54,16 +54,13 @@ public abstract class DataController<T extends Record<ID>, ID> extends DataAcces
     @Override
     protected LayerEnum provideThisLayer() { return LayerEnum.CONTROLLER; }
 
-    @Override
-    protected LayerEnum pullingAccessLayer() { return LayerEnum.SERVICE; }
-
     /**
      * 目标服务
      *
      * @return
      */
     protected DataService<T, ID> getService() {
-        BaseAccessor accessor = getAccessor();
+        BaseAccessor accessor = obtainOriginAccessor();
         if (accessor instanceof DataService) {
             return (DataService) accessor;
         }

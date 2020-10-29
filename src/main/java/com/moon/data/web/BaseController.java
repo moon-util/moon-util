@@ -54,16 +54,13 @@ public abstract class BaseController<T extends Record<ID>, ID> extends BaseAcces
     @Override
     protected LayerEnum provideThisLayer() { return LayerEnum.CONTROLLER; }
 
-    @Override
-    protected LayerEnum pullingAccessLayer() { return LayerEnum.SERVICE; }
-
     /**
      * 目标服务
      *
      * @return
      */
     protected BaseService<T, ID> getService() {
-        BaseAccessor accessor = getAccessor();
+        BaseAccessor accessor = obtainOriginAccessor();
         if (accessor instanceof BaseStringService) {
             return (BaseService) accessor;
         }

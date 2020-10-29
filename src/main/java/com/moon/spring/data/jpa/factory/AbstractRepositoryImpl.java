@@ -4,6 +4,7 @@ import com.moon.core.util.ListUtil;
 import com.moon.core.util.logger.Logger;
 import com.moon.core.util.logger.LoggerUtil;
 import com.moon.data.DataRecord;
+import com.moon.data.registry.LayerEnum;
 import com.moon.data.registry.LayerRegistry;
 import com.moon.spring.data.jpa.JpaRecord;
 import org.springframework.cache.Cache;
@@ -89,7 +90,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
         this.em = em;
         this.metadata = metadata;
         this.domainClass = ei.getJavaType();
-        LayerRegistry.registerRepository(domainClass, this);
+        LayerRegistry.registry(LayerEnum.REPOSITORY, domainClass, this);
         this.cacheManager = RecordCacheUtil.deduceCacheManager(metadata, domainClass, NoOpCacheManager.MANAGER);
         this.cacheNamespace = RecordCacheUtil.deduceCacheNamespace(metadata, domainClass, PLACEHOLDER);
     }

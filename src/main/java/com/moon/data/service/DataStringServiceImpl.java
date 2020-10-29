@@ -26,7 +26,4 @@ public abstract class DataStringServiceImpl<T extends Record<String>> extends Da
 
     @Override
     protected LayerEnum provideThisLayer() { return LayerEnum.SERVICE; }
-
-    @Override
-    protected LayerEnum pullingAccessLayer() { return LayerEnum.REPOSITORY; }
 }

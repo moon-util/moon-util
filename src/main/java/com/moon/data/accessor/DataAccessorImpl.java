@@ -22,10 +22,7 @@ public abstract class DataAccessorImpl<T extends Record<ID>, ID> extends BaseAcc
     }
 
     @Override
-    protected DataAccessor<T, ID> getAccessor() { return (DataAccessor<T, ID>) super.getAccessor(); }
-
-    @Override
-    protected DataAccessor<T, ID> provideDefaultAccessor() { return null; }
+    protected DataAccessor<T, ID> getAccessor() { return (DataAccessor<T, ID>) super.obtainOriginAccessor(); }
 
     /**
      * 逻辑删除

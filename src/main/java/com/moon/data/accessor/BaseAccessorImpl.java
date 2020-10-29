@@ -1,18 +1,10 @@
 package com.moon.data.accessor;
 
 import com.moon.data.Record;
-import com.moon.data.registry.LayerEnum;
-import com.moon.data.registry.LayerRegistry;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityNotFoundException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -22,47 +14,8 @@ import java.util.function.Supplier;
  */
 @Transactional
 @SuppressWarnings("all")
-public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements BaseAccessor<T, ID>, InitializingBean {
-
-    private static boolean isExtendOf(Class thisClass, Class superClass) {
-        return thisClass != null && superClass != null && superClass.isAssignableFrom(thisClass);
-    }
-
-    protected static boolean isAccessorType(Class cls) { return isExtendOf(cls, BaseAccessor.class); }
-
-    protected static boolean isRecordableType(Class cls) { return isExtendOf(cls, Record.class); }
-
-    protected final Class deduceDomainClass() {
-        Class domainClass = null;
-        Type type = getClass().getGenericSuperclass();
-        if (type instanceof ParameterizedType) {
-            ParameterizedType paramType = (ParameterizedType) type;
-            Type[] types = paramType.getActualTypeArguments();
-            if (types.length == 1) {
-                domainClass = (Class) types[0];
-            } else {
-                Class recordable = null;
-                for (Type entityType : types) {
-                    if (entityType instanceof Class) {
-                        Class cls = (Class) entityType;
-                        if (isRecordableType(cls)) {
-                            recordable = cls;
-                        }
-                    }
-                }
-                domainClass = recordable;
-            }
-        }
-        return domainClass;
-    }
-
-    @Autowired
-    private ApplicationContext context;
-    @Autowired(required = false)
-    private WebApplicationContext webContext;
-
-    protected final Class domainClass;
-    private BaseAccessor<T, ID> accessor;
+public abstract class BaseAccessorImpl<T extends Record<ID>, ID> extends AbstractAccessorImpl<T, ID>
+    implements BaseAccessor<T, ID> {
 
     /**
      * 构造器
@@ -70,116 +23,25 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> implements Base
      * @param accessServeClass 将要访问的服务具体实现类型，如：UserServiceImpl
      * @param domainClass      具体实体类型
      */
-    protected BaseAccessorImpl(
-        Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass
-    ) {
-        Class access = accessServeClass, domain = domainClass;
-
-        // 自动推测和交换领域实例类和数据访问类
-        if (domain == null) {
-            // 根据泛型推断领域实体类型
-            domain = deduceDomainClass();
-        } else if (!isRecordableType(domain)) {
-            if (isAccessorType(domain)) {
-                Class tempClass = null;
-                if (!isAccessorType(access)) {
-                    tempClass = access;
-                    access = domain;
-                }
-                if (tempClass != null && isRecordableType(tempClass)) {
-                    domain = tempClass;
-                }
-            } else {
-                // 根据泛型推断领域实体类型
-                domain = deduceDomainClass();
-            }
-        }
-
-        if (access == null || !isAccessorType(access)) {
-            if (domain == null && isRecordableType(access)) {
-                domain = access;
-            }
-            access = null;
-        }
-
-        this.domainClass = domain == null ? deduceDomainClass() : domain;
-        LayerRegistry.registry(provideThisLayer(), getDomainClass(), this);
-        AccessorRegistration.registry(getInjectRunner(access));
+    protected BaseAccessorImpl(Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass) {
+        super(accessServeClass, domainClass);
     }
 
     /**
-     * 自动注入任务
+     * 是否存在指定{@code id}对应的数据
      *
-     * @param accessServeClass
+     * @param id ID
      *
-     * @return
+     * @return 如果存在返回 true，否则返回 false
      */
-    protected Runnable getInjectRunner(Class<? extends BaseAccessor> accessServeClass) {
-        return () -> {
-            BaseAccessor accessor = provideDefaultAccessor();
-            if (accessor == null && accessServeClass != null) {
-                accessor = getContext().getBean(accessServeClass);
-            }
-            if (accessor == null) {
-                accessor = LayerRegistry.get(pullingAccessLayer(), getDomainClass());
-            }
-            if (this.accessor == null) {
-                this.accessor = accessor;
-            }
-        };
-    }
-
-    public Class getDomainClass() { return domainClass; }
-
-    protected ApplicationContext getContext() { return context; }
-
-    protected WebApplicationContext getWebContext() {
-        WebApplicationContext webContext = this.webContext;
-        if (webContext != null) {
-            return webContext;
-        }
-        ApplicationContext context = this.getContext();
-        if (context instanceof WebApplicationContext) {
-            return (WebApplicationContext) context;
-        }
-        return null;
-    }
-
-    protected BaseAccessor<T, ID> getAccessor() { return accessor; }
-
-    /**
-     * like getRepository
-     * like getService
-     * like getMapper
-     * <p>
-     * and so on...
-     *
-     * @return
-     */
-    protected BaseAccessor<T, ID> provideDefaultAccessor() { return null; }
-
-    /**
-     * 告诉注册器，“我”是哪一层
-     *
-     * @return
-     */
-    protected abstract LayerEnum provideThisLayer();
-
-    /**
-     * 我要访问的是哪一层
-     * <p>
-     * 通常：controller 访问 service，service 访问 repository/mapper层
-     *
-     * @return
-     */
-    protected abstract LayerEnum pullingAccessLayer();
-
-    @Override
-    public void afterPropertiesSet() throws Exception { }
-
     @Override
     public boolean existsById(ID id) { return getAccessor().existsById(id); }
 
+    /**
+     * 返回表数据总数
+     *
+     * @return 总数
+     */
     @Override
     public long count() { return getAccessor().count(); }
 

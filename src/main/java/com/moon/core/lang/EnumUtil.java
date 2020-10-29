@@ -121,6 +121,39 @@ public final class EnumUtil {
     }
 
     /**
+     * 排序比较
+     *
+     * @param e1  枚举值1
+     * @param e2  枚举值2
+     * @param <E> 枚举类型
+     *
+     * @return 比较结果
+     */
+    public static <E extends Enum<E>> int compareTo(E e1, E e2) { return e1.compareTo(e2); }
+
+    /**
+     * e1 是否在 e2 前面，比较序号
+     *
+     * @param e1  枚举值1
+     * @param e2  枚举值2
+     * @param <E> 枚举类型
+     *
+     * @return 比较结果
+     */
+    public static <E extends Enum<E>> boolean isBefore(E e1, E e2) { return compareTo(e1, e2) < 0; }
+
+    /**
+     * e1 是否在 e2 后面，比较序号
+     *
+     * @param e1  枚举值1
+     * @param e2  枚举值2
+     * @param <E> 枚举类型
+     *
+     * @return 比较结果
+     */
+    public static <E extends Enum<E>> boolean isAfter(E e1, E e2) { return compareTo(e1, e2) > 0; }
+
+    /**
      * 枚举类包含多少项
      *
      * @param enumType 枚举类型

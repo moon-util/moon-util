@@ -9,6 +9,7 @@ import com.moon.core.util.ValidationUtil;
 import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.IntBiFunction;
 
+import java.beans.Introspector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -1404,18 +1405,7 @@ public final class StringUtil {
      *
      * @return 首字母小写后的字符串
      */
-    public static String uncapitalize(String str) {
-        int len = length(str);
-        if (len == 0) { return str; }
-        char ch = str.charAt(0);
-        if (CharUtil.isUpperCase(ch)) {
-            char[] chars = new char[len];
-            chars[0] = (char) (ch + 32);
-            str.getChars(1, len, chars, 1);
-            return new String(chars);
-        }
-        return str;
-    }
+    public static String decapitalize(String str) { return Introspector.decapitalize(str); }
 
     /**
      * 连字符号转驼峰

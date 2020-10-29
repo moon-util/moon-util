@@ -1,9 +1,9 @@
 package com.moon.data.registry;
 
 
+import com.moon.core.enums.Level;
+import com.moon.core.lang.ref.FinalAccessor;
 import com.moon.data.accessor.BaseAccessor;
-
-import static com.moon.data.registry.LayerEnum.*;
 
 
 /**
@@ -12,7 +12,7 @@ import static com.moon.data.registry.LayerEnum.*;
 public class LayerRegistry {
 
     public static void registry(LayerEnum layer, Class domainClass, BaseAccessor accessor) {
-        if (layer != null && domainClass != null && accessor != null) {
+        if (layer != null) {
             layer.registry(domainClass, accessor);
         }
     }
@@ -21,27 +21,15 @@ public class LayerRegistry {
         return layer == null ? null : layer.get(domainClass);
     }
 
-    public static void registerRepository(Class domainClass, BaseAccessor accessor) {
-        registry(REPOSITORY, domainClass, accessor);
+    public static BaseAccessor pullTopLevelBy(LayerEnum layerEnum, Class domainClass) {
+        final Level level = layerEnum.getLevel();
+        FinalAccessor<BaseAccessor> accessor = FinalAccessor.of();
+        LayerEnum.forEachReversed(layer -> {
+            if (layer.getLevel().isBefore(level)) {
+                accessor.setIfAbsent(layer.get(domainClass));
+            }
+            return accessor.isAbsent();
+        });
+        return accessor.get();
     }
-
-    public static BaseAccessor getRepository(Class domainClass) { return get(REPOSITORY, domainClass); }
-
-    public static void registerService(Class domainClass, BaseAccessor accessor) {
-        registry(SERVICE, domainClass, accessor);
-    }
-
-    public static BaseAccessor getService(Class domainClass) { return get(SERVICE, domainClass); }
-
-    public static void registerController(Class domainClass, BaseAccessor accessor) {
-        registry(CONTROLLER, domainClass, accessor);
-    }
-
-    public static BaseAccessor getController(Class domainClass) { return get(CONTROLLER, domainClass); }
-
-    public static void registerMapper(Class domainClass, BaseAccessor accessor) {
-        registry(MAPPER, domainClass, accessor);
-    }
-
-    public static BaseAccessor getMapper(Class domainClass) { return get(MAPPER, domainClass); }
 }

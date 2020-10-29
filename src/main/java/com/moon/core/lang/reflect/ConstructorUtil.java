@@ -95,7 +95,7 @@ public final class ConstructorUtil {
                 exception = e;
             }
             String message = computeOrNull(exception, ex -> ex.getMessage());
-            return () -> accessor.getOrThrow(message);
+            return () -> accessor.requireGet(message);
         }).get();
     }
 
@@ -117,7 +117,7 @@ public final class ConstructorUtil {
                 exception = e;
             }
             String message = computeOrNull(exception, ex -> ex.getMessage());
-            return () -> accessor.getOrThrow(message);
+            return () -> accessor.requireGet(message);
         }).get();
     }
 
@@ -179,7 +179,7 @@ public final class ConstructorUtil {
                     parameterTypes);
             }
             final String finalMessage = message;
-            return () -> accessor.getOrThrow(finalMessage);
+            return () -> accessor.requireGet(finalMessage);
         }).get();
     }
 
