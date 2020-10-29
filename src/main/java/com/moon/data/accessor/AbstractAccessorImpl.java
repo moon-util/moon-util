@@ -5,10 +5,13 @@ import com.moon.data.registry.LayerEnum;
 import com.moon.data.registry.LayerRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 /**
  * @author moonsky
@@ -47,13 +50,14 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
         return domainClass;
     }
 
+    private BaseAccessor<T, ID> accessor;
     @Autowired
     private ApplicationContext context;
     @Autowired(required = false)
     private WebApplicationContext webContext;
 
     protected final Class domainClass;
-    private BaseAccessor<T, ID> accessor;
+    protected final Class<BaseAccessor<T, ID>> accessServeClass;
 
     /**
      * 构造器
@@ -61,6 +65,7 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
      * @param accessServeClass 将要访问的服务具体实现类型，如：UserServiceImpl
      * @param domainClass      具体实体类型
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected AbstractAccessorImpl(
         Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass
     ) {
@@ -77,7 +82,7 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
                     tempClass = access;
                     access = domain;
                 }
-                if (tempClass != null && isRecordableType(tempClass)) {
+                if (isRecordableType(tempClass)) {
                     domain = tempClass;
                 }
             } else {
@@ -86,47 +91,43 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
             }
         }
 
-        if (access == null || !isAccessorType(access)) {
+        if (!isAccessorType(access)) {
             if (domain == null && isRecordableType(access)) {
                 domain = access;
             }
             access = null;
         }
 
+        this.accessServeClass = access;
         this.domainClass = domain == null ? deduceDomainClass() : domain;
-        LayerRegistry.registry(provideThisLayer(), getDomainClass(), this);
-        AccessorRegistration.registry(getInjectRunner(access));
-    }
-
-    /**
-     * 自动注入任务
-     *
-     * @param accessServeClass
-     *
-     * @return
-     */
-    private Runnable getInjectRunner(Class<? extends BaseAccessor> accessServeClass) {
-        return () -> {
-            BaseAccessor accessor = provideDefaultAccessor();
-            if (accessor == null && accessServeClass != null) {
-                accessor = getContext().getBean(accessServeClass);
-            }
-            if (accessor == null) {
-                Class domainClass = getDomainClass();
-                LayerEnum layer = injectAccessLayer();
-                if (layer != null) {
-                    accessor = LayerRegistry.get(layer, domainClass);
-                } else {
-                    accessor = LayerRegistry.pullTopLevelBy(provideThisLayer(), domainClass);
-                }
-            }
-            if (this.accessor == null) {
-                this.accessor = accessor;
-            }
-        };
+        LayerRegistry.registry(requireThisLayer(), getDomainClass(), this);
     }
 
     public Class getDomainClass() { return domainClass; }
+
+    @EventListener
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public final void springApplicationContextRefreshed(ContextRefreshedEvent event) {
+        ApplicationContext ctx = event.getApplicationContext();
+        BaseAccessor accessor = provideDefaultAccessor();
+        if (accessor == null && accessServeClass != null) {
+            accessor = ctx.getBean(accessServeClass);
+        }
+        if (accessor == null) {
+            Class<? extends T> domainClass = getDomainClass();
+            LayerEnum layer = injectAccessLayer();
+            if (layer != null) {
+                accessor = LayerRegistry.get(layer, domainClass);
+            } else {
+                accessor = LayerRegistry.pullTopLevelBy(requireThisLayer(), domainClass);
+            }
+        }
+        this.accessor = accessor;
+    }
+
+    protected final LayerEnum requireThisLayer() { return Objects.requireNonNull(provideThisLayer()); }
+
+    protected final BaseAccessor<T, ID> obtainOriginAccessor() { return accessor; }
 
     protected ApplicationContext getContext() { return context; }
 
@@ -142,8 +143,6 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
         return null;
     }
 
-    protected final BaseAccessor<T, ID> obtainOriginAccessor() { return accessor; }
-
     protected BaseAccessor<T, ID> getAccessor() { return obtainOriginAccessor(); }
 
     /**
@@ -158,7 +157,7 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
     protected BaseAccessor<T, ID> provideDefaultAccessor() { return null; }
 
     /**
-     * 我要访问的是哪一层
+     * 明确指定我要访问的是哪一层
      * <p>
      * 通常：controller 访问 service，service 访问 repository/mapper层
      *

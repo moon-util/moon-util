@@ -81,7 +81,7 @@ public abstract class DataController<T extends Record<ID>, ID> extends DataAcces
     }
 
     protected final <T> void registryVo2Entity(Supplier<T> defaultValueSupplier) {
-        registryVo2Entity(domainClass, defaultValueSupplier);
+        registryVo2Entity(getDomainClass(), defaultValueSupplier);
     }
 
     protected final <T> void registryVo2Entity(Class<T> type, Supplier<T> defaultValueSupplier) {

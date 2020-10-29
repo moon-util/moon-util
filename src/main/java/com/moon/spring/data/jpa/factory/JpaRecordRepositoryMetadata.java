@@ -15,28 +15,18 @@ public class JpaRecordRepositoryMetadata<T extends JpaRecord<ID>, ID extends Ser
 
     private final Class<? extends T> repositoryInterface;
     private final ApplicationContext ctx;
-    private final EntityInformation<T, ID> ei;
-    private final RepositoryInformation ri;
 
     JpaRecordRepositoryMetadata(
         ApplicationContext ctx,
-        RepositoryInformation ri,
-        EntityInformation<T, ID> ei,
         Class<? extends T> repositoryInterface
     ) {
-        this.ei = ei;
-        this.ri = ri;
         this.ctx = ctx;
         this.repositoryInterface = repositoryInterface;
     }
 
     private ApplicationContext ctx() { return ctx; }
 
-    public RepositoryInformation getRepositoryInformation() { return ri; }
-
     public Class<? extends T> getRepositoryInterface() { return repositoryInterface; }
-
-    public EntityInformation<T, ID> getEntityInformation() { return ei; }
 
     public ApplicationContext getApplicationContext() { return ctx(); }
 

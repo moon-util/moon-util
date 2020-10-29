@@ -36,8 +36,7 @@ public class JpaRecordRepositoryFactoryBean<ID, T extends BaseRepository<E, ID>,
             DataStringRepositoryImpl.class);
     }
 
-    private Class<? extends T> repositoryInterface;
-    private JpaQueryMethodFactory queryMethodFactory;
+    private final Class<? extends T> repositoryInterface;
     private ApplicationContext applicationContext;
     private EntityPathResolver entityPathResolver;
     private EscapeCharacter escapeCharacter;
@@ -73,17 +72,6 @@ public class JpaRecordRepositoryFactoryBean<ID, T extends BaseRepository<E, ID>,
         this.escapeCharacter = EscapeCharacter.of(escapeCharacter);
     }
 
-    @Override
-    @Autowired
-    public void setQueryMethodFactory(JpaQueryMethodFactory factory) {
-        super.setQueryMethodFactory(factory);
-        if (factory != null) {
-            this.queryMethodFactory = factory;
-        }
-    }
-
-    public JpaQueryMethodFactory getQueryMethodFactory() { return queryMethodFactory; }
-
     public Class<? extends T> getRepositoryInterface() { return repositoryInterface; }
 
     public EntityPathResolver getEntityPathResolver() { return entityPathResolver; }
@@ -97,18 +85,11 @@ public class JpaRecordRepositoryFactoryBean<ID, T extends BaseRepository<E, ID>,
         JpaRecordRepositoryFactory factory = new JpaRecordRepositoryFactory(em, getJpaMetadata());
         factory.setEntityPathResolver(getEntityPathResolver());
         factory.setEscapeCharacter(getEscapeCharacter());
-        JpaQueryMethodFactory queryMethodFactory = getQueryMethodFactory();
-        if (queryMethodFactory != null) {
-            factory.setQueryMethodFactory(queryMethodFactory);
-        }
         return factory;
     }
 
     private JpaRecordRepositoryMetadata getJpaMetadata() {
-        return new JpaRecordRepositoryMetadata(getContext(),
-            getRepositoryInformation(),
-            getEntityInformation(),
-            getRepositoryInterface());
+        return new JpaRecordRepositoryMetadata(getContext(), getRepositoryInterface());
     }
 
     private ApplicationContext getContext() {

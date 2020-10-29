@@ -2,14 +2,12 @@ package com.moon.data.registry;
 
 
 import com.moon.core.enums.Level;
-import com.moon.core.lang.EnumUtil;
 import com.moon.data.accessor.BaseAccessor;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -59,10 +57,10 @@ public enum LayerEnum implements Function<Class, BaseAccessor> {
     @Override
     public BaseAccessor apply(Class domainClass) { return cached.get(domainClass); }
 
-    public static void forEachReversed(Predicate<LayerEnum> consumer) {
+    static void forEachReversed(Predicate<LayerEnum> consumer) {
         final LayerEnum[] layers = Values.ALL;
-        for (int i = 0; layers.length - 1 > -1; i--) {
-            if (false == consumer.test(layers[i])) {
+        for (int i = layers.length - 1; i > -1; i--) {
+            if (!consumer.test(layers[i])) {
                 return;
             }
         }
