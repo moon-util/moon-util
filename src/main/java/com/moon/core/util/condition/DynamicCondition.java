@@ -31,19 +31,16 @@ public final class DynamicCondition implements Conditional {
         return dynamicCondition.getAsBoolean();
     }
 
+    @SuppressWarnings("all")
     enum BooleanStrategy implements BooleanSupplier {
         TRUE(Boolean.TRUE),
         FALSE(Boolean.FALSE);
 
         private final Boolean value;
 
-        BooleanStrategy(Boolean value) {
-            this.value = value;
-        }
+        BooleanStrategy(Boolean value) { this.value = value; }
 
         @Override
-        public boolean getAsBoolean() {
-            return value;
-        }
+        public boolean getAsBoolean() { return value; }
     }
 }

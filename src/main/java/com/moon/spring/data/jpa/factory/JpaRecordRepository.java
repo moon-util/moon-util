@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * @author moonsky
  */
 @SuppressWarnings("all")
-public interface AbstractDataRepository<T extends JpaRecord<ID>, ID>
+public interface JpaRecordRepository<T extends JpaRecord<ID>, ID>
     extends DataRepository<T, ID>, JpaRepositoryImplementation<T, ID> {
 
     @Override

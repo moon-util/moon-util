@@ -23,6 +23,7 @@ import java.util.Map;
 /**
  * @author moonsky
  */
+@SuppressWarnings("all")
 final class RecordRepositoryNones {
 
     private final static String[] STRINGS = Arrays2.STRINGS.empty();

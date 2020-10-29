@@ -46,7 +46,7 @@ import static java.util.Optional.ofNullable;
 @NoRepositoryBean
 @Transactional(readOnly = true)
 public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extends SimpleJpaRepository<T, ID>
-    implements AbstractDataRepository<T, ID> {
+    implements JpaRecordRepository<T, ID> {
 
     protected final static Logger logger = LoggerUtil.getLogger();
     /**

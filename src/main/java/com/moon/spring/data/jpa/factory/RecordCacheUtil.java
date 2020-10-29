@@ -27,11 +27,27 @@ final class RecordCacheUtil {
 
     private final static Map<String, Object> CACHED_NAMESPACES = new ConcurrentHashMap<>();
 
+    /**
+     * 是否禁用缓存
+     *
+     * @param domainClass
+     *
+     * @return
+     */
+    private static boolean isDisabledCaching(Class<?> domainClass) {
+        RecordCacheable cacheable = domainClass.getDeclaredAnnotation(RecordCacheable.class);
+        return cacheable != null && !cacheable.value();
+    }
+
     private static <T> T onEnabledRecordCacheOrDefault(
         JpaRecordRepositoryMetadata metadata,
+        Class<?> domainClass,
         BiFunction<ApplicationContext, EnableJpaRecordCaching, T> converter,
         T defaultValue
     ) {
+        if (isDisabledCaching(domainClass)) {
+            return defaultValue;
+        }
         T resultValue = defaultValue;
         try {
             ApplicationContext context = metadata.getApplicationContext();
@@ -109,22 +125,11 @@ final class RecordCacheUtil {
         return null;
     }
 
-    /**
-     * 是否禁用缓存
-     *
-     * @param domainClass
-     *
-     * @return
-     */
-    private static boolean isDisabledCache(Class<?> domainClass) {
-        RecordCacheable cacheable = domainClass.getDeclaredAnnotation(RecordCacheable.class);
-        return cacheable != null && !cacheable.value();
-    }
-
     final static CacheManager deduceCacheManager(
         JpaRecordRepositoryMetadata metadata, Class<?> domainClass, CacheManager defaultIfAbsent
     ) {
-        return isDisabledCache(domainClass) ? defaultIfAbsent : onEnabledRecordCacheOrDefault(metadata,
+        return onEnabledRecordCacheOrDefault(metadata,
+            domainClass,
             (ctx, cache) -> ctx.getBean(cache.cacheManagerRef(), CacheManager.class),
             defaultIfAbsent);
     }
@@ -132,7 +137,8 @@ final class RecordCacheUtil {
     final static String deduceCacheNamespace(
         JpaRecordRepositoryMetadata metadata, Class<?> domainClass, Object placeholder
     ) {
-        return isDisabledCache(domainClass) ? null : onEnabledRecordCacheOrDefault(metadata,
+        return onEnabledRecordCacheOrDefault(metadata,
+            domainClass,
             (ctx, c) -> toCacheNamespace(c.group(), domainClass, placeholder),
             null);
     }
