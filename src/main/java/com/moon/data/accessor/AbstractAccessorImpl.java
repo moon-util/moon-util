@@ -100,14 +100,14 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
 
         this.accessServeClass = access;
         this.domainClass = domain == null ? deduceDomainClass() : domain;
-        LayerRegistry.registry(requireThisLayer(), getDomainClass(), this);
+        LayerRegistry.registry(provideThisLayer(), getDomainClass(), this);
     }
 
     public Class getDomainClass() { return domainClass; }
 
     @EventListener
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public final void springApplicationContextRefreshed(ContextRefreshedEvent event) {
+    public final void injectionWhenApplicationContextRefreshed(ContextRefreshedEvent event) {
         ApplicationContext ctx = event.getApplicationContext();
         BaseAccessor accessor = provideDefaultAccessor();
         if (accessor == null && accessServeClass != null) {
@@ -119,13 +119,11 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
             if (layer != null) {
                 accessor = LayerRegistry.get(layer, domainClass);
             } else {
-                accessor = LayerRegistry.pullTopLevelBy(requireThisLayer(), domainClass);
+                accessor = LayerRegistry.pullTopLevelBy(provideThisLayer(), domainClass);
             }
         }
         this.accessor = accessor;
     }
-
-    protected final LayerEnum requireThisLayer() { return Objects.requireNonNull(provideThisLayer()); }
 
     protected final BaseAccessor<T, ID> obtainOriginAccessor() { return accessor; }
 

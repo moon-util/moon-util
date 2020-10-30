@@ -22,7 +22,7 @@ public final class JpaRecordUtil extends CacheNamespace {
      *
      * @return 命名空间，如果不存在就返回{@code null}
      */
-    public static String getCacheNamespace(Record record) { return obtainCacheNamespace(record); }
+    public static String getCacheName(Record record) { return obtainCacheNamespace(record); }
 
     /**
      * 暂时保留
