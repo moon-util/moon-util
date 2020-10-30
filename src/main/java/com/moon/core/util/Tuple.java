@@ -68,12 +68,9 @@ public final class Tuple<T> implements Iterable<T>, Cloneable, Serializable {
      * 遍历处理所有元素
      *
      * @param consumer
-     *
-     * @return 返回自身
      */
-    public Tuple<T> forEach(BiIntConsumer<? super T> consumer) {
+    public void forEach(BiIntConsumer<? super T> consumer) {
         IteratorUtil.forEach(elements, consumer);
-        return this;
     }
 
     /**

@@ -238,7 +238,7 @@ public final class ParseSupportUtil {
                 return onlyItemOrSize(object);
             }
         } else {
-            return resolver.nullableApply(object);
+            return resolver.nullable(object);
         }
     }
 

@@ -9,6 +9,7 @@ import com.moon.core.lang.ref.FinalAccessor;
 
 import java.io.*;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -29,25 +30,39 @@ public class LocalStorage<T> implements Storage<String, T> {
 
     static {
         String namespace = ".java-imoon/localStorage/";
-        File file = new File(SystemUtil.getTempDir(), namespace);
-        PATH_NAMESPACE = FileUtil.formatFilepath(file.getAbsolutePath());
-        DEFAULT = new LocalStorage(null);
+        PATH_NAMESPACE = toFormatted(new File(SystemUtil.getTempDir(), namespace));
+        DEFAULT = new LocalStorage(null, null);
+    }
+
+    private static String toFormatted(File root) {
+        return FileUtil.formatFilepath(root.getAbsolutePath());
+    }
+
+    private static String toLocation(String root, String namespace) {
+        char first = namespace.charAt(0);
+        if (first == CHAR_HYPHEN || first == CHAR_WAVE) {
+            return root + namespace.substring(1);
+        } else {
+            return root + namespace;
+        }
     }
 
     private final String namespace;
+    private int cacheLimit = 10240;
 
     private final Map<String, T> localCached = new ConcurrentHashMap<>();
 
-    public LocalStorage(String namespace) {
+    private LocalStorage(String namespace) {
+        this.namespace = namespace;
+        storageMap.put(namespace, this);
+    }
+
+    public LocalStorage(String root, String namespace) {
+        String ROOT = StringUtil.defaultIfBlank(root, PATH_NAMESPACE);
         namespace = StringUtil.defaultIfBlank(namespace, "default");
         namespace = StringUtil.replace(namespace, '\\', CHAR_WAVE);
         namespace = StringUtil.replace(namespace, '/', CHAR_HYPHEN);
-        char first = namespace.charAt(0);
-        if (first == CHAR_HYPHEN || first == CHAR_WAVE) {
-            this.namespace = PATH_NAMESPACE + namespace.substring(1);
-        } else {
-            this.namespace = PATH_NAMESPACE + namespace;
-        }
+        this.namespace = toLocation(ROOT, namespace);
         storageMap.put(namespace, this);
     }
 
@@ -55,6 +70,18 @@ public class LocalStorage<T> implements Storage<String, T> {
 
     public static <T extends Serializable> LocalStorage<T> of(String namespace) {
         return storageMap.computeIfAbsent(namespace, LocalStorage::new);
+    }
+
+    /**
+     * 自定义存储位置
+     *
+     * @param location 存储位置
+     * @param <T>      数据类型
+     *
+     * @return Storage 建造工厂
+     */
+    public static <T extends Serializable> Factory<T> ofFactory(String location) {
+        return new Factory<>(location);
     }
 
     @Override
@@ -131,8 +158,8 @@ public class LocalStorage<T> implements Storage<String, T> {
     }
 
     public final static void clearAll() {
-        storageMap.forEach((s, localStorage) -> localStorage.clear());
-        FileUtil.deleteAllFiles(new File(PATH_NAMESPACE));
+        storageMap.forEach((r, s) -> s.clear());
+        doClear(PATH_NAMESPACE);
     }
 
     protected Function<T, byte[]> getSerializer() {
@@ -143,5 +170,39 @@ public class LocalStorage<T> implements Storage<String, T> {
         return (Function<byte[], T>) DESERIALIZER;
     }
 
-    protected int getCacheMemoryLimit() { return 10240; }
+    private static void doClear(String root) {
+        FileUtil.delete(new File(root));
+    }
+
+    public int getCacheMemoryLimit() { return cacheLimit; }
+
+    public static class Factory<T> {
+
+        private static Map<String, LocalStorage> factoryMap = new ConcurrentHashMap<>();
+        private Function<String, LocalStorage<T>> builder;
+        private final String root;
+
+        private Factory(String root) {
+            this.root = StringUtil.defaultIfBlank(root, PATH_NAMESPACE);
+        }
+
+        private Function<String, LocalStorage<T>> getBuilder() {
+            return builder == null ? LocalStorage::new : builder;
+        }
+
+        public void setStorageBuilder(Function<String, LocalStorage<T>> builder) {
+            this.builder = builder;
+        }
+
+        public LocalStorage<T> create(String namespace) {
+            LocalStorage<T> storage = getBuilder().apply(toFormatted(new File(root, namespace)));
+            factoryMap.put(storage.namespace, storage);
+            return storage;
+        }
+
+        public void clearAll(){
+            factoryMap.forEach((k, s) -> s.clear());
+            doClear(root);
+        }
+    }
 }

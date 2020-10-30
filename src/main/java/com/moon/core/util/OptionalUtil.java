@@ -92,11 +92,6 @@ public final class OptionalUtil {
 
     @SuppressWarnings("all")
     public static Object resolveOrNull(Object optionalReference) {
-        NullableFunction resolver = TypeofOptional.resolveByObject(optionalReference);
-        return resolver == null//
-               ? (optionalReference instanceof Optional//
-                  ? ((Optional<?>) optionalReference).getOrNull()//
-                  : optionalReference)//
-               : resolver.nullableApply(optionalReference);//
+        return TypeofOptional.resolveOrNull(optionalReference);
     }
 }

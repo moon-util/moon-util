@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public interface Traveller<T> extends Supplier<List<T>>, List<T> {
+public interface Traveller<T> extends List<T> {
 
     /**
      * 遍历指定目录下的文件
@@ -33,12 +33,4 @@ public interface Traveller<T> extends Supplier<List<T>>, List<T> {
      */
     @Override
     void clear();
-
-    /**
-     * 获取所有内容
-     *
-     * @return 当前遍历器
-     */
-    @Override
-    default List<T> get() { return new ArrayList<>(this); }
 }

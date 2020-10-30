@@ -61,7 +61,7 @@ public final class IteratorUtil {
      *
      * @return 倒序迭代器
      */
-    public static <T> Iterator<T> ofReverse(Collection<? extends T> collect) { return ReverseIterator.of(collect); }
+    public static <T> Iterator<T> ofReversed(Collection<? extends T> collect) { return ReverseIterator.of(collect); }
 
 
     /*
@@ -398,8 +398,8 @@ public final class IteratorUtil {
      * @param consumer
      * @param <E>
      */
-    public final static <E> void forEachReverse(Collection<? extends E> collect, Consumer<? super E> consumer) {
-        forEach(ofReverse(collect), consumer);
+    public final static <E> void forEachReversed(Collection<? extends E> collect, Consumer<? super E> consumer) {
+        forEach(ofReversed(collect), consumer);
     }
 
     /*
@@ -442,9 +442,8 @@ public final class IteratorUtil {
     public static void forEachFields(Object bean, BiIntConsumer consumer) {
         if (bean != null) {
             IntAccessor indexer = IntAccessor.of();
-            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass())
-                .forEach((name, desc) -> consumer.accept(desc.getValueIfPresent(bean, true),
-                    indexer.getAndIncrement()));
+            BeanInfoUtil.getFieldDescriptorsMap(bean.getClass()).forEach(
+                (name, desc) -> consumer.accept(desc.getValueIfPresent(bean, true), indexer.getAndIncrement()));
         }
     }
 
@@ -826,7 +825,9 @@ public final class IteratorUtil {
      * @param consumer 处理对象
      * @param file
      */
-    public static void forEachLines(File file, Consumer<String> consumer) { ofLines(file).forEachRemaining(consumer); }
+    public static void forEachLines(File file, Consumer<String> consumer) {
+        ofLines(file).forEachRemaining(consumer);
+    }
 
     public static void forEachLines(String filename, Consumer<String> consumer) {
         ofLines(filename).forEachRemaining(consumer);
@@ -943,7 +944,7 @@ public final class IteratorUtil {
      * 集合拆分处理器
      *
      * @param c
-     * @param size 指定拆分大小（拆分后每个集合元素数量）
+     * @param size     指定拆分大小（拆分后每个集合元素数量）
      * @param consumer
      * @param <E>
      * @param <C>

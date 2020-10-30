@@ -10,8 +10,7 @@ import java.util.List;
  *
  * @author moonsky
  */
-public class FileTraveller extends ArrayList<File>
-    implements Traveller<File>, List<File> {
+public class FileTraveller extends ArrayList<File> implements Traveller<File>, List<File> {
 
     private final boolean ignoreSecurity;
 
@@ -35,7 +34,8 @@ public class FileTraveller extends ArrayList<File>
             try {
                 if (dir.isDirectory()) {
                     String[] paths = dir.list();
-                    for (int i = 0, len = paths.length; i < len; i++) {
+                    int len = paths == null ? 0 : paths.length;
+                    for (int i = 0; i < len; i++) {
                         traverse(new File(dir, paths[i]));
                     }
                 } else if (dir.isFile()) {
@@ -82,10 +82,5 @@ public class FileTraveller extends ArrayList<File>
     @Override
     public void add(int index, File element) {
         this.traverse(element);
-    }
-
-    @Override
-    public List<File> get() {
-        return this;
     }
 }

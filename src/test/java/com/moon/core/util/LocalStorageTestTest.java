@@ -1,6 +1,7 @@
 package com.moon.core.util;
 
 import com.moon.core.lang.SystemUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -18,5 +19,9 @@ class LocalStorageTestTest {
 
         Object value = LocalStorage.of().get("123");
         System.out.println(value);
+    }
+
+    @Test
+    void testOfFactory() {
     }
 }

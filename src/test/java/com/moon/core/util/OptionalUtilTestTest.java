@@ -1,8 +1,10 @@
 package com.moon.core.util;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.util.OptionalInt;
 
 /**
  * @author moonsky
@@ -37,5 +39,7 @@ class OptionalUtilTestTest {
 
     @Test
     void testIfPresentOrElse() {
+        Optional optional = Optional.ofNullable(java.util.Optional.ofNullable(Optional.ofNullable(OptionalInt.of(20))));
+        Assertions.assertEquals(20, OptionalUtil.resolveOrNull(optional));
     }
 }
