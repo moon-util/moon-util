@@ -285,6 +285,13 @@ public final class DateTime extends Date implements TemporalAccessor, TemporalAd
     }
 
     /**
+     * 获取季节
+     *
+     * @return 季节
+     */
+    public Season getSeason() { return Season.ofMonth(getMonthValue()); }
+
+    /**
      * 获取年龄（周岁），假设当前{@code Datetime}是某一对象的生日
      * 返回到当前时刻的年数
      *

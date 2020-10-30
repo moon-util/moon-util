@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
     ElementType.TYPE_PARAMETER,
     ElementType.TYPE_USE
 })
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 public @interface Unsupported {
 
     /**

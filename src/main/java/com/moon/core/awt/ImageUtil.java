@@ -14,10 +14,9 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author moonsky
  */
-public final class ImageUtil {
-    private ImageUtil() {
-        noInstanceError();
-    }
+public abstract class ImageUtil {
+
+    private ImageUtil() { noInstanceError(); }
 
     public final static String imageToBase64(String imageFilePath) {
         return imageToBase64(new File(imageFilePath));

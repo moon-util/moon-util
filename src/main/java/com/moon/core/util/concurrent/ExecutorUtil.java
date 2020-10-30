@@ -1,6 +1,7 @@
 package com.moon.core.util.concurrent;
 
 import com.moon.core.lang.ThrowUtil;
+import com.moon.core.lang.Warning;
 import com.moon.core.util.support.ThreadPoolSupport;
 
 import java.util.concurrent.*;
@@ -12,6 +13,7 @@ import static com.moon.core.util.CPUUtil.getCoreCount;
 /**
  * @author moonsky
  */
+@Deprecated
 public final class ExecutorUtil {
 
     private final static long TIMEOUT = 10 * 1000;
@@ -86,32 +88,41 @@ public final class ExecutorUtil {
     public static ThreadPoolExecutor auto() { return auto(TIMEOUT); }
 
     public static ThreadPoolExecutor auto(long timeout) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            timeout, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>());
+        return new ThreadPoolExecutor(1, maxCount(), timeout, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
     }
 
     public static ThreadPoolExecutor auto(RejectedExecutionHandler rejected) { return auto(TIMEOUT, rejected); }
 
     public static ThreadPoolExecutor auto(long timeout, RejectedExecutionHandler rejected) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            TIMEOUT, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(), rejected);
+        return new ThreadPoolExecutor(1,
+            maxCount(),
+            TIMEOUT,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(),
+            rejected);
     }
 
     public static ThreadPoolExecutor auto(ThreadFactory factory) { return auto(TIMEOUT, factory); }
 
     public static ThreadPoolExecutor auto(long timeout, ThreadFactory factory) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            TIMEOUT, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(), factory);
+        return new ThreadPoolExecutor(1,
+            maxCount(),
+            TIMEOUT,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(),
+            factory);
     }
 
     public static ThreadPoolExecutor auto(
-        long timeout, ThreadFactory factory, RejectedExecutionHandler rejected) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            timeout, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(), factory, rejected);
+        long timeout, ThreadFactory factory, RejectedExecutionHandler rejected
+    ) {
+        return new ThreadPoolExecutor(1,
+            maxCount(),
+            timeout,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(),
+            factory,
+            rejected);
     }
 
     /*
@@ -121,8 +132,10 @@ public final class ExecutorUtil {
     public static ThreadPoolExecutor threshold(int thresholdTasks) { return threshold(thresholdTasks, TIMEOUT); }
 
     public static ThreadPoolExecutor threshold(int thresholdTasks, long timeout) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            timeout, TimeUnit.MILLISECONDS,
+        return new ThreadPoolExecutor(1,
+            maxCount(),
+            timeout,
+            TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<>(thresholdTasks));
     }
 
@@ -131,34 +144,49 @@ public final class ExecutorUtil {
     }
 
     public static ThreadPoolExecutor threshold(
-        int thresholdTasks, long timeout, ThreadFactory factory) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            timeout, TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue<>(thresholdTasks), factory);
+        int thresholdTasks, long timeout, ThreadFactory factory
+    ) {
+        return new ThreadPoolExecutor(1,
+            maxCount(),
+            timeout,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(thresholdTasks),
+            factory);
     }
 
     public static ThreadPoolExecutor threshold(
-        int thresholdTasks, RejectedExecutionHandler rejected) {
+        int thresholdTasks, RejectedExecutionHandler rejected
+    ) {
         return threshold(thresholdTasks, TIMEOUT, rejected);
     }
 
     public static ThreadPoolExecutor threshold(
-        int thresholdTasks, long timeout, RejectedExecutionHandler rejected) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            timeout, TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue<>(thresholdTasks), rejected);
+        int thresholdTasks, long timeout, RejectedExecutionHandler rejected
+    ) {
+        return new ThreadPoolExecutor(1,
+            maxCount(),
+            timeout,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(thresholdTasks),
+            rejected);
     }
 
     public static ThreadPoolExecutor threshold(
-        int thresholdTasks, ThreadFactory factory, RejectedExecutionHandler rejected) {
+        int thresholdTasks, ThreadFactory factory, RejectedExecutionHandler rejected
+    ) {
         return threshold(thresholdTasks, TIMEOUT, factory, rejected);
     }
 
     public static ThreadPoolExecutor threshold(
-        int thresholdTasks, long timeout, ThreadFactory factory, RejectedExecutionHandler rejected) {
-        return new ThreadPoolExecutor(1, maxCount(),
-            timeout, TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue<>(thresholdTasks), factory, rejected);
+        int thresholdTasks, long timeout, ThreadFactory factory, RejectedExecutionHandler rejected
+    ) {
+        return new ThreadPoolExecutor(1,
+            maxCount(),
+            timeout,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(thresholdTasks),
+            factory,
+            rejected);
     }
 
     private static int maxCount() { return max(getCoreCount() * 2, 1); }

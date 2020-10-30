@@ -73,6 +73,12 @@ public class CollectSplitter<E, T extends Collection<E>> implements Iterator<T> 
 
     public CollectSplitter(T t) { this(t, DEFAULT_SPLIT_COUNT); }
 
+    /**
+     * 执行拆分
+     *
+     * @param t
+     * @param count 指定拆分大小（拆分后每个集合元素数量）
+     */
     public CollectSplitter(T t, int count) { this.split(t, count); }
 
     /**

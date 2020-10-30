@@ -2,7 +2,7 @@ package com.moon.runner;
 
 import com.moon.core.lang.ParseSupportUtil;
 import com.moon.core.util.IteratorUtil;
-import com.moon.core.util.ValidationUtil;
+import com.moon.core.util.ValidateUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,9 +114,9 @@ public final class RunnerSetting implements IRunnerSetting {
 
     static String checkName(String name) {
         char curr = name.charAt(0);
-        ValidationUtil.requireTrue(ParseSupportUtil.isVar(curr), name);
+        ValidateUtil.requireTrue(ParseSupportUtil.isVar(curr), name);
         for (int i = 1, len = name.length(); i < len; i++) {
-            ValidationUtil.requireTrue(ParseSupportUtil.isVar(curr = name.charAt(i)) || ParseSupportUtil.isNum(curr), name);
+            ValidateUtil.requireTrue(ParseSupportUtil.isVar(curr = name.charAt(i)) || ParseSupportUtil.isNum(curr), name);
         }
         return name;
     }

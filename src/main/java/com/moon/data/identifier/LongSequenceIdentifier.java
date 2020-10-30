@@ -3,7 +3,7 @@ package com.moon.data.identifier;
 import com.moon.core.lang.RuntimeUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.FastTimestamp;
-import com.moon.core.util.ValidationUtil;
+import com.moon.core.util.ValidateUtil;
 import com.moon.data.IdentifierGenerator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 
@@ -71,9 +71,9 @@ public final class LongSequenceIdentifier implements IdentifierGenerator<Long, O
      * @param datacenterId 序列号
      */
     public LongSequenceIdentifier(long workerId, long datacenterId) {
-        ValidationUtil.requireFalse(workerId > maxWorkerId || workerId < 0,
+        ValidateUtil.requireFalse(workerId > maxWorkerId || workerId < 0,
             String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
-        ValidationUtil.requireFalse(datacenterId > maxDatacenterId || datacenterId < 0,
+        ValidateUtil.requireFalse(datacenterId > maxDatacenterId || datacenterId < 0,
             String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
         this.datacenterId = datacenterId;
         this.workerId = workerId;

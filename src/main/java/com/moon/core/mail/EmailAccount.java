@@ -2,7 +2,6 @@ package com.moon.core.mail;
 
 import com.moon.core.lang.MoonUtil;
 import com.moon.core.lang.ThrowUtil;
-import com.moon.core.util.concurrent.SynchronizationFuture;
 import com.sun.mail.util.MailSSLSocketFactory;
 
 import javax.mail.*;
@@ -144,7 +143,7 @@ public class EmailAccount implements Cloneable, Serializable {
         };
         if (sync) {
             runner.run();
-            return new SynchronizationFuture<>();
+            return null;
         } else {
             ExecutorService sender = service == null ? this.service : service;
             if (sender == null) {

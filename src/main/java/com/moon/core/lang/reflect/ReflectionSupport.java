@@ -1,6 +1,5 @@
 package com.moon.core.lang.reflect;
 
-import com.moon.core.enums.MatchLevel;
 import com.moon.core.util.TypeUtil;
 
 import java.lang.reflect.Executable;
@@ -21,25 +20,11 @@ final class ReflectionSupport {
     }
 
     static final Class[] PRIMITIVE_CLASSES = {
-        boolean.class,
-        byte.class,
-        char.class,
-        short.class,
-        int.class,
-        long.class,
-        float.class,
-        double.class
+        boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class
     };
 
     static final Class[] WRAPPER_CLASSES = {
-        Boolean.class,
-        Byte.class,
-        Character.class,
-        Short.class,
-        Integer.class,
-        Long.class,
-        Float.class,
-        Double.class
+        Boolean.class, Byte.class, Character.class, Short.class, Integer.class, Long.class, Float.class, Double.class
     };
 
     static Object[] castAsPossibly(Class[] types, Object[] arguments) {
@@ -60,7 +45,9 @@ final class ReflectionSupport {
         return result;
     }
 
-    static <T extends Executable> List<T> findByParameterTypes(List<T> matchOnlyTypes, int size, Class... parameterTypes) {
+    static <T extends Executable> List<T> findByParameterTypes(
+        List<T> matchOnlyTypes, int size, Class... parameterTypes
+    ) {
         UnmodifiableArrayList<T> strong = new UnmodifiableArrayList<>();
         UnmodifiableArrayList<T> soft = new UnmodifiableArrayList<>();
         UnmodifiableArrayList<T> weak = new UnmodifiableArrayList<>();
@@ -113,7 +100,9 @@ final class ReflectionSupport {
      *
      * @param type1
      * @param type2
+     *
      * @return
+     *
      * @see MatchLevel
      */
     static MatchLevel checkLevel(Class type1, Class type2) {
@@ -147,7 +136,8 @@ final class ReflectionSupport {
     }
 
     static <P, E extends P, C extends Collection<E>> C filter(
-        C collect, C resultContainer, Predicate<P> predicate) {
+        C collect, C resultContainer, Predicate<P> predicate
+    ) {
         if (collect != null) {
             for (E e : collect) {
                 if (predicate.test(e)) {

@@ -1,7 +1,5 @@
 package com.moon.core.awt;
 
-import com.moon.core.enums.Maths;
-
 import java.awt.image.BufferedImage;
 
 import static com.moon.core.enums.Const.ZERO;

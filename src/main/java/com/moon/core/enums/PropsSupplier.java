@@ -54,7 +54,7 @@ interface PropsSupplier extends EnumDescriptor, Supplier<String> {
      *
      * @param consumer
      */
-    default void ifConfiged(Consumer<String> consumer) {
+    default void ifConfigured(Consumer<String> consumer) {
         String val = getOrNull();
         if (val != null) {
             consumer.accept(val);
@@ -70,7 +70,7 @@ interface PropsSupplier extends EnumDescriptor, Supplier<String> {
      * @param <T>
      * @return
      */
-    default <T> T ifConfigedOrDefault(Function<String, ? extends T> fn, T defaultVal) {
+    default <T> T ifConfiguredOrDefault(Function<String, ? extends T> fn, T defaultVal) {
         String val = getOrNull();
         return val == null ? defaultVal : fn.apply(val);
     }
@@ -84,7 +84,7 @@ interface PropsSupplier extends EnumDescriptor, Supplier<String> {
      * @param <T>
      * @return
      */
-    default <T> T ifConfigedOrElse(Function<String, ? extends T> fn, Supplier<? extends T> supplier) {
+    default <T> T ifConfiguredOrElse(Function<String, ? extends T> fn, Supplier<? extends T> supplier) {
         String val = getOrNull();
         return val == null ? supplier.get() : fn.apply(val);
     }

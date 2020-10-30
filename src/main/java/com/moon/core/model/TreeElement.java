@@ -31,10 +31,19 @@ public class TreeElement<T> implements IdGetter, NameGetter {
     }
 
     public TreeElement(String id, String name, List<TreeElement<T>> children) {
+        this(id, name);
         this.children = children;
-        this.name = name;
-        this.id = id;
     }
+
+    @SafeVarargs
+    public static <T extends KeyValueGetter> List<TreeElement<T>> fromKeyValueList(
+        Iterable<T> data, Function<String, String>... reGroupers
+    ) { return fromKeyValueList(data, KeyGetter::getKey, reGroupers); }
+
+    @SafeVarargs
+    public static <T extends IdNameGetter> List<TreeElement<T>> fromIdNameList(
+        Iterable<T> data, Function<String, String>... reGroupers
+    ) { return fromIdNameList(data, IdGetter::getId, reGroupers); }
 
     @SafeVarargs
     public static <T extends KeyValueGetter> List<TreeElement<T>> fromKeyValueList(
@@ -89,20 +98,16 @@ public class TreeElement<T> implements IdGetter, NameGetter {
     ) {
         List<TreeElement<T>> topParents = new ArrayList<>();
         Map<String, List<TreeElement<T>>> grouped = new HashMap<>();
-        for (T datum : data) {
-            String key = grouper.apply(datum);
+        for (T item : data) {
+            String key = grouper.apply(item);
             if (key == null) {
-                TreeElement<T> element = new TreeElement<>();
-                element.setName(nameGetter.apply(datum));
-                element.setId(idGetter.apply(datum));
-                element.setData(datum);
+                TreeElement<T> element = new TreeElement<>(idGetter.apply(item), nameGetter.apply(item));
+                element.setData(item);
                 topParents.add(element);
             } else {
                 List<TreeElement<T>> list = grouped.computeIfAbsent(key, k -> new ArrayList<>());
-                TreeElement<T> element = new TreeElement<>();
-                element.setName(nameGetter.apply(datum));
-                element.setId(idGetter.apply(datum));
-                element.setData(datum);
+                TreeElement<T> element = new TreeElement<>(idGetter.apply(item), nameGetter.apply(item));
+                element.setData(item);
                 list.add(element);
             }
         }
@@ -152,16 +157,31 @@ public class TreeElement<T> implements IdGetter, NameGetter {
 
     public void setData(T data) { this.data = data; }
 
-    public void clearExpandData() {
+    /**
+     * 清空携带的扩展数据
+     *
+     * @return 当前对象
+     */
+    public TreeElement<T> clearExpandData() {
+        setData(null);
+        return this;
+    }
+
+    /**
+     * 清空当前以及子项所携带的扩展数据
+     *
+     * @return 当前对象
+     */
+    public TreeElement<T> clearAllExpandData() {
         List<TreeElement<T>> children = getChildren();
         if (children != null) {
             for (TreeElement<T> child : children) {
                 if (child != null) {
-                    child.clearExpandData();
+                    child.clearAllExpandData();
                 }
             }
         }
-        setData(null);
+        return clearExpandData();
     }
 
     @Override

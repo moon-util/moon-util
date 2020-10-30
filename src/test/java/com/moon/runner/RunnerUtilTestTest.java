@@ -4,14 +4,12 @@ import com.moon.core.AbstractTest;
 import com.moon.core.lang.ClassUtil;
 import com.moon.core.lang.DoubleUtil;
 import com.moon.core.lang.reflect.MethodUtil;
-import com.moon.core.script.ScriptUtil;
 import com.moon.core.time.DateUtil;
 import com.moon.core.util.IteratorUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
 import org.junit.jupiter.api.Test;
 
-import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -391,16 +389,11 @@ class RunnerUtilTestTest extends AbstractTest {
 
     @Test
     void testRunningTimes() throws ScriptException {
-        ScriptEngine engine = ScriptUtil.newJSEngine();
-        System.out.println(engine.eval("1+1"));
         System.out.println(RunnerUtil.run("1+1"));
         Runner runner = RunnerUtil.parse("1+1");
 
         int count = 10000;
         // Console.out.time();
-        for (int i = 0; i < count; i++) {
-            res = engine.eval("1+1");
-        }
         // Console.out.timeNext();
         for (int i = 0; i < count; i++) {
             res = RunnerUtil.run("1+1");

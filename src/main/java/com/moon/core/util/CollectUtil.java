@@ -5,7 +5,6 @@ import com.moon.core.enums.Lists;
 import com.moon.core.enums.Sets;
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.function.BiIntFunction;
-import com.moon.core.util.function.TableIntConsumer;
 import com.moon.core.util.function.TableIntFunction;
 
 import java.lang.reflect.Array;
@@ -55,6 +54,9 @@ public class CollectUtil extends BaseCollectUtil {
      * @return 所有集合的总长度，为 null 的集合长度为 0
      */
     public final static int sizeOfAll(Collection... cs) {
+        if (cs == null) {
+            return 0;
+        }
         int size = 0, i = 0;
         for (; i < cs.length; size += size(cs[i++])) {
         }
@@ -417,6 +419,6 @@ public class CollectUtil extends BaseCollectUtil {
      *                                  可用“{}”占位符接收入参集合
      */
     final static <E, C extends Collection<E>> C requireNotEmpty(C collect, String message) {
-        return ValidationUtil.requireNotEmpty(collect, message);
+        return ValidateUtil.requireNotEmpty(collect, message);
     }
 }

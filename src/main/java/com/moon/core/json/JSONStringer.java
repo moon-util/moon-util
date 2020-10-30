@@ -371,9 +371,7 @@ class JSONStringer implements Stringify {
                     boolean.class,
                     JSONBoolean.class,
                     AtomicBoolean.class,
-                    BooleanAccessor.class,
-                    // unwrapped JSONNull
-                    JSONNull.class);
+                    BooleanAccessor.class);
             }
         },
         /**

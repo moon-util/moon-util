@@ -20,7 +20,7 @@ class ValidateUtilTestTest {
 
     @Test
     void testOfCollect() {
-        ValidationUtil.ofCollect(getRandomStrings()).preset(list -> {
+        ValidateUtil.ofCollect(getRandomStrings()).preset(list -> {
             list.forEach(System.out::println);
         }).requireAtMost1(str -> str.length() == 12, "最多只能有一项长度为12").ifValid(list -> {
             // todo something

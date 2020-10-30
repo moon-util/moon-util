@@ -1,6 +1,6 @@
 package com.moon.spring.web.error;
 
-import com.moon.spring.SpringWebUtil;
+import com.moon.spring.web.SpringWebUtil;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;

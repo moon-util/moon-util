@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author moonsky
  */
 class ScriptUtilTestTest {
+
     Object res;
 
     @Test
     void testRunJSCode() {
-        res = ScriptUtil.runJSCode("1+1");
         assertEquals(res, 2);
     }
 }

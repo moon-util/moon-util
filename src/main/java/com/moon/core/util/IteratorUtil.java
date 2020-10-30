@@ -929,7 +929,7 @@ public final class IteratorUtil {
      * 默认拆分后每个容器里有十六个元素
      *
      * @param c
-     * @param size 指定拆分大小
+     * @param size 指定拆分大小（拆分后每个集合元素数量）
      * @param <E>
      * @param <C>
      *
@@ -943,7 +943,7 @@ public final class IteratorUtil {
      * 集合拆分处理器
      *
      * @param c
-     * @param size
+     * @param size 指定拆分大小（拆分后每个集合元素数量）
      * @param consumer
      * @param <E>
      * @param <C>

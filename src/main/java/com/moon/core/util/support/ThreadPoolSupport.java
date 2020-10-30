@@ -12,6 +12,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author moonsky
  */
+@Deprecated
 public final class ThreadPoolSupport {
     private ThreadPoolSupport() {
         noInstanceError();

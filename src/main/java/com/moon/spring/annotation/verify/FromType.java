@@ -1,6 +1,6 @@
 package com.moon.spring.annotation.verify;
 
-import com.moon.more.web.RequestUtil;
+import com.moon.web.RequestUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.function.BiFunction;

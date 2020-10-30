@@ -49,7 +49,7 @@ final class JSONParser {
     public JSONParser(String source) {
         this.source = source;
         if (StringUtil.isWebUndefined(source)) {
-            this.data = JSONNull.NULL;
+            this.data = null;
         } else {
             this.length = source.length();
         }
@@ -122,7 +122,7 @@ final class JSONParser {
         char curr = startIndexChar();
         Object json = parseNext(source, len, curr);
         if (json == null) {
-            data = JSONNull.NULL;
+            data = null;
         } else if (json == TRUE) {
             data = JSONBoolean.TRUE;
         } else if (json == FALSE) {

@@ -7,7 +7,7 @@ import com.moon.core.lang.ThrowUtil;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static com.moon.core.lang.NumberComparator.*;
+import static com.moon.core.math.NumFns.*;
 
 /**
  * @author moonsky

@@ -5,6 +5,7 @@ import java.lang.annotation.*;
 /**
  * @author moonsky
  */
+@Deprecated
 @Repeatable(MapField.List.class)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

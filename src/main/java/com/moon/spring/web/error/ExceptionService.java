@@ -2,7 +2,7 @@ package com.moon.spring.web.error;
 
 import com.moon.core.enums.Maps;
 import com.moon.core.lang.ClassUtil;
-import com.moon.spring.SpringWebUtil;
+import com.moon.spring.web.SpringWebUtil;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;

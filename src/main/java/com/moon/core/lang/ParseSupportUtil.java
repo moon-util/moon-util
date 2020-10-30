@@ -15,7 +15,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.lang.Character.isWhitespace;
 
 /**
- * 本类不推荐任何形式调用,随时可能会改
+ * 本类不推荐任何形式调用
  *
  * @author moonsky
  */
@@ -23,7 +23,7 @@ public final class ParseSupportUtil {
 
     private final static char DOT = '.';
 
-    private ParseSupportUtil() { noInstanceError("这个类不推荐任何形式调用"); }
+    private ParseSupportUtil() { noInstanceError("本类不推荐任何形式调用"); }
 
     /**
      * 添加 true

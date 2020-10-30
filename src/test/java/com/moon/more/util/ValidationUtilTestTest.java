@@ -1,7 +1,7 @@
 package com.moon.more.util;
 
-import com.moon.more.validator.ValidatorUtil;
-import com.moon.more.validator.annotation.InInts;
+import com.moon.validator.ValidatorUtil;
+import com.moon.validator.annotation.InInts;
 import org.hibernate.validator.constraints.Length;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

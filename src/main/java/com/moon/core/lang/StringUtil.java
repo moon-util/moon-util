@@ -5,7 +5,7 @@ import com.moon.core.enums.Const;
 import com.moon.core.enums.IntTesters;
 import com.moon.core.enums.Testers;
 import com.moon.core.lang.support.StringSupport;
-import com.moon.core.util.ValidationUtil;
+import com.moon.core.util.ValidateUtil;
 import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.IntBiFunction;
 
@@ -552,13 +552,13 @@ public final class StringUtil {
      * -------------------------------------------------------------------
      */
 
-    public static <C extends CharSequence> C requireEmpty(C c) { return ValidationUtil.requireEmpty(c); }
+    public static <C extends CharSequence> C requireEmpty(C c) { return ValidateUtil.requireEmpty(c); }
 
-    public static <C extends CharSequence> C requireNotEmpty(C c) { return ValidationUtil.requireNotEmpty(c); }
+    public static <C extends CharSequence> C requireNotEmpty(C c) { return ValidateUtil.requireNotEmpty(c); }
 
-    public static <C extends CharSequence> C requireBlank(C c) { return ValidationUtil.requireBlank(c); }
+    public static <C extends CharSequence> C requireBlank(C c) { return ValidateUtil.requireBlank(c); }
 
-    public static <C extends CharSequence> C requireNotBlank(C c) { return ValidationUtil.requireNotBlank(c); }
+    public static <C extends CharSequence> C requireNotBlank(C c) { return ValidateUtil.requireNotBlank(c); }
 
     /*
      * -------------------------------------------------------------------

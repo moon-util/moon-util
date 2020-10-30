@@ -7,5 +7,9 @@ public enum Placeholder {
     /**
      * 占位符
      */
-    DEFAULT
+    DEFAULT;
+    /**
+     * 空数组
+     */
+    public final static byte[] BYTES = {};
 }

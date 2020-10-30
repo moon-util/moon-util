@@ -42,8 +42,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextChinese(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextChinese(nextInt(min, max));
     }
 
@@ -73,8 +73,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextUpper(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextUpper(nextInt(min, max));
     }
 
@@ -104,8 +104,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextLower(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextLower(nextInt(min, max));
     }
 
@@ -135,8 +135,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextLetter(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextLetter(nextInt(min, max));
     }
 
@@ -166,8 +166,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextControl(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextControl(nextInt(min, max));
     }
 
@@ -197,8 +197,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextDigit(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextDigit(nextInt(min, max));
     }
 
@@ -230,8 +230,8 @@ public final class RandomStringUtil {
     }
 
     public static String nextSymbol(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return nextSymbol(nextInt(min, max));
     }
 
@@ -268,8 +268,8 @@ public final class RandomStringUtil {
     }
 
     public static String next(int min, int max) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return next(nextInt(min, max));
     }
 
@@ -293,8 +293,8 @@ public final class RandomStringUtil {
     }
 
     public static String next(int min, int max, boolean lower, boolean upper, boolean digit) {
-        ValidationUtil.requireGeOf(min, 0);
-        ValidationUtil.requireLeOf(min, max);
+        ValidateUtil.requireGeOf(min, 0);
+        ValidateUtil.requireLeOf(min, max);
         return next(nextInt(min, max), lower, upper, digit);
     }
 

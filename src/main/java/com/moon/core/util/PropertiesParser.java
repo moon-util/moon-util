@@ -160,7 +160,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
     private PropertiesParser(
         String namespace, Set<String> includes, boolean bubbleDelimiters, Map<String, PropertiesHashMap> parsedSources
     ) {
-        String ns = this.currentNamespace = ValidationUtil.requireNotEmpty(trimToNull(namespace));
+        String ns = this.currentNamespace = ValidateUtil.requireNotEmpty(trimToNull(namespace));
         this.currentDelimitersName = ns + DOT + DELIMITERS_NAME;
         this.bubbleDelimiters = bubbleDelimiters;
         this.parsedSources = parsedSources;
@@ -365,19 +365,19 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
             String sourceDir = activeDir(activePath, activeName);
             String[] strings = simpleName.split(COLON);
             String name = trimToNull(strings[1]);
-            formatted = toPropertiesName(sourceDir + ValidationUtil.requireNotEmpty(name));
+            formatted = toPropertiesName(sourceDir + ValidateUtil.requireNotEmpty(name));
             props = parseNSMap(formatted, strings, delimiters);
         } else if (simpleName.startsWith(PATH)) {
             String[] strings = simpleName.split(COLON);
-            formatted = toPropertiesName(ValidationUtil.requireNotEmpty(trimToNull(strings[1])));
+            formatted = toPropertiesName(ValidateUtil.requireNotEmpty(trimToNull(strings[1])));
             props = parseNSMap(formatted, strings, delimiters);
         } else if (simpleName.contains(COLON)) {
             String[] strings = simpleName.split(COLON);
             String name = trimToNull(strings[0]);
-            formatted = toPropertiesName(activePath + '-' + ValidationUtil.requireNotEmpty(name));
+            formatted = toPropertiesName(activePath + '-' + ValidateUtil.requireNotEmpty(name));
             props = parseNSMap(trimToNull(strings[1]), formatted, delimiters);
         } else if (!simpleName.isEmpty()) {
-            formatted = toPropertiesName(activePath + '-' + ValidationUtil.requireNotEmpty(simpleName));
+            formatted = toPropertiesName(activePath + '-' + ValidateUtil.requireNotEmpty(simpleName));
             props = parseNSMap(null, formatted, delimiters);
         }
         return props;
@@ -411,13 +411,13 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
      */
 
     private static String activePath(String sourcePath) {
-        int end = ValidationUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), 0);
+        int end = ValidateUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), 0);
         return sourcePath.substring(0, end);
     }
 
     private static String activeName(String sourcePath) {
         int begin = minimumWithZero(sourcePath.lastIndexOf('/'));
-        int end = ValidationUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), begin);
+        int end = ValidateUtil.requireGtOf(sourcePath.lastIndexOf(SUFFIX), begin);
         return sourcePath.substring(incrementIfPositive(begin), end);
     }
 
@@ -437,7 +437,7 @@ public class PropertiesParser implements Parser<PropertiesHashMap, String> {
     }
 
     private static Set<String> namesToIncludesSet(String namespace, String... names) {
-        final String ns = ValidationUtil.requireNotEmpty(trimToNull(namespace));
+        final String ns = ValidateUtil.requireNotEmpty(trimToNull(namespace));
         names = Arrays2.STRINGS.defaultIfEmpty(names, DEFAULT_NAMES);
         Set<String> ret = new LinkedHashSet<>();
         for (String name : names) {

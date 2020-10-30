@@ -40,7 +40,7 @@ import static com.moon.core.enums.Patterns.*;
  * @see StringUtil
  */
 @SuppressWarnings("all")
-public class TestUtil {
+public abstract class TestUtil {
 
     protected TestUtil() { ThrowUtil.noInstanceError(); }
 

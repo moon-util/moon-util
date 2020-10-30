@@ -1,9 +1,7 @@
 package com.moon.core.security;
 
 import com.moon.core.exception.DefaultException;
-import com.moon.core.lang.StringUtil;
-import com.moon.core.util.TestUtil;
-import com.moon.core.util.ValidationUtil;
+import com.moon.core.util.ValidateUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -34,7 +32,7 @@ public enum EncryptType implements Supplier<MessageDigest> {
 
     public static String encrypt(String input, MessageDigest digest) {
         try {
-            input = ValidationUtil.requireNotBlank(input).trim();
+            input = ValidateUtil.requireNotBlank(input).trim();
             digest.update(input.getBytes("UTF-8"));
             return toHexValue(digest.digest());
         } catch (UnsupportedEncodingException e) {

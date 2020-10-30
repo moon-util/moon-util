@@ -1,6 +1,5 @@
 package com.moon.core.awt;
 
-import com.moon.core.enums.Maths;
 import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.ref.IntAccessor;
 

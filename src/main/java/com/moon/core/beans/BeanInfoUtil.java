@@ -26,7 +26,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  * @author ZhangDongMin
  * @see FieldDescriptor
  */
-public final class BeanInfoUtil {
+public abstract class BeanInfoUtil {
 
     private BeanInfoUtil() { noInstanceError(); }
 

@@ -1,19 +1,16 @@
 package com.moon.more.util;
 
 import com.moon.core.enums.Testers;
-import com.moon.core.lang.StringUtil;
-import com.moon.core.model.KeyValue;
 import com.moon.core.util.RequireValidateException;
-import com.moon.more.validator.ValidatorUtil;
-import com.moon.more.validator.annotation.AllInInts;
-import com.moon.more.validator.annotation.InInts;
-import com.moon.more.validator.annotation.ResidentID18;
+import com.moon.validator.ValidatorUtil;
+import com.moon.validator.annotation.AllInInts;
+import com.moon.validator.annotation.InInts;
+import com.moon.validator.annotation.ResidentID18;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;

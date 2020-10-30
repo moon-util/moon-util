@@ -1,7 +1,7 @@
 package com.moon.core.enums;
 
-import com.moon.more.validator.annotation.RequirePatternOf;
-import com.moon.more.validator.annotation.RequireTesterOf;
+import com.moon.validator.annotation.RequirePatternOf;
+import com.moon.validator.annotation.RequireTesterOf;
 
 import java.util.*;
 import java.util.function.Predicate;

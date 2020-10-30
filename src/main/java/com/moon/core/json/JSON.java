@@ -40,7 +40,7 @@ public interface JSON<KEY> extends Cloneable, Serializable {
      * @return
      */
     static JSON parse(String jsonText) {
-        return jsonText == null ? JSONNull.NULL : new JSONParser(jsonText.startsWith("classpath:") ? readJsonString(
+        return jsonText == null ? null : new JSONParser(jsonText.startsWith("classpath:") ? readJsonString(
             jsonText.substring(10)) : jsonText).toJSON();
     }
 

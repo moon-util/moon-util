@@ -10,6 +10,7 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
 /**
  * @author moonsky
  */
+@Warning
 public final class MoonUtil {
 
     private final static ThreadPoolExecutor executor;

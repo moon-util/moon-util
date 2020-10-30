@@ -69,8 +69,25 @@ public enum DateTimeMonth implements TemporalAccessor, TemporalAdjuster, EnumDes
         this.month = Month.of(getValue());
     }
 
+    /**
+     * 获取季节
+     *
+     * @return 季节
+     */
+    public Season toSeason() { return Season.ofMonth(getValue()); }
+
+    /**
+     * 获取月份
+     *
+     * @return 月份
+     */
     public Month getMonth() { return month; }
 
+    /**
+     * 获取月份值
+     *
+     * @return 月份值
+     */
     public int getValue() { return ordinal() + 1; }
 
     /**
