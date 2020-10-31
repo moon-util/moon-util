@@ -26,5 +26,6 @@ class LocalStorageTestTest {
         LocalStorage<String> localStorage = LocalStorage.of("11208-test");
         localStorage.set("123", "456");
         Assertions.assertEquals("456", localStorage.get("123"));
+        localStorage.clear();
     }
 }

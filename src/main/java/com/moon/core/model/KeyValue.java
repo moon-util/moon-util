@@ -1,19 +1,24 @@
 package com.moon.core.model;
 
 import com.moon.core.enums.EnumDescriptor;
+import com.moon.core.model.getter.KeyGetter;
 import com.moon.core.model.getter.KeyValueGetter;
+import com.moon.core.model.getter.ValueGetter;
 import com.moon.core.model.supplier.KeySupplier;
 import com.moon.core.model.supplier.ValueSupplier;
-import com.moon.core.model.getter.KeyGetter;
-import com.moon.core.model.getter.ValueGetter;
+import com.moon.core.util.ComparatorUtil;
 
 import java.util.Objects;
 
 /**
  * @author moonsky
  */
-public final class KeyValue
-    implements ValueSupplier<String>, KeySupplier<String>, KeyGetter, ValueGetter, KeyValueGetter {
+public final class KeyValue implements ValueSupplier<String>,
+                                       KeySupplier<String>,
+                                       KeyGetter,
+                                       ValueGetter,
+                                       KeyValueGetter,
+                                       Comparable<KeyValue> {
 
     private String key;
     private String value;
@@ -76,5 +81,10 @@ public final class KeyValue
         sb.append(", value='").append(value).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(KeyValue o) {
+        return ComparatorUtil.comparing(this, o, KeyGetter::getKey, ValueGetter::getValue);
     }
 }

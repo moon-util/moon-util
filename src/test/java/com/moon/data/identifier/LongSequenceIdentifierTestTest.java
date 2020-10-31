@@ -81,7 +81,7 @@ class LongSequenceIdentifierTestTest {
 
     @Test
     void testStartTime() throws Exception {
-        System.out.println(DateTime.of(2020, 9, 1, 0, 0, 0, 0, 0).getTime());
+        System.out.println(DateTime.ofFields(2020, 9, 1, 0, 0, 0, 0, 0).getTime());
         ;
 
         final long twepoch = 1288834974657L;

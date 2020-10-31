@@ -21,7 +21,7 @@ class DatetimeTestTest {
 
     @Test
     void testEndOfYear() throws Exception {
-        DateTime datetime = DateTime.ofImmutable(2019, 8, 9, 12, 58, 59, 12, 26);
+        DateTime datetime = DateTime.ofImmutableFields(2019, 8, 9, 12, 58, 59, 12, 26);
         assertEquals("2019-08-09 12:58:59 012", fullStringify(datetime));
 
         assertEquals("2019-01-01 00:00:00 000", fullStringify(datetime.startOfYear()));

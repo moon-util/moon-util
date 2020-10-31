@@ -53,7 +53,7 @@ class DatetimeTestTest {
 
         String endOfMonth = DateTime.now().endOfMonth().toString();
         System.out.println(endOfMonth);
-        DateTime dt = DateTime.of(2000, 2, 12);
+        DateTime dt = DateTime.ofFields(2000, 2, 12);
         System.out.println(dt.endOfMonth().toString());
     }
 }

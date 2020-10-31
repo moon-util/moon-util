@@ -78,19 +78,19 @@ public class DatetimeTest {
 
     @Test
     void testGetYearLength() throws Exception {
-        assertTrue(DateTime.of(2020, 12, 30).isLeapYear());
-        assertTrue(DateTime.of(2020, 12, 30).getYearLength() == 366);
-        assertTrue(DateTime.of(2016, 12, 30).isLeapYear());
-        assertTrue(DateTime.of(2000, 12, 30).isLeapYear());
-        assertFalse(DateTime.of(1900, 12, 30).isLeapYear());
+        assertTrue(DateTime.ofFields(2020, 12, 30).isLeapYear());
+        assertTrue(DateTime.ofFields(2020, 12, 30).getYearLength() == 366);
+        assertTrue(DateTime.ofFields(2016, 12, 30).isLeapYear());
+        assertTrue(DateTime.ofFields(2000, 12, 30).isLeapYear());
+        assertFalse(DateTime.ofFields(1900, 12, 30).isLeapYear());
     }
 
     @Test
     void testGetYearValue() throws Exception {
-        assertTrue(DateTime.of(2020, 12, 30).isLeapYear());
-        assertTrue(DateTime.of(2016, 12, 30).isLeapYear());
-        assertTrue(DateTime.of(2000, 12, 30).isLeapYear());
-        assertFalse(DateTime.of(1900, 12, 30).isLeapYear());
+        assertTrue(DateTime.ofFields(2020, 12, 30).isLeapYear());
+        assertTrue(DateTime.ofFields(2016, 12, 30).isLeapYear());
+        assertTrue(DateTime.ofFields(2000, 12, 30).isLeapYear());
+        assertFalse(DateTime.ofFields(1900, 12, 30).isLeapYear());
     }
 
     @Test
@@ -400,16 +400,16 @@ public class DatetimeTest {
 
     @Test
     void testTestStartOfWeek() throws Exception {
-        DateTime datetime = DateTime.of(2020, 7, 25, 10, 29, 25);
+        DateTime datetime = DateTime.ofFields(2020, 7, 25, 10, 29, 25);
         System.out.println(datetime);
         System.out.println(datetime.startOfWeek());
         System.out.println(datetime.endOfWeek());
 
-        datetime = DateTime.of(2020, 7, 25, 10, 29, 25);
+        datetime = DateTime.ofFields(2020, 7, 25, 10, 29, 25);
         System.out.println(datetime.startOfWeek(DayOfWeek.SUNDAY));
         System.out.println(datetime.endOfWeek(DayOfWeek.SUNDAY));
 
-        datetime = DateTime.of(2020, 7, 25, 10, 29, 25);
+        datetime = DateTime.ofFields(2020, 7, 25, 10, 29, 25);
         System.out.println(datetime.startOfWeek(DayOfWeek.TUESDAY));
         System.out.println(datetime.endOfWeek(DayOfWeek.TUESDAY));
     }

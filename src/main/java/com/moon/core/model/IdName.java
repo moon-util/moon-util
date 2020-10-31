@@ -2,10 +2,11 @@ package com.moon.core.model;
 
 import com.moon.core.enums.EnumDescriptor;
 import com.moon.core.model.getter.IdGetter;
+import com.moon.core.model.getter.IdNameGetter;
 import com.moon.core.model.getter.NameGetter;
 import com.moon.core.model.supplier.IdSupplier;
-import com.moon.core.model.getter.IdNameGetter;
 import com.moon.core.model.supplier.NameSupplier;
+import com.moon.core.util.ComparatorUtil;
 
 import java.util.Objects;
 
@@ -13,7 +14,7 @@ import java.util.Objects;
  * @author moonsky
  */
 public final class IdName
-    implements NameSupplier<String>, IdSupplier<String>, IdGetter, NameGetter, IdNameGetter {
+    implements NameSupplier<String>, IdSupplier<String>, IdGetter, NameGetter, IdNameGetter, Comparable<IdName> {
 
     private String id;
 
@@ -81,5 +82,10 @@ public final class IdName
         sb.append(", name='").append(name).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(IdName o) {
+        return ComparatorUtil.comparing(this, o, IdName::getId, IdName::getName);
     }
 }

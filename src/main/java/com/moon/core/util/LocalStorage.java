@@ -1,17 +1,19 @@
 package com.moon.core.util;
 
+import com.moon.core.enums.Arrays2;
 import com.moon.core.io.FileUtil;
 import com.moon.core.io.IOUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.SystemUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.lang.ref.FinalAccessor;
+import com.moon.core.util.function.TableFunction;
 
 import java.io.*;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -37,14 +39,14 @@ import java.util.function.Supplier;
  */
 public class LocalStorage<T> implements Storage<String, T> {
 
+    protected final static String LOCAL_STORAGE_STRING_PREFIX = "S:";
+    protected final static String LOCAL_STORAGE_OTHER_PREFIX = "A:";
     private final static String ISOLATION = ".JAVAIMOONUTILLOCALSTORAGEISOLATION";
     private final static char CHAR_HYPHEN = '-';
     private final static char CHAR_WAVE = '~';
     private final static short FACTOR = 19968;
 
     private final static Map<String, Object> FACTORY_MAP = new ConcurrentHashMap<>();
-    private final static Function<byte[], Object> DESERIALIZER = IOUtil::deserialize;
-    private final static Function SERIALIZER = IOUtil::serialize;
 
     private final static String DEFAULT_ROOT;
     private final static LocalStorage DEFAULT;
@@ -92,16 +94,6 @@ public class LocalStorage<T> implements Storage<String, T> {
     private int cacheLengthLimit = 10240;
 
     /**
-     * 构造器
-     *
-     * @param root      存储根路径
-     * @param namespace 命名路径
-     */
-    protected LocalStorage(String root, String namespace) {
-        this(root, namespace, new ConcurrentHashMap());
-    }
-
-    /**
      * 提供自定义本地缓存构造器，如需自定义实现{@link #valueCached}可以通过传入{@code null}
      * 并覆盖方法{@link #getValueCached()}实现
      *
@@ -115,6 +107,10 @@ public class LocalStorage<T> implements Storage<String, T> {
         String localNs = absolutePath(r, ns);
         this.valueCached = valueCached;
         this.namespace = localNs;
+        /**
+         * 自定义实现可能无法被{@link Factory}管理，此时通过构造器捕捉{@code root}路径后
+         * 可由{@link LocalStorage#clearAll()} 管理全局
+         */
         placedRootPath(r);
     }
 
@@ -155,7 +151,7 @@ public class LocalStorage<T> implements Storage<String, T> {
     }
 
     private void doStorage(String key, T value, boolean forceCache) {
-        char[] chars = doSerialize(value);
+        char[] chars = getSerializer().apply(value);
         try (Writer writer = createStorageWriter(key)) {
             writer.write(chars);
             writer.flush();
@@ -180,15 +176,6 @@ public class LocalStorage<T> implements Storage<String, T> {
         }
         FileUtil.createNewFile(enduranceFile);
         return IOUtil.getWriter(enduranceFile);
-    }
-
-    private char[] doSerialize(T value) {
-        byte[] serialized = getSerializer().apply(value);
-        char[] chars = new char[serialized.length];
-        for (int i = 0; i < serialized.length; i++) {
-            chars[i] = (char) (serialized[i] + FACTOR);
-        }
-        return chars;
     }
 
     /**
@@ -248,7 +235,7 @@ public class LocalStorage<T> implements Storage<String, T> {
             return (T) cached;
         }
         // 读取存储
-        byte[] serialized = readStorage(key);
+        String serialized = readStorage(key);
         if (serialized == null) {
             // 不存在
             if (!forceNonCache) {
@@ -258,13 +245,13 @@ public class LocalStorage<T> implements Storage<String, T> {
         }
         // 存在
         T data = getDeserializer().apply(serialized);
-        if (!forceNonCache && serialized.length < getCacheLengthLimit()) {
+        if (!forceNonCache && serialized.length() < getCacheLengthLimit()) {
             valueCacheMap.put(key, data);
         }
         return data;
     }
 
-    private byte[] readStorage(String key) {
+    private String readStorage(String key) {
         File enduranceFile = new File(namespace, key);
         if (!enduranceFile.exists()) {
             return null;
@@ -272,13 +259,13 @@ public class LocalStorage<T> implements Storage<String, T> {
         FinalAccessor<String> accessor = FinalAccessor.of();
         try (FileReader reader = new FileReader(enduranceFile)) {
             IteratorUtil.forEachLines(reader, accessor::set);
-            return accessor.ifPresentOrNull(v -> preDeserialize(v.toCharArray()));
+            return accessor.get();
         } catch (IOException e) {
             return ThrowUtil.unchecked(e);
         }
     }
 
-    private byte[] preDeserialize(char[] line) {
+    private static byte[] preDeserialize(char[] line) {
         byte[] serialized = new byte[line.length];
         for (int i = 0; i < line.length; i++) {
             serialized[i] = (byte) (line[i] - FACTOR);
@@ -317,9 +304,43 @@ public class LocalStorage<T> implements Storage<String, T> {
 
     public int getCacheLengthLimit() { return cacheLengthLimit; }
 
-    protected Function<T, byte[]> getSerializer() { return SERIALIZER; }
+    protected Function<T, char[]> getSerializer() {
+        return data -> {
+            if (data instanceof String) {
+                return (LOCAL_STORAGE_STRING_PREFIX + data).toCharArray();
+            } else if (data == null) {
+                return Arrays2.CHARS.empty();
+            } else {
+                byte[] serialized = IOUtil.serialize(data);
+                String otherPrefix = LOCAL_STORAGE_OTHER_PREFIX;
+                int prefixLen = otherPrefix.length();
+                char[] chars = new char[serialized.length + prefixLen];
+                otherPrefix.getChars(0, prefixLen, chars, 0);
+                for (int i = 0; i < serialized.length; i++) {
+                    chars[i + 2] = (char) (serialized[i] + FACTOR);
+                }
+                return chars;
+            }
+        };
+    }
 
-    protected Function<byte[], T> getDeserializer() { return (Function<byte[], T>) DESERIALIZER; }
+    protected Function<String, T> getDeserializer() {
+        return serialized -> {
+            // 如果为空
+            if (StringUtil.isEmpty(serialized)) {
+                return null;
+            }
+            String prefix = serialized.startsWith(LOCAL_STORAGE_STRING_PREFIX)//
+                            ? LOCAL_STORAGE_STRING_PREFIX//
+                            : LOCAL_STORAGE_OTHER_PREFIX;
+            String content = StringUtil.substrAfter(serialized, prefix);
+            if (LOCAL_STORAGE_STRING_PREFIX.equals(prefix)) {
+                return (T) content;
+            }else {
+                return (T) IOUtil.deserialize(preDeserialize(content.toCharArray()));
+            }
+        };
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -355,7 +376,7 @@ public class LocalStorage<T> implements Storage<String, T> {
     public final static class Factory<T> {
 
         private final Map<String, LocalStorage> STORAGE_MAP = new ConcurrentHashMap<>();
-        private BiFunction<String, String, LocalStorage<T>> builder;
+        private TableFunction<String, String, Map<String, T>, LocalStorage<T>> builder;
         private final String root;
 
         private Factory(String root) { this.root = root; }
@@ -364,8 +385,14 @@ public class LocalStorage<T> implements Storage<String, T> {
             return absolutePath(useRootPath(root), useNamespace(ns));
         }
 
-        private BiFunction<String, String, LocalStorage<T>> getBuilder() {
-            return builder == null ? LocalStorage::new : builder;
+        private TableFunction<String, String, Map<String, T>, LocalStorage<T>> getBuilder() {
+            return builder == null ? new TableFunction<String, String, Map<String, T>, LocalStorage<T>>() {
+                @Override
+                public <R> R apply(String s, String s2, Map<String, T> map) {
+                    LocalStorage storage = new LocalStorage<>(s, s2, map);
+                    return (R) storage;
+                }
+            } : builder;
         }
 
         public String getRootPath() { return root; }
@@ -375,19 +402,40 @@ public class LocalStorage<T> implements Storage<String, T> {
          *
          * @param builder LocalStorage
          */
-        public void setStorageBuilder(BiFunction<String, String, LocalStorage<T>> builder) {
+        public void setStorageBuilder(TableFunction<String, String, Map<String, T>, LocalStorage<T>> builder) {
             this.builder = builder;
         }
 
         public LocalStorage<T> create(String namespace) {
             final String root = getRootPath();
             return STORAGE_MAP.computeIfAbsent(toLocalNamespace(root, namespace),
-                k -> getBuilder().apply(root, namespace));
+                k -> getBuilder().apply(root, namespace, new LRU<>(64)));
+        }
+
+        public LocalStorage<T> create(String namespace, Map<String, T> valueCaching) {
+            final String root = getRootPath();
+            return STORAGE_MAP.computeIfAbsent(toLocalNamespace(root, namespace),
+                k -> getBuilder().apply(root, namespace, valueCaching));
         }
 
         /**
          * 清除当前{@link Factory}所有缓存
          */
         public void clearAll() { STORAGE_MAP.forEach((k, s) -> s.clear()); }
+    }
+
+    public final static class LRU<K, V> extends LinkedHashMap<K, V> {
+
+        private final int MAX_CACHE_SIZE;
+
+        protected LRU(int discardOnSize) {
+            super((int) Math.ceil(discardOnSize / 0.75) + 1, 0.75f, true);
+            MAX_CACHE_SIZE = discardOnSize;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > MAX_CACHE_SIZE;
+        }
     }
 }

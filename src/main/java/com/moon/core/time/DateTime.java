@@ -168,7 +168,7 @@ public final class DateTime extends Date implements TemporalAccessor, TemporalAd
 
     public static DateTime of(CharSequence dateStr) { return new DateTime(dateStr); }
 
-    public static DateTime of(int... fields) { return new DateTime(DateUtil.toCalendar(fields)); }
+    public static DateTime ofFields(int... fields) { return new DateTime(DateUtil.toCalendar(fields)); }
 
     public static DateTime ofToday(LocalTime time) { return new DateTime(time.atDate(LocalDate.now())); }
 
@@ -190,7 +190,7 @@ public final class DateTime extends Date implements TemporalAccessor, TemporalAd
 
     public static DateTime ofImmutable(CharSequence dateStr) { return ofImmutable(DateUtil.toCalendar(dateStr)); }
 
-    public static DateTime ofImmutable(int... fields) { return ofImmutable(DateUtil.toCalendar(fields)); }
+    public static DateTime ofImmutableFields(int... fields) { return ofImmutable(DateUtil.toCalendar(fields)); }
 
     public static DateTime ofImmutable(LocalDate date) { return ofImmutable(DateUtil.toCalendar(date)); }
 

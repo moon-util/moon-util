@@ -1,6 +1,10 @@
 package com.moon.core.lang;
 
+import com.moon.core.lang.invoke.LambdaUtil;
+import com.moon.core.util.function.SerializableFunction;
+
 import java.util.Objects;
+import java.util.function.Function;
 
 import static com.moon.core.lang.ThrowUtil.noInstanceError;
 
@@ -9,11 +13,80 @@ import static com.moon.core.lang.ThrowUtil.noInstanceError;
  */
 public final class ObjectUtil {
 
+    private final static String NULL = null;
+
     private ObjectUtil() { noInstanceError(); }
 
     public static <T> T defaultIfNull(T obj, T defaultValue) { return obj == null ? defaultValue : obj; }
 
     public static boolean equals(Object o1, Object o2) { return Objects.equals(o1, o2); }
+
+    public static <T> boolean equalsProperties(T o1, T o2, Function<? super T, Object>... propertiesGetter) {
+        if (o1 == o2) {
+            return true;
+        }
+        if (o1 == null || o2 == null) {
+            return false;
+        }
+        int length = propertiesGetter == null ? 0 : propertiesGetter.length;
+        if (length > 0) {
+            for (Function<? super T, Object> getter : propertiesGetter) {
+                if (!Objects.equals(getter.apply(o1), getter.apply(o2))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        throw new IllegalStateException("没有任何可比较的属性");
+    }
+
+    public static <T> String toString(T object, SerializableFunction<T, Object>... getters) {
+        if (object == null) {
+            return "null";
+        }
+        StringBuilder builder = new StringBuilder(getters.length * 16);
+        builder.append(object.getClass().getSimpleName()).append("{");
+        for (SerializableFunction<T, Object> getter : getters) {
+            Object value = getter.apply(object);
+            builder.append(LambdaUtil.getPropertyName(getter)).append("=");
+            if (value instanceof CharSequence) {
+                builder.append("'").append(value).append('\'');
+            } else if (value instanceof Number || value instanceof Boolean) {
+                builder.append(value);
+            } else if (value == null) {
+                builder.append(NULL);
+            } else {
+                builder.append("{").append(value).append('}');
+            }
+            builder.append(", ");
+        }
+        int length = builder.length();
+        return builder.delete(length - 2, length).append("}").toString();
+    }
+
+    public static <T> String toStringAsJSON(T object, SerializableFunction<T, Object>... getters) {
+        if (object == null) {
+            return "null";
+        }
+        StringBuilder builder = new StringBuilder(getters.length * 16);
+        builder.append("{\"").append(object.getClass().getSimpleName()).append("\":{");
+        for (SerializableFunction<T, Object> getter : getters) {
+            Object value = getter.apply(object);
+            builder.append('"').append(LambdaUtil.getPropertyName(getter)).append("\":");
+            if (value instanceof CharSequence) {
+                builder.append('"').append(value).append('"');
+            } else if (value instanceof Number || value instanceof Boolean) {
+                builder.append(value);
+            } else if (value == null) {
+                builder.append(NULL);
+            } else {
+                builder.append(value);
+            }
+            builder.append(",");
+        }
+        int length = builder.length();
+        return builder.delete(length - 1, length).append("}}").toString();
+    }
 
     public static boolean contentEquals(ContentEquals a, ContentEquals b) {
         return (a == b) || (a != null && a.contentEquals(b));
