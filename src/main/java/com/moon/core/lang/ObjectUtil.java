@@ -64,12 +64,13 @@ public final class ObjectUtil {
         return builder.delete(length - 2, length).append("}").toString();
     }
 
-    public static <T> String toStringAsJSON(T object, SerializableFunction<T, Object>... getters) {
+    @SafeVarargs
+    public static <T> String toStringAsJson(T object, SerializableFunction<T, Object>... getters) {
         if (object == null) {
             return "null";
         }
         StringBuilder builder = new StringBuilder(getters.length * 16);
-        builder.append("{\"").append(object.getClass().getSimpleName()).append("\":{");
+        builder.append("{\"@type\":\"").append(object.getClass().getName()).append("\",");
         for (SerializableFunction<T, Object> getter : getters) {
             Object value = getter.apply(object);
             builder.append('"').append(LambdaUtil.getPropertyName(getter)).append("\":");
@@ -79,13 +80,19 @@ public final class ObjectUtil {
                 builder.append(value);
             } else if (value == null) {
                 builder.append(NULL);
+            } else if (value instanceof Iterable) {
+                Iterable iterable = (Iterable) value;
+                for (Object o : iterable) {
+                    builder.append(o).append(',');
+                }
+                builder.deleteCharAt(builder.length() - 1);
             } else {
                 builder.append(value);
             }
             builder.append(",");
         }
         int length = builder.length();
-        return builder.delete(length - 1, length).append("}}").toString();
+        return builder.deleteCharAt(length - 1).append("}}").toString();
     }
 
     public static boolean contentEquals(ContentEquals a, ContentEquals b) {

@@ -20,6 +20,7 @@ public final class ComparatorUtil {
      *
      * @return 多条件比较器
      */
+    @SafeVarargs
     public static <T> Comparator<T> ofMulti(Comparator<T>... comparators) {
         return (o1, o2) -> {
             for (Comparator<T> comparator : comparators) {
@@ -42,7 +43,7 @@ public final class ComparatorUtil {
      *
      * @return 比较结果
      */
-    public static <T extends Comparable> int comparing(T o1, T o2) {
+    public static <T extends Comparable<T>> int comparing(T o1, T o2) {
         return comparing(false, o1, o2);
     }
 
@@ -56,7 +57,7 @@ public final class ComparatorUtil {
      *
      * @return 比较结果
      */
-    public static <T extends Comparable> int comparingNullBehind(T o1, T o2) {
+    public static <T extends Comparable<T>> int comparingNullBehind(T o1, T o2) {
         return comparing(true, o1, o2);
     }
 
@@ -70,7 +71,7 @@ public final class ComparatorUtil {
      *
      * @return 比较结果
      */
-    public static <T extends Comparable> int comparing(boolean nullBehind, T o1, T o2) {
+    public static <T extends Comparable<T>> int comparing(boolean nullBehind, T o1, T o2) {
         if (o1 == null) { return o2 == null ? 0 : (nullBehind ? 1 : -1); }
         if (o2 == null) { return nullBehind ? -1 : 1; }
         return o1.compareTo(o2);
@@ -87,11 +88,12 @@ public final class ComparatorUtil {
      *
      * @return 比较结果
      */
+    @SafeVarargs
     public static <T> int comparing(
         T o1,
         T o2,
-        Function<? super T, ? extends Comparable> propertyGetter,
-        Function<? super T, ? extends Comparable>... propertiesGetter
+        Function<? super T, ? extends Comparable<?>> propertyGetter,
+        Function<? super T, ? extends Comparable<?>>... propertiesGetter
     ) { return comparing(false, o1, o2, propertyGetter, propertiesGetter); }
 
     /**
@@ -105,11 +107,12 @@ public final class ComparatorUtil {
      *
      * @return 比较结果
      */
+    @SafeVarargs
     public static <T> int comparingNullBehind(
         T o1,
         T o2,
-        Function<? super T, ? extends Comparable> propertyGetter,
-        Function<? super T, ? extends Comparable>... propertiesGetter
+        Function<? super T, ? extends Comparable<?>> propertyGetter,
+        Function<? super T, ? extends Comparable<?>>... propertiesGetter
     ) { return comparing(true, o1, o2, propertyGetter, propertiesGetter); }
 
     /**
@@ -124,20 +127,23 @@ public final class ComparatorUtil {
      *
      * @return 比较结果
      */
+    @SafeVarargs
     public static <T> int comparing(
         boolean nullBehind,
         T o1,
         T o2,
-        Function<? super T, ? extends Comparable> propertyGetter,
-        Function<? super T, ? extends Comparable>... propertiesGetter
+        Function<? super T, ? extends Comparable<?>> propertyGetter,
+        Function<? super T, ? extends Comparable<?>>... propertiesGetter
     ) {
         if (o1 == null) { return o2 == null ? 0 : (nullBehind ? 1 : -1); }
         if (o2 == null) { return nullBehind ? -1 : 1; }
         Comparable c1 = propertyGetter.apply(o1), c2 = propertyGetter.apply(o2);
-        int compared = comparing(c1, c2);
+        int compared = comparing(nullBehind, c1, c2);
         if (compared == 0) {
-            for (Function<? super T, ? extends Comparable> fn : propertiesGetter) {
-                if ((compared = comparing(nullBehind, fn.apply(o1), fn.apply(o2))) != 0) {
+            for (Function<? super T, ? extends Comparable<?>> fn : propertiesGetter) {
+                c1 = fn.apply(o1);
+                c2 = fn.apply(o2);
+                if ((compared = comparing(nullBehind, c1, c2)) != 0) {
                     break;
                 }
             }
@@ -154,9 +160,10 @@ public final class ComparatorUtil {
      *
      * @return null 值靠前属性比较器
      */
+    @SafeVarargs
     public static <T> Comparator<T> comparatorOf(
-        Function<? super T, ? extends Comparable> propertyGetter,
-        Function<? super T, ? extends Comparable>... propertiesGetter
+        Function<? super T, ? extends Comparable<?>> propertyGetter,
+        Function<? super T, ? extends Comparable<?>>... propertiesGetter
     ) { return (o1, o2) -> comparing(o1, o2, propertyGetter, propertiesGetter); }
 
     /**
@@ -168,8 +175,9 @@ public final class ComparatorUtil {
      *
      * @return null 值靠后属性比较器
      */
+    @SafeVarargs
     public static <T> Comparator<T> comparatorNullBehindOf(
-        Function<? super T, ? extends Comparable> propertyGetter,
-        Function<? super T, ? extends Comparable>... propertiesGetter
+        Function<? super T, ? extends Comparable<?>> propertyGetter,
+        Function<? super T, ? extends Comparable<?>>... propertiesGetter
     ) { return (o1, o2) -> comparing(true, o1, o2, propertyGetter, propertiesGetter); }
 }

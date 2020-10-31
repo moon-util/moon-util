@@ -1,5 +1,7 @@
 package com.moon.core.lang;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -15,7 +17,7 @@ class ObjectUtilTestTest {
 
         @Override
         public String toString() {
-            return ObjectUtil.toStringAsJSON(this, Employee::getName);
+            return ObjectUtil.toStringAsJson(this, Employee::getName);
         }
     }
 
@@ -49,8 +51,8 @@ class ObjectUtilTestTest {
     @Test
     void testTestToString() throws Exception {
         UserDetail user = new UserDetail();
-        String str = ObjectUtil.toStringAsJSON(user, UserDetail::getAddress, UserDetail::getAge, UserDetail::getEmployee);
+        String str = ObjectUtil.toStringAsJson(user, UserDetail::getAddress, UserDetail::getAge, UserDetail::getEmployee);
         System.out.println(str);
-        System.out.println(user);
+        System.out.println(JSON.toJSONString(user, SerializerFeature.WriteClassName));
     }
 }
