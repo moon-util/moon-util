@@ -413,13 +413,16 @@ public final class FileUtil {
      * @return 是否还存在目标目录
      */
     public static boolean deleteAllFiles(File dir) {
+        return deleteAllFiles(dir, false);
+    }
+
+    public static boolean deleteAllFiles(File dir, boolean deleteDirectory) {
         if (dir == null) {
             return true;
         } else if (dir.isDirectory()) {
             boolean deleted = true;
-            List<File> files = traverseDirectory(dir);
-            for (int i = files.size() - 1; i >= 0; i--) {
-                deleted = delete(files.get(i));
+            for (File file : traverseDirectory(dir)) {
+                deleted = delete(file, deleteDirectory) && deleted;
             }
             return deleted;
         } else if (dir.isFile()) {
@@ -435,11 +438,19 @@ public final class FileUtil {
      *
      * @return 是否还存在目标文件
      */
-    public static boolean delete(File file) {
+    public static boolean delete(File file) { return delete(file, true); }
+
+    public static boolean delete(File file, boolean deleteDirectory) {
         if (file == null) {
             return true;
         }
         try {
+            if (file.isDirectory()) {
+                if (deleteDirectory) {
+                    return file.delete();
+                }
+                return false;
+            }
             return file.delete();
         } catch (SecurityException e) {
             return !file.exists();

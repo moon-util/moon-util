@@ -38,6 +38,7 @@ public class FileTraveller extends ArrayList<File> implements Traveller<File>, L
                     for (int i = 0; i < len; i++) {
                         traverse(new File(dir, paths[i]));
                     }
+                    super.add(dir);
                 } else if (dir.isFile()) {
                     super.add(dir);
                 }

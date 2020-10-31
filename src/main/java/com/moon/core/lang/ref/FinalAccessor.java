@@ -101,6 +101,10 @@ public class FinalAccessor<T> implements Supplier<T> {
         return this;
     }
 
+    public <R> R ifPresentOrNull(Function<T, R> consumer) {
+        return isPresent() ? consumer.apply(value) : null;
+    }
+
     /*
      * ------------------------------------------------------------
      * computer

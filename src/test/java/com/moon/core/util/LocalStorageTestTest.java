@@ -23,5 +23,8 @@ class LocalStorageTestTest {
 
     @Test
     void testOfFactory() {
+        LocalStorage<String> localStorage = LocalStorage.of("11208-test");
+        localStorage.set("123", "456");
+        Assertions.assertEquals("456", localStorage.get("123"));
     }
 }
