@@ -1,5 +1,6 @@
 package com.moon.core.lang.invoke;
 
+import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ThrowUtil;
 import com.moon.core.util.function.SerializableFunction;
 
@@ -25,10 +26,15 @@ public abstract class LambdaUtil {
     }
 
     /**
-     * 从对象的 getter、setter 方法引用 lambda 表达式中解析属性名，如：
+     * 从对象的 getter、setter 方法引用 lambda 表达式中解析属性名，
+     * <p>
+     * 例：
      * <pre>
      * LambdaUtil.getPropertyName(User::getUsername); // username
      * LambdaUtil.getPropertyName(User::setPassword); // password
+     * LambdaUtil.getPropertyName(User::getA); // a
+     * LambdaUtil.getPropertyName(User::getAType); // AType
+     * LambdaUtil.getPropertyName(User::getbType); // bType
      * </pre>
      *
      * @param getter getter 或 setter 方法引用
@@ -36,7 +42,8 @@ public abstract class LambdaUtil {
      *
      * @return 属性名
      *
-     * @throws IllegalStateException 当无法解析属性名是抛出异常
+     * @throws IllegalStateException 当无法解析属性名时抛出异常
+     * @see StringUtil#decapitalize(String)
      */
     public static <T> String getPropertyName(SerializableFunction<T, Object> getter) {
         SerializedLambda lambda = resolve(getter);

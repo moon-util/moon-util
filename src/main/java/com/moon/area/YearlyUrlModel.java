@@ -12,9 +12,19 @@ import java.util.Objects;
 public class YearlyUrlModel implements Comparable<YearlyUrlModel>, Serializable {
 
     private final static long serialVersionUID = 1L;
-
+    /**
+     * 具体月份地区代码的url，访问 srcUrl 时会重定向到这里，并且不是 302 自动重定向
+     * <p>
+     * 而是通过 js location.href 重定向的，只能通过正则表达式提取出来
+     */
     private final String redirectUrl;
+    /**
+     * 具体月份地区代码直接地址，访问这会有一步重定向
+     */
     private final String srcUrl;
+    /**
+     * 具体月份，如：2020年8月xxxx县以上地区代码
+     */
     private final String name;
 
     public YearlyUrlModel(String srcUrl, String redirectUrl, String name) {

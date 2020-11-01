@@ -1399,16 +1399,78 @@ public final class StringUtil {
     }
 
     /**
-     * 首字母小写
+     * 首字母小写（返回的首字母一定是小写）
+     *
+     * <pre>
+     *     StringUtil.uncapitalize("AType"); // aType
+     *     StringUtil.uncapitalize("bType"); // bType
+     *     StringUtil.uncapitalize("A"); // a
+     *     StringUtil.uncapitalize("b"); // b
+     *     StringUtil.uncapitalize("Username"); // username
+     *     StringUtil.uncapitalize("UserType"); // userType
+     *     StringUtil.uncapitalize("userType"); // userType
+     * </pre>
      *
      * @param str 字符串
      *
      * @return 首字母小写后的字符串
+     *
+     * @see #decapitalize(String)
+     */
+    public static String uncapitalize(String str) {
+        int len = length(str);
+        if (len == 0) { return str; }
+        char ch = str.charAt(0);
+        if (CharUtil.isUpperCase(ch)) {
+            char[] chars = new char[len];
+            chars[0] = (char) (ch + 32);
+            str.getChars(1, len, chars, 1);
+            return new String(chars);
+        }
+        return str;
+    }
+
+    /**
+     * 首字母小写（这里主要用于字段名解析，返回的首字母不一定是小写），如：
+     *
+     * <pre>
+     *     StringUtil.decapitalize("AType"); // AType
+     *     StringUtil.decapitalize("bType"); // bType
+     *     StringUtil.decapitalize("A"); // a
+     *     StringUtil.decapitalize("b"); // b
+     *     StringUtil.decapitalize("Username"); // username
+     *     StringUtil.decapitalize("UserType"); // userType
+     *     StringUtil.decapitalize("userType"); // userType
+     * </pre>
+     *
+     * <pre>
+     * public class Example {
+     *
+     *     private String AType;
+     *
+     *     public String getAType() {
+     *         // StringUtil.decapitalize("AType"); // == "AType"
+     *         // StringUtil.uncapitalize("AType"); // == "aType"
+     *         return AType;
+     *     }
+     * }
+     * </pre>
+     *
+     * @param str 字符串
+     *
+     * @return 首字母小写后的字符串
+     *
+     * @see #uncapitalize(String)
      */
     public static String decapitalize(String str) { return Introspector.decapitalize(str); }
 
     /**
      * 连字符号转驼峰
+     *
+     * <pre>
+     * StringUtil.camelcase("abc def   null"); // abcDefNull
+     * StringUtil.camelcase("abc-def -  null"); // abcDefNull
+     * </pre>
      *
      * @param str 字符串
      *

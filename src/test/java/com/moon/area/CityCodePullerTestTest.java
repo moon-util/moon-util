@@ -2,9 +2,9 @@ package com.moon.area;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author moonsky
@@ -21,9 +21,9 @@ class CityCodePullerTestTest {
 
     @Test
     void testExtraYearlyUrlsList() throws Exception {
-        List<YearlyUrlModel> urlsList = CityCodePuller.getYearlyUrlList(2018);
-        for (YearlyUrlModel url : urlsList) {
-            System.out.println(url);
+        Map<String, YearlyUrlModel> yearly = CityCodePuller.getYearlyUrlList(2018);
+        for (Map.Entry entry : yearly.entrySet()) {
+            System.out.println(entry.getKey() + "\t" + entry.getValue());
         }
     }
 }

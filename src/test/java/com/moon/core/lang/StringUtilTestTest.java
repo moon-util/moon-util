@@ -396,6 +396,8 @@ class StringUtilTestTest {
 
     @Test
     void testTrimToDefault() {
+        assertEquals("abcDefNull", StringUtil.camelcase("abc def   null"));
+        assertEquals("abcDefNull", StringUtil.camelcase("abc-def -  null"));
     }
 
     @Test

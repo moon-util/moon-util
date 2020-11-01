@@ -3,11 +3,11 @@ package com.moon.area;
 import com.moon.core.io.IOUtil;
 import com.moon.core.net.URLUtil;
 import com.moon.core.time.DateTime;
-import com.moon.core.util.ComparatorUtil;
 import com.moon.core.util.LocalStorage;
+import com.moon.core.util.MapUtil;
+import com.moon.core.util.SetUtil;
 import com.moon.core.util.ValidateUtil;
 
-import java.io.Serializable;
 import java.net.URL;
 import java.time.Month;
 import java.util.*;
@@ -24,7 +24,7 @@ public class CityCodePuller {
 
     private final static int MIN_YEAR = 2017;
 
-    private final LocalStorage localStorage = LocalStorage.of();
+    private final LocalStorage localStorage = LocalStorage.of(getClass().getPackage().getName());
     private final DateTime datetime;
 
     public CityCodePuller() { this(Calendar.getInstance().get(Calendar.YEAR)); }
@@ -38,12 +38,12 @@ public class CityCodePuller {
 
     private static String getYearlyKey(int year) {
         // CCP = CityCodePuller
-        return String.format(".im-AREA-CCP-YEARLY-%d", year);
+        return String.format(".YEARLY-%d", year);
     }
 
     private static String getMonthlyKey(int year, int month) {
         // CCP = CityCodePuller
-        return String.format(".im-AREA-CCP-MONTHLY-%d-%d", year, month);
+        return String.format(month < 10 ? ".MONTHLY-%d-0%d" : ".MONTHLY-%s-%s", year, month);
     }
 
     public static CityCodePuller of() {
@@ -80,13 +80,33 @@ public class CityCodePuller {
 
     }
 
-    static List<YearlyUrlModel> getYearlyUrlList(int year) {
-        Set<YearlyUrlModel> yearlyUrls = new TreeSet<>(Comparator.reverseOrder());
+    private final static Pattern YEAR_MONTH_PATTERN = Pattern.compile(
+        "(\\d{4})[\u4E00-\u9FAF]{1,3}(\\d{1,2})[\u4E00-\u9FAF]+");
+
+    private static String toMonthlyKey(YearlyUrlModel yearlyUrlModel) {
+        return toMonthlyKey(yearlyUrlModel.getName());
+    }
+
+    private static String toMonthlyKey(String monthlyName) {
+        Matcher matcher = YEAR_MONTH_PATTERN.matcher(monthlyName);
+        if (matcher.find()) {
+            return toMonthlyKey(Integer.valueOf(matcher.group(1)), Integer.valueOf(matcher.group(2)));
+        }
+        return null;
+    }
+
+    private static String toMonthlyKey(int year, int month) {
+        return getMonthlyKey(year, month);
+    }
+
+    static Map<String, YearlyUrlModel> getYearlyUrlList(int year) {
+        Map<String, YearlyUrlModel> yearlyUrlModelMap = new TreeMap<>(Comparator.reverseOrder());
         for (int page = 1; page < 3; page++) {
             String content = toString(toYearlyUrl(year, page));
-            yearlyUrls.addAll(extraYearlyUrlList(content));
+            SetUtil.reduce(extraYearlyUrlList(content), (yearlyMap, model, i) ->//
+                MapUtil.put(yearlyMap, toMonthlyKey(model), model), yearlyUrlModelMap);
         }
-        return new ArrayList<>(yearlyUrls);
+        return yearlyUrlModelMap;
     }
 
     private final static Pattern YEARLY_PATTERN = Pattern.compile(
