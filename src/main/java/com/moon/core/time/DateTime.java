@@ -2,6 +2,7 @@ package com.moon.core.time;
 
 import com.moon.core.lang.IntUtil;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.time.*;
@@ -46,7 +47,8 @@ import static java.time.temporal.ChronoField.NANO_OF_DAY;
  *
  * @author moonsky
  */
-public final class DateTime extends Date implements TemporalAccessor, TemporalAdjuster, Temporal {
+public final class DateTime extends Date
+    implements TemporalAccessor, TemporalAdjuster, Temporal, Cloneable, Serializable {
 
     /**
      * 纳秒
@@ -970,8 +972,7 @@ public final class DateTime extends Date implements TemporalAccessor, TemporalAd
     public DateTime endOfWeek(DayOfWeek firstDayOfWeek) {
         DateTime datetime = endOfDay();
         int diffDays = firstDayOfWeek.ordinal() - datetime.getDayOfWeek().ordinal();
-        changeCalendarOf(datetime.originCalendar(),
-            Calendar.DAY_OF_MONTH,
+        changeCalendarOf(datetime.originCalendar(), Calendar.DAY_OF_MONTH,
             (diffDays <= 0 ? diffDays + 6 : diffDays - 1));
         return datetime;
     }
@@ -1433,6 +1434,11 @@ public final class DateTime extends Date implements TemporalAccessor, TemporalAd
         this(DateUtil.toCalendar(year, month, date, hrs, min, sec));
     }
 
+    /**
+     * 返回 1 ~ 12 月
+     *
+     * @return
+     */
     @Override
     @Deprecated
     public int getMonth() { return getMonthValue(); }
@@ -1585,7 +1591,7 @@ public final class DateTime extends Date implements TemporalAccessor, TemporalAd
         total += getDayOfMonth() - 1;
         if (m > 2) {
             total--;
-            if (isLeapYear() == false) {
+            if (!isLeapYear()) {
                 total--;
             }
         }

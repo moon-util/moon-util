@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * @author moonsky
  */
-public class YearlyUrlModel implements Comparable<YearlyUrlModel>, Serializable {
+public class MonthlyUrlModel implements Comparable<MonthlyUrlModel>, Serializable {
 
     private final static long serialVersionUID = 1L;
     /**
@@ -27,7 +27,7 @@ public class YearlyUrlModel implements Comparable<YearlyUrlModel>, Serializable 
      */
     private final String name;
 
-    public YearlyUrlModel(String srcUrl, String redirectUrl, String name) {
+    public MonthlyUrlModel(String srcUrl, String redirectUrl, String name) {
         this.redirectUrl = redirectUrl;
         this.srcUrl = srcUrl;
         this.name = name;
@@ -44,12 +44,12 @@ public class YearlyUrlModel implements Comparable<YearlyUrlModel>, Serializable 
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        YearlyUrlModel that = (YearlyUrlModel) o;
+        MonthlyUrlModel that = (MonthlyUrlModel) o;
         return ObjectUtil.equalsProperties(this,
             that,
-            YearlyUrlModel::getRedirectUrl,
-            YearlyUrlModel::getSrcUrl,
-            YearlyUrlModel::getName);
+            MonthlyUrlModel::getRedirectUrl,
+            MonthlyUrlModel::getSrcUrl,
+            MonthlyUrlModel::getName);
     }
 
     @Override
@@ -69,11 +69,11 @@ public class YearlyUrlModel implements Comparable<YearlyUrlModel>, Serializable 
 
 
     @Override
-    public int compareTo(YearlyUrlModel o) {
+    public int compareTo(MonthlyUrlModel o) {
         return ComparatorUtil.comparing(this,
             o,
-            YearlyUrlModel::getName,
-            YearlyUrlModel::getRedirectUrl,
-            YearlyUrlModel::getSrcUrl);
+            MonthlyUrlModel::getName,
+            MonthlyUrlModel::getRedirectUrl,
+            MonthlyUrlModel::getSrcUrl);
     }
 }
