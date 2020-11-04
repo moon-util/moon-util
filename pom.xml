@@ -364,5 +364,13 @@
       <version>2.2.4</version>
       <optional>true</optional>
     </dependency>
+
+    <!-- MappingUtil -->
+    <dependency>
+      <groupId>com.google.auto.service</groupId>
+      <artifactId>auto-service</artifactId>
+      <version>1.0-rc7</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 </project>
