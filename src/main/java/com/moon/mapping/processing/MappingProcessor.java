@@ -20,7 +20,7 @@ import static com.moon.mapping.processing.ProcessingUtil.toPropertiesModelMap;
 /**
  * @author moonsky
  */
-@AutoService(Processor.class)
+// @AutoService(Processor.class)
 public class MappingProcessor extends AbstractProcessor {
 
     private final static String SUPPORTED_TYPE = MappingFor.class.getName();
@@ -83,20 +83,6 @@ public class MappingProcessor extends AbstractProcessor {
         return models;
     }
 
-    // private void onAnnotatedMapping0(TypeElement thisTyped) {
-    //     Collection<String> classes = ProcessingUtil.getThatClasses(thisTyped);
-    //     if (classes.isEmpty()) {
-    //         return;
-    //     }
-    //     Types types = getTypeUtils();
-    //     TypeMirror superclass = thisTyped.getSuperclass();
-    //     TypeElement superTyped = cast(types.asElement(superclass));
-    //     List<GenericModel> genericModels = GenericUtil.parse(superclass, superTyped, env());
-    //
-    //     Elements utils = env().getElementUtils();
-    //     // Map<String,PropertyModel> properties = toPropertiesMap(utils, )
-    // }
-
     private MappingForModel onAnnotatedMapping(TypeElement element) {
         Collection<String> classes = ProcessingUtil.getThatClasses(element);
         if (classes.isEmpty()) {
@@ -112,7 +98,7 @@ public class MappingProcessor extends AbstractProcessor {
                 targetModelsMap.put(classname, toPropertiesModelMap(env(), annotated));
             }
         }
-        return new MappingForModel(elementName, modelMap, targetModelsMap);
+        return new MappingForModel(env(), elementName, modelMap, targetModelsMap);
     }
 
     private Messager getMessager() { return env().getMessager(); }

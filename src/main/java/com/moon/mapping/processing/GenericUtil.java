@@ -60,7 +60,7 @@ final class GenericUtil {
         for (TypeParameterElement param : typedSuperclass.getTypeParameters()) {
             String actual = index < actuals.size() ? actuals.get(index++) : null;
             GenericModel model = new GenericModel(param, actual);
-            genericMap.put(model.getDeclare(), model);
+            genericMap.put(model.getDeclareType(), model);
         }
         return genericMap;
     }

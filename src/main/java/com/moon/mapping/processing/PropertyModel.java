@@ -35,6 +35,8 @@ final class PropertyModel {
         this.thisType = thisType;
     }
 
+    public String getName() { return name; }
+
     void setProperty(VariableElement property) { this.property = property; }
 
     void setGetter(ExecutableElement getter) { this.getter = getter; }
@@ -112,7 +114,7 @@ final class PropertyModel {
     /**
      * 返回声明的属性类型，可能是实际类，也可能是泛型
      */
-    public String getDeclaredPropertyType() {
+    public String getPropertyDeclareType() {
         if (hasProperty()) {
             return this.getProperty().asType().toString();
         } else {
@@ -123,14 +125,14 @@ final class PropertyModel {
     /**
      * 返回属性实际类型
      */
-    public String getActualPropertyType() {
-        return getPropertyTypename() == null ? getDeclaredPropertyType() : getPropertyTypename();
+    public String getPropertyActualType() {
+        return getPropertyTypename() == null ? getPropertyDeclareType() : getPropertyTypename();
     }
 
     /**
      * 返回 getter 方法返回值类型，可能是实际类，也可能是泛型
      */
-    public String getDeclaredGetterType() {
+    public String getGetterDeclareType() {
         if (hasPublicGetterMethod()) {
             return getGetter().getReturnType().toString();
         }
@@ -140,13 +142,13 @@ final class PropertyModel {
     /**
      * getter 实际返回值类型
      */
-    public String getActualGetterType() {
+    public String getGetterActualType() {
         if (getGetterTypename() != null) {
             return getGetterTypename();
         } else if (hasPublicGetterMethod()) {
             return getGetter().getReturnType().toString();
         } else if (hasLombokGetterMethod()) {
-            return getActualPropertyType();
+            return getPropertyActualType();
         }
         return null;
     }
@@ -154,7 +156,7 @@ final class PropertyModel {
     /**
      * 获取声明在 setter 方法上的方法参数类型，可能是实际类，也可能是泛型
      */
-    public String getDeclaredSetterType() {
+    public String getSetterDeclareType() {
         if (hasPublicSetterMethod()) {
             VariableElement var = getSetter().getParameters().get(0);
             return var.asType().toString();
@@ -166,20 +168,22 @@ final class PropertyModel {
     /**
      * setter 参数实际类型
      */
-    public String getActualSetterType() {
+    public String getSetterActualType() {
         if (getSetterTypename() != null) {
             return getSetterTypename();
         } else if (hasPublicSetterMethod()) {
             VariableElement var = getSetter().getParameters().get(0);
             return var.asType().toString();
         } else if (hasLombokSetterMethod()) {
-            return getActualPropertyType();
+            return getPropertyActualType();
         }
         return null;
     }
 
     /**
      * 返回基本数据类型的包装类
+     *
+     * @see #isPrimitiveSetterMethod()
      */
     public String getWrappedSetterType() {
         TypeMirror mirror;

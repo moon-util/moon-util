@@ -77,9 +77,9 @@ final class ProcessingUtil {
                 PropertyModel property = propsMap.computeIfAbsent(name, PropertyModel::new);
                 property.setProperty(var);
                 // 推测泛型实际类型
-                String propertyType = property.getDeclaredPropertyType();
+                String propertyType = property.getPropertyDeclareType();
                 GenericModel generic = genericModelMap.get(propertyType);
-                property.setPropertyTypename(generic.getSimpleValue());
+                property.setPropertyTypename(generic.getSimpleFinalType());
             } else if (isSetterMethod(element)) {
                 // setter 方法
                 ExecutableElement exe = (ExecutableElement) element;
@@ -90,9 +90,9 @@ final class ProcessingUtil {
                 PropertyModel setter = propsMap.computeIfAbsent(name, PropertyModel::new);
                 setter.setSetter(exe);
                 // 推测泛型实际类型
-                String setterType = setter.getDeclaredSetterType();
+                String setterType = setter.getSetterDeclareType();
                 GenericModel generic = genericModelMap.get(setterType);
-                setter.setSetterTypename(generic.getSimpleValue());
+                setter.setSetterTypename(generic.getSimpleFinalType());
             } else if (isGetterMethod(element)) {
                 // getter 方法
                 ExecutableElement exe = (ExecutableElement) element;
@@ -103,9 +103,9 @@ final class ProcessingUtil {
                 PropertyModel getter = propsMap.computeIfAbsent(name, PropertyModel::new);
                 getter.setGetter(exe);
                 // 推测泛型实际类型
-                String getterType = getter.getDeclaredGetterType();
+                String getterType = getter.getGetterDeclareType();
                 GenericModel generic = genericModelMap.get(getterType);
-                getter.setGetterTypename(generic.getSimpleValue());
+                getter.setGetterTypename(generic.getSimpleFinalType());
             }
         }
         propsMap.putAll(parseSuperPropertiesModel(propsMap.keySet(), env, superTyped));

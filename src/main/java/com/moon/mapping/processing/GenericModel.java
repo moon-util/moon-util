@@ -21,36 +21,37 @@ public class GenericModel {
         this.bound = bound;
     }
 
-    public String getDeclare() { return declare; }
+    /**
+     * 泛型声明类型，如 M
+     * @return
+     */
+    public String getDeclareType() { return declare; }
 
-    public String getActual() { return actual; }
+    /**
+     * 泛型实际使用类型，可为 null
+     * @return
+     */
+    public String getActualType() { return actual; }
 
-    public String getBound() { return bound; }
+    /**
+     * 泛型边界，如 M extends Map，默认 Object
+     */
+    public String getBoundType() { return bound; }
 
-    static String simpleActual(String value) {
+    public String getFinalType() {
+        String act = getActualType(), bound = getBoundType();
+        return act == null ? bound : act;
+    }
+
+    public String getSimpleFinalType() {
+        return simpleGenericTypename(getFinalType());
+    }
+
+    private final static String simpleGenericTypename(String value) {
         if (value == null) {
             return null;
         }
         int index = value.indexOf('<');
         return index < 0 ? value : value.substring(0, index);
-    }
-
-    public String getValue() {
-        String act = getActual(), bound = getBound();
-        return act == null ? bound : act;
-    }
-
-    public String getSimpleValue() {
-        return simpleActual(getValue());
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("GenericModel{");
-        sb.append("declare='").append(declare).append('\'');
-        sb.append(", actual='").append(actual).append('\'');
-        sb.append(", bound='").append(bound).append('\'');
-        sb.append('}');
-        return sb.toString();
     }
 }

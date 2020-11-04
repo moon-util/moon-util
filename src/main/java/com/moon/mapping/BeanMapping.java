@@ -1,5 +1,8 @@
 package com.moon.mapping;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author moonsky
  */
@@ -32,7 +35,7 @@ public interface BeanMapping<THIS, THAT> extends MapMapping<THIS> {
      *
      * @return 当前类实例
      */
-    // THIS newThis(THAT thatObject);
+    THIS newThis(THAT thatObject);
 
     /**
      * 以当前类为数据源，构造并复制属性到目标对象
@@ -41,5 +44,25 @@ public interface BeanMapping<THIS, THAT> extends MapMapping<THIS> {
      *
      * @return 目标对象
      */
-    // THAT newThat(THIS thisObject);
+    THAT newThat(THIS thisObject);
+
+    default List<THIS> forEachNewThis(Iterable<THAT> thatIterable) {
+        List<THIS> thisList = new ArrayList<>(Mappings.detectSize(thatIterable));
+        if (thatIterable != null) {
+            for (THAT that : thatIterable) {
+                thisList.add(newThis(that));
+            }
+        }
+        return thisList;
+    }
+
+    default List<THAT> forEachNewThat(Iterable<THIS> thisIterable) {
+        List<THAT> thatList = new ArrayList<>(Mappings.detectSize(thisIterable));
+        if (thisIterable != null) {
+            for (THIS self : thisIterable) {
+                thatList.add(newThat(self));
+            }
+        }
+        return thatList;
+    }
 }

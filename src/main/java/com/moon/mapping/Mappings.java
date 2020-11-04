@@ -1,5 +1,6 @@
 package com.moon.mapping;
 
+import java.util.Collection;
 import java.util.function.Function;
 
 import static java.lang.Enum.valueOf;
@@ -54,6 +55,13 @@ final class Mappings {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    static int detectSize(Iterable iterable) {
+        if (iterable == null) {
+            return 0;
+        }
+        return iterable instanceof Collection ? ((Collection<?>) iterable).size() : 16;
     }
 
     private static Class toClass(String cls) throws ClassNotFoundException {

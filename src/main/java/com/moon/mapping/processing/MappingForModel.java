@@ -3,7 +3,10 @@ package com.moon.mapping.processing;
 import com.moon.mapping.BeanMapping;
 import com.moon.mapping.MappingUtil;
 
+import javax.annotation.processing.ProcessingEnvironment;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,11 +19,14 @@ final class MappingForModel {
     private final static String INTERFACE = BeanMapping.class.getName();
     private final static String MAP_NAME = Map.class.getName(), OBJ_NAME = "Object";
 
+    private final Implementation implementation;
+    private final ProcessingEnvironment env;
     private final String thisClassname;
     private final Map<String, PropertyModel> propertiesModelMap;
     private final Map<String, Map<String, PropertyModel>> targetModelsMap;
 
     MappingForModel(
+        ProcessingEnvironment env,
         String thisClassname,
         Map<String, PropertyModel> propertiesModelMap,
         Map<String, Map<String, PropertyModel>> targetModelsMap
@@ -28,7 +34,11 @@ final class MappingForModel {
         this.thisClassname = thisClassname;
         this.propertiesModelMap = propertiesModelMap;
         this.targetModelsMap = targetModelsMap;
+        this.implementation = new Implementation(env);
+        this.env = env;
     }
+
+    private Implementation getImpl(){ return implementation; }
 
     private String getThisClassname() { return thisClassname; }
 
@@ -42,7 +52,7 @@ final class MappingForModel {
 
     private static String formatClassname(String classname) { return classname.replace('.', '_'); }
 
-    private static void doBeforeBuild(
+    private  void doBeforeBuild(
         MappingForStringer builder,
         String methodName,
         String thisName,
@@ -61,11 +71,11 @@ final class MappingForModel {
         builder.add(thatName).add(" to=(").add(thatName).add(")thatObject;");
     }
 
-    private static void returnThatObject(MappingForStringer builder) { builder.add("return thatObject;}"); }
+    private  void returnThatObject(MappingForStringer builder) { builder.add("return thatObject;}"); }
 
-    private static void returnThisObject(MappingForStringer builder) { builder.add("return thisObject;}"); }
+    private  void returnThisObject(MappingForStringer builder) { builder.add("return thisObject;}"); }
 
-    private static void as$fromMap(
+    private  void as$fromMap(
         MappingForStringer builder, String thisName, Map<String, PropertyModel> thisModelMap
     ) {
         int index = 0;
@@ -94,7 +104,7 @@ final class MappingForModel {
                     类似: from.setName(to.get("name"));
                     </pre>
                      */
-                    builder.add("from.").add(property.getSetterName()).add("((").add(property.getActualSetterType())
+                    builder.add("from.").add(property.getSetterName()).add("((").add(property.getSetterActualType())
                         .add(")to.get(").add('"').add(entry.getKey()).add('"').add("));");
                 }
             }
@@ -102,7 +112,7 @@ final class MappingForModel {
         returnThisObject(builder);
     }
 
-    private static void as$toMap(
+    private  void as$toMap(
         MappingForStringer builder, String thisName, Map<String, PropertyModel> thisModelMap
     ) {
         doBeforeBuild(builder, "toMap", thisName, MAP_NAME, OBJ_NAME, MAP_NAME, MAP_NAME, false);
@@ -122,47 +132,33 @@ final class MappingForModel {
         returnThatObject(builder);
     }
 
-    private static void buildMapMapping(
+    private  void buildMapMapping(
         MappingForStringer builder, String fromClassname, Map<String, PropertyModel> thisModelMap
     ) {
         as$fromMap(builder, fromClassname, thisModelMap);
         as$toMap(builder, fromClassname, thisModelMap);
     }
 
-    private static void build$toString(
+    private void build$toString(
         MappingForStringer builder, String fromClassname, Map<String, PropertyModel> thisModelMap
     ) {
-        String name = fromClassname.substring(fromClassname.lastIndexOf('.') + 1);
-        builder.add("@Override public String toString(Object thisObject){");
-        builder.add("if (thisObject == null ) {return ").add('"').add("null").add('"').add(";}");
-        builder.add("if (!(thisObject instanceof ").add(fromClassname).add(")) {return thisObject.toString();}");
-        builder.add(fromClassname).add(" self=(").add(fromClassname).add(")thisObject;");
-        builder.add("StringBuilder builder=new StringBuilder();");
-        builder.add("builder.append(").add('"').add(name).add('"').add(").append(");
-        builder.add('"').add("{").add('"').add(");");
+        Implementation impl = getImpl();
+        List<String> joinFields = new ArrayList<>();
         int index = 0;
         for (Map.Entry<String, PropertyModel> entry : thisModelMap.entrySet()) {
             PropertyModel model = entry.getValue();
             if (model != null && model.hasPublicGetterMethod()) {
-                builder.add("builder.append(").add('"');
-                if (index > 0) {
-                    builder.add("', ");
-                }
-                builder.add(entry.getKey()).add("='").add('"').add(");");
-                builder.add("builder.append(self.").add(model.getGetterName()).add("());");
-                index++;
+                joinFields.add(impl.toStringField(model, (index++) == 0));
             }
         }
-        builder.add("builder.append(").add('"').add("'}").add('"').add(");");
-        builder.add("return builder.toString();");
-        builder.add("}");
+        builder.add(impl.toStringMethod(fromClassname, joinFields));
     }
 
-    private static void buildObjectMapping(
+    private void buildObjectMapping(
         MappingForStringer builder, String fromClassname, Map<String, PropertyModel> thisModelMap
     ) { build$toString(builder, fromClassname, thisModelMap); }
 
-    private static void build$newThis(
+    private  void build$newThis(
         MappingForStringer builder,
         String fromClassname,
         String toClassname,
@@ -171,7 +167,7 @@ final class MappingForModel {
     ) {
     }
 
-    private static void build$newThat(
+    private  void build$newThat(
         MappingForStringer builder,
         String fromClassname,
         String toClassname,
@@ -180,7 +176,7 @@ final class MappingForModel {
     ) {
     }
 
-    private static void build$toThat(
+    private  void build$toThat(
         MappingForStringer builder,
         String fromClassname,
         String toClassname,
@@ -202,7 +198,7 @@ final class MappingForModel {
         returnThatObject(builder);
     }
 
-    private static void build$fromThat(
+    private  void build$fromThat(
         MappingForStringer builder,
         String fromClassname,
         String toClassname,
@@ -222,13 +218,13 @@ final class MappingForModel {
         returnThisObject(builder);
     }
 
-    private static boolean isUsable(PropertyModel thisModel, PropertyModel thatModel) {
+    private  boolean isUsable(PropertyModel thisModel, PropertyModel thatModel) {
         boolean hasThis = thisModel != null && thisModel.hasPublicGetterMethod();
         boolean hasThat = thatModel != null && thatModel.hasPublicSetterMethod();
         return hasThat && hasThis;
     }
 
-    private static void buildBeanMapping(
+    private  void buildBeanMapping(
         MappingForStringer builder,
         String fromClassname,
         String thatClassname,
