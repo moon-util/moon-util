@@ -21,7 +21,7 @@ class CityCodePullerTestTest {
 
     @Test
     void testExtraYearlyUrlsList() throws Exception {
-        Map<String, MonthlyUrlModel> yearly = CityCodePuller.of().getYearlyUrlList(2018);
+        Map<String, MonthlyUrlModel> yearly = CityCodePuller.of(2020).getYearlyUrlList(2018);
         for (Map.Entry entry : yearly.entrySet()) {
             System.out.println(entry.getKey() + "\t" + entry.getValue());
         }

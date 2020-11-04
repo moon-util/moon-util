@@ -1,6 +1,7 @@
 package com.moon.mapping.processing;
 
 import com.moon.mapping.BeanMapping;
+import com.moon.mapping.MappingUtil;
 
 import java.util.Collections;
 import java.util.Map;
@@ -8,25 +9,25 @@ import java.util.Map;
 /**
  * @author moonsky
  */
-final class MappingForAnnotatedModel {
+final class MappingForModel {
 
     private final static String MAP_NAME = Map.class.getName();
 
-    private final String rootClass;
+    private final String thisClassname;
     private final Map<String, PropertyModel> propertiesModelMap;
     private final Map<String, Map<String, PropertyModel>> targetModelsMap;
 
-    MappingForAnnotatedModel(
-        String rootClass,
+    MappingForModel(
+        String thisClassname,
         Map<String, PropertyModel> propertiesModelMap,
         Map<String, Map<String, PropertyModel>> targetModelsMap
     ) {
-        this.rootClass = rootClass;
+        this.thisClassname = thisClassname;
         this.propertiesModelMap = propertiesModelMap;
         this.targetModelsMap = targetModelsMap;
     }
 
-    private String getRootClassName() { return rootClass; }
+    private String getThisClassname() { return thisClassname; }
 
     public Map<String, PropertyModel> getPropertiesModelMap() {
         return propertiesModelMap == null ? Collections.emptyMap() : propertiesModelMap;
@@ -40,12 +41,24 @@ final class MappingForAnnotatedModel {
         return classname.replace('.', '_');
     }
 
-    private static void doBeforeBuild(StringBuilder builder, String methodName, String fromName, String toName) {
-        builder.append("@Override public Object ");
-        builder.append(methodName).append("(Object thisObject, Object thatObject) {");
+    private static void doBeforeBuild(
+        StringBuilder builder, String methodName, String thisName, String thatName
+    ) { doBeforeBuild(builder, methodName, thisName, thatName, "Object", "Object", "Object"); }
+
+    private static void doBeforeBuild(
+        StringBuilder builder,
+        String methodName,
+        String thisName,
+        String thatName,
+        String param1Name,
+        String param2Name,
+        String returnName
+    ) {
+        builder.append("@Override public ").append(returnName).append(' ');
+        builder.append(methodName).append("(" + param1Name + " thisObject, " + param2Name + " thatObject) {");
         builder.append(" if (thisObject == null || thatObject == null) { return thatObject; }");
-        builder.append(fromName).append(" from=(").append(fromName).append(")thisObject;");
-        builder.append(toName).append(" to=(").append(toName).append(")thatObject;");
+        builder.append(thisName).append(" from=(").append(thisName).append(")thisObject;");
+        builder.append(thatName).append(" to=(").append(thatName).append(")thatObject;");
     }
 
     private static void doAfterBuild(StringBuilder builder) {
@@ -65,16 +78,13 @@ final class MappingForAnnotatedModel {
     }
 
     private static void build$overrideFromMap(
-        StringBuilder builder, String fromClassname, Map<String, PropertyModel> thisModelMap
+        StringBuilder builder, String thisName, Map<String, PropertyModel> thisModelMap
     ) {
-        doBeforeBuild(builder, "overrideFromMap", fromClassname, MAP_NAME);
+        doBeforeBuild(builder, "overrideFromMap", thisName, MAP_NAME, "Object", MAP_NAME, MAP_NAME);
         for (Map.Entry<String, PropertyModel> entry : thisModelMap.entrySet()) {
             PropertyModel model = entry.getValue();
             if (model.hasPublicSetterMethod()) {
-                builder.append("from.")
-                    .append(model.getSetterName())
-                    .append("(to.get(")
-                    .append(entry.getKey())
+                builder.append("from.").append(model.getSetterName()).append("(to.get(").append(entry.getKey())
                     .append("));");
             }
         }
@@ -82,17 +92,15 @@ final class MappingForAnnotatedModel {
     }
 
     private static void build$toMap(
-        StringBuilder builder, String fromClassname, Map<String, PropertyModel> thisModelMap
+        StringBuilder builder, String thisName, Map<String, PropertyModel> thisModelMap
     ) {
-        doBeforeBuild(builder, "toMap", fromClassname, MAP_NAME);
+        doBeforeBuild(builder, "toMap", thisName, MAP_NAME, "Object", MAP_NAME, MAP_NAME);
         for (Map.Entry<String, PropertyModel> entry : thisModelMap.entrySet()) {
             PropertyModel model = entry.getValue();
             if (model.hasPublicGetterMethod()) {
-                builder.append("to.put(")
-                    .append(entry.getKey())
-                    .append(",from.")
-                    .append(model.getGetterName())
-                    .append("());");
+                builder.append("to.put(");
+                builder.append('"').append(entry.getKey()).append('"');
+                builder.append(",from.").append(model.getGetterName()).append("());");
             }
         }
         doAfterBuild(builder);
@@ -107,22 +115,34 @@ final class MappingForAnnotatedModel {
     ) {
         builder.append(formatClassname(thatClassname)).append(" {");
         // build$override(builder, fromClassname, thatClassname, thisModelMap, thatModelMap);
+        builder.append("},");
+    }
+
+    private static void buildMapMapping(
+        StringBuilder builder, String fromClassname, Map<String, PropertyModel> thisModelMap
+    ) {
+        builder.append(";");
         // build$overrideFromMap(builder, fromClassname, thisModelMap);
         build$toMap(builder, fromClassname, thisModelMap);
-        builder.append("},");
+    }
+
+    public String getGeneratedMappingName() {
+        return "MoonBeanMappingsGenerated_" + formatClassname(getThisClassname());
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        String fromClassname = getRootClassName();
+        final String thisClassname = getThisClassname();
         Map<String, PropertyModel> thisModelMap = getPropertiesModelMap();
-        builder.append(" enum ").append(formatClassname(fromClassname));
+        builder.append("package ").append(MappingUtil.class.getPackage().getName()).append(';');
+        builder.append(" enum ").append(getGeneratedMappingName());
         builder.append(" implements ").append(BeanMapping.class.getName());
         builder.append(" {");
         for (Map.Entry<String, Map<String, PropertyModel>> entry : getTargetModelsMap().entrySet()) {
-            buildMappingEnumOf(builder, fromClassname, entry.getKey(), thisModelMap, entry.getValue());
+            buildMappingEnumOf(builder, thisClassname, entry.getKey(), thisModelMap, entry.getValue());
         }
+        buildMapMapping(builder, thisClassname, thisModelMap);
         return builder.append(" }").toString();
     }
 }
