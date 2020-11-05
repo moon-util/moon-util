@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -19,11 +20,18 @@ import static com.moon.mapping.processing.ProcessingUtil.isPublic;
 final class PropertyModel {
 
     private final String name;
+    private final TypeElement thisType;
     private VariableElement property;
     private ExecutableElement getter;
     private ExecutableElement setter;
+    private String setterTypename;
 
-    PropertyModel(String name) { this.name = name; }
+    PropertyModel(String name) { this(name, null); }
+
+    PropertyModel(String name, TypeElement thisType) {
+        this.name = name;
+        this.thisType = thisType;
+    }
 
     void setProperty(VariableElement property) { this.property = property; }
 
@@ -31,11 +39,17 @@ final class PropertyModel {
 
     void setSetter(ExecutableElement setter) { this.setter = setter; }
 
+    public void setSetterTypename(String setterTypename) { this.setterTypename = setterTypename; }
+
     public ExecutableElement getGetter() { return getter; }
 
     public ExecutableElement getSetter() { return setter; }
 
     public VariableElement getProperty() { return property; }
+
+    public String getSetterTypename() { return setterTypename; }
+
+    public boolean isTypeof(Object obj) { return this.thisType == obj; }
 
     public boolean hasPublicSetterMethod() {
         return hasDefaultSetterMethod() || hasLombokSetterMethod();
@@ -51,16 +65,21 @@ final class PropertyModel {
         } else if (hasLombokSetterMethod()) {
             return wasLombokPrimitiveSetterMethod();
         }
-        throw new IllegalStateException(toString());
+        return false;
     }
 
     public String getDefaultSetterType() {
         VariableElement var = getSetter().getParameters().get(0);
-        TypeMirror mirror = var.asType();
-        // mirror.accept()
-        return mirror.toString();
+        return var.asType().toString();
     }
 
+    public String getEffectiveSetterType() {
+        return getSetterTypename() == null ? getDefaultSetterType() : getSetterTypename();
+    }
+
+    /**
+     * 返回基本数据类型的包装类
+     */
     public String getWrappedSetterType() {
         TypeMirror mirror;
         if (wasDefaultPrimitiveSetterMethod()) {
@@ -114,8 +133,7 @@ final class PropertyModel {
     private boolean hasDefaultGetterMethod() { return isPublic(getGetter()); }
 
     private boolean wasDefaultPrimitiveSetterMethod() {
-        ExecutableElement setter = getSetter();
-        VariableElement setterParam = setter.getParameters().get(0);
+        VariableElement setterParam = getSetter().getParameters().get(0);
         return setterParam.asType().getKind().isPrimitive();
     }
 
@@ -163,7 +181,7 @@ final class PropertyModel {
     }
 
     @SuppressWarnings("all")
-    static String capitalize(String name) {
+    private static String capitalize(String name) {
         if (name == null || name.length() == 0) {
             return name;
         }

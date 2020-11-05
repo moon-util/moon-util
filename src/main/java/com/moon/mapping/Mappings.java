@@ -1,5 +1,7 @@
 package com.moon.mapping;
 
+import java.util.function.Function;
+
 import static java.lang.Enum.valueOf;
 
 /**
@@ -15,6 +17,8 @@ final class Mappings {
     }
 
     private Mappings() {}
+
+    final static Function<?, ?> DFT_CONVERTER = o -> o;
 
     static Class classAs(String classname) {
         try {

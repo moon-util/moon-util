@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author moonsky
  */
-public interface MapMapping<THIS> {
+public interface MapMapping<THIS> extends ObjectMapping<THIS> {
 
     /**
      * 从{@code propertiesMap}复制属性到{@code thisObject}

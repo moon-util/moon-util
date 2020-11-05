@@ -7,17 +7,15 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 
-import static com.moon.mapping.processing.ProcessingUtil.toPropertiesMap;
+import static com.moon.mapping.processing.ProcessingUtil.toPropertiesModelMap;
 
 /**
  * @author moonsky
@@ -77,14 +75,7 @@ public class MappingProcessor extends AbstractProcessor {
                 Set<? extends Element> set = env.getElementsAnnotatedWith(MappingFor.class);
                 for (Element element : set) {
                     if (element instanceof TypeElement) {
-                        TypeElement thisTyped = (TypeElement) element;
-                        Types types = getTypeUtils();
-                        TypeMirror superclass = thisTyped.getSuperclass();
-                        TypeElement superTyped = cast(types.asElement(superclass));
-
-                        List<GenericModel> genericModels = GenericUtil.parse(superclass, superTyped);
-
-                        models.add(onAnnotatedMapping(thisTyped));
+                        models.add(onAnnotatedMapping((TypeElement) element));
                     }
                 }
             }
@@ -92,24 +83,36 @@ public class MappingProcessor extends AbstractProcessor {
         return models;
     }
 
+    // private void onAnnotatedMapping0(TypeElement thisTyped) {
+    //     Collection<String> classes = ProcessingUtil.getThatClasses(thisTyped);
+    //     if (classes.isEmpty()) {
+    //         return;
+    //     }
+    //     Types types = getTypeUtils();
+    //     TypeMirror superclass = thisTyped.getSuperclass();
+    //     TypeElement superTyped = cast(types.asElement(superclass));
+    //     List<GenericModel> genericModels = GenericUtil.parse(superclass, superTyped, env());
+    //
+    //     Elements utils = env().getElementUtils();
+    //     // Map<String,PropertyModel> properties = toPropertiesMap(utils, )
+    // }
+
     private MappingForModel onAnnotatedMapping(TypeElement element) {
-        Collection<String> classes = ProcessingUtil.getMappingForClasses(element);
+        Collection<String> classes = ProcessingUtil.getThatClasses(element);
         if (classes.isEmpty()) {
             return null;
         }
         String elementName = element.getQualifiedName().toString();
         Elements utils = env().getElementUtils();
         Map<String, Map<String, PropertyModel>> targetModelsMap = new HashMap<>(4);
-        Map<String, PropertyModel> modelMap = toPropertiesMap(utils, element);
+        Map<String, PropertyModel> modelMap = toPropertiesModelMap(env(), element);
         for (String classname : classes) {
             TypeElement annotated = utils.getTypeElement(classname);
-            targetModelsMap.put(classname, toPropertiesMap(utils, annotated));
+            if (annotated != null) {
+                targetModelsMap.put(classname, toPropertiesModelMap(env(), annotated));
+            }
         }
         return new MappingForModel(elementName, modelMap, targetModelsMap);
-    }
-
-    private void warn(Object obj) {
-        env().getMessager().printMessage(Diagnostic.Kind.WARNING, obj == null ? null : obj.toString());
     }
 
     private Messager getMessager() { return env().getMessager(); }

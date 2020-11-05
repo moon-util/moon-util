@@ -1,13 +1,15 @@
 package com.moon.mapping.processing;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author moonsky
@@ -49,28 +51,25 @@ final class GenericUtil {
      * @return
      */
     @SuppressWarnings("all")
-    static List<GenericModel> parse(TypeMirror superclass, TypeElement typedSuperclass) {
-        List<GenericModel> genericModels = new ArrayList<>();
-        String superString = superclass.toString();
-        List<String> actualSpliced = Collections.emptyList();
-        if (Extract.hasGeneric(superString)) {
-            String fullActualType = Extract.extractWrapped(superString);
-            actualSpliced = Extract.split(fullActualType);
-        }
+    static Map<String, GenericModel> parse(
+        TypeMirror superclass, TypeElement typedSuperclass, ProcessingEnvironment env
+    ) {
+        Map<String, GenericModel> genericMap = new HashMap<>();
+        List<String> actuals = Extract.splitSuperclass(superclass.toString());
         int index = 0;
         for (TypeParameterElement param : typedSuperclass.getTypeParameters()) {
-            String declare = param.toString();
-            String bound = param.toString();
-            String actual = null;
-            if (index < actualSpliced.size()) {
-                actualSpliced.get(index++);
-            }
-            genericModels.add(new GenericModel(declare, actual, bound));
+            String actual = index < actuals.size() ? actuals.get(index++) : null;
+            GenericModel model = new GenericModel(param, actual);
+            genericMap.put(model.getDeclare(), model);
         }
-        return genericModels;
+        return genericMap;
     }
 
     private static class Extract {
+
+        static List<String> splitSuperclass(String fullType) {
+            return hasGeneric(fullType) ? split(extractWrapped(fullType)) : new ArrayList<>();
+        }
 
         static List<String> split(String angleWrapped) {
             char[] chars = unbracketAngle(angleWrapped).toCharArray();
@@ -106,7 +105,7 @@ final class GenericUtil {
         }
 
         private static boolean hasGeneric(String fullActual) {
-            return fullActual.contains("<");
+            return fullActual != null && fullActual.contains("<");
         }
 
         private static String extractWrapped(String str) {
@@ -119,8 +118,6 @@ final class GenericUtil {
     }
 
     private final static class Bound {
-
-        private static boolean isDot(int ch) { return ch == '.'; }
 
         private static boolean isLeft(int ch) { return ch == '<'; }
 
