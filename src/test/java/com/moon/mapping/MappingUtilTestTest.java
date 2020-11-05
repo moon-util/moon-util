@@ -23,6 +23,5 @@ class MappingUtilTestTest {
 
     @Test
     void testOverride() throws Exception {
-        System.out.println();
     }
 }

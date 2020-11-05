@@ -16,6 +16,14 @@ final class Mappings {
 
     private Mappings() {}
 
+    static Class classAs(String classname) {
+        try {
+            return Class.forName(classname);
+        } catch (Throwable t) {
+            throw new IllegalStateException(classname);
+        }
+    }
+
     @SuppressWarnings("all")
     static <F, T> BeanMapping<F, T> resolve(Class cls1, Class cls2) {
         return resolve(cls1.getName(), cls2.getName());

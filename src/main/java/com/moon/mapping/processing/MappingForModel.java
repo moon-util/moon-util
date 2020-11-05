@@ -11,7 +11,7 @@ import java.util.Map;
  */
 final class MappingForModel {
 
-    private final static String MAP_NAME = Map.class.getName();
+    private final static String MAP_NAME = Map.class.getName(), OBJ_NAME = "Object";
 
     private final String thisClassname;
     private final Map<String, PropertyModel> propertiesModelMap;
@@ -43,7 +43,7 @@ final class MappingForModel {
 
     private static void doBeforeBuild(
         StringBuilder builder, String methodName, String thisName, String thatName
-    ) { doBeforeBuild(builder, methodName, thisName, thatName, "Object", "Object", "Object"); }
+    ) { doBeforeBuild(builder, methodName, thisName, thatName, OBJ_NAME, OBJ_NAME, OBJ_NAME); }
 
     private static void doBeforeBuild(
         StringBuilder builder,
@@ -61,8 +61,12 @@ final class MappingForModel {
         builder.append(thatName).append(" to=(").append(thatName).append(")thatObject;");
     }
 
-    private static void doAfterBuild(StringBuilder builder) {
+    private static void returnThatObject(StringBuilder builder) {
         builder.append("return thatObject;}");
+    }
+
+    private static void returnThisObject(StringBuilder builder) {
+        builder.append("return thisObject;}");
     }
 
     private static void build$override(
@@ -74,36 +78,38 @@ final class MappingForModel {
     ) {
         doBeforeBuild(builder, "override", fromClassname, toClassname);
         // do mapping ...
-        doAfterBuild(builder);
+        returnThatObject(builder);
     }
 
     private static void build$overrideFromMap(
         StringBuilder builder, String thisName, Map<String, PropertyModel> thisModelMap
     ) {
-        doBeforeBuild(builder, "overrideFromMap", thisName, MAP_NAME, "Object", MAP_NAME, MAP_NAME);
+        doBeforeBuild(builder, "overrideFromMap", thisName, MAP_NAME, OBJ_NAME, MAP_NAME, OBJ_NAME);
         for (Map.Entry<String, PropertyModel> entry : thisModelMap.entrySet()) {
             PropertyModel model = entry.getValue();
             if (model.hasPublicSetterMethod()) {
-                builder.append("from.").append(model.getSetterName()).append("(to.get(").append(entry.getKey())
-                    .append("));");
+                // LIKE from.setName(to.get("name"));
+                builder.append("from.").append(model.getSetterName()).append("(to.get(").append('"')
+                    .append(entry.getKey()).append('"').append("));");
             }
         }
-        doAfterBuild(builder);
+        returnThisObject(builder);
     }
 
     private static void build$toMap(
         StringBuilder builder, String thisName, Map<String, PropertyModel> thisModelMap
     ) {
-        doBeforeBuild(builder, "toMap", thisName, MAP_NAME, "Object", MAP_NAME, MAP_NAME);
+        doBeforeBuild(builder, "toMap", thisName, MAP_NAME, OBJ_NAME, MAP_NAME, MAP_NAME);
         for (Map.Entry<String, PropertyModel> entry : thisModelMap.entrySet()) {
             PropertyModel model = entry.getValue();
             if (model.hasPublicGetterMethod()) {
+                // LIKE to.put("name", from.getName());
                 builder.append("to.put(");
                 builder.append('"').append(entry.getKey()).append('"');
                 builder.append(",from.").append(model.getGetterName()).append("());");
             }
         }
-        doAfterBuild(builder);
+        returnThatObject(builder);
     }
 
     private static void buildMappingEnumOf(
@@ -122,7 +128,7 @@ final class MappingForModel {
         StringBuilder builder, String fromClassname, Map<String, PropertyModel> thisModelMap
     ) {
         builder.append(";");
-        // build$overrideFromMap(builder, fromClassname, thisModelMap);
+        build$overrideFromMap(builder, fromClassname, thisModelMap);
         build$toMap(builder, fromClassname, thisModelMap);
     }
 
