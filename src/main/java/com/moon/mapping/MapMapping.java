@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author moonsky
  */
-public interface MapMapping<T> {
+public interface MapMapping<THIS> {
 
     /**
      * 从{@code propertiesMap}复制属性到{@code thisObject}
@@ -17,7 +17,7 @@ public interface MapMapping<T> {
      *
      * @return 属性覆盖目标对象 thisObject
      */
-    T fromMap(T thisObject, Map<String, ?> propertiesMap);
+    THIS fromMap(THIS thisObject, Map<String, ?> propertiesMap);
 
     /**
      * 将{@code thisObject}的所有属性映射到指定{@code targetMap}中
@@ -28,7 +28,7 @@ public interface MapMapping<T> {
      *
      * @return java.util.Map、{@code targetMap}
      */
-    <M extends Map<String, ?>> M toMap(T thisObject, M targetMap);
+    <M extends Map<String, ?>> M toMap(THIS thisObject, M targetMap);
 
     /**
      * 将{@code thisObject}的所有属性映射到{@link HashMap}中
@@ -37,7 +37,7 @@ public interface MapMapping<T> {
      *
      * @return java.util.HashMap
      */
-    default HashMap<String, ?> toHashMap(T thisObject) {
+    default HashMap<String, ?> toHashMap(THIS thisObject) {
         return toMap(thisObject, new HashMap<>(16));
     }
 }

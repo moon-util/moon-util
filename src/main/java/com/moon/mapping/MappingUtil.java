@@ -39,7 +39,7 @@ public abstract class MappingUtil {
      *
      * @return 当存在时返回对应映射器
      *
-     * @throws NoSuchBeanMappingException 不存在对应的映射器是抛出异常，
+     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常，
      *                                    必须通过{@link MappingFor}或手动注册方可获取到
      * @see MappingFor#value()
      */

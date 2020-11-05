@@ -73,10 +73,11 @@ public class MappingProcessor extends AbstractProcessor {
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
                 Set<? extends Element> set = env.getElementsAnnotatedWith(MappingFor.class);
-                warn(annotation.getQualifiedName() + "2" + set.size());
                 for (Element element : set) {
                     if (element instanceof TypeElement) {
                         TypeElement typed = (TypeElement) element;
+                        warn(">>>>>>>>>>>>>>>>>>>>>>" + typed.asType());
+                        warn(">>>>>>>>>>>>>>>>>>>>>>" + typed.getSuperclass());
                         models.add(onAnnotatedMapping(typed));
                     }
                 }
@@ -91,12 +92,12 @@ public class MappingProcessor extends AbstractProcessor {
             return null;
         }
         String elementName = element.getQualifiedName().toString();
-        Elements elements = env().getElementUtils();
+        Elements utils = env().getElementUtils();
         Map<String, Map<String, PropertyModel>> targetModelsMap = new HashMap<>(4);
-        Map<String, PropertyModel> modelMap = toPropertiesMap(elements, element);
+        Map<String, PropertyModel> modelMap = toPropertiesMap(utils, element);
         for (String classname : classes) {
-            TypeElement annotated = elements.getTypeElement(classname);
-            targetModelsMap.put(classname, toPropertiesMap(elements, annotated));
+            TypeElement annotated = utils.getTypeElement(classname);
+            targetModelsMap.put(classname, toPropertiesMap(utils, annotated));
         }
         return new MappingForModel(elementName, modelMap, targetModelsMap);
     }
