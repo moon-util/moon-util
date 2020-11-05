@@ -2,7 +2,6 @@ package com.moon.mapping;
 
 import com.moon.mapping.annotation.MappingFor;
 
-import static com.moon.core.lang.ThrowUtil.noInstanceError;
 import static java.lang.Thread.currentThread;
 
 /**
@@ -10,7 +9,7 @@ import static java.lang.Thread.currentThread;
  */
 public abstract class MappingUtil {
 
-    private MappingUtil() { noInstanceError(); }
+    private MappingUtil() { }
 
     /**
      * 获取当前类的{@link MapMapping}

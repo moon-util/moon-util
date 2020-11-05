@@ -7,7 +7,9 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
@@ -75,10 +77,14 @@ public class MappingProcessor extends AbstractProcessor {
                 Set<? extends Element> set = env.getElementsAnnotatedWith(MappingFor.class);
                 for (Element element : set) {
                     if (element instanceof TypeElement) {
-                        TypeElement typed = (TypeElement) element;
-                        warn(">>>>>>>>>>>>>>>>>>>>>>" + typed.asType());
-                        warn(">>>>>>>>>>>>>>>>>>>>>>" + typed.getSuperclass());
-                        models.add(onAnnotatedMapping(typed));
+                        TypeElement thisTyped = (TypeElement) element;
+                        Types types = getTypeUtils();
+                        TypeMirror superclass = thisTyped.getSuperclass();
+                        TypeElement superTyped = cast(types.asElement(superclass));
+
+                        List<GenericModel> genericModels = GenericUtil.parse(superclass, superTyped);
+
+                        models.add(onAnnotatedMapping(thisTyped));
                     }
                 }
             }
@@ -106,6 +112,15 @@ public class MappingProcessor extends AbstractProcessor {
         env().getMessager().printMessage(Diagnostic.Kind.WARNING, obj == null ? null : obj.toString());
     }
 
+    private Messager getMessager() { return env().getMessager(); }
+
+    private Types getTypeUtils() { return env().getTypeUtils(); }
+
+    private Elements getElementUtils() { return env().getElementUtils(); }
 
     private ProcessingEnvironment env() { return processingEnv; }
+
+    private static <T> T cast(Object obj) {
+        return (T) obj;
+    }
 }

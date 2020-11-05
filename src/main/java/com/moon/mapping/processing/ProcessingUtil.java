@@ -11,8 +11,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.moon.core.lang.ThrowUtil.noInstanceError;
-
 /**
  * @author benshaoye
  */
@@ -20,7 +18,7 @@ final class ProcessingUtil {
 
     private final static String CLASS_SUFFIX = ".class", GET = "get", SET = "set", IS = "is";
 
-    private ProcessingUtil() { noInstanceError(); }
+    private ProcessingUtil() { }
 
     private final static boolean IS_IMPORTED_LOMBOK;
 
