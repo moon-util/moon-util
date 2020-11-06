@@ -94,7 +94,7 @@ final class MappingForModel {
                     类似: from.setName(to.get("name"));
                     </pre>
                      */
-                    builder.add("from.").add(property.getSetterName()).add("((").add(property.getEffectiveSetterType())
+                    builder.add("from.").add(property.getSetterName()).add("((").add(property.getActualSetterType())
                         .add(")to.get(").add('"').add(entry.getKey()).add('"').add("));");
                 }
             }
@@ -193,6 +193,8 @@ final class MappingForModel {
             PropertyModel thisModel = thisEntry.getValue();
             PropertyModel thatModel = thatModelMap.get(name);
             if (isUsable(thisModel, thatModel)) {
+                thatModel.getSetterTypename();
+                thisModel.getGetter();
                 builder.add("to.").add(thatModel.getSetterName()).add("(from.");
                 builder.add(thisModel.getGetterName()).add("());");
             }
@@ -212,7 +214,7 @@ final class MappingForModel {
             final String name = thisEntry.getKey();
             PropertyModel thisModel = thisEntry.getValue();
             PropertyModel thatModel = thatModelMap.get(name);
-            if (isUsable(thisModel, thatModel)) {
+            if (isUsable(thatModel, thisModel)) {
                 builder.add("from.").add(thisModel.getSetterName()).add("(to.");
                 builder.add(thatModel.getGetterName()).add("());");
             }

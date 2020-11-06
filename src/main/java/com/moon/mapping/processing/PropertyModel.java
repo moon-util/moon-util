@@ -24,7 +24,9 @@ final class PropertyModel {
     private VariableElement property;
     private ExecutableElement getter;
     private ExecutableElement setter;
+    private String propertyTypename;
     private String setterTypename;
+    private String getterTypename;
 
     PropertyModel(String name) { this(name, null); }
 
@@ -41,6 +43,14 @@ final class PropertyModel {
 
     public void setSetterTypename(String setterTypename) { this.setterTypename = setterTypename; }
 
+    public void setPropertyTypename(String propertyTypename) {
+        this.propertyTypename = propertyTypename;
+    }
+
+    public void setGetterTypename(String getterTypename) {
+        this.getterTypename = getterTypename;
+    }
+
     public ExecutableElement getGetter() { return getter; }
 
     public ExecutableElement getSetter() { return setter; }
@@ -49,16 +59,35 @@ final class PropertyModel {
 
     public String getSetterTypename() { return setterTypename; }
 
+    public String getGetterTypename() { return getterTypename; }
+
+    public String getPropertyTypename() { return propertyTypename; }
+
     public boolean isTypeof(Object obj) { return this.thisType == obj; }
 
+    public boolean hasProperty() { return this.property != null; }
+
+    /**
+     * 是否存在 public setter
+     *
+     * @return
+     */
     public boolean hasPublicSetterMethod() {
         return hasDefaultSetterMethod() || hasLombokSetterMethod();
     }
 
+    /**
+     * 是否存在 public getter
+     *
+     * @return
+     */
     public boolean hasPublicGetterMethod() {
         return hasDefaultGetterMethod() || hasLombokGetterMethod();
     }
 
+    /**
+     * setter 参数类型是否是基本数据类型
+     */
     public boolean isPrimitiveSetterMethod() {
         if (hasPublicSetterMethod()) {
             return wasDefaultPrimitiveSetterMethod();
@@ -68,13 +97,85 @@ final class PropertyModel {
         return false;
     }
 
-    public String getDefaultSetterType() {
-        VariableElement var = getSetter().getParameters().get(0);
-        return var.asType().toString();
+    /**
+     * getter 返回值是否是基本数据类型
+     */
+    public boolean isPrimitiveGetterMethod() {
+        if (hasPublicGetterMethod()) {
+            return wasDefaultPrimitiveGetterMethod();
+        } else if (hasLombokGetterMethod()) {
+            return wasLombokPrimitiveGetterMethod();
+        }
+        return false;
     }
 
-    public String getEffectiveSetterType() {
-        return getSetterTypename() == null ? getDefaultSetterType() : getSetterTypename();
+    /**
+     * 返回声明的属性类型，可能是实际类，也可能是泛型
+     */
+    public String getDeclaredPropertyType() {
+        if (hasProperty()) {
+            return this.getProperty().asType().toString();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 返回属性实际类型
+     */
+    public String getActualPropertyType() {
+        return getPropertyTypename() == null ? getDeclaredPropertyType() : getPropertyTypename();
+    }
+
+    /**
+     * 返回 getter 方法返回值类型，可能是实际类，也可能是泛型
+     */
+    public String getDeclaredGetterType() {
+        if (hasPublicGetterMethod()) {
+            return getGetter().getReturnType().toString();
+        }
+        return null;
+    }
+
+    /**
+     * getter 实际返回值类型
+     */
+    public String getActualGetterType() {
+        if (getGetterTypename() != null) {
+            return getGetterTypename();
+        } else if (hasPublicGetterMethod()) {
+            return getGetter().getReturnType().toString();
+        } else if (hasLombokGetterMethod()) {
+            return getActualPropertyType();
+        }
+        return null;
+    }
+
+    /**
+     * 获取声明在 setter 方法上的方法参数类型，可能是实际类，也可能是泛型
+     */
+    public String getDeclaredSetterType() {
+        if (hasPublicSetterMethod()) {
+            VariableElement var = getSetter().getParameters().get(0);
+            return var.asType().toString();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * setter 参数实际类型
+     */
+    public String getActualSetterType() {
+        if (getSetterTypename() != null) {
+            return getSetterTypename();
+        } else if (hasPublicSetterMethod()) {
+            VariableElement var = getSetter().getParameters().get(0);
+            return var.asType().toString();
+        } else if (hasLombokSetterMethod()) {
+            return getActualPropertyType();
+        }
+        return null;
     }
 
     /**
@@ -87,7 +188,10 @@ final class PropertyModel {
         } else {
             mirror = getProperty().asType();
         }
-        return toWrapperType(mirror.getKind());
+        if (mirror.getKind().isPrimitive()) {
+            return toWrapperType(mirror.getKind());
+        }
+        return mirror.toString();
     }
 
     private static String toWrapperType(TypeKind kind) {
@@ -137,11 +241,24 @@ final class PropertyModel {
         return setterParam.asType().getKind().isPrimitive();
     }
 
+    private boolean wasDefaultPrimitiveGetterMethod() {
+        return getGetter().getReturnType().getKind().isPrimitive();
+    }
+
     private boolean wasLombokPrimitiveSetterMethod() {
         try {
             return getProperty().asType().getKind().isPrimitive();
         } catch (NullPointerException e) {
             String type = getSetter().getEnclosingElement().toString();
+            throw new IllegalStateException(name + "\t ~~ " + getProperty() + "\t >> " + type, e);
+        }
+    }
+
+    private boolean wasLombokPrimitiveGetterMethod() {
+        try {
+            return getProperty().asType().getKind().isPrimitive();
+        } catch (NullPointerException e) {
+            String type = getGetter().getEnclosingElement().toString();
             throw new IllegalStateException(name + "\t ~~ " + getProperty() + "\t >> " + type, e);
         }
     }

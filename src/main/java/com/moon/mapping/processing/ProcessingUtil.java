@@ -74,7 +74,12 @@ final class ProcessingUtil {
                 if (properties.contains(name)) {
                     continue;
                 }
-                propsMap.computeIfAbsent(name, PropertyModel::new).setProperty(var);
+                PropertyModel property = propsMap.computeIfAbsent(name, PropertyModel::new);
+                property.setProperty(var);
+                // 推测泛型实际类型
+                String propertyType = property.getDeclaredPropertyType();
+                GenericModel generic = genericModelMap.get(propertyType);
+                property.setPropertyTypename(generic.getSimpleValue());
             } else if (isSetterMethod(element)) {
                 // setter 方法
                 ExecutableElement exe = (ExecutableElement) element;
@@ -84,7 +89,8 @@ final class ProcessingUtil {
                 }
                 PropertyModel setter = propsMap.computeIfAbsent(name, PropertyModel::new);
                 setter.setSetter(exe);
-                String setterType = setter.getDefaultSetterType();
+                // 推测泛型实际类型
+                String setterType = setter.getDeclaredSetterType();
                 GenericModel generic = genericModelMap.get(setterType);
                 setter.setSetterTypename(generic.getSimpleValue());
             } else if (isGetterMethod(element)) {
@@ -94,7 +100,12 @@ final class ProcessingUtil {
                 if (properties.contains(name)) {
                     continue;
                 }
-                propsMap.computeIfAbsent(name, PropertyModel::new).setGetter(exe);
+                PropertyModel getter = propsMap.computeIfAbsent(name, PropertyModel::new);
+                getter.setGetter(exe);
+                // 推测泛型实际类型
+                String getterType = getter.getDeclaredGetterType();
+                GenericModel generic = genericModelMap.get(getterType);
+                getter.setGetterTypename(generic.getSimpleValue());
             }
         }
         propsMap.putAll(parseSuperPropertiesModel(propsMap.keySet(), env, superTyped));
