@@ -12,7 +12,8 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
-import static com.moon.mapping.processing.ProcessingUtil.isPublic;
+import static com.moon.mapping.processing.DetectUtils.isImportedLombok;
+import static com.moon.mapping.processing.DetectUtils.isPublic;
 
 /**
  * @author moonsky
@@ -20,7 +21,17 @@ import static com.moon.mapping.processing.ProcessingUtil.isPublic;
 final class PropertyModel {
 
     private final String name;
+    /**
+     * this 指向的类，总是指向最终子类
+     * <p>
+     * 如 A extends B，不论是 A 或者是 B 中的属性，这总是指向 A
+     */
     private final TypeElement thisType;
+    /**
+     * 所在的声明类，{@link #thisType}中的例子中，
+     * A 中的属性这里就指向 A，B 中的属性这里就指向 B
+     */
+    private final TypeElement declareType;
     private VariableElement property;
     private ExecutableElement getter;
     private ExecutableElement setter;
@@ -28,11 +39,10 @@ final class PropertyModel {
     private String setterTypename;
     private String getterTypename;
 
-    PropertyModel(String name) { this(name, null); }
-
-    PropertyModel(String name, TypeElement thisType) {
-        this.name = name;
+    PropertyModel(String name, TypeElement thisType, TypeElement declareType) {
+        this.declareType = declareType;
         this.thisType = thisType;
+        this.name = name;
     }
 
     public String getName() { return name; }
@@ -59,15 +69,19 @@ final class PropertyModel {
 
     public VariableElement getProperty() { return property; }
 
+    public TypeElement getDeclareType() { return declareType; }
+
+    public TypeElement getThisType() { return thisType; }
+
     public String getSetterTypename() { return setterTypename; }
 
     public String getGetterTypename() { return getterTypename; }
 
     public String getPropertyTypename() { return propertyTypename; }
 
-    public boolean isTypeof(Object obj) { return this.thisType == obj; }
+    public boolean isThisTypeof(Object obj) { return getThisType() == obj; }
 
-    public boolean hasProperty() { return this.property != null; }
+    private boolean hasProperty() { return getProperty() != null; }
 
     /**
      * 是否存在 public setter
@@ -268,7 +282,7 @@ final class PropertyModel {
     }
 
     private boolean hasLombokSetterMethod() {
-        if (ProcessingUtil.isImportedLombok()) {
+        if (isImportedLombok()) {
             VariableElement var = getProperty();
             if (var == null) {
                 return false;
@@ -285,7 +299,7 @@ final class PropertyModel {
     }
 
     private boolean hasLombokGetterMethod() {
-        if (ProcessingUtil.isImportedLombok()) {
+        if (isImportedLombok()) {
             VariableElement var = getProperty();
             if (var == null) {
                 return false;
@@ -306,15 +320,7 @@ final class PropertyModel {
         if (name == null || name.length() == 0) {
             return name;
         }
-        if (name.length() > 1) {
-            if (Character.isUpperCase(name.charAt(1)) &&//
-                Character.isUpperCase(name.charAt(0))) {
-                return name;
-            }
-            if (Character.isUpperCase(name.charAt(1)) &&//
-                Character.isLowerCase(name.charAt(0))) {
-                return name;
-            }
+        if (name.length() > 1 && Character.isUpperCase(name.charAt(1))) {
         }
         char chars[] = name.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
@@ -325,10 +331,13 @@ final class PropertyModel {
     public String toString() {
         final StringBuilder sb = new StringBuilder("PropertyModel{");
         sb.append("name='").append(name).append('\'');
+        sb.append(", thisType=").append(thisType);
         sb.append(", property=").append(property);
         sb.append(", getter=").append(getter);
         sb.append(", setter=").append(setter);
-        sb.append('}');
-        return sb.toString();
+        sb.append(", propertyTypename='").append(propertyTypename).append('\'');
+        sb.append(", setterTypename='").append(setterTypename).append('\'');
+        sb.append(", getterTypename='").append(getterTypename).append('\'');
+        return sb.append('}').toString();
     }
 }

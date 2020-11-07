@@ -46,18 +46,20 @@ final class GenericUtil {
      * 还有问题
      *
      * @param superclass
-     * @param typedSuperclass
+     * @param element
      *
      * @return
      */
     @SuppressWarnings("all")
-    static Map<String, GenericModel> parse(
-        TypeMirror superclass, TypeElement typedSuperclass, ProcessingEnvironment env
-    ) {
+    static Map<String, GenericModel> parse(TypeElement element, ProcessingEnvironment env) {
+        return parse(element.asType(), element, env);
+    }
+
+    static Map<String, GenericModel> parse(TypeMirror elementTyped, TypeElement element, ProcessingEnvironment env) {
         Map<String, GenericModel> genericMap = new HashMap<>();
-        List<String> actuals = Extract.splitSuperclass(superclass.toString());
+        List<String> actuals = Extract.splitSuperclass(elementTyped.toString());
         int index = 0;
-        for (TypeParameterElement param : typedSuperclass.getTypeParameters()) {
+        for (TypeParameterElement param : element.getTypeParameters()) {
             String actual = index < actuals.size() ? actuals.get(index++) : null;
             GenericModel model = new GenericModel(param, actual);
             genericMap.put(model.getDeclareType(), model);

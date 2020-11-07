@@ -8,13 +8,14 @@ import static java.lang.Enum.valueOf;
 /**
  * @author benshaoye
  */
+@SuppressWarnings("all")
 final class Mappings {
 
     private final static String NAMESPACE;
 
     static {
         String packageName = Mappings.class.getPackage().getName();
-        NAMESPACE = packageName + ".MoonBeanMappingsGenerated_";
+        NAMESPACE = packageName + ".BeanMapping_";
     }
 
     private Mappings() {}
@@ -29,26 +30,22 @@ final class Mappings {
         }
     }
 
-    @SuppressWarnings("all")
     static <F, T> BeanMapping<F, T> resolve(Class cls1, Class cls2) {
-        return resolve(cls1.getName(), cls2.getName());
+        return resolve(cls1.getCanonicalName(), cls2.getCanonicalName());
     }
 
-    @SuppressWarnings("all")
     static <T> MapMapping<T> resolve(Class<T> cls1) {
-        return resolve(cls1.getName());
+        return resolve(cls1.getCanonicalName());
     }
 
-    @SuppressWarnings("all")
     static BeanMapping resolve(String cls1, String cls2) {
         try {
-            return (BeanMapping) valueOf(toClass(cls1), toVarName(cls2));
+            return (BeanMapping) valueOf(toClass(cls1), "TO_" + toVarName(cls2));
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    @SuppressWarnings("all")
     static BeanMapping resolve(String cls1) {
         try {
             return (BeanMapping) toClass(cls1).getEnumConstants()[0];

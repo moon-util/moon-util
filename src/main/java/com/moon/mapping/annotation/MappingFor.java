@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * @author moonsky
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface MappingFor {
 
     Class<?>[] value();

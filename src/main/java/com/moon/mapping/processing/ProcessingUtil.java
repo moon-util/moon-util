@@ -1,13 +1,12 @@
 package com.moon.mapping.processing;
 
-import lombok.Data;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import java.beans.Introspector;
 import java.util.*;
+
+import static com.moon.mapping.processing.DetectUtils.*;
 
 /**
  * @author benshaoye
@@ -15,110 +14,120 @@ import java.util.*;
 final class ProcessingUtil {
 
     private final static String TOP_SUPER = Object.class.getName();
-    private final static String CLASS_SUFFIX = ".class", GET_CLASS = "getClass";
-    private final static String GET = "get", SET = "set", IS = "is";
+    private final static String CLASS_SUFFIX = ".class";
 
     private ProcessingUtil() { }
 
-    private final static boolean IS_IMPORTED_LOMBOK;
-
-    static {
-        boolean isImportedLombok;
-        try {
-            Data.class.toString();
-            isImportedLombok = true;
-        } catch (Throwable t) {
-            isImportedLombok = false;
+    private static PropertyModel ensurePropertyModel(
+        final Map<String, PropertyModel> propertiesModel,
+        final String name,
+        final TypeElement thisType,
+        final TypeElement declareType
+    ) {
+        PropertyModel model = propertiesModel.get(name);
+        if (model == null) {
+            model = new PropertyModel(name, thisType, declareType);
+            propertiesModel.put(name, model);
         }
-        IS_IMPORTED_LOMBOK = isImportedLombok;
+        return model;
     }
 
-    static boolean isImportedLombok() { return IS_IMPORTED_LOMBOK; }
+    private static String extractGenericFinalType(
+        final Map<String, GenericModel> thisGenericMap, String propertyType
+    ) {
+        GenericModel generic = thisGenericMap.get(propertyType);
+        return generic == null ? null : generic.getSimpleFinalType();
+    }
 
-    private static Map<String, PropertyModel> parseRootPropertiesMap(TypeElement typeElement) {
-        Map<String, PropertyModel> propertiesModel = new LinkedHashMap<>();
-        List<? extends Element> elements = typeElement.getEnclosedElements();
-        for (Element element : elements) {
-            if (isMemberField(element)) {
-                VariableElement var = (VariableElement) element;
-                String name = var.getSimpleName().toString();
-                propertiesModel.computeIfAbsent(name, name1 -> new PropertyModel(name1, null)).setProperty(var);
-            } else if (isSetterMethod(element)) {
-                ExecutableElement exe = (ExecutableElement) element;
-                String name = executableToPropertyName(exe);
-                propertiesModel.computeIfAbsent(name, name1 -> new PropertyModel(name1, null)).setSetter(exe);
-            } else if (isGetterMethod(element)) {
-                ExecutableElement exe = (ExecutableElement) element;
-                String name = executableToPropertyName(exe);
-                propertiesModel.computeIfAbsent(name, name1 -> new PropertyModel(name1, null)).setGetter(exe);
+    private static void handleEnclosedElem(
+        final Set<String> presentsProps,
+        final Map<String, PropertyModel> propertiesModel,
+        final Map<String, GenericModel> thisGenericMap,
+        final Element element,
+        final TypeElement thisType,
+        final TypeElement declareType
+    ) {
+        if (isMemberField(element)) {
+            VariableElement var = (VariableElement) element;
+            String name = var.getSimpleName().toString();
+            if (presentsProps.contains(name)) {
+                return;
             }
+            PropertyModel model = ensurePropertyModel(propertiesModel, name, thisType, declareType);
+            model.setProperty(var);
+            // 推测泛型实际类型
+            String propertyType = model.getPropertyDeclareType();
+            String finalType = extractGenericFinalType(thisGenericMap, propertyType);
+            model.setPropertyTypename(finalType);
+        } else if (isSetterMethod(element)) {
+            ExecutableElement exe = (ExecutableElement) element;
+            String name = toPropertyName(exe);
+            if (presentsProps.contains(name)) {
+                return;
+            }
+            PropertyModel model = ensurePropertyModel(propertiesModel, name, thisType, declareType);
+            model.setSetter(exe);
+            // 推测泛型实际类型
+            String setterType = model.getSetterDeclareType();
+            String finalType = extractGenericFinalType(thisGenericMap, setterType);
+            model.setSetterTypename(finalType);
+        } else if (isGetterMethod(element)) {
+            ExecutableElement exe = (ExecutableElement) element;
+            String name = toPropertyName(exe);
+            if (presentsProps.contains(name)) {
+                return;
+            }
+            PropertyModel model = ensurePropertyModel(propertiesModel, name, thisType, declareType);
+            model.setGetter(exe);
+            // 推测泛型实际类型
+            String getterType = model.getGetterDeclareType();
+            String finalType = extractGenericFinalType(thisGenericMap, getterType);
+            model.setGetterTypename(finalType);
         }
-        return propertiesModel;
+    }
+
+    private static MappedPropsMap parseRootPropertiesMap(
+        ProcessingEnvironment env, final TypeElement rootElement
+    ) {
+        MappedPropsMap propsMap = new MappedPropsMap(rootElement, rootElement);
+        Map<String, GenericModel> thisGenericMap = GenericUtil.parse(rootElement, env);
+        List<? extends Element> elements = rootElement.getEnclosedElements();
+        Set<String> presents = new HashSet<>();
+        for (Element element : CollectUtils.emptyIfNull(elements)) {
+            handleEnclosedElem(presents, propsMap,//
+                thisGenericMap, element, rootElement, rootElement);
+        }
+        return propsMap;
     }
 
     private static Map<String, PropertyModel> parseSuperPropertiesModel(
-        Set<String> properties, ProcessingEnvironment env, TypeElement typeElement
+        Set<String> properties, ProcessingEnvironment env, final TypeElement thisElement, final TypeElement rootElement
     ) {
-        TypeMirror superclass = typeElement.getSuperclass();
+        TypeMirror superclass = thisElement.getSuperclass();
         if (superclass.toString().equals(TOP_SUPER)) {
             return Collections.emptyMap();
         }
         Map<String, PropertyModel> propsMap = new LinkedHashMap<>();
-        TypeElement superTyped = cast(env.getTypeUtils().asElement(superclass));
-        Map<String, GenericModel> genericModelMap = GenericUtil.parse(superclass, superTyped, env);
-        List<? extends Element> elements = superTyped.getEnclosedElements();
+        TypeElement superElement = cast(env.getTypeUtils().asElement(superclass));
+        Map<String, GenericModel> genericModelMap = GenericUtil.parse(superclass, superElement, env);
+        List<? extends Element> elements = superElement.getEnclosedElements();
         for (Element element : elements) {
-            if (isMemberField(element)) {
-                VariableElement var = (VariableElement) element;
-                String name = var.getSimpleName().toString();
-                if (properties.contains(name)) {
-                    continue;
-                }
-                PropertyModel property = propsMap.computeIfAbsent(name, PropertyModel::new);
-                property.setProperty(var);
-                // 推测泛型实际类型
-                String propertyType = property.getPropertyDeclareType();
-                GenericModel generic = genericModelMap.get(propertyType);
-                property.setPropertyTypename(generic.getSimpleFinalType());
-            } else if (isSetterMethod(element)) {
-                // setter 方法
-                ExecutableElement exe = (ExecutableElement) element;
-                String name = executableToPropertyName(exe);
-                if (properties.contains(name)) {
-                    continue;
-                }
-                PropertyModel setter = propsMap.computeIfAbsent(name, PropertyModel::new);
-                setter.setSetter(exe);
-                // 推测泛型实际类型
-                String setterType = setter.getSetterDeclareType();
-                GenericModel generic = genericModelMap.get(setterType);
-                setter.setSetterTypename(generic.getSimpleFinalType());
-            } else if (isGetterMethod(element)) {
-                // getter 方法
-                ExecutableElement exe = (ExecutableElement) element;
-                String name = executableToPropertyName(exe);
-                if (properties.contains(name)) {
-                    continue;
-                }
-                PropertyModel getter = propsMap.computeIfAbsent(name, PropertyModel::new);
-                getter.setGetter(exe);
-                // 推测泛型实际类型
-                String getterType = getter.getGetterDeclareType();
-                GenericModel generic = genericModelMap.get(getterType);
-                getter.setGetterTypename(generic.getSimpleFinalType());
-            }
+            handleEnclosedElem(properties, propsMap, genericModelMap, element, rootElement, superElement);
         }
-        propsMap.putAll(parseSuperPropertiesModel(propsMap.keySet(), env, superTyped));
+        properties.addAll(propsMap.keySet());
+        propsMap.putAll(parseSuperPropertiesModel(properties, env, superElement, rootElement));
         return propsMap;
     }
 
-    static Map<String, PropertyModel> toPropertiesModelMap(ProcessingEnvironment env, TypeElement typeElement) {
-        Map<String, PropertyModel> propertiesMap = parseRootPropertiesMap(typeElement);
-        propertiesMap.putAll(parseSuperPropertiesModel(propertiesMap.keySet(), env, typeElement));
-        return propertiesMap;
+    static MappedPropsMap toPropertiesModelMap(ProcessingEnvironment env, TypeElement rootElement) {
+        DetectUtils.assertRootElement(rootElement);
+        final MappedPropsMap propsMap = parseRootPropertiesMap(env, rootElement);
+        final Set<String> presentsProps = new HashSet<>(propsMap.keySet());
+        propsMap.putAll(parseSuperPropertiesModel(presentsProps, env, rootElement, rootElement));
+        return propsMap.reversed();
     }
 
-    static Collection<String> getThatClasses(TypeElement element) {
+    static Collection<String> getMappingForClasses(TypeElement element) {
         Collection<String> classes = new HashSet<>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             for (AnnotationValue value : mirror.getElementValues().values()) {
@@ -132,56 +141,10 @@ final class ProcessingUtil {
         return classes;
     }
 
-    private static boolean isMemberField(Element elem) {
-        return isField(elem) && isMember(elem);
-    }
-
-    private static boolean isSetterMethod(Element elem) {
-        if (isMethod(elem) && isMember(elem)) {
-            ExecutableElement exe = (ExecutableElement) elem;
-            String name = exe.getSimpleName().toString();
-            boolean maybeSet = name.length() > 3 && name.startsWith(SET);
-            maybeSet = maybeSet && exe.getParameters().size() == 1;
-            maybeSet = maybeSet && exe.getReturnType().getKind() == TypeKind.VOID;
-            return maybeSet && isPublic(exe);
-        }
-        return false;
-    }
-
-    private static boolean isGetterMethod(Element elem) {
-        if (isMethod(elem) && isMember(elem)) {
-            ExecutableElement exe = (ExecutableElement) elem;
-            String name = exe.getSimpleName().toString();
-            boolean maybeGet = exe.getParameters().isEmpty() && isPublic(exe);
-            if (name.startsWith(GET)) {
-                return maybeGet && !name.equals(GET_CLASS);
-            } else if (name.startsWith(IS)) {
-                return maybeGet && exe.getReturnType().getKind() == TypeKind.BOOLEAN;
-            }
-        }
-        return false;
-    }
-
-    private static String executableToPropertyName(ExecutableElement element) {
+    private static String toPropertyName(ExecutableElement element) {
         String name = element.getSimpleName().toString();
-        return Introspector.decapitalize(name.substring(name.startsWith(IS) ? 2 : 3));
+        return Introspector.decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
     }
 
     private static <T> T cast(Object obj) { return (T) obj; }
-
-    static boolean isPublic(Element elem) {
-        return elem != null && elem.getModifiers().contains(Modifier.PUBLIC);
-    }
-
-    static boolean isMember(Element elem) {
-        return elem != null && !elem.getModifiers().contains(Modifier.STATIC);
-    }
-
-    static boolean isMethod(Element elem) {
-        return elem.getKind() == ElementKind.METHOD && elem instanceof ExecutableElement;
-    }
-
-    static boolean isField(Element elem) {
-        return elem.getKind() == ElementKind.FIELD && elem instanceof VariableElement;
-    }
 }

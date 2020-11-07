@@ -1,6 +1,7 @@
 package com.moon.mapping.processing;
 
 import javax.lang.model.element.TypeParameterElement;
+import java.util.Objects;
 
 /**
  * @author moonsky
@@ -40,7 +41,7 @@ public class GenericModel {
 
     public String getFinalType() {
         String act = getActualType(), bound = getBoundType();
-        return act == null ? bound : act;
+        return act == null|| Objects.equals(act, declare) ? bound : act;
     }
 
     public String getSimpleFinalType() {
@@ -53,5 +54,17 @@ public class GenericModel {
         }
         int index = value.indexOf('<');
         return index < 0 ? value : value.substring(0, index);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("GenericModel{");
+        sb.append("declare='").append(declare).append('\'');
+        sb.append(", actual='").append(actual).append('\'');
+        sb.append(", bound='").append(bound).append('\'');
+        sb.append(", finalType='").append(getFinalType()).append('\'');
+        sb.append(", simpleFinalType='").append(getSimpleFinalType()).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -8,11 +8,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-import javax.tools.JavaFileObject;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.*;
 
 import static com.moon.mapping.processing.ProcessingUtil.toPropertiesModelMap;
@@ -20,15 +16,13 @@ import static com.moon.mapping.processing.ProcessingUtil.toPropertiesModelMap;
 /**
  * @author moonsky
  */
-// @AutoService(Processor.class)
+@AutoService(Processor.class)
 public class MappingProcessor extends AbstractProcessor {
 
     private final static String SUPPORTED_TYPE = MappingFor.class.getName();
 
     @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.RELEASE_8;
-    }
+    public SourceVersion getSupportedSourceVersion() { return SourceVersion.RELEASE_8; }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
@@ -39,14 +33,22 @@ public class MappingProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
+        Logger.initialize(processingEnv);
         super.init(processingEnv);
+    }
+
+    private void doWriteJavaFile(List<FromCToCModel> models) throws IOException {
+        Filer filer = env().getFiler();
+        for (FromCToCModel model : models) {
+            model.writeJavaFile(filer);
+        }
     }
 
     @Override
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        List<MappingForModel> models = getMappingModels(annotations, roundEnv);
+        List<FromCToCModel> models = getMappingModels(annotations, roundEnv);
         if (!models.isEmpty()) {
             try {
                 doWriteJavaFile(models);
@@ -57,19 +59,8 @@ public class MappingProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void doWriteJavaFile(List<MappingForModel> models) throws IOException {
-        Filer filer = env().getFiler();
-        for (MappingForModel model : models) {
-            JavaFileObject java = filer.createSourceFile(model.getGeneratedMappingName());
-            try (Writer javaWriter = java.openWriter(); PrintWriter writer = new PrintWriter(javaWriter)) {
-                writer.println(model.toString());
-                writer.flush();
-            }
-        }
-    }
-
-    private List<MappingForModel> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        List<MappingForModel> models = new ArrayList<>();
+    private List<FromCToCModel> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        List<FromCToCModel> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
                 Set<? extends Element> set = env.getElementsAnnotatedWith(MappingFor.class);
@@ -83,33 +74,27 @@ public class MappingProcessor extends AbstractProcessor {
         return models;
     }
 
-    private MappingForModel onAnnotatedMapping(TypeElement element) {
-        Collection<String> classes = ProcessingUtil.getThatClasses(element);
+    @SuppressWarnings("all")
+    private FromCToCModel onAnnotatedMapping(final TypeElement thisElement) {
+        final String thisClassname = thisElement.getQualifiedName().toString();
+        final ProcessingEnvironment env = env();
+        final Elements utils = env.getElementUtils();
+        Map<String, MappedPropsMap> targetsMap = new HashMap<>(4);
+        MappedPropsMap thisModel = toPropertiesModelMap(env(), thisElement);
+        Collection<String> classes = ProcessingUtil.getMappingForClasses(thisElement);
+        FromCToCModel model = new FromCToCModel(env(), thisClassname, thisModel, targetsMap);
         if (classes.isEmpty()) {
-            return null;
+            return model;
         }
-        String elementName = element.getQualifiedName().toString();
-        Elements utils = env().getElementUtils();
-        Map<String, Map<String, PropertyModel>> targetModelsMap = new HashMap<>(4);
-        Map<String, PropertyModel> modelMap = toPropertiesModelMap(env(), element);
-        for (String classname : classes) {
-            TypeElement annotated = utils.getTypeElement(classname);
-            if (annotated != null) {
-                targetModelsMap.put(classname, toPropertiesModelMap(env(), annotated));
+        for (String thatClassname : classes) {
+            TypeElement target = utils.getTypeElement(thatClassname);
+            if (target == null) {
+                continue;
             }
+            targetsMap.put(thatClassname, toPropertiesModelMap(env(), target));
         }
-        return new MappingForModel(env(), elementName, modelMap, targetModelsMap);
+        return model;
     }
-
-    private Messager getMessager() { return env().getMessager(); }
-
-    private Types getTypeUtils() { return env().getTypeUtils(); }
-
-    private Elements getElementUtils() { return env().getElementUtils(); }
 
     private ProcessingEnvironment env() { return processingEnv; }
-
-    private static <T> T cast(Object obj) {
-        return (T) obj;
-    }
 }
