@@ -81,7 +81,7 @@ final class ProcessUtils {
         if (superclass.toString().equals(TOP_CLASS)) {
             return;
         }
-        Types types = EnvironmentUtils.getTypeUtils();
+        Types types = EnvironmentUtils.getTypes();
         TypeElement superElement = ElementUtils.cast(types.asElement(superclass));
         Map<String, GenericModel> genericModelMap = GenericUtil.parse(superclass, superElement);
         List<? extends Element> elements = superElement.getEnclosedElements();

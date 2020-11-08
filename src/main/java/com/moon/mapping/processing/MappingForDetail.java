@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * @author moonsky
@@ -35,11 +37,10 @@ final class MappingForDetail extends DefinitionDetail {
     @Override
     public void writeJavaFile(Filer filer) throws IOException {
         super.writeJavaFile(filer);
-        JavaFileObject javaFile = filer.createSourceFile(getBeanMappingClassname());
-        try (Writer jw = javaFile.openWriter(); PrintWriter writer = new PrintWriter(jw)) {
+        EnvironmentUtils.newJavaFile(filer, getBeanMappingClassname(), writer -> {
             writer.println(implementation());
             writer.flush();
-        }
+        });
     }
 
     private String getBeanMappingClassname() {
@@ -48,125 +49,88 @@ final class MappingForDetail extends DefinitionDetail {
 
     private String implementation() {
         final MappingAdder adder = new MappingAdder();
-        final String thisClassname = getThisClassname();
-        DefinitionDetail thisDetailMap = this;
         adder.add("package ").add(PACKAGE).add(';');
         adder.add("enum ").add(getBeanMappingClassname()).add(" implements ").add(INTERFACE).add("{TO,");
         final Map<String, DefinitionDetail> mappingForDetailsMap = getMappingForDetailsMap();
         for (Map.Entry<String, DefinitionDetail> entry : mappingForDetailsMap.entrySet()) {
-
-            addBeanMapping(adder, thisClassname, entry.getKey(), thisDetailMap, entry.getValue());
+            addBeanMapping(adder, entry.getValue());
         }
         adder.add(";");
-        addObjectMapping(adder, thisClassname, thisDetailMap);
-        addMapMapping(adder, thisClassname, thisDetailMap);
+        addObjectMapping(adder);
+        addMapMapping(adder);
         adder.add("}");
         return adder.toString();
     }
 
-    private void addBeanMapping(
-        MappingAdder adder,
-        String fromClassname,
-        String thatClassname,
-        DefinitionDetail thisModelMap,
-        DefinitionDetail thatModelMap
-    ) {
+    private void addBeanMapping(MappingAdder adder, DefinitionDetail thatDef) {
+        String thatClassname = thatDef.getThisClassname();
         adder.add("TO_" + ElementUtils.format(thatClassname)).add(" {");
-        build$safeWithThat(adder, fromClassname, thatClassname, thisModelMap, thatModelMap);
-        adder.add(getFactory().copyForwardMethod(fromClassname, thatClassname));
-        adder.add(getFactory().copyBackwardMethod(fromClassname, thatClassname));
-        adder.add(getFactory().newThatOnEmptyConstructor(fromClassname, thatClassname));
-        adder.add(getFactory().newThisOnEmptyConstructor(fromClassname, thatClassname));
+        build$safeWithThat(adder, thatDef);
+        adder.add(getFactory().copyForwardMethod(getThisClassname(), thatClassname));
+        adder.add(getFactory().copyBackwardMethod(getThisClassname(), thatClassname));
+        adder.add(getFactory().newThatOnEmptyConstructor(getThisClassname(), thatClassname));
+        adder.add(getFactory().newThisOnEmptyConstructor(getThisClassname(), thatClassname));
         adder.add("},");
     }
 
-    private void build$safeWithThat(
-        MappingAdder builder, String thisClassname, String thatClassname,//
-        Map<String, PropertyDetail> thisModelMap,//
-        Map<String, PropertyDetail> thatModelMap
-    ) {
-        Set<Map.Entry<String, PropertyDetail>> entries = thisModelMap.entrySet();
+    private void build$safeWithThat(MappingAdder adder, DefinitionDetail thatDef) {
+        final Set<Map.Entry<String, PropertyDetail>> entries = entrySet();
+        final String thatClassname = thatDef.getThisClassname();
+        final String thisClassname = getThisClassname();
         {
             List<String> fields = CollectUtils.reduce(entries, (props, thisEntry, idx) -> {
                 final String name = thisEntry.getKey();
                 PropertyDetail thisModel = thisEntry.getValue();
-                PropertyDetail thatModel = thatModelMap.get(name);
+                PropertyDetail thatModel = thatDef.get(name);
                 if (isUsable(thisModel, thatModel)) {
                     props.add(getFactory().copyForwardField(thisModel, thatModel));
                 }
                 return props;
             }, new ArrayList<>());
-            builder.add(getFactory().safeCopyForwardMethod(thisClassname, thatClassname, fields));
+            adder.add(getFactory().safeCopyForwardMethod(thisClassname, thatClassname, fields));
         }
         {
             List<String> fields = CollectUtils.reduce(entries, (props, thisEntry, idx) -> {
                 final String name = thisEntry.getKey();
                 PropertyDetail thisModel = thisEntry.getValue();
-                PropertyDetail thatModel = thatModelMap.get(name);
+                PropertyDetail thatModel = thatDef.get(name);
                 if (isUsable(thisModel, thatModel)) {
                     props.add(getFactory().copyBackwardField(thatModel, thisModel));
                 }
                 return props;
             }, new ArrayList<>());
-            builder.add(getFactory().safeCopyBackwardMethod(thisClassname, thatClassname, fields));
+            adder.add(getFactory().safeCopyBackwardMethod(thisClassname, thatClassname, fields));
         }
     }
 
-    private void addObjectMapping(
-        MappingAdder adder, String thisClassname, Map<String, PropertyDetail> thisModelMap
-    ) {
-        Set<Map.Entry<String, PropertyDetail>> entries = thisModelMap.entrySet();
+    private void addObjectMapping(MappingAdder adder) {
         {
             // toString(Object)
-            Set<String> sorted = getSortedKeys();
-            List<String> fields = new ArrayList<>();
-            for (String name : sorted) {
-                PropertyDetail detail = thisModelMap.get(name);
-                if (detail != null) {
-                    fields.add(getFactory().toStringField(detail, fields.isEmpty()));
-                }
-            }
-            CollectUtils.reduce(entries, (list, entry) -> {
-                if (!sorted.contains(entry.getKey())) {
-                    list.add(getFactory().toStringField(entry.getValue(), list.isEmpty()));
-                }
-                return list;
-            }, fields);
-            adder.add(getFactory().toStringMethod(thisClassname, fields));
+            List<String> fields = reducing((list, property) ->//
+                getFactory().toStringField(property, list.isEmpty()));
+            adder.add(getFactory().toStringMethod(getThisClassname(), fields));
         }
         {
             // copy(Object)
-            List<String> fields = CollectUtils.reduce(entries, (props, entry, idx) -> {
-                props.add(getFactory().cloneField(entry.getValue()));
-                return props;
-            }, new ArrayList<>());
-            adder.add(getFactory().cloneMethod(thisClassname, fields));
+            List<String> fields = reducing(getFactory()::cloneField);
+            adder.add(getFactory().cloneMethod(getThisClassname(), fields));
         }
     }
 
-    private void addMapMapping(
-        MappingAdder adder, String thisClassname, Map<String, PropertyDetail> thisModelMap
-    ) {
-        Set<Map.Entry<String, PropertyDetail>> entries = thisModelMap.entrySet();
+    private void addMapMapping(MappingAdder adder) {
         {
             // fromMap(Object,Map)
-            List<String> fields = CollectUtils.reduce(entries, (props, entry) -> {
-                props.add(getFactory().fromMapField(entry.getValue()));
-                return props;
-            }, new ArrayList<>());
-            adder.add(getFactory().fromMapMethod(thisClassname, fields));
+            List<String> fields = reducing(getFactory()::fromMapField);
+            adder.add(getFactory().fromMapMethod(getThisClassname(), fields));
         }
         {
             // toMap(Object,Map)
-            List<String> fields = CollectUtils.reduce(entries, (props, entry) -> {
-                props.add(getFactory().toMapField(entry.getValue()));
-                return props;
-            }, new ArrayList<>());
-            adder.add(getFactory().toMapMethod(thisClassname, fields));
+            List<String> fields = reducing(getFactory()::toMapField);
+            adder.add(getFactory().toMapMethod(getThisClassname(), fields));
         }
         {
             // newThis(Map)
-            adder.add(getFactory().newThisAsMapMethod(thisClassname));
+            adder.add(getFactory().newThisAsMapMethod(getThisClassname()));
         }
     }
 
@@ -177,13 +141,66 @@ final class MappingForDetail extends DefinitionDetail {
     }
 
     private Set<String> getSortedKeys() {
-        Set<String> SORTER = new LinkedHashSet<>();
-        SORTER.add("id");
-        SORTER.add("pk");
-        SORTER.add("primarykey");
-        SORTER.add("uk");
-        SORTER.add("unquekey");
-        return SORTER;
+        Set<String> sorts = new LinkedHashSet<>();
+        sorts.add("id");
+        return sorts;
+    }
+
+    private List<String> reducing(Function<PropertyDetail, String> serializer) {
+        final List<String> fields = new ArrayList<>();
+        final Set<String> sortKeys = getSortedKeys();
+        for (String key : sortKeys) {
+            PropertyDetail property = get(key);
+            if (property != null) {
+                String field = serializer.apply(property);
+                if (isNotBlank(field)) {
+                    fields.add(field);
+                }
+            }
+        }
+        return CollectUtils.reduce(entrySet(), (list, entry) -> {
+            if (sortKeys.contains(entry.getKey())) {
+                return list;
+            }
+            String field = serializer.apply(entry.getValue());
+            if (isNotBlank(field)) { list.add(field); }
+            return list;
+        }, fields);
+    }
+
+    private List<String> reducing(BiFunction<List<String>, PropertyDetail, String> serializer) {
+        final List<String> fields = new ArrayList<>();
+        final Set<String> sortKeys = getSortedKeys();
+        for (String key : sortKeys) {
+            PropertyDetail property = get(key);
+            if (property != null) {
+                String field = serializer.apply(fields, property);
+                if (isNotBlank(field)) {
+                    fields.add(field);
+                }
+            }
+        }
+        return CollectUtils.reduce(entrySet(), (list, entry) -> {
+            if (sortKeys.contains(entry.getKey())) {
+                return list;
+            }
+            String field = serializer.apply(list, entry.getValue());
+            if (isNotBlank(field)) { list.add(field); }
+            return list;
+        }, new ArrayList<>());
+    }
+
+    private static boolean isNotBlank(String str) {
+        if (str == null) {
+            return false;
+        }
+        int strLen = str.length();
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

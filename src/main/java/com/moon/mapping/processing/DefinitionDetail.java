@@ -60,14 +60,7 @@ class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements 
     }
 
     private final String getPackageName() {
-        Element elem = getThisElement();
-        do {
-            Element parent = elem.getEnclosingElement();
-            if (parent.getKind() == ElementKind.PACKAGE) {
-                return ElementUtils.getQualifiedName((QualifiedNameable) parent);
-            }
-            elem = parent;
-        } while (true);
+        return ElementUtils.getPackageName(getThisElement());
     }
 
     public final boolean isInterface() { return thisElement.getKind().isInterface(); }
