@@ -24,12 +24,14 @@ public class GenericModel {
 
     /**
      * 泛型声明类型，如 M
+     *
      * @return
      */
     public String getDeclareType() { return declare; }
 
     /**
      * 泛型实际使用类型，可为 null
+     *
      * @return
      */
     public String getActualType() { return actual; }
@@ -41,7 +43,7 @@ public class GenericModel {
 
     public String getFinalType() {
         String act = getActualType(), bound = getBoundType();
-        return act == null|| Objects.equals(act, declare) ? bound : act;
+        return act == null || Objects.equals(act, declare) ? bound : act;
     }
 
     public String getSimpleFinalType() {

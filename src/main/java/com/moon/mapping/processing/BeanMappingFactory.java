@@ -11,42 +11,42 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author moonsky
  */
 @SuppressWarnings("all")
-public class Implementation {
+public class BeanMappingFactory {
 
     private final ProcessingEnvironment env;
     private final AtomicInteger indexer = new AtomicInteger();
 
-    Implementation(ProcessingEnvironment env) { this.env = env; }
+    BeanMappingFactory() { this.env = EnvironmentUtils.getEnv(); }
 
     public AtomicInteger getIndexer() { return indexer; }
 
     final String newThatOnEmptyConstructor(String thisType, String thatType) {
-        return repaceTypeAndName(ImplConst.newThatAsEmpty, thisType, thatType);
+        return repaceTypeAndName(Scripts.newThatAsEmpty, thisType, thatType);
     }
 
     final String newThisOnEmptyConstructor(String thisType, String thatType) {
-        return repaceTypeAndName(ImplConst.newThisAsEmpty, thisType, thatType);
+        return repaceTypeAndName(Scripts.newThisAsEmpty, thisType, thatType);
     }
 
-    final String fromThatField(
-        PropertyModel fromProperty, PropertyModel toProperty
+    final String copyBackwardField(
+        PropertyDetail fromProperty, PropertyDetail toProperty
     ) {
-        return fromThatField(toProperty.getSetterName(),//
-            fromProperty.getGetterName(),//
-            toProperty.getSetterActualType(),//
-            fromProperty.getGetterActualType(),//
-            toProperty.isPrimitiveSetterMethod());
+        return copyBackwardField(toProperty.gotSetterName(),//
+            fromProperty.gotGetterName(),//
+            toProperty.gotSetterType(),//
+            fromProperty.gotGetterType(),//
+            toProperty.wasPrimitiveSetter());
     }
 
-    private final String fromThatField(
+    private final String copyBackwardField(
         String setterName, String getterName, String setterType, String getterType, boolean primitive
     ) {
         String result = "self.{setterName}(({setterType}) that.{getterName}());";
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
                 result = value.getFromThatTemplate(getIndexer());
-                if (primitive) {
-                    result += Defaults.toThatNull;
+                if (!primitive) {
+                    result += Defaults.copyForwardNull;
                 }
                 break;
             }
@@ -57,30 +57,30 @@ public class Implementation {
         return Replacer.getterName.replace(result, getterName);
     }
 
-    final String fromThatMethod(String thisType, String thatType) {
-        String result = Replacer.thisType.replace(ImplConst.fromThat, thisType);
+    final String copyForwardMethod(String thisType, String thatType) {
+        String result = Replacer.thisType.replace(Scripts.copyBackward, thisType);
         return Replacer.thatType.replace(result, thatType);
     }
 
-    final String toThatField(
-        PropertyModel fromProperty, PropertyModel toProperty
+    final String copyForwardField(
+        PropertyDetail fromProperty, PropertyDetail toProperty
     ) {
-        return toThatField(toProperty.getSetterName(),//
-            fromProperty.getGetterName(),//
-            toProperty.getSetterActualType(),//
-            fromProperty.getGetterActualType(),//
-            toProperty.isPrimitiveSetterMethod());
+        return copyForwardField(toProperty.gotSetterName(),//
+            fromProperty.gotGetterName(),//
+            toProperty.gotSetterType(),//
+            fromProperty.gotGetterType(),//
+            toProperty.wasPrimitiveSetter());
     }
 
-    private final String toThatField(
+    private final String copyForwardField(
         String setterName, String getterName, String setterType, String getterType, boolean primitive
     ) {
         String result = "that.{setterName}(({setterType}) self.{getterName}());";
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
                 result = value.getToThatTemplate(getIndexer());
-                if (primitive) {
-                    result += Defaults.toThatNull;
+                if (!primitive) {
+                    result += Defaults.copyForwardNull;
                 }
                 break;
             }
@@ -91,36 +91,36 @@ public class Implementation {
         return Replacer.getterName.replace(result, getterName);
     }
 
-    final String toThatMethod(String thisType, String thatType) {
-        String result = Replacer.thisType.replace(ImplConst.toThat, thisType);
+    final String copyBackwardMethod(String thisType, String thatType) {
+        String result = Replacer.thisType.replace(Scripts.copyForward, thisType);
         return Replacer.thatType.replace(result, thatType);
     }
 
-    final String fromMapField(PropertyModel property) {
+    final String fromMapField(PropertyDetail property) {
         String t0 = "self.{setterName}(({setterType}) thatObject.get(\"{name}\"));";
-        if (property.isPrimitiveSetterMethod()) {
+        if (property.wasPrimitiveSetter()) {
             t0 = "{setterType} {var} = ({setterType}) thatObject.get(\"{name}\");" +//
                 "if ({var} != null) { self.{setterName}({var}); }";
             t0 = Replacer.var.replace(t0, nextVarname());
-            t0 = Replacer.setterType.replace(t0, property.getWrappedSetterType());
-        } else if (Objects.equals(property.getSetterActualType(), String.class.getName())) {
+            t0 = Replacer.setterType.replace(t0, property.gotWrappedSetterType());
+        } else if (Objects.equals(property.gotSetterType(), String.class.getName())) {
             t0 = "Object {var} = thatObject.get(\"{name}\");" +//
                 "if ({var} == null) { self.{setterName}(null); }" +//
                 "else { self.{setterName}({var}.toString()); }";
             t0 = Replacer.var.replace(t0, nextVarname());
         }
-        t0 = Replacer.setterType.replace(t0, property.getSetterActualType());
-        t0 = Replacer.setterName.replace(t0, property.getSetterName());
+        t0 = Replacer.setterType.replace(t0, property.gotSetterType());
+        t0 = Replacer.setterName.replace(t0, property.gotSetterName());
         return Replacer.name.replace(t0, property.getName());
     }
 
     final String fromMapMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(ImplConst.fromMap, thisType);
+        String result = Replacer.thisType.replace(Scripts.fromMap, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String toMapField(PropertyModel property) {
-        return toMapField(property.getName(), property.getGetterName());
+    final String toMapField(PropertyDetail property) {
+        return toMapField(property.getName(), property.gotGetterName());
     }
 
     private final String toMapField(String name, String getterName) {
@@ -130,18 +130,18 @@ public class Implementation {
     }
 
     final String toMapMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(ImplConst.toMap, thisType);
+        String result = Replacer.thisType.replace(Scripts.toMap, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
     final String newThisAsMapMethod(String thisType) {
-        return Replacer.thisType.replace(ImplConst.newThisAsMap, thisType);
+        return Replacer.thisType.replace(Scripts.newThisAsMap, thisType);
     }
 
     private Elements elements() { return env.getElementUtils(); }
 
-    final String toStringField(PropertyModel model, boolean first) {
-        return toStringField(model.getName(), model.getGetterName(), first);
+    final String toStringField(PropertyDetail model, boolean first) {
+        return toStringField(model.getName(), model.gotGetterName(), first);
     }
 
     private final String toStringField(String name, String getterName, boolean first) {
@@ -152,34 +152,34 @@ public class Implementation {
     }
 
     final String toStringMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(ImplConst.toString, thisType);
+        String result = Replacer.thisType.replace(Scripts.toString, thisType);
         result = Replacer.thisName.replace(result, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String safeToThatMethod(String thisType, String thatType, Iterable fields) {
-        String result = Replacer.thisType.replace(ImplConst.safeToThat, thisType);
+    final String safeCopyForwardMethod(String thisType, String thatType, Iterable fields) {
+        String result = Replacer.thisType.replace(Scripts.safeCopyForward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String safeFromThatMethod(String thisType, String thatType, Iterable fields) {
-        String result = Replacer.thisType.replace(ImplConst.safeFromThat, thisType);
+    final String safeCopyBackwardMethod(String thisType, String thatType, Iterable fields) {
+        String result = Replacer.thisType.replace(Scripts.safeCopyBackward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String copyField(PropertyModel property) {
-        if (property.hasPublicGetterMethod() && property.hasPublicSetterMethod()) {
+    final String cloneField(PropertyDetail property) {
+        if (property.hasGetterMethod() && property.hasSetterMethod()) {
             String result = "self.{setterName}(that.{getterName}());";
-            result = Replacer.setterName.replace(result, property.getSetterName());
-            return Replacer.getterName.replace(result, property.getGetterName());
+            result = Replacer.setterName.replace(result, property.gotSetterName());
+            return Replacer.getterName.replace(result, property.gotGetterName());
         }
         return "";
     }
 
-    final String copyMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(ImplConst.copy, thisType);
+    final String cloneMethod(String thisType, Iterable<String> fields) {
+        String result = Replacer.thisType.replace(Scripts.clone, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
@@ -213,11 +213,11 @@ public class Implementation {
         thatType,
         thisName {
             @Override
-            String toReplacement(String value) { return toName(value); }
+            String toReplacement(String value) { return ElementUtils.getSimpleName(value); }
         },
         thatName {
             @Override
-            String toReplacement(String value) { return toName(value); }
+            String toReplacement(String value) { return ElementUtils.getSimpleName(value); }
         },
         ;
 
@@ -229,11 +229,6 @@ public class Implementation {
 
         public String replace(String template, String type) {
             return template.replaceAll(pattern, toReplacement(type));
-        }
-
-        private static String toName(String value) {
-            int index = value.lastIndexOf('.');
-            return index < 0 ? value : value.substring(index + 1);
         }
     }
 
@@ -276,8 +271,8 @@ public class Implementation {
             "    that.{setterName}(Boolean.parseBoolean({var}.toString(), 10));" +//
             "}", "boolean", "Boolean", "java.lang.Boolean");
 
-        private final static String fromThatNull = " else { self.{setterName}(null); }";
-        private final static String toThatNull = " else { that.{setterName}(null); }";
+        private final static String copyBackwardNull = " else { self.{setterName}(null); }";
+        private final static String copyForwardNull = " else { that.{setterName}(null); }";
         private final String[] setterTypes;
         private final String fromThat;
         private final String toThat;

@@ -6,22 +6,22 @@ import java.util.Map;
  * @author benshaoye
  */
 @SuppressWarnings("all")
-abstract class ImplConst {
+abstract class Scripts {
 
     /**
      * @see com.moon.mapping.BeanMapping#newThat(Object)
-     * @see com.moon.mapping.BeanMapping#toThat(Object, Object)
+     * @see com.moon.mapping.BeanMapping#copyBackward(Object, Object)
      */
-    final static String safeToThat = "" +//
-        "private void safeToThat({thisType} self, {thatType} that) { {MAPPINGS} }";
+    final static String safeCopyBackward = "" +//
+        "private void safeCopyBackward({thisType} self, {thatType} that) { {MAPPINGS} }";
     /**
      * @see com.moon.mapping.BeanMapping#newThat(Object)
-     * @see com.moon.mapping.BeanMapping#fromThat(Object, Object)
+     * @see com.moon.mapping.BeanMapping#copyForward(Object, Object)
      */
-    final static String safeFromThat = "" +//
-        "private void safeFromThat({thisType} self, {thatType} that) { {MAPPINGS} }";
+    final static String safeCopyForward = "" +//
+        "private void safeCopyForward({thisType} self, {thatType} that) { {MAPPINGS} }";
 
-    private ImplConst() {}
+    private Scripts() {}
 
     /** @see com.moon.mapping.BeanMapping#newThat(Object) */
     final static String newThatAsEmpty = "" +//
@@ -29,7 +29,7 @@ abstract class ImplConst {
         "public Object newThat(Object thisObject) {" +//
         "    if (thisObject == null) { return null; }" +//
         "    {thatType} that = new {thatType}();" +//
-        "    safeToThat(({thisType}) thisObject, that);" +//
+        "    safeCopyForward(({thisType}) thisObject, that);" +//
         "    return that;" +//
         "}";
 
@@ -39,25 +39,25 @@ abstract class ImplConst {
         "public Object newThis(Object thatObject) {" +//
         "    if (thatObject == null) { return null; }" +//
         "    {thisType} self = new {thisType}();" +//
-        "    safeFromThat(self, ({thatType}) thatObject);" +//
+        "    safeCopyBackward(self, ({thatType}) thatObject);" +//
         "    return self;" +//
         "}";
 
     /** @see com.moon.mapping.BeanMapping#fromThat(Object, Object) */
-    final static String fromThat = "" +//
+    final static String copyBackward = "" +//
         "@Override " +//
-        "public Object fromThat(Object thisObject, Object thatObject) {" +//
+        "public Object copyBackward(Object thisObject, Object thatObject) {" +//
         "    if (thisObject == null || thatObject == null) { return thisObject; }" +//
-        "    safeFromThat(({thisType}) thisObject, ({thatType}) thatObject);" +//
+        "    safeCopyBackward(({thisType}) thisObject, ({thatType}) thatObject);" +//
         "    return thisObject;" +//
         "}";
 
     /** @see com.moon.mapping.BeanMapping#toThat(Object, Object) */
-    final static String toThat = "" +//
+    final static String copyForward = "" +//
         "@Override " +//
-        "public Object toThat(Object thisObject, Object thatObject) {" +//
+        "public Object copyForward(Object thisObject, Object thatObject) {" +//
         "    if (thisObject == null || thatObject == null) { return thatObject; }" +//
-        "    safeToThat(({thisType}) thisObject, ({thatType}) thatObject);" +//
+        "    safeCopyForward(({thisType}) thisObject, ({thatType}) thatObject);" +//
         "    return thatObject;" +//
         "}";
 
@@ -101,11 +101,11 @@ abstract class ImplConst {
         "    return builder.append('}').toString();" +//
         "}";
 
-    /** @see com.moon.mapping.ObjectMapping#copy(Object) */
-    final static String copy = "" +//
+    /** @see com.moon.mapping.ObjectMapping#clone(Object) */
+    final static String clone = "" +//
         "@Override " +//
-        "public Object copy(Object thisObject) {" +//
-        "    if (thisObject == null) {return null; }" +//
+        "public Object clone(Object thisObject) {" +//
+        "    if (thisObject == null) { return null; }" +//
         "    {thisType} that = ({thisType}) thisObject;" +//
         "    {thisType} self = new {thisType}();" +//
         "    {MAPPINGS}" +//

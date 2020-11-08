@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Repeatable(MapProperty.List.class)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface MapProperty {
+@interface MapProperty {
 
     /**
      * 指定映射为{@link #target()}类里的{@link #value()}字段

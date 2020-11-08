@@ -21,7 +21,7 @@ public interface ObjectMapping<THIS> {
      *
      * @param thisObject 将要复制的对象
      *
-     * @return 复制的对象
+     * @return thisObject 的副本
      */
-    THIS copy(THIS thisObject);
+    THIS clone(THIS thisObject);
 }

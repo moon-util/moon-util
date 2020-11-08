@@ -1,6 +1,5 @@
 package com.moon.mapping.processing;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.DeclaredType;
@@ -18,44 +17,11 @@ final class GenericUtil {
 
     private GenericUtil() {}
 
-    @SuppressWarnings("all")
-    private static List<GenericModel> parse(TypeMirror superclass, TypeElement typedSuperclass, Types types) {
-        // 解析泛型声明，不需要这段，但还是留着
-        List<? extends TypeParameterElement> typeParameters = typedSuperclass.getTypeParameters();
-        TypeMirror[] typeMirrors = typeParameters.stream().map(elem -> elem.asType()).toArray(TypeMirror[]::new);
-        DeclaredType declaredType = types.getDeclaredType(typedSuperclass, typeMirrors);
-        String fullDeclaredType = Extract.extractWrapped(declaredType.toString());
-        List<String> declareSpliced = Extract.split(fullDeclaredType);
-
-        // 解析泛型实际使用类型
-        String fullActualType = Extract.extractWrapped(superclass.toString());
-        List<String> actualSpliced = Extract.split(fullActualType);
-        List<GenericModel> genericModels = new ArrayList<>();
-
-        // 执行映射
-        int index = 0;
-        for (TypeParameterElement param : typedSuperclass.getTypeParameters()) {
-            String declare = param.toString();
-            String bound = param.toString();
-            genericModels.add(new GenericModel(declare, actualSpliced.get(index), bound));
-        }
-        return genericModels;
+    static Map<String, GenericModel> parse(TypeElement element) {
+        return parse(element.asType(), element);
     }
 
-    /**
-     * 还有问题
-     *
-     * @param superclass
-     * @param element
-     *
-     * @return
-     */
-    @SuppressWarnings("all")
-    static Map<String, GenericModel> parse(TypeElement element, ProcessingEnvironment env) {
-        return parse(element.asType(), element, env);
-    }
-
-    static Map<String, GenericModel> parse(TypeMirror elementTyped, TypeElement element, ProcessingEnvironment env) {
+    static Map<String, GenericModel> parse(TypeMirror elementTyped, TypeElement element) {
         Map<String, GenericModel> genericMap = new HashMap<>();
         List<String> actuals = Extract.splitSuperclass(elementTyped.toString());
         int index = 0;

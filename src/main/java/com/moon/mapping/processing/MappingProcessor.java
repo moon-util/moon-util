@@ -11,8 +11,6 @@ import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.*;
 
-import static com.moon.mapping.processing.ProcessingUtil.toPropertiesModelMap;
-
 /**
  * @author moonsky
  */
@@ -33,13 +31,14 @@ public class MappingProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
+        EnvironmentUtils.initialize(processingEnv);
         Logger.initialize(processingEnv);
         super.init(processingEnv);
     }
 
-    private void doWriteJavaFile(List<FromCToCModel> models) throws IOException {
+    private void doWriteJavaFile(List<MappingForDetail> models) throws IOException {
         Filer filer = env().getFiler();
-        for (FromCToCModel model : models) {
+        for (MappingForDetail model : models) {
             model.writeJavaFile(filer);
         }
     }
@@ -48,7 +47,7 @@ public class MappingProcessor extends AbstractProcessor {
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        List<FromCToCModel> models = getMappingModels(annotations, roundEnv);
+        List<MappingForDetail> models = getMappingModels(annotations, roundEnv);
         if (!models.isEmpty()) {
             try {
                 doWriteJavaFile(models);
@@ -59,8 +58,8 @@ public class MappingProcessor extends AbstractProcessor {
         return true;
     }
 
-    private List<FromCToCModel> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        List<FromCToCModel> models = new ArrayList<>();
+    private List<MappingForDetail> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        List<MappingForDetail> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
                 Set<? extends Element> set = env.getElementsAnnotatedWith(MappingFor.class);
@@ -75,25 +74,24 @@ public class MappingProcessor extends AbstractProcessor {
     }
 
     @SuppressWarnings("all")
-    private FromCToCModel onAnnotatedMapping(final TypeElement thisElement) {
-        final String thisClassname = thisElement.getQualifiedName().toString();
+    private MappingForDetail onAnnotatedMapping(final TypeElement thisElement) {
         final ProcessingEnvironment env = env();
         final Elements utils = env.getElementUtils();
-        Map<String, MappedPropsMap> targetsMap = new HashMap<>(4);
-        MappedPropsMap thisModel = toPropertiesModelMap(env(), thisElement);
-        Collection<String> classes = ProcessingUtil.getMappingForClasses(thisElement);
-        FromCToCModel model = new FromCToCModel(env(), thisClassname, thisModel, targetsMap);
+        Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);
+        Map<String, DefinitionDetail> mappingForDetailsMap = new HashMap<>(4);
+        MappingForDetail mappingResult = new MappingForDetail(thisElement, mappingForDetailsMap);
+        mappingResult.putAll(ProcessUtils.toPropertiesMap(thisElement));
         if (classes.isEmpty()) {
-            return model;
+            return mappingResult;
         }
         for (String thatClassname : classes) {
             TypeElement target = utils.getTypeElement(thatClassname);
             if (target == null) {
                 continue;
             }
-            targetsMap.put(thatClassname, toPropertiesModelMap(env(), target));
+            mappingForDetailsMap.put(thatClassname, ProcessUtils.toPropertiesMap(target));
         }
-        return model;
+        return mappingResult;
     }
 
     private ProcessingEnvironment env() { return processingEnv; }
