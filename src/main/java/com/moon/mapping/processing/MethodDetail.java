@@ -24,10 +24,10 @@ final class MethodDetail {
     private final String actualType;
 
     MethodDetail(ExecutableElement elem, String declareType, Map<String, GenericModel> generics) {
-        this.elem = elem;
-        this.declareType = declareType;
-        GenericModel model = generics.get(this.declareType);
+        GenericModel model = generics.get(declareType);
         this.actualType = model == null ? null : model.getSimpleFinalType();
+        this.declareType = declareType;
+        this.elem = elem;
     }
 
     /*
@@ -42,15 +42,5 @@ final class MethodDetail {
 
     public String getFactActualType() {
         return getActualType() == null ? getDeclareType() : getActualType();
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("MethodDetail{");
-        sb.append("elem=").append(elem);
-        sb.append(", declareType='").append(declareType).append('\'');
-        sb.append(", actualType='").append(actualType).append('\'');
-        sb.append('}');
-        return sb.toString();
     }
 }

@@ -57,7 +57,7 @@ abstract class ElementUtils {
         return new String(chars);
     }
 
-    final static String format(String classname) { return classname.replace('.', '_'); }
+    static String format(String classname) { return classname.replace('.', '_'); }
 
     static String getBeanMappingEnumName(String classname) {
         return "BeanMapping_" + format(classname);

@@ -10,15 +10,6 @@ final class CollectUtils {
 
     private CollectUtils() {}
 
-    static <F, T> T reduceReversed(Collection<? extends F> collect, BiFunction<T, F, T> converter, T totalValue) {
-        List<? extends F> list = new ArrayList<>(collect);
-        Collections.reverse(list);
-        for (F property : list) {
-            totalValue = converter.apply(totalValue, property);
-        }
-        return totalValue;
-    }
-
     static <F, T> T reduce(Iterable<? extends F> collect, BiFunction<T, F, T> converter, T totalValue) {
         if (collect != null) {
             for (F item : collect) {

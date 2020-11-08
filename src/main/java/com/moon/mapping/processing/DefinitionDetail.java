@@ -71,7 +71,7 @@ class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements 
 
     @Override
     @SuppressWarnings("all")
-    public void writeJavaFile(Filer filer) throws IOException {
+    public void writeJavaFile() throws IOException {
         if (isInterface()) {
             StringBuilder content = new StringBuilder();
             content.append("package ").append(getPackageName()).append(";");
@@ -86,16 +86,5 @@ class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements 
         this.constructors.sort(Comparator.comparingInt(o -> o.getParameters().size()));
         forEach((k, property) -> property.onParseCompleted());
         return this;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("DefinitionDetail{");
-        sb.append(super.toString());
-        sb.append(", thisClassname='").append(thisClassname).append('\'');
-        sb.append(", thisElement=").append(thisElement);
-        sb.append(", constructors=").append(constructors);
-        sb.append('}');
-        return sb.toString();
     }
 }

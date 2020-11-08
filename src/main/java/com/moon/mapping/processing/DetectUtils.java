@@ -59,7 +59,7 @@ abstract class DetectUtils {
 
     static void assertRootElement(TypeElement rootElement) {
         final Element parentElement = rootElement.getEnclosingElement();
-        // 如果是类文件，要求必须是 public 类
+        // 如果是类文件，要求必须是 public
         if (parentElement.getKind() == ElementKind.PACKAGE) {
             if (!DetectUtils.isPublic(rootElement)) {
                 String thisClassname = rootElement.getQualifiedName().toString();
@@ -107,7 +107,7 @@ abstract class DetectUtils {
     }
 
     static boolean isPrivate(Element elem) {
-        return elem != null && isAll(elem, Modifier.PRIVATE);
+        return elem != null && isAny(elem, Modifier.PRIVATE);
     }
 
     static boolean isNotPrivate(Element elem) { return !isPrivate(elem); }
@@ -124,22 +124,23 @@ abstract class DetectUtils {
         return elem instanceof VariableElement && elem.getKind() == ElementKind.FIELD;
     }
 
-    static boolean isAll(Element elem, Modifier modifier, Modifier... modifiers) {
+    static boolean isAny(Element elem, Modifier modifier, Modifier... modifiers) {
         Set<Modifier> modifierSet = elem.getModifiers();
         boolean contains = modifierSet.contains(modifier);
-        if (contains && modifiers != null) {
+        if (contains) {
+            return true;
+        } else if (modifiers != null) {
             for (Modifier m : modifiers) {
-                if (!modifierSet.contains(m)) {
-                    return false;
+                if (modifierSet.contains(m)) {
+                    return true;
                 }
             }
-            return true;
         }
         return false;
     }
 
-    static boolean isNotAll(Element elem, Modifier modifier, Modifier... modifiers) {
-        return !isAll(elem, modifier, modifiers);
+    static boolean isNotAny(Element elem, Modifier modifier, Modifier... modifiers) {
+        return !isAny(elem, modifier, modifiers);
     }
 
     static boolean isPackage(Element elem) {

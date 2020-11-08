@@ -1,6 +1,7 @@
 package com.moon.mapping.processing;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author moonsky
@@ -27,6 +29,8 @@ final class EnvironmentUtils {
 
     public static Elements getUtils() { return getEnv().getElementUtils(); }
 
+    public static Messager getMessager() { return getEnv().getMessager(); }
+
     public static void newJavaFile(String name, Consumer<PrintWriter> consumer) throws IOException {
         newJavaFile(getEnv().getFiler(), name, consumer);
     }
@@ -36,5 +40,12 @@ final class EnvironmentUtils {
         try (Writer jw = javaFile.openWriter(); PrintWriter writer = new PrintWriter(jw)) {
             consumer.accept(writer);
         }
+    }
+
+    public static void newJavaFile(String name, Supplier<String> supplier) throws IOException {
+        newJavaFile(name, writer -> {
+            writer.write(supplier.get());
+            writer.flush();
+        });
     }
 }

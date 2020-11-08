@@ -5,10 +5,7 @@ import com.moon.mapping.MappingUtil;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.TypeElement;
-import javax.tools.JavaFileObject;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -35,12 +32,9 @@ final class MappingForDetail extends DefinitionDetail {
     public Map<String, DefinitionDetail> getMappingForDetailsMap() { return mappingForDetailsMap; }
 
     @Override
-    public void writeJavaFile(Filer filer) throws IOException {
-        super.writeJavaFile(filer);
-        EnvironmentUtils.newJavaFile(filer, getBeanMappingClassname(), writer -> {
-            writer.println(implementation());
-            writer.flush();
-        });
+    public void writeJavaFile() throws IOException {
+        super.writeJavaFile();
+        EnvironmentUtils.newJavaFile(getBeanMappingClassname(), this::implementation);
     }
 
     private String getBeanMappingClassname() {
@@ -74,31 +68,26 @@ final class MappingForDetail extends DefinitionDetail {
     }
 
     private void build$safeWithThat(MappingAdder adder, DefinitionDetail thatDef) {
-        final Set<Map.Entry<String, PropertyDetail>> entries = entrySet();
         final String thatClassname = thatDef.getThisClassname();
         final String thisClassname = getThisClassname();
         {
-            List<String> fields = CollectUtils.reduce(entries, (props, thisEntry, idx) -> {
-                final String name = thisEntry.getKey();
-                PropertyDetail thisModel = thisEntry.getValue();
-                PropertyDetail thatModel = thatDef.get(name);
-                if (isUsable(thisModel, thatModel)) {
-                    props.add(getFactory().copyForwardField(thisModel, thatModel));
+            Collection<String> fields = reducing(thisProp -> {
+                PropertyDetail thatProp = thatDef.get(thisProp.getName());
+                if (isUsable(thisProp, thatProp)) {
+                    return getFactory().copyForwardField(thisProp, thatProp);
                 }
-                return props;
-            }, new ArrayList<>());
+                return null;
+            });
             adder.add(getFactory().safeCopyForwardMethod(thisClassname, thatClassname, fields));
         }
         {
-            List<String> fields = CollectUtils.reduce(entries, (props, thisEntry, idx) -> {
-                final String name = thisEntry.getKey();
-                PropertyDetail thisModel = thisEntry.getValue();
-                PropertyDetail thatModel = thatDef.get(name);
-                if (isUsable(thisModel, thatModel)) {
-                    props.add(getFactory().copyBackwardField(thatModel, thisModel));
+            Collection<String> fields = reducing(thisProp -> {
+                PropertyDetail thatProp = thatDef.get(thisProp.getName());
+                if (isUsable(thatProp, thisProp)) {
+                    return getFactory().copyBackwardField(thatProp, thisProp);
                 }
-                return props;
-            }, new ArrayList<>());
+                return null;
+            });
             adder.add(getFactory().safeCopyBackwardMethod(thisClassname, thatClassname, fields));
         }
     }
@@ -106,13 +95,14 @@ final class MappingForDetail extends DefinitionDetail {
     private void addObjectMapping(MappingAdder adder) {
         {
             // toString(Object)
-            List<String> fields = reducing((list, property) ->//
+            @SuppressWarnings("all")
+            Collection<String> fields = reducing((list, property) ->//
                 getFactory().toStringField(property, list.isEmpty()));
             adder.add(getFactory().toStringMethod(getThisClassname(), fields));
         }
         {
             // copy(Object)
-            List<String> fields = reducing(getFactory()::cloneField);
+            Collection<String> fields = reducing(getFactory()::cloneField);
             adder.add(getFactory().cloneMethod(getThisClassname(), fields));
         }
     }
@@ -120,12 +110,12 @@ final class MappingForDetail extends DefinitionDetail {
     private void addMapMapping(MappingAdder adder) {
         {
             // fromMap(Object,Map)
-            List<String> fields = reducing(getFactory()::fromMapField);
+            Collection<String> fields = reducing(getFactory()::fromMapField);
             adder.add(getFactory().fromMapMethod(getThisClassname(), fields));
         }
         {
             // toMap(Object,Map)
-            List<String> fields = reducing(getFactory()::toMapField);
+            Collection<String> fields = reducing(getFactory()::toMapField);
             adder.add(getFactory().toMapMethod(getThisClassname(), fields));
         }
         {
@@ -134,60 +124,44 @@ final class MappingForDetail extends DefinitionDetail {
         }
     }
 
-    private boolean isUsable(PropertyDetail thisModel, PropertyDetail thatModel) {
-        boolean hasGetter = thisModel != null && thisModel.hasGetterMethod();
-        boolean hasSetter = thatModel != null && thatModel.hasSetterMethod();
-        return hasGetter && hasSetter;
-    }
-
     private Set<String> getSortedKeys() {
         Set<String> sorts = new LinkedHashSet<>();
         sorts.add("id");
         return sorts;
     }
 
-    private List<String> reducing(Function<PropertyDetail, String> serializer) {
-        final List<String> fields = new ArrayList<>();
-        final Set<String> sortKeys = getSortedKeys();
-        for (String key : sortKeys) {
-            PropertyDetail property = get(key);
-            if (property != null) {
-                String field = serializer.apply(property);
-                if (isNotBlank(field)) {
-                    fields.add(field);
-                }
-            }
-        }
-        return CollectUtils.reduce(entrySet(), (list, entry) -> {
-            if (sortKeys.contains(entry.getKey())) {
-                return list;
-            }
-            String field = serializer.apply(entry.getValue());
-            if (isNotBlank(field)) { list.add(field); }
-            return list;
-        }, fields);
+    private Collection<String> reducing(Function<PropertyDetail, String> serializer) {
+        return reducing((m, prop) -> serializer.apply(prop));
     }
 
-    private List<String> reducing(BiFunction<List<String>, PropertyDetail, String> serializer) {
-        final List<String> fields = new ArrayList<>();
+    private Collection<String> reducing(BiFunction<Map<String, String>, PropertyDetail, String> serializer) {
+        final Map<String, String> parsedFields = new LinkedHashMap<>();
         final Set<String> sortKeys = getSortedKeys();
         for (String key : sortKeys) {
             PropertyDetail property = get(key);
             if (property != null) {
-                String field = serializer.apply(fields, property);
+                String field = serializer.apply(parsedFields, property);
                 if (isNotBlank(field)) {
-                    fields.add(field);
+                    parsedFields.put(key, field);
                 }
             }
         }
-        return CollectUtils.reduce(entrySet(), (list, entry) -> {
+        return CollectUtils.reduce(entrySet(), (parsed, entry) -> {
             if (sortKeys.contains(entry.getKey())) {
-                return list;
+                return parsed;
             }
-            String field = serializer.apply(list, entry.getValue());
-            if (isNotBlank(field)) { list.add(field); }
-            return list;
-        }, new ArrayList<>());
+            String field = serializer.apply(parsed, entry.getValue());
+            if (isNotBlank(field)) {
+                parsed.put(entry.getKey(), field);
+            }
+            return parsed;
+        }, parsedFields).values();
+    }
+
+    private static boolean isUsable(PropertyDetail from, PropertyDetail to) {
+        boolean hasGetter = from != null && from.hasGetterMethod();
+        boolean hasSetter = to != null && to.hasSetterMethod();
+        return hasGetter && hasSetter;
     }
 
     private static boolean isNotBlank(String str) {

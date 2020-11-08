@@ -341,21 +341,4 @@ class PropertyDetail {
             }
         }
     }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("PropertyDetail{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", thisElem=").append(thisElem);
-        sb.append(", declareElem=").append(declareElem);
-        sb.append(", field=").append(field);
-        sb.append(", declareType='").append(declareType).append('\'');
-        sb.append(", actualType='").append(actualType).append('\'');
-        sb.append(", setter=").append(setter);
-        sb.append(", setters=").append(setters);
-        sb.append(", getter=").append(getter);
-        sb.append(", getters=").append(getters);
-        sb.append('}');
-        return sb.toString();
-    }
 }

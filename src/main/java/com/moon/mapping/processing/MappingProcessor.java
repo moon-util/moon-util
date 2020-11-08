@@ -32,14 +32,12 @@ public class MappingProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         EnvironmentUtils.initialize(processingEnv);
-        Logger.initialize(processingEnv);
         super.init(processingEnv);
     }
 
     private void doWriteJavaFile(List<MappingForDetail> models) throws IOException {
-        Filer filer = env().getFiler();
         for (MappingForDetail model : models) {
-            model.writeJavaFile(filer);
+            model.writeJavaFile();
         }
     }
 
@@ -62,8 +60,7 @@ public class MappingProcessor extends AbstractProcessor {
         List<MappingForDetail> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
-                Set<? extends Element> set = env.getElementsAnnotatedWith(MappingFor.class);
-                for (Element element : set) {
+                for (Element element :  env.getElementsAnnotatedWith(MappingFor.class)) {
                     if (element instanceof TypeElement) {
                         models.add(onAnnotatedMapping((TypeElement) element));
                     }
@@ -73,13 +70,11 @@ public class MappingProcessor extends AbstractProcessor {
         return models;
     }
 
-    @SuppressWarnings("all")
     private MappingForDetail onAnnotatedMapping(final TypeElement thisElement) {
-        final ProcessingEnvironment env = env();
-        final Elements utils = env.getElementUtils();
-        Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);
-        Map<String, DefinitionDetail> mappingForDetailsMap = new HashMap<>(4);
-        MappingForDetail mappingResult = new MappingForDetail(thisElement, mappingForDetailsMap);
+        final Elements utils = EnvironmentUtils.getUtils();
+        final Map<String, DefinitionDetail> mappingForDetailsMap = new HashMap<>(4);
+        final Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);
+        final MappingForDetail mappingResult = new MappingForDetail(thisElement, mappingForDetailsMap);
         mappingResult.putAll(ProcessUtils.toPropertiesMap(thisElement));
         if (classes.isEmpty()) {
             return mappingResult;
@@ -93,6 +88,4 @@ public class MappingProcessor extends AbstractProcessor {
         }
         return mappingResult;
     }
-
-    private ProcessingEnvironment env() { return processingEnv; }
 }

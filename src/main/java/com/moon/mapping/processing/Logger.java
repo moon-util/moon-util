@@ -5,6 +5,8 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.Diagnostic;
 import java.util.concurrent.atomic.LongAdder;
 
+import static com.moon.mapping.processing.EnvironmentUtils.getMessager;
+
 /**
  * @author benshaoye
  */
@@ -12,13 +14,7 @@ abstract class Logger {
 
     private Logger() {}
 
-    private static ProcessingEnvironment ENV;
-
     private final static LongAdder ADDER = new LongAdder();
-
-    static void initialize(ProcessingEnvironment environment) {
-        ENV = environment;
-    }
 
     static void warn(ProcessingEnvironment env, Object obj) {
         warn(env.getMessager(), obj);
@@ -57,9 +53,5 @@ abstract class Logger {
         if (messager != null) {
             warn(messager, template, values);
         }
-    }
-
-    private static Messager getMessager() {
-        return ENV == null ? null : ENV.getMessager();
     }
 }
