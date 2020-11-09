@@ -33,6 +33,11 @@ final class GenericUtils {
         return genericMap;
     }
 
+    static String findActualType(Map<String, GenericModel> generics, String declareType) {
+        GenericModel model = generics.get(declareType);
+        return model == null ? null : model.getSimpleFinalType();
+    }
+
     private static class Extract {
 
         static List<String> splitSuperclass(String fullType) {

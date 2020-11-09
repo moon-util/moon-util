@@ -5,20 +5,20 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-final class MappingAdder implements Supplier<String> {
+final class StringAdder implements Supplier<String> {
 
     private final StringBuilder content;
 
-    public MappingAdder() { this.content = new StringBuilder(); }
+    public StringAdder() { this.content = new StringBuilder(); }
 
-    public MappingAdder add(Object obj) { return add(obj == null ? null : obj.toString()); }
+    public StringAdder add(Object obj) { return add(obj == null ? null : obj.toString()); }
 
-    public MappingAdder add(CharSequence content) {
+    public StringAdder add(CharSequence content) {
         this.content.append(content);
         return this;
     }
 
-    public MappingAdder addSpace(){
+    public StringAdder addSpace(){
         return add(" ");
     }
 

@@ -2,27 +2,17 @@ package com.moon.mapping.processing;
 
 import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.String.join;
 
 /**
  * @author moonsky
  */
-final class InterDefinition extends LinkedHashMap<String, InterProperty> {
+final class InterDefinition extends BaseDefinition<InterMethod, InterProperty> {
 
-    private final TypeElement interfaceElem;
-
-    public InterDefinition(TypeElement interfaceElem) {
-        this.interfaceElem = interfaceElem;
-    }
-
-    public TypeElement getInterfaceElem() { return interfaceElem; }
-
-    final InterDefinition onParseCompleted() {
-        forEach((key, prop) -> prop.onParseCompleted(key));
-        return this;
-    }
+    public InterDefinition(TypeElement enclosingElement) { super(enclosingElement); }
 
     final String implementation(String classname) {
         List<String> impl = new ArrayList<>();
@@ -34,28 +24,34 @@ final class InterDefinition extends LinkedHashMap<String, InterProperty> {
         }
         impl.add(toEqualsAndHashCode(classname));
         impl.add(toStringMethod(classname));
-        return String.join("", impl);
+        impl.add(toCloneMethod(classname));
+        return join("", impl);
     }
 
-    final String toStringMethod(String classname) {
-        MappingAdder adder = new MappingAdder().add("@Override public String toString() {");
-        List<String> scripts = CollectUtils.reduce(entrySet(), (list, entry) -> {
-            list.add(entry.getValue().toStringMethod(list.isEmpty()));
+    private String toCloneMethod(String classname) {
+        StringAdder adder = new StringAdder();
+        adder.add("@Override public ").add(classname).add(" clone() {");
+        adder.add(classname).add(" clone = new ").add(classname).add("();");
+        return adder.add(" return clone;}").toString();
+    }
+
+    private String toStringMethod(String classname) {
+        StringAdder adder = new StringAdder().add("@Override public String toString() {");
+        adder.add("final StringBuilder builder = new StringBuilder().append(\"").add(classname);
+        return adder.add("{\");").add(join("", reduceList((list, prop) -> {
+            list.add(prop.toStringMethod(list.isEmpty()));
             return list;
-        }, new ArrayList<>());
-        adder.add("final StringBuilder builder = new StringBuilder().append(\"").add(classname).add("{\");");
-        adder.add(String.join("", scripts));
-        return adder.add("return builder.append('}').toString();}").toString();
+        }))).add("return builder.append('}').toString();}").toString();
     }
 
-    final String toEqualsAndHashCode(String classname) {
-        MappingAdder adder = new MappingAdder();
+    private String toEqualsAndHashCode(String classname) {
+        StringAdder adder = new StringAdder();
         // hashCode
         adder.add("@Override public int hashCode(){ return java.util.Objects.hash(");
-        adder.add(String.join(",", CollectUtils.reduce(entrySet(), (list, prop) -> {
-            list.add(prop.getValue().toCallGetterArr());
+        adder.add(join(",", reduceList((list, prop) -> {
+            list.add(prop.toStringMethod(list.isEmpty()));
             return list;
-        }, new ArrayList()))).add(");}");
+        }))).add(");}");
 
         // equals
         adder.add("@Override public boolean equals(Object thatObject) {");
@@ -64,10 +60,9 @@ final class InterDefinition extends LinkedHashMap<String, InterProperty> {
         adder.add("if (!(thatObject instanceof ").add(classname).add(")) { return false; }");
         adder.add(classname).addSpace().add("that=").add("(").add(classname).add(")");
         adder.add("thatObject;return ");
-        String equals = String.join(" && ", CollectUtils.reduce(entrySet(), (list, prop) -> {
-            list.add(prop.getValue().toEqualsString("that"));
+        return adder.add(join(" && ", reduceList((list, prop) -> {
+            list.add(prop.toStringMethod(list.isEmpty()));
             return list;
-        }, new ArrayList()));
-        return adder.add(equals).add(";}").toString();
+        }))).add(";}").toString();
     }
 }

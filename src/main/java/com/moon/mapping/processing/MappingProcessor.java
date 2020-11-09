@@ -35,8 +35,8 @@ public class MappingProcessor extends AbstractProcessor {
         super.init(processingEnv);
     }
 
-    private void doWriteJavaFile(List<MappingForDetail> models) throws IOException {
-        for (MappingForDetail model : models) {
+    private void doWriteJavaFile(List<JavaFileWritable> models) throws IOException {
+        for (JavaFileWritable model : models) {
             model.writeJavaFile();
         }
     }
@@ -45,7 +45,7 @@ public class MappingProcessor extends AbstractProcessor {
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        List<MappingForDetail> models = getMappingModels(annotations, roundEnv);
+        List<JavaFileWritable> models = getMappingModels(annotations, roundEnv);
         if (!models.isEmpty()) {
             try {
                 doWriteJavaFile(models);
@@ -56,13 +56,13 @@ public class MappingProcessor extends AbstractProcessor {
         return true;
     }
 
-    private List<MappingForDetail> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        List<MappingForDetail> models = new ArrayList<>();
+    private List<JavaFileWritable> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        final List<JavaFileWritable> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
                 for (Element element :  env.getElementsAnnotatedWith(MappingFor.class)) {
                     if (element instanceof TypeElement) {
-                        models.add(onAnnotatedMapping((TypeElement) element));
+                        models.add(onAnnotatedClass((TypeElement) element));
                     }
                 }
             }
@@ -70,9 +70,21 @@ public class MappingProcessor extends AbstractProcessor {
         return models;
     }
 
-    private MappingForDetail onAnnotatedMapping(final TypeElement thisElement) {
+    private JavaFileWritable onAnnotatedMappingFor(final TypeElement thisElement) {
+        if (thisElement.getKind().isInterface()) {
+            return onAnnotatedInter(thisElement);
+        }
+        return onAnnotatedClass(thisElement);
+    }
+
+    private JavaFileWritable onAnnotatedInter(final TypeElement thisElement) {
+
+        return null;
+    }
+
+    private JavaFileWritable onAnnotatedClass(final TypeElement thisElement) {
         final Elements utils = EnvironmentUtils.getUtils();
-        final Map<String, DefinitionDetail> mappingForDetailsMap = new HashMap<>(4);
+        final Map<String, ClassDefinition> mappingForDetailsMap = new HashMap<>(4);
         final Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);
         final MappingForDetail mappingResult = new MappingForDetail(thisElement, mappingForDetailsMap);
         mappingResult.putAll(ProcessUtils.toPropertiesMap(thisElement));

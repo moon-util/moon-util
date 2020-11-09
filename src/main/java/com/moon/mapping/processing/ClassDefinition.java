@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author moonsky
  */
-class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements JavaFileWritable {
+class ClassDefinition extends LinkedHashMap<String, ClassProperty> implements JavaFileWritable {
 
     protected final static String IMPL_SUFFIX = "Implementation";
 
@@ -30,7 +30,7 @@ class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements 
      */
     private final List<ExecutableElement> constructors;
 
-    DefinitionDetail(TypeElement thisElement) {
+    ClassDefinition(TypeElement thisElement) {
         this.thisClassname = ElementUtils.getQualifiedName(thisElement);
         this.thisElement = thisElement;
         constructors = new ArrayList<>();
@@ -75,7 +75,7 @@ class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements 
         if (isInterface()) {
             final String pkgName = getPackageName();
             final String classname = getSimpleImplClassname();
-            MappingAdder adder = new MappingAdder();
+            StringAdder adder = new StringAdder();
             adder.add("package ").add(pkgName).add(";");
             adder.add("public class ").add(classname)//
                 .add(" implements ").add(getThisClassname()).add("{");
@@ -87,7 +87,7 @@ class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements 
         }
     }
 
-    final DefinitionDetail onParseCompleted() {
+    final ClassDefinition onParseCompleted() {
         this.constructors.sort(Comparator.comparingInt(o -> o.getParameters().size()));
         forEach((k, property) -> property.onParseCompleted());
         return this;

@@ -12,7 +12,7 @@ import static com.moon.mapping.processing.ElementUtils.capitalize;
 /**
  * @author moonsky
  */
-class PropertyDetail {
+class ClassProperty {
 
     /**
      * 字段名
@@ -46,21 +46,21 @@ class PropertyDetail {
     /**
      * 与字段名、字段类型对应一致的 setter 方法
      */
-    private MethodDetail setter;
+    private ClassMethod setter;
     /**
      * setter 方法重载，与{@link #setter}同名但类型不同的方法
      */
-    private List<MethodDetail> setters;
+    private List<ClassMethod> setters;
     /**
      * 与字段名、字段类型对应一致的 getter 方法
      */
-    private MethodDetail getter;
+    private ClassMethod getter;
     /**
      * getter 方法重载，与{@link #getter}同名但类型不同的方法
      */
-    private List<MethodDetail> getters;
+    private List<ClassMethod> getters;
 
-    PropertyDetail(String name, TypeElement thisElem, TypeElement declareElem) {
+    ClassProperty(String name, TypeElement thisElem, TypeElement declareElem) {
         this.name = name;
         this.thisElem = thisElem;
         this.declareElem = declareElem;
@@ -80,12 +80,12 @@ class PropertyDetail {
 
     void setSetter(ExecutableElement elem, Map<String, GenericModel> generics) {
         String declareType = elem.getParameters().get(0).asType().toString();
-        ensureSetter().add((new MethodDetail(elem, declareType, generics)));
+        ensureSetter().add((new ClassMethod(elem, declareType, generics)));
     }
 
     void setGetter(ExecutableElement elem, Map<String, GenericModel> generics) {
         String declareType = elem.getReturnType().toString();
-        ensureGetter().add((new MethodDetail(elem, declareType, generics)));
+        ensureGetter().add((new ClassMethod(elem, declareType, generics)));
     }
 
     /*
@@ -104,17 +104,17 @@ class PropertyDetail {
 
     String getActualType() { return actualType; }
 
-    MethodDetail getSetter() { return setter; }
+    ClassMethod getSetter() { return setter; }
 
-    List<MethodDetail> getSetters() { return setters; }
+    List<ClassMethod> getSetters() { return setters; }
 
-    private List<MethodDetail> ensureSetter() { return getSetters() == null ? (this.setters = new ArrayList<>()) : getSetters(); }
+    private List<ClassMethod> ensureSetter() { return getSetters() == null ? (this.setters = new ArrayList<>()) : getSetters(); }
 
-    MethodDetail getGetter() { return getter; }
+    ClassMethod getGetter() { return getter; }
 
-    List<MethodDetail> getGetters() { return getters; }
+    List<ClassMethod> getGetters() { return getters; }
 
-    private List<MethodDetail> ensureGetter() { return getGetters() == null ? (this.getters = new ArrayList<>()) : getGetters(); }
+    private List<ClassMethod> ensureGetter() { return getGetters() == null ? (this.getters = new ArrayList<>()) : getGetters(); }
 
     /*
     custom
@@ -148,7 +148,7 @@ class PropertyDetail {
         TypeMirror typeMirror = null;
         if (wasPrimitiveSetter()) {
             if (hasPublicDefaultSetter()) {
-                MethodDetail setter = getSetter();
+                ClassMethod setter = getSetter();
                 typeMirror = setter.getElem().getParameters().get(0).asType();
             }
             if (hasLombokSetter()) {
@@ -187,7 +187,7 @@ class PropertyDetail {
 
     public boolean wasPrimitiveSetter() {
         if (hasPublicDefaultSetter()) {
-            MethodDetail setter = getSetter();
+            ClassMethod setter = getSetter();
             return setter.getElem().getParameters().get(0).asType().getKind().isPrimitive();
         }
         if (hasLombokSetter()) {
@@ -238,7 +238,7 @@ class PropertyDetail {
         TypeMirror typeMirror = null;
         if (wasPrimitiveGetter()) {
             if (hasPublicDefaultGetter()) {
-                MethodDetail setter = getGetter();
+                ClassMethod setter = getGetter();
                 typeMirror = setter.getElem().getReturnType();
             }
             if (hasLombokGetter()) {
@@ -289,7 +289,7 @@ class PropertyDetail {
      * 主动声明的 setter 方法
      */
     private boolean hasPublicDefaultSetter() {
-        MethodDetail setter = getSetter();
+        ClassMethod setter = getSetter();
         return setter != null && DetectUtils.isPublic(setter.getElem());
     }
 
@@ -304,7 +304,7 @@ class PropertyDetail {
      * 主动声明的 public getter 方法
      */
     private boolean hasPublicDefaultGetter() {
-        MethodDetail getter = getGetter();
+        ClassMethod getter = getGetter();
         return getter != null && DetectUtils.isPublic(getter.getElem());
     }
 
@@ -316,11 +316,11 @@ class PropertyDetail {
     }
 
     void onParseCompleted() {
-        List<MethodDetail> getters = getGetters();
+        List<ClassMethod> getters = getGetters();
         if (getters != null) {
-            Iterator<MethodDetail> gettersIterator = getters.iterator();
+            Iterator<ClassMethod> gettersIterator = getters.iterator();
             while (gettersIterator.hasNext()) {
-                MethodDetail detail = gettersIterator.next();
+                ClassMethod detail = gettersIterator.next();
                 if (Objects.equals(detail.getFactActualType(), getFactActualType())) {
                     this.getter = detail;
                     gettersIterator.remove();
@@ -328,11 +328,11 @@ class PropertyDetail {
                 }
             }
         }
-        List<MethodDetail> setters = getSetters();
+        List<ClassMethod> setters = getSetters();
         if (setters != null) {
-            Iterator<MethodDetail> settersIterator = setters.iterator();
+            Iterator<ClassMethod> settersIterator = setters.iterator();
             while (settersIterator.hasNext()) {
-                MethodDetail detail = settersIterator.next();
+                ClassMethod detail = settersIterator.next();
                 if (Objects.equals(detail.getFactActualType(), getFactActualType())) {
                     this.setter = detail;
                     settersIterator.remove();

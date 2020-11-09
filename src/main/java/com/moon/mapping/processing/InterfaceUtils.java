@@ -44,14 +44,16 @@ abstract class InterfaceUtils {
                 throwNamedException(interElement, element);
             }
         }
-        return definition.onParseCompleted();
+        definition.onCompleted();
+        return definition;
     }
 
     private static InterProperty ensureProperty(InterDefinition properties, ExecutableElement elem) {
         String propertyName = ElementUtils.toPropertyName(elem);
         InterProperty property = properties.get(propertyName);
         if (property == null) {
-            property = new InterProperty(propertyName);
+            TypeElement thisElement = (TypeElement) elem.getEnclosingElement();
+            property = new InterProperty(propertyName, thisElement);
             properties.put(propertyName, property);
         }
         return property;

@@ -50,7 +50,7 @@ final class GenericModel {
         return simpleGenericTypename(getFinalType());
     }
 
-    private final static String simpleGenericTypename(String value) {
+    private static String simpleGenericTypename(String value) {
         if (value == null) {
             return null;
         }

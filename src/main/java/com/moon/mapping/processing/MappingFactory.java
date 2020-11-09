@@ -29,7 +29,7 @@ final class MappingFactory {
     }
 
     final String copyBackwardField(
-        PropertyDetail fromProperty, PropertyDetail toProperty
+        ClassProperty fromProperty, ClassProperty toProperty
     ) {
         return copyBackwardField(toProperty.gotSetterName(),//
             fromProperty.gotGetterName(),//
@@ -63,7 +63,7 @@ final class MappingFactory {
     }
 
     final String copyForwardField(
-        PropertyDetail fromProperty, PropertyDetail toProperty
+        ClassProperty fromProperty, ClassProperty toProperty
     ) {
         return copyForwardField(toProperty.gotSetterName(),//
             fromProperty.gotGetterName(),//
@@ -96,7 +96,7 @@ final class MappingFactory {
         return Replacer.thatType.replace(result, thatType);
     }
 
-    final String fromMapField(PropertyDetail property) {
+    final String fromMapField(ClassProperty property) {
         String t0 = "self.{setterName}(({setterType}) thatObject.get(\"{name}\"));";
         if (property.wasPrimitiveSetter()) {
             t0 = "{setterType} {var} = ({setterType}) thatObject.get(\"{name}\");" +//
@@ -119,7 +119,7 @@ final class MappingFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String toMapField(PropertyDetail property) {
+    final String toMapField(ClassProperty property) {
         return toMapField(property.getName(), property.gotGetterName());
     }
 
@@ -140,7 +140,7 @@ final class MappingFactory {
 
     private Elements elements() { return env.getElementUtils(); }
 
-    final String toStringField(PropertyDetail model, boolean first) {
+    final String toStringField(ClassProperty model, boolean first) {
         return toStringField(model.getName(), model.gotGetterName(), first);
     }
 
@@ -169,7 +169,7 @@ final class MappingFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String cloneField(PropertyDetail property) {
+    final String cloneField(ClassProperty property) {
         if (property.hasGetterMethod() && property.hasSetterMethod()) {
             String result = "self.{setterName}(that.{getterName}());";
             result = Replacer.setterName.replace(result, property.gotSetterName());
@@ -228,7 +228,7 @@ final class MappingFactory {
         String toReplacement(String value) { return value; }
 
         public String replace(String template, String type) {
-            return template.replaceAll(pattern, toReplacement(type));
+            return template.replaceAll(pattern, String.valueOf(toReplacement(type)));
         }
     }
 

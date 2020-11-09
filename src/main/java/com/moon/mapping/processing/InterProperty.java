@@ -1,8 +1,10 @@
 package com.moon.mapping.processing;
 
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -12,36 +14,17 @@ import static com.moon.mapping.processing.CollectUtils.simpleGroup;
 /**
  * @author moonsky
  */
-final class InterProperty {
+final class InterProperty extends BaseProperty<InterMethod> {
 
-    private final String name;
-    private List<InterMethod> settersArr;
-    private List<InterMethod> gettersArr;
     private List<Managed> fields;
 
-    public InterProperty(String name) { this.name = name; }
-
-    public String getName() { return name; }
-
-    public List<InterMethod> getSettersArr() { return settersArr; }
-
-    public List<InterMethod> getGettersArr() { return gettersArr; }
-
-    public List<InterMethod> ensureSettersArr() {
-        return settersArr == null ? (settersArr = new ArrayList<>()) : settersArr;
-    }
-
-    public List<InterMethod> ensureGettersArr() {
-        return gettersArr == null ? (gettersArr = new ArrayList<>()) : gettersArr;
+    InterProperty(String name, TypeElement enclosingElement) {
+        super(name, enclosingElement);
     }
 
     public List<Managed> getFields() { return fields; }
 
     public List<Managed> ensureManagedArr() { return fields == null ? (fields = new ArrayList<>()) : fields; }
-
-    final void addSetter(InterMethod setter) { ensureSettersArr().add(setter); }
-
-    final void addGetter(InterMethod setter) { ensureGettersArr().add(setter); }
 
     String toDeclareField() { return toDeclared(Managed::toDeclareField); }
 
@@ -54,11 +37,15 @@ final class InterProperty {
     }
 
     String toCallGetterArr() {
-        return toDeclared(",", Managed::toCallGetterForHashCode);
+        return toDeclared(",", Managed::toCallGetter);
     }
 
     String toEqualsString(String varName) {
         return toDeclared(" && ", managed -> managed.toEqualsString(varName));
+    }
+
+    String toCloneMethod() {
+        return "";
     }
 
     private String toDeclared(Function<Managed, String> stringifier) {
@@ -72,17 +59,17 @@ final class InterProperty {
         }, new ArrayList<>()));
     }
 
-    void onParseCompleted(String name) {
-        doParseCompleted(name);
-    }
+    @Override
+    public void onCompleted() { doParseCompleted(); }
 
-    protected final void doParseCompleted(String name) {
-        Map<String, InterMethod> gettersMap = simpleGroup(ensureGettersArr(), InterMethod::getFactActualType);
-        Map<String, InterMethod> settersMap = simpleGroup(ensureSettersArr(), InterMethod::getFactActualType);
-        List<Managed> managedArr = new ArrayList<>();
+    protected final void doParseCompleted() {
+        final String name = getName();
+        Map<String, InterMethod> gettersMap = simpleGroup(ensureGetterArr(), InterMethod::getFactActualType);
+        Map<String, InterMethod> settersMap = simpleGroup(ensureSetterArr(), InterMethod::getFactActualType);
+        final Map<String, Managed> propsMap = new LinkedHashMap<>();
         int index = 0;
         for (Map.Entry<String, InterMethod> entry : gettersMap.entrySet()) {
-            InterMethod getter = entry.getValue();
+            final InterMethod getter = entry.getValue();
             String declareType = getter.getDeclareType();
             String actualType = getter.getActualType();
             String factActualType = entry.getKey();
@@ -90,7 +77,8 @@ final class InterProperty {
             if (setter == null) {
                 setter = new InterMethod(toSetterName(getter), declareType, actualType);
             }
-            managedArr.add(new Managed(name, index++, factActualType, getter, setter));
+            Managed managed = new Managed(name, index++, factActualType, getter, setter);
+            propsMap.put(managed.getFieldName(), managed);
         }
         for (Map.Entry<String, InterMethod> entry : settersMap.entrySet()) {
             InterMethod setter = entry.getValue();
@@ -98,9 +86,10 @@ final class InterProperty {
             String actualType = setter.getActualType();
             String factActualType = entry.getKey();
             InterMethod getter = new InterMethod(toGetterName(setter), declareType, actualType);
-            managedArr.add(new Managed(name, index++, factActualType, getter, setter));
+            Managed managed = new Managed(name, index++, factActualType, getter, setter);
+            propsMap.put(managed.getFieldName(), managed);
         }
-        ensureManagedArr().addAll(managedArr);
+        ensureManagedArr().addAll(propsMap.values());
     }
 
     private static String toSetterName(InterMethod getter) {
@@ -149,18 +138,18 @@ final class InterProperty {
         }
 
         String toDeclareField() {
-            return ElementUtils.concat("private ", getFactActualType(), " ", getPropertyName(), ";");
+            return ElementUtils.concat("private ", getFactActualType(), " ", getFieldName(), ";");
         }
 
         public String toDeclareSetter() {
-            MappingAdder adder = new MappingAdder();
+            StringAdder adder = new StringAdder();
             InterMethod setter = getSetter();
             if (setter.isOverride()) {
                 adder.add("@Override ");
             }
             adder.add("public void ").add(setter.getMethodName()).add("(");
             adder.add(getFactActualType()).addSpace().add("var").add(") {");
-            adder.add("this.").add(getPropertyName()).add("=var;}");
+            adder.add("this.").add(getFieldName()).add("=var;}");
             return adder.toString();
         }
 
@@ -168,38 +157,38 @@ final class InterProperty {
             if (getIndex() > 0) {
                 return "";
             }
-            MappingAdder adder = new MappingAdder();
+            StringAdder adder = new StringAdder();
             InterMethod getter = getGetter();
             if (getter.isOverride()) {
                 adder.add("@Override ");
             }
             adder.add("public ").add(getFactActualType()).addSpace().add(getter.getMethodName()).add("(){");
-            adder.add("return this.").add(getPropertyName()).add(";}");
+            adder.add("return this.").add(getFieldName()).add(";}");
             return adder.toString();
         }
 
         public String toStringMethod(boolean onFirst) {
-            final MappingAdder adder = new MappingAdder();
+            final StringAdder adder = new StringAdder();
             if (onFirst && getIndex() == 0) {
-                adder.add("builder.append(\"").add(getPropertyName()).add("=\");");
+                adder.add("builder.append(\"").add(getFieldName()).add("=\");");
             } else {
-                adder.add("builder.append(\", ").add(getPropertyName()).add("=\");");
+                adder.add("builder.append(\", ").add(getFieldName()).add("=\");");
             }
-            adder.add("builder.append(").add(toCallGetterForHashCode()).add(");");
+            adder.add("builder.append(").add(toCallGetter()).add(");");
             return adder.toString();
         }
 
-        public String toCallGetterForHashCode() {
+        public String toCallGetter() {
             if (getIndex() > 0) {
-                return getPropertyName();
+                return getFieldName();
             } else {
                 return getGetter().getMethodName() + "()";
             }
         }
 
         public String toEqualsString(String varName) {
-            String callGetter = toCallGetterForHashCode();
-            MappingAdder adder = new MappingAdder();
+            String callGetter = toCallGetter();
+            StringAdder adder = new StringAdder();
             if (isPrimitive(getFactActualType())) {
                 adder.add(callGetter).add("==").add(varName).add(".").add(callGetter);
             } else {
@@ -209,12 +198,29 @@ final class InterProperty {
             return adder.toString();
         }
 
-        public String getPropertyName() {
+        /**
+         * 实际字段名
+         *
+         * @return 字段名
+         */
+        public String getFieldName() {
             return getIndex() == 0 ? getName() : (getName() + getIndex());
         }
 
+        /**
+         * 声明的字段名（可能存在重载，所以不是最终字段名）
+         *
+         * @return 声明时字段名
+         *
+         * @see #getFieldName()
+         */
         public String getName() { return name; }
 
+        /**
+         * 当前是第几个字段，存在重载的情况下，这里可能大于 0
+         *
+         * @return 当前是第几个字段
+         */
         public int getIndex() { return index; }
 
         public String getFactActualType() { return factActualType; }

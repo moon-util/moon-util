@@ -12,15 +12,15 @@ import java.util.function.Function;
 /**
  * @author moonsky
  */
-final class MappingForDetail extends DefinitionDetail {
+final class MappingForDetail extends ClassDefinition {
 
     protected final static String PACKAGE = MappingUtil.class.getPackage().getName();
     protected final static String INTERFACE = BeanMapping.class.getName();
 
     private final MappingFactory factory;
-    private final Map<String, DefinitionDetail> mappingForDetailsMap;
+    private final Map<String, ClassDefinition> mappingForDetailsMap;
 
-    MappingForDetail(TypeElement thisElement, Map<String, DefinitionDetail> mappingForDetailsMap) {
+    MappingForDetail(TypeElement thisElement, Map<String, ClassDefinition> mappingForDetailsMap) {
         super(thisElement);
         this.factory = new MappingFactory();
         this.mappingForDetailsMap = mappingForDetailsMap;
@@ -28,7 +28,7 @@ final class MappingForDetail extends DefinitionDetail {
 
     public final MappingFactory getFactory() { return factory; }
 
-    public Map<String, DefinitionDetail> getMappingForDetailsMap() { return mappingForDetailsMap; }
+    public Map<String, ClassDefinition> getMappingForDetailsMap() { return mappingForDetailsMap; }
 
     @Override
     public void writeJavaFile() throws IOException {
@@ -47,12 +47,12 @@ final class MappingForDetail extends DefinitionDetail {
     }
 
     private String implementation() throws IOException {
-        final MappingAdder adder = new MappingAdder();
+        final StringAdder adder = new StringAdder();
         adder.add("package ").add(PACKAGE).add(';');
         adder.add("enum ").add(getBeanMappingClassname()).add(" implements ").add(INTERFACE).add("{TO,");
-        final Map<String, DefinitionDetail> mappingForDetailsMap = getMappingForDetailsMap();
-        for (Map.Entry<String, DefinitionDetail> entry : mappingForDetailsMap.entrySet()) {
-            DefinitionDetail definition = entry.getValue();
+        final Map<String, ClassDefinition> mappingForDetailsMap = getMappingForDetailsMap();
+        for (Map.Entry<String, ClassDefinition> entry : mappingForDetailsMap.entrySet()) {
+            ClassDefinition definition = entry.getValue();
             definition.writeJavaFile();
             addBeanMapping(adder, definition);
         }
@@ -63,7 +63,7 @@ final class MappingForDetail extends DefinitionDetail {
         return adder.toString();
     }
 
-    private void addBeanMapping(MappingAdder adder, DefinitionDetail thatDef) {
+    private void addBeanMapping(StringAdder adder, ClassDefinition thatDef) {
         String thatClassname = thatDef.getThisClassname();
         adder.add("TO_" + NamingUtils.format(thatClassname)).add(" {");
         build$safeWithThat(adder, thatDef);
@@ -74,12 +74,12 @@ final class MappingForDetail extends DefinitionDetail {
         adder.add("},");
     }
 
-    private void build$safeWithThat(MappingAdder adder, DefinitionDetail thatDef) {
+    private void build$safeWithThat(StringAdder adder, ClassDefinition thatDef) {
         final String thatClassname = thatDef.getThisClassname();
         final String thisClassname = getThisClassname();
         {
             Collection<String> fields = reducing(thisProp -> {
-                PropertyDetail thatProp = thatDef.get(thisProp.getName());
+                ClassProperty thatProp = thatDef.get(thisProp.getName());
                 if (isUsable(thisProp, thatProp)) {
                     return getFactory().copyForwardField(thisProp, thatProp);
                 }
@@ -89,7 +89,7 @@ final class MappingForDetail extends DefinitionDetail {
         }
         {
             Collection<String> fields = reducing(thisProp -> {
-                PropertyDetail thatProp = thatDef.get(thisProp.getName());
+                ClassProperty thatProp = thatDef.get(thisProp.getName());
                 if (isUsable(thatProp, thisProp)) {
                     return getFactory().copyBackwardField(thatProp, thisProp);
                 }
@@ -99,13 +99,19 @@ final class MappingForDetail extends DefinitionDetail {
         }
     }
 
-    private void addObjectMapping(MappingAdder adder) {
+    private void addObjectMapping(StringAdder adder) {
         {
             // toString(Object)
-            @SuppressWarnings("all")
-            Collection<String> fields = reducing((list, property) ->//
-                getFactory().toStringField(property, list.isEmpty()));
-            adder.add(getFactory().toStringMethod(getThisClassname(), fields));
+            if (isInterface()) {
+                adder.add("@Override public String toString(Object that) {");
+                adder.add("return that == null ? \"null\" : that.toString();");
+                adder.add("}");
+            } else {
+                @SuppressWarnings("all")
+                Collection<String> fields = reducing((list, property) ->//
+                    getFactory().toStringField(property, list.isEmpty()));
+                adder.add(getFactory().toStringMethod(getThisClassname(), fields));
+            }
         }
         {
             // copy(Object)
@@ -114,7 +120,7 @@ final class MappingForDetail extends DefinitionDetail {
         }
     }
 
-    private void addMapMapping(MappingAdder adder) {
+    private void addMapMapping(StringAdder adder) {
         {
             // fromMap(Object,Map)
             Collection<String> fields = reducing(getFactory()::fromMapField);
@@ -137,15 +143,15 @@ final class MappingForDetail extends DefinitionDetail {
         return sorts;
     }
 
-    private Collection<String> reducing(Function<PropertyDetail, String> serializer) {
+    private Collection<String> reducing(Function<ClassProperty, String> serializer) {
         return reducing((m, prop) -> serializer.apply(prop));
     }
 
-    private Collection<String> reducing(BiFunction<Map<String, String>, PropertyDetail, String> serializer) {
+    private Collection<String> reducing(BiFunction<Map<String, String>, ClassProperty, String> serializer) {
         final Map<String, String> parsedFields = new LinkedHashMap<>();
         final Set<String> sortKeys = getSortedKeys();
         for (String key : sortKeys) {
-            PropertyDetail property = get(key);
+            ClassProperty property = get(key);
             if (property != null) {
                 String field = serializer.apply(parsedFields, property);
                 if (isNotBlank(field)) {
@@ -165,7 +171,7 @@ final class MappingForDetail extends DefinitionDetail {
         }, parsedFields).values();
     }
 
-    private static boolean isUsable(PropertyDetail from, PropertyDetail to) {
+    private static boolean isUsable(ClassProperty from, ClassProperty to) {
         boolean hasGetter = from != null && from.hasGetterMethod();
         boolean hasSetter = to != null && to.hasSetterMethod();
         return hasGetter && hasSetter;
