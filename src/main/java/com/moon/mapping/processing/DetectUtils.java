@@ -49,9 +49,13 @@ abstract class DetectUtils {
                 return;
             }
             if (isPrivate(parent)) {
-                String target = ElementUtils.getQualifiedName((TypeElement) element);
-                String location = parent.getSimpleName().toString();
-                throw new IllegalStateException("类 " + target + " 所在位置: " + location + " 不能被 private 修饰的。");
+                String target = ElementUtils.getQualifiedName((TypeElement) element), location;
+                if (parent instanceof TypeElement) {
+                    location = ElementUtils.getQualifiedName((QualifiedNameable) parent);
+                } else {
+                    location = ElementUtils.getSimpleName(element);
+                }
+                throw new IllegalStateException("目标: " + target + " 所在位置: " + location + " 不能被 private 修饰的。");
             }
             element = parent;
         } while (true);

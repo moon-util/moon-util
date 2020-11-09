@@ -11,12 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author moonsky
  */
 @SuppressWarnings("all")
-public class BeanMappingFactory {
+final class MappingFactory {
 
     private final ProcessingEnvironment env;
     private final AtomicInteger indexer = new AtomicInteger();
 
-    BeanMappingFactory() { this.env = EnvironmentUtils.getEnv(); }
+    MappingFactory() { this.env = EnvironmentUtils.getEnv(); }
 
     public AtomicInteger getIndexer() { return indexer; }
 
@@ -145,8 +145,8 @@ public class BeanMappingFactory {
     }
 
     private final String toStringField(String name, String getterName, boolean first) {
-        String t0 = "builder.append(\"{name}='\").append(self.{getterName}()).append(\"'\");";
-        String t1 = "builder.append(\", {name}='\").append(self.{getterName}()).append(\"'\");";
+        String t0 = "builder.append(\"{name}=\").append(self.{getterName}());";
+        String t1 = "builder.append(\", {name}=\").append(self.{getterName}());";
         String template = Replacer.name.replace(first ? t0 : t1, name);
         return Replacer.getterName.replace(template, getterName);
     }

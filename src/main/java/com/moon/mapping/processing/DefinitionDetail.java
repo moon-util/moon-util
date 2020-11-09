@@ -2,8 +2,8 @@ package com.moon.mapping.processing;
 
 import com.moon.mapping.annotation.MappingFor;
 
-import javax.annotation.processing.Filer;
-import javax.lang.model.element.*;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -73,12 +73,17 @@ class DefinitionDetail extends LinkedHashMap<String, PropertyDetail> implements 
     @SuppressWarnings("all")
     public void writeJavaFile() throws IOException {
         if (isInterface()) {
-            StringBuilder content = new StringBuilder();
-            content.append("package ").append(getPackageName()).append(";");
-            content.append("public class ").append(getSimpleImplClassname())//
-                .append(" implements ").append(getThisClassname()).append("{");
-            // generate codes ...
-            content.append("}");
+            final String pkgName = getPackageName();
+            final String classname = getSimpleImplClassname();
+            MappingAdder adder = new MappingAdder();
+            adder.add("package ").add(pkgName).add(";");
+            adder.add("public class ").add(classname)//
+                .add(" implements ").add(getThisClassname()).add("{");
+            adder.add("public ").add(classname).add("(){}");
+            InterDefinition interDef = InterfaceUtils.toPropertiesMap(getThisElement());
+            adder.add(interDef.implementation(classname));
+            adder.add("}");
+            EnvironmentUtils.newJavaFile(classname, adder);
         }
     }
 

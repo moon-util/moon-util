@@ -3,7 +3,6 @@ package com.moon.mapping.processing;
 import com.moon.mapping.BeanMapping;
 import com.moon.mapping.MappingUtil;
 
-import javax.annotation.processing.Filer;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.util.*;
@@ -18,36 +17,44 @@ final class MappingForDetail extends DefinitionDetail {
     protected final static String PACKAGE = MappingUtil.class.getPackage().getName();
     protected final static String INTERFACE = BeanMapping.class.getName();
 
-    private final BeanMappingFactory factory;
+    private final MappingFactory factory;
     private final Map<String, DefinitionDetail> mappingForDetailsMap;
 
     MappingForDetail(TypeElement thisElement, Map<String, DefinitionDetail> mappingForDetailsMap) {
         super(thisElement);
-        this.factory = new BeanMappingFactory();
+        this.factory = new MappingFactory();
         this.mappingForDetailsMap = mappingForDetailsMap;
     }
 
-    public final BeanMappingFactory getFactory() { return factory; }
+    public final MappingFactory getFactory() { return factory; }
 
     public Map<String, DefinitionDetail> getMappingForDetailsMap() { return mappingForDetailsMap; }
 
     @Override
     public void writeJavaFile() throws IOException {
         super.writeJavaFile();
-        EnvironmentUtils.newJavaFile(getBeanMappingClassname(), this::implementation);
+        EnvironmentUtils.newJavaFile(getBeanMappingClassname(), () -> {
+            try {
+                return this.implementation();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        });
     }
 
     private String getBeanMappingClassname() {
-        return ElementUtils.getBeanMappingEnumName(getImplClassname());
+        return NamingUtils.getBeanMappingEnumName(getImplClassname());
     }
 
-    private String implementation() {
+    private String implementation() throws IOException {
         final MappingAdder adder = new MappingAdder();
         adder.add("package ").add(PACKAGE).add(';');
         adder.add("enum ").add(getBeanMappingClassname()).add(" implements ").add(INTERFACE).add("{TO,");
         final Map<String, DefinitionDetail> mappingForDetailsMap = getMappingForDetailsMap();
         for (Map.Entry<String, DefinitionDetail> entry : mappingForDetailsMap.entrySet()) {
-            addBeanMapping(adder, entry.getValue());
+            DefinitionDetail definition = entry.getValue();
+            definition.writeJavaFile();
+            addBeanMapping(adder, definition);
         }
         adder.add(";");
         addObjectMapping(adder);
@@ -58,7 +65,7 @@ final class MappingForDetail extends DefinitionDetail {
 
     private void addBeanMapping(MappingAdder adder, DefinitionDetail thatDef) {
         String thatClassname = thatDef.getThisClassname();
-        adder.add("TO_" + ElementUtils.format(thatClassname)).add(" {");
+        adder.add("TO_" + NamingUtils.format(thatClassname)).add(" {");
         build$safeWithThat(adder, thatDef);
         adder.add(getFactory().copyForwardMethod(getThisClassname(), thatClassname));
         adder.add(getFactory().copyBackwardMethod(getThisClassname(), thatClassname));

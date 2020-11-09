@@ -31,6 +31,10 @@ abstract class ElementUtils {
         return Introspector.decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
     }
 
+    public static String getSimpleName(Element elem) {
+        return elem.getSimpleName().toString();
+    }
+
     public static String getSimpleName(String fullName) {
         int index = fullName.lastIndexOf('.');
         return index < 0 ? fullName : fullName.substring(index + 1);
@@ -55,11 +59,5 @@ abstract class ElementUtils {
         char[] chars = name.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         return new String(chars);
-    }
-
-    static String format(String classname) { return classname.replace('.', '_'); }
-
-    static String getBeanMappingEnumName(String classname) {
-        return "BeanMapping_" + format(classname);
     }
 }

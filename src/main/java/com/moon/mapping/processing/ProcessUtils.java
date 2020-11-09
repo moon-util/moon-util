@@ -62,9 +62,10 @@ final class ProcessUtils {
         }
     }
 
+    @SuppressWarnings("all")
     private static DefinitionDetail parseRootPropertiesMap(final TypeElement rootElement) {
         DefinitionDetail definition = new DefinitionDetail(rootElement);
-        Map<String, GenericModel> thisGenericMap = GenericUtil.parse(rootElement);
+        Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
         List<? extends Element> elements = rootElement.getEnclosedElements();
         Set<String> presents = new HashSet<>();
         for (Element element : CollectUtils.emptyIfNull(elements)) {
@@ -83,7 +84,10 @@ final class ProcessUtils {
         }
         Types types = EnvironmentUtils.getTypes();
         TypeElement superElement = ElementUtils.cast(types.asElement(superclass));
-        Map<String, GenericModel> genericModelMap = GenericUtil.parse(superclass, superElement);
+        if (superElement == null) {
+            return;
+        }
+        Map<String, GenericModel> genericModelMap = GenericUtils.parse(superclass, superElement);
         List<? extends Element> elements = superElement.getEnclosedElements();
         for (Element element : elements) {
             handleEnclosedElem(presentKeys, definition, element, genericModelMap, superElement, rootElement);

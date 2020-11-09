@@ -13,9 +13,9 @@ import java.util.Map;
 /**
  * @author moonsky
  */
-final class GenericUtil {
+final class GenericUtils {
 
-    private GenericUtil() {}
+    private GenericUtils() {}
 
     static Map<String, GenericModel> parse(TypeElement element) {
         return parse(element.asType(), element);

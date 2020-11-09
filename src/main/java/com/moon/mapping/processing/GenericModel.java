@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * @author moonsky
  */
-public class GenericModel {
+final class GenericModel {
 
     private final String declare;
     private final String actual;

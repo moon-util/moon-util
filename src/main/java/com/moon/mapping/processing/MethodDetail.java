@@ -8,12 +8,16 @@ import java.util.Map;
  *
  * @author moonsky
  */
-final class MethodDetail {
+class MethodDetail {
 
     /**
      * getter 或 setter 方法
      */
     private final ExecutableElement elem;
+    /**
+     * getter 或 setter 方法名
+     */
+    private final String methodName;
     /**
      * getter 方法声明返回类型（可能是泛型）
      */
@@ -24,10 +28,23 @@ final class MethodDetail {
     private final String actualType;
 
     MethodDetail(ExecutableElement elem, String declareType, Map<String, GenericModel> generics) {
-        GenericModel model = generics.get(declareType);
-        this.actualType = model == null ? null : model.getSimpleFinalType();
+        this(elem, ElementUtils.getSimpleName(elem), declareType, generics);
+    }
+
+    MethodDetail(ExecutableElement elem, String methodName, String declareType, Map<String, GenericModel> generics) {
+        this(elem, methodName, declareType, findActualType(generics, declareType));
+    }
+
+    public MethodDetail(ExecutableElement elem, String methodName, String declareType, String actualType) {
+        this.methodName = methodName;
         this.declareType = declareType;
+        this.actualType = actualType;
         this.elem = elem;
+    }
+
+    private static String findActualType(Map<String, GenericModel> generics, String declareType) {
+        GenericModel model = generics.get(declareType);
+        return model == null ? null : model.getSimpleFinalType();
     }
 
     /*
@@ -35,6 +52,8 @@ final class MethodDetail {
      */
 
     public ExecutableElement getElem() { return elem; }
+
+    public String getMethodName() { return methodName; }
 
     public String getDeclareType() { return declareType; }
 
