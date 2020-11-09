@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author moonsky
  */
-public interface MapMapping<THIS> {
+public interface MapMapping<THIS> extends ObjectMapping<THIS> {
 
     /**
      * 从{@code propertiesMap}复制属性到{@code thisObject}
@@ -18,6 +18,16 @@ public interface MapMapping<THIS> {
      * @return 属性覆盖目标对象 thisObject
      */
     THIS fromMap(THIS thisObject, Map<String, ?> propertiesMap);
+
+    /**
+     * 用{@code propertiesMap}里的属性创建对象{@code THIS}
+     *
+     * @param propertiesMap 包含{@code THIS}属性和值的{@link Map}，
+     *                      按字段名，有多少字段就获取和设置多少字段
+     *
+     * @return 新创建的 THIS 对象，对象里各字段值来自于 propertiesMap
+     */
+    THIS newThis(Map<String, ?> propertiesMap);
 
     /**
      * 将{@code thisObject}的所有属性映射到指定{@code targetMap}中
