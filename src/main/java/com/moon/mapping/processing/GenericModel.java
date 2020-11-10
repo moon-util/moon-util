@@ -57,16 +57,4 @@ final class GenericModel {
         int index = value.indexOf('<');
         return index < 0 ? value : value.substring(0, index);
     }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("GenericModel{");
-        sb.append("declare='").append(declare).append('\'');
-        sb.append(", actual='").append(actual).append('\'');
-        sb.append(", bound='").append(bound).append('\'');
-        sb.append(", finalType='").append(getFinalType()).append('\'');
-        sb.append(", simpleFinalType='").append(getSimpleFinalType()).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
 }

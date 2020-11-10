@@ -31,10 +31,6 @@ final class EnvUtils {
 
     public static Messager getMessager() { return getEnv().getMessager(); }
 
-    public static void newJavaFile(String name, Consumer<PrintWriter> consumer) throws IOException {
-        newJavaFile(getEnv().getFiler(), name, consumer);
-    }
-
     public static void newJavaFile(Filer filer, String name, Consumer<PrintWriter> consumer) throws IOException {
         JavaFileObject javaFile = filer.createSourceFile(name);
         try (Writer jw = javaFile.openWriter(); PrintWriter writer = new PrintWriter(jw)) {
@@ -42,14 +38,7 @@ final class EnvUtils {
         }
     }
 
-    public static void newJavaFile(String name, Supplier<String> supplier) throws IOException {
-        newJavaFile(name, writer -> {
-            writer.write(supplier.get());
-            writer.flush();
-        });
-    }
-
-    public static void newJavaFile(Filer filer, String name, Supplier<String> supplier) throws IOException {
+    public static void newJavaFile(Filer filer, String name, ThrowingSupplier<String> supplier) throws IOException {
         newJavaFile(filer, name, writer -> {
             writer.write(supplier.get());
             writer.flush();

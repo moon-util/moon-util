@@ -43,12 +43,12 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     public void setSetter(ExecutableElement setter, Map<String, GenericModel> genericMap) {
         String declareType = setter.getParameters().get(0).asType().toString();
-        ensureSetterArr().add(toMethod(declareType, setter, genericMap));
+        addSetterMethod(toMethod(declareType, setter, genericMap));
     }
 
     public void setGetter(ExecutableElement getter, Map<String, GenericModel> genericMap) {
         String declareType = getter.getReturnType().toString();
-        ensureGetterArr().add(toMethod(declareType, getter, genericMap));
+        addGetterMethod(toMethod(declareType, getter, genericMap));
     }
 
     private BasicMethod toMethod(String declareType, ExecutableElement method, Map<String, GenericModel> generics) {
@@ -255,12 +255,6 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         } else {
             onPresentField(propertyType);
         }
-
-
-        // Logger.warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        // Logger.warn(getEnclosingElement());
-        // Logger.warn(ensureGetterArr());
-        // Logger.warn(ensureSetterArr());
     }
 
     private void onMissingField() {
@@ -283,7 +277,6 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
     }
 
     private void onMissingGetter() {
-
     }
 
     private void onPresentField(final String propertyType) {

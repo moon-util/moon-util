@@ -1,15 +1,13 @@
 package com.moon.mapping;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 import static java.lang.Enum.valueOf;
 
 /**
  * @author benshaoye
  */
-@SuppressWarnings("all")
-final class Mappings {
+public class Mappings {
 
     private final static String NAMESPACE;
 
@@ -20,29 +18,19 @@ final class Mappings {
 
     private Mappings() {}
 
-    final static Function<?, ?> DFT_CONVERTER = o -> o;
-
     static Class classAs(String classname) {
         try {
             return Class.forName(classname);
-        } catch (Throwable t) {
-            throw new IllegalStateException(classname);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(classname, e);
         }
-    }
-
-    static <F, T> BeanMapping<F, T> resolve(Class cls1, Class cls2) {
-        return resolve(cls1.getCanonicalName(), cls2.getCanonicalName());
-    }
-
-    static <T> MapMapping<T> resolve(Class<T> cls1) {
-        return resolve(cls1.getCanonicalName());
     }
 
     static BeanMapping resolve(String cls1, String cls2) {
         try {
-            return (BeanMapping) valueOf(toClass(cls1), "TO_" + toVarName(cls2));
+            return (BeanMapping) valueOf(toClass(cls1), "TO_" + toName(cls2));
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(e);
+            throw new NoSuchMappingException(cls1, cls2);
         }
     }
 
@@ -50,22 +38,29 @@ final class Mappings {
         try {
             return (BeanMapping) toClass(cls1).getEnumConstants()[0];
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(e);
+            throw new NoSuchMappingException(cls1, e);
         }
     }
 
+    static <F, T> BeanMapping<F, T> resolve(Class cls1, Class cls2) {
+        return resolve(toName(cls1), toName(cls2));
+    }
+
+    static <T> MapMapping<T> resolve(Class<T> cls1) { return resolve(toName(cls1)); }
+
     static int detectSize(Iterable iterable) {
-        if (iterable == null) {
-            return 0;
-        }
-        return iterable instanceof Collection ? ((Collection<?>) iterable).size() : 16;
+        return iterable instanceof Collection//
+            ? ((Collection<?>) iterable).size()//
+            : (iterable == null ? 0 : 16);
     }
 
     private static Class toClass(String cls) throws ClassNotFoundException {
-        return Class.forName(NAMESPACE + toVarName(cls));
+        return Class.forName(NAMESPACE + toName(cls));
     }
 
-    private static String toVarName(String classname) {
+    private static String toName(String classname) {
         return classname.replace('.', '_');
     }
+
+    private static String toName(Class<?> cls) { return cls.getCanonicalName(); }
 }

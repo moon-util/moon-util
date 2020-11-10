@@ -103,7 +103,7 @@ final class MappingFactory {
                 "if ({var} != null) { self.{setterName}({var}); }";
             t0 = Replacer.var.replace(t0, nextVarname());
             t0 = Replacer.setterType.replace(t0, property.getWrappedSetterType());
-        } else if (Objects.equals(property.getSetterFinalType(), String.class.getName())) {
+        } else if (Objects.equals(property.getSetterFinalType(), "java.lang.String")) {
             t0 = "Object {var} = thatObject.get(\"{name}\");" +//
                 "if ({var} == null) { self.{setterName}(null); }" +//
                 "else { self.{setterName}({var}.toString()); }";

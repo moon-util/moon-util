@@ -1,18 +1,19 @@
 package com.moon.mapping.processing;
 
-import java.util.Arrays;
-import java.util.function.Supplier;
-
-import static java.util.stream.Collectors.joining;
+import static java.util.Arrays.stream;
 
 /**
  * @author moonsky
  */
-final class StringAdder implements Supplier<String> {
+final class StringAdder implements ThrowingSupplier<String> {
 
     private final StringBuilder content;
 
     public StringAdder() { this.content = new StringBuilder(); }
+
+    public StringAdder pkg(Class<?> type) { return add(type.getPackage().getName()); }
+
+    public StringAdder cls(Class<?> type) { return add(type.getCanonicalName()); }
 
     public StringAdder add(Object obj) { return add(obj == null ? null : obj.toString()); }
 
@@ -25,14 +26,12 @@ final class StringAdder implements Supplier<String> {
         return doAdd ? add(content) : this;
     }
 
-    public StringAdder implement(Class... interfaces) {
-        add(" implements ");
-        return add(Arrays.stream(interfaces).map(Class::getCanonicalName).collect(joining(",")));
+    public StringAdder impl(Class<?>... interfaces) {
+        return impl(stream(interfaces).map(Class::getCanonicalName).toArray(String[]::new));
     }
 
-    public StringAdder implement(String... interfaces) {
-        add(" implements ");
-        return add(Arrays.stream(interfaces).collect(joining(",")));
+    public StringAdder impl(String... interfaces) {
+        return add(" implements ").add(String.join(",", interfaces));
     }
 
     public StringAdder space() { return add(" "); }

@@ -3,10 +3,7 @@ package com.moon.mapping.processing;
 import com.google.auto.service.AutoService;
 import com.moon.mapping.annotation.MappingFor;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
-import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -40,17 +37,19 @@ public class MappingProcessor extends AbstractProcessor {
         super.init(processingEnv);
     }
 
-    private void doWriteJavaFile(List<JavaFileWritable> models) throws IOException {
-        for (JavaFileWritable model : models) {
-            model.writeJavaFile(EnvUtils.getEnv().getFiler());
+    private void doWriteJavaFile(List<MappingWriter> models) throws IOException {
+        Filer filer = EnvUtils.getEnv().getFiler();
+        for (MappingWriter model : models) {
+            model.writeJavaFile(filer);
         }
+        // MappingWriter.forAutoConfig(filer, models);
     }
 
     @Override
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        List<JavaFileWritable> models = getMappingModels(annotations, roundEnv);
+        List<MappingWriter> models = getMappingModels(annotations, roundEnv);
         if (!models.isEmpty()) {
             try {
                 doWriteJavaFile(models);
@@ -61,8 +60,8 @@ public class MappingProcessor extends AbstractProcessor {
         return true;
     }
 
-    private List<JavaFileWritable> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        final List<JavaFileWritable> models = new ArrayList<>();
+    private List<MappingWriter> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        final List<MappingWriter> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
                 for (Element element : env.getElementsAnnotatedWith(MappingFor.class)) {
@@ -75,7 +74,7 @@ public class MappingProcessor extends AbstractProcessor {
         return models;
     }
 
-    private JavaFileWritable onAnnotatedClass(final TypeElement thisElement) {
+    private MappingWriter onAnnotatedClass(final TypeElement thisElement) {
         final Elements utils = EnvUtils.getUtils();
         final Map<String, BasicDefinition> mappingForDetailsMap = new HashMap<>(4);
         final Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);

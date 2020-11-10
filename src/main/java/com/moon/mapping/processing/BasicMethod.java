@@ -1,8 +1,5 @@
 package com.moon.mapping.processing;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import javax.lang.model.element.ExecutableElement;
 import java.util.Map;
 
@@ -11,8 +8,6 @@ import static com.moon.mapping.processing.GenericUtils.findActualType;
 /**
  * @author benshaoye
  */
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 class BasicMethod extends BaseMethod {
 
     /**

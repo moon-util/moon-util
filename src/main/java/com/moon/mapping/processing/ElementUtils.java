@@ -17,14 +17,6 @@ abstract class ElementUtils {
 
     static <T> T cast(Object obj) { return (T) obj; }
 
-    static String concat(Object... values) {
-        StringBuilder str = new StringBuilder();
-        for (Object value : values) {
-            str.append(value);
-        }
-        return str.toString();
-    }
-
     static String toPropertyName(ExecutableElement element) {
         String name = element.getSimpleName().toString();
         return StringUtils.decapitalize(name.substring(name.startsWith("is") ? 2 : 3));

@@ -32,16 +32,6 @@ final class CollectUtils {
         return totalValue;
     }
 
-    static <F, T> T reduce(Iterable<? extends F> collect, BiIntFunction<T, F, T> converter, T totalValue) {
-        if (collect != null) {
-            int index = 0;
-            for (F item : collect) {
-                totalValue = converter.apply(totalValue, item, index++);
-            }
-        }
-        return totalValue;
-    }
-
     static <E> List<E> emptyIfNull(List<E> list) {
         return list == null ? new ArrayList<>() : list;
     }

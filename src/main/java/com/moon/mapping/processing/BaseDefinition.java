@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static javax.lang.model.element.Modifier.ABSTRACT;
+import static com.moon.mapping.processing.DetectUtils.isUsable;
 
 /**
  * @author benshaoye
@@ -30,8 +30,6 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     public final TypeElement getThisElement() { return thisElement; }
 
     public final boolean isInterface() { return getThisElement().getKind().isInterface(); }
-
-    public final boolean isAbstract() { return DetectUtils.isAny(getThisElement(), ABSTRACT); }
 
     public final MappingFactory getFactory() { return factory; }
 
@@ -56,42 +54,8 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
      */
     public final String getQualifiedName() { return ElementUtils.getQualifiedName(getThisElement()); }
 
-    public String getFactThisImplName() { return getQualifiedName(); }
-
-    public String getInterfaceImplSimpleName() {
-        if (isInterface()) {
-            return getSimpleName() + IMPL_SUFFIX;
-        }
-        return null;
-    }
-
-    /**
-     * 实现自定义接口，如果{@link #thisElement}是接口的话
-     *
-     * @return
-     */
-    public StringAdder implGeneratedMethods() { return null; }
-
     @Override
     public void onCompleted() { forEach((name, prop) -> prop.onCompleted()); }
-
-    public final <T> T reduce(BiFunction<T, P, T> converter, T totalValue) {
-        for (Map.Entry<String, P> pEntry : entrySet()) {
-            totalValue = converter.apply(totalValue, pEntry.getValue());
-        }
-        return totalValue;
-    }
-
-    public final <E> List<E> reduceList(BiFunction<List<E>, P, List<E>> converter) {
-        return reduce(converter, new ArrayList<>());
-    }
-
-    public final <E> List<E> reduceFor(Function<P, E> converter) {
-        return reduce(((list, p) -> {
-            list.add(converter.apply(p));
-            return list;
-        }), new ArrayList<>());
-    }
 
     /**
      * 实现{@link BeanMapping}的公共方法
@@ -115,27 +79,28 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     }
 
     private void build$safeWithThat(StringAdder adder, BaseDefinition thatDef) {
-        final String thatClassname = thatDef.getQualifiedName();
-        final String thisClassname = getQualifiedName();
+        final String thatClass = thatDef.getQualifiedName();
+        final String thisClass = getQualifiedName();
+        final MappingFactory factory = getFactory();
         {
             Collection<String> fields = reducing(thisProp -> {
                 Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
                 if (isUsable(thisProp, thatProp)) {
-                    return getFactory().copyForwardField(thisProp, thatProp);
+                    return factory.copyForwardField(thisProp, thatProp);
                 }
                 return null;
             });
-            adder.add(getFactory().safeCopyForwardMethod(thisClassname, thatClassname, fields));
+            adder.add(factory.safeCopyForwardMethod(thisClass, thatClass, fields));
         }
         {
             Collection<String> fields = reducing(thisProp -> {
                 Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
                 if (isUsable(thatProp, thisProp)) {
-                    return getFactory().copyBackwardField(thatProp, thisProp);
+                    return factory.copyBackwardField(thatProp, thisProp);
                 }
                 return null;
             });
-            adder.add(getFactory().safeCopyBackwardMethod(thisClassname, thatClassname, fields));
+            adder.add(factory.safeCopyBackwardMethod(thisClass, thatClass, fields));
         }
     }
 
@@ -143,7 +108,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         {
             // fromMap(Object,Map)
             Collection<String> fields = reducing(getFactory()::fromMapField);
-            adder.add(getFactory().fromMapMethod(getFactThisImplName(), fields));
+            adder.add(getFactory().fromMapMethod(getQualifiedName(), fields));
         }
         {
             // toMap(Object,Map)
@@ -152,7 +117,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         }
         {
             // newThis(Map)
-            adder.add(getFactory().newThisAsMapMethod(getFactThisImplName()));
+            adder.add(getFactory().newThisAsMapMethod(getQualifiedName()));
         }
     }
 
@@ -160,13 +125,13 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         {
             // clone(Object)
             Collection<String> fields = reducing(getFactory()::cloneField);
-            adder.add(getFactory().cloneMethod(getQualifiedName(), getFactThisImplName(), fields));
+            adder.add(getFactory().cloneMethod(getQualifiedName(), getQualifiedName(), fields));
         }
         {
             // toString(Object)
             @SuppressWarnings("all") Collection<String> fields = reducing((list, property) ->//
                 getFactory().toStringField(property, list.isEmpty()));
-            adder.add(getFactory().toStringMethod(getFactThisImplName(), fields));
+            adder.add(getFactory().toStringMethod(getQualifiedName(), fields));
         }
     }
 
@@ -215,11 +180,5 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         Set<String> sorts = new LinkedHashSet<>();
         sorts.add("id");
         return sorts;
-    }
-
-    private static boolean isUsable(Mappable from, Mappable to) {
-        boolean hasGetter = from != null && from.hasGetterMethod();
-        boolean hasSetter = to != null && to.hasSetterMethod();
-        return hasGetter && hasSetter;
     }
 }

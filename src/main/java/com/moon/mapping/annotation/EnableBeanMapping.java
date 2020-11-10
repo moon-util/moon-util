@@ -2,6 +2,7 @@ package com.moon.mapping.annotation;
 
 import com.moon.mapping.MappingUtil;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,4 +15,4 @@ import java.lang.annotation.Target;
 @ComponentScan(basePackageClasses = MappingUtil.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@interface EnableBeanMapping {}
+public @interface EnableBeanMapping {}
