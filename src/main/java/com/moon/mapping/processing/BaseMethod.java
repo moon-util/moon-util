@@ -1,13 +1,9 @@
 package com.moon.mapping.processing;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * @author benshaoye
  */
-@ToString(callSuper = true)
-@EqualsAndHashCode
 abstract class BaseMethod implements BaseTypeGetter {
 
     /**
@@ -48,5 +44,5 @@ abstract class BaseMethod implements BaseTypeGetter {
 
     public boolean isDeclaration() { return declaration; }
 
-    public boolean isGenerated(){ return !isDeclaration(); }
+    public boolean isGenerated() { return !isDeclaration(); }
 }

@@ -2,8 +2,6 @@ package com.moon.mapping.processing;
 
 import com.moon.mapping.BeanMapping;
 import com.moon.mapping.annotation.MappingFor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import javax.lang.model.element.TypeElement;
 import java.util.*;
@@ -15,8 +13,6 @@ import static javax.lang.model.element.Modifier.ABSTRACT;
 /**
  * @author benshaoye
  */
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> extends LinkedHashMap<String, P>
     implements Completable {
 
@@ -107,6 +103,42 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         return adder;
     }
 
+    final void addBeanMapping(StringAdder adder, BaseDefinition thatDef) {
+        String thatClassname = thatDef.getQualifiedName();
+        adder.add("TO_" + StringUtils.underscore(thatClassname)).add(" {");
+        build$safeWithThat(adder, thatDef);
+        adder.add(getFactory().copyForwardMethod(getQualifiedName(), thatClassname));
+        adder.add(getFactory().copyBackwardMethod(getQualifiedName(), thatClassname));
+        adder.add(getFactory().newThatOnEmptyConstructor(getQualifiedName(), thatClassname));
+        adder.add(getFactory().newThisOnEmptyConstructor(getQualifiedName(), thatClassname));
+        adder.add("},");
+    }
+
+    private void build$safeWithThat(StringAdder adder, BaseDefinition thatDef) {
+        final String thatClassname = thatDef.getQualifiedName();
+        final String thisClassname = getQualifiedName();
+        {
+            Collection<String> fields = reducing(thisProp -> {
+                Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
+                if (isUsable(thisProp, thatProp)) {
+                    return getFactory().copyForwardField(thisProp, thatProp);
+                }
+                return null;
+            });
+            adder.add(getFactory().safeCopyForwardMethod(thisClassname, thatClassname, fields));
+        }
+        {
+            Collection<String> fields = reducing(thisProp -> {
+                Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
+                if (isUsable(thatProp, thisProp)) {
+                    return getFactory().copyBackwardField(thatProp, thisProp);
+                }
+                return null;
+            });
+            adder.add(getFactory().safeCopyBackwardMethod(thisClassname, thatClassname, fields));
+        }
+    }
+
     private void addMapMapping(final StringAdder adder) {
         {
             // fromMap(Object,Map)
@@ -183,5 +215,11 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         Set<String> sorts = new LinkedHashSet<>();
         sorts.add("id");
         return sorts;
+    }
+
+    private static boolean isUsable(Mappable from, Mappable to) {
+        boolean hasGetter = from != null && from.hasGetterMethod();
+        boolean hasSetter = to != null && to.hasSetterMethod();
+        return hasGetter && hasSetter;
     }
 }

@@ -3,7 +3,10 @@ package com.moon.mapping.processing;
 import com.google.auto.service.AutoService;
 import com.moon.mapping.annotation.MappingFor;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.Processor;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -62,27 +65,14 @@ public class MappingProcessor extends AbstractProcessor {
         final List<JavaFileWritable> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
-                for (Element element :  env.getElementsAnnotatedWith(MappingFor.class)) {
+                for (Element element : env.getElementsAnnotatedWith(MappingFor.class)) {
                     if (element instanceof TypeElement) {
-                        models.add(onAnnotatedMappingFor((TypeElement) element));
+                        models.add(onAnnotatedClass((TypeElement) element));
                     }
                 }
             }
         }
         return models;
-    }
-
-    private JavaFileWritable onAnnotatedMappingFor(final TypeElement thisElement) {
-        if (thisElement.getKind().isInterface()) {
-            return onAnnotatedInter(thisElement);
-        }
-        return onAnnotatedClass(thisElement);
-    }
-
-    private JavaFileWritable onAnnotatedInter(final TypeElement thisElement) {
-        InterDefinition definition = InterfaceUtils.toPropertiesMap(thisElement);
-        final Map<String, BasicDefinition> mappingForDetailsMap = new HashMap<>(4);
-        return new MappingWriter(definition, mappingForDetailsMap);
     }
 
     private JavaFileWritable onAnnotatedClass(final TypeElement thisElement) {

@@ -3,7 +3,7 @@ package com.moon.mapping.processing;
 /**
  * @author benshaoye
  */
-final class ParseModel {
+public class ParseModel {
 
     private String returnType;
     private String returnName;

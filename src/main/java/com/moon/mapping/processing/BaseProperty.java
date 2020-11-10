@@ -1,8 +1,5 @@
 package com.moon.mapping.processing;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +7,6 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-@ToString(callSuper = true)
-@EqualsAndHashCode
 abstract class BaseProperty<M extends BaseMethod> implements Mappable, BaseTypeGetter, Completable {
 
     /**
@@ -76,6 +71,7 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, BaseTypeG
         return getterArr == null ? (getterArr = new ArrayList<>()) : getterArr;
     }
 
+    @Override
     public String getName() { return name; }
 
     @Override
