@@ -1,5 +1,8 @@
 package com.moon.mapping.processing;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +10,9 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-abstract class BaseProperty<M extends BaseMethod> implements BaseTypeGetter, Completable {
+@ToString(callSuper = true)
+@EqualsAndHashCode
+abstract class BaseProperty<M extends BaseMethod> implements Mappable, BaseTypeGetter, Completable {
 
     /**
      * 字段名
@@ -38,7 +43,7 @@ abstract class BaseProperty<M extends BaseMethod> implements BaseTypeGetter, Com
      */
     private List<M> setterArr;
     /**
-     * getter 方法不肯被重写，这里是为了和 setter 沿用统一结构
+     * getter 方法不可能被重写，这里是为了和 setter 沿用统一结构
      */
     private List<M> getterArr;
 
@@ -84,7 +89,4 @@ abstract class BaseProperty<M extends BaseMethod> implements BaseTypeGetter, Com
     public void addSetterMethod(M setter) { ensureSetterArr().add(setter); }
 
     public void addGetterMethod(M getter) { ensureGetterArr().add(getter); }
-
-    @Override
-    public void onCompleted() { }
 }

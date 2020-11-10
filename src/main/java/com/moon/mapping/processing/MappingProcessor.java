@@ -11,6 +11,8 @@ import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.*;
 
+import static com.moon.mapping.processing.ProcessUtils.toPropertiesMap;
+
 /**
  * @author moonsky
  */
@@ -31,13 +33,13 @@ public class MappingProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
-        EnvironmentUtils.initialize(processingEnv);
+        EnvUtils.initialize(processingEnv);
         super.init(processingEnv);
     }
 
     private void doWriteJavaFile(List<JavaFileWritable> models) throws IOException {
         for (JavaFileWritable model : models) {
-            model.writeJavaFile();
+            model.writeJavaFile(EnvUtils.getEnv().getFiler());
         }
     }
 
@@ -62,7 +64,7 @@ public class MappingProcessor extends AbstractProcessor {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
                 for (Element element :  env.getElementsAnnotatedWith(MappingFor.class)) {
                     if (element instanceof TypeElement) {
-                        models.add(onAnnotatedClass((TypeElement) element));
+                        models.add(onAnnotatedMappingFor((TypeElement) element));
                     }
                 }
             }
@@ -78,26 +80,27 @@ public class MappingProcessor extends AbstractProcessor {
     }
 
     private JavaFileWritable onAnnotatedInter(final TypeElement thisElement) {
-
-        return null;
+        InterDefinition definition = InterfaceUtils.toPropertiesMap(thisElement);
+        final Map<String, BasicDefinition> mappingForDetailsMap = new HashMap<>(4);
+        return new MappingWriter(definition, mappingForDetailsMap);
     }
 
     private JavaFileWritable onAnnotatedClass(final TypeElement thisElement) {
-        final Elements utils = EnvironmentUtils.getUtils();
-        final Map<String, ClassDefinition> mappingForDetailsMap = new HashMap<>(4);
+        final Elements utils = EnvUtils.getUtils();
+        final Map<String, BasicDefinition> mappingForDetailsMap = new HashMap<>(4);
         final Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);
-        final MappingForDetail mappingResult = new MappingForDetail(thisElement, mappingForDetailsMap);
-        mappingResult.putAll(ProcessUtils.toPropertiesMap(thisElement));
+        BasicDefinition thisDefined = toPropertiesMap(thisElement);
+        MappingWriter writable = new MappingWriter(thisDefined, mappingForDetailsMap);
         if (classes.isEmpty()) {
-            return mappingResult;
+            return writable;
         }
         for (String thatClassname : classes) {
             TypeElement target = utils.getTypeElement(thatClassname);
             if (target == null) {
                 continue;
             }
-            mappingForDetailsMap.put(thatClassname, ProcessUtils.toPropertiesMap(target));
+            mappingForDetailsMap.put(thatClassname, toPropertiesMap(target));
         }
-        return mappingResult;
+        return writable;
     }
 }

@@ -14,6 +14,11 @@ final class InterDefinition extends BaseDefinition<InterMethod, InterProperty> {
 
     public InterDefinition(TypeElement enclosingElement) { super(enclosingElement); }
 
+    @Override
+    public String getFactThisImplName() {
+        return super.getFactThisImplName() + IMPL_SUFFIX;
+    }
+
     final String implementation(String classname) {
         List<String> impl = new ArrayList<>();
         for (Map.Entry<String, InterProperty> entry : entrySet()) {
@@ -32,7 +37,10 @@ final class InterDefinition extends BaseDefinition<InterMethod, InterProperty> {
         StringAdder adder = new StringAdder();
         adder.add("@Override public ").add(classname).add(" clone() {");
         adder.add(classname).add(" clone = new ").add(classname).add("();");
-        return adder.add(" return clone;}").toString();
+        return adder.add(join("", reduceList((list, prop) -> {
+            list.add(prop.toCloneMethod("clone"));
+            return list;
+        }))).add(" return clone;}").toString();
     }
 
     private String toStringMethod(String classname) {
@@ -49,7 +57,7 @@ final class InterDefinition extends BaseDefinition<InterMethod, InterProperty> {
         // hashCode
         adder.add("@Override public int hashCode(){ return java.util.Objects.hash(");
         adder.add(join(",", reduceList((list, prop) -> {
-            list.add(prop.toStringMethod(list.isEmpty()));
+            list.add(prop.toCallGetterArr());
             return list;
         }))).add(");}");
 
@@ -58,10 +66,10 @@ final class InterDefinition extends BaseDefinition<InterMethod, InterProperty> {
         adder.add("if (this == thatObject) { return true; }");
         adder.add("if (thatObject == null) { return false; }");
         adder.add("if (!(thatObject instanceof ").add(classname).add(")) { return false; }");
-        adder.add(classname).addSpace().add("that=").add("(").add(classname).add(")");
+        adder.add(classname).space().add("that=").add("(").add(classname).add(")");
         adder.add("thatObject;return ");
         return adder.add(join(" && ", reduceList((list, prop) -> {
-            list.add(prop.toStringMethod(list.isEmpty()));
+            list.add(prop.toEqualsString("that"));
             return list;
         }))).add(";}").toString();
     }

@@ -15,12 +15,12 @@ final class ProcessUtils {
 
     private ProcessUtils() {}
 
-    private static ClassProperty ensureDetail(
-        ClassDefinition definition, String name, TypeElement parsingElement, TypeElement thisElement
+    private static BasicProperty ensureDetail(
+        BasicDefinition definition, String name, TypeElement parsingElement, TypeElement thisElement
     ) {
-        ClassProperty detail = definition.get(name);
+        BasicProperty detail = definition.get(name);
         if (detail == null) {
-            detail = new ClassProperty(name, thisElement, parsingElement);
+            detail = new BasicProperty(name, parsingElement, thisElement);
             definition.put(name, detail);
         }
         return detail;
@@ -28,7 +28,7 @@ final class ProcessUtils {
 
     private static void handleEnclosedElem(
         Set<String> presentKeys,
-        ClassDefinition definition,
+        BasicDefinition definition,
         Element element,
         Map<String, GenericModel> genericMap,
         TypeElement parsingElement,
@@ -39,32 +39,32 @@ final class ProcessUtils {
             if (presentKeys.contains(name)) {
                 return;
             }
-            ClassProperty detail = ensureDetail(definition, name, parsingElement, thisElement);
-            detail.setVariableElem((VariableElement) element, genericMap);
+            BasicProperty prop = ensureDetail(definition, name, parsingElement, thisElement);
+            prop.setField((VariableElement) element, genericMap);
         } else if (DetectUtils.isSetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             String name = ElementUtils.toPropertyName(elem);
             if (presentKeys.contains(name)) {
                 return;
             }
-            ClassProperty detail = ensureDetail(definition, name, parsingElement, thisElement);
-            detail.setSetter(elem, genericMap);
+            BasicProperty prop = ensureDetail(definition, name, parsingElement, thisElement);
+            prop.setSetter(elem, genericMap);
         } else if (DetectUtils.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             String name = ElementUtils.toPropertyName(elem);
             if (presentKeys.contains(name)) {
                 return;
             }
-            ClassProperty detail = ensureDetail(definition, name, parsingElement, thisElement);
-            detail.setGetter(elem, genericMap);
+            BasicProperty prop = ensureDetail(definition, name, parsingElement, thisElement);
+            prop.setGetter(elem, genericMap);
         } else if (DetectUtils.isConstructor(element)) {
-            definition.addConstructor((ExecutableElement) element);
+            // definition.addConstructor((ExecutableElement) element);
         }
     }
 
     @SuppressWarnings("all")
-    private static ClassDefinition parseRootPropertiesMap(final TypeElement rootElement) {
-        ClassDefinition definition = new ClassDefinition(rootElement);
+    private static BasicDefinition parseRootPropertiesMap(final TypeElement rootElement) {
+        BasicDefinition definition = new BasicDefinition(rootElement);
         Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
         List<? extends Element> elements = rootElement.getEnclosedElements();
         Set<String> presents = new HashSet<>();
@@ -76,13 +76,13 @@ final class ProcessUtils {
     }
 
     private static void parseSuperPropertiesMap(
-        Set<String> presentKeys, ClassDefinition definition, TypeElement thisElement, TypeElement rootElement
+        Set<String> presentKeys, BasicDefinition definition, TypeElement thisElement, TypeElement rootElement
     ) {
         TypeMirror superclass = thisElement.getSuperclass();
         if (superclass.toString().equals(TOP_CLASS)) {
             return;
         }
-        Types types = EnvironmentUtils.getTypes();
+        Types types = EnvUtils.getTypes();
         TypeElement superElement = ElementUtils.cast(types.asElement(superclass));
         if (superElement == null) {
             return;
@@ -96,11 +96,12 @@ final class ProcessUtils {
         parseSuperPropertiesMap(presentKeys, definition, superElement, rootElement);
     }
 
-    static ClassDefinition toPropertiesMap(TypeElement rootElement) {
+    static BasicDefinition toPropertiesMap(TypeElement rootElement) {
         DetectUtils.assertRootElement(rootElement);
-        ClassDefinition definition = parseRootPropertiesMap(rootElement);
+        BasicDefinition definition = parseRootPropertiesMap(rootElement);
         parseSuperPropertiesMap(new HashSet<>(), definition, rootElement, rootElement);
-        return definition.onParseCompleted();
+        definition.onCompleted();
+        return definition;
     }
 
     static Collection<String> getMappingForClasses(TypeElement element) {

@@ -15,11 +15,11 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-final class EnvironmentUtils {
+final class EnvUtils {
 
     private static ProcessingEnvironment ENV;
 
-    private EnvironmentUtils() { }
+    private EnvUtils() { }
 
     static void initialize(ProcessingEnvironment environment) { ENV = environment; }
 
@@ -44,6 +44,13 @@ final class EnvironmentUtils {
 
     public static void newJavaFile(String name, Supplier<String> supplier) throws IOException {
         newJavaFile(name, writer -> {
+            writer.write(supplier.get());
+            writer.flush();
+        });
+    }
+
+    public static void newJavaFile(Filer filer, String name, Supplier<String> supplier) throws IOException {
+        newJavaFile(filer, name, writer -> {
             writer.write(supplier.get());
             writer.flush();
         });

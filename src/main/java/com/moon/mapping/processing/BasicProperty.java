@@ -1,35 +1,66 @@
 package com.moon.mapping.processing;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import static com.moon.mapping.processing.ElementUtils.capitalize;
+import static com.moon.mapping.processing.GenericUtils.findActualType;
+import static com.moon.mapping.processing.StringUtils.capitalize;
 
 /**
  * @author benshaoye
  */
-final class BasicProperty extends BaseProperty<BasicMethod> implements Mappable {
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+final class BasicProperty extends BaseProperty<BasicMethod> {
+
+    private final TypeElement thisElement;
 
     private VariableElement field;
 
-    BasicProperty(String name, TypeElement enclosingElement) {
+    BasicProperty(String name, TypeElement enclosingElement, TypeElement thisElement) {
         super(name, enclosingElement);
+        this.thisElement = thisElement;
     }
 
     public VariableElement getField() { return field; }
 
-    public void setField(VariableElement field) { this.field = field; }
+    public void setField(VariableElement field, Map<String, GenericModel> genericMap) {
+        this.field = field;
+        String type = field.asType().toString();
+        setDeclareType(type);
+        setActualType(findActualType(genericMap, type));
+    }
+
+    public void setSetter(ExecutableElement setter, Map<String, GenericModel> genericMap) {
+        String declareType = setter.getParameters().get(0).asType().toString();
+        ensureSetterArr().add(toMethod(declareType, setter, genericMap));
+    }
+
+    public void setGetter(ExecutableElement getter, Map<String, GenericModel> genericMap) {
+        String declareType = getter.getReturnType().toString();
+        ensureGetterArr().add(toMethod(declareType, getter, genericMap));
+    }
+
+    private BasicMethod toMethod(String declareType, ExecutableElement method, Map<String, GenericModel> generics) {
+        return new BasicMethod(method, declareType, findActualType(generics, declareType), true);
+    }
 
     /*
     custom
      */
 
     @Override
-    public boolean hasSetterMethod() {
-        return hasPublicDefaultSetter() || hasLombokSetter();
-    }
+    public boolean hasSetterMethod() { return hasPublicDefaultSetter() || hasLombokSetter(); }
 
     @Override
     public String getSetterName() {
@@ -53,6 +84,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> implements Mappable 
         return null;
     }
 
+    @Override
     public String getWrappedSetterType() {
         TypeMirror typeMirror = null;
         if (isPrimitiveSetter()) {
@@ -109,9 +141,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> implements Mappable 
      * 是否有 getter
      */
     @Override
-    public boolean hasGetterMethod() {
-        return hasPublicDefaultGetter() || hasLombokGetter();
-    }
+    public boolean hasGetterMethod() { return hasPublicDefaultGetter() || hasLombokGetter(); }
 
     /**
      * getter method name
@@ -145,6 +175,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> implements Mappable 
         return null;
     }
 
+    @Override
     public String getWrappedGetterType() {
         TypeMirror typeMirror = null;
         if (isPrimitiveGetter()) {
@@ -201,9 +232,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> implements Mappable 
     /**
      * lombok 生成的 setter 方法
      */
-    private boolean hasLombokSetter() {
-        return DetectUtils.hasLombokSetter(getField());
-    }
+    private boolean hasLombokSetter() { return DetectUtils.hasLombokSetter(getField()); }
 
     /**
      * 主动声明的 public getter 方法
@@ -216,7 +245,66 @@ final class BasicProperty extends BaseProperty<BasicMethod> implements Mappable 
     /**
      * lombok 生成的 getter 方法
      */
-    private boolean hasLombokGetter() {
-        return DetectUtils.hasLombokGetter(getField());
+    private boolean hasLombokGetter() { return DetectUtils.hasLombokGetter(getField()); }
+
+    @Override
+    public void onCompleted() {
+        final String propertyType = getComputedType();
+        if (propertyType == null) {
+            onMissingField();
+        } else {
+            onPresentField(propertyType);
+        }
+
+
+        // Logger.warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        // Logger.warn(getEnclosingElement());
+        // Logger.warn(ensureGetterArr());
+        // Logger.warn(ensureSetterArr());
+    }
+
+    private void onMissingField() {
+        List<BasicMethod> getterArr = ensureGetterArr();
+        if (getterArr.isEmpty()) {
+            onMissingGetter();
+        } else {
+            BasicMethod getter = getterArr.remove(0);
+            setGetter(getter);
+            Iterator<BasicMethod> setterItr = ensureSetterArr().iterator();
+            while (setterItr.hasNext()) {
+                BasicMethod method = setterItr.next();
+                if (Objects.equals(method.getComputedType(), getter.getComputedType())) {
+                    this.setSetter(method);
+                    setterItr.remove();
+                    break;
+                }
+            }
+        }
+    }
+
+    private void onMissingGetter() {
+
+    }
+
+    private void onPresentField(final String propertyType) {
+        Iterator<BasicMethod> getterItr = ensureGetterArr().iterator();
+        while (getterItr.hasNext()) {
+            BasicMethod method = getterItr.next();
+            if (Objects.equals(method.getComputedType(), propertyType)) {
+                this.setGetter(method);
+                getterItr.remove();
+                break;
+            }
+        }
+
+        Iterator<BasicMethod> setterItr = ensureSetterArr().iterator();
+        while (setterItr.hasNext()) {
+            BasicMethod method = setterItr.next();
+            if (Objects.equals(method.getComputedType(), propertyType)) {
+                this.setSetter(method);
+                setterItr.remove();
+                break;
+            }
+        }
     }
 }

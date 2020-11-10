@@ -3,10 +3,7 @@ package com.moon.mapping.processing;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.moon.mapping.processing.CollectUtils.simpleGroup;
@@ -14,17 +11,53 @@ import static com.moon.mapping.processing.CollectUtils.simpleGroup;
 /**
  * @author moonsky
  */
-final class InterProperty extends BaseProperty<InterMethod> {
 
-    private List<Managed> fields;
+final class InterProperty extends BaseProperty<InterMethod> implements Mappable {
 
-    InterProperty(String name, TypeElement enclosingElement) {
-        super(name, enclosingElement);
-    }
+    private Managed primaryManaged;
+    private Map<String, Managed> fields;
 
-    public List<Managed> getFields() { return fields; }
+    InterProperty(String name, TypeElement enclosingElement) { super(name, enclosingElement); }
 
-    public List<Managed> ensureManagedArr() { return fields == null ? (fields = new ArrayList<>()) : fields; }
+    public Managed getPrimaryManaged() { return primaryManaged; }
+
+    public void setPrimaryManaged(Managed primaryManaged) { this.primaryManaged = primaryManaged; }
+
+    public Map<String, Managed> getFields() { return fields; }
+
+    public Map<String, Managed> ensureFields() { return fields == null ? (fields = new LinkedHashMap<>()) : fields; }
+
+    /*
+    mapping 实现
+     */
+
+    @Override
+    public boolean hasGetterMethod() { return getGetter() != null; }
+
+    @Override
+    public boolean hasSetterMethod() { return getSetter() != null; }
+
+    @Override
+    public String getGetterName() { return getGetter().getMethodName(); }
+
+    @Override
+    public String getSetterName() { return getSetter().getMethodName(); }
+
+    @Override
+    public String getGetterFinalType() { return getGetter().getComputedType(); }
+
+    @Override
+    public String getSetterFinalType() { return getSetter().getComputedType(); }
+
+    @Override
+    public boolean isPrimitiveGetter() { return StringUtils.isPrimitive(getGetterFinalType()); }
+
+    @Override
+    public boolean isPrimitiveSetter() { return StringUtils.isPrimitive(getSetterFinalType()); }
+
+    /*
+    接口实现
+     */
 
     String toDeclareField() { return toDeclared(Managed::toDeclareField); }
 
@@ -44,8 +77,8 @@ final class InterProperty extends BaseProperty<InterMethod> {
         return toDeclared(" && ", managed -> managed.toEqualsString(varName));
     }
 
-    String toCloneMethod() {
-        return "";
+    String toCloneMethod(String cloneName) {
+        return toDeclared(managed -> managed.toCloneField(cloneName));
     }
 
     private String toDeclared(Function<Managed, String> stringifier) {
@@ -53,22 +86,76 @@ final class InterProperty extends BaseProperty<InterMethod> {
     }
 
     private String toDeclared(String delimiter, Function<Managed, String> stringifier) {
-        return String.join(delimiter, CollectUtils.reduce(ensureManagedArr(), (declares, field) -> {
+        List<Managed> fields = new ArrayList<>();
+        Managed primary = getPrimaryManaged();
+        if (primary != null) {
+            fields.add(primary);
+        }
+        fields.addAll(ensureFields().values());
+        return String.join(delimiter, CollectUtils.reduce(fields, (declares, field) -> {
             declares.add(stringifier.apply(field));
             return declares;
         }, new ArrayList<>()));
     }
 
     @Override
-    public void onCompleted() { doParseCompleted(); }
+    public void onCompleted() { doCompleted(); }
+
+    protected final void doCompleted() {
+        int index = 0;
+        final String propertyName = getName();
+        final Map<String, InterMethod> settersMap = simpleGroup(ensureSetterArr(), InterMethod::getComputedType);
+        Iterator<InterMethod> getterItr = ensureGetterArr().iterator();
+        InterMethod getterMethod = null, setterMethod = null;
+        Managed primary = null;
+        while (getterItr.hasNext()) {
+            getterMethod = getterItr.next();
+            String actualType = getterMethod.getActualType();
+            String declareType = getterMethod.getDeclareType();
+            String factActualType = getterMethod.getComputedType();
+            setterMethod = settersMap.remove(getterMethod.getComputedType());
+            if (setterMethod == null) {
+                setterMethod = new InterMethod(toSetterName(getterMethod), declareType, actualType);
+            }
+            primary=new Managed(propertyName, index++, factActualType, getterMethod, setterMethod);
+        }
+        final List<Managed> managedArr = new ArrayList<>();
+        for (Map.Entry<String, InterMethod> entry : settersMap.entrySet()) {
+            InterMethod setter = entry.getValue();
+            String declareType = setter.getDeclareType();
+            String actualType = setter.getActualType();
+            String factActualType = entry.getKey();
+            InterMethod getter = new InterMethod(toGetterName(setter), declareType, actualType);
+            managedArr.add(new Managed(propertyName, index++, factActualType, getter, setter));
+        }
+        if (getterMethod != null) {
+            // 只要声明了 getter 就走这里
+            this.setGetter(getterMethod);
+            this.setSetter(setterMethod);
+            this.setPrimaryManaged(primary);
+        } else if (managedArr.size() == 1) {
+            // 没有 getter 且只有一个 setter 走这里
+            Managed managed = managedArr.get(0);
+            this.setGetter(managed.getGetter());
+            this.setSetter(managed.getSetter());
+            this.setPrimaryManaged(managed);
+            return;
+        }
+        // 没有 getter 且有多个 setter 时走这里
+        Map<String, Managed> managedMap = ensureFields();
+        for (Managed managed : managedArr) {
+            managedMap.put(managed.getFactActualType(), managed);
+        }
+    }
 
     protected final void doParseCompleted() {
         final String name = getName();
-        Map<String, InterMethod> gettersMap = simpleGroup(ensureGetterArr(), InterMethod::getFactActualType);
-        Map<String, InterMethod> settersMap = simpleGroup(ensureSetterArr(), InterMethod::getFactActualType);
+        Map<String, InterMethod> gettersMap = simpleGroup(ensureGetterArr(), InterMethod::getComputedType);
+        Map<String, InterMethod> settersMap = simpleGroup(ensureSetterArr(), InterMethod::getComputedType);
         final Map<String, Managed> propsMap = new LinkedHashMap<>();
         int index = 0;
         for (Map.Entry<String, InterMethod> entry : gettersMap.entrySet()) {
+            // 同名 getter 最多只有一个，即这里面最多只会走一次
             final InterMethod getter = entry.getValue();
             String declareType = getter.getDeclareType();
             String actualType = getter.getActualType();
@@ -89,7 +176,8 @@ final class InterProperty extends BaseProperty<InterMethod> {
             Managed managed = new Managed(name, index++, factActualType, getter, setter);
             propsMap.put(managed.getFieldName(), managed);
         }
-        ensureManagedArr().addAll(propsMap.values());
+        ensureFields().clear();
+        ensureFields().putAll(propsMap);
     }
 
     private static String toSetterName(InterMethod getter) {
@@ -101,22 +189,6 @@ final class InterProperty extends BaseProperty<InterMethod> {
         String name = setter.getMethodName().substring(3);
         TypeMirror type = setter.getElem().getParameters().get(0).asType();
         return (type.getKind() == TypeKind.BOOLEAN ? "is" : "get") + name;
-    }
-
-    private static boolean isPrimitive(String type) {
-        switch (type) {
-            case "byte":
-            case "short":
-            case "int":
-            case "long":
-            case "float":
-            case "double":
-            case "boolean":
-            case "char":
-                return true;
-            default:
-                return false;
-        }
     }
 
     private static class Managed {
@@ -144,11 +216,9 @@ final class InterProperty extends BaseProperty<InterMethod> {
         public String toDeclareSetter() {
             StringAdder adder = new StringAdder();
             InterMethod setter = getSetter();
-            if (setter.isOverride()) {
-                adder.add("@Override ");
-            }
+            adder.add(setter.isDeclaration(), "@Override ");
             adder.add("public void ").add(setter.getMethodName()).add("(");
-            adder.add(getFactActualType()).addSpace().add("var").add(") {");
+            adder.add(getFactActualType()).space().add("var").add(") {");
             adder.add("this.").add(getFieldName()).add("=var;}");
             return adder.toString();
         }
@@ -159,10 +229,8 @@ final class InterProperty extends BaseProperty<InterMethod> {
             }
             StringAdder adder = new StringAdder();
             InterMethod getter = getGetter();
-            if (getter.isOverride()) {
-                adder.add("@Override ");
-            }
-            adder.add("public ").add(getFactActualType()).addSpace().add(getter.getMethodName()).add("(){");
+            adder.add(getter.isDeclaration(), "@Override ");
+            adder.add("public ").add(getFactActualType()).space().add(getter.getMethodName()).add("(){");
             adder.add("return this.").add(getFieldName()).add(";}");
             return adder.toString();
         }
@@ -189,13 +257,25 @@ final class InterProperty extends BaseProperty<InterMethod> {
         public String toEqualsString(String varName) {
             String callGetter = toCallGetter();
             StringAdder adder = new StringAdder();
-            if (isPrimitive(getFactActualType())) {
+            if (StringUtils.isPrimitive(getFactActualType())) {
                 adder.add(callGetter).add("==").add(varName).add(".").add(callGetter);
             } else {
                 adder.add("java.util.Objects.equals(").add(callGetter).add(",").add(varName);
                 adder.add(".").add(callGetter).add(")");
             }
             return adder.toString();
+        }
+
+        public String toCloneField(String cloneName) {
+            String field = getFieldName();
+            return new StringAdder().add(cloneName)
+                .dot()
+                .add(field)
+                .add("=")
+                .add("this.")
+                .add(field)
+                .add(";")
+                .toString();
         }
 
         /**

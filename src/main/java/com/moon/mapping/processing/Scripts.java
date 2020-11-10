@@ -107,7 +107,7 @@ abstract class Scripts {
         "public Object clone(Object thisObject) {" +//
         "    if (thisObject == null) { return null; }" +//
         "    {thisType} that = ({thisType}) thisObject;" +//
-        "    {thisType} self = new {thisType}();" +//
+        "    {implType} self = new {implType}();" +//
         "    {MAPPINGS}" +//
         "    return self;" +//
         "}";

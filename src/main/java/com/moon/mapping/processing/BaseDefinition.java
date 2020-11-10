@@ -1,20 +1,28 @@
 package com.moon.mapping.processing;
 
-import javax.lang.model.element.Modifier;
+import com.moon.mapping.BeanMapping;
+import com.moon.mapping.annotation.MappingFor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.lang.model.element.TypeElement;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import static javax.lang.model.element.Modifier.ABSTRACT;
 
 /**
  * @author benshaoye
  */
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> extends LinkedHashMap<String, P>
-    implements JavaFileWritable, Completable {
+    implements Completable {
+
+    protected final static String IMPL_SUFFIX = "ImplGeneratedByMoonUtil";
+
+    private final MappingFactory factory = new MappingFactory();
 
     /**
      * 声明注解{@link com.moon.mapping.annotation.MappingFor}的类
@@ -25,31 +33,51 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     public final TypeElement getThisElement() { return thisElement; }
 
-    public final String getPackageName() {
-        return ElementUtils.getPackageName(getThisElement());
-    }
-
-    public final String getSimpleName() {
-        return ElementUtils.getSimpleName(getThisElement());
-    }
-
-    public final String getQualifiedName() {
-        return ElementUtils.getQualifiedName(getThisElement());
-    }
-
     public final boolean isInterface() { return getThisElement().getKind().isInterface(); }
 
-    public final boolean isAbstract() {
-        return DetectUtils.isAny(getThisElement(), Modifier.ABSTRACT);
+    public final boolean isAbstract() { return DetectUtils.isAny(getThisElement(), ABSTRACT); }
+
+    public final MappingFactory getFactory() { return factory; }
+
+    /**
+     * 声明{@link MappingFor}的类{@link #getThisElement()}所在包的完整名
+     *
+     * @return 包名
+     */
+    public final String getPackageName() { return ElementUtils.getPackageName(getThisElement()); }
+
+    /**
+     * {@link #getThisElement()}的类名，如果是内部类，也只返回最后一部分
+     *
+     * @return
+     */
+    public final String getSimpleName() { return ElementUtils.getSimpleName(getThisElement()); }
+
+    /**
+     * {@link #getThisElement()}的完整合法名称
+     *
+     * @return
+     */
+    public final String getQualifiedName() { return ElementUtils.getQualifiedName(getThisElement()); }
+
+    public String getFactThisImplName() { return getQualifiedName(); }
+
+    public String getInterfaceImplSimpleName() {
+        if (isInterface()) {
+            return getSimpleName() + IMPL_SUFFIX;
+        }
+        return null;
     }
 
-    @Override
-    public void onCompleted() {
-        forEach((name, prop) -> prop.onCompleted());
-    }
+    /**
+     * 实现自定义接口，如果{@link #thisElement}是接口的话
+     *
+     * @return
+     */
+    public StringAdder implGeneratedMethods() { return null; }
 
     @Override
-    public void writeJavaFile() throws IOException { }
+    public void onCompleted() { forEach((name, prop) -> prop.onCompleted()); }
 
     public final <T> T reduce(BiFunction<T, P, T> converter, T totalValue) {
         for (Map.Entry<String, P> pEntry : entrySet()) {
@@ -67,5 +95,93 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
             list.add(converter.apply(p));
             return list;
         }), new ArrayList<>());
+    }
+
+    /**
+     * 实现{@link BeanMapping}的公共方法
+     */
+    public StringAdder implMappingSharedMethods() {
+        final StringAdder adder = new StringAdder();
+        addObjectMapping(adder);
+        addMapMapping(adder);
+        return adder;
+    }
+
+    private void addMapMapping(final StringAdder adder) {
+        {
+            // fromMap(Object,Map)
+            Collection<String> fields = reducing(getFactory()::fromMapField);
+            adder.add(getFactory().fromMapMethod(getFactThisImplName(), fields));
+        }
+        {
+            // toMap(Object,Map)
+            Collection<String> fields = reducing(getFactory()::toMapField);
+            adder.add(getFactory().toMapMethod(getQualifiedName(), fields));
+        }
+        {
+            // newThis(Map)
+            adder.add(getFactory().newThisAsMapMethod(getFactThisImplName()));
+        }
+    }
+
+    private void addObjectMapping(final StringAdder adder) {
+        {
+            // clone(Object)
+            Collection<String> fields = reducing(getFactory()::cloneField);
+            adder.add(getFactory().cloneMethod(getQualifiedName(), getFactThisImplName(), fields));
+        }
+        {
+            // toString(Object)
+            @SuppressWarnings("all") Collection<String> fields = reducing((list, property) ->//
+                getFactory().toStringField(property, list.isEmpty()));
+            adder.add(getFactory().toStringMethod(getFactThisImplName(), fields));
+        }
+    }
+
+    private Collection<String> reducing(Function<Mappable, String> serializer) {
+        return reducing((m, prop) -> serializer.apply(prop));
+    }
+
+    private Collection<String> reducing(BiFunction<Map<String, String>, Mappable, String> serializer) {
+        final Map<String, String> parsedFields = new LinkedHashMap<>();
+        final Set<String> sortKeys = getSortedKeys();
+        for (String key : sortKeys) {
+            Mappable property = get(key);
+            if (property != null) {
+                String field = serializer.apply(parsedFields, property);
+                if (isNotBlank(field)) {
+                    parsedFields.put(key, field);
+                }
+            }
+        }
+        return CollectUtils.reduce(entrySet(), (parsed, entry) -> {
+            if (sortKeys.contains(entry.getKey())) {
+                return parsed;
+            }
+            String field = serializer.apply(parsed, entry.getValue());
+            if (isNotBlank(field)) {
+                parsed.put(entry.getKey(), field);
+            }
+            return parsed;
+        }, parsedFields).values();
+    }
+
+    private static boolean isNotBlank(String str) {
+        if (str == null) {
+            return false;
+        }
+        int strLen = str.length();
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<String> getSortedKeys() {
+        Set<String> sorts = new LinkedHashSet<>();
+        sorts.add("id");
+        return sorts;
     }
 }

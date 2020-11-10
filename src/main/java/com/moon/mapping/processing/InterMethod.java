@@ -6,12 +6,7 @@ import java.util.Map;
 /**
  * @author moonsky
  */
-final class InterMethod extends ClassMethod {
-
-    /**
-     * 是否是覆盖方法
-     */
-    private final boolean override;
+final class InterMethod extends BasicMethod {
 
     /**
      * 接口原先声明的方法从这里进入
@@ -22,7 +17,6 @@ final class InterMethod extends ClassMethod {
      */
     InterMethod(ExecutableElement elem, String declareType, Map<String, GenericModel> generics) {
         super(elem, declareType, generics);
-        this.override = true;
     }
 
     /**
@@ -36,9 +30,5 @@ final class InterMethod extends ClassMethod {
      */
     InterMethod(String methodName, String declareType, String actualType) {
         super(null, methodName, declareType, actualType, false);
-        this.override = false;
     }
-
-    @Override
-    public boolean isOverride() { return override; }
 }

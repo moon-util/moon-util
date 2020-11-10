@@ -5,7 +5,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.Diagnostic;
 import java.util.concurrent.atomic.LongAdder;
 
-import static com.moon.mapping.processing.EnvironmentUtils.getMessager;
+import static com.moon.mapping.processing.EnvUtils.getMessager;
 
 /**
  * @author benshaoye

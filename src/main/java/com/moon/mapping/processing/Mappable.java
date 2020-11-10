@@ -6,6 +6,13 @@ package com.moon.mapping.processing;
 interface Mappable {
 
     /**
+     * property name
+     *
+     * @return property name
+     */
+    String getName();
+
+    /**
      * 是否有 getter
      *
      * @return getter
@@ -60,4 +67,22 @@ interface Mappable {
      * @return setter 方法参数是否是基本数据类型
      */
     boolean isPrimitiveSetter();
+
+    /**
+     * 返回包装类，主要是基本数据类型到对应包装类的转换
+     *
+     * @return 包装类
+     */
+    default String getWrappedGetterType() {
+        return StringUtils.toWrappedType(getGetterFinalType());
+    }
+
+    /**
+     * 返回包装类，主要是基本数据类型到对应包装类的转换
+     *
+     * @return 包装类
+     */
+    default String getWrappedSetterType() {
+        return StringUtils.toWrappedType(getSetterFinalType());
+    }
 }

@@ -2,6 +2,7 @@ package com.moon.mapping.processing;
 
 import com.moon.mapping.annotation.MappingFor;
 
+import javax.annotation.processing.Filer;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
@@ -71,7 +72,7 @@ class ClassDefinition extends LinkedHashMap<String, ClassProperty> implements Ja
 
     @Override
     @SuppressWarnings("all")
-    public void writeJavaFile() throws IOException {
+    public void writeJavaFile(Filer filer) throws IOException {
         if (isInterface()) {
             final String pkgName = getPackageName();
             final String classname = getSimpleImplClassname();
@@ -83,7 +84,7 @@ class ClassDefinition extends LinkedHashMap<String, ClassProperty> implements Ja
             InterDefinition interDef = InterfaceUtils.toPropertiesMap(getThisElement());
             adder.add(interDef.implementation(classname));
             adder.add("}");
-            EnvironmentUtils.newJavaFile(classname, adder);
+            EnvUtils.newJavaFile(classname, adder);
         }
     }
 

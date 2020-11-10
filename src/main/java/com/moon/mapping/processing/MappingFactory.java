@@ -16,7 +16,7 @@ final class MappingFactory {
     private final ProcessingEnvironment env;
     private final AtomicInteger indexer = new AtomicInteger();
 
-    MappingFactory() { this.env = EnvironmentUtils.getEnv(); }
+    MappingFactory() { this.env = EnvUtils.getEnv(); }
 
     public AtomicInteger getIndexer() { return indexer; }
 
@@ -29,13 +29,13 @@ final class MappingFactory {
     }
 
     final String copyBackwardField(
-        ClassProperty fromProperty, ClassProperty toProperty
+        Mappable fromProperty, Mappable toProperty
     ) {
-        return copyBackwardField(toProperty.gotSetterName(),//
-            fromProperty.gotGetterName(),//
-            toProperty.gotSetterType(),//
-            fromProperty.gotGetterType(),//
-            toProperty.wasPrimitiveSetter());
+        return copyBackwardField(toProperty.getSetterName(),//
+            fromProperty.getGetterName(),//
+            toProperty.getSetterFinalType(),//
+            fromProperty.getGetterFinalType(),//
+            toProperty.isPrimitiveSetter());
     }
 
     private final String copyBackwardField(
@@ -63,13 +63,13 @@ final class MappingFactory {
     }
 
     final String copyForwardField(
-        ClassProperty fromProperty, ClassProperty toProperty
+        Mappable fromProperty, Mappable toProperty
     ) {
-        return copyForwardField(toProperty.gotSetterName(),//
-            fromProperty.gotGetterName(),//
-            toProperty.gotSetterType(),//
-            fromProperty.gotGetterType(),//
-            toProperty.wasPrimitiveSetter());
+        return copyForwardField(toProperty.getSetterName(),//
+            fromProperty.getGetterName(),//
+            toProperty.getSetterFinalType(),//
+            fromProperty.getGetterFinalType(),//
+            toProperty.isPrimitiveSetter());
     }
 
     private final String copyForwardField(
@@ -96,21 +96,21 @@ final class MappingFactory {
         return Replacer.thatType.replace(result, thatType);
     }
 
-    final String fromMapField(ClassProperty property) {
+    final String fromMapField(Mappable property) {
         String t0 = "self.{setterName}(({setterType}) thatObject.get(\"{name}\"));";
-        if (property.wasPrimitiveSetter()) {
+        if (property.isPrimitiveSetter()) {
             t0 = "{setterType} {var} = ({setterType}) thatObject.get(\"{name}\");" +//
                 "if ({var} != null) { self.{setterName}({var}); }";
             t0 = Replacer.var.replace(t0, nextVarname());
-            t0 = Replacer.setterType.replace(t0, property.gotWrappedSetterType());
-        } else if (Objects.equals(property.gotSetterType(), String.class.getName())) {
+            t0 = Replacer.setterType.replace(t0, property.getWrappedSetterType());
+        } else if (Objects.equals(property.getSetterFinalType(), String.class.getName())) {
             t0 = "Object {var} = thatObject.get(\"{name}\");" +//
                 "if ({var} == null) { self.{setterName}(null); }" +//
                 "else { self.{setterName}({var}.toString()); }";
             t0 = Replacer.var.replace(t0, nextVarname());
         }
-        t0 = Replacer.setterType.replace(t0, property.gotSetterType());
-        t0 = Replacer.setterName.replace(t0, property.gotSetterName());
+        t0 = Replacer.setterType.replace(t0, property.getSetterFinalType());
+        t0 = Replacer.setterName.replace(t0, property.getSetterName());
         return Replacer.name.replace(t0, property.getName());
     }
 
@@ -119,8 +119,8 @@ final class MappingFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String toMapField(ClassProperty property) {
-        return toMapField(property.getName(), property.gotGetterName());
+    final String toMapField(Mappable property) {
+        return toMapField(property.getName(), property.getGetterName());
     }
 
     private final String toMapField(String name, String getterName) {
@@ -140,8 +140,8 @@ final class MappingFactory {
 
     private Elements elements() { return env.getElementUtils(); }
 
-    final String toStringField(ClassProperty model, boolean first) {
-        return toStringField(model.getName(), model.gotGetterName(), first);
+    final String toStringField(Mappable model, boolean first) {
+        return toStringField(model.getName(), model.getGetterName(), first);
     }
 
     private final String toStringField(String name, String getterName, boolean first) {
@@ -169,17 +169,18 @@ final class MappingFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String cloneField(ClassProperty property) {
+    final String cloneField(Mappable property) {
         if (property.hasGetterMethod() && property.hasSetterMethod()) {
             String result = "self.{setterName}(that.{getterName}());";
-            result = Replacer.setterName.replace(result, property.gotSetterName());
-            return Replacer.getterName.replace(result, property.gotGetterName());
+            result = Replacer.setterName.replace(result, property.getSetterName());
+            return Replacer.getterName.replace(result, property.getGetterName());
         }
         return "";
     }
 
-    final String cloneMethod(String thisType, Iterable<String> fields) {
+    final String cloneMethod(String thisType, String implType, Iterable<String> fields) {
         String result = Replacer.thisType.replace(Scripts.clone, thisType);
+        result = Replacer.implType.replace(result, implType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
@@ -210,6 +211,7 @@ final class MappingFactory {
         getterType,
         setterType,
         thisType,
+        implType,
         thatType,
         thisName {
             @Override

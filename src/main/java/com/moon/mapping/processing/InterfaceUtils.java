@@ -35,11 +35,11 @@ abstract class InterfaceUtils {
             if (isSetterMethod(element)) {
                 ExecutableElement elem = (ExecutableElement) element;
                 InterMethod setter = toSetterMethod(elem, generics);
-                ensureProperty(definition, elem).addSetter(setter);
+                ensureProperty(definition, elem).addSetterMethod(setter);
             } else if (isGetterMethod(element)) {
                 ExecutableElement elem = (ExecutableElement) element;
                 InterMethod getter = toGetterMethod(elem, generics);
-                ensureProperty(definition, elem).addGetter(getter);
+                ensureProperty(definition, elem).addGetterMethod(getter);
             } else {
                 throwNamedException(interElement, element);
             }

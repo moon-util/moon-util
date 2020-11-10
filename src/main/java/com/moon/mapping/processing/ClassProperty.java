@@ -7,12 +7,12 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import java.util.*;
 
-import static com.moon.mapping.processing.ElementUtils.capitalize;
+import static com.moon.mapping.processing.StringUtils.capitalize;
 
 /**
  * @author moonsky
  */
-class ClassProperty {
+class ClassProperty implements Mappable{
 
     /**
      * 字段名
@@ -46,19 +46,19 @@ class ClassProperty {
     /**
      * 与字段名、字段类型对应一致的 setter 方法
      */
-    private ClassMethod setter;
+    private BasicMethod setter;
     /**
      * setter 方法重载，与{@link #setter}同名但类型不同的方法
      */
-    private List<ClassMethod> setters;
+    private List<BasicMethod> setters;
     /**
      * 与字段名、字段类型对应一致的 getter 方法
      */
-    private ClassMethod getter;
+    private BasicMethod getter;
     /**
      * getter 方法重载，与{@link #getter}同名但类型不同的方法
      */
-    private List<ClassMethod> getters;
+    private List<BasicMethod> getters;
 
     ClassProperty(String name, TypeElement thisElem, TypeElement declareElem) {
         this.name = name;
@@ -74,25 +74,25 @@ class ClassProperty {
         this.field = field;
         String type = field.asType().toString();
         this.declareType = type;
-        GenericModel model = generics.get(type);
-        this.actualType = model == null ? null : model.getSimpleFinalType();
+        this.actualType = GenericUtils.findActualType(generics, type);
     }
 
     void setSetter(ExecutableElement elem, Map<String, GenericModel> generics) {
         String declareType = elem.getParameters().get(0).asType().toString();
-        ensureSetter().add((new ClassMethod(elem, declareType, generics)));
+        ensureSetter().add((new BasicMethod(elem, declareType, generics)));
     }
 
     void setGetter(ExecutableElement elem, Map<String, GenericModel> generics) {
         String declareType = elem.getReturnType().toString();
-        ensureGetter().add((new ClassMethod(elem, declareType, generics)));
+        ensureGetter().add((new BasicMethod(elem, declareType, generics)));
     }
 
     /*
     getter & setter
      */
 
-    String getName() { return name; }
+    @Override
+    public String getName() { return name; }
 
     public TypeElement getThisElem() { return thisElem; }
 
@@ -104,27 +104,29 @@ class ClassProperty {
 
     String getActualType() { return actualType; }
 
-    ClassMethod getSetter() { return setter; }
+    BasicMethod getSetter() { return setter; }
 
-    List<ClassMethod> getSetters() { return setters; }
+    List<BasicMethod> getSetters() { return setters; }
 
-    private List<ClassMethod> ensureSetter() { return getSetters() == null ? (this.setters = new ArrayList<>()) : getSetters(); }
+    private List<BasicMethod> ensureSetter() { return getSetters() == null ? (this.setters = new ArrayList<>()) : getSetters(); }
 
-    ClassMethod getGetter() { return getter; }
+    BasicMethod getGetter() { return getter; }
 
-    List<ClassMethod> getGetters() { return getters; }
+    List<BasicMethod> getGetters() { return getters; }
 
-    private List<ClassMethod> ensureGetter() { return getGetters() == null ? (this.getters = new ArrayList<>()) : getGetters(); }
+    private List<BasicMethod> ensureGetter() { return getGetters() == null ? (this.getters = new ArrayList<>()) : getGetters(); }
 
     /*
     custom
      */
 
+    @Override
     public boolean hasSetterMethod() {
         return hasPublicDefaultSetter() || hasLombokSetter();
     }
 
-    public String gotSetterName() {
+    @Override
+    public String getSetterName() {
         if (hasPublicDefaultSetter()) {
             return getSetter().getElem().getSimpleName().toString();
         }
@@ -134,9 +136,10 @@ class ClassProperty {
         return null;
     }
 
-    public String gotSetterType() {
+    @Override
+    public String getGetterFinalType() {
         if (hasPublicDefaultSetter()) {
-            return getSetter().getFactActualType();
+            return getSetter().getComputedType();
         }
         if (hasLombokSetter()) {
             return getFactActualType();
@@ -144,11 +147,12 @@ class ClassProperty {
         return null;
     }
 
-    public String gotWrappedSetterType() {
+    @Override
+    public String getWrappedSetterType() {
         TypeMirror typeMirror = null;
-        if (wasPrimitiveSetter()) {
+        if (isPrimitiveSetter()) {
             if (hasPublicDefaultSetter()) {
-                ClassMethod setter = getSetter();
+                BasicMethod setter = getSetter();
                 typeMirror = setter.getElem().getParameters().get(0).asType();
             }
             if (hasLombokSetter()) {
@@ -156,7 +160,7 @@ class ClassProperty {
             }
         }
         if (typeMirror == null) {
-            return gotSetterType();
+            return getGetterFinalType();
         }
         if (typeMirror.getKind().isPrimitive()) {
             return toWrapperType(typeMirror.getKind());
@@ -175,7 +179,7 @@ class ClassProperty {
         }
     }
 
-    public TypeMirror gotSetterTypeElem() {
+    public TypeMirror getSetterTypeElem() {
         if (hasPublicDefaultGetter()) {
             return getSetter().getElem().getParameters().get(0).asType();
         }
@@ -185,9 +189,10 @@ class ClassProperty {
         return null;
     }
 
-    public boolean wasPrimitiveSetter() {
+    @Override
+    public boolean isPrimitiveSetter() {
         if (hasPublicDefaultSetter()) {
-            ClassMethod setter = getSetter();
+            BasicMethod setter = getSetter();
             return setter.getElem().getParameters().get(0).asType().getKind().isPrimitive();
         }
         if (hasLombokSetter()) {
@@ -200,6 +205,7 @@ class ClassProperty {
     /**
      * 是否有 getter
      */
+    @Override
     public boolean hasGetterMethod() {
         return hasPublicDefaultGetter() || hasLombokGetter();
     }
@@ -207,7 +213,8 @@ class ClassProperty {
     /**
      * getter method name
      */
-    public String gotGetterName() {
+    @Override
+    public String getGetterName() {
         if (hasPublicDefaultGetter()) {
             return getGetter().getElem().getSimpleName().toString();
         }
@@ -224,9 +231,10 @@ class ClassProperty {
     /**
      * getter return type
      */
-    public String gotGetterType() {
+    @Override
+    public String getSetterFinalType() {
         if (hasPublicDefaultGetter()) {
-            return getGetter().getFactActualType();
+            return getGetter().getComputedType();
         }
         if (hasLombokGetter()) {
             return getFactActualType();
@@ -234,11 +242,12 @@ class ClassProperty {
         return null;
     }
 
-    public String gotWrappedGetterType() {
+    @Override
+    public String getWrappedGetterType() {
         TypeMirror typeMirror = null;
-        if (wasPrimitiveGetter()) {
+        if (isPrimitiveGetter()) {
             if (hasPublicDefaultGetter()) {
-                ClassMethod setter = getGetter();
+                BasicMethod setter = getGetter();
                 typeMirror = setter.getElem().getReturnType();
             }
             if (hasLombokGetter()) {
@@ -246,7 +255,7 @@ class ClassProperty {
             }
         }
         if (typeMirror == null) {
-            return gotGetterType();
+            return getGetterFinalType();
         }
         if (typeMirror.getKind().isPrimitive()) {
             return toWrapperType(typeMirror.getKind());
@@ -254,7 +263,7 @@ class ClassProperty {
         return typeMirror.toString();
     }
 
-    public TypeMirror gotGetterTypeElem() {
+    public TypeMirror getGetterTypeElem() {
         if (hasPublicDefaultGetter()) {
             return getGetter().getElem().getReturnType();
         }
@@ -267,7 +276,8 @@ class ClassProperty {
     /**
      * 是否是基本数据类型 getter
      */
-    public boolean wasPrimitiveGetter() {
+    @Override
+    public boolean isPrimitiveGetter() {
         if (hasPublicDefaultGetter()) {
             return getGetter().getElem().getReturnType().getKind().isPrimitive();
         }
@@ -289,7 +299,7 @@ class ClassProperty {
      * 主动声明的 setter 方法
      */
     private boolean hasPublicDefaultSetter() {
-        ClassMethod setter = getSetter();
+        BasicMethod setter = getSetter();
         return setter != null && DetectUtils.isPublic(setter.getElem());
     }
 
@@ -304,7 +314,7 @@ class ClassProperty {
      * 主动声明的 public getter 方法
      */
     private boolean hasPublicDefaultGetter() {
-        ClassMethod getter = getGetter();
+        BasicMethod getter = getGetter();
         return getter != null && DetectUtils.isPublic(getter.getElem());
     }
 
@@ -316,24 +326,24 @@ class ClassProperty {
     }
 
     void onParseCompleted() {
-        List<ClassMethod> getters = getGetters();
+        List<BasicMethod> getters = getGetters();
         if (getters != null) {
-            Iterator<ClassMethod> gettersIterator = getters.iterator();
+            Iterator<BasicMethod> gettersIterator = getters.iterator();
             while (gettersIterator.hasNext()) {
-                ClassMethod detail = gettersIterator.next();
-                if (Objects.equals(detail.getFactActualType(), getFactActualType())) {
+                BasicMethod detail = gettersIterator.next();
+                if (Objects.equals(detail.getComputedType(), getFactActualType())) {
                     this.getter = detail;
                     gettersIterator.remove();
                     break;
                 }
             }
         }
-        List<ClassMethod> setters = getSetters();
+        List<BasicMethod> setters = getSetters();
         if (setters != null) {
-            Iterator<ClassMethod> settersIterator = setters.iterator();
+            Iterator<BasicMethod> settersIterator = setters.iterator();
             while (settersIterator.hasNext()) {
-                ClassMethod detail = settersIterator.next();
-                if (Objects.equals(detail.getFactActualType(), getFactActualType())) {
+                BasicMethod detail = settersIterator.next();
+                if (Objects.equals(detail.getComputedType(), getFactActualType())) {
                     this.setter = detail;
                     settersIterator.remove();
                     break;

@@ -3,6 +3,7 @@ package com.moon.mapping.processing;
 import com.moon.mapping.BeanMapping;
 import com.moon.mapping.MappingUtil;
 
+import javax.annotation.processing.Filer;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
 import java.util.*;
@@ -31,9 +32,9 @@ final class MappingForDetail extends ClassDefinition {
     public Map<String, ClassDefinition> getMappingForDetailsMap() { return mappingForDetailsMap; }
 
     @Override
-    public void writeJavaFile() throws IOException {
-        super.writeJavaFile();
-        EnvironmentUtils.newJavaFile(getBeanMappingClassname(), () -> {
+    public void writeJavaFile(Filer filer) throws IOException {
+        super.writeJavaFile(filer);
+        EnvUtils.newJavaFile(getBeanMappingClassname(), () -> {
             try {
                 return this.implementation();
             } catch (IOException e) {
@@ -43,7 +44,7 @@ final class MappingForDetail extends ClassDefinition {
     }
 
     private String getBeanMappingClassname() {
-        return NamingUtils.getBeanMappingEnumName(getImplClassname());
+        return StringUtils.toMappingClassname(getImplClassname());
     }
 
     private String implementation() throws IOException {
@@ -53,7 +54,7 @@ final class MappingForDetail extends ClassDefinition {
         final Map<String, ClassDefinition> mappingForDetailsMap = getMappingForDetailsMap();
         for (Map.Entry<String, ClassDefinition> entry : mappingForDetailsMap.entrySet()) {
             ClassDefinition definition = entry.getValue();
-            definition.writeJavaFile();
+            // definition.writeJavaFile();
             addBeanMapping(adder, definition);
         }
         adder.add(";");
@@ -65,7 +66,7 @@ final class MappingForDetail extends ClassDefinition {
 
     private void addBeanMapping(StringAdder adder, ClassDefinition thatDef) {
         String thatClassname = thatDef.getThisClassname();
-        adder.add("TO_" + NamingUtils.format(thatClassname)).add(" {");
+        adder.add("TO_" + StringUtils.underscore(thatClassname)).add(" {");
         build$safeWithThat(adder, thatDef);
         adder.add(getFactory().copyForwardMethod(getThisClassname(), thatClassname));
         adder.add(getFactory().copyBackwardMethod(getThisClassname(), thatClassname));
@@ -116,7 +117,7 @@ final class MappingForDetail extends ClassDefinition {
         {
             // copy(Object)
             Collection<String> fields = reducing(getFactory()::cloneField);
-            adder.add(getFactory().cloneMethod(getThisClassname(), fields));
+            // adder.add(getFactory().cloneMethod(getThisClassname(), fields));
         }
     }
 
