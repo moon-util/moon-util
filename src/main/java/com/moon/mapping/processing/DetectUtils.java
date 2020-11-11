@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
@@ -12,9 +15,14 @@ import java.util.Set;
 /**
  * @author benshaoye
  */
+@Configuration
+@ConditionalOnMissingBean
 abstract class DetectUtils {
 
-    private final static boolean IS_IMPORTED_LOMBOK;
+    final static boolean IMPORTED_LOMBOK;
+    final static boolean IMPORTED_CONFIGURATION;
+    final static boolean IMPORTED_MISSING_BEAN;
+    final static boolean IMPORTED_BEAN;
 
     private final static String GET = "get", SET = "set", IS = "is", GET_CLASS = "getClass";
 
@@ -22,40 +30,40 @@ abstract class DetectUtils {
         boolean isImportedLombok;
         try {
             Data.class.toString();
+            Getter.class.toString();
+            Setter.class.toString();
             isImportedLombok = true;
         } catch (Throwable t) {
             isImportedLombok = false;
         }
-        IS_IMPORTED_LOMBOK = isImportedLombok;
+        IMPORTED_LOMBOK = isImportedLombok;
+        boolean isImportedConfig;
+        try {
+            Configuration.class.toString();
+            isImportedConfig = true;
+        } catch (Throwable t) {
+            isImportedConfig = false;
+        }
+        IMPORTED_CONFIGURATION = isImportedConfig;
+        boolean isImportedMissingBean;
+        try {
+            ConditionalOnMissingBean.class.toString();
+            isImportedMissingBean = true;
+        } catch (Throwable t) {
+            isImportedMissingBean = false;
+        }
+        IMPORTED_MISSING_BEAN = isImportedMissingBean;
+        boolean isImportedBean;
+        try {
+            Bean.class.toString();
+            isImportedBean = true;
+        } catch (Throwable t) {
+            isImportedBean = false;
+        }
+        IMPORTED_BEAN = isImportedBean;
     }
 
     private DetectUtils() { }
-
-    /**
-     * 如果跟节点是接口：
-     * 1. 是接口文件，没有特殊限制；
-     * 2. 是内部类形式的接口，不允许被 private 修饰
-     *
-     * @param typeElement
-     */
-    static void assertInterface(TypeElement typeElement) {
-        if (typeElement.getKind() != ElementKind.INTERFACE) {
-            return;
-        }
-        Element element = typeElement;
-        do {
-            Element parent = element.getEnclosingElement();
-            if (isPackage(parent)) {
-                return;
-            }
-            if (isPrivate(parent)) {
-                String target = ElementUtils.getQualifiedName((TypeElement) element);
-                String location = parent.getSimpleName().toString();
-                throw new IllegalStateException("类 " + target + " 所在位置: " + location + " 不能被 private 修饰的。");
-            }
-            element = parent;
-        } while (true);
-    }
 
     static void assertRootElement(TypeElement rootElement) {
         final Element parentElement = rootElement.getEnclosingElement();
@@ -100,7 +108,7 @@ abstract class DetectUtils {
         return false;
     }
 
-    static boolean isImportedLombok() { return IS_IMPORTED_LOMBOK; }
+    static boolean isImportedLombok() { return IMPORTED_LOMBOK; }
 
     static boolean isPublic(Element elem) {
         return elem != null && elem.getModifiers().contains(Modifier.PUBLIC);
@@ -141,6 +149,21 @@ abstract class DetectUtils {
 
     static boolean isNotAny(Element elem, Modifier modifier, Modifier... modifiers) {
         return !isAny(elem, modifier, modifiers);
+    }
+
+    static boolean isAnyNull(Object... values) {
+        for (Object value : values) {
+            if (value == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static boolean isUsable(Mappable from, Mappable to) {
+        boolean hasGetter = from != null && from.hasGetterMethod();
+        boolean hasSetter = to != null && to.hasSetterMethod();
+        return hasGetter && hasSetter;
     }
 
     static boolean isPackage(Element elem) {

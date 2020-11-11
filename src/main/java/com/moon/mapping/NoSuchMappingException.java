@@ -12,4 +12,8 @@ public class NoSuchMappingException extends IllegalStateException {
     public NoSuchMappingException(Class<?> fromClass, Class<?> toClass) {
         this(fromClass.getName(), toClass.getName());
     }
+
+    public NoSuchMappingException(String classname, Throwable cause) {
+        super("找不到映射器: " + classname, cause);
+    }
 }

@@ -11,6 +11,8 @@ import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.*;
 
+import static com.moon.mapping.processing.ProcessUtils.toPropertiesMap;
+
 /**
  * @author moonsky
  */
@@ -31,21 +33,23 @@ public class MappingProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
-        EnvironmentUtils.initialize(processingEnv);
+        EnvUtils.initialize(processingEnv);
         super.init(processingEnv);
     }
 
-    private void doWriteJavaFile(List<MappingForDetail> models) throws IOException {
-        for (MappingForDetail model : models) {
-            model.writeJavaFile();
+    private void doWriteJavaFile(List<MappingWriter> models) throws IOException {
+        Filer filer = EnvUtils.getEnv().getFiler();
+        for (MappingWriter model : models) {
+            model.writeJavaFile(filer);
         }
+        MappingWriter.forAutoConfig(filer, models);
     }
 
     @Override
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        List<MappingForDetail> models = getMappingModels(annotations, roundEnv);
+        List<MappingWriter> models = getMappingModels(annotations, roundEnv);
         if (!models.isEmpty()) {
             try {
                 doWriteJavaFile(models);
@@ -56,13 +60,13 @@ public class MappingProcessor extends AbstractProcessor {
         return true;
     }
 
-    private List<MappingForDetail> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        List<MappingForDetail> models = new ArrayList<>();
+    private List<MappingWriter> getMappingModels(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+        final List<MappingWriter> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
-                for (Element element :  env.getElementsAnnotatedWith(MappingFor.class)) {
+                for (Element element : env.getElementsAnnotatedWith(MappingFor.class)) {
                     if (element instanceof TypeElement) {
-                        models.add(onAnnotatedMapping((TypeElement) element));
+                        models.add(onAnnotatedClass((TypeElement) element));
                     }
                 }
             }
@@ -70,22 +74,22 @@ public class MappingProcessor extends AbstractProcessor {
         return models;
     }
 
-    private MappingForDetail onAnnotatedMapping(final TypeElement thisElement) {
-        final Elements utils = EnvironmentUtils.getUtils();
-        final Map<String, DefinitionDetail> mappingForDetailsMap = new HashMap<>(4);
+    private MappingWriter onAnnotatedClass(final TypeElement thisElement) {
+        final Elements utils = EnvUtils.getUtils();
+        final Map<String, BasicDefinition> mappingForDetailsMap = new HashMap<>(4);
         final Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);
-        final MappingForDetail mappingResult = new MappingForDetail(thisElement, mappingForDetailsMap);
-        mappingResult.putAll(ProcessUtils.toPropertiesMap(thisElement));
+        BasicDefinition thisDefined = toPropertiesMap(thisElement);
+        MappingWriter writable = new MappingWriter(thisDefined, mappingForDetailsMap);
         if (classes.isEmpty()) {
-            return mappingResult;
+            return writable;
         }
         for (String thatClassname : classes) {
             TypeElement target = utils.getTypeElement(thatClassname);
             if (target == null) {
                 continue;
             }
-            mappingForDetailsMap.put(thatClassname, ProcessUtils.toPropertiesMap(target));
+            mappingForDetailsMap.put(thatClassname, toPropertiesMap(target));
         }
-        return mappingResult;
+        return writable;
     }
 }

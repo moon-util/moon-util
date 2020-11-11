@@ -11,12 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author moonsky
  */
 @SuppressWarnings("all")
-public class BeanMappingFactory {
+final class MappingFactory {
 
     private final ProcessingEnvironment env;
     private final AtomicInteger indexer = new AtomicInteger();
 
-    BeanMappingFactory() { this.env = EnvironmentUtils.getEnv(); }
+    MappingFactory() { this.env = EnvUtils.getEnv(); }
 
     public AtomicInteger getIndexer() { return indexer; }
 
@@ -29,18 +29,21 @@ public class BeanMappingFactory {
     }
 
     final String copyBackwardField(
-        PropertyDetail fromProperty, PropertyDetail toProperty
+        Mappable fromProperty, Mappable toProperty
     ) {
-        return copyBackwardField(toProperty.gotSetterName(),//
-            fromProperty.gotGetterName(),//
-            toProperty.gotSetterType(),//
-            fromProperty.gotGetterType(),//
-            toProperty.wasPrimitiveSetter());
+        return copyBackwardField(toProperty.getSetterName(),//
+            fromProperty.getGetterName(),//
+            toProperty.getSetterFinalType(),//
+            fromProperty.getGetterFinalType(),//
+            toProperty.isPrimitiveSetter());
     }
 
     private final String copyBackwardField(
         String setterName, String getterName, String setterType, String getterType, boolean primitive
     ) {
+        if (DetectUtils.isAnyNull(setterName, getterName, setterType, getterType)) {
+            return "";
+        }
         String result = "self.{setterName}(({setterType}) that.{getterName}());";
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
@@ -63,18 +66,21 @@ public class BeanMappingFactory {
     }
 
     final String copyForwardField(
-        PropertyDetail fromProperty, PropertyDetail toProperty
+        Mappable fromProperty, Mappable toProperty
     ) {
-        return copyForwardField(toProperty.gotSetterName(),//
-            fromProperty.gotGetterName(),//
-            toProperty.gotSetterType(),//
-            fromProperty.gotGetterType(),//
-            toProperty.wasPrimitiveSetter());
+        return copyForwardField(toProperty.getSetterName(),//
+            fromProperty.getGetterName(),//
+            toProperty.getSetterFinalType(),//
+            fromProperty.getGetterFinalType(),//
+            toProperty.isPrimitiveSetter());
     }
 
     private final String copyForwardField(
         String setterName, String getterName, String setterType, String getterType, boolean primitive
     ) {
+        if (DetectUtils.isAnyNull(setterName, getterName, setterType, getterType)) {
+            return "";
+        }
         String result = "that.{setterName}(({setterType}) self.{getterName}());";
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
@@ -96,22 +102,25 @@ public class BeanMappingFactory {
         return Replacer.thatType.replace(result, thatType);
     }
 
-    final String fromMapField(PropertyDetail property) {
+    final String fromMapField(Mappable prop) {
+        if (DetectUtils.isAnyNull(prop.getSetterName(), prop.getSetterFinalType())) {
+            return "";
+        }
         String t0 = "self.{setterName}(({setterType}) thatObject.get(\"{name}\"));";
-        if (property.wasPrimitiveSetter()) {
+        if (prop.isPrimitiveSetter()) {
             t0 = "{setterType} {var} = ({setterType}) thatObject.get(\"{name}\");" +//
                 "if ({var} != null) { self.{setterName}({var}); }";
             t0 = Replacer.var.replace(t0, nextVarname());
-            t0 = Replacer.setterType.replace(t0, property.gotWrappedSetterType());
-        } else if (Objects.equals(property.gotSetterType(), String.class.getName())) {
+            t0 = Replacer.setterType.replace(t0, prop.getWrappedSetterType());
+        } else if (Objects.equals(prop.getSetterFinalType(), "java.lang.String")) {
             t0 = "Object {var} = thatObject.get(\"{name}\");" +//
                 "if ({var} == null) { self.{setterName}(null); }" +//
                 "else { self.{setterName}({var}.toString()); }";
             t0 = Replacer.var.replace(t0, nextVarname());
         }
-        t0 = Replacer.setterType.replace(t0, property.gotSetterType());
-        t0 = Replacer.setterName.replace(t0, property.gotSetterName());
-        return Replacer.name.replace(t0, property.getName());
+        t0 = Replacer.setterType.replace(t0, prop.getSetterFinalType());
+        t0 = Replacer.setterName.replace(t0, prop.getSetterName());
+        return Replacer.name.replace(t0, prop.getName());
     }
 
     final String fromMapMethod(String thisType, Iterable<String> fields) {
@@ -119,8 +128,8 @@ public class BeanMappingFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String toMapField(PropertyDetail property) {
-        return toMapField(property.getName(), property.gotGetterName());
+    final String toMapField(Mappable property) {
+        return toMapField(property.getName(), property.getGetterName());
     }
 
     private final String toMapField(String name, String getterName) {
@@ -140,13 +149,13 @@ public class BeanMappingFactory {
 
     private Elements elements() { return env.getElementUtils(); }
 
-    final String toStringField(PropertyDetail model, boolean first) {
-        return toStringField(model.getName(), model.gotGetterName(), first);
+    final String toStringField(Mappable model, boolean first) {
+        return toStringField(model.getName(), model.getGetterName(), first);
     }
 
     private final String toStringField(String name, String getterName, boolean first) {
-        String t0 = "builder.append(\"{name}='\").append(self.{getterName}()).append(\"'\");";
-        String t1 = "builder.append(\", {name}='\").append(self.{getterName}()).append(\"'\");";
+        String t0 = "builder.append(\"{name}=\").append(self.{getterName}());";
+        String t1 = "builder.append(\", {name}=\").append(self.{getterName}());";
         String template = Replacer.name.replace(first ? t0 : t1, name);
         return Replacer.getterName.replace(template, getterName);
     }
@@ -169,17 +178,18 @@ public class BeanMappingFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String cloneField(PropertyDetail property) {
+    final String cloneField(Mappable property) {
         if (property.hasGetterMethod() && property.hasSetterMethod()) {
             String result = "self.{setterName}(that.{getterName}());";
-            result = Replacer.setterName.replace(result, property.gotSetterName());
-            return Replacer.getterName.replace(result, property.gotGetterName());
+            result = Replacer.setterName.replace(result, property.getSetterName());
+            return Replacer.getterName.replace(result, property.getGetterName());
         }
         return "";
     }
 
-    final String cloneMethod(String thisType, Iterable<String> fields) {
+    final String cloneMethod(String thisType, String implType, Iterable<String> fields) {
         String result = Replacer.thisType.replace(Scripts.clone, thisType);
+        result = Replacer.implType.replace(result, implType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
@@ -210,6 +220,7 @@ public class BeanMappingFactory {
         getterType,
         setterType,
         thisType,
+        implType,
         thatType,
         thisName {
             @Override
@@ -228,7 +239,7 @@ public class BeanMappingFactory {
         String toReplacement(String value) { return value; }
 
         public String replace(String template, String type) {
-            return template.replaceAll(pattern, toReplacement(type));
+            return template.replaceAll(pattern, String.valueOf(toReplacement(type)));
         }
     }
 

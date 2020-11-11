@@ -1,5 +1,6 @@
 package com.moon.mapping.processing;
 
+import javax.annotation.processing.Filer;
 import java.io.IOException;
 
 /**
@@ -10,7 +11,9 @@ interface JavaFileWritable {
     /**
      * 创建 java 类
      *
+     * @param filer 创建 java 源文件
+     *
      * @throws IOException 异常
      */
-    void writeJavaFile() throws IOException;
+    void writeJavaFile(Filer filer) throws IOException;
 }

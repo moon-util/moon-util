@@ -2,9 +2,7 @@ package com.moon.mapping.processing;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +11,9 @@ import java.util.Map;
 /**
  * @author moonsky
  */
-final class GenericUtil {
+final class GenericUtils {
 
-    private GenericUtil() {}
+    private GenericUtils() {}
 
     static Map<String, GenericModel> parse(TypeElement element) {
         return parse(element.asType(), element);
@@ -31,6 +29,11 @@ final class GenericUtil {
             genericMap.put(model.getDeclareType(), model);
         }
         return genericMap;
+    }
+
+    static String findActualType(Map<String, GenericModel> generics, String declareType) {
+        GenericModel model = generics.get(declareType);
+        return model == null ? null : model.getSimpleFinalType();
     }
 
     private static class Extract {

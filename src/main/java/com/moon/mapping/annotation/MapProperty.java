@@ -8,21 +8,14 @@ import java.lang.annotation.*;
 @Repeatable(MapProperty.List.class)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-@interface MapProperty {
+public @interface MapProperty {
 
     /**
-     * 指定映射为{@link #target()}类里的{@link #value()}字段
+     * 指定映射为{@link #target()}类里的字段
      *
      * @return 目标类里的字段名
      */
     String value() default "";
-
-    /**
-     * 是否忽略这个字段的映射
-     *
-     * @return 当返回值为 true 时，会忽略这个字段到目标的映射
-     */
-    boolean ignore() default false;
 
     /**
      * 映射目标类，如果{@link MappingFor#value()}指定了多个类，这里
@@ -34,6 +27,13 @@ import java.lang.annotation.*;
      * @return 目标类，当返回值为
      */
     Class<?> target() default void.class;
+
+    /**
+     * 是否忽略这个字段的映射
+     *
+     * @return 当返回值为 true 时，会忽略这个字段到目标的映射
+     */
+    boolean ignore() default false;
 
     @Target({ElementType.FIELD, ElementType.METHOD})
     @Retention(RetentionPolicy.SOURCE)
