@@ -7,6 +7,7 @@ import com.moon.core.time.DateTime;
 import com.moon.poi.excel.ExcelUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -38,31 +39,34 @@ class LongSequenceIdentifierTestTest {
         iterator.next();
         while (iterator.hasNext()) {
             Row row = iterator.next();
-            LibraryEnum library = LibraryEnum.valueOf(ExcelUtil.getStringValue(row.getCell(2)));
-            String memberName = ExcelUtil.getStringValue(row.getCell(6));
-            String memberCertNo = ExcelUtil.getStringValue(row.getCell(7));
+            LibraryEnum library = LibraryEnum.valueOf(ExcelUtil.getStringValue(row.getCell(0)));
+            String memberName = ExcelUtil.getStringValue(row.getCell(1));
+            String memberCertNo = ExcelUtil.getStringValue(row.getCell(2));
             updates.put(memberCertNo, StringUtil.format(template, library.name, memberName, memberCertNo));
         }
         return updates.values();
     }
 
     @Test
+    @Disabled
     void testName() throws Exception {
         String ss = "UPDATE t_cy_member_info_basic SET pay_library='{}' WHERE name='{}' AND cert_no='{}';";
         String af = "UPDATE t_cy_member_info_basic SET af_pay_library='{}' WHERE name='{}' AND cert_no='{}';";
 
-        ExcelUtil.load(new File("D:/", "2020.8.28零工宝.xlsx")).sheet("社保672人", sheetFactory -> {
-            // parse(sheetFactory.getSheet(), ss).forEach(System.out::println);
-            sheetFactory.forEach(1, rowFactory -> {
-                // rowFactory.next
-                String library = rowFactory.useCell(2).getValue(StringUtil::stringify);
-                String name = rowFactory.useCell(6).getValue(StringUtil::stringify);
-                String certNo = rowFactory.useCell(7).getValue(StringUtil::stringify);
-                String info = StringUtil.format("Library: {}, Name: {}, CertNo: {}", library, name, certNo);
-                System.out.println(info);
-            });
-        }).sheet("住房372", sheetFactory -> {
-            // parse(sheetFactory.getSheet(), af).forEach(System.out::println);
+        // String path = "E:\\Documents\\WeChat Files\\wxid_zy6joap7ovkq22\\FileStorage\\File\\2020-11";
+        // String filename = "2020.10月零工宝分配表(1).xlsx";
+        ExcelUtil.load(new File("null", "")).sheet("社保", sheetFactory -> {
+            parse(sheetFactory.getSheet(), ss).forEach(System.out::println);
+            // sheetFactory.forEach(1, rowFactory -> {
+            //     // rowFactory.next
+            //     String library = rowFactory.useCell(2).getValue(StringUtil::stringify);
+            //     String name = rowFactory.useCell(6).getValue(StringUtil::stringify);
+            //     String certNo = rowFactory.useCell(7).getValue(StringUtil::stringify);
+            //     String info = StringUtil.format("Library: {}, Name: {}, CertNo: {}", library, name, certNo);
+            //     System.out.println(info);
+            // });
+        }).sheet("住房", sheetFactory -> {
+            parse(sheetFactory.getSheet(), af).forEach(System.out::println);
         });
     }
 

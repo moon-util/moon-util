@@ -1,5 +1,7 @@
 package com.moon.web;
 
+import com.moon.core.json.JSON;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -73,6 +75,11 @@ public final class ResponseWriter {
 
     public ResponseWriter ok() { return status200(); }
 
+    public ResponseWriter length(int length) {
+        response.setContentLength(length);
+        return this;
+    }
+
     public ResponseWriter config(Consumer<HttpServletResponse> configurer) {
         configurer.accept(response);
         return this;
@@ -103,5 +110,10 @@ public final class ResponseWriter {
         } catch (Throwable t) {
             throw new IllegalStateException(t);
         }
+    }
+
+    public void fastWriteJson(Object data) {
+        String json = JSON.stringify(data);
+        ok().contentAsJson().charsetUtf8().length(json.length()).write(json);
     }
 }
