@@ -42,7 +42,7 @@ public class MappingProcessor extends AbstractProcessor {
         for (MappingWriter model : models) {
             model.writeJavaFile(filer);
         }
-        // MappingWriter.forAutoConfig(filer, models);
+        MappingWriter.forAutoConfig(filer, models);
     }
 
     @Override

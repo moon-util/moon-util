@@ -14,7 +14,7 @@ import static com.moon.mapping.processing.DetectUtils.isUsable;
  * @author benshaoye
  */
 abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> extends LinkedHashMap<String, P>
-    implements Completable {
+    implements Completable, CanonicalNameable {
 
     protected final static String IMPL_SUFFIX = "ImplGeneratedByMoonUtil";
 
@@ -33,6 +33,9 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     public final MappingFactory getFactory() { return factory; }
 
+    @Override
+    public final String getCanonicalName() { return ElementUtils.getQualifiedName(getThisElement()); }
+
     /**
      * 声明{@link MappingFor}的类{@link #getThisElement()}所在包的完整名
      *
@@ -45,6 +48,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
      *
      * @return
      */
+    @Override
     public final String getSimpleName() { return ElementUtils.getSimpleName(getThisElement()); }
 
     /**
@@ -68,19 +72,20 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     }
 
     final void addBeanMapping(StringAdder adder, BaseDefinition thatDef) {
-        String thatClassname = thatDef.getQualifiedName();
-        adder.add("TO_" + StringUtils.underscore(thatClassname)).add(" {");
+        adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
         build$safeWithThat(adder, thatDef);
-        adder.add(getFactory().copyForwardMethod(getQualifiedName(), thatClassname));
-        adder.add(getFactory().copyBackwardMethod(getQualifiedName(), thatClassname));
-        adder.add(getFactory().newThatOnEmptyConstructor(getQualifiedName(), thatClassname));
-        adder.add(getFactory().newThisOnEmptyConstructor(getQualifiedName(), thatClassname));
+        final String thisClassname = getSimpleName();
+        final String thatClassname = thatDef.getSimpleName();
+        adder.add(getFactory().copyForwardMethod(thisClassname, thatClassname));
+        adder.add(getFactory().copyBackwardMethod(thisClassname, thatClassname));
+        adder.add(getFactory().newThatOnEmptyConstructor(thisClassname, thatClassname));
+        adder.add(getFactory().newThisOnEmptyConstructor(thisClassname, thatClassname));
         adder.add("},");
     }
 
     private void build$safeWithThat(StringAdder adder, BaseDefinition thatDef) {
-        final String thatClass = thatDef.getQualifiedName();
-        final String thisClass = getQualifiedName();
+        final String thatClass = thatDef.getSimpleName();
+        final String thisClass = getSimpleName();
         final MappingFactory factory = getFactory();
         {
             Collection<String> fields = reducing(thisProp -> {
@@ -108,16 +113,16 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         {
             // fromMap(Object,Map)
             Collection<String> fields = reducing(getFactory()::fromMapField);
-            adder.add(getFactory().fromMapMethod(getQualifiedName(), fields));
+            adder.add(getFactory().fromMapMethod(getSimpleName(), fields));
         }
         {
             // toMap(Object,Map)
             Collection<String> fields = reducing(getFactory()::toMapField);
-            adder.add(getFactory().toMapMethod(getQualifiedName(), fields));
+            adder.add(getFactory().toMapMethod(getSimpleName(), fields));
         }
         {
             // newThis(Map)
-            adder.add(getFactory().newThisAsMapMethod(getQualifiedName()));
+            adder.add(getFactory().newThisAsMapMethod(getSimpleName()));
         }
     }
 
@@ -125,13 +130,13 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         {
             // clone(Object)
             Collection<String> fields = reducing(getFactory()::cloneField);
-            adder.add(getFactory().cloneMethod(getQualifiedName(), getQualifiedName(), fields));
+            adder.add(getFactory().cloneMethod(getSimpleName(), getSimpleName(), fields));
         }
         {
             // toString(Object)
             @SuppressWarnings("all") Collection<String> fields = reducing((list, property) ->//
                 getFactory().toStringField(property, list.isEmpty()));
-            adder.add(getFactory().toStringMethod(getQualifiedName(), fields));
+            adder.add(getFactory().toStringMethod(getSimpleName(), fields));
         }
     }
 

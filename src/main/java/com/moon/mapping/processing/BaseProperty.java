@@ -85,4 +85,19 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, BaseTypeG
     public void addSetterMethod(M setter) { ensureSetterArr().add(setter); }
 
     public void addGetterMethod(M getter) { ensureGetterArr().add(getter); }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("BaseProperty{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", enclosingElement=").append(enclosingElement);
+        sb.append(", declareType='").append(declareType).append('\'');
+        sb.append(", actualType='").append(actualType).append('\'');
+        sb.append(", setter=").append(setter);
+        sb.append(", getter=").append(getter);
+        sb.append(", setterArr=").append(setterArr);
+        sb.append(", getterArr=").append(getterArr);
+        sb.append('}');
+        return sb.toString();
+    }
 }

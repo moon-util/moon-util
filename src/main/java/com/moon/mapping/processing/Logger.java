@@ -35,7 +35,11 @@ abstract class Logger {
     static void warn(Messager messager, String template, Object... values) {
         if (values != null) {
             for (Object value : values) {
-                template = template.replace("{}", value == null ? "null" : value.toString());
+                if (template.contains("{}")) {
+                    template = template.replace("{}", value == null ? "null" : value.toString());
+                } else {
+                    template += ", " + value;
+                }
             }
             warn(messager, template);
         }

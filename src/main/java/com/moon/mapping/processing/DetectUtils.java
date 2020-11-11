@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.lang.model.element.*;
@@ -18,9 +19,10 @@ import java.util.Set;
 @ConditionalOnMissingBean
 abstract class DetectUtils {
 
-    final static boolean IS_IMPORTED_LOMBOK;
+    final static boolean IMPORTED_LOMBOK;
     final static boolean IMPORTED_CONFIGURATION;
     final static boolean IMPORTED_MISSING_BEAN;
+    final static boolean IMPORTED_BEAN;
 
     private final static String GET = "get", SET = "set", IS = "is", GET_CLASS = "getClass";
 
@@ -28,11 +30,13 @@ abstract class DetectUtils {
         boolean isImportedLombok;
         try {
             Data.class.toString();
+            Getter.class.toString();
+            Setter.class.toString();
             isImportedLombok = true;
         } catch (Throwable t) {
             isImportedLombok = false;
         }
-        IS_IMPORTED_LOMBOK = isImportedLombok;
+        IMPORTED_LOMBOK = isImportedLombok;
         boolean isImportedConfig;
         try {
             Configuration.class.toString();
@@ -49,6 +53,14 @@ abstract class DetectUtils {
             isImportedMissingBean = false;
         }
         IMPORTED_MISSING_BEAN = isImportedMissingBean;
+        boolean isImportedBean;
+        try {
+            Bean.class.toString();
+            isImportedBean = true;
+        } catch (Throwable t) {
+            isImportedBean = false;
+        }
+        IMPORTED_BEAN = isImportedBean;
     }
 
     private DetectUtils() { }
@@ -96,7 +108,7 @@ abstract class DetectUtils {
         return false;
     }
 
-    static boolean isImportedLombok() { return IS_IMPORTED_LOMBOK; }
+    static boolean isImportedLombok() { return IMPORTED_LOMBOK; }
 
     static boolean isPublic(Element elem) {
         return elem != null && elem.getModifiers().contains(Modifier.PUBLIC);
@@ -137,6 +149,15 @@ abstract class DetectUtils {
 
     static boolean isNotAny(Element elem, Modifier modifier, Modifier... modifiers) {
         return !isAny(elem, modifier, modifiers);
+    }
+
+    static boolean isAnyNull(Object... values) {
+        for (Object value : values) {
+            if (value == null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static boolean isUsable(Mappable from, Mappable to) {

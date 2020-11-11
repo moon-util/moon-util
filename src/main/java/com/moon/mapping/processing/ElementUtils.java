@@ -3,6 +3,8 @@ package com.moon.mapping.processing;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.QualifiedNameable;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * @author benshaoye
@@ -10,6 +12,27 @@ import javax.lang.model.element.QualifiedNameable;
 abstract class ElementUtils {
 
     private ElementUtils() {}
+
+    public static String getFieldDeclareType(VariableElement elem) {
+        return stringifyTypeMirror(elem.asType());
+    }
+
+    public static String getGetterDeclareType(ExecutableElement elem) {
+        return stringifyTypeMirror(elem.getReturnType());
+    }
+
+    public static String getSetterDeclareType(ExecutableElement elem) {
+        return stringifyTypeMirror(elem.getParameters().get(0).asType());
+    }
+
+    public static String stringifyTypeMirror(TypeMirror type) {
+        Element typeElem = EnvUtils.getTypes().asElement(type);
+        @SuppressWarnings("all")//
+        String declareType = typeElem instanceof QualifiedNameable//
+                             ? ElementUtils.getQualifiedName((QualifiedNameable) typeElem) //
+                             : (typeElem == null ? type.toString() : typeElem.toString());
+        return declareType;
+    }
 
     public static String getQualifiedName(QualifiedNameable elem) {
         return elem.getQualifiedName().toString();

@@ -1,6 +1,9 @@
 package com.moon.mapping.processing;
 
+import com.moon.mapping.annotation.MappingFor;
+
 import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.*;
@@ -10,6 +13,7 @@ import java.util.*;
  */
 final class ProcessUtils {
 
+    private final static String MAPPING_FOR_CLASSNAME = MappingFor.class.getCanonicalName();
     private final static String CLASS_SUFFIX = ".class";
     private final static String TOP_CLASS = Object.class.getName();
 
@@ -105,14 +109,21 @@ final class ProcessUtils {
     }
 
     static Collection<String> getMappingForClasses(TypeElement element) {
+        TypeMirror supportedType = EnvUtils.getUtils().getTypeElement(MAPPING_FOR_CLASSNAME).asType();
         Collection<String> classes = new HashSet<>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+            DeclaredType declaredType = mirror.getAnnotationType();
+            if (!EnvUtils.getTypes().isSameType(supportedType, declaredType)) {
+                continue;
+            }
             for (AnnotationValue value : mirror.getElementValues().values()) {
-                String classname = value.getValue().toString();
-                if (classname.endsWith(CLASS_SUFFIX)) {
-                    classname = classname.substring(0, classname.length() - 6);
+                String[] classnames = value.getValue().toString().split(",");
+                for (String classname : classnames) {
+                    if (classname.endsWith(CLASS_SUFFIX)) {
+                        classname = classname.substring(0, classname.length() - 6);
+                    }
+                    classes.add(classname);
                 }
-                classes.add(classname);
             }
         }
         return classes;

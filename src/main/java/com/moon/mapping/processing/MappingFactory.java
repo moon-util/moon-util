@@ -41,6 +41,9 @@ final class MappingFactory {
     private final String copyBackwardField(
         String setterName, String getterName, String setterType, String getterType, boolean primitive
     ) {
+        if (DetectUtils.isAnyNull(setterName, getterName, setterType, getterType)) {
+            return "";
+        }
         String result = "self.{setterName}(({setterType}) that.{getterName}());";
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
@@ -75,6 +78,9 @@ final class MappingFactory {
     private final String copyForwardField(
         String setterName, String getterName, String setterType, String getterType, boolean primitive
     ) {
+        if (DetectUtils.isAnyNull(setterName, getterName, setterType, getterType)) {
+            return "";
+        }
         String result = "that.{setterName}(({setterType}) self.{getterName}());";
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
@@ -96,22 +102,25 @@ final class MappingFactory {
         return Replacer.thatType.replace(result, thatType);
     }
 
-    final String fromMapField(Mappable property) {
+    final String fromMapField(Mappable prop) {
+        if (DetectUtils.isAnyNull(prop.getSetterName(), prop.getSetterFinalType())) {
+            return "";
+        }
         String t0 = "self.{setterName}(({setterType}) thatObject.get(\"{name}\"));";
-        if (property.isPrimitiveSetter()) {
+        if (prop.isPrimitiveSetter()) {
             t0 = "{setterType} {var} = ({setterType}) thatObject.get(\"{name}\");" +//
                 "if ({var} != null) { self.{setterName}({var}); }";
             t0 = Replacer.var.replace(t0, nextVarname());
-            t0 = Replacer.setterType.replace(t0, property.getWrappedSetterType());
-        } else if (Objects.equals(property.getSetterFinalType(), "java.lang.String")) {
+            t0 = Replacer.setterType.replace(t0, prop.getWrappedSetterType());
+        } else if (Objects.equals(prop.getSetterFinalType(), "java.lang.String")) {
             t0 = "Object {var} = thatObject.get(\"{name}\");" +//
                 "if ({var} == null) { self.{setterName}(null); }" +//
                 "else { self.{setterName}({var}.toString()); }";
             t0 = Replacer.var.replace(t0, nextVarname());
         }
-        t0 = Replacer.setterType.replace(t0, property.getSetterFinalType());
-        t0 = Replacer.setterName.replace(t0, property.getSetterName());
-        return Replacer.name.replace(t0, property.getName());
+        t0 = Replacer.setterType.replace(t0, prop.getSetterFinalType());
+        t0 = Replacer.setterName.replace(t0, prop.getSetterName());
+        return Replacer.name.replace(t0, prop.getName());
     }
 
     final String fromMapMethod(String thisType, Iterable<String> fields) {

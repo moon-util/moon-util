@@ -1,8 +1,5 @@
 package com.moon.mapping.processing;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -19,8 +16,6 @@ import static com.moon.mapping.processing.StringUtils.capitalize;
 /**
  * @author benshaoye
  */
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 final class BasicProperty extends BaseProperty<BasicMethod> {
 
     private final TypeElement thisElement;
@@ -36,18 +31,18 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     public void setField(VariableElement field, Map<String, GenericModel> genericMap) {
         this.field = field;
-        String type = field.asType().toString();
-        setDeclareType(type);
-        setActualType(findActualType(genericMap, type));
+        String declareType = ElementUtils.getFieldDeclareType(field);
+        setDeclareType(declareType);
+        setActualType(findActualType(genericMap, declareType));
     }
 
     public void setSetter(ExecutableElement setter, Map<String, GenericModel> genericMap) {
-        String declareType = setter.getParameters().get(0).asType().toString();
+        String declareType = ElementUtils.getSetterDeclareType(setter);
         addSetterMethod(toMethod(declareType, setter, genericMap));
     }
 
     public void setGetter(ExecutableElement getter, Map<String, GenericModel> genericMap) {
-        String declareType = getter.getReturnType().toString();
+        String declareType = ElementUtils.getGetterDeclareType(getter);
         addGetterMethod(toMethod(declareType, getter, genericMap));
     }
 
@@ -299,5 +294,14 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
                 break;
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("BasicProperty{");
+        sb.append("thisElement=").append(thisElement);
+        sb.append(", field=").append(field);
+        sb.append('}');
+        return sb.toString();
     }
 }

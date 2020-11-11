@@ -1,6 +1,9 @@
 package com.moon.mapping.processing;
 
+import java.util.Collection;
+
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author moonsky
@@ -11,9 +14,15 @@ final class StringAdder implements ThrowingSupplier<String> {
 
     public StringAdder() { this.content = new StringBuilder(); }
 
+    public StringAdder imports(Collection<String> classes) {
+        return add(classes.stream().map(cls -> "import " + cls + ";").collect(joining("")));
+    }
+
     public StringAdder pkg(Class<?> type) { return add(type.getPackage().getName()); }
 
     public StringAdder cls(Class<?> type) { return add(type.getCanonicalName()); }
+
+    public StringAdder simpleCls(Class<?> type) { return add(type.getSimpleName());}
 
     public StringAdder add(Object obj) { return add(obj == null ? null : obj.toString()); }
 
