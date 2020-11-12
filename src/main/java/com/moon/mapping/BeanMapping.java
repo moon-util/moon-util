@@ -13,9 +13,7 @@ public interface BeanMapping<THIS, THAT> extends MapMapping<THIS> {
      *
      * @return 设置属性后的目标对象 thatObject
      */
-    default THAT doForward(THIS thisObject, THAT thatObject) {
-        throw new UnsupportedOperationException("unknown target type of: toThat(Object, Object)");
-    }
+    default THAT doForward(THIS thisObject, THAT thatObject) { return thatObject; }
 
     /**
      * 从目标属性数据源{@code thatObject}按属性名称复制到当前对象{@code thisObject}
@@ -25,9 +23,7 @@ public interface BeanMapping<THIS, THAT> extends MapMapping<THIS> {
      *
      * @return 当前对象 thisObject
      */
-    default THIS doBackward(THIS thisObject, THAT thatObject) {
-        throw new UnsupportedOperationException("unknown target type of: fromThat(Object, Object)");
-    }
+    default THIS doBackward(THIS thisObject, THAT thatObject) { return thisObject; }
 
     /**
      * 以对象{@code thatObject}为数据源，构造并复制属性到当前类实例对象

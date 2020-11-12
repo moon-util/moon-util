@@ -14,7 +14,7 @@ public interface ObjectMapping<THIS> {
      *
      * @return 对象按属性 toString 后的子串形式
      */
-    default String toString(THIS thisObject){ return String.valueOf(thisObject); }
+    default String toString(THIS thisObject) { return String.valueOf(thisObject); }
 
     /**
      * 浅复制一个当前对象

@@ -73,71 +73,68 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     final void addBeanMapping(StringAdder adder, BaseDefinition thatDef) {
         adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
-        build$safeWithThat(adder, thatDef);
-        final String thisClassname = getSimpleName();
-        final String thatClassname = thatDef.getSimpleName();
-        adder.add(getFactory().copyForwardMethod(thisClassname, thatClassname));
-        adder.add(getFactory().copyBackwardMethod(thisClassname, thatClassname));
-        adder.add(getFactory().newThatOnEmptyConstructor(thisClassname, thatClassname));
-        adder.add(getFactory().newThisOnEmptyConstructor(thisClassname, thatClassname));
+        final boolean emptyForward = safeDoForward(adder, thatDef);
+        final boolean emptyBackward = safeDoBackward(adder, thatDef);
+        final String thisCls = getSimpleName();
+        final String thatCls = thatDef.getSimpleName();
+        adder.add(getFactory().copyForwardMethod(thisCls, thatCls, emptyForward));
+        adder.add(getFactory().copyBackwardMethod(thisCls, thatCls, emptyBackward));
+        adder.add(getFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
+        adder.add(getFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
         adder.add("},");
     }
 
-    private void build$safeWithThat(StringAdder adder, BaseDefinition thatDef) {
+    private boolean safeDoForward(StringAdder adder, BaseDefinition thatDef) {
         final String thatClass = thatDef.getSimpleName();
         final String thisClass = getSimpleName();
-        final MapMethodFactory factory = getFactory();
-        {
-            Collection<String> fields = reducing(thisProp -> {
-                Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
-                if (isUsable(thisProp, thatProp)) {
-                    return factory.copyForwardField(thisProp, thatProp);
-                }
-                return null;
-            });
-            adder.add(factory.safeCopyForwardMethod(thisClass, thatClass, fields));
+        Collection<String> fields = reducing(thisProp -> {
+            Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
+            if (isUsable(thisProp, thatProp)) {
+                return factory.copyForwardField(thisProp, thatProp);
+            }
+            return null;
+        });
+        if (fields.isEmpty()) {
+            return true;
         }
-        {
-            Collection<String> fields = reducing(thisProp -> {
-                Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
-                if (isUsable(thatProp, thisProp)) {
-                    return factory.copyBackwardField(thatProp, thisProp);
-                }
-                return null;
-            });
-            adder.add(factory.safeCopyBackwardMethod(thisClass, thatClass, fields));
+        adder.add(factory.safeCopyForwardMethod(thisClass, thatClass, fields));
+        return false;
+    }
+
+    private boolean safeDoBackward(StringAdder adder, BaseDefinition thatDef) {
+        Collection<String> fields = reducing(thisProp -> {
+            Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
+            if (isUsable(thatProp, thisProp)) {
+                return factory.copyBackwardField(thatProp, thisProp);
+            }
+            return null;
+        });
+        if (fields.isEmpty()) {
+            return true;
         }
+        adder.add(factory.safeCopyBackwardMethod(getSimpleName(), thatDef.getSimpleName(), fields));
+        return false;
     }
 
     private void addMapMapping(final StringAdder adder) {
-        {
-            // fromMap(Object,Map)
-            Collection<String> fields = reducing(getFactory()::fromMapField);
-            adder.add(getFactory().fromMapMethod(getSimpleName(), fields));
-        }
-        {
-            // toMap(Object,Map)
-            Collection<String> fields = reducing(getFactory()::toMapField);
-            adder.add(getFactory().toMapMethod(getSimpleName(), fields));
-        }
-        {
-            // newThis(Map)
-            adder.add(getFactory().newThisAsMapMethod(getSimpleName()));
-        }
+        final String name = getSimpleName();
+        final MapMethodFactory f = getFactory();
+        // fromMap(Object,Map)
+        adder.add(f.fromMapMethod(name, reducing(f::fromMapField)));
+        // toMap(Object,Map)
+        adder.add(f.toMapMethod(name, reducing(f::toMapField)));
+        // newThis(Map)
+        adder.add(f.newThisAsMapMethod(name));
     }
 
     private void addObjectMapping(final StringAdder adder) {
-        {
-            // clone(Object)
-            Collection<String> fields = reducing(getFactory()::cloneField);
-            adder.add(getFactory().cloneMethod(getSimpleName(), getSimpleName(), fields));
-        }
-        {
-            // toString(Object)
-            @SuppressWarnings("all") Collection<String> fields = reducing((list, property) ->//
-                getFactory().toStringField(property, list.isEmpty()));
-            adder.add(getFactory().toStringMethod(getSimpleName(), fields));
-        }
+        final String name = getSimpleName();
+        final MapMethodFactory f = getFactory();
+        // clone(Object)
+        adder.add(f.cloneMethod(name, name, reducing(f::cloneField)));
+        // toString(Object)
+        adder.add(f.toStringMethod(name, reducing((list, property) ->//
+            f.toStringField(property, list.isEmpty()))));
     }
 
     private Collection<String> reducing(Function<Mappable, String> serializer) {
@@ -151,7 +148,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
             Mappable property = get(key);
             if (property != null) {
                 String field = serializer.apply(parsedFields, property);
-                if (isNotBlank(field)) {
+                if (StringUtils.isNotBlank(field)) {
                     parsedFields.put(key, field);
                 }
             }
@@ -161,24 +158,11 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
                 return parsed;
             }
             String field = serializer.apply(parsed, entry.getValue());
-            if (isNotBlank(field)) {
+            if (StringUtils.isNotBlank(field)) {
                 parsed.put(entry.getKey(), field);
             }
             return parsed;
         }, parsedFields).values();
-    }
-
-    private static boolean isNotBlank(String str) {
-        if (str == null) {
-            return false;
-        }
-        int strLen = str.length();
-        for (int i = 0; i < strLen; i++) {
-            if (!Character.isWhitespace(str.charAt(i))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private Set<String> getSortedKeys() {

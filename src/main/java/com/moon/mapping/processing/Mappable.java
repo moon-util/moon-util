@@ -12,6 +12,8 @@ interface Mappable {
      */
     String getName();
 
+    String getThisClassname();
+
     /**
      * 是否有 getter
      *

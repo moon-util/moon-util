@@ -31,6 +31,11 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     public VariableElement getField() { return field; }
 
+    @Override
+    public String getThisClassname() {
+        return ElementUtils.getQualifiedName(thisElement);
+    }
+
     public void setField(VariableElement field, Map<String, GenericModel> genericMap) {
         this.field = field;
         String declareType = ElementUtils.getFieldDeclareType(field);
@@ -61,7 +66,9 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     @Override
     public String getSetterName() {
-        return ifHasSetter(getSetter()::getMethodName, () -> "set" + capitalize(getName()));
+        return ifHasSetter(() -> {
+            return getSetter().getMethodName();
+        }, () -> "set" + capitalize(getName()));
     }
 
     @Override

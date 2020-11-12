@@ -32,6 +32,9 @@ abstract class MapScripts {
         "    safeCopyForward(({thisType}) thisObject, that);" +//
         "    return that;" +//
         "}";
+    final static String newThatAsEmpty4NonFields = "" +//
+        "@Override " +//
+        "public Object doForward(Object thisObject) {return new {thatType}();}";
 
     /** @see com.moon.mapping.BeanMapping#doBackward(Object) */
     final static String newThisAsEmpty = "" +//
@@ -42,6 +45,11 @@ abstract class MapScripts {
         "    safeCopyBackward(self, ({thatType}) thatObject);" +//
         "    return self;" +//
         "}";
+
+    /** @see com.moon.mapping.BeanMapping#doBackward(Object) */
+    final static String newThisAsEmpty4NonFields = "" +//
+        "@Override " +//
+        "public Object doBackward(Object thatObject) {return new {thisType}();}";
 
     /** @see com.moon.mapping.BeanMapping#doBackward(Object, Object) */
     final static String doBackward = "" +//

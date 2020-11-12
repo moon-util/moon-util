@@ -4,6 +4,7 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.Diagnostic;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Supplier;
 
 import static com.moon.mapping.processing.EnvUtils.getMessager;
 
@@ -33,16 +34,8 @@ abstract class Logger {
     }
 
     static void warn(Messager messager, String template, Object... values) {
-        if (values != null) {
-            for (Object value : values) {
-                if (template.contains("{}")) {
-                    template = template.replace("{}", value == null ? "null" : value.toString());
-                } else {
-                    template += ", " + value;
-                }
-            }
-            warn(messager, template);
-        }
+        String formatted = StringUtils.format(true, template, values);
+        warn(messager, String.valueOf(formatted));
     }
 
     static void warn(Object obj) {
@@ -56,6 +49,13 @@ abstract class Logger {
         Messager messager = getMessager();
         if (messager != null) {
             warn(messager, template, values);
+        }
+    }
+
+    static void onLevel(Diagnostic.Kind level, Supplier<String> content) {
+        String message = content.get();
+        if (message != null) {
+            getMessager().printMessage(level, message);
         }
     }
 }
