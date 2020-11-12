@@ -18,7 +18,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     protected final static String IMPL_SUFFIX = "ImplGeneratedByMoonUtil";
 
-    private final MappingFactory factory = new MappingFactory();
+    private final MapMethodFactory factory = new MapMethodFactory();
 
     /**
      * 声明注解{@link com.moon.mapping.annotation.MappingFor}的类
@@ -31,7 +31,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     public final boolean isInterface() { return getThisElement().getKind().isInterface(); }
 
-    public final MappingFactory getFactory() { return factory; }
+    public final MapMethodFactory getFactory() { return factory; }
 
     @Override
     public final String getCanonicalName() { return ElementUtils.getQualifiedName(getThisElement()); }
@@ -86,7 +86,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     private void build$safeWithThat(StringAdder adder, BaseDefinition thatDef) {
         final String thatClass = thatDef.getSimpleName();
         final String thisClass = getSimpleName();
-        final MappingFactory factory = getFactory();
+        final MapMethodFactory factory = getFactory();
         {
             Collection<String> fields = reducing(thisProp -> {
                 Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());

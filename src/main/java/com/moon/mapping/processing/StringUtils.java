@@ -62,6 +62,25 @@ abstract class StringUtils {
         }
     }
 
+    static boolean isPrimitiveNumber(String type) {
+        if (type == null) {
+            return false;
+        }
+        switch (type) {
+            case "byte":
+            case "short":
+            case "int":
+            case "long":
+            case "float":
+            case "double":
+                return true;
+            case "boolean":
+            case "char":
+            default:
+                return false;
+        }
+    }
+
     static String toWrappedType(String type) {
         if (type == null) {
             return null;

@@ -6,56 +6,56 @@ import java.util.Map;
  * @author benshaoye
  */
 @SuppressWarnings("all")
-abstract class Scripts {
+abstract class MapScripts {
 
     /**
-     * @see com.moon.mapping.BeanMapping#newThat(Object)
-     * @see com.moon.mapping.BeanMapping#copyBackward(Object, Object)
+     * @see com.moon.mapping.BeanMapping#doBackward(Object)
+     * @see com.moon.mapping.BeanMapping#doBackward(Object, Object)
      */
     final static String safeCopyBackward = "" +//
         "private void safeCopyBackward({thisType} self, {thatType} that) { {MAPPINGS} }";
     /**
-     * @see com.moon.mapping.BeanMapping#newThat(Object)
-     * @see com.moon.mapping.BeanMapping#copyForward(Object, Object)
+     * @see com.moon.mapping.BeanMapping#doForward(Object)
+     * @see com.moon.mapping.BeanMapping#doForward(Object, Object)
      */
     final static String safeCopyForward = "" +//
         "private void safeCopyForward({thisType} self, {thatType} that) { {MAPPINGS} }";
 
-    private Scripts() {}
+    private MapScripts() {}
 
-    /** @see com.moon.mapping.BeanMapping#newThat(Object) */
+    /** @see com.moon.mapping.BeanMapping#doForward(Object) */
     final static String newThatAsEmpty = "" +//
         "@Override " +//
-        "public Object newThat(Object thisObject) {" +//
+        "public Object doForward(Object thisObject) {" +//
         "    if (thisObject == null) { return null; }" +//
         "    {thatType} that = new {thatType}();" +//
         "    safeCopyForward(({thisType}) thisObject, that);" +//
         "    return that;" +//
         "}";
 
-    /** @see com.moon.mapping.BeanMapping#newThis(Object) */
+    /** @see com.moon.mapping.BeanMapping#doBackward(Object) */
     final static String newThisAsEmpty = "" +//
         "@Override " +//
-        "public Object newThis(Object thatObject) {" +//
+        "public Object doBackward(Object thatObject) {" +//
         "    if (thatObject == null) { return null; }" +//
         "    {thisType} self = new {thisType}();" +//
         "    safeCopyBackward(self, ({thatType}) thatObject);" +//
         "    return self;" +//
         "}";
 
-    /** @see com.moon.mapping.BeanMapping#fromThat(Object, Object) */
-    final static String copyBackward = "" +//
+    /** @see com.moon.mapping.BeanMapping#doBackward(Object, Object) */
+    final static String doBackward = "" +//
         "@Override " +//
-        "public Object copyBackward(Object thisObject, Object thatObject) {" +//
+        "public Object doBackward(Object thisObject, Object thatObject) {" +//
         "    if (thisObject == null || thatObject == null) { return thisObject; }" +//
         "    safeCopyBackward(({thisType}) thisObject, ({thatType}) thatObject);" +//
         "    return thisObject;" +//
         "}";
 
-    /** @see com.moon.mapping.BeanMapping#toThat(Object, Object) */
-    final static String copyForward = "" +//
+    /** @see com.moon.mapping.BeanMapping#doForward(Object, Object) */
+    final static String doForward = "" +//
         "@Override " +//
-        "public Object copyForward(Object thisObject, Object thatObject) {" +//
+        "public Object doForward(Object thisObject, Object thatObject) {" +//
         "    if (thisObject == null || thatObject == null) { return thatObject; }" +//
         "    safeCopyForward(({thisType}) thisObject, ({thatType}) thatObject);" +//
         "    return thatObject;" +//

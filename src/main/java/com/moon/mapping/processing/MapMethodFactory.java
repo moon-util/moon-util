@@ -11,21 +11,21 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author moonsky
  */
 @SuppressWarnings("all")
-final class MappingFactory {
+final class MapMethodFactory {
 
     private final ProcessingEnvironment env;
     private final AtomicInteger indexer = new AtomicInteger();
 
-    MappingFactory() { this.env = EnvUtils.getEnv(); }
+    MapMethodFactory() { this.env = EnvUtils.getEnv(); }
 
     public AtomicInteger getIndexer() { return indexer; }
 
     final String newThatOnEmptyConstructor(String thisType, String thatType) {
-        return repaceTypeAndName(Scripts.newThatAsEmpty, thisType, thatType);
+        return replaceTypeAndName(MapScripts.newThatAsEmpty, thisType, thatType);
     }
 
     final String newThisOnEmptyConstructor(String thisType, String thatType) {
-        return repaceTypeAndName(Scripts.newThisAsEmpty, thisType, thatType);
+        return replaceTypeAndName(MapScripts.newThisAsEmpty, thisType, thatType);
     }
 
     final String copyBackwardField(
@@ -45,6 +45,9 @@ final class MappingFactory {
             return "";
         }
         String result = "self.{setterName}(({setterType}) that.{getterName}());";
+        // if (Objects.equals(getterType, setterType)) {
+        //     result = "self.{setterName}(that.{getterName}());";
+        // }
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
                 result = value.getFromThatTemplate(getIndexer());
@@ -61,7 +64,7 @@ final class MappingFactory {
     }
 
     final String copyForwardMethod(String thisType, String thatType) {
-        String result = Replacer.thisType.replace(Scripts.copyBackward, thisType);
+        String result = Replacer.thisType.replace(MapScripts.doBackward, thisType);
         return Replacer.thatType.replace(result, thatType);
     }
 
@@ -82,6 +85,9 @@ final class MappingFactory {
             return "";
         }
         String result = "that.{setterName}(({setterType}) self.{getterName}());";
+        // if (Objects.equals(getterType, setterType)) {
+        //     result = "that.{setterName}(self.{getterName}());";
+        // }
         for (Defaults value : Defaults.values()) {
             if (value.isTypeMatches(getterType, setterType)) {
                 result = value.getToThatTemplate(getIndexer());
@@ -98,7 +104,7 @@ final class MappingFactory {
     }
 
     final String copyBackwardMethod(String thisType, String thatType) {
-        String result = Replacer.thisType.replace(Scripts.copyForward, thisType);
+        String result = Replacer.thisType.replace(MapScripts.doForward, thisType);
         return Replacer.thatType.replace(result, thatType);
     }
 
@@ -124,7 +130,7 @@ final class MappingFactory {
     }
 
     final String fromMapMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(Scripts.fromMap, thisType);
+        String result = Replacer.thisType.replace(MapScripts.fromMap, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
@@ -139,12 +145,12 @@ final class MappingFactory {
     }
 
     final String toMapMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(Scripts.toMap, thisType);
+        String result = Replacer.thisType.replace(MapScripts.toMap, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
     final String newThisAsMapMethod(String thisType) {
-        return Replacer.thisType.replace(Scripts.newThisAsMap, thisType);
+        return Replacer.thisType.replace(MapScripts.newThisAsMap, thisType);
     }
 
     private Elements elements() { return env.getElementUtils(); }
@@ -161,19 +167,19 @@ final class MappingFactory {
     }
 
     final String toStringMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(Scripts.toString, thisType);
+        String result = Replacer.thisType.replace(MapScripts.toString, thisType);
         result = Replacer.thisName.replace(result, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
     final String safeCopyForwardMethod(String thisType, String thatType, Iterable fields) {
-        String result = Replacer.thisType.replace(Scripts.safeCopyForward, thisType);
+        String result = Replacer.thisType.replace(MapScripts.safeCopyForward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
     final String safeCopyBackwardMethod(String thisType, String thatType, Iterable fields) {
-        String result = Replacer.thisType.replace(Scripts.safeCopyBackward, thisType);
+        String result = Replacer.thisType.replace(MapScripts.safeCopyBackward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
@@ -188,12 +194,12 @@ final class MappingFactory {
     }
 
     final String cloneMethod(String thisType, String implType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(Scripts.clone, thisType);
+        String result = Replacer.thisType.replace(MapScripts.clone, thisType);
         result = Replacer.implType.replace(result, implType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    private static String repaceTypeAndName(String template, String thisType, String thatType) {
+    private static String replaceTypeAndName(String template, String thisType, String thatType) {
         String result = Replacer.thisType.replace(template, thisType);
         result = Replacer.thatType.replace(result, thatType);
         result = Replacer.thisName.replace(result, thisType);
