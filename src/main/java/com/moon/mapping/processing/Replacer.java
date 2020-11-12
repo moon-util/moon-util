@@ -6,6 +6,7 @@ package com.moon.mapping.processing;
 public enum Replacer {
     MAPPINGS,
     var,
+    cast,
     name,
     type0,
     type1,

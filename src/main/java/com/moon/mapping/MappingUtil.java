@@ -39,7 +39,7 @@ public abstract class MappingUtil {
      *     // other fields & getter & setter
      * }
      *
-     * @MappingFor({Bus.class, Car.class})
+     * &#64;MappingFor({Bus.class, Car.class})
      * public class Auto {
      *
      *     final static BeanMapping&lt;Auto, Bus&gt; = MappingUtil.thisPrimary();

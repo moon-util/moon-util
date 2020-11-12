@@ -1,5 +1,9 @@
 package com.moon.mapping.processing;
 
+import org.joda.time.*;
+
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import java.math.BigDecimal;
@@ -93,6 +97,9 @@ final class MapFieldFactory {
             t0 = declare2WrappedNumber(fromProp, toProp);
         }
         if (t0 == null) {
+            t0 = declare2Enum(fromProp, toProp);
+        }
+        if (t0 == null) {
             t0 = declare2Boolean(fromProp, toProp);
         }
         if (t0 == null) {
@@ -102,12 +109,45 @@ final class MapFieldFactory {
             t0 = declare2Date(fromProp, toProp);
         }
         if (t0 == null) {
+            t0 = declare2JodaTime(fromProp, toProp);
+        }
+        if (t0 == null) {
             t0 = declare2BigInteger(fromProp, toProp);
         }
         if (t0 == null) {
             t0 = declare2BigDecimal(fromProp, toProp);
         }
         return onDeclareCompleted(t0, fromProp, toProp, fromName, toName);
+    }
+
+    private String declare2Enum(Mappable fromProp, Mappable toProp) {
+        String t0;
+        final String setterDeclareType = toProp.getSetterDeclareType();
+        final String getterDeclareType = fromProp.getGetterDeclareType();
+        if (isEnum(setterDeclareType)) {
+            if (isString(getterDeclareType)) {
+                t0 = "String {var} = {fromName}.{getterName}();" +//
+                    "if ({var} == null || {var}.length() == 0) { {toName}.{setterName}(null); }" +//
+                    "else { {toName}.{setterName}({setterType}.valueOf({var})); }";
+                t0 = Replacer.setterType.replace(t0, setterDeclareType);
+            } else if (StringUtils.isPrimitiveNumber(getterDeclareType)) {
+                if (isCompatible(INT, getterDeclareType)) {
+                    t0 = "{toName}.{setterName}({setterType}.values()[{fromName}.{getterName}()]);";
+                } else {
+                    t0 = "{toName}.{setterName}({setterType}.values()[(int){fromName}.{getterName}()]);";
+                }
+                t0 = Replacer.setterType.replace(t0, setterDeclareType);
+            } else if (isSubTypeof(getterDeclareType, Number.class)) {
+                t0 = "Number {var} = {fromName}.{getterName}();" +//
+                    "if ({var} == null) { {toName}.{setterName}(null); }" +//
+                    "else { {toName}.{setterName}({setterType}.values()[{var}.intValue()]); }";
+                t0 = Replacer.setterType.replace(t0, setterDeclareType);
+            } else {
+                t0 = warningAndIgnored(fromProp, toProp);
+            }
+            return t0;
+        }
+        return null;
     }
 
     private String declare2String(Mappable fromProp, Mappable toProp) {
@@ -120,6 +160,11 @@ final class MapFieldFactory {
                 t0 = "{toName}.{setterName}({fromName}.{getterName}());";
             } else if (StringUtils.isPrimitive(getterType)) {
                 t0 = "{toName}.{setterName}(String.valueOf({fromName}.{getterName}()));";
+            } else if (isEnum(getterDeclareType)) {
+                t0 = "{getterType} {var} = {fromName}.{getterName}();" +//
+                    "if ({var} == null) { {toName}.{setterName}(null); }" +//
+                    "else { {toName}.{setterName}({var}.name()); }";
+                t0 = Replacer.getterType.replace(t0, getterType);
             } else {
                 t0 = "{getterType} {var} = {fromName}.{getterName}();" +//
                     "if ({var} == null) { {toName}.{setterName}(null); }" +//
@@ -162,17 +207,21 @@ final class MapFieldFactory {
             } else if (isString(getterType)) {
                 t0 = "{toName}.{setterName}({type0}.parse{type1}({fromName}.{getterName}()));";
                 String setterWrapped = StringUtils.toWrappedType(setterType);
-                if (INT.equals(setterType)) {
-                    t0 = Replacer.type0.replace(t0, setterWrapped);
-                    t0 = Replacer.type1.replace(t0, "Int");
-                } else {
-                    t0 = Replacer.type0.replace(t0, setterWrapped);
-                    t0 = Replacer.type1.replace(t0, setterWrapped);
-                }
+                t0 = Replacer.type0.replace(t0, setterWrapped);
+                t0 = Replacer.type1.replace(t0, INT.equals(setterType) ? "Int" : setterWrapped);
             } else if (isSubTypeof(getterType, Number.class)) {
                 t0 = "Number {var} = {fromName}.{getterName}();" +//
                     "if ({var} != null) { {toName}.{setterName}({var}.{type0}Value()); }";
                 t0 = Replacer.type0.replace(t0, setterType);
+            } else if (isEnum(getterDeclareType)) {
+                if (isCompatible(setterDeclareType, INT)) {
+                    t0 = "Enum {var} = {fromName}.{getterName}();" +//
+                        "if ({var} != null) { {toName}.{setterName}({var}.ordinal()); }";
+                } else {
+                    t0 = "Enum {var} = {fromName}.{getterName}();" +//
+                        "if ({var} != null) { {toName}.{setterName}(({setterType}){var}.ordinal()); }";
+                    t0 = Replacer.setterType.replace(t0, setterType);
+                }
             } else if (LONG.equals(setterDeclareType)) {
                 if (isSubTypeof(getterDeclareType, Date.class)) {
                     t0 = "java.util.Date {var} = {fromName}.{getterName}();" +//
@@ -226,6 +275,22 @@ final class MapFieldFactory {
                     t0 = Replacer.type1.replace(t0, "Int");
                 } else {
                     t0 = Replacer.type1.replace(t0, setterType);
+                }
+            } else if (isEnum(getterDeclareType)) {
+                if (isCompatible(setterDeclareType, INT)) {
+                    t0 = "Enum {var} = {fromName}.{getterName}();" +//
+                        "if ({var} == null) { {toName}.{setterName}(null); }" +//
+                        "else { {toName}.{setterName}({var}.ordinal()); }";
+                } else {
+                    t0 = "Enum {var} = {fromName}.{getterName}();" +//
+                        "if ({var} == null) { {toName}.{setterName}(null); }" +//
+                        "else { {toName}.{setterName}({setterType}.valueOf({cast}{var}.ordinal())); }";
+                    t0 = Replacer.setterType.replace(t0, setterType);
+                    if (isCompatible(setterPrimitive, INT)) {
+                        t0 = Replacer.cast.replace(t0, "");
+                    } else {
+                        t0 = Replacer.cast.replace(t0, "(" + setterPrimitive + ")");
+                    }
                 }
             } else if (StringUtils.isPrimitiveChar(getterType)) {
                 if (isCompatible(setterPrimitive, INT)) {
@@ -428,6 +493,43 @@ final class MapFieldFactory {
         }
     }
 
+    private String declare2JodaTime(Mappable fromProp, Mappable toProp) {
+        if (!DetectUtils.IMPORTED_JODA_TIME) {
+            return null;
+        }
+        String t0;
+        final String setterDeclareType = toProp.getSetterDeclareType();
+        final String getterDeclareType = fromProp.getGetterDeclareType();
+        if (isTypeofAny(setterDeclareType,
+            MutablePeriod.class,
+            MutableDateTime.class,
+            DateTime.class,
+            LocalDateTime.class,
+            LocalDate.class,
+            LocalTime.class,
+            Duration.class,
+            YearMonth.class,
+            MonthDay.class)) {
+            if (StringUtils.isPrimitiveNumber(getterDeclareType)) {
+                if (isCompatible(LONG, getterDeclareType)) {
+                    t0 = "{toName}.{setterName}(new {setterType}({fromName}.{getterName}()));";
+                } else {
+                    t0 = "{toName}.{setterName}(new {setterType}((long){fromName}.{getterName}()));";
+                }
+                t0 = Replacer.setterType.replace(t0, setterDeclareType);
+            } else if (isSubTypeof(getterDeclareType, Number.class)) {
+                t0 = "Number {var} = {fromName}.{getterName}();" +//
+                    "if ({var} == null) { {toName}.{setterName}(null); }" +//
+                    "else { {toName}.{setterName}(new {setterType}({var}.longValue())); }";
+                t0 = Replacer.setterType.replace(t0, setterDeclareType);
+            } else {
+                t0 = warningAndIgnored(fromProp, toProp);
+            }
+            return t0;
+        }
+        return null;
+    }
+
     private String declare2Date(Mappable fromProp, Mappable toProp) {
         String t0;
         final String setterDeclareType = toProp.getSetterDeclareType();
@@ -439,6 +541,7 @@ final class MapFieldFactory {
                 } else {
                     t0 = "{toName}.{setterName}(new {setterType}((long){fromName}.{getterName}()));";
                 }
+                t0 = Replacer.setterType.replace(t0, setterDeclareType);
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
                 t0 = "Number {var} = {fromName}.{getterName}();" +//
                     "if ({var} == null) { {toName}.{setterName}(null); }" +//
@@ -522,6 +625,11 @@ final class MapFieldFactory {
 
     private static boolean isSubTypeof(String actualType, Class superClass) {
         return isSubTypeof(actualType, superClass.getCanonicalName());
+    }
+
+    private static boolean isEnum(String value) {
+        TypeElement elem = EnvUtils.getUtils().getTypeElement(value);
+        return elem != null && elem.getKind() == ElementKind.ENUM;
     }
 
     private static boolean isSubTypeof(String actualType, String superClass) {

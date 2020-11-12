@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,7 @@ abstract class DetectUtils {
     final static boolean IMPORTED_CONFIGURATION;
     final static boolean IMPORTED_MISSING_BEAN;
     final static boolean IMPORTED_BEAN;
+    final static boolean IMPORTED_JODA_TIME;
 
     private final static String GET = "get", SET = "set", IS = "is", GET_CLASS = "getClass";
 
@@ -61,6 +63,14 @@ abstract class DetectUtils {
             isImportedBean = false;
         }
         IMPORTED_BEAN = isImportedBean;
+        boolean importedJodaTime;
+        try {
+            DateTime.now().toString();
+            importedJodaTime = true;
+        } catch (Throwable t) {
+            importedJodaTime = false;
+        }
+        IMPORTED_JODA_TIME = importedJodaTime;
     }
 
     private DetectUtils() { }
