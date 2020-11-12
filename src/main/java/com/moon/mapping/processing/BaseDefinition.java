@@ -9,6 +9,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static com.moon.mapping.processing.DetectUtils.isUsable;
+import static com.moon.mapping.processing.PropertyAttr.DFT;
 
 /**
  * @author benshaoye
@@ -19,6 +20,8 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     protected final static String IMPL_SUFFIX = "ImplGeneratedByMoonUtil";
 
     private final MapMethodFactory factory = new MapMethodFactory();
+
+    private final Map<String, Map<String, PropertyAttr>> propertyAttrMap = new HashMap<>();
 
     /**
      * 声明注解{@link com.moon.mapping.annotation.MappingFor}的类
@@ -35,6 +38,14 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     @Override
     public final String getCanonicalName() { return ElementUtils.getQualifiedName(getThisElement()); }
+
+    final void addPropertyAttr(String targetCls, String name, PropertyAttr attr) {
+        Map<String, Map<String, PropertyAttr>> map = getPropertyAttrMap();
+        Map<String, PropertyAttr> attrMap = map.computeIfAbsent(targetCls, cls -> new HashMap<>());
+        attrMap.put(name, attr);
+    }
+
+    public Map<String, Map<String, PropertyAttr>> getPropertyAttrMap() { return propertyAttrMap; }
 
     /**
      * 声明{@link MappingFor}的类{@link #getThisElement()}所在包的完整名
@@ -84,36 +95,61 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         adder.add("},");
     }
 
+    private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp) {
+        final String targetClass = thatDef.getCanonicalName();
+        Map<String, Map<String, PropertyAttr>> propertyMap = getPropertyAttrMap();
+        Map<String, PropertyAttr> attrMap = propertyMap.get(targetClass);
+        return attrMap == null ? DFT : attrMap.getOrDefault(thisProp.getName(), DFT);
+    }
+
     private boolean safeDoForward(StringAdder adder, BaseDefinition thatDef) {
-        final String thatClass = thatDef.getSimpleName();
-        final String thisClass = getSimpleName();
         Collection<String> fields = reducing(thisProp -> {
-            Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
+            PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
+            if (attr.isIgnored()) {
+                return null;
+            }
+            String targetProp = attr.getField(thisProp.getName());
+            Mappable thatProp = (Mappable) thatDef.get(targetProp);
             if (isUsable(thisProp, thatProp)) {
-                return factory.copyForwardField(thisProp, thatProp);
+                return factory.copyForwardField(thisProp, thatProp, attr);
             }
             return null;
         });
-        if (fields.isEmpty()) {
-            return true;
-        }
-        adder.add(factory.safeCopyForwardMethod(thisClass, thatClass, fields));
-        return false;
+        return forMethod(adder, fields, this, thatDef, true);
     }
 
     private boolean safeDoBackward(StringAdder adder, BaseDefinition thatDef) {
         Collection<String> fields = reducing(thisProp -> {
-            Mappable thatProp = (Mappable) thatDef.get(thisProp.getName());
+            PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
+            if (attr.isIgnored()) {
+                return null;
+            }
+            String targetProp = attr.getField(thisProp.getName());
+            Mappable thatProp = (Mappable) thatDef.get(targetProp);
             if (isUsable(thatProp, thisProp)) {
-                return factory.copyBackwardField(thatProp, thisProp);
+                return factory.copyBackwardField(thatProp, thisProp, attr);
             }
             return null;
         });
+        return forMethod(adder, fields, this, thatDef, false);
+    }
+
+    private static boolean forMethod(
+        StringAdder adder, Collection<String> fields, BaseDefinition thisDef, BaseDefinition thatDef, boolean forward
+    ) {
         if (fields.isEmpty()) {
             return true;
+        } else {
+            String thisClass = thisDef.getSimpleName();
+            String thatClass = thatDef.getSimpleName();
+            MapMethodFactory factory = thisDef.getFactory();
+            if (forward) {
+                adder.add(factory.safeCopyForward(thisClass, thatClass, fields));
+            } else {
+                adder.add(factory.safeCopyBackward(thisClass, thatClass, fields));
+            }
+            return false;
         }
-        adder.add(factory.safeCopyBackwardMethod(getSimpleName(), thatDef.getSimpleName(), fields));
-        return false;
     }
 
     private void addMapMapping(final StringAdder adder) {

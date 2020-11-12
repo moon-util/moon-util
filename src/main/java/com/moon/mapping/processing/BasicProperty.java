@@ -312,6 +312,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         final StringBuilder sb = new StringBuilder("BasicProperty{");
         sb.append("thisElement=").append(thisElement);
         sb.append(", field=").append(field);
+        sb.append(super.toString());
         sb.append('}');
         return sb.toString();
     }

@@ -32,8 +32,8 @@ final class MapMethodFactory {
      start BeanMapping
      */
 
-    final String copyBackwardField(Mappable from, Mappable to) {
-        return fieldFactory.doConvertField(from, to, "that", "self");
+    final String copyBackwardField(Mappable from, Mappable to, PropertyAttr attr) {
+        return fieldFactory.doConvertField(from, to, "that", "self", attr);
     }
 
     final String copyForwardMethod(String thisType, String thatType, boolean emptyFields) {
@@ -45,8 +45,8 @@ final class MapMethodFactory {
         }
     }
 
-    final String copyForwardField(Mappable from, Mappable to) {
-        return fieldFactory.doConvertField(from, to, "self", "that");
+    final String copyForwardField(Mappable from, Mappable to, PropertyAttr attr) {
+        return fieldFactory.doConvertField(from, to, "self", "that", attr);
     }
 
     final String copyBackwardMethod(String thisType, String thatType, boolean emptyFields) {
@@ -125,13 +125,13 @@ final class MapMethodFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String safeCopyForwardMethod(String thisType, String thatType, Iterable fields) {
+    final String safeCopyForward(String thisType, String thatType, Iterable fields) {
         String result = Replacer.thisType.replace(MapScripts.safeCopyForward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String safeCopyBackwardMethod(String thisType, String thatType, Iterable fields) {
+    final String safeCopyBackward(String thisType, String thatType, Iterable fields) {
         String result = Replacer.thisType.replace(MapScripts.safeCopyBackward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));

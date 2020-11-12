@@ -12,6 +12,22 @@ interface Mappable {
      */
     String getName();
 
+    /**
+     * 返回当前属性所在的最终类
+     *
+     * <pre>
+     * public class A {
+     *     private String str;
+     * }
+     * public class B extends A {
+     *     private int age;
+     * }
+     * </pre>
+     * <p>
+     * 不论是属性 age 或者 str，最终类均是 B
+     *
+     * @return 实际使用这个属性的最终类
+     */
     String getThisClassname();
 
     /**

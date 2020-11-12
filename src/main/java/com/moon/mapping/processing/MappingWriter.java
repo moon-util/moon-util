@@ -46,10 +46,10 @@ final class MappingWriter implements JavaFileWritable {
         }
         final String configName = "MappingConfiguration";
         final NameGenerator generator = new NameGenerator();
-        final StringAdder adder = new StringAdder().add("package ").pkg(MappingUtil.class).add(";");
+        final StringAdder adder = new StringAdder().add("package ").pkg(BeanMapping.class).add(";");
         adder.imports(getAllImportsNameForConfiguration(writers));
         // @Configuration
-        adder.add("@").simpleCls(Configuration.class);
+        adder.add("@").simpleCls(Configuration.class).add("@SuppressWarnings({\"all\",\"unchecked\"})");
         adder.add(" public class ").add(configName).add(" {");
         for (MappingWriter writer : writers) {
             String thisCls = writer.getThisDefined().getCanonicalName();
@@ -79,7 +79,8 @@ final class MappingWriter implements JavaFileWritable {
         final BaseDefinition def = getThisDefined();
         StringAdder adder = new StringAdder().add("package ").pkg(BeanMapping.class).add(';');
         adder.imports(getAllCanonicalName());
-        adder.add("enum ").add(getSimpleName(classname)).impl(BeanMapping.class).add("{TO,");
+        adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
+        adder.impl(BeanMapping.class).add("{TO,");
         for (BaseDefinition value : getForAllDefined().values()) {
             def.addBeanMapping(adder, value);
         }

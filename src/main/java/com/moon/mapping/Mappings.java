@@ -5,6 +5,7 @@ import static java.lang.Enum.valueOf;
 /**
  * @author benshaoye
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Mappings {
 
     private final static String NAMESPACE;

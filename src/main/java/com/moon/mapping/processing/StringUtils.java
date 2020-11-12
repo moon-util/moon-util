@@ -43,6 +43,19 @@ abstract class StringUtils {
         return new String(chars);
     }
 
+    static boolean isBlank(String str){
+        if (str == null) {
+            return true;
+        }
+        int strLen = str.length();
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return false;
+            }
+        }
+        return strLen == 0;
+    }
+
     static boolean isNotBlank(String str) {
         if (str == null) {
             return false;
@@ -53,7 +66,7 @@ abstract class StringUtils {
                 return true;
             }
         }
-        return false;
+        return strLen != 0;
     }
 
     static String format(boolean appendIfOver, String template, Object... values) {

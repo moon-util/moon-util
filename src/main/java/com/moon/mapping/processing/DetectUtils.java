@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author benshaoye
@@ -116,6 +118,37 @@ abstract class DetectUtils {
             }
         }
         return false;
+    }
+
+    static boolean isDefaultType(String type) {
+        Set<Class<?>> classes = new HashSet<>();
+        classes.add(char.class);
+        classes.add(Character.class);
+        classes.add(boolean.class);
+        classes.add(Boolean.class);
+        classes.add(byte.class);
+        classes.add(Byte.class);
+        classes.add(short.class);
+        classes.add(Short.class);
+        classes.add(int.class);
+        classes.add(Integer.class);
+        classes.add(long.class);
+        classes.add(Long.class);
+        classes.add(float.class);
+        classes.add(Float.class);
+        classes.add(double.class);
+        classes.add(Double.class);
+        classes.add(void.class);
+        classes.add(Void.class);
+        classes.add(Object.class);
+        classes.add(String.class);
+        classes.add(Throwable.class);
+        classes.add(Exception.class);
+        classes.add(RuntimeException.class);
+        classes.add(CharSequence.class);
+        classes.add(StringBuilder.class);
+        classes.add(StringBuffer.class);
+        return classes.stream().map(Class::getCanonicalName).collect(Collectors.toSet()).contains(type);
     }
 
     static boolean isImportedLombok() { return IMPORTED_LOMBOK; }
