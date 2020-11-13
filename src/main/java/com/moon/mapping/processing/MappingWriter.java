@@ -81,10 +81,12 @@ final class MappingWriter implements JavaFileWritable {
         adder.imports(getAllCanonicalName());
         adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
         adder.impl(BeanMapping.class).add("{TO,");
+        StaticManager staticManager = new StaticManager();
         for (BaseDefinition value : getForAllDefined().values()) {
-            def.addBeanMapping(adder, value);
+            def.addBeanMapping(adder, value, staticManager);
         }
-        return adder.add(';').add(def.implMappingSharedMethods()).add("}");
+        adder.add(';').add(staticManager);
+        return adder.add(def.implMappingSharedMethods()).add("}");
     }
 
     private List<String> getAllCanonicalName() {

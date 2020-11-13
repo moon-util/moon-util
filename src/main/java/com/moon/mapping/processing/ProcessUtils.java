@@ -35,15 +35,18 @@ final class ProcessUtils {
     private static void handleMapProperty(BasicDefinition definition, Element element, String name) {
         MapProperty[] properties = element.getAnnotationsByType(MapProperty.class);
         for (MapProperty property : properties) {
+
             boolean ignore = property.ignore();
             String value = property.value();
+            String format = property.format();
+            String defaultValue = property.defaultValue();
             String targetCls;
             try {
                 targetCls = property.target().getCanonicalName();
             } catch (MirroredTypeException mirrored) {
                 targetCls = mirrored.getTypeMirror().toString();
             }
-            PropertyAttr attr = new PropertyAttr(targetCls, value, ignore);
+            PropertyAttr attr = new PropertyAttr(targetCls, value, format, defaultValue, ignore);
             definition.addPropertyAttr(targetCls, name, attr);
         }
     }

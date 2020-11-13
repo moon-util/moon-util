@@ -171,8 +171,32 @@ abstract class DetectUtils {
         return elem instanceof ExecutableElement && elem.getKind() == ElementKind.METHOD;
     }
 
+    static boolean isEnum(Element elem) {
+        return elem != null && elem.getKind() == ElementKind.ENUM;
+    }
+
     static boolean isField(Element elem) {
         return elem instanceof VariableElement && elem.getKind() == ElementKind.FIELD;
+    }
+
+    static boolean isDigit(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static boolean isVar(String str){
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        char value = str.trim().charAt(0);
+        return Character.isLetter(value) || value == '_' || value == '$';
     }
 
     static boolean isAny(Element elem, Modifier modifier, Modifier... modifiers) {

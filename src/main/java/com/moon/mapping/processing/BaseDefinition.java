@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static com.moon.mapping.processing.DetectUtils.isUsable;
 import static com.moon.mapping.processing.PropertyAttr.DFT;
 
 /**
@@ -82,52 +81,58 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         return adder;
     }
 
-    final void addBeanMapping(StringAdder adder, BaseDefinition thatDef) {
+    final StringAdder addBeanMapping(StringAdder adder, BaseDefinition thatDef, StaticManager staticManager) {
         adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
-        final boolean emptyForward = safeDoForward(adder, thatDef);
-        final boolean emptyBackward = safeDoBackward(adder, thatDef);
         final String thisCls = getSimpleName();
         final String thatCls = thatDef.getSimpleName();
-        adder.add(getFactory().copyForwardMethod(thisCls, thatCls, emptyForward));
-        adder.add(getFactory().copyBackwardMethod(thisCls, thatCls, emptyBackward));
+        final MappingModel model = new MappingModel();
+        final boolean emptyForward = unsafeForward(adder, thatDef, model,staticManager);
+        final boolean emptyBackward = unsafeBackward(adder, thatDef, model,staticManager);
         adder.add(getFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
         adder.add(getFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
-        adder.add("},");
+        return adder.add("},");
     }
 
     private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp) {
         final String targetClass = thatDef.getCanonicalName();
         Map<String, Map<String, PropertyAttr>> propertyMap = getPropertyAttrMap();
         Map<String, PropertyAttr> attrMap = propertyMap.get(targetClass);
+        if (attrMap == null) {
+            attrMap = propertyMap.get("void");
+        }
         return attrMap == null ? DFT : attrMap.getOrDefault(thisProp.getName(), DFT);
     }
 
-    private boolean safeDoForward(StringAdder adder, BaseDefinition thatDef) {
+    private boolean unsafeForward(
+        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, StaticManager staticManager
+    ) {
         Collection<String> fields = reducing(thisProp -> {
             PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
             if (attr.isIgnored()) {
                 return null;
             }
-            String targetProp = attr.getField(thisProp.getName());
-            Mappable thatProp = (Mappable) thatDef.get(targetProp);
-            if (isUsable(thisProp, thatProp)) {
-                return factory.copyForwardField(thisProp, thatProp, attr);
+            String targetName = attr.getField(thisProp.getName());
+            Mappable thatProp = (Mappable) thatDef.get(targetName);
+            if (model.forward(thisProp, thatProp, attr).isUsable()) {
+                return factory.onField(model,staticManager);
             }
             return null;
         });
         return forMethod(adder, fields, this, thatDef, true);
     }
 
-    private boolean safeDoBackward(StringAdder adder, BaseDefinition thatDef) {
+    private boolean unsafeBackward(
+        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, StaticManager staticManager
+    ) {
         Collection<String> fields = reducing(thisProp -> {
             PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
             if (attr.isIgnored()) {
                 return null;
             }
-            String targetProp = attr.getField(thisProp.getName());
-            Mappable thatProp = (Mappable) thatDef.get(targetProp);
-            if (isUsable(thatProp, thisProp)) {
-                return factory.copyBackwardField(thatProp, thisProp, attr);
+            String targetName = attr.getField(thisProp.getName());
+            Mappable thatProp = (Mappable) thatDef.get(targetName);
+            if (model.backward(thisProp, thatProp, attr).isUsable()) {
+                return factory.onField(model,staticManager);
             }
             return null;
         });
@@ -144,9 +149,9 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
             String thatClass = thatDef.getSimpleName();
             MapMethodFactory factory = thisDef.getFactory();
             if (forward) {
-                adder.add(factory.safeCopyForward(thisClass, thatClass, fields));
+                adder.add(factory.unsafeForward(thisClass, thatClass, fields));
             } else {
-                adder.add(factory.safeCopyBackward(thisClass, thatClass, fields));
+                adder.add(factory.unsafeBackward(thisClass, thatClass, fields));
             }
             return false;
         }

@@ -6,12 +6,17 @@ package com.moon.mapping.processing;
 public enum Replacer {
     MAPPINGS,
     var,
+    var0,
+    var1,
     cast,
     name,
+    NULL,
     type0,
     type1,
+    value,
     fromName,
     toName,
+    format,
     getterName,
     setterName,
     getterType,
@@ -19,6 +24,7 @@ public enum Replacer {
     thisType,
     implType,
     thatType,
+    modifiers,
     thisName {
         @Override
         String toReplacement(String value) { return ElementUtils.getSimpleName(value); }
@@ -34,6 +40,10 @@ public enum Replacer {
     Replacer() { this.pattern = "\\{" + name() + "\\}"; }
 
     String toReplacement(String value) { return value; }
+
+    public String replaceTypeof(String template, Class<?> type) {
+        return replace(template, type.getCanonicalName());
+    }
 
     public String replace(String template, String type) {
         return template.replaceAll(pattern, String.valueOf(toReplacement(type)));

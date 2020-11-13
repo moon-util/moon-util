@@ -32,30 +32,8 @@ final class MapMethodFactory {
      start BeanMapping
      */
 
-    final String copyBackwardField(Mappable from, Mappable to, PropertyAttr attr) {
-        return fieldFactory.doConvertField(from, to, "that", "self", attr);
-    }
-
-    final String copyForwardMethod(String thisType, String thatType, boolean emptyFields) {
-        if (emptyFields) {
-            return "";
-        } else {
-            String result = Replacer.thisType.replace(MapScripts.doBackward, thisType);
-            return Replacer.thatType.replace(result, thatType);
-        }
-    }
-
-    final String copyForwardField(Mappable from, Mappable to, PropertyAttr attr) {
-        return fieldFactory.doConvertField(from, to, "self", "that", attr);
-    }
-
-    final String copyBackwardMethod(String thisType, String thatType, boolean emptyFields) {
-        if (emptyFields) {
-            return "";
-        } else {
-            String result = Replacer.thisType.replace(MapScripts.doForward, thisType);
-            return Replacer.thatType.replace(result, thatType);
-        }
+    final String onField(final MappingModel model, StaticManager staticManager) {
+        return fieldFactory.doConvertField(model, staticManager);
     }
 
     /*
@@ -125,14 +103,14 @@ final class MapMethodFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String safeCopyForward(String thisType, String thatType, Iterable fields) {
-        String result = Replacer.thisType.replace(MapScripts.safeCopyForward, thisType);
+    final String unsafeForward(String thisType, String thatType, Iterable fields) {
+        String result = Replacer.thisType.replace(MapScripts.unsafeForward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String safeCopyBackward(String thisType, String thatType, Iterable fields) {
-        String result = Replacer.thisType.replace(MapScripts.safeCopyBackward, thisType);
+    final String unsafeBackward(String thisType, String thatType, Iterable fields) {
+        String result = Replacer.thisType.replace(MapScripts.unsafeBackward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }

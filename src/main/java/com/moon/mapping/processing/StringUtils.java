@@ -43,6 +43,8 @@ abstract class StringUtils {
         return new String(chars);
     }
 
+    static boolean isEmpty(String str) { return str == null || str.length() == 0; }
+
     static boolean isBlank(String str){
         if (str == null) {
             return true;

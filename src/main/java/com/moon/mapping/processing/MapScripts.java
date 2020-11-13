@@ -9,17 +9,27 @@ import java.util.Map;
 abstract class MapScripts {
 
     /**
-     * @see com.moon.mapping.BeanMapping#doBackward(Object)
-     * @see com.moon.mapping.BeanMapping#doBackward(Object, Object)
-     */
-    final static String safeCopyBackward = "" +//
-        "private void safeCopyBackward({thisType} self, {thatType} that) { {MAPPINGS} }";
-    /**
      * @see com.moon.mapping.BeanMapping#doForward(Object)
      * @see com.moon.mapping.BeanMapping#doForward(Object, Object)
      */
-    final static String safeCopyForward = "" +//
-        "private void safeCopyForward({thisType} self, {thatType} that) { {MAPPINGS} }";
+    final static String unsafeForward = "" +//
+        "@Override public Object unsafeForward(Object thisObject, Object thatObject) {" +//
+        "    {thatType} that=({thatType})thatObject;" +//
+        "    {thisType} self=({thisType})thisObject;" +//
+        "    {MAPPINGS}" +//
+        "    return thatObject;" +//
+        "}";
+    /**
+     * @see com.moon.mapping.BeanMapping#doBackward(Object)
+     * @see com.moon.mapping.BeanMapping#doBackward(Object, Object)
+     */
+    final static String unsafeBackward = "" +//
+        "@Override public Object unsafeBackward(Object thisObject, Object thatObject) {" +//
+        "    {thatType} that=({thatType})thatObject;" +//
+        "    {thisType} self=({thisType})thisObject;" +//
+        "    {MAPPINGS} " +//
+        "    return self; " +//
+        "}";
 
     private MapScripts() {}
 
@@ -27,47 +37,23 @@ abstract class MapScripts {
     final static String newThatAsEmpty = "" +//
         "@Override " +//
         "public Object doForward(Object thisObject) {" +//
-        "    if (thisObject == null) { return null; }" +//
-        "    {thatType} that = new {thatType}();" +//
-        "    safeCopyForward(({thisType}) thisObject, that);" +//
-        "    return that;" +//
+        "    return thisObject == null ? null : unsafeForward(thisObject, new {thatType}());" +//
         "}";
     final static String newThatAsEmpty4NonFields = "" +//
         "@Override " +//
-        "public Object doForward(Object thisObject) {return new {thatType}();}";
+        "public Object doForward(Object thisObject) {return thisObject == null ? null : new {thatType}();}";
 
     /** @see com.moon.mapping.BeanMapping#doBackward(Object) */
     final static String newThisAsEmpty = "" +//
         "@Override " +//
         "public Object doBackward(Object thatObject) {" +//
-        "    if (thatObject == null) { return null; }" +//
-        "    {thisType} self = new {thisType}();" +//
-        "    safeCopyBackward(self, ({thatType}) thatObject);" +//
-        "    return self;" +//
+        "    return thatObject == null ? null : unsafeBackward(new {thisType}(), thatObject);" +//
         "}";
 
     /** @see com.moon.mapping.BeanMapping#doBackward(Object) */
     final static String newThisAsEmpty4NonFields = "" +//
         "@Override " +//
-        "public Object doBackward(Object thatObject) {return new {thisType}();}";
-
-    /** @see com.moon.mapping.BeanMapping#doBackward(Object, Object) */
-    final static String doBackward = "" +//
-        "@Override " +//
-        "public Object doBackward(Object thisObject, Object thatObject) {" +//
-        "    if (thisObject == null || thatObject == null) { return thisObject; }" +//
-        "    safeCopyBackward(({thisType}) thisObject, ({thatType}) thatObject);" +//
-        "    return thisObject;" +//
-        "}";
-
-    /** @see com.moon.mapping.BeanMapping#doForward(Object, Object) */
-    final static String doForward = "" +//
-        "@Override " +//
-        "public Object doForward(Object thisObject, Object thatObject) {" +//
-        "    if (thisObject == null || thatObject == null) { return thatObject; }" +//
-        "    safeCopyForward(({thisType}) thisObject, ({thatType}) thatObject);" +//
-        "    return thatObject;" +//
-        "}";
+        "public Object doBackward(Object thatObject) {return thatObject == null ? null : new {thisType}();}";
 
     /** @see com.moon.mapping.MapMapping#fromMap(Object, Map) */
     static final String fromMap = "" +//
