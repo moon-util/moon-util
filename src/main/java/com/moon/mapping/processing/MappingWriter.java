@@ -79,14 +79,16 @@ final class MappingWriter implements JavaFileWritable {
         final BaseDefinition def = getThisDefined();
         StringAdder adder = new StringAdder().add("package ").pkg(BeanMapping.class).add(';');
         adder.imports(getAllCanonicalName());
-        adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
-        adder.impl(BeanMapping.class).add("{TO,");
-        StaticManager staticManager = new StaticManager();
+        final Manager manager = new Manager();
+        StringAdder enumAdder = new StringAdder();
         for (BaseDefinition value : getForAllDefined().values()) {
-            def.addBeanMapping(adder, value, staticManager);
+            def.addBeanMapping(enumAdder, value, manager);
         }
-        adder.add(';').add(staticManager);
-        return adder.add(def.implMappingSharedMethods()).add("}");
+        StringAdder shardAdder = def.implMappingSharedMethods(manager);
+        adder.add(manager.getImports());
+        adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
+        adder.impl(BeanMapping.class).add("{TO,").add(enumAdder).add(';').add(manager.ofStatic());
+        return adder.add(shardAdder).add("}");
     }
 
     private List<String> getAllCanonicalName() {

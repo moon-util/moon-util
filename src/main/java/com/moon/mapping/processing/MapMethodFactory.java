@@ -32,7 +32,7 @@ final class MapMethodFactory {
      start BeanMapping
      */
 
-    final String onField(final MappingModel model, StaticManager staticManager) {
+    final String onField(final MappingModel model, Manager staticManager) {
         return fieldFactory.doConvertField(model, staticManager);
     }
 
@@ -41,7 +41,7 @@ final class MapMethodFactory {
      */
 
     @SuppressWarnings("all")
-    final String fromMapField(Mappable prop) {
+    final String fromMapField(Mappable prop, Manager manager) {
         if (DetectUtils.isAnyNull(prop.getSetterName(), prop.getSetterFinalType())) {
             return "";
         }
@@ -50,14 +50,14 @@ final class MapMethodFactory {
             t0 = "{setterType} {var} = ({setterType}) thatObject.get(\"{name}\");" +//
                 "if ({var} != null) { self.{setterName}({var}); }";
             t0 = Replacer.var.replace(t0, nextVarname());
-            t0 = Replacer.setterType.replace(t0, prop.getWrappedSetterType());
+            t0 = Replacer.setterType.replace(t0, manager.onImported(prop.getWrappedSetterType()));
         } else if (Objects.equals(prop.getSetterFinalType(), "java.lang.String")) {
             t0 = "Object {var} = thatObject.get(\"{name}\");" +//
                 "if ({var} == null) { self.{setterName}(null); }" +//
                 "else { self.{setterName}({var}.toString()); }";
             t0 = Replacer.var.replace(t0, nextVarname());
         }
-        t0 = Replacer.setterType.replace(t0, prop.getSetterFinalType());
+        t0 = Replacer.setterType.replace(t0, manager.onImported(prop.getSetterFinalType()));
         t0 = Replacer.setterName.replace(t0, prop.getSetterName());
         return Replacer.name.replace(t0, prop.getName());
     }
@@ -67,11 +67,14 @@ final class MapMethodFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String toMapField(Mappable property) {
-        return toMapField(property.getName(), property.getGetterName());
+    final String toMapField(Mappable prop) {
+        if (DetectUtils.isAnyNull(prop.getSetterName(), prop.getSetterFinalType())) {
+            return "";
+        }
+        return toMapField(prop.getName(), prop.getGetterName());
     }
 
-    private final String toMapField(String name, String getterName) {
+    private String toMapField(String name, String getterName) {
         String t0 = "thatObject.put(\"{name}\", self.{getterName}());";
         String result = Replacer.name.replace(t0, name);
         return Replacer.getterName.replace(result, getterName);
@@ -87,10 +90,11 @@ final class MapMethodFactory {
     }
 
     final String toStringField(Mappable model, boolean first) {
-        return toStringField(model.getName(), model.getGetterName(), first);
+        return StringUtils.isBlank(model.getGetterName()) ? ""
+            : toStringField(model.getName(), model.getGetterName(), first);
     }
 
-    private final String toStringField(String name, String getterName, boolean first) {
+    private String toStringField(String name, String getterName, boolean first) {
         String t0 = "builder.append(\"{name}=\").append(self.{getterName}());";
         String t1 = "builder.append(\", {name}=\").append(self.{getterName}());";
         String template = Replacer.name.replace(first ? t0 : t1, name);
@@ -103,13 +107,13 @@ final class MapMethodFactory {
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String unsafeForward(String thisType, String thatType, Iterable fields) {
+    final String unsafeForward(String thisType, String thatType, Iterable<String> fields) {
         String result = Replacer.thisType.replace(MapScripts.unsafeForward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
-    final String unsafeBackward(String thisType, String thatType, Iterable fields) {
+    final String unsafeBackward(String thisType, String thatType, Iterable<String> fields) {
         String result = Replacer.thisType.replace(MapScripts.unsafeBackward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
@@ -138,11 +142,11 @@ final class MapMethodFactory {
         return result;
     }
 
-    private final String nextVarname() {
+    private String nextVarname() {
         return nextVarname(getIndexer());
     }
 
-    private final static String nextVarname(AtomicInteger indexer) {
+    private static String nextVarname(AtomicInteger indexer) {
         return "var" + indexer.getAndIncrement();
     }
 }

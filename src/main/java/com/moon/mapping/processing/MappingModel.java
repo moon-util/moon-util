@@ -3,7 +3,7 @@ package com.moon.mapping.processing;
 /**
  * @author benshaoye
  */
-public class MappingModel {
+final class MappingModel {
 
     private Mappable fromProp;
     private Mappable toProp;

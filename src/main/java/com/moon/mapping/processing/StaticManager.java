@@ -13,11 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
- * @author moonsky
+ * @author benshaoye
  */
-final class StaticManager {
+public class StaticManager {
 
     static final String NULL = "null";
+
+    private final ImportManager importManager;
 
     private final AtomicInteger indexer = new AtomicInteger();
     /**
@@ -29,10 +31,14 @@ final class StaticManager {
      */
     private final List<String> fields = new ArrayList<>();
 
-    public StaticManager() { }
+    public StaticManager(ImportManager importManager) { this.importManager = importManager; }
 
     public String getStaticVar(String key) {
-        return varCached.computeIfAbsent(key, k -> "STATIC_VAR" + indexer.getAndIncrement());
+        return varCached.computeIfAbsent(key, k -> "VAR" + indexer.getAndIncrement());
+    }
+
+    public String onDefaultNumber(Class<?> type, String value) {
+        return onDefaultNumber(type.getCanonicalName(), value);
     }
 
     public String onDefaultNumber(String type, String value) {
@@ -63,7 +69,7 @@ final class StaticManager {
         }
         varName = getStaticVar(key);
         String t0 = "{modifiers} {type0} {var} = {value};";
-        t0 = Replacer.type0.replace(t0, type);
+        t0 = Replacer.type0.replace(t0, importManager.onImported(type));
         t0 = Replacer.value.replace(t0, value);
         fields.add(then(t0, varName));
         return varName;
@@ -110,7 +116,7 @@ final class StaticManager {
         }
         varName = getStaticVar(key);
         String t0 = "{modifiers} {type0} {var} = " + valExp;
-        t0 = Replacer.type0.replaceTypeof(t0, type);
+        t0 = Replacer.type0.replace(t0, importManager.onImported(type));
         t0 = Replacer.value.replace(t0, value);
         fields.add(then(t0, varName));
         return varName;
@@ -123,7 +129,7 @@ final class StaticManager {
         try {
             DateTimeFormatter.ofPattern(format);
         } catch (Exception e) {
-            Logger.warn("【已忽略默认值】非法日期格式: {}.", format);
+            Logger.warn("【已忽略日期格式化】非法日期格式: {}.", format);
             return NULL;
         }
         String key = getKey(DateTimeFormatter.class, format);
@@ -131,7 +137,7 @@ final class StaticManager {
         if (varName == null) {
             varName = getStaticVar(key);
             String declare = "{modifiers} {type0} {var} = {type0}.ofPattern(\"{format}\");";
-            declare = Replacer.type0.replaceTypeof(declare, DateTimeFormatter.class);
+            declare = Replacer.type0.replace(declare, importManager.onImported(DateTimeFormatter.class));
             declare = Replacer.format.replace(declare, format);
             fields.add(then(declare, varName));
         }
@@ -145,7 +151,7 @@ final class StaticManager {
         try {
             DateTimeFormat.forPattern(format);
         } catch (Exception e) {
-            Logger.warn("【已忽略默认值】非法日期格式: {}.", format);
+            Logger.warn("【已忽略日期格式化】非法日期格式: {}.", format);
             return NULL;
         }
         String key = getJodaFormatterKey(format);
@@ -153,7 +159,7 @@ final class StaticManager {
         if (varName == null) {
             varName = getStaticVar(key);
             String declare = "{modifiers} {type0} {var} = {type0}.ofPattern(\"{format}\");";
-            declare = Replacer.type0.replaceTypeof(declare, DateTimeFormat.class);
+            declare = Replacer.type0.replace(declare, importManager.onImported(DateTimeFormat.class));
             declare = Replacer.format.replace(declare, format);
             fields.add(then(declare, varName));
         }
@@ -195,7 +201,7 @@ final class StaticManager {
         } else {
             varName = getStaticVar(key);
             String declare = "{modifiers} {type0} {var}={type0}.{name};";
-            declare = Replacer.type0.replace(declare, enumClassname);
+            declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));
             declare = Replacer.name.replace(declare, enumConstName);
             declare = then(declare, varName);
             fields.add(declare);
@@ -224,7 +230,7 @@ final class StaticManager {
                 name)) {
                 varName = getStaticVar(key);
                 String declare = "{modifiers} {type0} {var} = {type0}.{name};";
-                declare = Replacer.type0.replace(declare, enumClassname);
+                declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));
                 declare = Replacer.name.replace(declare, name);
                 declare = then(declare, varName);
                 fields.add(declare);
@@ -240,7 +246,7 @@ final class StaticManager {
         if (varName == null) {
             varName = getStaticVar(enumClassname);
             String declare = "{modifiers} {type0}[] {var} = {type0}.values();";
-            declare = Replacer.type0.replace(declare, enumClassname);
+            declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));
             fields.add(then(declare, varName));
         }
         return varName;

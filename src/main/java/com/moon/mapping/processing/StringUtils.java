@@ -119,8 +119,6 @@ abstract class StringUtils {
             case "float":
             case "double":
                 return true;
-            case "boolean":
-            case "char":
             default:
                 return false;
         }

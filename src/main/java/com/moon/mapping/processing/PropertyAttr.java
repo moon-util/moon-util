@@ -17,8 +17,15 @@ class PropertyAttr {
         this.field = StringUtils.isBlank(field) ? null : field.trim();
         this.format = StringUtils.isBlank(format) ? null : format;
         this.defaultValue = StringUtils.isEmpty(defaultValue) ? null : defaultValue;
-        this.targetCls = targetCls;
+        this.targetCls = targetCls == null ? null : defaultTargetCls(targetCls);
         this.ignored = ignored;
+    }
+
+    private static String defaultTargetCls(String cls) {
+        @SuppressWarnings("all")
+        boolean isLang = cls.split("\\.").length == 3//
+            && (cls.startsWith("java.lang.") || cls.startsWith("java.util."));
+        return (isLang || StringUtils.isPrimitive(cls)) ? "void" : cls;
     }
 
     public boolean isIgnored() { return ignored; }
@@ -39,5 +46,17 @@ class PropertyAttr {
 
         @Override
         public String getField(String fromProperty) { return fromProperty; }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("PropertyAttr{");
+        sb.append("targetCls='").append(targetCls).append('\'');
+        sb.append(", field='").append(field).append('\'');
+        sb.append(", ignored=").append(ignored);
+        sb.append(", format='").append(format).append('\'');
+        sb.append(", defaultValue='").append(defaultValue).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
