@@ -45,7 +45,7 @@ abstract class StringUtils {
 
     static boolean isEmpty(String str) { return str == null || str.length() == 0; }
 
-    static boolean isBlank(String str){
+    static boolean isBlank(String str) {
         if (str == null) {
             return true;
         }
@@ -85,22 +85,7 @@ abstract class StringUtils {
     }
 
     static boolean isPrimitive(String type) {
-        if (type == null) {
-            return false;
-        }
-        switch (type) {
-            case "byte":
-            case "short":
-            case "int":
-            case "long":
-            case "float":
-            case "double":
-            case "boolean":
-            case "char":
-                return true;
-            default:
-                return false;
-        }
+        return isPrimitiveNumber(type) || "char".equals(type) || "boolean".equals(type);
     }
 
     static boolean isPrimitiveChar(String type) { return "char".equals(type); }
@@ -177,16 +162,16 @@ abstract class StringUtils {
         }
         switch (type) {
             case "int":
-                return "Integer";
+                return Integer.class.getCanonicalName();
             case "char":
-                return "Character";
+                return Character.class.getCanonicalName();
             case "byte":
             case "short":
             case "long":
             case "float":
             case "double":
             case "boolean":
-                return capitalize(type);
+                return ("java.lang." + capitalize(type));
             default:
                 return type;
         }

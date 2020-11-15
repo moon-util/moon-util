@@ -101,20 +101,9 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
             return getSetterFinalType();
         }
         if (typeMirror.getKind().isPrimitive()) {
-            return toWrapperType(typeMirror.getKind());
+            return StringUtils.toWrappedType(typeMirror.getKind().toString().toLowerCase());
         }
         return typeMirror.toString();
-    }
-
-    private static String toWrapperType(TypeKind kind) {
-        switch (kind) {
-            case INT:
-                return Integer.class.getName();
-            case CHAR:
-                return Character.class.getName();
-            default:
-                return capitalize(kind.name().toLowerCase());
-        }
     }
 
     public TypeMirror getSetterTypeMirror() {
@@ -185,7 +174,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
             return getGetterFinalType();
         }
         if (typeMirror.getKind().isPrimitive()) {
-            return toWrapperType(typeMirror.getKind());
+            return StringUtils.toWrappedType(typeMirror.getKind().toString().toLowerCase());
         }
         return typeMirror.toString();
     }

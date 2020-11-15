@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -16,11 +17,11 @@ import static java.time.ZoneId.systemDefault;
  * 数据转换器：此转始终使用系统默认格式，且不对任何数据进行空指针判断
  *
  * @author benshaoye
- * @see JodaConvert
+ * @see JodaUnsafeConvert
  */
-public abstract class Convert {
+public abstract class UnsafeConvert {
 
-    private Convert() { }
+    private UnsafeConvert() { }
 
     public static Byte toByte(Enum<?> enumVal) { return (byte) enumVal.ordinal(); }
 
@@ -34,15 +35,33 @@ public abstract class Convert {
 
     public static Double toDouble(Enum<?> enumVal) { return (double) enumVal.ordinal(); }
 
-    public static BigDecimal toBigDecimal(Number number) { return BigDecimal.valueOf(number.longValue()); }
+    public static BigDecimal toBigDecimal(Double value) { return BigDecimal.valueOf(value); }
+
+    public static BigDecimal toBigDecimal(Float value) { return BigDecimal.valueOf(value); }
+
+    public static BigDecimal toBigDecimal(Number number) {
+        if (number instanceof Double || number instanceof Float) {
+            return BigDecimal.valueOf(number.doubleValue());
+        } else {
+            return BigDecimal.valueOf(number.longValue());
+        }
+    }
 
     public static BigDecimal toBigDecimal(String number) { return new BigDecimal(number); }
+
+    public static BigDecimal toBigDecimal(String number, String pattern) {
+        return toBigDecimal(toNumber(number, pattern));
+    }
 
     public static BigDecimal toBigDecimal(BigInteger number) { return new BigDecimal(number); }
 
     public static BigInteger toBigInteger(Number number) { return BigInteger.valueOf(number.longValue()); }
 
     public static BigInteger toBigInteger(String number) { return new BigInteger(number); }
+
+    public static BigInteger toBigInteger(String number, String pattern) {
+        return toBigInteger(toNumber(number, pattern));
+    }
 
     public static long toLongValue(Instant instant) { return instant.toEpochMilli(); }
 
@@ -57,6 +76,20 @@ public abstract class Convert {
     public static long toLongValue(Calendar calendar) { return calendar.getTimeInMillis(); }
 
     public static long toLongValue(Date calendar) { return calendar.getTime(); }
+
+    public static double toDoubleValue(Instant instant) { return instant.toEpochMilli(); }
+
+    public static double toDoubleValue(OffsetDateTime date) { return toDoubleValue(date.toInstant()); }
+
+    public static double toDoubleValue(ZonedDateTime date) { return toDoubleValue(date.toInstant()); }
+
+    public static double toDoubleValue(LocalDateTime date) { return toDoubleValue(date.atZone(systemDefault())); }
+
+    public static double toDoubleValue(LocalDate date) { return toDoubleValue(date.atStartOfDay()); }
+
+    public static double toDoubleValue(Calendar calendar) { return calendar.getTimeInMillis(); }
+
+    public static double toDoubleValue(Date calendar) { return calendar.getTime(); }
 
     public static int toIntValue(Enum<?> enumValue) { return enumValue.ordinal(); }
 
@@ -120,13 +153,9 @@ public abstract class Convert {
 
     public static Timestamp toTimestamp(OffsetDateTime date) { return toTimestamp(date.toInstant()); }
 
-    public static java.sql.Date toJavaSqlDate(Calendar date) {
-        return toJavaSqlDate(date.getTimeInMillis());
-    }
+    public static java.sql.Date toJavaSqlDate(Calendar date) { return toJavaSqlDate(date.getTimeInMillis()); }
 
-    public static java.sql.Date toJavaSqlDate(LocalDate date) {
-        return toJavaSqlDate(date.atStartOfDay());
-    }
+    public static java.sql.Date toJavaSqlDate(LocalDate date) { return toJavaSqlDate(date.atStartOfDay()); }
 
     public static java.sql.Date toJavaSqlDate(LocalDateTime date) {
         return toJavaSqlDate(date.atZone(systemDefault()));
@@ -286,6 +315,8 @@ public abstract class Convert {
 
     public static LocalDate toLocalDate(OffsetDateTime time) { return time.toLocalDate(); }
 
+    public static LocalDate toLocalDate(Instant time) { return toLocalDateTime(time).toLocalDate(); }
+
     public static LocalTime toLocalTime(double number) { return toLocalDateTime(number).toLocalTime(); }
 
     public static LocalTime toLocalTime(long number) { return toLocalDateTime(number).toLocalTime(); }
@@ -302,7 +333,47 @@ public abstract class Convert {
 
     public static LocalTime toLocalTime(OffsetDateTime time) { return time.toLocalTime(); }
 
+    public static LocalTime toLocalTime(Instant time) { return toLocalDateTime(time).toLocalTime(); }
+
     public static Instant toInstant(double instant) { return Instant.ofEpochMilli((long) instant); }
 
     public static Instant toInstant(long instant) { return Instant.ofEpochMilli(instant); }
+
+    public static Instant toInstant(Calendar calendar) { return calendar.toInstant(); }
+
+    public static Instant toInstant(Date date) { return date.toInstant(); }
+
+    public static Instant toInstant(LocalDate date) { return toInstant(date.atStartOfDay()); }
+
+    public static Instant toInstant(LocalDateTime datetime) { return toInstant(datetime.atZone(systemDefault())); }
+
+    public static Instant toInstant(ZonedDateTime time) { return time.toInstant(); }
+
+    public static Instant toInstant(OffsetDateTime time) { return time.toInstant(); }
+
+    public static Instant toInstant(Number time) { return Instant.ofEpochMilli(time.longValue()); }
+
+    public static String toString(Date date, String pattern) { return new SimpleDateFormat(pattern).format(date); }
+
+    public static String toString(Calendar date, String pattern) {
+        return new SimpleDateFormat(pattern).format(date.getTime());
+    }
+
+    public static String toString(Number number, String pattern) { return new DecimalFormat(pattern).format(number); }
+
+    public static String toString(double number, String pattern) { return new DecimalFormat(pattern).format(number); }
+
+    public static String toString(long number, String pattern) { return new DecimalFormat(pattern).format(number); }
+
+    public static double toDoubleValue(String number, String pattern) {
+        return toNumber(number, pattern).doubleValue();
+    }
+
+    public static Number toNumber(String number, String pattern) {
+        try {
+            return new DecimalFormat(pattern).parse(number);
+        } catch (ParseException e) {
+            throw new IllegalStateException("数字格式错误, 要求: " + pattern + ", 实际: " + number, e);
+        }
+    }
 }

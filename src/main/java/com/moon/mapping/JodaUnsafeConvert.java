@@ -12,42 +12,54 @@ import java.util.Date;
  * Joda 日期转换器：此转始终使用系统默认格式，且不对任何数据进行空指针判断
  *
  * @author benshaoye
- * @see Convert
+ * @see UnsafeConvert
  */
-public abstract class JodaConvert {
+public abstract class JodaUnsafeConvert {
 
-    private JodaConvert() { }
+    private JodaUnsafeConvert() { }
+
+    public static long toLongValue(ReadableInstant instant) {
+        return instant.getMillis();
+    }
+
+    public static long toLongValue(org.joda.time.LocalDateTime instant) {
+        return instant.toDate().getTime();
+    }
+
+    public static long toLongValue(org.joda.time.LocalDate instant) {
+        return instant.toDate().getTime();
+    }
 
     public static java.sql.Date toJavaSqlDate(ReadableInstant instant) {
         return new java.sql.Date(instant.getMillis());
     }
 
     public static java.sql.Date toJavaSqlDate(org.joda.time.LocalDateTime instant) {
-        return Convert.toJavaSqlDate(instant.toDate());
+        return UnsafeConvert.toJavaSqlDate(instant.toDate());
     }
 
     public static java.sql.Date toJavaSqlDate(org.joda.time.LocalDate instant) {
-        return Convert.toJavaSqlDate(instant.toDate());
+        return UnsafeConvert.toJavaSqlDate(instant.toDate());
     }
 
     public static Timestamp toTimestamp(ReadableInstant instant) { return new Timestamp(instant.getMillis()); }
 
     public static Timestamp toTimestamp(org.joda.time.LocalDateTime instant) {
-        return Convert.toTimestamp(instant.toDate());
+        return UnsafeConvert.toTimestamp(instant.toDate());
     }
 
     public static Timestamp toTimestamp(org.joda.time.LocalDate instant) {
-        return Convert.toTimestamp(instant.toDate());
+        return UnsafeConvert.toTimestamp(instant.toDate());
     }
 
     public static Time toTime(ReadableInstant instant) { return new Time(instant.getMillis()); }
 
     public static Time toTime(org.joda.time.LocalDateTime instant) {
-        return Convert.toTime(instant.toDate());
+        return UnsafeConvert.toTime(instant.toDate());
     }
 
     public static Time toTime(org.joda.time.LocalDate instant) {
-        return Convert.toTime(instant.toDate());
+        return UnsafeConvert.toTime(instant.toDate());
     }
 
     public static Date toDate(ReadableInstant instant) { return new Date(instant.getMillis()); }
@@ -57,74 +69,74 @@ public abstract class JodaConvert {
     public static Date toDate(org.joda.time.LocalDate instant) { return instant.toDate(); }
 
     public static OffsetDateTime toOffsetDateTime(ReadableInstant instant) {
-        return Convert.toOffsetDateTime(instant.getMillis());
+        return UnsafeConvert.toOffsetDateTime(instant.getMillis());
     }
 
     public static OffsetDateTime toOffsetDateTime(org.joda.time.LocalDateTime instant) {
-        return Convert.toOffsetDateTime(instant.toDate());
+        return UnsafeConvert.toOffsetDateTime(instant.toDate());
     }
 
     public static OffsetDateTime toOffsetDateTime(org.joda.time.LocalDate instant) {
-        return Convert.toOffsetDateTime(instant.toDate());
+        return UnsafeConvert.toOffsetDateTime(instant.toDate());
     }
 
     public static ZonedDateTime toZonedDateTime(ReadableInstant instant) {
-        return Convert.toZonedDateTime(instant.getMillis());
+        return UnsafeConvert.toZonedDateTime(instant.getMillis());
     }
 
     public static ZonedDateTime toZonedDateTime(org.joda.time.LocalDateTime instant) {
-        return Convert.toZonedDateTime(instant.toDate());
+        return UnsafeConvert.toZonedDateTime(instant.toDate());
     }
 
     public static ZonedDateTime toZonedDateTime(org.joda.time.LocalDate instant) {
-        return Convert.toZonedDateTime(instant.toDate());
+        return UnsafeConvert.toZonedDateTime(instant.toDate());
     }
 
     public static LocalDateTime toLocalDateTime(ReadableInstant instant) {
-        return Convert.toLocalDateTime(instant.getMillis());
+        return UnsafeConvert.toLocalDateTime(instant.getMillis());
     }
 
     public static LocalDateTime toLocalDateTime(org.joda.time.LocalDateTime instant) {
-        return Convert.toLocalDateTime(instant.toDate());
+        return UnsafeConvert.toLocalDateTime(instant.toDate());
     }
 
     public static LocalDateTime toLocalDateTime(org.joda.time.LocalDate instant) {
-        return Convert.toLocalDateTime(instant.toDate());
+        return UnsafeConvert.toLocalDateTime(instant.toDate());
     }
 
     public static LocalDate toLocalDate(ReadableInstant instant) {
-        return Convert.toLocalDate(instant.getMillis());
+        return UnsafeConvert.toLocalDate(instant.getMillis());
     }
 
     public static LocalDate toLocalDate(org.joda.time.LocalDateTime instant) {
-        return Convert.toLocalDate(instant.toDate());
+        return UnsafeConvert.toLocalDate(instant.toDate());
     }
 
     public static LocalDate toLocalDate(org.joda.time.LocalDate instant) {
-        return Convert.toLocalDate(instant.toDate());
+        return UnsafeConvert.toLocalDate(instant.toDate());
     }
 
     public static LocalTime toLocalTime(ReadableInstant instant) {
-        return Convert.toLocalTime(instant.getMillis());
+        return UnsafeConvert.toLocalTime(instant.getMillis());
     }
 
     public static LocalTime toLocalTime(org.joda.time.LocalDateTime instant) {
-        return Convert.toLocalTime(instant.toDate());
+        return UnsafeConvert.toLocalTime(instant.toDate());
     }
 
     public static LocalTime toLocalTime(org.joda.time.LocalDate instant) {
-        return Convert.toLocalTime(instant.toDate());
+        return UnsafeConvert.toLocalTime(instant.toDate());
     }
 
     public static Calendar toCalendar(ReadableInstant instant) {
-        return Convert.toCalendar(instant.getMillis());
+        return UnsafeConvert.toCalendar(instant.getMillis());
     }
 
     public static Calendar toCalendar(org.joda.time.LocalDateTime instant) {
-        return Convert.toCalendar(instant.toDate());
+        return UnsafeConvert.toCalendar(instant.toDate());
     }
 
     public static Calendar toCalendar(org.joda.time.LocalDate instant) {
-        return Convert.toCalendar(instant.toDate());
+        return UnsafeConvert.toCalendar(instant.toDate());
     }
 }

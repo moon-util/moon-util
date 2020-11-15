@@ -1,14 +1,14 @@
 package com.moon.mapping.processing;
 
-import com.moon.mapping.Convert;
-import com.moon.mapping.JodaConvert;
+import com.moon.mapping.JodaUnsafeConvert;
+import com.moon.mapping.UnsafeConvert;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -16,15 +16,15 @@ import java.util.stream.Collectors;
  */
 final class ConvertManager {
 
-    private final Map<String, String> converter = new HashMap<>();
+    private final Map<String, CallerInfo> converter = new HashMap<>();
 
     private final ImportManager importManager;
 
     public ConvertManager(ImportManager importManager) {
         this.importManager = importManager;
-        loadPredefinedConvert(Convert.class);
+        loadPredefinedConvert(UnsafeConvert.class);
         if (DetectUtils.IMPORTED_JODA_TIME) {
-            loadPredefinedConvert(JodaConvert.class);
+            loadPredefinedConvert(JodaUnsafeConvert.class);
         }
     }
 
@@ -34,62 +34,111 @@ final class ConvertManager {
         for (Element element : unsafeConvert.getEnclosedElements()) {
             if (DetectUtils.isMethod(element)) {
                 ExecutableElement convert = (ExecutableElement) element;
-                List<String> params = convert.getParameters().stream()
-                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", "")).collect(Collectors.toList());
+                List<String> params = convert.getParameters()
+                    .stream()
+                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", ""))
+                    .collect(Collectors.toList());
                 String returnType = convert.getReturnType().toString();
                 String key = toTypedKey(returnType, params);
-                this.converter.put(key, toCallConvert(convert, unsafeConvertName));
+                CallerInfo converter = toCallConvert(convert, unsafeConvertName, params);
+                this.converter.put(key, converter);
             }
         }
     }
 
-    private static String toCallConvert(ExecutableElement convert, String unsafeConvertName) {
+    private static CallerInfo toCallConvert(ExecutableElement convert, String unsafeConvertName, List<String> params) {
         String simpleName = ElementUtils.getSimpleName(convert);
-        return StringUtils.format(false, "{}.{}({var})", unsafeConvertName, simpleName);
+        String caller = StringUtils.format(false, "{}.{}", unsafeConvertName, simpleName);
+        List<String> vars = new ArrayList<>();
+        vars.add("{var}");
+        for (int i = 1; i < params.size(); i++) {
+            vars.add("{var" + (i - 1) + "}");
+        }
+        return new CallerInfo(caller, "(" + String.join(", ", vars) + ")", String.join(",", params));
     }
 
-    /**
+    /*
      * 进入这里的要求确保 getter 类型不是基本数据类型
-     *
-     * @param model
-     *
-     * @return
      */
-    public String onRefType(final MappingModel model) {
-        final String getterType = model.getGetterDeclareType();
-        final String setterType = model.getSetterDeclareType();
-        return onRefType(setterType, getterType);
+
+    public String useMapping(
+        String defaultVal, Supplier<String> mapper, String setterType
+    ) { return useMapping(defaultVal, mapper, setterType, ""); }
+
+    public String useMapping(
+        String defaultVal, Supplier<String> mapper, String setterType, Class<?>... getterTypes
+    ) {
+        String[] types = Arrays.stream(getterTypes).map(Class::getCanonicalName).toArray(String[]::new);
+        return useMapping(defaultVal, mapper, setterType, types);
     }
 
-    public String onRefType(String setterType, Class<?> getterType) {
-        return onRefType(setterType, getterType.getCanonicalName());
-    }
-
-    public String onRefType(String setterType, String getterType) {
-        String convert = converter.get(toTypedKey(setterType, getterType));
-        return convert == null ? null : onRefType(setterType, getterType, convert);
-    }
-
-    public String onRefType(String setterType, Class<?> getterType, String mappings) {
-        return onRefType(setterType, getterType.getCanonicalName(), mappings);
-    }
-
-    public String onRefType(String setterType, String getterType, String mappings) {
-        String t0 = StringUtils.isPrimitive(setterType) ? o2p : o2o;
+    public String useMapping(
+        String defaultVal, Supplier<String> mapper, String setterType, String... getterTypes
+    ) {
+        String t0;
+        String getterType = getterTypes[0];
+        if (StringUtils.isPrimitive(getterType)) {
+            t0 = "{toName}.{setterName}({MAPPINGS});";
+        } else if (isNullString(defaultVal)) {
+            t0 = StringUtils.isPrimitive(setterType) ? o2p : o2o;
+        } else {
+            t0 = StringUtils.isPrimitive(setterType) ? default_o2p : default_o2o;
+            t0 = Replacer.value.replace(t0, defaultVal);
+        }
+        t0 = Replacer.MAPPINGS.replace(t0, mapper.get());
+        t0 = Replacer.setterType.replace(t0, importManager.onImported(setterType));
         t0 = Replacer.getterType.replace(t0, importManager.onImported(getterType));
-        t0 = Replacer.MAPPINGS.replace(t0, mappings);
-        return Replacer.setterType.replace(t0, importManager.onImported(setterType));
+        return t0;
     }
 
-    private final static String p2p = "{toName}.{setterName}({MAPPINGS}({fromName}.{getterName}()));";
-    private final static String p2o = "{toName}.{setterName}({MAPPINGS}({fromName}.{getterName}()));";
+    public String useConvert(
+        String defaultVal, Function<CallerInfo, String> mapper, String setterType, Class<?>... getterTypes
+    ) {
+        String[] types = Arrays.stream(getterTypes).map(Class::getCanonicalName).toArray(String[]::new);
+        return useConvert(defaultVal, mapper, setterType, types);
+    }
 
-    private final static String o2p = "" +
-        "{getterType} {var} = {fromName}.{getterName}();" +
-        "if ({var} != null) { {toName}.{setterName}(MAPPINGS); }";
-    private final static String o2o = "" +
-        "{getterType} {var} = {fromName}.{getterName}();" +
-        "if ({var} == null) { {toName}.{setterName}(null); }" +
+    public String useConvert(
+        String defaultVal, Function<CallerInfo, String> mapper, String setterType, String... getterTypes
+    ) {
+        String t0;
+        String getterType = getterTypes[0];
+        if (StringUtils.isPrimitive(getterType)) {
+            t0 = "{toName}.{setterName}({MAPPINGS});";
+        } else if (isNullString(defaultVal)) {
+            t0 = StringUtils.isPrimitive(setterType) ? o2p : o2o;
+        } else {
+            t0 = StringUtils.isPrimitive(setterType) ? default_o2p : default_o2o;
+            t0 = Replacer.value.replace(t0, defaultVal);
+        }
+        CallerInfo callerInfo = converter.get(toTypedKey(setterType, getterTypes));
+        if (callerInfo == null) {
+            return null;
+        }
+        t0 = Replacer.MAPPINGS.replace(t0, mapper.apply(callerInfo));
+        t0 = Replacer.setterType.replace(t0, importManager.onImported(setterType));
+        t0 = Replacer.getterType.replace(t0, importManager.onImported(getterType));
+        return t0;
+    }
+
+    @SuppressWarnings("all")
+    private final static String o2p = "" +//
+        "{getterType} {var} = {fromName}.{getterName}();" +//
+        "if ({var} != null) { {toName}.{setterName}({MAPPINGS}); }";
+    @SuppressWarnings("all")
+    private final static String o2o = "" +//
+        "{getterType} {var} = {fromName}.{getterName}();" +//
+        "if ({var} == null) { {toName}.{setterName}(null); }" +//
+        "else { {toName}.{setterName}({MAPPINGS}); }";
+    @SuppressWarnings("all")
+    private final static String default_o2p = "" +//
+        "{getterType} {var} = {fromName}.{getterName}();" +//
+        "if ({var} == null) { {toName}.{setterName}({value}); }" +//
+        "else { {toName}.{setterName}({MAPPINGS}); }";
+    @SuppressWarnings("all")
+    private final static String default_o2o = "" +//
+        "{getterType} {var} = {fromName}.{getterName}();" +//
+        "if ({var} == null) { {toName}.{setterName}({value}); }" +//
         "else { {toName}.{setterName}({MAPPINGS}); }";
 
     private static String toTypedKey(String returnType, String... paramTypes) {
@@ -98,5 +147,9 @@ final class ConvertManager {
 
     private static String toTypedKey(String returnType, Iterable<String> paramTypes) {
         return "(" + String.join(",", paramTypes) + ") -> " + returnType;
+    }
+
+    private static boolean isNullString(String value) {
+        return value == null || "null".equals(value);
     }
 }

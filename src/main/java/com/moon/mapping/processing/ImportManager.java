@@ -8,8 +8,8 @@ import java.util.Map;
  */
 final class ImportManager {
 
-    private final Map<String, String> importCached = new HashMap<>();
     private final Map<String, String> shortNameCached = new HashMap<>();
+    private final Map<String, String> importCached = new HashMap<>();
 
     public ImportManager() {}
 
@@ -18,29 +18,28 @@ final class ImportManager {
     }
 
     public String onImported(String classname) {
-        String imported = importCached.get(classname);
-        if (imported != null) {
-            return imported;
+        if (StringUtils.isBlank(classname)) {
+            return "";
         }
-        String shortName = ElementUtils.getSimpleName(classname);
-        if (shortNameCached.containsKey(shortName)) {
+        String shortName = shortNameCached.get(classname);
+        if (shortName != null) {
+            return shortName;
+        }
+        shortName = ElementUtils.getSimpleName(classname);
+        if (importCached.containsKey(shortName)) {
             return classname;
         } else if (StringUtils.isPrimitive(classname)) {
-            importCached.put(classname, classname);
+            shortNameCached.put(classname, classname);
             return classname;
         } else {
-            String script = "import " + classname + ";";
-            if (classname.startsWith("java.lang.") && classname.split("\\.").length == 3) {
-                script = "";
+            if (!(classname.startsWith("java.lang.") && classname.split("\\.").length == 3)) {
+                importCached.put(shortName, "import " + classname + ";");
             }
-            shortNameCached.put(shortName, script);
-            importCached.put(classname, shortName);
+            shortNameCached.put(classname, shortName);
             return shortName;
         }
     }
 
     @Override
-    public String toString() {
-        return String.join("", shortNameCached.values());
-    }
+    public String toString() { return String.join("", importCached.values()); }
 }
