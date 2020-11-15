@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import static com.moon.mapping.processing.ElementUtils.getSimpleName;
+
 /**
  * @author benshaoye
  */
@@ -42,7 +44,7 @@ public class StaticManager {
     }
 
     public String onDefaultNumber(String type, String value) {
-        value = value.trim().toUpperCase();
+        value = (value == null ? "" : value).trim().toUpperCase();
         if (!(StringUtils.isPrimitiveNumber(type) || StringUtils.isWrappedNumber(type))) {
             return NULL;
         }
@@ -84,7 +86,7 @@ public class StaticManager {
     }
 
     private <T> String onDefault(String value, Class<T> type, Function<String, T> newer) {
-        value = value.trim();
+        value = (value == null ? "" : value).trim();
         if (StringUtils.isEmpty(value)) {
             return NULL;
         }
@@ -118,6 +120,35 @@ public class StaticManager {
         String t0 = "{modifiers} {type0} {var} = " + valExp;
         t0 = Replacer.type0.replace(t0, importManager.onImported(type));
         t0 = Replacer.value.replace(t0, value);
+        fields.add(then(t0, varName));
+        return varName;
+    }
+
+    public String onString(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return NULL;
+        }
+        String key = getKey(String.class, value);
+        String varName = varCached.get(key);
+        if (varName != null) {
+            return varName;
+        }
+        char quote = '"';
+        String fieldVal;
+        varName = getStaticVar(key);
+        int length = value.length();
+        if (length > 1) {
+            if (value.charAt(0) == quote && value.charAt(length - 1) == quote) {
+                fieldVal = value;
+            } else {
+                fieldVal = (quote + value + quote);
+            }
+        } else {
+            fieldVal = (quote + value + quote);
+        }
+        String t0 = "{modifiers} {type0} {var} = {value};";
+        t0 = Replacer.type0.replace(t0, importManager.onImported(String.class));
+        t0 = Replacer.value.replace(t0, fieldVal);
         fields.add(then(t0, varName));
         return varName;
     }
@@ -188,7 +219,7 @@ public class StaticManager {
         for (Element child : elem.getEnclosedElements()) {
             if (child.getKind() == ElementKind.ENUM_CONSTANT) {
                 if (idx == indexer) {
-                    enumConstName = ElementUtils.getSimpleName(child);
+                    enumConstName = getSimpleName(child);
                     break;
                 } else {
                     indexer++;
@@ -210,7 +241,7 @@ public class StaticManager {
     }
 
     public String onEnumNamed(String enumClassname, String name) {
-        name = name.trim();
+        name = (name == null ? "" : name).trim();
         if (StringUtils.isEmpty(name)) {
             return NULL;
         }
@@ -226,8 +257,7 @@ public class StaticManager {
             return NULL;
         }
         for (Element child : elem.getEnclosedElements()) {
-            if (child.getKind() == ElementKind.ENUM_CONSTANT && Objects.equals(ElementUtils.getSimpleName(elem),
-                name)) {
+            if (child.getKind() == ElementKind.ENUM_CONSTANT && Objects.equals(getSimpleName(child), name)) {
                 varName = getStaticVar(key);
                 String declare = "{modifiers} {type0} {var} = {type0}.{name};";
                 declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));

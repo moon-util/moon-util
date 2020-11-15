@@ -34,10 +34,8 @@ final class ConvertManager {
         for (Element element : unsafeConvert.getEnclosedElements()) {
             if (DetectUtils.isMethod(element)) {
                 ExecutableElement convert = (ExecutableElement) element;
-                List<String> params = convert.getParameters()
-                    .stream()
-                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", ""))
-                    .collect(Collectors.toList());
+                List<String> params = convert.getParameters().stream()
+                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", "")).collect(Collectors.toList());
                 String returnType = convert.getReturnType().toString();
                 String key = toTypedKey(returnType, params);
                 CallerInfo converter = toCallConvert(convert, unsafeConvertName, params);
@@ -55,6 +53,15 @@ final class ConvertManager {
             vars.add("{var" + (i - 1) + "}");
         }
         return new CallerInfo(caller, "(" + String.join(", ", vars) + ")", String.join(",", params));
+    }
+
+    public CallerInfo find(String setterType, Class<?>... getterTypes) {
+        String[] types = Arrays.stream(getterTypes).map(Class::getCanonicalName).toArray(String[]::new);
+        return converter.get(toTypedKey(setterType, types));
+    }
+
+    public CallerInfo find(String setterType, String... getterTypes) {
+        return converter.get(toTypedKey(setterType, getterTypes));
     }
 
     /*
