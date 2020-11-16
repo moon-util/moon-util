@@ -365,9 +365,7 @@ public abstract class UnsafeConvert {
 
     public static String toString(long number, String pattern) { return new DecimalFormat(pattern).format(number); }
 
-    public static double toDoubleValue(String number, String pattern) {
-        return toNumber(number, pattern).doubleValue();
-    }
+    public static double toDoubleValue(String val, String pattern) { return toNumber(val, pattern).doubleValue(); }
 
     public static Number toNumber(String number, String pattern) {
         try {
@@ -376,4 +374,16 @@ public abstract class UnsafeConvert {
             throw new IllegalStateException("数字格式错误, 要求: " + pattern + ", 实际: " + number, e);
         }
     }
+
+    public static Byte toByte(String value, String pattern) { return toNumber(value, pattern).byteValue(); }
+
+    public static Short toShort(String value, String pattern) { return toNumber(value, pattern).shortValue(); }
+
+    public static Integer toInteger(String value, String pattern) { return toNumber(value, pattern).intValue(); }
+
+    public static Long toLong(String value, String pattern) { return toNumber(value, pattern).longValue(); }
+
+    public static Float toFloat(String value, String pattern) { return toNumber(value, pattern).floatValue(); }
+
+    public static Double toDouble(String value, String pattern) { return toNumber(value, pattern).doubleValue(); }
 }

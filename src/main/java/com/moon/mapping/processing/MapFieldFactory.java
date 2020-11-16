@@ -85,12 +85,7 @@ final class MapFieldFactory {
     private String doConvertDeclaredField(
         final MappingModel model, Manager manager
     ) {
-        String t0 = null;
-        final String setterDeclareType = model.getSetterDeclareType();
-        final String getterDeclareType = model.getGetterDeclareType();
-        if (Objects.equals(setterDeclareType, getterDeclareType)) {
-            t0 = "{toName}.{setterName}({fromName}.{getterName}());";
-        }
+        String t0 = declareOnDefault(model, manager);
         if (t0 == null) {
             t0 = declare2String(model, manager);
         }
@@ -130,6 +125,18 @@ final class MapFieldFactory {
         return onDeclareCompleted(t0, model);
     }
 
+    private String declareOnDefault(MappingModel model, Manager manager) {
+        if (model.nonAnnotatedMapProperty()) {
+            final String setterDeclareType = model.getSetterDeclareType();
+            final String getterDeclareType = model.getGetterDeclareType();
+            if (Objects.equals(setterDeclareType, getterDeclareType)//
+                || isSubTypeof(getterDeclareType, setterDeclareType)) {
+                return "{toName}.{setterName}({fromName}.{getterName}());";
+            }
+        }
+        return null;
+    }
+
     private String forDefaultEnum(MappingModel model, Manager manager, String enumClassname) {
         PropertyAttr attr = model.getAttr();
         String dftValue = attr.defaultValue();
@@ -142,13 +149,23 @@ final class MapFieldFactory {
         }
     }
 
+    /**
+     * 已支持：枚举默认值、枚举到字符串数字等默认类型转换、指定属性名
+     * <p>
+     * 不支持格式化
+     *
+     * @param model
+     * @param manager
+     *
+     * @return
+     */
     private String declare2Enum(MappingModel model, Manager manager) {
         String t0;
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        final String dftValue = forDefaultEnum(model, manager, setterDeclareType);
         if (isEnum(setterDeclareType)) {
+            final String dftValue = forDefaultEnum(model, manager, setterDeclareType);
             if (isString(getterDeclareType)) {
                 Supplier<String> mappings = () -> "{setterType}.valueOf({var})";
                 t0 = convert.useMapping(dftValue, mappings, setterDeclareType, getterDeclareType);
@@ -160,8 +177,8 @@ final class MapFieldFactory {
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
                 String enumValues = manager.ofStatic().onEnumValues(setterDeclareType);
                 t0 = convert.useMapping(dftValue, () -> {
-                    String tx = "{setterType}[{var}.intValue()]";
-                    return Replacer.setterType.replace(tx, enumValues);
+                    String tx = "{name}[{var}.intValue()]";
+                    return Replacer.name.replace(tx, enumValues);
                 }, "", getterDeclareType);
             } else {
                 t0 = warningAndIgnored(model);
@@ -171,19 +188,37 @@ final class MapFieldFactory {
         return null;
     }
 
+    /**
+     * 所有数据类型到字符串的转换
+     * 1. 基本数字类型：String.valueOf(..) + 格式化
+     * 2. 数字包装类 + 格式化
+     * 3. 枚举
+     * 4. jdk8 日期类型 + 格式化
+     * 5. Date、Calendar、sql.Date 日期类型 + 格式化
+     * 6. TODO joda 日期类型 + 格式化
+     * 7. 其他对象到直接调用 Object.toString()
+     *
+     * @param model
+     * @param manager
+     *
+     * @return
+     */
     private String declare2String(final MappingModel model, Manager manager) {
         String t0;
         final PropertyAttr attr = model.getAttr();
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        final String dftValue = manager.ofStatic().onString(attr.defaultValue());
         if (isString(setterDeclareType)) {
+            final String dftValue = manager.ofStatic().onString(attr.defaultValue());
             if (isString(getterDeclareType)) {
-                // todo 默认值
-                t0 = "{toName}.{setterName}({fromName}.{getterName}());";
+                if (isNullString(dftValue)) {
+                    t0 = "{toName}.{setterName}({fromName}.{getterName}());";
+                } else {
+                    t0 = convert.useMapping(dftValue, () -> "{var}", setterDeclareType, String.class);
+                }
             } else if (StringUtils.isPrimitive(getterDeclareType)) {
-                // todo 默认值
+                // getter 是基本数据类型，没有默认值，因为 get 不到 null
                 if (attr.formatValue() == null) {
                     t0 = "{toName}.{setterName}({type1}.valueOf({fromName}.{getterName}()));";
                     t0 = Replacer.type1.replace(t0, manager.onImported(String.class));
@@ -196,13 +231,13 @@ final class MapFieldFactory {
                     }, setterDeclareType, getterDeclareType);
                 }
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
-                // todo 默认值
                 String format = model.getAttr().formatValue();
                 if (format == null) {
-                    t0 = convert.useMapping(null, () -> "{var}.toString()", setterDeclareType, Number.class);
+                    t0 = convert.useMapping(dftValue, () -> "{var}.toString()", setterDeclareType, Number.class);
                 } else {
-                    t0 = convert.useConvert(null, info -> {
-                        return info.toString(null, strWrapped(format));
+                    t0 = convert.useConvert(dftValue, info -> {
+                        String fmt = strWrapped(format);
+                        return info.toString(null, fmt);
                     }, setterDeclareType, Number.class, String.class);
                 }
             } else if (isEnum(getterDeclareType)) {
@@ -216,13 +251,17 @@ final class MapFieldFactory {
                     t0 = convert.useMapping(dftValue, () -> fmt, setterDeclareType, getterDeclareType);
                 }
             } else if (isSubTypeof(getterDeclareType, Date.class) && !isNullString(attr.formatValue())) {
-                t0 = convert.useConvert(dftValue, info -> info.toString(null, strWrapped(attr.formatValue())),
-                    setterDeclareType, Date.class, String.class);
+                t0 = convert.useConvert(dftValue, info -> {
+                    String fmt = strWrapped(attr.formatValue());
+                    return info.toString(null, fmt);
+                }, setterDeclareType, Date.class, String.class);
             } else if (isSubTypeof(getterDeclareType, Calendar.class) && !isNullString(attr.formatValue())) {
-                t0 = convert.useConvert(dftValue, info -> info.toString(null, strWrapped(attr.formatValue())),
-                    setterDeclareType, Calendar.class, String.class);
+                t0 = convert.useConvert(dftValue,
+                    info -> info.toString(null, strWrapped(attr.formatValue())),
+                    setterDeclareType,
+                    Calendar.class,
+                    String.class);
             } else {
-                // todo 默认值
                 t0 = convert.useMapping(dftValue, () -> "{var}.toString()", "", getterDeclareType);
             }
             return t0;
@@ -245,8 +284,8 @@ final class MapFieldFactory {
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        final String dftValue = forDefaultNumber(model, manager, setterDeclareType);
         if (isPrimitiveNumber(setterDeclareType)) {
+            final String dftValue = forDefaultNumber(model, manager, setterDeclareType);
             if (isPrimitiveNumber(getterDeclareType)) {
                 if (isCompatible(setterDeclareType, getterDeclareType)) {
                     t0 = "{toName}.{setterName}({fromName}.{getterName}());";
@@ -291,8 +330,10 @@ final class MapFieldFactory {
                     }, Number.class.getCanonicalName(), String.class, String.class);
                 }
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
-                t0 = convert
-                    .useMapping(dftValue, () -> "{var}.{setterType}Value()", setterDeclareType, getterDeclareType);
+                t0 = convert.useMapping(dftValue,
+                    () -> "{var}.{setterType}Value()",
+                    setterDeclareType,
+                    getterDeclareType);
             } else if (isEnum(getterDeclareType)) {
                 if (isNullString(dftValue)) {
                     if (isCompatible(setterDeclareType, INT)) {
@@ -321,12 +362,16 @@ final class MapFieldFactory {
                     t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, Date.class);
                 } else if (isSubTypeof(getterDeclareType, Calendar.class)) {
                     t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, Calendar.class);
-                } else if (isTypeofAny(getterDeclareType, java.time.LocalDate.class, java.time.LocalDateTime.class,
-                    ZonedDateTime.class, OffsetDateTime.class, java.time.Instant.class)) {
+                } else if (isTypeofAny(getterDeclareType,
+                    java.time.LocalDate.class,
+                    java.time.LocalDateTime.class,
+                    ZonedDateTime.class,
+                    OffsetDateTime.class,
+                    java.time.Instant.class)) {
                     t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, getterDeclareType);
                 } else if (DetectUtils.IMPORTED_JODA_TIME) {
-                    if (isSubTypeof(getterDeclareType, ReadableInstant.class) ||
-                        isTypeof(getterDeclareType, DateTime.class)) {
+                    if (isSubTypeof(getterDeclareType, ReadableInstant.class) || isTypeof(getterDeclareType,
+                        DateTime.class)) {
                         t0 = convert.useConvert(dftValue, STRINGIFY, LONG, ReadableInstant.class);
                     } else if (isTypeofAny(getterDeclareType, LocalDateTime.class, LocalDate.class)) {
                         t0 = convert.useConvert(dftValue, STRINGIFY, LONG, getterDeclareType);
@@ -347,10 +392,12 @@ final class MapFieldFactory {
 
     private String declare2WrappedNumber(final MappingModel model, Manager manager) {
         String t0;
+        final PropertyAttr attr = model.getAttr();
+        final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        final String dftValue = forDefaultNumber(model, manager, setterDeclareType);
         if (isWrappedNumber(setterDeclareType)) {
+            final String dftValue = forDefaultNumber(model, manager, setterDeclareType);
             final String setterPrimitive = toPrimitiveType(setterDeclareType);
             if (isPrimitiveNumber(getterDeclareType)) {
                 if (isCompatible(setterPrimitive, getterDeclareType)) {
@@ -369,38 +416,30 @@ final class MapFieldFactory {
                         t0 = Replacer.NULL.replace(t0, dftValue);
                     }
                 } else {
-                    t0 = "{getterType} {var} = {fromName}.{getterName}();" +//
-                        "if ({var} == null) { {toName}.{setterName}({NULL}); }" +//
-                        "else { {toName}.{setterName}({var}.{type0}Value()); }";
-                    t0 = Replacer.getterType.replace(t0, manager.onImported(getterDeclareType));
-                    t0 = Replacer.type0.replace(t0, setterPrimitive);
-                    t0 = Replacer.NULL.replace(t0, dftValue);
+                    t0 = convert.useMapping(dftValue, () -> {
+                        String tx = "{var}.{type0}Value()";
+                        return Replacer.type0.replace(tx, setterPrimitive);
+                    }, setterDeclareType, getterDeclareType);
                 }
             } else if (isString(getterDeclareType)) {
-                // todo 字符串到数字格式化解析
-                t0 = "{getterType} {var} = {fromName}.{getterName}();" +//
-                    "if ({var} == null || {var}.length() == 0) { {toName}.{setterName}({NULL}); }" +//
-                    "else { {toName}.{setterName}({type0}.parse{type1}({var})); }";
-                t0 = Replacer.NULL.replace(t0, dftValue);
-                t0 = Replacer.type0.replace(t0, manager.onImported(setterDeclareType));
-                t0 = Replacer.getterType.replace(t0, manager.onImported(getterDeclareType));
-                if (INT.equals(setterPrimitive)) {
-                    t0 = Replacer.type1.replace(t0, "Int");
+                if (attr.formatValue() == null) {
+                    t0 = convert.useMapping(dftValue, () -> {
+                        String tx = "{setterType}.parse{type1}({var})";
+                        String type1 = INT.equals(setterPrimitive) ? "Int" : getSimpleName(setterDeclareType);
+                        return Replacer.type1.replace(tx, type1);
+                    }, setterDeclareType, getterDeclareType);
                 } else {
-                    String type1 = getSimpleName(setterDeclareType);
-                    t0 = Replacer.type1.replace(t0, type1);
+                    t0 = convert.useConvert(dftValue, info -> {
+                        String format = strWrapped(attr.formatValue());
+                        return info.toString(null, format);
+                    }, setterDeclareType, String.class, String.class);
                 }
             } else if (isEnum(getterDeclareType)) {
-                t0 = "Enum {var} = {fromName}.{getterName}();" +//
-                    "if ({var} == null) { {toName}.{setterName}({NULL}); }" +//
-                    "else { {toName}.{setterName}({setterType}.valueOf({cast}{var}.ordinal())); }";
-                t0 = Replacer.setterType.replace(t0, manager.onImported(setterDeclareType));
-                if (isCompatible(setterPrimitive, INT)) {
-                    t0 = Replacer.cast.replace(t0, "");
-                } else {
-                    t0 = Replacer.cast.replace(t0, "(" + setterPrimitive + ")");
-                }
-                t0 = Replacer.NULL.replace(t0, dftValue);
+                t0 = convert.useMapping(dftValue, () -> {
+                    String tx = "{setterType}.valueOf({cast}{var}.ordinal())";
+                    String cast = isCompatible(setterPrimitive, INT) ? "" : "(" + setterPrimitive + ")";
+                    return Replacer.cast.replace(tx, cast);
+                }, setterDeclareType, getterDeclareType);
             } else if (StringUtils.isPrimitiveChar(getterDeclareType)) {
                 if (isCompatible(setterPrimitive, INT)) {
                     t0 = "{toName}.{setterName}({fromName}.{getterName}());";
@@ -435,13 +474,15 @@ final class MapFieldFactory {
                             "else { {toName}.{setterName}({var}.getTimeInMillis()); }";
                         t0 = Replacer.getterType.replace(t0, manager.onImported(Calendar.class));
                     } else if (DetectUtils.IMPORTED_JODA_TIME) {
-                        if (isSubTypeof(getterDeclareType, ReadableInstant.class) ||
-                            isTypeof(getterDeclareType, DateTime.class)) {
+                        if (isSubTypeof(getterDeclareType, ReadableInstant.class) || isTypeof(getterDeclareType,
+                            DateTime.class)) {
                             t0 = "{getterType} {var} = {fromName}.{getterName}();" +//
                                 "if ({var} == null) { {toName}.{setterName}(null); }" +//
                                 "else { {toName}.{setterName}({var}.getMillis()); }";
                             t0 = Replacer.getterType.replace(t0, manager.onImported(getterDeclareType));
-                        } else if (isTypeofAny(getterDeclareType, LocalDateTime.class, LocalDate.class,
+                        } else if (isTypeofAny(getterDeclareType,
+                            LocalDateTime.class,
+                            LocalDate.class,
                             MutableDateTime.class)) {
                             t0 = "{getterType} {var} = {fromName}.{getterName}();" +//
                                 "if ({var} == null) { {toName}.{setterName}(null); }" +//
@@ -467,17 +508,15 @@ final class MapFieldFactory {
                         t0 = Replacer.getterType.replace(t0, manager.onImported(Calendar.class));
                         t0 = Replacer.NULL.replace(t0, dftValue);
                     } else if (DetectUtils.IMPORTED_JODA_TIME) {
-                        if (isSubTypeof(getterDeclareType, ReadableInstant.class) ||
-                            isTypeof(getterDeclareType, DateTime.class)) {
-                            t0 = "{getterType} {var} = {fromName}.{getterName}();" +
-                                "if ({var} != null) { {toName}.{setterName}({NULL}); }" +
-                                "else { {toName}.{setterName}({var}.getMillis()); }";
+                        if (isSubTypeof(getterDeclareType, ReadableInstant.class) || isTypeof(getterDeclareType,
+                            DateTime.class)) {
+                            t0 = "{getterType} {var} = {fromName}.{getterName}();" + "if ({var} != null) { {toName}.{setterName}({NULL}); }" + "else { {toName}.{setterName}({var}.getMillis()); }";
                             t0 = Replacer.getterType.replace(t0, manager.onImported(getterDeclareType));
-                        } else if (isTypeofAny(getterDeclareType, LocalDateTime.class, LocalDate.class,
+                        } else if (isTypeofAny(getterDeclareType,
+                            LocalDateTime.class,
+                            LocalDate.class,
                             MutableDateTime.class)) {
-                            t0 = "{getterType} {var} = {fromName}.{getterName}();" +
-                                "if ({var} == null) { {toName}.{setterName}({NULL}); }" +
-                                "else { {toName}.{setterName}({var}.toDate().getTime()); }";
+                            t0 = "{getterType} {var} = {fromName}.{getterName}();" + "if ({var} == null) { {toName}.{setterName}({NULL}); }" + "else { {toName}.{setterName}({var}.toDate().getTime()); }";
                             t0 = Replacer.getterType.replace(t0, manager.onImported(getterDeclareType));
                         } else {
                             t0 = warningAndIgnored(model);
@@ -490,10 +529,18 @@ final class MapFieldFactory {
                 t0 = warningAndIgnored(model);
             }
         } else if (isTypeof(setterDeclareType, Number.class)) {
-            if (isSubTypeof(getterDeclareType, Number.class) ||
-                isPrimitiveNumber(getterDeclareType) ||
-                isPrimitiveChar(getterDeclareType)) {
+            final String dftValue = forDefaultNumber(model, manager, setterDeclareType);
+            if (isSubTypeof(getterDeclareType, Number.class) || isPrimitiveNumber(getterDeclareType) || isPrimitiveChar(
+                getterDeclareType)) {
                 t0 = "{toName}.{setterName}({fromName}.{getterName}());";
+            } else if (isEnum(getterDeclareType)) {
+                Supplier<String> mapper = () -> "{var}.ordinal()";
+                t0 = convert.useMapping(dftValue, mapper, setterDeclareType, getterDeclareType);
+            } else if (isString(getterDeclareType) && attr.formatValue() != null) {
+                t0 = convert.useConvert(dftValue, info -> {
+                    String format = strWrapped(attr.formatValue());
+                    return info.toString(null, format);
+                }, Number.class.getCanonicalName(), String.class, String.class);
             } else {
                 t0 = warningAndIgnored(model);
             }
@@ -637,8 +684,8 @@ final class MapFieldFactory {
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        final String dftValue = forDefaultBigDecimal(model, manager, setterDeclareType);
         if (isTypeof(setterDeclareType, BigDecimal.class)) {
+            final String dftValue = forDefaultBigDecimal(model, manager, setterDeclareType);
             if (isPrimitiveNumber(getterDeclareType)) {
                 t0 = "{toName}.{setterName}({setterType}.valueOf({fromName}.{getterName}()));";
                 t0 = Replacer.setterType.replace(t0, setterDeclareType);
@@ -648,6 +695,9 @@ final class MapFieldFactory {
                 t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, BigInteger.class);
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
                 t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, Number.class);
+            } else if (isEnum(getterDeclareType)) {
+                Supplier<String> mapper = () -> "{setterType}.valueOf({var}.ordinal())";
+                t0 = convert.useMapping(dftValue, mapper, setterDeclareType, getterDeclareType);
             } else if (isString(getterDeclareType)) {
                 // TODO format & defaultValue(返回值应判断 null 和 str.length() == 0)
                 String format = model.getAttr().formatValue();
@@ -697,8 +747,8 @@ final class MapFieldFactory {
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        final String dftValue = forDefaultBigInteger(model, manager, setterDeclareType);
         if (isTypeof(setterDeclareType, BigInteger.class)) {
+            final String dftValue = forDefaultBigInteger(model, manager, setterDeclareType);
             if (isPrimitiveNumber(getterDeclareType)) {
                 t0 = "{toName}.{setterName}({setterType}.valueOf({cast}{fromName}.{getterName}()));";
                 String cast = isCompatible(LONG, toPrimitiveType(getterDeclareType)) ? "" : "(long)";
@@ -711,6 +761,9 @@ final class MapFieldFactory {
                 }, setterDeclareType);
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
                 t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, Number.class);
+            } else if (isEnum(getterDeclareType)) {
+                Supplier<String> mapper = () -> "{setterType}.valueOf({var}.ordinal())";
+                t0 = convert.useMapping(dftValue, mapper, setterDeclareType, getterDeclareType);
             } else if (isString(getterDeclareType)) {
                 String format = model.getAttr().formatValue();
                 if (format == null) {
@@ -759,15 +812,26 @@ final class MapFieldFactory {
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        if (isTypeofAny(setterDeclareType, MutableDateTime.class, DateTime.class, LocalDateTime.class, LocalDate.class,
-            LocalTime.class, MutablePeriod.class, Duration.class, YearMonth.class, Instant.class, MonthDay.class)) {
+        if (isTypeofAny(setterDeclareType,
+            MutableDateTime.class,
+            DateTime.class,
+            LocalDateTime.class,
+            LocalDate.class,
+            LocalTime.class,
+            MutablePeriod.class,
+            Duration.class,
+            YearMonth.class,
+            Instant.class,
+            MonthDay.class)) {
             if (isPrimitiveNumber(getterDeclareType)) {
                 String cast = isCompatible(LONG, getterDeclareType) ? "" : "(long)";
                 t0 = "{toName}.{setterName}(new {setterType}({cast}{fromName}.{getterName}()));";
                 t0 = Replacer.cast.replace(t0, cast);
                 t0 = Replacer.setterType.replace(t0, manager.onImported(setterDeclareType));
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
-                t0 = convert.useMapping(null, () -> "new {setterType}({var}.longValue())", setterDeclareType,
+                t0 = convert.useMapping(null,
+                    () -> "new {setterType}({var}.longValue())",
+                    setterDeclareType,
                     getterDeclareType);
             } else if (isTypeof(setterDeclareType, Duration.class)) {
                 if (isString(getterDeclareType)) {
@@ -775,8 +839,15 @@ final class MapFieldFactory {
                 } else {
                     t0 = warningAndIgnored(model);
                 }
-            } else if (isTypeofAny(setterDeclareType, MutableDateTime.class, DateTime.class, LocalDateTime.class,
-                LocalDate.class, LocalTime.class, YearMonth.class, MonthDay.class, Instant.class)) {
+            } else if (isTypeofAny(setterDeclareType,
+                MutableDateTime.class,
+                DateTime.class,
+                LocalDateTime.class,
+                LocalDate.class,
+                LocalTime.class,
+                YearMonth.class,
+                MonthDay.class,
+                Instant.class)) {
                 if (isString(getterDeclareType)) {
                     String format = model.getAttr().formatValue();
                     String dftFormat = manager.ofStatic().onJodaDateTimeFormat(format);
@@ -790,8 +861,10 @@ final class MapFieldFactory {
                         }, setterDeclareType, String.class);
                     }
                 } else if (isSubTypeof(getterDeclareType, Date.class) || isTypeof(getterDeclareType, Calendar.class)) {
-                    t0 = convert
-                        .useMapping(null, () -> "new {setterType}({var})", setterDeclareType, getterDeclareType);
+                    t0 = convert.useMapping(null,
+                        () -> "new {setterType}({var})",
+                        setterDeclareType,
+                        getterDeclareType);
                 } else {
                     t0 = warningAndIgnored(model);
                 }
@@ -811,7 +884,9 @@ final class MapFieldFactory {
         if (isTypeofJdk8DateTime(setterDeclareType)) {
             if (isPrimitiveNumber(getterDeclareType)) {
                 String getterType = isCompatible(LONG, getterDeclareType) ? LONG : DOUBLE;
-                t0 = convert.useConvert(null, info -> info.toString("{fromName}.{getterName}()"), setterDeclareType,
+                t0 = convert.useConvert(null,
+                    info -> info.toString("{fromName}.{getterName}()"),
+                    setterDeclareType,
                     getterType);
             } else if (isString(getterDeclareType)) {
                 String format = manager.ofStatic().onDateTimeFormatter(model.getAttr().formatValue());
@@ -911,7 +986,9 @@ final class MapFieldFactory {
         if (isTypeof(setterDeclareType, Calendar.class)) {
             if (isPrimitiveNumber(getterDeclareType)) {
                 String getterType = isCompatible(LONG, getterDeclareType) ? LONG : DOUBLE;
-                t0 = convert.useConvert(null, info -> info.toString("{fromName}.{getterName}()"), setterDeclareType,
+                t0 = convert.useConvert(null,
+                    info -> info.toString("{fromName}.{getterName}()"),
+                    setterDeclareType,
                     getterType);
             } else if (isSubTypeof(getterDeclareType, Number.class)) {
                 t0 = convert.useConvert(null, STRINGIFY, setterDeclareType, Number.class);
@@ -1019,8 +1096,12 @@ final class MapFieldFactory {
     }
 
     private static boolean isTypeofJdk8Date(String type) {
-        return isTypeofAny(type, java.time.LocalDateTime.class, java.time.ZonedDateTime.class,
-            java.time.OffsetDateTime.class, java.time.Instant.class, java.time.LocalDate.class);
+        return isTypeofAny(type,
+            java.time.LocalDateTime.class,
+            java.time.ZonedDateTime.class,
+            java.time.OffsetDateTime.class,
+            java.time.Instant.class,
+            java.time.LocalDate.class);
     }
 
     private static boolean isTypeofJdk8DateTime(String type) {
