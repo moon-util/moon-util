@@ -68,6 +68,14 @@ final class ConvertManager {
      * 进入这里的要求确保 getter 类型不是基本数据类型
      */
 
+    public String onMapping( String defaultVal, String mapping, String setterType, Class<?>... getterTypes){
+        return useMapping(defaultVal, () -> mapping, setterType, getterTypes);
+    }
+
+    public String onMapping( String defaultVal, String mapping, String setterType, String... getterTypes){
+        return useMapping(defaultVal, () -> mapping, setterType, getterTypes);
+    }
+
     public String useMapping(
         String defaultVal, Supplier<String> mapper, String setterType
     ) { return useMapping(defaultVal, mapper, setterType, ""); }

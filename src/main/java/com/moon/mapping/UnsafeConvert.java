@@ -23,18 +23,6 @@ public abstract class UnsafeConvert {
 
     private UnsafeConvert() { }
 
-    public static Byte toByte(Enum<?> enumVal) { return (byte) enumVal.ordinal(); }
-
-    public static Short toShort(Enum<?> enumVal) { return (short) enumVal.ordinal(); }
-
-    public static Integer toInteger(Enum<?> enumVal) { return enumVal.ordinal(); }
-
-    public static Long toLong(Enum<?> enumVal) { return (long) enumVal.ordinal(); }
-
-    public static Float toFloat(Enum<?> enumVal) { return (float) enumVal.ordinal(); }
-
-    public static Double toDouble(Enum<?> enumVal) { return (double) enumVal.ordinal(); }
-
     public static BigDecimal toBigDecimal(Double value) { return BigDecimal.valueOf(value); }
 
     public static BigDecimal toBigDecimal(Float value) { return BigDecimal.valueOf(value); }

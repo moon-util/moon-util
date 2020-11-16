@@ -8,15 +8,20 @@ final class Manager {
     private final ImportManager importManager;
     private final StaticManager staticManager;
     private final ConvertManager convertManager;
+    private final ScopedManager scopedManager;
 
     public Manager() {
-        ImportManager importManager = new ImportManager();
+        final ImportManager importManager = new ImportManager();
         ConvertManager convertManager = new ConvertManager(importManager);
         StaticManager staticManager = new StaticManager(importManager);
+        ScopedManager scopedManager = new ScopedManager(importManager);
         this.convertManager = convertManager;
         this.importManager = importManager;
         this.staticManager = staticManager;
+        this.scopedManager = scopedManager;
     }
+
+    public ScopedManager ofScoped() { return scopedManager; }
 
     public StaticManager ofStatic() { return staticManager; }
 
