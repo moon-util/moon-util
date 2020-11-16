@@ -189,8 +189,10 @@ public class StaticManager {
         String varName = varCached.get(key);
         if (varName == null) {
             varName = getStaticVar(key);
-            String declare = "{modifiers} {type0} {var} = {type0}.ofPattern(\"{format}\");";
-            declare = Replacer.type0.replace(declare, importManager.onImported(DateTimeFormat.class));
+            String declare = "{modifiers} {type0} {var} = {type1}.forPattern(\"{format}\");";
+            Class<?> formatter = org.joda.time.format.DateTimeFormatter.class;
+            declare = Replacer.type0.replace(declare, importManager.onImported(formatter));
+            declare = Replacer.type1.replace(declare, importManager.onImported(DateTimeFormat.class));
             declare = Replacer.format.replace(declare, format);
             fields.add(then(declare, varName));
         }
@@ -283,10 +285,6 @@ public class StaticManager {
     }
 
     public String defaultNull() { return NULL; }
-
-    public void addStaticField(String key, String field) {
-        fields.add(Replacer.var.replace(field, getStaticVar(key)));
-    }
 
     @Override
     public String toString() { return String.join("", fields); }
