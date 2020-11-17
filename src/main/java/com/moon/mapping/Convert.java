@@ -17,11 +17,11 @@ import static java.time.ZoneId.systemDefault;
  * 数据转换器：此转始终使用系统默认格式，且不对任何数据进行空指针判断
  *
  * @author benshaoye
- * @see JodaUnsafeConvert
+ * @see JodaConvert
  */
-public abstract class UnsafeConvert {
+public abstract class Convert {
 
-    private UnsafeConvert() { }
+    private Convert() { }
 
     public static BigDecimal toBigDecimal(Double value) { return BigDecimal.valueOf(value); }
 
@@ -203,7 +203,7 @@ public abstract class UnsafeConvert {
 
     public static Date toDate(OffsetDateTime date) { return toDate(date.toInstant()); }
 
-    public static Date toDate(Instant instant) { return new Date(toLongValue(instant)); }
+    public static Date toDate(Instant instant) { return Date.from(instant); }
 
     public static Date toDate(Number number) { return new Date(number.longValue()); }
 

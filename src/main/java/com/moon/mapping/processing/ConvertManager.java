@@ -1,7 +1,7 @@
 package com.moon.mapping.processing;
 
-import com.moon.mapping.JodaUnsafeConvert;
-import com.moon.mapping.UnsafeConvert;
+import com.moon.mapping.JodaConvert;
+import com.moon.mapping.Convert;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -22,9 +22,9 @@ final class ConvertManager {
 
     public ConvertManager(ImportManager importManager) {
         this.importManager = importManager;
-        loadPredefinedConvert(UnsafeConvert.class);
+        loadPredefinedConvert(Convert.class);
         if (DetectUtils.IMPORTED_JODA_TIME) {
-            loadPredefinedConvert(JodaUnsafeConvert.class);
+            loadPredefinedConvert(JodaConvert.class);
         }
     }
 
@@ -34,8 +34,10 @@ final class ConvertManager {
         for (Element element : unsafeConvert.getEnclosedElements()) {
             if (DetectUtils.isMethod(element)) {
                 ExecutableElement convert = (ExecutableElement) element;
-                List<String> params = convert.getParameters().stream()
-                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", "")).collect(Collectors.toList());
+                List<String> params = convert.getParameters()
+                    .stream()
+                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", ""))
+                    .collect(Collectors.toList());
                 String returnType = convert.getReturnType().toString();
                 String key = toTypedKey(returnType, params);
                 CallerInfo converter = toCallConvert(convert, unsafeConvertName, params);
@@ -68,11 +70,11 @@ final class ConvertManager {
      * 进入这里的要求确保 getter 类型不是基本数据类型
      */
 
-    public String onMapping( String defaultVal, String mapping, String setterType, Class<?>... getterTypes){
+    public String onMapping(String defaultVal, String mapping, String setterType, Class<?>... getterTypes) {
         return useMapping(defaultVal, () -> mapping, setterType, getterTypes);
     }
 
-    public String onMapping( String defaultVal, String mapping, String setterType, String... getterTypes){
+    public String onMapping(String defaultVal, String mapping, String setterType, String... getterTypes) {
         return useMapping(defaultVal, () -> mapping, setterType, getterTypes);
     }
 
@@ -104,6 +106,14 @@ final class ConvertManager {
         t0 = Replacer.setterType.replace(t0, importManager.onImported(setterType));
         t0 = Replacer.getterType.replace(t0, importManager.onImported(getterType));
         return t0;
+    }
+
+    public String onConvertSimple(String setterType, Class<?> getterType) {
+        return useConvert(null, Object::toString, setterType, getterType);
+    }
+
+    public String onConvertSimple(String setterType, String getterType) {
+        return useConvert(null, Object::toString, setterType, getterType);
     }
 
     public String useConvert(
