@@ -12,8 +12,6 @@ final class MapMethodFactory {
 
     private final AtomicInteger indexer = new AtomicInteger();
 
-    private final MapFieldFactory fieldFactory = new MapFieldFactory();
-
     MapMethodFactory() { }
 
     public AtomicInteger getIndexer() { return indexer; }
@@ -26,14 +24,6 @@ final class MapMethodFactory {
     final String newThisOnEmptyConstructor(String thisType, String thatType, boolean emptyFields) {
         String template = emptyFields ? newThisAsEmpty4NonFields : newThisAsEmpty;
         return replaceTypeAndName(template, thisType, thatType);
-    }
-
-    /*
-     start BeanMapping
-     */
-
-    final String onField(final MappingModel model, Manager staticManager) {
-        return fieldFactory.doConvertField(model, staticManager);
     }
 
     /*

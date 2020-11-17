@@ -16,11 +16,13 @@ public abstract class MappingUtil {
     /**
      * 获取当前类的{@link MapMapping}
      * <p>
-     * 注：返回值{@link MapMapping}不可强转为{@link BeanMapping}是不可用的
+     * 注：返回值{@link MapMapping}强转为{@link BeanMapping}后{@code BeanMapping}的方法是不可用的
      *
      * @param <THIS> 当前类数据类型
      *
      * @return MapMapping
+     *
+     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
      */
     public static <THIS> MapMapping<THIS> thisMapping() {
         return Mappings.resolve(currentThread().getStackTrace()[2].getClassName());
@@ -54,6 +56,8 @@ public abstract class MappingUtil {
      * @param <THAT> 转换目标类型
      *
      * @return 映射器
+     *
+     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
      */
     public static <THIS, THAT> BeanMapping<THIS, THAT> thisPrimary() {
         Class<THIS> thisClass = classAs(currentThread().getStackTrace()[2].getClassName());
@@ -71,6 +75,8 @@ public abstract class MappingUtil {
      * @param <THAT>    目标类
      *
      * @return 映射器
+     *
+     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
      */
     public static <THIS, THAT> BeanMapping<THIS, THAT> thisMappingFor(Class<THAT> thatClass) {
         return resolve(classAs(currentThread().getStackTrace()[2].getClassName()), thatClass);
@@ -86,8 +92,7 @@ public abstract class MappingUtil {
      *
      * @return 当存在时返回对应映射器
      *
-     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常，
-     *                                必须通过{@link MappingFor}或手动注册方可获取到
+     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
      * @see MappingFor#value()
      */
     public static <F, T> BeanMapping<F, T> resolve(Class<F> fromClass, Class<T> toClass) {
@@ -101,8 +106,9 @@ public abstract class MappingUtil {
      * @param <T>       目标类型
      *
      * @return 映射器
+     *
+     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
+     * @see #thisMapping()
      */
-    public static <T> MapMapping<T> resolve(Class<T> fromClass) {
-        return Mappings.resolve(fromClass);
-    }
+    public static <T> MapMapping<T> resolve(Class<T> fromClass) { return Mappings.resolve(fromClass); }
 }

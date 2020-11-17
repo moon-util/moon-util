@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * import 管理器
+ *
  * @author benshaoye
  */
 final class ImportManager {

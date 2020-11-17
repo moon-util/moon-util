@@ -1,6 +1,8 @@
 package com.moon.mapping.processing;
 
 /**
+ * 方法级别的作用域管理器
+ *
  * @author benshaoye
  */
 final class ScopedManager {
@@ -9,5 +11,9 @@ final class ScopedManager {
 
     public ScopedManager(ImportManager importManager) {
         this.importManager = importManager;
+    }
+
+    public void onStartScoped() {
+
     }
 }

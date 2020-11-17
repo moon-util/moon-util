@@ -1,5 +1,6 @@
 package com.moon.mapping.processing;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.lang.model.element.Element;
@@ -12,9 +13,12 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import static com.moon.mapping.processing.ElementUtils.cast;
 import static com.moon.mapping.processing.ElementUtils.getSimpleName;
 
 /**
+ * 静态变量遍历器
+ *
  * @author benshaoye
  */
 public class StaticManager {
@@ -37,6 +41,30 @@ public class StaticManager {
 
     public String getStaticVar(String key) {
         return varCached.computeIfAbsent(key, k -> "VAR" + indexer.getAndIncrement());
+    }
+
+    /**
+     * 默认 boolean 值
+     * @param type boolean 类型（boolean 和 Boolean）
+     * @param value 只能为 true / false
+     * @return
+     */
+    public String onDefaultBoolean(String type, String value) {
+        if (value == null) {
+            return NULL;
+        }
+        String key = getKey(type, value);
+        String varName = varCached.get(key);
+        if (varName != null) {
+            return varName;
+        }
+        varName = getStaticVar(key);
+        String booleanValue = Boolean.valueOf(value).toString();
+        String t0 = "{modifiers} {type0} {var} = {value};";
+        t0 = Replacer.type0.replace(t0, importManager.onImported(type));
+        t0 = Replacer.value.replace(t0, booleanValue);
+        fields.add(then(t0, varName));
+        return varName;
     }
 
     public String onDefaultNumber(Class<?> type, String value) {
