@@ -1,4 +1,4 @@
-package com.moon.mapping;
+package com.moon.mapping.convert;
 
 import org.joda.time.ReadableInstant;
 

@@ -1,5 +1,6 @@
 package com.moon.mapping.processing;
 
+import com.moon.mapping.annotation.IgnoreMode;
 import com.moon.mapping.annotation.MapProperty;
 import com.moon.mapping.annotation.MappingFor;
 
@@ -35,7 +36,7 @@ final class ProcessUtils {
     private static void handleMapProperty(BasicDefinition definition, Element element, String name) {
         MapProperty[] properties = element.getAnnotationsByType(MapProperty.class);
         for (MapProperty property : properties) {
-            boolean ignore = property.ignore();
+            IgnoreMode ignore = property.ignore();
             String value = property.value();
             String format = property.format();
             String defaultValue = property.defaultValue();

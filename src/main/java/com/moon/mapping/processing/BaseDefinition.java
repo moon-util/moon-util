@@ -119,7 +119,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
             PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
-            if (attr.isIgnored()) {
+            if (attr.isIgnoreForward()) {
                 return null;
             }
             String targetName = attr.getField(thisProp.getName());
@@ -138,16 +138,11 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
             PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
-            if (attr.isIgnored()) {
+            if (attr.isIgnoreBackward()) {
                 return null;
             }
             String targetName = attr.getField(thisProp.getName());
             Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (Objects.equals(thisProp.getName(), "username")) {
-                Logger.warn("+++++++++++++++++++++++=");
-                Logger.warn(thatProp);
-                Logger.warn(thisProp);
-            }
             if (model.backward(thisProp, thatProp, attr).isUsable()) {
                 return getFieldFactory().doConvertField(model, manager);
             }
@@ -157,7 +152,12 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     }
 
     private static boolean forMethod(
-        StringAdder adder, Collection<String> fields, BaseDefinition thisDef, BaseDefinition thatDef, Manager manager, boolean forward
+        StringAdder adder,
+        Collection<String> fields,
+        BaseDefinition thisDef,
+        BaseDefinition thatDef,
+        Manager manager,
+        boolean forward
     ) {
         if (fields.isEmpty()) {
             return true;

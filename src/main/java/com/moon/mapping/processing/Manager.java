@@ -29,13 +29,9 @@ final class Manager {
 
     public ConvertManager ofConvert() { return convertManager; }
 
-    public String onImported(String classname) {
-        return importManager.onImported(classname);
-    }
+    public String onImported(String classname) { return ofImport().onImported(classname); }
 
-    public String onImported(Class<?> classname) {
-        return importManager.onImported(classname);
-    }
+    public String onImported(Class<?> classname) { return ofImport().onImported(classname); }
 
     public String getImports() { return importManager.toString(); }
 }

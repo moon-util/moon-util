@@ -1,7 +1,7 @@
 package com.moon.mapping.processing;
 
-import com.moon.mapping.JodaConvert;
-import com.moon.mapping.Convert;
+import com.moon.mapping.convert.JodaConvert;
+import com.moon.mapping.convert.Convert;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

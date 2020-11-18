@@ -30,7 +30,6 @@ public enum Replacer {
     implType,
     thatType,
     modifiers,
-    simpleName,
     thisName {
         @Override
         String toReplacement(String value) { return ElementUtils.getSimpleName(value); }

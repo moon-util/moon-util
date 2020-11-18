@@ -58,7 +58,7 @@ final class MapMethodFactory {
     }
 
     final String toMapField(Mappable prop) {
-        if (DetectUtils.isAnyNull(prop.getSetterName(), prop.getSetterFinalType())) {
+        if (DetectUtils.isAnyNull(prop.getGetterName(), prop.getGetterFinalType())) {
             return "";
         }
         return toMapField(prop.getName(), prop.getGetterName());
@@ -80,8 +80,9 @@ final class MapMethodFactory {
     }
 
     final String toStringField(Mappable model, boolean first) {
-        return StringUtils.isBlank(model.getGetterName()) ? ""
-            : toStringField(model.getName(), model.getGetterName(), first);
+        return StringUtils.isBlank(model.getGetterName()) ? "" : toStringField(model.getName(),
+            model.getGetterName(),
+            first);
     }
 
     private String toStringField(String name, String getterName, boolean first) {

@@ -231,14 +231,14 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
     }
 
     private <T> T ifHasGetter(Supplier<T> dftGetter, Supplier<T> lombokGetter) {
-        if (hasPublicDefaultSetter()) { return dftGetter.get(); }
-        if (hasLombokSetter()) { return lombokGetter.get(); }
+        if (hasPublicDefaultGetter()) { return dftGetter.get(); }
+        if (hasLombokGetter()) { return lombokGetter.get(); }
         return null;
     }
 
     private <T> T ifHasGetter(Function<BaseTypeGetter, T> getter) {
-        if (hasPublicDefaultSetter()) { return getter.apply(getGetter()); }
-        if (hasLombokSetter()) { return getter.apply(this); }
+        if (hasPublicDefaultGetter()) { return getter.apply(getGetter()); }
+        if (hasLombokGetter()) { return getter.apply(this); }
         return null;
     }
 
@@ -254,12 +254,15 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     private void onMissingField() {
         List<BasicMethod> getterArr = ensureGetterArr();
+        List<BasicMethod> setterArr = ensureSetterArr();
         if (getterArr.isEmpty()) {
-            onMissingGetter();
+            if (setterArr.size() == 1) {
+                this.setSetter(setterArr.remove(0));
+            }
         } else {
             BasicMethod getter = getterArr.remove(0);
             setGetter(getter);
-            Iterator<BasicMethod> setterItr = ensureSetterArr().iterator();
+            Iterator<BasicMethod> setterItr = setterArr.iterator();
             while (setterItr.hasNext()) {
                 BasicMethod method = setterItr.next();
                 if (Objects.equals(method.getComputedType(), getter.getComputedType())) {
@@ -269,9 +272,6 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
                 }
             }
         }
-    }
-
-    private void onMissingGetter() {
     }
 
     private void onPresentField(final String propertyType) {

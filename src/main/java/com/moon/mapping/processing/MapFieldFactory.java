@@ -338,12 +338,16 @@ final class MapFieldFactory {
                 t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, Date.class);
             } else if (isSubtypeOf(getterDeclareType, Calendar.class)) {
                 t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, Calendar.class);
-            } else if (isTypeofAny(getterDeclareType, java.time.LocalDate.class, java.time.LocalDateTime.class,
-                ZonedDateTime.class, OffsetDateTime.class, java.time.Instant.class)) {
+            } else if (isTypeofAny(getterDeclareType,
+                java.time.LocalDate.class,
+                java.time.LocalDateTime.class,
+                ZonedDateTime.class,
+                OffsetDateTime.class,
+                java.time.Instant.class)) {
                 t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, getterDeclareType);
             } else if (DetectUtils.IMPORTED_JODA_TIME) {
-                if (isSubtypeOf(getterDeclareType, ReadableInstant.class) ||
-                    isTypeof(getterDeclareType, DateTime.class)) {
+                if (isSubtypeOf(getterDeclareType, ReadableInstant.class) || isTypeof(getterDeclareType,
+                    DateTime.class)) {
                     t0 = convert.useConvert(dftValue, STRINGIFY, LONG, ReadableInstant.class);
                 } else if (isTypeofAny(getterDeclareType, LocalDateTime.class, LocalDate.class)) {
                     t0 = convert.useConvert(dftValue, STRINGIFY, LONG, getterDeclareType);
@@ -436,10 +440,12 @@ final class MapFieldFactory {
                 } else if (isSubtypeOf(getterDeclareType, Calendar.class)) {
                     t0 = convert.onMapping(dftValue, "{var}.getTimeInMillis()", "", getterDeclareType);
                 } else if (DetectUtils.IMPORTED_JODA_TIME) {
-                    if (isSubtypeOf(getterDeclareType, ReadableInstant.class) ||
-                        isTypeof(getterDeclareType, DateTime.class)) {
+                    if (isSubtypeOf(getterDeclareType, ReadableInstant.class) || isTypeof(getterDeclareType,
+                        DateTime.class)) {
                         t0 = convert.onMapping(dftValue, "{var}.getMillis()", "", getterDeclareType);
-                    } else if (isTypeofAny(getterDeclareType, LocalDateTime.class, LocalDate.class,
+                    } else if (isTypeofAny(getterDeclareType,
+                        LocalDateTime.class,
+                        LocalDate.class,
                         MutableDateTime.class)) {
                         t0 = convert.onMapping(dftValue, "{var}.toDate().getTime()", "", getterDeclareType);
                     } else {
@@ -453,9 +459,8 @@ final class MapFieldFactory {
             }
         } else if (isTypeof(setterDeclareType, Number.class)) {
             final String dftValue = forDefaultNumber(model, manager, setterDeclareType);
-            if (isSubtypeOf(getterDeclareType, Number.class) ||
-                isPrimitiveNumber(getterDeclareType) ||
-                isPrimitiveChar(getterDeclareType)) {
+            if (isSubtypeOf(getterDeclareType, Number.class) || isPrimitiveNumber(getterDeclareType) || isPrimitiveChar(
+                getterDeclareType)) {
                 t0 = "{toName}.{setterName}({fromName}.{getterName}());";
             } else if (isEnum(getterDeclareType)) {
                 t0 = convert.onMapping(dftValue, "{var}.ordinal()", "", getterDeclareType);
@@ -763,24 +768,42 @@ final class MapFieldFactory {
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
-        if (isTypeofAny(setterDeclareType, MutableDateTime.class, DateTime.class, LocalDateTime.class, LocalDate.class,
-            LocalTime.class, MutablePeriod.class, Duration.class, YearMonth.class, Instant.class, MonthDay.class)) {
+        if (isTypeofAny(setterDeclareType,
+            MutableDateTime.class,
+            DateTime.class,
+            LocalDateTime.class,
+            LocalDate.class,
+            LocalTime.class,
+            MutablePeriod.class,
+            Duration.class,
+            YearMonth.class,
+            Instant.class,
+            MonthDay.class)) {
             if (isPrimitiveNumber(getterDeclareType)) {
                 String cast = isCompatible(LONG, getterDeclareType) ? "" : "(long)";
                 t0 = "{toName}.{setterName}(new {setterType}({cast}{fromName}.{getterName}()));";
                 t0 = Replacer.cast.replace(t0, cast);
                 t0 = Replacer.setterType.replace(t0, manager.onImported(setterDeclareType));
             } else if (isSubtypeOf(getterDeclareType, Number.class)) {
-                t0 = convert
-                    .onMapping(null, "new {setterType}({var}.longValue())", setterDeclareType, getterDeclareType);
+                t0 = convert.onMapping(null,
+                    "new {setterType}({var}.longValue())",
+                    setterDeclareType,
+                    getterDeclareType);
             } else if (isTypeof(setterDeclareType, Duration.class)) {
                 if (isString(getterDeclareType)) {
                     t0 = convert.onMapping(null, "{setterType}.parse({var})", setterDeclareType, getterDeclareType);
                 } else {
                     t0 = warningAndIgnored(model);
                 }
-            } else if (isTypeofAny(setterDeclareType, MutableDateTime.class, DateTime.class, LocalDateTime.class,
-                LocalDate.class, LocalTime.class, YearMonth.class, MonthDay.class, Instant.class)) {
+            } else if (isTypeofAny(setterDeclareType,
+                MutableDateTime.class,
+                DateTime.class,
+                LocalDateTime.class,
+                LocalDate.class,
+                LocalTime.class,
+                YearMonth.class,
+                MonthDay.class,
+                Instant.class)) {
                 if (isString(getterDeclareType)) {
                     String format = model.getAttr().formatValue();
                     String dftFormat = manager.ofStatic().onJodaDateTimeFormat(format);
@@ -826,8 +849,10 @@ final class MapFieldFactory {
         String t0;
         if (isPrimitiveNumber(getterDeclareType)) {
             String getterType = isCompatible(LONG, getterDeclareType) ? LONG : DOUBLE;
-            t0 = convert
-                .useConvert(null, info -> info.toString("{fromName}.{getterName}()"), setterDeclareType, getterType);
+            t0 = convert.useConvert(null,
+                info -> info.toString("{fromName}.{getterName}()"),
+                setterDeclareType,
+                getterType);
         } else if (isSubtypeOf(getterDeclareType, Number.class)) {
             t0 = convert.onConvertSimple(setterDeclareType, Number.class);
         } else if (isSubtypeOf(getterDeclareType, Date.class)) {
@@ -1002,6 +1027,9 @@ final class MapFieldFactory {
     private static boolean isString(String value) { return isTypeof(value, String.class); }
 
     private static boolean isEnum(String value) {
+        if (value == null) {
+            return false;
+        }
         TypeElement elem = EnvUtils.getUtils().getTypeElement(value);
         return elem != null && elem.getKind() == ElementKind.ENUM;
     }
@@ -1020,8 +1048,12 @@ final class MapFieldFactory {
     }
 
     private static boolean isTypeofJdk8Date(String type) {
-        return isTypeofAny(type, java.time.LocalDateTime.class, java.time.ZonedDateTime.class,
-            java.time.OffsetDateTime.class, java.time.Instant.class, java.time.LocalDate.class);
+        return isTypeofAny(type,
+            java.time.LocalDateTime.class,
+            java.time.ZonedDateTime.class,
+            java.time.OffsetDateTime.class,
+            java.time.Instant.class,
+            java.time.LocalDate.class);
     }
 
     private static boolean isTypeofJdk8DateTime(String type) {
@@ -1044,6 +1076,9 @@ final class MapFieldFactory {
     }
 
     private static boolean isSubtypeOf(String actualType, String superClass) {
+        if (actualType == null || superClass == null) {
+            return false;
+        }
         Elements utils = EnvUtils.getUtils();
         TypeElement elem1 = utils.getTypeElement(actualType);
         TypeElement elem2 = utils.getTypeElement(superClass);
