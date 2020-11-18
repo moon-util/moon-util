@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.moon.mapping.processing.GenericUtils.findActualType;
 import static com.moon.mapping.processing.StringUtils.capitalize;
@@ -28,6 +30,11 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
     }
 
     public VariableElement getField() { return field; }
+
+    @Override
+    public String getThisClassname() {
+        return ElementUtils.getQualifiedName(thisElement);
+    }
 
     public void setField(VariableElement field, Map<String, GenericModel> genericMap) {
         this.field = field;
@@ -59,24 +66,24 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     @Override
     public String getSetterName() {
-        if (hasPublicDefaultSetter()) {
+        return ifHasSetter(() -> {
             return getSetter().getMethodName();
-        }
-        if (hasLombokSetter()) {
-            return "set" + capitalize(getName());
-        }
-        return null;
+        }, () -> "set" + capitalize(getName()));
+    }
+
+    @Override
+    public String getSetterActualType() {
+        return ifHasSetter(BaseTypeGetter::getActualType);
+    }
+
+    @Override
+    public String getSetterDeclareType() {
+        return ifHasSetter(BaseTypeGetter::getDeclareType);
     }
 
     @Override
     public String getSetterFinalType() {
-        if (hasPublicDefaultSetter()) {
-            return getGetter().getComputedType();
-        }
-        if (hasLombokSetter()) {
-            return getComputedType();
-        }
-        return null;
+        return ifHasSetter(BaseTypeGetter::getComputedType);
     }
 
     @Override
@@ -94,23 +101,12 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
             return getSetterFinalType();
         }
         if (typeMirror.getKind().isPrimitive()) {
-            return toWrapperType(typeMirror.getKind());
+            return StringUtils.toWrappedType(typeMirror.getKind().toString().toLowerCase());
         }
         return typeMirror.toString();
     }
 
-    private static String toWrapperType(TypeKind kind) {
-        switch (kind) {
-            case INT:
-                return Integer.class.getName();
-            case CHAR:
-                return Character.class.getName();
-            default:
-                return capitalize(kind.name().toLowerCase());
-        }
-    }
-
-    public TypeMirror getSetterTypeElem() {
+    public TypeMirror getSetterTypeMirror() {
         if (hasPublicDefaultGetter()) {
             return getSetter().getElem().getParameters().get(0).asType();
         }
@@ -122,14 +118,8 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     @Override
     public boolean isPrimitiveSetter() {
-        if (hasPublicDefaultSetter()) {
-            return getSetter().getElem().getParameters().get(0).asType().getKind().isPrimitive();
-        }
-        if (hasLombokSetter()) {
-            VariableElement var = getField();
-            return var != null && var.asType().getKind().isPrimitive();
-        }
-        return false;
+        TypeMirror type = getSetterTypeMirror();
+        return type != null && type.getKind().isPrimitive();
     }
 
     /**
@@ -156,49 +146,41 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         return null;
     }
 
+    @Override
+    public String getGetterActualType() {
+        return ifHasGetter(BaseTypeGetter::getActualType);
+    }
+
+    @Override
+    public String getGetterDeclareType() {
+        return ifHasGetter(BaseTypeGetter::getDeclareType);
+    }
+
     /**
      * getter return type
      */
     @Override
     public String getGetterFinalType() {
-        if (hasPublicDefaultGetter()) {
-            return getGetter().getComputedType();
-        }
-        if (hasLombokGetter()) {
-            return getComputedType();
-        }
-        return null;
+        return ifHasGetter(BaseTypeGetter::getComputedType);
     }
 
     @Override
     public String getWrappedGetterType() {
         TypeMirror typeMirror = null;
         if (isPrimitiveGetter()) {
-            if (hasPublicDefaultGetter()) {
-                BasicMethod setter = getGetter();
-                typeMirror = setter.getElem().getReturnType();
-            }
-            if (hasLombokGetter()) {
-                typeMirror = getField().asType();
-            }
+            typeMirror = getGetterTypeMirror();
         }
         if (typeMirror == null) {
             return getGetterFinalType();
         }
         if (typeMirror.getKind().isPrimitive()) {
-            return toWrapperType(typeMirror.getKind());
+            return StringUtils.toWrappedType(typeMirror.getKind().toString().toLowerCase());
         }
         return typeMirror.toString();
     }
 
-    public TypeMirror getGetterTypeElem() {
-        if (hasPublicDefaultGetter()) {
-            return getGetter().getElem().getReturnType();
-        }
-        if (hasLombokGetter()) {
-            return getField().asType();
-        }
-        return null;
+    public TypeMirror getGetterTypeMirror() {
+        return ifHasGetter(() -> getGetter().getElem().getReturnType(), () -> getField().asType());
     }
 
     /**
@@ -206,14 +188,8 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
      */
     @Override
     public boolean isPrimitiveGetter() {
-        if (hasPublicDefaultGetter()) {
-            return getGetter().getElem().getReturnType().getKind().isPrimitive();
-        }
-        if (hasLombokGetter()) {
-            VariableElement var = getField();
-            return var != null && var.asType().getKind().isPrimitive();
-        }
-        return false;
+        TypeMirror type = getGetterTypeMirror();
+        return type != null && type.getKind().isPrimitive();
     }
 
     /**
@@ -242,6 +218,30 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
      */
     private boolean hasLombokGetter() { return DetectUtils.hasLombokGetter(getField()); }
 
+    private <T> T ifHasSetter(Supplier<T> dftGetter, Supplier<T> lombokGetter) {
+        if (hasPublicDefaultSetter()) { return dftGetter.get(); }
+        if (hasLombokSetter()) { return lombokGetter.get(); }
+        return null;
+    }
+
+    private <T> T ifHasSetter(Function<BaseTypeGetter, T> getter) {
+        if (hasPublicDefaultSetter()) { return getter.apply(getSetter()); }
+        if (hasLombokSetter()) { return getter.apply(this); }
+        return null;
+    }
+
+    private <T> T ifHasGetter(Supplier<T> dftGetter, Supplier<T> lombokGetter) {
+        if (hasPublicDefaultGetter()) { return dftGetter.get(); }
+        if (hasLombokGetter()) { return lombokGetter.get(); }
+        return null;
+    }
+
+    private <T> T ifHasGetter(Function<BaseTypeGetter, T> getter) {
+        if (hasPublicDefaultGetter()) { return getter.apply(getGetter()); }
+        if (hasLombokGetter()) { return getter.apply(this); }
+        return null;
+    }
+
     @Override
     public void onCompleted() {
         final String propertyType = getComputedType();
@@ -254,12 +254,15 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     private void onMissingField() {
         List<BasicMethod> getterArr = ensureGetterArr();
+        List<BasicMethod> setterArr = ensureSetterArr();
         if (getterArr.isEmpty()) {
-            onMissingGetter();
+            if (setterArr.size() == 1) {
+                this.setSetter(setterArr.remove(0));
+            }
         } else {
             BasicMethod getter = getterArr.remove(0);
             setGetter(getter);
-            Iterator<BasicMethod> setterItr = ensureSetterArr().iterator();
+            Iterator<BasicMethod> setterItr = setterArr.iterator();
             while (setterItr.hasNext()) {
                 BasicMethod method = setterItr.next();
                 if (Objects.equals(method.getComputedType(), getter.getComputedType())) {
@@ -269,9 +272,6 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
                 }
             }
         }
-    }
-
-    private void onMissingGetter() {
     }
 
     private void onPresentField(final String propertyType) {
@@ -294,14 +294,5 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
                 break;
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("BasicProperty{");
-        sb.append("thisElement=").append(thisElement);
-        sb.append(", field=").append(field);
-        sb.append('}');
-        return sb.toString();
     }
 }

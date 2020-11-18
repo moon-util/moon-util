@@ -44,15 +44,16 @@ final class MappingWriter implements JavaFileWritable {
         if (!DetectUtils.IMPORTED_CONFIGURATION) {
             return;
         }
-        final String configName = "MappingConfiguration";
+        final Manager manager = getAllImportsNameForConfiguration();
+        final String configName = "BeanMappingConfiguration";
         final NameGenerator generator = new NameGenerator();
-        final StringAdder adder = new StringAdder().add("package ").pkg(MappingUtil.class).add(";");
-        adder.imports(getAllImportsNameForConfiguration(writers));
-        // @Configuration
-        adder.add("@").simpleCls(Configuration.class);
-        adder.add(" public class ").add(configName).add(" {");
+        final StringAdder beansAdder = new StringAdder();
+        beansAdder.add("@").add(manager.onImported(Configuration.class));
+        beansAdder.add("@SuppressWarnings({\"all\",\"unchecked\"})");
+        beansAdder.add(" public class ").add(configName).add(" {");
         for (MappingWriter writer : writers) {
             String thisCls = writer.getThisDefined().getCanonicalName();
+            String thisSimpleName = manager.onImported(thisCls);
             generator.atFromClass(thisCls);
             Set entries = writer.getForAllDefined().entrySet();
             for (Object entry : entries) {
@@ -60,47 +61,46 @@ final class MappingWriter implements JavaFileWritable {
                 BaseDefinition definition = thatDef.getValue();
                 // 类全名
                 String thatCls = definition.getCanonicalName();
+                String thatSimpleName = manager.onImported(thatCls);
                 // bean name
                 String thisBeanName = generator.get(thatCls);
                 // @Bean @ConditionalOnMissingBean
-                conditionalOnMissingBean(adder, thisBeanName);
-                adder.add(" public ").simpleCls(BeanMapping.class);
-                adder.add("<").add(thisCls).add(',').add(thatCls).add("> ").add(thisBeanName).add("() {");
-                adder.add("return ").add(toEnumClass(thisCls)).dot();
-                adder.add("TO_").add(thatCls.replace('.', '_')).add(";}");
+                conditionalOnMissingBean(beansAdder, thisBeanName, manager);
+                beansAdder.add(" public ").add(manager.onImported(BeanMapping.class));
+                beansAdder.add("<").add(thisSimpleName).add(',').add(thatSimpleName).add("> ");
+                beansAdder.add(thisBeanName).add("() {");
+                beansAdder.add("return ").add(toEnumClass(thisCls)).dot();
+                beansAdder.add("TO_").add(thatCls.replace('.', '_')).add(";}");
             }
         }
-        adder.add("}");
+        beansAdder.add("}");
+        StringAdder configAdder = new StringAdder().add("package ").pkg(BeanMapping.class).add(";");
+        configAdder.add(manager.getImports()).add(beansAdder);
         StringAdder src = new StringAdder().pkg(MappingUtil.class).dot().add(configName);
-        EnvUtils.newJavaFile(filer, src.toString(), adder);
+        EnvUtils.newJavaFile(filer, src.toString(), configAdder);
     }
 
     private StringAdder impl(final String classname) {
         final BaseDefinition def = getThisDefined();
-        StringAdder adder = new StringAdder().add("package ").pkg(BeanMapping.class).add(';');
-        adder.imports(getAllCanonicalName());
-        adder.add("enum ").add(getSimpleName(classname)).impl(BeanMapping.class).add("{TO,");
+        final Manager manager = new Manager();
+        StringAdder enumAdder = new StringAdder();
         for (BaseDefinition value : getForAllDefined().values()) {
-            def.addBeanMapping(adder, value);
+            def.addBeanMapping(enumAdder, value, manager);
         }
-        return adder.add(';').add(def.implMappingSharedMethods()).add("}");
+        StringAdder shardAdder = def.implMappingSharedMethods(manager), adder = new StringAdder();
+        adder.add("package ").pkg(BeanMapping.class).add(';').add(manager.getImports());
+        adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
+        adder.impl(BeanMapping.class).add("{TO,").add(enumAdder).add(';').add(manager.ofStatic());
+        return adder.add(shardAdder).add("}");
     }
 
-    private List<String> getAllCanonicalName() {
-        List<CanonicalNameable> nameableArr = new ArrayList<>();
-        nameableArr.add(getThisDefined());
-        nameableArr.addAll(getForAllDefined().values());
-        return nameableArr.stream().map(CanonicalNameable::getCanonicalName).collect(Collectors.toList());
-    }
-
-    private static Set<String> getAllImportsNameForConfiguration(List<MappingWriter> writers) {
-        List<Class<?>> classes = new ArrayList<>();
-        if (DetectUtils.IMPORTED_MISSING_BEAN) { classes.add(ConditionalOnMissingBean.class); }
-        if (DetectUtils.IMPORTED_CONFIGURATION) { classes.add(Configuration.class); }
-        if (DetectUtils.IMPORTED_BEAN) { classes.add(Bean.class); }
-        classes.add(BeanMapping.class);
-        Set<String> names = classes.stream().map(Class::getCanonicalName).collect(Collectors.toSet());
-        return names;
+    private static Manager getAllImportsNameForConfiguration() {
+        Manager manager = new Manager();
+        if (DetectUtils.IMPORTED_MISSING_BEAN) { manager.onImported(ConditionalOnMissingBean.class); }
+        if (DetectUtils.IMPORTED_CONFIGURATION) { manager.onImported(Configuration.class); }
+        if (DetectUtils.IMPORTED_BEAN) { manager.onImported(Bean.class); }
+        manager.onImported(BeanMapping.class);
+        return manager;
     }
 
     @SuppressWarnings("all")
@@ -108,13 +108,13 @@ final class MappingWriter implements JavaFileWritable {
         return new StringAdder().pkg(MappingUtil.class).dot().add(toEnumClass(def)).toString();
     }
 
-    private static void conditionalOnMissingBean(StringAdder adder, String thisBeanName) {
+    private static void conditionalOnMissingBean(StringAdder adder, String thisBeanName,final Manager manager) {
         if (DetectUtils.IMPORTED_MISSING_BEAN) {
-            adder.add("@").simpleCls(ConditionalOnMissingBean.class);
+            adder.add("@").add(manager.onImported(ConditionalOnMissingBean.class));
             adder.add("(name=\"").add(thisBeanName).add("\")");
         }
         if (DetectUtils.IMPORTED_BEAN) {
-            adder.add("@").simpleCls(Bean.class);
+            adder.add("@").add(manager.onImported(Bean.class));
         }
         adder.space();
     }

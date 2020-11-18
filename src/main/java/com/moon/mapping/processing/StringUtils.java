@@ -43,7 +43,56 @@ abstract class StringUtils {
         return new String(chars);
     }
 
+    static boolean isEmpty(String str) { return str == null || str.length() == 0; }
+
+    static boolean isBlank(String str) {
+        if (str == null) {
+            return true;
+        }
+        int strLen = str.length();
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return false;
+            }
+        }
+        return strLen == 0;
+    }
+
+    static boolean isNotBlank(String str) {
+        if (str == null) {
+            return false;
+        }
+        int strLen = str.length();
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return true;
+            }
+        }
+        return strLen != 0;
+    }
+
+    static String format(boolean appendIfOver, String template, Object... values) {
+        if (values != null) {
+            for (Object value : values) {
+                if (template.contains("{}")) {
+                    template = template.replaceFirst("\\{\\}", value == null ? "null" : value.toString());
+                } else if (appendIfOver) {
+                    template += ", " + value;
+                }
+            }
+        }
+        return template;
+    }
+
     static boolean isPrimitive(String type) {
+        return isPrimitiveNumber(type) || "char".equals(type) || "boolean".equals(type);
+    }
+
+    static boolean isPrimitiveChar(String type) { return "char".equals(type); }
+
+    static boolean isPrimitiveBoolean(String type) { return "boolean".equals(type); }
+
+    static boolean isPrimitiveNumber(String type) {
         if (type == null) {
             return false;
         }
@@ -54,11 +103,56 @@ abstract class StringUtils {
             case "long":
             case "float":
             case "double":
-            case "boolean":
-            case "char":
                 return true;
             default:
                 return false;
+        }
+    }
+
+    static boolean isWrappedNumber(String type) {
+        if (type == null) {
+            return false;
+        }
+        switch (type) {
+            case "java.lang.Byte":
+            case "java.lang.Short":
+            case "java.lang.Integer":
+            case "java.lang.Long":
+            case "java.lang.Float":
+            case "java.lang.Double":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    static String toPrimitiveType(String type) {
+        if (type == null) {
+            return null;
+        }
+        switch (type) {
+            case "Integer":
+            case "java.lang.Integer":
+                return "int";
+            case "Character":
+            case "java.lang.Character":
+                return "char";
+            case "Byte":
+            case "java.lang.Byte":
+            case "Short":
+            case "java.lang.Short":
+            case "Long":
+            case "java.lang.Long":
+            case "Float":
+            case "java.lang.Float":
+            case "Double":
+            case "java.lang.Double":
+            case "Boolean":
+            case "java.lang.Boolean":
+                int dotIdx = type.lastIndexOf('.');
+                return (dotIdx < 0 ? type : type.substring(dotIdx + 1)).toLowerCase();
+            default:
+                return type;
         }
     }
 
@@ -68,16 +162,16 @@ abstract class StringUtils {
         }
         switch (type) {
             case "int":
-                return "Integer";
+                return Integer.class.getCanonicalName();
             case "char":
-                return "Character";
+                return Character.class.getCanonicalName();
             case "byte":
             case "short":
             case "long":
             case "float":
             case "double":
             case "boolean":
-                return capitalize(type);
+                return ("java.lang." + capitalize(type));
             default:
                 return type;
         }

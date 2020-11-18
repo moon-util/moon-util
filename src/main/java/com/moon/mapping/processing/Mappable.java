@@ -13,6 +13,24 @@ interface Mappable {
     String getName();
 
     /**
+     * 返回当前属性所在的最终类
+     *
+     * <pre>
+     * public class A {
+     *     private String str;
+     * }
+     * public class B extends A {
+     *     private int age;
+     * }
+     * </pre>
+     * <p>
+     * 不论是属性 age 或者 str，最终类均是 B
+     *
+     * @return 实际使用这个属性的最终类
+     */
+    String getThisClassname();
+
+    /**
      * 是否有 getter
      *
      * @return getter
@@ -41,6 +59,34 @@ interface Mappable {
     String getSetterName();
 
     /**
+     * getter 方法返回值声明类型
+     *
+     * @return getter 声明类型
+     */
+    String getGetterDeclareType();
+
+    /**
+     * setter 方法参数声明类型
+     *
+     * @return setter 声明类型
+     */
+    String getSetterDeclareType();
+
+    /**
+     * getter 返回值实际类型
+     *
+     * @return getter 返回值实际类型
+     */
+    String getGetterActualType();
+
+    /**
+     * setter 方法参数声明类型
+     *
+     * @return setter 声明类型
+     */
+    String getSetterActualType();
+
+    /**
      * getter 方法最终实际返回值类型，不能是泛型
      *
      * @return getter 实际类型
@@ -59,14 +105,36 @@ interface Mappable {
      *
      * @return setter 返回值类型是否是基本数据类型
      */
-    boolean isPrimitiveGetter();
+    default boolean isPrimitiveGetter() {
+        return StringUtils.isPrimitive(getGetterFinalType());
+    }
 
     /**
      * setter 方法参数是否是基本数据类型
      *
      * @return setter 方法参数是否是基本数据类型
      */
-    boolean isPrimitiveSetter();
+    default boolean isPrimitiveSetter() {
+        return StringUtils.isPrimitive(getSetterFinalType());
+    }
+
+    /**
+     * getter 方法是否包含泛型
+     *
+     * @return
+     */
+    default boolean isGetterGenerify() {
+        return getGetterActualType() != null;
+    }
+
+    /**
+     * setter 方法是否包含泛型
+     *
+     * @return
+     */
+    default boolean isSetterGenerify() {
+        return getSetterActualType() != null;
+    }
 
     /**
      * 返回包装类，主要是基本数据类型到对应包装类的转换

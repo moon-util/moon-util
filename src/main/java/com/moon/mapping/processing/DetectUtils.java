@@ -4,13 +4,16 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author benshaoye
@@ -23,6 +26,7 @@ abstract class DetectUtils {
     final static boolean IMPORTED_CONFIGURATION;
     final static boolean IMPORTED_MISSING_BEAN;
     final static boolean IMPORTED_BEAN;
+    final static boolean IMPORTED_JODA_TIME;
 
     private final static String GET = "get", SET = "set", IS = "is", GET_CLASS = "getClass";
 
@@ -61,6 +65,14 @@ abstract class DetectUtils {
             isImportedBean = false;
         }
         IMPORTED_BEAN = isImportedBean;
+        boolean importedJodaTime;
+        try {
+            DateTime.now().toString();
+            importedJodaTime = true;
+        } catch (Throwable t) {
+            importedJodaTime = false;
+        }
+        IMPORTED_JODA_TIME = importedJodaTime;
     }
 
     private DetectUtils() { }
@@ -128,8 +140,32 @@ abstract class DetectUtils {
         return elem instanceof ExecutableElement && elem.getKind() == ElementKind.METHOD;
     }
 
+    static boolean isEnum(Element elem) {
+        return elem != null && elem.getKind() == ElementKind.ENUM;
+    }
+
     static boolean isField(Element elem) {
         return elem instanceof VariableElement && elem.getKind() == ElementKind.FIELD;
+    }
+
+    static boolean isDigit(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static boolean isVar(String str){
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        char value = str.trim().charAt(0);
+        return Character.isLetter(value) || value == '_' || value == '$';
     }
 
     static boolean isAny(Element elem, Modifier modifier, Modifier... modifiers) {
