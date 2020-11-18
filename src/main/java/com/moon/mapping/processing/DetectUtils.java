@@ -120,17 +120,12 @@ abstract class DetectUtils {
         return false;
     }
 
+
     static boolean isImportedLombok() { return IMPORTED_LOMBOK; }
 
     static boolean isPublic(Element elem) {
         return elem != null && elem.getModifiers().contains(Modifier.PUBLIC);
     }
-
-    static boolean isPrivate(Element elem) {
-        return elem != null && isAny(elem, Modifier.PRIVATE);
-    }
-
-    static boolean isNotPrivate(Element elem) { return !isPrivate(elem); }
 
     static boolean isMember(Element elem) {
         return elem != null && !elem.getModifiers().contains(Modifier.STATIC);
@@ -194,12 +189,6 @@ abstract class DetectUtils {
             }
         }
         return false;
-    }
-
-    static boolean isUsable(Mappable from, Mappable to) {
-        boolean hasGetter = from != null && from.hasGetterMethod();
-        boolean hasSetter = to != null && to.hasSetterMethod();
-        return hasGetter && hasSetter;
     }
 
     static boolean isPackage(Element elem) {

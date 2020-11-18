@@ -5,7 +5,7 @@ package com.moon.mapping;
  *
  * @author moonsky
  */
-public interface ObjectMapping<THIS> {
+interface ObjectMapping<THIS> {
 
     /**
      * 对象按各属性执行{@code toString()}方法

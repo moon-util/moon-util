@@ -3,7 +3,7 @@ package com.moon.mapping;
 /**
  * @author moonsky
  */
-public interface BeanMapping<THIS, THAT> extends MapMapping<THIS> {
+public interface BeanMapping<THIS, THAT> {
 
     /**
      * null 安全的属性映射，不会对{@code thisObject}和{@code thatObject}进行{@code null}检查

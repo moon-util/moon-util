@@ -1,8 +1,8 @@
 package com.moon.mapping.processing;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * @author benshaoye

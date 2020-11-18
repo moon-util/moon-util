@@ -1,7 +1,7 @@
 package com.moon.mapping.processing;
 
-import com.moon.mapping.convert.JodaConvert;
 import com.moon.mapping.convert.Convert;
+import com.moon.mapping.convert.JodaConvert;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -34,10 +34,8 @@ final class ConvertManager {
         for (Element element : unsafeConvert.getEnclosedElements()) {
             if (DetectUtils.isMethod(element)) {
                 ExecutableElement convert = (ExecutableElement) element;
-                List<String> params = convert.getParameters()
-                    .stream()
-                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", ""))
-                    .collect(Collectors.toList());
+                List<String> params = convert.getParameters().stream()
+                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", "")).collect(Collectors.toList());
                 String returnType = convert.getReturnType().toString();
                 String key = toTypedKey(returnType, params);
                 CallerInfo converter = toCallConvert(convert, unsafeConvertName, params);
