@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 本来已实现，但考虑到实体映射到 Map 的情况实在很少，就删除了
+ *
  * @author moonsky
  */
-public interface MapMapping<THIS> extends ObjectMapping<THIS> {
+interface MapMapping<THIS> extends ObjectMapping<THIS> {
 
     /**
      * 从{@code propertiesMap}复制属性到{@code thisObject}

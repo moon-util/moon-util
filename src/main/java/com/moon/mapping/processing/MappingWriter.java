@@ -87,11 +87,13 @@ final class MappingWriter implements JavaFileWritable {
         for (BaseDefinition value : getForAllDefined().values()) {
             def.addBeanMapping(enumAdder, value, manager);
         }
-        StringAdder shardAdder = def.implMappingSharedMethods(manager), adder = new StringAdder();
+        // 暂时不是想 MapMapping 和 ObjectMapping 了
+        // StringAdder shardAdder = def.implMappingSharedMethods(manager);
+        StringAdder adder = new StringAdder();
         adder.add("package ").pkg(BeanMapping.class).add(';').add(manager.getImports());
         adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
         adder.impl(BeanMapping.class).add("{TO,").add(enumAdder).add(';').add(manager.ofStatic());
-        return adder.add(shardAdder).add("}");
+        return adder.add("}");
     }
 
     private static Manager getAllImportsNameForConfiguration() {

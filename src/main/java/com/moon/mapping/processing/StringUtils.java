@@ -9,22 +9,10 @@ abstract class StringUtils {
 
     private StringUtils() { }
 
-    static String concat(Object... values) {
-        StringBuilder str = new StringBuilder();
-        for (Object value : values) {
-            str.append(value);
-        }
-        return str.toString();
-    }
-
     static String underscore(String classname) { return classname.replace('.', '_'); }
 
     static String toMappingClassname(String classname) {
         return "BeanMapping_" + underscore(classname);
-    }
-
-    static String toTargetClassname(String classname) {
-        return "TO_" + underscore(classname);
     }
 
     static String decapitalize(String name) {

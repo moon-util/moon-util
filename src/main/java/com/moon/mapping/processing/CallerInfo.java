@@ -26,7 +26,7 @@ final class CallerInfo {
 
     public String getParams() { return params; }
 
-    public String formatParams(String first, String... params){
+    public String formatParams(String first, String... params) {
         final String var = "var";
         String t0 = getParams();
         if (first != null) {
