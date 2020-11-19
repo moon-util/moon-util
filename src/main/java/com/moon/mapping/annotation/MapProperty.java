@@ -3,6 +3,8 @@ package com.moon.mapping.annotation;
 import java.lang.annotation.*;
 
 /**
+ * 映射属性
+ *
  * @author moonsky
  */
 @Repeatable(MapProperty.List.class)

@@ -23,7 +23,7 @@ final class ConvertManager {
     public ConvertManager(ImportManager importManager) {
         this.importManager = importManager;
         loadPredefinedConvert(Convert.class);
-        if (DetectUtils.IMPORTED_JODA_TIME) {
+        if (Imported.JODA_TIME) {
             loadPredefinedConvert(JodaConvert.class);
         }
     }
@@ -67,6 +67,20 @@ final class ConvertManager {
     /*
      * 进入这里的要求确保 getter 类型不是基本数据类型
      */
+
+    public String onSameType(){
+        return "{toName}.{setterName}({fromName}.{getterName}());";
+    }
+
+    public String onSameType(String defaultVal, String getterType) {
+        if (isNullString(defaultVal)) {
+            return onSameType();
+        }
+        String t0 = "{getterType} {var} = {fromName}.{getterName}();" +//
+            "{toName}.{setterName}({var} == null ? {value} : {var});";
+        t0 = Replacer.getterType.replace(t0, getterType);
+        return Replacer.value.replace(t0, defaultVal);
+    }
 
     public String onMapping(String defaultVal, String mapping, String setterType, Class<?>... getterTypes) {
         return useMapping(defaultVal, () -> mapping, setterType, getterTypes);

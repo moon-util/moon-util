@@ -6,7 +6,7 @@ package com.moon.mapping;
 public interface BeanMapping<THIS, THAT> {
 
     /**
-     * null 安全的属性映射，不会对{@code thisObject}和{@code thatObject}进行{@code null}检查
+     * null 不安全的属性映射，不会对{@code thisObject}和{@code thatObject}进行{@code null}检查
      * <p>
      * 将当前对象{@code thisObject}按属性名映射到另一个对象{@code thatObject}
      *
@@ -18,7 +18,7 @@ public interface BeanMapping<THIS, THAT> {
     default THAT unsafeForward(THIS thisObject, THAT thatObject) { return thatObject; }
 
     /**
-     * null 安全的属性映射，不会对{@code thisObject}和{@code thatObject}进行{@code null}检查
+     * null 不安全的属性映射，不会对{@code thisObject}和{@code thatObject}进行{@code null}检查
      * <p>
      * 从目标属性数据源{@code thatObject}按属性名称复制到当前对象{@code thisObject}
      *

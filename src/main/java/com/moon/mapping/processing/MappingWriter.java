@@ -8,11 +8,9 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.processing.Filer;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.moon.mapping.processing.ElementUtils.getSimpleName;
 
@@ -41,7 +39,7 @@ final class MappingWriter implements JavaFileWritable {
     }
 
     public static void forAutoConfig(Filer filer, List<MappingWriter> writers) throws IOException {
-        if (!DetectUtils.IMPORTED_CONFIGURATION) {
+        if (!Imported.CONFIGURATION) {
             return;
         }
         final Manager manager = getAllImportsNameForConfiguration();
@@ -98,9 +96,9 @@ final class MappingWriter implements JavaFileWritable {
 
     private static Manager getAllImportsNameForConfiguration() {
         Manager manager = new Manager();
-        if (DetectUtils.IMPORTED_MISSING_BEAN) { manager.onImported(ConditionalOnMissingBean.class); }
-        if (DetectUtils.IMPORTED_CONFIGURATION) { manager.onImported(Configuration.class); }
-        if (DetectUtils.IMPORTED_BEAN) { manager.onImported(Bean.class); }
+        if (Imported.CONDITIONAL_ON_MISSING_BEAN) { manager.onImported(ConditionalOnMissingBean.class); }
+        if (Imported.CONFIGURATION) { manager.onImported(Configuration.class); }
+        if (Imported.BEAN) { manager.onImported(Bean.class); }
         manager.onImported(BeanMapping.class);
         return manager;
     }
@@ -111,11 +109,11 @@ final class MappingWriter implements JavaFileWritable {
     }
 
     private static void conditionalOnMissingBean(StringAdder adder, String thisBeanName,final Manager manager) {
-        if (DetectUtils.IMPORTED_MISSING_BEAN) {
+        if (Imported.CONDITIONAL_ON_MISSING_BEAN) {
             adder.add("@").add(manager.onImported(ConditionalOnMissingBean.class));
             adder.add("(name=\"").add(thisBeanName).add("\")");
         }
-        if (DetectUtils.IMPORTED_BEAN) {
+        if (Imported.BEAN) {
             adder.add("@").add(manager.onImported(Bean.class));
         }
         adder.space();

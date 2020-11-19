@@ -4,92 +4,59 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
-import java.util.HashSet;
+import javax.lang.model.type.TypeMirror;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static com.moon.mapping.processing.ElementUtils.getQualifiedName;
+import static javax.lang.model.element.ElementKind.*;
 
 /**
  * @author benshaoye
  */
-@Configuration
-@ConditionalOnMissingBean
 abstract class DetectUtils {
-
-    final static boolean IMPORTED_LOMBOK;
-    final static boolean IMPORTED_CONFIGURATION;
-    final static boolean IMPORTED_MISSING_BEAN;
-    final static boolean IMPORTED_BEAN;
-    final static boolean IMPORTED_JODA_TIME;
 
     private final static String GET = "get", SET = "set", IS = "is", GET_CLASS = "getClass";
 
-    static {
-        boolean isImportedLombok;
-        try {
-            Data.class.toString();
-            Getter.class.toString();
-            Setter.class.toString();
-            isImportedLombok = true;
-        } catch (Throwable t) {
-            isImportedLombok = false;
-        }
-        IMPORTED_LOMBOK = isImportedLombok;
-        boolean isImportedConfig;
-        try {
-            Configuration.class.toString();
-            isImportedConfig = true;
-        } catch (Throwable t) {
-            isImportedConfig = false;
-        }
-        IMPORTED_CONFIGURATION = isImportedConfig;
-        boolean isImportedMissingBean;
-        try {
-            ConditionalOnMissingBean.class.toString();
-            isImportedMissingBean = true;
-        } catch (Throwable t) {
-            isImportedMissingBean = false;
-        }
-        IMPORTED_MISSING_BEAN = isImportedMissingBean;
-        boolean isImportedBean;
-        try {
-            Bean.class.toString();
-            isImportedBean = true;
-        } catch (Throwable t) {
-            isImportedBean = false;
-        }
-        IMPORTED_BEAN = isImportedBean;
-        boolean importedJodaTime;
-        try {
-            DateTime.now().toString();
-            importedJodaTime = true;
-        } catch (Throwable t) {
-            importedJodaTime = false;
-        }
-        IMPORTED_JODA_TIME = importedJodaTime;
-    }
-
     private DetectUtils() { }
 
-    static void assertRootElement(TypeElement rootElement) {
-        final Element parentElement = rootElement.getEnclosingElement();
-        // 如果是类文件，要求必须是 public
-        if (parentElement.getKind() == ElementKind.PACKAGE) {
-            if (!DetectUtils.isPublic(rootElement)) {
-                String thisClassname = rootElement.getQualifiedName().toString();
-                throw new IllegalStateException("类 " + thisClassname + " 必须是被 public 修饰的公共类。");
+    private static void requireOf(TypeElement elem, Modifier modifier) {
+        if (!isAny(elem, modifier)) {
+            String name = getQualifiedName(elem);
+            String m = modifier.toString().toLowerCase();
+            throw new IllegalStateException("类 " + name + " 必须被 " + m + " 修饰。");
+        }
+    }
+
+    static void assertRootElement(TypeElement element) {
+        if (isElemKind(element, ElementKind.INTERFACE)) {
+            throw new IllegalStateException("不能映射接口: " + getQualifiedName(element));
+        }
+        if (isElemKind(element, ENUM)) {
+            throw new IllegalStateException("不能映射枚举类: " + getQualifiedName(element));
+        }
+        if (isAny(element, Modifier.ABSTRACT)) {
+            throw new IllegalStateException("不能映射抽象类: " + getQualifiedName(element));
+        }
+        for (int i = 0; true; i++) {
+            requireOf(element, Modifier.PUBLIC);
+            Element enclosing = element.getEnclosingElement();
+            if (isPackage(enclosing)) {
+                break;
+            } else if (i == 0) {
+                requireOf(element, Modifier.STATIC);
+            }
+            element = (TypeElement) enclosing;
+            if (isElemKind(element, CLASS)) {
+                requireOf(element, Modifier.STATIC);
             }
         }
     }
 
     static boolean hasLombokSetter(VariableElement field) {
-        if (isImportedLombok()) {
+        if (Imported.LOMBOK) {
             if (field == null) {
                 return false;
             }
@@ -105,7 +72,7 @@ abstract class DetectUtils {
     }
 
     static boolean hasLombokGetter(VariableElement field) {
-        if (isImportedLombok()) {
+        if (Imported.LOMBOK) {
             if (field == null) {
                 return false;
             }
@@ -121,26 +88,18 @@ abstract class DetectUtils {
     }
 
 
-    static boolean isImportedLombok() { return IMPORTED_LOMBOK; }
+    static boolean isPublic(Element elem) { return isAny(elem, Modifier.PUBLIC); }
 
-    static boolean isPublic(Element elem) {
-        return elem != null && elem.getModifiers().contains(Modifier.PUBLIC);
-    }
-
-    static boolean isMember(Element elem) {
-        return elem != null && !elem.getModifiers().contains(Modifier.STATIC);
-    }
+    static boolean isMember(Element elem) { return isNotAny(elem, Modifier.STATIC); }
 
     static boolean isMethod(Element elem) {
-        return elem instanceof ExecutableElement && elem.getKind() == ElementKind.METHOD;
+        return elem instanceof ExecutableElement && isElemKind(elem, METHOD);
     }
 
-    static boolean isEnum(Element elem) {
-        return elem != null && elem.getKind() == ElementKind.ENUM;
-    }
+    static boolean isEnum(Element elem) { return isElemKind(elem, ENUM); }
 
     static boolean isField(Element elem) {
-        return elem instanceof VariableElement && elem.getKind() == ElementKind.FIELD;
+        return elem instanceof VariableElement && isElemKind(elem, FIELD);
     }
 
     static boolean isDigit(String str) {
@@ -155,7 +114,7 @@ abstract class DetectUtils {
         return true;
     }
 
-    static boolean isVar(String str){
+    static boolean isVar(String str) {
         if (StringUtils.isEmpty(str)) {
             return false;
         }
@@ -191,13 +150,21 @@ abstract class DetectUtils {
         return false;
     }
 
-    static boolean isPackage(Element elem) {
-        return elem.getKind() == ElementKind.PACKAGE;
+    static boolean isTypeKind(TypeMirror elem, TypeKind kind) {
+        return elem != null && elem.getKind() == kind;
     }
 
-    static boolean isMemberField(Element elem) {
-        return isField(elem) && isMember(elem);
+    static boolean isElemKind(Element elem, ElementKind kind) {
+        return elem != null && elem.getKind() == kind;
     }
+
+    static boolean isMappableElement(Element elem) { return elem != null; }
+
+    static boolean isConstructor(Element elem) { return isElemKind(elem, CONSTRUCTOR); }
+
+    static boolean isPackage(Element elem) { return isElemKind(elem, PACKAGE); }
+
+    static boolean isMemberField(Element elem) { return isField(elem) && isMember(elem); }
 
     static boolean isSetterMethod(Element elem) {
         if (isMethod(elem) && isMember(elem) && isPublic(elem)) {
@@ -205,7 +172,7 @@ abstract class DetectUtils {
             String name = exe.getSimpleName().toString();
             boolean maybeSet = name.length() > 3 && name.startsWith(SET);
             maybeSet = maybeSet && exe.getParameters().size() == 1;
-            maybeSet = maybeSet && exe.getReturnType().getKind() == TypeKind.VOID;
+            maybeSet = maybeSet && isTypeKind(exe.getReturnType(), TypeKind.VOID);
             return maybeSet;
         }
         return false;
@@ -219,13 +186,9 @@ abstract class DetectUtils {
             if (name.startsWith(GET)) {
                 return maybeGet && name.length() > 3 && !name.equals(GET_CLASS);
             } else if (name.startsWith(IS)) {
-                return maybeGet && name.length() > 2 && exe.getReturnType().getKind() == TypeKind.BOOLEAN;
+                return maybeGet && name.length() > 2 && isTypeKind(exe.getReturnType(), TypeKind.BOOLEAN);
             }
         }
         return false;
-    }
-
-    static boolean isConstructor(Element elem) {
-        return elem != null && elem.getKind() == ElementKind.CONSTRUCTOR;
     }
 }

@@ -47,7 +47,7 @@ final class ProcessUtils {
                 targetCls = mirrored.getTypeMirror().toString();
             }
             PropertyAttr attr = new PropertyAttr(targetCls, value, format, defaultValue, ignore);
-            definition.addPropertyAttr(attr.getTargetCls(), name, attr);
+            definition.addPropertyAttr(name, attr);
         }
     }
 

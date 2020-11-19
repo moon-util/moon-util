@@ -29,7 +29,9 @@ public abstract class MappingUtil {
      * &#64;MappingFor({Bus.class, Car.class})
      * public class Auto {
      *
+     *     // thisPrimary 获取第一个映射
      *     final static BeanMapping&lt;Auto, Bus&gt; = MappingUtil.thisPrimary();
+     *     // 不是第一个映射这样获取
      *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.thisMappingFor(Car.class);
      *
      *     private String name;

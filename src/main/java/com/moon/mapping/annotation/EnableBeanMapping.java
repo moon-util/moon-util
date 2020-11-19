@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Spring 支持后会向容器中注册名称形如{@code mapUserToPersonal}的{@link BeanMapping}, 例：
+ * 开启 Spring 支持后会向容器中注册名称形如{@code mapUserToPersonal}的{@link BeanMapping}, 例：
  *
  * <pre>
  * public class Car {
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  *     // other fields & setters & getters
  * }
  *
- * &#64;MappingFor({Car.class})
+ * &#64;MappingFor({Car.class}) // {@link MappingFor}
  * public class Bus {
  *     private String name;
  *     // other fields & setters & getters

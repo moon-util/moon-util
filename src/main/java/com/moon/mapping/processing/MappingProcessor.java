@@ -65,7 +65,7 @@ public class MappingProcessor extends AbstractProcessor {
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
                 for (Element element : env.getElementsAnnotatedWith(MappingFor.class)) {
-                    if (element instanceof TypeElement) {
+                    if (DetectUtils.isMappableElement(element)) {
                         models.add(onAnnotatedClass((TypeElement) element));
                     }
                 }
@@ -85,7 +85,7 @@ public class MappingProcessor extends AbstractProcessor {
         }
         for (String thatClassname : classes) {
             TypeElement target = utils.getTypeElement(thatClassname);
-            if (target == null) {
+            if (!DetectUtils.isMappableElement(target)) {
                 continue;
             }
             mappingForDetailsMap.put(thatClassname, toPropertiesMap(target));

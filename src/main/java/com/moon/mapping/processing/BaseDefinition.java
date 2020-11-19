@@ -16,8 +16,6 @@ import static com.moon.mapping.processing.PropertyAttr.DFT;
 abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> extends LinkedHashMap<String, P>
     implements Completable, CanonicalNameable {
 
-    protected final static String IMPL_SUFFIX = "ImplGeneratedByMoonUtil";
-
     private final MapMethodFactory methodFactory = new MapMethodFactory();
 
     private final MapFieldFactory fieldFactory = new MapFieldFactory();
@@ -42,7 +40,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     @Override
     public final String getCanonicalName() { return ElementUtils.getQualifiedName(getThisElement()); }
 
-    final void addPropertyAttr(String targetCls, String name, PropertyAttr attr) {
+    final void addPropertyAttr(String name, PropertyAttr attr) {
         getPropertyAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
     }
 
@@ -86,8 +84,8 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     final void addBeanMapping(StringAdder adder, BaseDefinition thatDef, Manager manager) {
         adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
         final MappingModel model = new MappingModel();
-        final String thisCls = manager.onImported(getSimpleName());
-        final String thatCls = manager.onImported(thatDef.getSimpleName());
+        final String thisCls = manager.onImported(getCanonicalName());
+        final String thatCls = manager.onImported(thatDef.getCanonicalName());
         final boolean emptyForward = unsafeForward(adder, thatDef, model, manager);
         final boolean emptyBackward = unsafeBackward(adder, thatDef, model, manager);
         adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));

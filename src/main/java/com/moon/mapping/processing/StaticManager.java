@@ -1,6 +1,5 @@
 package com.moon.mapping.processing;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.lang.model.element.Element;
@@ -13,7 +12,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import static com.moon.mapping.processing.ElementUtils.cast;
 import static com.moon.mapping.processing.ElementUtils.getSimpleName;
 
 /**
@@ -204,7 +202,7 @@ public class StaticManager {
     }
 
     public String onJodaDateTimeFormat(String format) {
-        if (!DetectUtils.IMPORTED_JODA_TIME || StringUtils.isEmpty(format)) {
+        if (!Imported.JODA_TIME || StringUtils.isEmpty(format)) {
             return NULL;
         }
         try {
