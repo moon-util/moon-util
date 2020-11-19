@@ -43,8 +43,10 @@ public class StaticManager {
 
     /**
      * 默认 boolean 值
-     * @param type boolean 类型（boolean 和 Boolean）
+     *
+     * @param type  boolean 类型（boolean 和 Boolean）
      * @param value 只能为 true / false
+     *
      * @return
      */
     public String onDefaultBoolean(String type, String value) {
@@ -239,7 +241,7 @@ public class StaticManager {
             return varName;
         }
         TypeElement elem = EnvUtils.getUtils().getTypeElement(enumClassname);
-        if (!DetectUtils.isEnum(elem)) {
+        if (DetectUtils.isNotEnum(elem)) {
             Logger.warn("【已忽略默认值】{} 不存在第 '{}' 个枚举值", enumClassname, index);
             return NULL;
         }
@@ -280,7 +282,7 @@ public class StaticManager {
         }
 
         TypeElement elem = EnvUtils.getUtils().getTypeElement(enumClassname);
-        if (!DetectUtils.isEnum(elem)) {
+        if (DetectUtils.isNotEnum(elem)) {
             Logger.warn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
             return NULL;
         }
@@ -308,6 +310,30 @@ public class StaticManager {
             fields.add(then(declare, varName));
         }
         return varName;
+    }
+
+    public String onDefaultChar(String value) {
+        value = (value == null ? "" : value).trim();
+        switch (value.length()) {
+            case 0:
+                return NULL;
+            case 1:
+                try {
+                    char ch = value.charAt(0);
+                    String key = getKey(char.class, value);
+                    String varName = varCached.get(key);
+                    if (varName != null) {
+                        return varName;
+                    }
+                    varName = "'" + ch + "'";
+                    varCached.put(key, varName);
+                    return varName;
+                } catch (Throwable ignored) {
+                }
+            default:
+                Logger.warn("【已忽略默认值】非法 {} 默认值: {}", "char", value);
+                return NULL;
+        }
     }
 
     public String defaultNull() { return NULL; }

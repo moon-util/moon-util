@@ -108,13 +108,13 @@ final class MappingWriter implements JavaFileWritable {
         return new StringAdder().pkg(MappingUtil.class).dot().add(toEnumClass(def)).toString();
     }
 
-    private static void conditionalOnMissingBean(StringAdder adder, String thisBeanName,final Manager manager) {
+    private static void conditionalOnMissingBean(StringAdder adder, String thisBeanName, final Manager manager) {
+        if (Imported.BEAN) {
+            adder.add("@").add(manager.onImported(Bean.class));
+        }
         if (Imported.CONDITIONAL_ON_MISSING_BEAN) {
             adder.add("@").add(manager.onImported(ConditionalOnMissingBean.class));
             adder.add("(name=\"").add(thisBeanName).add("\")");
-        }
-        if (Imported.BEAN) {
-            adder.add("@").add(manager.onImported(Bean.class));
         }
         adder.space();
     }

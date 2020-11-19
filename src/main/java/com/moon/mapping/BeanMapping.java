@@ -58,7 +58,7 @@ public interface BeanMapping<THIS, THAT> {
      *
      * @param thisObject 当前类实例，属性数据源
      *
-     * @return 目标对象
+     * @return {@code THAT}类实例
      */
     default THAT doForward(THIS thisObject) {
         throw new UnsupportedOperationException("unknown target type of: doForward(Object, Object)");
@@ -69,7 +69,7 @@ public interface BeanMapping<THIS, THAT> {
      *
      * @param thatObject 属性数据源对象
      *
-     * @return 当前类实例
+     * @return {@code THIS}类实例
      */
     default THIS doBackward(THAT thatObject) {
         throw new UnsupportedOperationException("unknown target type of: doBackward(Object, Object)");

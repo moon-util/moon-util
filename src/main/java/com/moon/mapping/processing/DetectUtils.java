@@ -40,18 +40,14 @@ abstract class DetectUtils {
         if (isAny(element, Modifier.ABSTRACT)) {
             throw new IllegalStateException("不能映射抽象类: " + getQualifiedName(element));
         }
-        for (int i = 0; true; i++) {
+        for (; true;) {
             requireOf(element, Modifier.PUBLIC);
             Element enclosing = element.getEnclosingElement();
             if (isPackage(enclosing)) {
                 break;
-            } else if (i == 0) {
-                requireOf(element, Modifier.STATIC);
             }
+            requireOf(element, Modifier.STATIC);
             element = (TypeElement) enclosing;
-            if (isElemKind(element, CLASS)) {
-                requireOf(element, Modifier.STATIC);
-            }
         }
     }
 
@@ -96,7 +92,7 @@ abstract class DetectUtils {
         return elem instanceof ExecutableElement && isElemKind(elem, METHOD);
     }
 
-    static boolean isEnum(Element elem) { return isElemKind(elem, ENUM); }
+    static boolean isNotEnum(Element elem) { return !isElemKind(elem, ENUM); }
 
     static boolean isField(Element elem) {
         return elem instanceof VariableElement && isElemKind(elem, FIELD);

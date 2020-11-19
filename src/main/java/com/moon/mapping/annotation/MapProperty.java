@@ -22,9 +22,6 @@ public @interface MapProperty {
     /**
      * 映射目标类，如果{@link MappingFor#value()}指定了多个类，这里
      * 可以为每个不同的类指定不同属性
-     * <p>
-     * 当指定的类为：基本数据类型和对应包装类 Object 时，
-     * 且{@link #value()}上指定了值，则代表默认目标类里的字段
      *
      * @return 目标类
      */

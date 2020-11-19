@@ -6,6 +6,13 @@ import static com.moon.mapping.Mappings.classAs;
 import static java.lang.Thread.currentThread;
 
 /**
+ * 获取两个类之间的映射，获取不到时会抛出异常{@link NoSuchMappingException}
+ * <p>
+ * 推荐获取后用静态变量的方式保存，因为没必要获取多次
+ * <p>
+ * 如果两个了之间没有用{@link MappingFor}关联映射关系，就会获取不到，并抛出异常，
+ * 此时可能中断启动过程
+ *
  * @author moonsky
  */
 @SuppressWarnings("all")
@@ -29,10 +36,14 @@ public abstract class MappingUtil {
      * &#64;MappingFor({Bus.class, Car.class})
      * public class Auto {
      *
+     *     // thisXxx 方法只能在注解了 {@link MappingFor}的类使用
      *     // thisPrimary 获取第一个映射
      *     final static BeanMapping&lt;Auto, Bus&gt; = MappingUtil.thisPrimary();
-     *     // 不是第一个映射这样获取
+     *     // 不是第一个映射这样获取: {@link #thisMappingFor(Class)}
      *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.thisMappingFor(Car.class);
+     *     // 所有声明的映射都可以这样获取: {@link #resolve(Class, Class)}
+     *     // 这个方法不像{@code thisXxx}方法, 可以在任意位置使用
+     *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.resolve(Auto.class, Car.class);
      *
      *     private String name;
      *     // other fields & getter & setter
@@ -63,7 +74,7 @@ public abstract class MappingUtil {
      *
      * @return 映射器
      *
-     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
+     * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
      */
     public static <THIS, THAT> BeanMapping<THIS, THAT> thisMappingFor(Class<THAT> thatClass) {
         return resolve(classAs(currentThread().getStackTrace()[2].getClassName()), thatClass);
@@ -72,14 +83,14 @@ public abstract class MappingUtil {
     /**
      * 获取从类{@code fromClass}到{@code toClass}的映射器;
      * <p>
-     * {@code toClass}必须存在于{@code fromClass}的注解{@link MappingFor#value()}声明中或手动注册
+     * {@code toClass}必须存在于{@code fromClass}的注解{@link MappingFor#value()}声明中
      *
      * @param fromClass 数据源类
      * @param toClass   应声明在{@code fromClass}注解的{@link MappingFor#value()}中
      *
      * @return 当存在时返回对应映射器
      *
-     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
+     * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
      * @see MappingFor#value()
      */
     public static <F, T> BeanMapping<F, T> resolve(Class<F> fromClass, Class<T> toClass) {
