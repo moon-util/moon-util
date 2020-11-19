@@ -78,16 +78,16 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
      */
     public StringAdder implMappingSharedMethods(final Manager manager) {
         final StringAdder adder = new StringAdder();
-        addObjectMapping(adder);
         addMapMapping(adder, manager);
+        addObjectMapping(adder);
         return adder;
     }
 
     final void addBeanMapping(StringAdder adder, BaseDefinition thatDef, Manager manager) {
         adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
-        final String thisCls = getSimpleName();
-        final String thatCls = thatDef.getSimpleName();
         final MappingModel model = new MappingModel();
+        final String thisCls = manager.onImported(getSimpleName());
+        final String thatCls = manager.onImported(thatDef.getSimpleName());
         final boolean emptyForward = unsafeForward(adder, thatDef, model, manager);
         final boolean emptyBackward = unsafeBackward(adder, thatDef, model, manager);
         adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));

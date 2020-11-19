@@ -45,8 +45,6 @@ public class Mappings {
         return resolve(toName(cls1), toName(cls2));
     }
 
-    static <T> MapMapping<T> resolve(Class<T> cls1) { return resolve(toName(cls1)); }
-
     private static Class toClass(String cls) throws ClassNotFoundException {
         return Class.forName(NAMESPACE + toName(cls));
     }

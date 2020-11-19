@@ -14,21 +14,6 @@ public abstract class MappingUtil {
     private MappingUtil() { }
 
     /**
-     * 获取当前类的{@link MapMapping}
-     * <p>
-     * 注：返回值{@link MapMapping}强转为{@link BeanMapping}后{@code BeanMapping}的方法是不可用的
-     *
-     * @param <THIS> 当前类数据类型
-     *
-     * @return MapMapping
-     *
-     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
-     */
-    public static <THIS> MapMapping<THIS> thisMapping() {
-        return Mappings.resolve(currentThread().getStackTrace()[2].getClassName());
-    }
-
-    /**
      * 获取当前类注解{@link MappingFor#value()}的第一个映射，如：
      * <pre>
      * public class Car {
@@ -98,17 +83,4 @@ public abstract class MappingUtil {
     public static <F, T> BeanMapping<F, T> resolve(Class<F> fromClass, Class<T> toClass) {
         return Mappings.resolve(fromClass, toClass);
     }
-
-    /**
-     * 加载目标类{@code fromClass}到{@link java.util.Map}的映射器
-     *
-     * @param fromClass 目标类型
-     * @param <T>       目标类型
-     *
-     * @return 映射器
-     *
-     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
-     * @see #thisMapping()
-     */
-    public static <T> MapMapping<T> resolve(Class<T> fromClass) { return Mappings.resolve(fromClass); }
 }
