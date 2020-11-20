@@ -20,7 +20,9 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     private final MapFieldFactory fieldFactory = new MapFieldFactory();
 
-    private final Map<String, Map<String, PropertyAttr>> propertyAttrMap = new HashMap<>();
+    private final Map<String, Map<String, PropertyAttr>> fieldAttrMap = new HashMap<>();
+    private final Map<String, Map<String, PropertyAttr>> setterAttrMap = new HashMap<>();
+    private final Map<String, Map<String, PropertyAttr>> getterAttrMap = new HashMap<>();
 
     /**
      * 声明注解{@link com.moon.mapping.annotation.MappingFor}的类
@@ -40,11 +42,23 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     @Override
     public final String getCanonicalName() { return ElementUtils.getQualifiedName(getThisElement()); }
 
-    final void addPropertyAttr(String name, PropertyAttr attr) {
-        getPropertyAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
+    final void addFieldAttr(String name, PropertyAttr attr) {
+        getFieldAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
     }
 
-    public Map<String, Map<String, PropertyAttr>> getPropertyAttrMap() { return propertyAttrMap; }
+    final void addSetterAttr(String name, PropertyAttr attr) {
+        getSetterAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
+    }
+
+    final void addGetterAttr(String name, PropertyAttr attr) {
+        getGetterAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
+    }
+
+    public Map<String, Map<String, PropertyAttr>> getFieldAttrMap() { return fieldAttrMap; }
+
+    public Map<String, Map<String, PropertyAttr>> getGetterAttrMap() { return getterAttrMap; }
+
+    public Map<String, Map<String, PropertyAttr>> getSetterAttrMap() { return setterAttrMap; }
 
     /**
      * 声明{@link MappingFor}的类{@link #getThisElement()}所在包的完整名
@@ -93,20 +107,30 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         adder.add("},");
     }
 
-    private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp) {
+    private static PropertyAttr findPropertyAttr(
+        BaseDefinition thatDef, Mappable thisProp, Map<String, Map<String, PropertyAttr>> propertiesMap
+    ) {
         final String targetClass = thatDef.getCanonicalName();
-        Map<String, Map<String, PropertyAttr>> propertyMap = getPropertyAttrMap();
-        Map<String, PropertyAttr> attrMap = propertyMap.get(targetClass);
+        Map<String, PropertyAttr> attrMap = propertiesMap.get(targetClass);
         PropertyAttr attr;
         if (attrMap == null) {
-            attrMap = propertyMap.getOrDefault("void", Collections.emptyMap());
+            attrMap = propertiesMap.getOrDefault("void", Collections.emptyMap());
             attr = attrMap.get(thisProp.getName());
         } else {
             attr = attrMap.get(thisProp.getName());
             if (attr == null) {
-                attrMap = propertyMap.getOrDefault("void", Collections.emptyMap());
+                attrMap = propertiesMap.getOrDefault("void", Collections.emptyMap());
                 attr = attrMap.get(thisProp.getName());
             }
+        }
+        return attr;
+    }
+
+    private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp, boolean getter) {
+        Map propertiesMap = getter ? getGetterAttrMap() : getSetterAttrMap();
+        PropertyAttr attr = findPropertyAttr(thatDef, thisProp, propertiesMap);
+        if (attr == null) {
+            attr = findPropertyAttr(thatDef, thisProp, getFieldAttrMap());
         }
         return attr == null ? DFT : attr;
     }
@@ -116,7 +140,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     ) {
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
-            PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
+            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, true);
             if (attr.isIgnoreForward()) {
                 return null;
             }
@@ -135,7 +159,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     ) {
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
-            PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
+            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, false);
             if (attr.isIgnoreBackward()) {
                 return null;
             }

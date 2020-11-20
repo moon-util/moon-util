@@ -40,7 +40,7 @@ abstract class DetectUtils {
         if (isAny(element, Modifier.ABSTRACT)) {
             throw new IllegalStateException("不能映射抽象类: " + getQualifiedName(element));
         }
-        for (; true;) {
+        for (; true; ) {
             requireOf(element, Modifier.PUBLIC);
             Element enclosing = element.getEnclosingElement();
             if (isPackage(enclosing)) {
@@ -186,5 +186,22 @@ abstract class DetectUtils {
             }
         }
         return false;
+    }
+
+    static boolean isTypeofAny(String actual, Class<?>... expected) {
+        for (Class<?> aClass : expected) {
+            if (isTypeof(actual, aClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static boolean isTypeof(String actual, Class<?> expected) {
+        return isTypeof(expected.getCanonicalName(), actual);
+    }
+
+    static boolean isTypeof(String actual, String expected) {
+        return expected.equals(actual);
     }
 }

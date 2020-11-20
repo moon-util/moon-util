@@ -60,7 +60,7 @@ public abstract class MappingUtil {
     public static <THIS, THAT> BeanMapping<THIS, THAT> thisPrimary() {
         Class<THIS> thisClass = classAs(currentThread().getStackTrace()[2].getClassName());
         MappingFor mappingFor = thisClass.getAnnotation(MappingFor.class);
-        return resolve(thisClass, (Class<THAT>) mappingFor.value()[0]);
+        return get(thisClass, (Class<THAT>) mappingFor.value()[0]);
     }
 
     /**
@@ -77,7 +77,7 @@ public abstract class MappingUtil {
      * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
      */
     public static <THIS, THAT> BeanMapping<THIS, THAT> thisMappingFor(Class<THAT> thatClass) {
-        return resolve(classAs(currentThread().getStackTrace()[2].getClassName()), thatClass);
+        return get(classAs(currentThread().getStackTrace()[2].getClassName()), thatClass);
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class MappingUtil {
      * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
      * @see MappingFor#value()
      */
-    public static <F, T> BeanMapping<F, T> resolve(Class<F> fromClass, Class<T> toClass) {
+    public static <F, T> BeanMapping<F, T> get(Class<F> fromClass, Class<T> toClass) {
         return Mappings.resolve(fromClass, toClass);
     }
 }

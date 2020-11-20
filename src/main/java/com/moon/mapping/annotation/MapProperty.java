@@ -3,7 +3,7 @@ package com.moon.mapping.annotation;
 import java.lang.annotation.*;
 
 /**
- * 映射属性
+ * 映射属性, 只能注解在 getter/setter/field 上
  *
  * @author moonsky
  */
