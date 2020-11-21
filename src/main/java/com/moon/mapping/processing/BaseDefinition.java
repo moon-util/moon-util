@@ -101,11 +101,11 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     final void addBeanMapping(StringAdder adder, BaseDefinition thatDef, Manager manager) {
         adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
-        final MappingModel model = new MappingModel();
+        // final MappingModel model = new MappingModel();
         final String thisCls = manager.onImported(getCanonicalName());
         final String thatCls = manager.onImported(thatDef.getCanonicalName());
-        final boolean emptyForward = unsafeConvert(adder, thatDef, model, manager, true);
-        final boolean emptyBackward = unsafeConvert(adder, thatDef, model, manager, false);
+        final boolean emptyForward = unsafeConvert(adder, thatDef, manager, true);
+        final boolean emptyBackward = unsafeConvert(adder, thatDef, manager, false);
         adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
         adder.add(getMethodFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
         adder.add("},");
@@ -140,7 +140,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     }
 
     private boolean unsafeConvert(
-        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, Manager manager, boolean forward
+        StringAdder adder, final BaseDefinition thatDef, Manager manager, boolean forward
     ) {
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
@@ -150,8 +150,8 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
             }
             String targetName = attr.getField(thisProp.getName());
             Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (model.onConvert(thisProp, thatProp, attr, forward).isUsable()) {
-                return getFieldFactory().doConvertField(model, manager);
+            if (manager.canUsableModel(thisProp, thatProp, attr, forward)) {
+                return getFieldFactory().doConvertField(manager);
             }
             return null;
         });

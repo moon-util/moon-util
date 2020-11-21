@@ -17,7 +17,7 @@ final class MappingModel {
         return forward ? forward(thisProp, thatProp, attr) : backward(thisProp, thatProp, attr);
     }
 
-    public MappingModel forward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
+    private MappingModel forward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
         this.fromProp = thisProp;
         this.toProp = thatProp;
         this.fromName = "self";
@@ -26,7 +26,7 @@ final class MappingModel {
         return this;
     }
 
-    public MappingModel backward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
+    private MappingModel backward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
         this.fromProp = thatProp;
         this.toProp = thisProp;
         this.fromName = "that";

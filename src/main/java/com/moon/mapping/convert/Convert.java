@@ -23,10 +23,6 @@ public abstract class Convert {
 
     private Convert() { }
 
-    public static BigDecimal toBigDecimal(Double value) { return BigDecimal.valueOf(value); }
-
-    public static BigDecimal toBigDecimal(Float value) { return BigDecimal.valueOf(value); }
-
     public static BigDecimal toBigDecimal(Number number) {
         if (number instanceof Double || number instanceof Float) {
             return BigDecimal.valueOf(number.doubleValue());
@@ -35,20 +31,12 @@ public abstract class Convert {
         }
     }
 
-    public static BigDecimal toBigDecimal(String number) { return new BigDecimal(number); }
-
     public static BigDecimal toBigDecimal(String number, String pattern) {
         return toBigDecimal(toNumber(number, pattern));
     }
 
-    public static BigDecimal toBigDecimal(BigInteger number) { return new BigDecimal(number); }
-
-    public static BigInteger toBigInteger(Number number) { return BigInteger.valueOf(number.longValue()); }
-
-    public static BigInteger toBigInteger(String number) { return new BigInteger(number); }
-
     public static BigInteger toBigInteger(String number, String pattern) {
-        return toBigInteger(toNumber(number, pattern));
+        return BigInteger.valueOf(toNumber(number, pattern).longValue());
     }
 
     public static long toLongValue(Instant instant) { return instant.toEpochMilli(); }
@@ -78,12 +66,6 @@ public abstract class Convert {
     public static double toDoubleValue(Calendar calendar) { return calendar.getTimeInMillis(); }
 
     public static double toDoubleValue(Date calendar) { return calendar.getTime(); }
-
-    public static int toIntValue(Enum<?> enumValue) { return enumValue.ordinal(); }
-
-    public static short toShortValue(Enum<?> enumValue) { return (short) enumValue.ordinal(); }
-
-    public static byte toByteValue(Enum<?> enumValue) { return (byte) enumValue.ordinal(); }
 
     public static Calendar toCalendar(LocalDate date) { return toCalendar(date.atStartOfDay()); }
 

@@ -55,11 +55,6 @@ final class ConvertManager {
         return new CallerInfo(caller, "(" + String.join(", ", vars) + ")", String.join(",", params));
     }
 
-    public CallerInfo find(String setterType, Class<?>... getterTypes) {
-        String[] types = Arrays.stream(getterTypes).map(Class::getCanonicalName).toArray(String[]::new);
-        return converter.get(toTypedKey(setterType, types));
-    }
-
     public CallerInfo find(String setterType, String... getterTypes) {
         return converter.get(toTypedKey(setterType, getterTypes));
     }
@@ -89,10 +84,6 @@ final class ConvertManager {
     public String onMapping(String defaultVal, String mapping, String setterType, String... getterTypes) {
         return useMapping(defaultVal, () -> mapping, setterType, getterTypes);
     }
-
-    public String useMapping(
-        String defaultVal, Supplier<String> mapper, String setterType
-    ) { return useMapping(defaultVal, mapper, setterType, ""); }
 
     public String useMapping(
         String defaultVal, Supplier<String> mapper, String setterType, Class<?>... getterTypes
