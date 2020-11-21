@@ -3,7 +3,7 @@ package com.moon.mapping.processing;
 /**
  * @author benshaoye
  */
-interface BaseTypeGetter {
+interface TypeGetter {
 
     /**
      * 属性的声明类型（可能是泛型）

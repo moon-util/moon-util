@@ -73,17 +73,17 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     @Override
     public String getSetterActualType() {
-        return ifHasSetter(BaseTypeGetter::getActualType);
+        return ifHasSetter(TypeGetter::getActualType);
     }
 
     @Override
     public String getSetterDeclareType() {
-        return ifHasSetter(BaseTypeGetter::getDeclareType);
+        return ifHasSetter(TypeGetter::getDeclareType);
     }
 
     @Override
     public String getSetterFinalType() {
-        return ifHasSetter(BaseTypeGetter::getComputedType);
+        return ifHasSetter(TypeGetter::getComputedType);
     }
 
     @Override
@@ -148,12 +148,12 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     @Override
     public String getGetterActualType() {
-        return ifHasGetter(BaseTypeGetter::getActualType);
+        return ifHasGetter(TypeGetter::getActualType);
     }
 
     @Override
     public String getGetterDeclareType() {
-        return ifHasGetter(BaseTypeGetter::getDeclareType);
+        return ifHasGetter(TypeGetter::getDeclareType);
     }
 
     /**
@@ -161,7 +161,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
      */
     @Override
     public String getGetterFinalType() {
-        return ifHasGetter(BaseTypeGetter::getComputedType);
+        return ifHasGetter(TypeGetter::getComputedType);
     }
 
     @Override
@@ -224,7 +224,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         return null;
     }
 
-    private <T> T ifHasSetter(Function<BaseTypeGetter, T> getter) {
+    private <T> T ifHasSetter(Function<TypeGetter, T> getter) {
         if (hasPublicDefaultSetter()) { return getter.apply(getSetter()); }
         if (hasLombokSetter()) { return getter.apply(this); }
         return null;
@@ -236,7 +236,7 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         return null;
     }
 
-    private <T> T ifHasGetter(Function<BaseTypeGetter, T> getter) {
+    private <T> T ifHasGetter(Function<TypeGetter, T> getter) {
         if (hasPublicDefaultGetter()) { return getter.apply(getGetter()); }
         if (hasLombokGetter()) { return getter.apply(this); }
         return null;

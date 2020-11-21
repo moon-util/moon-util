@@ -4,7 +4,7 @@ package com.moon.mapping.processing;
 /**
  * @author benshaoye
  */
-abstract class BaseMethod implements BaseTypeGetter {
+abstract class BaseMethod implements TypeGetter {
 
     /**
      * getter 或 setter 方法名

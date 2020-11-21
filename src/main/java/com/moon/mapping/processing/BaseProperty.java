@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-abstract class BaseProperty<M extends BaseMethod> implements Mappable, BaseTypeGetter, Completable {
+abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGetter, Completable {
 
     /**
      * 字段名

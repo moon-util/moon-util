@@ -41,7 +41,7 @@ final class MappingWriter implements JavaFileWritable {
             return;
         }
         final Manager manager = getAllImportsNameForConfiguration();
-        final Set<String> classes = new LinkedHashSet<>();
+        final Set<String> classes = new TreeSet<>();
 
         // beans
         final StringAdder beansAddr = getBeansDefinition(writers, manager, classes);
@@ -66,10 +66,9 @@ final class MappingWriter implements JavaFileWritable {
 
     private static String getBeanMappingConfigName(Collection<String> fullClasses) {
         // 所包含映射器的 hash 码
-        String hash = Integer.toString(Objects.hash(fullClasses.stream().toArray(String[]::new)), 36);
-        // 时间戳
-        String time = Long.toString(System.currentTimeMillis(), 36);
-        return "BeanMappingConfiguration" + String.join("At", hash, time);
+        int hashCode = Arrays.hashCode(fullClasses.toArray(new String[0]));
+        String hash = Integer.toString(Math.abs(hashCode), 36);
+        return "BeanMappingConfiguration" + hash;
     }
 
     private static StringAdder getBeansDefinition(

@@ -20,6 +20,10 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     private final MapFieldFactory fieldFactory = new MapFieldFactory();
 
+    private final Set<String> sorts = new LinkedHashSet<>();
+
+    { sorts.add("id"); }
+
     private final Map<String, Map<String, PropertyAttr>> fieldAttrMap = new HashMap<>();
     private final Map<String, Map<String, PropertyAttr>> setterAttrMap = new HashMap<>();
     private final Map<String, Map<String, PropertyAttr>> getterAttrMap = new HashMap<>();
@@ -100,8 +104,8 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         final MappingModel model = new MappingModel();
         final String thisCls = manager.onImported(getCanonicalName());
         final String thatCls = manager.onImported(thatDef.getCanonicalName());
-        final boolean emptyForward = unsafeForward(adder, thatDef, model, manager);
-        final boolean emptyBackward = unsafeBackward(adder, thatDef, model, manager);
+        final boolean emptyForward = unsafeConvert(adder, thatDef, model, manager, true);
+        final boolean emptyBackward = unsafeConvert(adder, thatDef, model, manager, false);
         adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
         adder.add(getMethodFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
         adder.add("},");
@@ -135,42 +139,23 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         return attr == null ? DFT : attr;
     }
 
-    private boolean unsafeForward(
-        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, Manager manager
+    private boolean unsafeConvert(
+        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, Manager manager, boolean forward
     ) {
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
-            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, true);
-            if (attr.isIgnoreForward()) {
+            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, forward);
+            if (attr.isIgnore(forward)) {
                 return null;
             }
             String targetName = attr.getField(thisProp.getName());
             Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (model.forward(thisProp, thatProp, attr).isUsable()) {
+            if (model.onConvert(thisProp, thatProp, attr, forward).isUsable()) {
                 return getFieldFactory().doConvertField(model, manager);
             }
             return null;
         });
-        return forMethod(adder, fields, this, thatDef, manager, true);
-    }
-
-    private boolean unsafeBackward(
-        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, Manager manager
-    ) {
-        manager.ofScoped().onStartScoped();
-        Collection<String> fields = reducing(thisProp -> {
-            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, false);
-            if (attr.isIgnoreBackward()) {
-                return null;
-            }
-            String targetName = attr.getField(thisProp.getName());
-            Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (model.backward(thisProp, thatProp, attr).isUsable()) {
-                return getFieldFactory().doConvertField(model, manager);
-            }
-            return null;
-        });
-        return forMethod(adder, fields, this, thatDef, manager, false);
+        return forMethod(adder, fields, this, thatDef, manager, forward);
     }
 
     private static boolean forMethod(
@@ -184,7 +169,6 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         if (fields.isEmpty()) {
             return true;
         } else {
-
             String thisClass = manager.onImported(thisDef.getCanonicalName());
             String thatClass = manager.onImported(thatDef.getCanonicalName());
             MapMethodFactory factory = thisDef.getMethodFactory();
@@ -246,9 +230,5 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         }, parsedFields).values();
     }
 
-    private Set<String> getSortedKeys() {
-        Set<String> sorts = new LinkedHashSet<>();
-        sorts.add("id");
-        return sorts;
-    }
+    private Set<String> getSortedKeys() { return sorts; }
 }
