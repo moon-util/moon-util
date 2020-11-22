@@ -101,11 +101,10 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     final void addBeanMapping(StringAdder adder, BaseDefinition thatDef, Manager manager) {
         adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
-        // final MappingModel model = new MappingModel();
         final String thisCls = manager.onImported(getCanonicalName());
         final String thatCls = manager.onImported(thatDef.getCanonicalName());
-        final boolean emptyForward = unsafeConvert(adder, thatDef, manager, true);
-        final boolean emptyBackward = unsafeConvert(adder, thatDef, manager, false);
+        final boolean emptyForward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.FORWARD);
+        final boolean emptyBackward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.BACKWARD);
         adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
         adder.add(getMethodFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
         adder.add("},");
@@ -130,8 +129,8 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         return attr;
     }
 
-    private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp, boolean getter) {
-        Map propertiesMap = getter ? getGetterAttrMap() : getSetterAttrMap();
+    private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp, ConvertStrategy strategy) {
+        Map propertiesMap = strategy.getMethodAttrMap(this);
         PropertyAttr attr = findPropertyAttr(thatDef, thisProp, propertiesMap);
         if (attr == null) {
             attr = findPropertyAttr(thatDef, thisProp, getFieldAttrMap());
@@ -140,22 +139,22 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     }
 
     private boolean unsafeConvert(
-        StringAdder adder, final BaseDefinition thatDef, Manager manager, boolean forward
+        StringAdder adder, final BaseDefinition thatDef, Manager manager, ConvertStrategy strategy
     ) {
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
-            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, forward);
-            if (attr.isIgnore(forward)) {
+            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, strategy);
+            if (strategy.isIgnore(attr)) {
                 return null;
             }
             String targetName = attr.getField(thisProp.getName());
             Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (manager.canUsableModel(thisProp, thatProp, attr, forward)) {
+            if (manager.canUsableModel(thisProp, thatProp, attr, strategy)) {
                 return getFieldFactory().doConvertField(manager);
             }
             return null;
         });
-        return forMethod(adder, fields, this, thatDef, manager, forward);
+        return forMethod(adder, fields, this, thatDef, manager, strategy);
     }
 
     private static boolean forMethod(
@@ -164,7 +163,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         BaseDefinition thisDef,
         BaseDefinition thatDef,
         Manager manager,
-        boolean forward
+        ConvertStrategy strategy
     ) {
         if (fields.isEmpty()) {
             return true;
@@ -172,11 +171,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
             String thisClass = manager.onImported(thisDef.getCanonicalName());
             String thatClass = manager.onImported(thatDef.getCanonicalName());
             MapMethodFactory factory = thisDef.getMethodFactory();
-            if (forward) {
-                adder.add(factory.unsafeForward(thisClass, thatClass, fields));
-            } else {
-                adder.add(factory.unsafeBackward(thisClass, thatClass, fields));
-            }
+            adder.add(strategy.forMethod(factory, thisClass, thatClass, fields));
             return false;
         }
     }

@@ -13,7 +13,11 @@ final class MappingManager {
         this.importManager = importManager;
     }
 
-    public String onDeclare(MappingModel model, String mapping, String defaultVal) {
+    private MappingModel getModel() { return model; }
+
+    public String onDeclare(String mapping, String defaultVal) { return onDeclare(getModel(), mapping, defaultVal); }
+
+    private String onDeclare(MappingModel model, String mapping, String defaultVal) {
         return get(model.getSetterDeclareType(), model.getGetterDeclareType(), mapping, defaultVal);
     }
 
@@ -57,24 +61,20 @@ final class MappingManager {
     }
 
     private String object2object(String setterType, String getterType, String mapping, String defaultVal) {
-        @SuppressWarnings("all")
-        final String nonDefaultVal = "" +//
+        @SuppressWarnings("all") final String nonDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
             "{toName}.{setterName}({var} == null ? null : {MAPPINGS});";
-        @SuppressWarnings("all")
-        final String hasDefaultVal = "" +//
+        @SuppressWarnings("all") final String hasDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
             "{toName}.{setterName}({var} == null ? {value} : {MAPPINGS});";
         return doReplaceVariables(setterType, getterType, mapping, defaultVal, nonDefaultVal, hasDefaultVal);
     }
 
     private String object2primitive(String setterType, String getterType, String mapping, String defaultVal) {
-        @SuppressWarnings("all")
-        final String nonDefaultVal = "" +//
+        @SuppressWarnings("all") final String nonDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
             "if ({var} != null) { {toName}.{setterName}({MAPPINGS}); }";
-        @SuppressWarnings("all")
-        final String hasDefaultVal = "" +//
+        @SuppressWarnings("all") final String hasDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
             "{toName}.{setterName}({var} == null ? {value} :{MAPPINGS});";
         return doReplaceVariables(setterType, getterType, mapping, defaultVal, nonDefaultVal, hasDefaultVal);

@@ -13,8 +13,10 @@ final class MappingModel {
 
     public MappingModel() {}
 
-    public MappingModel onConvert(Mappable thisProp, Mappable thatProp, PropertyAttr attr, boolean forward) {
-        return forward ? forward(thisProp, thatProp, attr) : backward(thisProp, thatProp, attr);
+    public MappingModel onConvert(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
+        return strategy == ConvertStrategy.FORWARD//
+               ? forward(thisProp, thatProp, attr)//
+               : backward(thisProp, thatProp, attr);
     }
 
     private MappingModel forward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {

@@ -7,6 +7,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -18,9 +19,13 @@ final class ConvertManager {
 
     private final Map<String, CallerInfo> converter = new HashMap<>();
 
+    private final MappingManager mappingManager;
+    private final WarningManager warningManager;
     private final ImportManager importManager;
 
-    public ConvertManager(ImportManager importManager) {
+    public ConvertManager(MappingManager mappingManager,WarningManager warningManager, ImportManager importManager) {
+        this.mappingManager = mappingManager;
+        this.warningManager = warningManager;
         this.importManager = importManager;
         loadPredefinedConvert(Convert.class);
         if (Imported.JODA_TIME) {
@@ -34,8 +39,10 @@ final class ConvertManager {
         for (Element element : unsafeConvert.getEnclosedElements()) {
             if (DetectUtils.isMethod(element)) {
                 ExecutableElement convert = (ExecutableElement) element;
-                List<String> params = convert.getParameters().stream()
-                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", "")).collect(Collectors.toList());
+                List<String> params = convert.getParameters()
+                    .stream()
+                    .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", ""))
+                    .collect(Collectors.toList());
                 String returnType = convert.getReturnType().toString();
                 String key = toTypedKey(returnType, params);
                 CallerInfo converter = toCallConvert(convert, unsafeConvertName, params);
@@ -59,11 +66,28 @@ final class ConvertManager {
         return converter.get(toTypedKey(setterType, getterTypes));
     }
 
+    public String convertOrWarnedThenNull(String defaultVar, String setterType, String... getterTypes) {
+        return convertOrWarnedThenNull(defaultVar, CallerInfo::toString, setterType, getterTypes);
+    }
+
+    // public String ifPresentOrNull(String defaultVar, BiFunction<CallerInfo, String, String> mapping, Class<?> setterType, Class<?>... getterTypes) {
+    //     return ifPresentOrNull(defaultVar, mapping, getName(setterType), getterTypes);
+    // }
+    //
+    // public String ifPresentOrNull(String defaultVar, BiFunction<CallerInfo, String, String> mapping, String setterType, Class<?>... getterTypes) {
+    //     return ifPresentOrNull(defaultVar, mapping, setterType, classnames(getterTypes));
+    // }
+
+    public String convertOrWarnedThenNull(String defaultVar, BiFunction<CallerInfo, String, String> mapping, String setterType, String... getterTypes) {
+        CallerInfo info = find(setterType, getterTypes);
+        return info == null ? null : mapping.apply(info, defaultVar);
+    }
+
     /*
      * 进入这里的要求确保 getter 类型不是基本数据类型
      */
 
-    public String onSameType(){
+    public String onSameType() {
         return "{toName}.{setterName}({fromName}.{getterName}());";
     }
 
@@ -180,4 +204,10 @@ final class ConvertManager {
     private static boolean isNullString(String value) {
         return value == null || "null".equals(value);
     }
+
+    private static String[] classnames(Class<?>... classes) {
+        return Arrays.stream(classes).map(ConvertManager::getName).toArray(String[]::new);
+    }
+
+    private static String getName(Class<?> cls) { return cls.getCanonicalName(); }
 }

@@ -57,7 +57,7 @@ final class MappingWriter implements JavaFileWritable {
 
         // 类文件: 包名 + import + 类内容
         StringAdder configAdder = new StringAdder().add("package ").pkg(BeanMapping.class).add(";");
-        configAdder.add(manager.getImports()).add(configurationAdder);
+        configAdder.add(manager.toStringForImports()).add(configurationAdder);
         StringAdder src = new StringAdder().pkg(BeanMapping.class).dot().add(configName);
 
         // 生成文件
@@ -133,9 +133,9 @@ final class MappingWriter implements JavaFileWritable {
         // 暂时不实现 MapMapping 和 ObjectMapping 了
         // StringAdder shardAdder = def.implMappingSharedMethods(manager);
         StringAdder adder = new StringAdder();
-        adder.add("package ").pkg(BeanMapping.class).add(';').add(manager.getImports());
+        adder.add("package ").pkg(BeanMapping.class).add(';').add(manager.toStringForImports());
         adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
-        adder.impl(BeanMapping.class).add("{TO,").add(enumAdder).add(';').add(manager.ofStatic());
+        adder.impl(BeanMapping.class).add("{TO,").add(enumAdder).add(';').add(manager.toStringForStaticVars());
         return adder.add("}");
     }
 
