@@ -33,6 +33,10 @@ class PropertyAttr {
         return (isLang || StringUtils.isPrimitive(cls)) ? "void" : cls;
     }
 
+    public boolean isIgnore(boolean forward) {
+        return forward ? isIgnoreForward() : isIgnoreBackward();
+    }
+
     public boolean isIgnoreForward() {
         return ignoreType == ALL || ignoreType == FORWARD;
     }

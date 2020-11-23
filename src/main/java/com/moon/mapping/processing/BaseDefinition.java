@@ -16,16 +16,20 @@ import static com.moon.mapping.processing.PropertyAttr.DFT;
 abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> extends LinkedHashMap<String, P>
     implements Completable, CanonicalNameable {
 
-    protected final static String IMPL_SUFFIX = "ImplGeneratedByMoonUtil";
-
     private final MapMethodFactory methodFactory = new MapMethodFactory();
 
     private final MapFieldFactory fieldFactory = new MapFieldFactory();
 
-    private final Map<String, Map<String, PropertyAttr>> propertyAttrMap = new HashMap<>();
+    private final Set<String> sorts = new LinkedHashSet<>();
+
+    { sorts.add("id"); }
+
+    private final Map<String, Map<String, PropertyAttr>> fieldAttrMap = new HashMap<>();
+    private final Map<String, Map<String, PropertyAttr>> setterAttrMap = new HashMap<>();
+    private final Map<String, Map<String, PropertyAttr>> getterAttrMap = new HashMap<>();
 
     /**
-     * 声明注解{@link MappingFor}的类
+     * 声明注解{@link com.moon.mapping.annotation.MappingFor}的类
      */
     private final TypeElement thisElement;
 
@@ -42,11 +46,23 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     @Override
     public final String getCanonicalName() { return ElementUtils.getQualifiedName(getThisElement()); }
 
-    final void addPropertyAttr(String targetCls, String name, PropertyAttr attr) {
-        getPropertyAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
+    final void addFieldAttr(String name, PropertyAttr attr) {
+        getFieldAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
     }
 
-    public Map<String, Map<String, PropertyAttr>> getPropertyAttrMap() { return propertyAttrMap; }
+    final void addSetterAttr(String name, PropertyAttr attr) {
+        getSetterAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
+    }
+
+    final void addGetterAttr(String name, PropertyAttr attr) {
+        getGetterAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
+    }
+
+    public Map<String, Map<String, PropertyAttr>> getFieldAttrMap() { return fieldAttrMap; }
+
+    public Map<String, Map<String, PropertyAttr>> getGetterAttrMap() { return getterAttrMap; }
+
+    public Map<String, Map<String, PropertyAttr>> getSetterAttrMap() { return setterAttrMap; }
 
     /**
      * 声明{@link MappingFor}的类{@link #getThisElement()}所在包的完整名
@@ -78,77 +94,67 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
      */
     public StringAdder implMappingSharedMethods(final Manager manager) {
         final StringAdder adder = new StringAdder();
-        addObjectMapping(adder);
         addMapMapping(adder, manager);
+        addObjectMapping(adder);
         return adder;
     }
 
     final void addBeanMapping(StringAdder adder, BaseDefinition thatDef, Manager manager) {
         adder.add("TO_" + StringUtils.underscore(thatDef.getCanonicalName())).add(" {");
-        final String thisCls = getSimpleName();
-        final String thatCls = thatDef.getSimpleName();
-        final MappingModel model = new MappingModel();
-        final boolean emptyForward = unsafeForward(adder, thatDef, model, manager);
-        final boolean emptyBackward = unsafeBackward(adder, thatDef, model, manager);
+        final String thisCls = manager.onImported(getCanonicalName());
+        final String thatCls = manager.onImported(thatDef.getCanonicalName());
+        final boolean emptyForward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.FORWARD);
+        final boolean emptyBackward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.BACKWARD);
         adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
         adder.add(getMethodFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
         adder.add("},");
     }
 
-    private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp) {
+    private static PropertyAttr findPropertyAttr(
+        BaseDefinition thatDef, Mappable thisProp, Map<String, Map<String, PropertyAttr>> propertiesMap
+    ) {
         final String targetClass = thatDef.getCanonicalName();
-        Map<String, Map<String, PropertyAttr>> propertyMap = getPropertyAttrMap();
-        Map<String, PropertyAttr> attrMap = propertyMap.get(targetClass);
+        Map<String, PropertyAttr> attrMap = propertiesMap.get(targetClass);
         PropertyAttr attr;
         if (attrMap == null) {
-            attrMap = propertyMap.getOrDefault("void", Collections.emptyMap());
+            attrMap = propertiesMap.getOrDefault("void", Collections.emptyMap());
             attr = attrMap.get(thisProp.getName());
         } else {
             attr = attrMap.get(thisProp.getName());
             if (attr == null) {
-                attrMap = propertyMap.getOrDefault("void", Collections.emptyMap());
+                attrMap = propertiesMap.getOrDefault("void", Collections.emptyMap());
                 attr = attrMap.get(thisProp.getName());
             }
+        }
+        return attr;
+    }
+
+    private PropertyAttr getPropertyAttr(BaseDefinition thatDef, Mappable thisProp, ConvertStrategy strategy) {
+        Map propertiesMap = strategy.getMethodAttrMap(this);
+        PropertyAttr attr = findPropertyAttr(thatDef, thisProp, propertiesMap);
+        if (attr == null) {
+            attr = findPropertyAttr(thatDef, thisProp, getFieldAttrMap());
         }
         return attr == null ? DFT : attr;
     }
 
-    private boolean unsafeForward(
-        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, Manager manager
+    private boolean unsafeConvert(
+        StringAdder adder, final BaseDefinition thatDef, Manager manager, ConvertStrategy strategy
     ) {
         manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
-            PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
-            if (attr.isIgnoreForward()) {
+            PropertyAttr attr = getPropertyAttr(thatDef, thisProp, strategy);
+            if (strategy.isIgnore(attr)) {
                 return null;
             }
             String targetName = attr.getField(thisProp.getName());
             Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (model.forward(thisProp, thatProp, attr).isUsable()) {
-                return getFieldFactory().doConvertField(model, manager);
+            if (manager.canUsableModel(thisProp, thatProp, attr, strategy)) {
+                return getFieldFactory().doConvertField(manager);
             }
             return null;
         });
-        return forMethod(adder, fields, this, thatDef, manager, true);
-    }
-
-    private boolean unsafeBackward(
-        StringAdder adder, final BaseDefinition thatDef, final MappingModel model, Manager manager
-    ) {
-        manager.ofScoped().onStartScoped();
-        Collection<String> fields = reducing(thisProp -> {
-            PropertyAttr attr = getPropertyAttr(thatDef, thisProp);
-            if (attr.isIgnoreBackward()) {
-                return null;
-            }
-            String targetName = attr.getField(thisProp.getName());
-            Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (model.backward(thisProp, thatProp, attr).isUsable()) {
-                return getFieldFactory().doConvertField(model, manager);
-            }
-            return null;
-        });
-        return forMethod(adder, fields, this, thatDef, manager, false);
+        return forMethod(adder, fields, this, thatDef, manager, strategy);
     }
 
     private static boolean forMethod(
@@ -157,20 +163,15 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         BaseDefinition thisDef,
         BaseDefinition thatDef,
         Manager manager,
-        boolean forward
+        ConvertStrategy strategy
     ) {
         if (fields.isEmpty()) {
             return true;
         } else {
-
             String thisClass = manager.onImported(thisDef.getCanonicalName());
             String thatClass = manager.onImported(thatDef.getCanonicalName());
             MapMethodFactory factory = thisDef.getMethodFactory();
-            if (forward) {
-                adder.add(factory.unsafeForward(thisClass, thatClass, fields));
-            } else {
-                adder.add(factory.unsafeBackward(thisClass, thatClass, fields));
-            }
+            adder.add(strategy.forMethod(factory, thisClass, thatClass, fields));
             return false;
         }
     }
@@ -224,9 +225,5 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         }, parsedFields).values();
     }
 
-    private Set<String> getSortedKeys() {
-        Set<String> sorts = new LinkedHashSet<>();
-        sorts.add("id");
-        return sorts;
-    }
+    private Set<String> getSortedKeys() { return sorts; }
 }

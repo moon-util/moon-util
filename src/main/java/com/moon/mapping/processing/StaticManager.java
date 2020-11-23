@@ -1,20 +1,22 @@
 package com.moon.mapping.processing;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.joda.time.format.DateTimeFormat;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.TypeElement;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
-import static com.moon.mapping.processing.ElementUtils.cast;
 import static com.moon.mapping.processing.ElementUtils.getSimpleName;
+import static com.moon.mapping.processing.StringUtils.isPrimitiveNumber;
+import static com.moon.mapping.processing.StringUtils.isWrappedNumber;
+import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 
 /**
  * 静态变量遍历器
@@ -22,8 +24,6 @@ import static com.moon.mapping.processing.ElementUtils.getSimpleName;
  * @author benshaoye
  */
 public class StaticManager {
-
-    static final String NULL = "null";
 
     private final ImportManager importManager;
 
@@ -43,80 +43,78 @@ public class StaticManager {
         return varCached.computeIfAbsent(key, k -> "VAR" + indexer.getAndIncrement());
     }
 
+    private String computeStaticVariable(
+        String classname, String declareVal, BiFunction<String, String, String> defaultPuller
+    ) {
+        final String trimmedVal = trimToEmpty(declareVal);
+        if (StringUtils.isEmpty(trimmedVal)) {
+            return null;
+        }
+        String key = getKey(classname, trimmedVal);
+        String varName = varCached.get(key);
+        if (varName != null) {
+            return varName;
+        } else {
+            String script = defaultPuller.apply(classname, declareVal);
+            if (script != null) {
+                String resultVar = getStaticVar(key);
+                script = Replacer.type0.replace(script, importManager.onImported(classname));
+                script = Replacer.var.replace(script, resultVar);
+                fields.add("private final static " + script);
+                return resultVar;
+            }
+            return null;
+        }
+    }
+
     /**
      * 默认 boolean 值
-     * @param type boolean 类型（boolean 和 Boolean）
-     * @param value 只能为 true / false
+     *
+     * @param classname  boolean 类型（boolean 和 Boolean）
+     * @param declareVal 只能为 true / false
+     *
      * @return
      */
-    public String onDefaultBoolean(String type, String value) {
-        if (value == null) {
-            return NULL;
-        }
-        String key = getKey(type, value);
-        String varName = varCached.get(key);
-        if (varName != null) {
-            return varName;
-        }
-        varName = getStaticVar(key);
-        String booleanValue = Boolean.valueOf(value).toString();
-        String t0 = "{modifiers} {type0} {var} = {value};";
-        t0 = Replacer.type0.replace(t0, importManager.onImported(type));
-        t0 = Replacer.value.replace(t0, booleanValue);
-        fields.add(then(t0, varName));
-        return varName;
+    public String onDefaultBoolean(String classname, String declareVal) {
+        return computeStaticVariable(classname, declareVal, (type, value) -> {
+            String booleanValue = Boolean.valueOf(value).toString();
+            String t0 = "{type0} {var} = {value};";
+            return Replacer.value.replace(t0, booleanValue);
+        });
     }
 
-    public String onDefaultNumber(Class<?> type, String value) {
-        return onDefaultNumber(type.getCanonicalName(), value);
+    public String onDefaultNumber(String classname, String declareVal) {
+        return computeStaticVariable(classname, declareVal, (type, value) -> {
+            if (!(isPrimitiveNumber(type) || isWrappedNumber(type))) {
+                return null;
+            }
+            if (StringUtils.isEmpty(value)) {
+                return null;
+            }
+            value = value.toUpperCase();
+            if (value.endsWith("D") || value.endsWith("F") || value.endsWith("L")) {
+                value = value.substring(value.length() - 1);
+            }
+            if (!DetectUtils.isDigit(value)) {
+                Logger.printWarn("【已忽略默认值】非法 {} 默认值: {}.", type, value);
+                return null;
+            }
+            if (DetectUtils.isTypeofAny(type, Float.class, Double.class, Long.class)) {
+                value += ElementUtils.getSimpleName(type).charAt(0);
+            }
+            String t0 = "{type0} {var} = {value};";
+            return Replacer.value.replace(t0, value);
+        });
     }
 
-    public String onDefaultNumber(String type, String value) {
-        value = (value == null ? "" : value).trim().toUpperCase();
-        if (!(StringUtils.isPrimitiveNumber(type) || StringUtils.isWrappedNumber(type))) {
-            return NULL;
-        }
+    public String onDefaultBigInteger(String value) { return onDefault(value, BigInteger.class); }
+
+    public String onDefaultBigDecimal(String value) { return onDefault(value, BigDecimal.class); }
+
+    private <T> String onDefault(String value, Class<T> type) {
+        value = trimToEmpty(value);
         if (StringUtils.isEmpty(value)) {
-            return NULL;
-        }
-        if (!DetectUtils.isDigit(value)) {
-            Logger.warn("【已忽略默认值】非法 {} 默认值: {}.", type, value);
-            return NULL;
-        }
-        String key = getKey(type, value);
-        String varName = varCached.get(key);
-        if (varName != null) {
-            return varName;
-        }
-        if (value.endsWith("D") || value.endsWith("F") || value.endsWith("L")) {
-            // ignored
-        } else if ("Double".equals(type) || Double.class.getCanonicalName().equals(type)) {
-            value += "D";
-        } else if ("Float".equals(type) || Float.class.getCanonicalName().equals(type)) {
-            value += "F";
-        } else if ("Long".equals(type) || Long.class.getCanonicalName().equals(type)) {
-            value += "L";
-        }
-        varName = getStaticVar(key);
-        String t0 = "{modifiers} {type0} {var} = {value};";
-        t0 = Replacer.type0.replace(t0, importManager.onImported(type));
-        t0 = Replacer.value.replace(t0, value);
-        fields.add(then(t0, varName));
-        return varName;
-    }
-
-    public String onDefaultBigInteger(String value) {
-        return onDefault(value, BigInteger.class, BigInteger::new);
-    }
-
-    public String onDefaultBigDecimal(String value) {
-        return onDefault(value, BigDecimal.class, BigDecimal::new);
-    }
-
-    private <T> String onDefault(String value, Class<T> type, Function<String, T> newer) {
-        value = (value == null ? "" : value).trim();
-        if (StringUtils.isEmpty(value)) {
-            return NULL;
+            return null;
         }
         String key = getKey(type, value);
         String varName = varCached.get(key);
@@ -141,7 +139,7 @@ public class StaticManager {
                     break;
                 } catch (Throwable t) {
                     Logger.warn("【已忽略默认值】非法 {} 默认值: {}.", type.getSimpleName(), value);
-                    return NULL;
+                    return null;
                 }
         }
         varName = getStaticVar(key);
@@ -152,44 +150,29 @@ public class StaticManager {
         return varName;
     }
 
-    public String onString(String value) {
-        if (StringUtils.isEmpty(value)) {
-            return NULL;
-        }
-        String key = getKey(String.class, value);
-        String varName = varCached.get(key);
-        if (varName != null) {
-            return varName;
-        }
-        char quote = '"';
-        String fieldVal;
-        varName = getStaticVar(key);
-        int length = value.length();
-        if (length > 1) {
-            if (value.charAt(0) == quote && value.charAt(length - 1) == quote) {
-                fieldVal = value;
+    public String onString(String declareVal) {
+        return computeStaticVariable(String.class.getCanonicalName(), declareVal, (type, value) -> {
+            final int length = value.length();
+            final char quote = '"';
+            String fieldValue;
+            if (length > 1 && value.charAt(0) == quote && value.charAt(length - 1) == quote) {
+                fieldValue = value;
             } else {
-                fieldVal = (quote + value + quote);
+                fieldValue = (quote + value + quote);
             }
-        } else {
-            fieldVal = (quote + value + quote);
-        }
-        String t0 = "{modifiers} {type0} {var} = {value};";
-        t0 = Replacer.type0.replace(t0, importManager.onImported(String.class));
-        t0 = Replacer.value.replace(t0, fieldVal);
-        fields.add(then(t0, varName));
-        return varName;
+            return Replacer.value.replace("{type0} {var} = {value};", fieldValue);
+        });
     }
 
     public String onDateTimeFormatter(String format) {
         if (StringUtils.isEmpty(format)) {
-            return NULL;
+            return null;
         }
         try {
             DateTimeFormatter.ofPattern(format);
         } catch (Exception e) {
-            Logger.warn("【已忽略日期格式化】非法日期格式: {}.", format);
-            return NULL;
+            Logger.printWarn("【已忽略日期格式化】非法日期格式: {}.", format);
+            return null;
         }
         String key = getKey(DateTimeFormatter.class, format);
         String varName = varCached.get(key);
@@ -204,14 +187,14 @@ public class StaticManager {
     }
 
     public String onJodaDateTimeFormat(String format) {
-        if (!DetectUtils.IMPORTED_JODA_TIME || StringUtils.isEmpty(format)) {
-            return NULL;
+        if (!Imported.JODA_TIME || StringUtils.isEmpty(format)) {
+            return null;
         }
         try {
             DateTimeFormat.forPattern(format);
         } catch (Exception e) {
-            Logger.warn("【已忽略日期格式化】非法日期格式: {}.", format);
-            return NULL;
+            Logger.printWarn("【已忽略日期格式化】非法日期格式: {}.", format);
+            return null;
         }
         String key = getJodaFormatterKey(format);
         String varName = varCached.get(key);
@@ -228,77 +211,54 @@ public class StaticManager {
     }
 
     public String onEnumIndexed(String enumClassname, String index) {
-        int indexer = 0, idx;
+        index = trimToEmpty(index);
+        int idx;
         try {
-            idx = Integer.parseInt(index.trim());
+            idx = Integer.parseInt(index);
         } catch (Exception e) {
-            Logger.warn("【已忽略默认值】{} 不存在第 '{}' 个枚举值", enumClassname, index);
-            return NULL;
+            Logger.printWarn("【已忽略默认值】{} 不存在第 '{}' 个枚举值", enumClassname, index);
+            return null;
         }
-        String key = enumClassname + "#" + idx;
+        String key = getKey(enumClassname, index);
         String varName = varCached.get(key);
         if (varName != null) {
             return varName;
         }
-        TypeElement elem = EnvUtils.getUtils().getTypeElement(enumClassname);
-        if (!DetectUtils.isEnum(elem)) {
-            Logger.warn("【已忽略默认值】{} 不存在第 '{}' 个枚举值", enumClassname, index);
-            return NULL;
+        Element enumConst = ElementUtils.findEnumIndexOf(enumClassname, idx);
+        if (enumConst == null) {
+            Logger.printWarn("【已忽略默认值】{} 不存在第 '{}' 个枚举项", enumClassname, index);
+            return null;
         }
-        String enumConstName = null;
-        for (Element child : elem.getEnclosedElements()) {
-            if (child.getKind() == ElementKind.ENUM_CONSTANT) {
-                if (idx == indexer) {
-                    enumConstName = getSimpleName(child);
-                    break;
-                } else {
-                    indexer++;
-                }
-            }
-        }
-        if (enumConstName == null) {
-            Logger.warn("【已忽略默认值】{} 不存在第 '{}' 个枚举值", enumClassname, index);
-            return NULL;
-        } else {
-            varName = getStaticVar(key);
-            String declare = "{modifiers} {type0} {var}={type0}.{name};";
-            declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));
-            declare = Replacer.name.replace(declare, enumConstName);
-            declare = then(declare, varName);
-            fields.add(declare);
-        }
+        String enumConstName = getSimpleName(enumConst);
+        varName = getStaticVar(key);
+        String declare = "{modifiers} {type0} {var}={type0}.{name};";
+        declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));
+        declare = Replacer.name.replace(declare, enumConstName);
+        fields.add(then(declare, varName));
         return varName;
     }
 
     public String onEnumNamed(String enumClassname, String name) {
-        name = (name == null ? "" : name).trim();
+        name = trimToEmpty(name);
         if (StringUtils.isEmpty(name)) {
-            return NULL;
+            return null;
         }
         String key = getKey(enumClassname, name);
         String varName = varCached.get(key);
         if (varName != null) {
             return varName;
         }
-
-        TypeElement elem = EnvUtils.getUtils().getTypeElement(enumClassname);
-        if (!DetectUtils.isEnum(elem)) {
-            Logger.warn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
-            return NULL;
+        Element enumConst = ElementUtils.findEnumNameOf(enumClassname, name);
+        if (enumConst == null) {
+            Logger.printWarn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
+            return null;
         }
-        for (Element child : elem.getEnclosedElements()) {
-            if (child.getKind() == ElementKind.ENUM_CONSTANT && Objects.equals(getSimpleName(child), name)) {
-                varName = getStaticVar(key);
-                String declare = "{modifiers} {type0} {var} = {type0}.{name};";
-                declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));
-                declare = Replacer.name.replace(declare, name);
-                declare = then(declare, varName);
-                fields.add(declare);
-                return varName;
-            }
-        }
-        Logger.warn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
-        return NULL;
+        varName = getStaticVar(key);
+        String declare = "{modifiers} {type0} {var} = {type0}.{name};";
+        declare = Replacer.type0.replace(declare, importManager.onImported(enumClassname));
+        declare = Replacer.name.replace(declare, name);
+        fields.add(then(declare, varName));
+        return varName;
     }
 
     public String onEnumValues(String enumClassname) {
@@ -312,7 +272,31 @@ public class StaticManager {
         return varName;
     }
 
-    public String defaultNull() { return NULL; }
+    public String onDefaultChar(String value) {
+        value = trimToEmpty(value);
+        switch (value.length()) {
+            case 0:
+                return null;
+            case 1:
+                try {
+                    char ch = value.charAt(0);
+                    String key = getKey(char.class, value);
+                    String varName = varCached.get(key);
+                    if (varName != null) {
+                        return varName;
+                    }
+                    varName = "'" + ch + "'";
+                    varCached.put(key, varName);
+                    return varName;
+                } catch (Throwable ignored) {
+                }
+            default:
+                Logger.printWarn("【已忽略默认值】非法 {} 默认值: {}", "char", value);
+                return null;
+        }
+    }
+
+    public String defaultNull() { return null; }
 
     @Override
     public String toString() { return String.join("", fields); }
@@ -331,11 +315,9 @@ public class StaticManager {
         }
     }
 
-    private String getKey(Class<?> type, String key) {
-        return getKey(type.getCanonicalName(), key);
-    }
+    private static String trimToEmpty(String value) { return (value == null ? "" : value).trim(); }
 
-    private String getKey(String type, String key) {
-        return type + ">" + key;
-    }
+    private String getKey(Class<?> type, String key) { return getKey(type.getCanonicalName(), key); }
+
+    private String getKey(String type, String key) { return type + ">" + key; }
 }

@@ -10,6 +10,8 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * @author moonsky
@@ -33,7 +35,7 @@ final class ProcessUtils {
         return detail;
     }
 
-    private static void handleMapProperty(BasicDefinition definition, Element element, String name) {
+    private static void handleMapProperty(Element element, Consumer<PropertyAttr> handler) {
         MapProperty[] properties = element.getAnnotationsByType(MapProperty.class);
         for (MapProperty property : properties) {
             IgnoreMode ignore = property.ignore();
@@ -46,8 +48,7 @@ final class ProcessUtils {
             } catch (MirroredTypeException mirrored) {
                 targetCls = mirrored.getTypeMirror().toString();
             }
-            PropertyAttr attr = new PropertyAttr(targetCls, value, format, defaultValue, ignore);
-            definition.addPropertyAttr(attr.getTargetCls(), name, attr);
+            handler.accept(new PropertyAttr(targetCls, value, format, defaultValue, ignore));
         }
     }
 
@@ -66,7 +67,7 @@ final class ProcessUtils {
             }
             BasicProperty prop = ensureDetail(definition, name, parsingElement, thisElement);
             prop.setField((VariableElement) element, genericMap);
-            handleMapProperty(definition, element, name);
+            handleMapProperty(element, attr -> definition.addFieldAttr(name, attr));
         } else if (DetectUtils.isSetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             String name = ElementUtils.toPropertyName(elem);
@@ -74,7 +75,7 @@ final class ProcessUtils {
                 return;
             }
             BasicProperty prop = ensureDetail(definition, name, parsingElement, thisElement);
-            handleMapProperty(definition, element, name);
+            handleMapProperty(element, attr -> definition.addSetterAttr(name, attr));
             prop.setSetter(elem, genericMap);
         } else if (DetectUtils.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
@@ -83,7 +84,7 @@ final class ProcessUtils {
                 return;
             }
             BasicProperty prop = ensureDetail(definition, name, parsingElement, thisElement);
-            handleMapProperty(definition, element, name);
+            handleMapProperty(element, attr -> definition.addGetterAttr(name, attr));
             prop.setGetter(elem, genericMap);
         } else if (DetectUtils.isConstructor(element)) {
             // definition.addConstructor((ExecutableElement) element);

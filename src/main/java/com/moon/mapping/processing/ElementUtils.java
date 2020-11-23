@@ -1,10 +1,8 @@
 package com.moon.mapping.processing;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.QualifiedNameable;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
+import java.util.Objects;
 
 /**
  * @author benshaoye
@@ -61,5 +59,36 @@ abstract class ElementUtils {
             }
             element = element.getEnclosingElement();
         } while (true);
+    }
+
+    public static Element findEnumIndexOf(String classname, int index) {
+        TypeElement elem = EnvUtils.getUtils().getTypeElement(classname);
+        if (elem == null) {
+            return null;
+        }
+        int indexer = 0;
+        for (Element child : elem.getEnclosedElements()) {
+            if (child.getKind() == ElementKind.ENUM_CONSTANT) {
+                if (index == indexer) {
+                    return child;
+                } else {
+                    indexer++;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Element findEnumNameOf(String classname, String name) {
+        TypeElement elem = EnvUtils.getUtils().getTypeElement(classname);
+        if (elem == null) {
+            return null;
+        }
+        for (Element child : elem.getEnclosedElements()) {
+            if (child.getKind() == ElementKind.ENUM_CONSTANT && Objects.equals(getSimpleName(child), name)) {
+                return child;
+            }
+        }
+        return null;
     }
 }

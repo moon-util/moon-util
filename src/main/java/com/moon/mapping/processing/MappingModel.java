@@ -13,7 +13,13 @@ final class MappingModel {
 
     public MappingModel() {}
 
-    public MappingModel forward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
+    public MappingModel onConvert(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
+        return strategy == ConvertStrategy.FORWARD//
+               ? forward(thisProp, thatProp, attr)//
+               : backward(thisProp, thatProp, attr);
+    }
+
+    private MappingModel forward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
         this.fromProp = thisProp;
         this.toProp = thatProp;
         this.fromName = "self";
@@ -22,7 +28,7 @@ final class MappingModel {
         return this;
     }
 
-    public MappingModel backward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
+    private MappingModel backward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
         this.fromProp = thatProp;
         this.toProp = thisProp;
         this.fromName = "that";

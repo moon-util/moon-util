@@ -6,11 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 映射注册
+ *
  * @author moonsky
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MappingFor {
 
-    Class<?>[] value() default {};
+    Class<?>[] value();
 }

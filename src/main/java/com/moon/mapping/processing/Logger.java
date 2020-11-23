@@ -3,10 +3,12 @@ package com.moon.mapping.processing;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.Diagnostic;
+import java.util.Objects;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Supplier;
 
 import static com.moon.mapping.processing.EnvUtils.getMessager;
+import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 
 /**
  * @author benshaoye
@@ -50,6 +52,10 @@ abstract class Logger {
         if (messager != null) {
             warn(messager, template, values);
         }
+    }
+
+    static void printWarn(String template, Object...values){
+        Logger.onLevel(MANDATORY_WARNING, () -> StringUtils.format(true, template, values));
     }
 
     static void onLevel(Diagnostic.Kind level, Supplier<String> content) {

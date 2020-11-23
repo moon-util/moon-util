@@ -72,6 +72,21 @@ abstract class StringUtils {
         return template;
     }
 
+    static int count(String source, String search) {
+        if (source == null) {
+            return 0;
+        }
+        int startIdx = 0, count = 0, searchLen = search.length();
+        do {
+            int idx = source.indexOf(search, startIdx);
+            if (idx < 0) {
+                return count;
+            }
+            startIdx = idx + searchLen;
+            count++;
+        } while (true);
+    }
+
     static boolean isPrimitive(String type) {
         return isPrimitiveNumber(type) || "char".equals(type) || "boolean".equals(type);
     }
