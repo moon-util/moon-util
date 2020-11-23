@@ -62,6 +62,14 @@ final class ConvertManager {
         return new CallerInfo(caller, "(" + String.join(", ", vars) + ")", String.join(",", params));
     }
 
+    public CallerInfo find(Class<?> setterType, Class<?>... getterTypes) {
+        return find(getName(setterType), getterTypes);
+    }
+
+    public CallerInfo find(String setterType, Class<?>... getterTypes) {
+        return find(setterType, classnames(getterTypes));
+    }
+
     public CallerInfo find(String setterType, String... getterTypes) {
         return converter.get(toTypedKey(setterType, getterTypes));
     }

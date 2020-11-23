@@ -22,7 +22,6 @@ import static com.moon.mapping.processing.DetectUtils.isTypeof;
 import static com.moon.mapping.processing.DetectUtils.isTypeofAny;
 import static com.moon.mapping.processing.ElementUtils.getSimpleName;
 import static com.moon.mapping.processing.StringUtils.*;
-import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 
 /**
  * @author benshaoye
@@ -226,33 +225,33 @@ final class MapFieldFactory {
         final String dftValue = manager.staticVarForDefaultString();
         if (isString(getterDeclareType)) {
             return mapping.onDeclare(null, dftValue);
-        } else if (StringUtils.isPrimitive(getterDeclareType)) {
+        } else if (StringUtils.isPrimitiveNumber(getterDeclareType)) {
             // getter 是基本数据类型，没有默认值，因为 get 不到 null
             if (formatVal == null) {
-                t0 = mapping.onDeclare("{setterType}.valueOf({var})", dftValue);
+                t0 = mapping.onDeclare("{setterType}.valueOf({var})", null);
             } else {
-                // TODO
-                t0 = convert.useMapping(dftValue, () -> {
-                    String stringType = String.class.getCanonicalName();
-                    String targetType = isCompatible(LONG, getterDeclareType) ? LONG : DOUBLE;
-                    CallerInfo info = convert.find(stringType, targetType, stringType);
-                    return info.toString("{fromName}.{getterName}()", strWrapped(formatVal));
-                }, setterDeclareType, getterDeclareType);
+                String stringType = String.class.getCanonicalName();
+                String targetType = isCompatible(LONG, getterDeclareType) ? LONG : DOUBLE;
+                CallerInfo info = convert.find(stringType, targetType, stringType);
+                String mapper = info.toString("{fromName}.{getterName}()", strWrapped(formatVal));
+                t0 = mapping.onDeclare(mapper, null);
             }
+        } else if (StringUtils.isPrimitive(getterDeclareType)) {
+            t0 = mapping.onDeclare("{setterType}.valueOf({var})", null);
         } else if (isEnum(getterDeclareType)) {
             t0 = mapping.onDeclare("{var}.name()", dftValue);
         } else if (isFormattable(formatVal, getterDeclareType, Number.class)) {
-            // TODO
-            t0 = useConvertAndDftValAndFormat(model, manager, dftValue, Number.class);
+            CallerInfo mapper = convert.find(String.class, Number.class, String.class);
+            t0 = mapping.onDeclare(mapper.toString(null, strWrapped(formatVal)), dftValue);
         }
         if (t0 == null) {
             final String dateFormat = defaultDatePattern(getterDeclareType, formatVal);
             if (isFormattable(dateFormat, getterDeclareType, Date.class)) {
-                // TODO
-                t0 = useConvertAndDftValAndFormat(dateFormat, setterDeclareType, manager, dftValue, Date.class);
+                CallerInfo mapper = convert.find(String.class, Calendar.class, String.class);
+                t0 = mapping.onDeclare(mapper.toString(null, strWrapped(formatVal)), dftValue);
             } else if (isFormattable(dateFormat, getterDeclareType, Calendar.class)) {
-                // TODO
-                t0 = useConvertAndDftValAndFormat(dateFormat, setterDeclareType, manager, dftValue, Calendar.class);
+                CallerInfo mapper = convert.find(String.class, Calendar.class, String.class);
+                t0 = mapping.onDeclare(mapper.toString(null, strWrapped(formatVal)), dftValue);
             } else if (isFormattable(dateFormat, getterDeclareType, TemporalAccessor.class)) {
                 String format = manager.staticVarForDateTimeFormatter(dateFormat);
                 String fmt = Replacer.format.replace("{format}.format({var})", format);
@@ -333,14 +332,13 @@ final class MapFieldFactory {
             if (isNullString(format)) {
                 String name = INT.equals(setterDeclareType) ? "Int" : getSimpleName(setterWrapped);
                 String mapper = Replacer.name.replace("{setterType}.parse{name}({var})", name);
+                mapper = Replacer.setterType.replace(mapper, setterWrapped);
                 return mapping.onDeclare(mapper, dftValue);
             } else {
-                // TODO
-                return convert.useConvert(dftValue, info -> {
-                    String suffix = ".{type0}Value()";
-                    suffix = Replacer.type0.replace(suffix, setterDeclareType);
-                    return info.toString(null, strWrapped(format)) + suffix;
-                }, Number.class.getCanonicalName(), String.class, String.class);
+                CallerInfo info = convert.find(Number.class, String.class, String.class);
+                String suffix = Replacer.type0.replace(".{type0}Value()", setterDeclareType);
+                String mapper = info.toString(null, strWrapped(format)) + suffix;
+                return mapping.onDeclare(mapper, dftValue);
             }
         }
         if (isEnum(getterDeclareType)) {
@@ -360,8 +358,8 @@ final class MapFieldFactory {
                 ZonedDateTime.class,
                 OffsetDateTime.class,
                 java.time.Instant.class)) {
-                // TODO
-                return convert.useConvert(dftValue, STRINGIFY, setterDeclareType, getterDeclareType);
+                CallerInfo info = convert.find(setterDeclareType, getterDeclareType);
+                return mapping.onDeclare(info.toString(), dftValue);
             } else if (Imported.JODA_TIME) {
                 if (isSubtypeOf(getterDeclareType, ReadableInstant.class)) {
                     return mapping.onDeclare("{var}.getMillis()", dftValue);
@@ -425,11 +423,9 @@ final class MapFieldFactory {
                     String mapper = Replacer.name.replace("{setterType}.parse{name}({var})", name);
                     t0 = mapping.onDeclare(mapper, dftValue);
                 } else {
-                    // TODO
-                    t0 = convert.useConvert(dftValue, info -> {
-                        String format = strWrapped(attr.formatValue());
-                        return info.toString(null, format);
-                    }, setterDeclareType, String.class, String.class);
+                    CallerInfo info = convert.find(setterDeclareType, String.class, String.class);
+                    String mapper = info.toString(null, strWrapped(attr.formatValue()));
+                    t0 = mapping.onDeclare(mapper, dftValue);
                 }
             } else if (isEnum(getterDeclareType)) {
                 String cast = castPrimitiveIfLtLow(setterPrimitive, INT);
@@ -476,11 +472,9 @@ final class MapFieldFactory {
             } else if (isEnum(getterDeclareType)) {
                 return mapping.onDeclare("{var}.ordinal()", dftValue);
             } else if (isString(getterDeclareType) && attr.formatValue() != null) {
-                // TODO
-                t0 = convert.useConvert(dftValue, info -> {
-                    String format = strWrapped(attr.formatValue());
-                    return info.toString(null, format);
-                }, Number.class.getCanonicalName(), String.class, String.class);
+                CallerInfo info = convert.find(Number.class, String.class, String.class);
+                String mapper = info.toString(null, strWrapped(attr.formatValue()));
+                t0 = mapping.onDeclare(mapper, dftValue);
             } else {
                 t0 = warningAndIgnored(model);
             }
@@ -606,8 +600,8 @@ final class MapFieldFactory {
         } else if (isTypeof(getterDeclareType, BigInteger.class)) {
             return mapping.onDeclare("new {setterType}({var})", dftValue);
         } else if (isSubtypeOf(getterDeclareType, Number.class)) {
-            // TODO
-            t0 = convert.useConvert(dftValue, STRINGIFY, setterDeclareType, Number.class);
+            CallerInfo mapper = convert.find(BigDecimal.class, Number.class);
+            t0 = mapping.onDeclare(mapper.toString(), dftValue);
         } else if (isEnum(getterDeclareType)) {
             return mapping.onDeclare("{setterType}.valueOf({var}.ordinal())", dftValue);
         } else if (isString(getterDeclareType)) {
@@ -616,9 +610,8 @@ final class MapFieldFactory {
                 String mapper = "new {setterType}({var})";
                 return mapping.onDeclare(mapper, dftValue);
             } else {
-                // TODO
-                Function<CallerInfo, String> mapper = info -> info.toString(null, strWrapped(format));
-                t0 = convert.useConvert(dftValue, mapper, setterDeclareType, String.class, String.class);
+                CallerInfo mapper = convert.find(setterDeclareType, String.class, String.class);
+                t0 = mapping.onDeclare(mapper.toString(null, strWrapped(format)), dftValue);
             }
         } else {
             t0 = warningAndIgnored(model);
@@ -662,9 +655,8 @@ final class MapFieldFactory {
             if (formatVal == null) {
                 return mapping.onDeclare("new {setterType}({var})", dftValue);
             } else {
-                // TODO
-                Function<CallerInfo, String> mapper = info -> info.toString(null, strWrapped(formatVal));
-                t0 = convert.useConvert(dftValue, mapper, setterDeclareType, String.class, String.class);
+                CallerInfo mapper = convert.find(setterDeclareType, String.class, String.class);
+                t0 = mapping.onDeclare(mapper.toString(null, strWrapped(formatVal)), dftValue);
             }
         } else {
             t0 = warningAndIgnored(model);
@@ -922,7 +914,7 @@ final class MapFieldFactory {
             toType, model.getSetterName(), model.getSetterFinalType(),//
             fromType, model.getGetterName(), model.getGetterFinalType()
         };
-        Logger.onLevel(MANDATORY_WARNING, () -> StringUtils.format(true, TEMPLATE, values));
+        Logger.printWarn(TEMPLATE, values);
         this.warned = true;
         return null;
     }

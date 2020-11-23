@@ -16,6 +16,7 @@ import java.util.function.BiFunction;
 import static com.moon.mapping.processing.ElementUtils.getSimpleName;
 import static com.moon.mapping.processing.StringUtils.isPrimitiveNumber;
 import static com.moon.mapping.processing.StringUtils.isWrappedNumber;
+import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 
 /**
  * 静态变量遍历器
@@ -95,7 +96,7 @@ public class StaticManager {
                 value = value.substring(value.length() - 1);
             }
             if (!DetectUtils.isDigit(value)) {
-                Logger.warn("【已忽略默认值】非法 {} 默认值: {}.", type, value);
+                Logger.printWarn("【已忽略默认值】非法 {} 默认值: {}.", type, value);
                 return null;
             }
             if (DetectUtils.isTypeofAny(type, Float.class, Double.class, Long.class)) {
@@ -170,7 +171,7 @@ public class StaticManager {
         try {
             DateTimeFormatter.ofPattern(format);
         } catch (Exception e) {
-            Logger.warn("【已忽略日期格式化】非法日期格式: {}.", format);
+            Logger.printWarn("【已忽略日期格式化】非法日期格式: {}.", format);
             return null;
         }
         String key = getKey(DateTimeFormatter.class, format);
@@ -192,7 +193,7 @@ public class StaticManager {
         try {
             DateTimeFormat.forPattern(format);
         } catch (Exception e) {
-            Logger.warn("【已忽略日期格式化】非法日期格式: {}.", format);
+            Logger.printWarn("【已忽略日期格式化】非法日期格式: {}.", format);
             return null;
         }
         String key = getJodaFormatterKey(format);
@@ -215,7 +216,7 @@ public class StaticManager {
         try {
             idx = Integer.parseInt(index);
         } catch (Exception e) {
-            Logger.warn("【已忽略默认值】{} 不存在第 '{}' 个枚举值", enumClassname, index);
+            Logger.printWarn("【已忽略默认值】{} 不存在第 '{}' 个枚举值", enumClassname, index);
             return null;
         }
         String key = getKey(enumClassname, index);
@@ -225,7 +226,7 @@ public class StaticManager {
         }
         Element enumConst = ElementUtils.findEnumIndexOf(enumClassname, idx);
         if (enumConst == null) {
-            Logger.warn("【已忽略默认值】{} 不存在第 '{}' 个枚举项", enumClassname, index);
+            Logger.printWarn("【已忽略默认值】{} 不存在第 '{}' 个枚举项", enumClassname, index);
             return null;
         }
         String enumConstName = getSimpleName(enumConst);
@@ -249,7 +250,7 @@ public class StaticManager {
         }
         Element enumConst = ElementUtils.findEnumNameOf(enumClassname, name);
         if (enumConst == null) {
-            Logger.warn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
+            Logger.printWarn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
             return null;
         }
         varName = getStaticVar(key);
@@ -290,7 +291,7 @@ public class StaticManager {
                 } catch (Throwable ignored) {
                 }
             default:
-                Logger.warn("【已忽略默认值】非法 {} 默认值: {}", "char", value);
+                Logger.printWarn("【已忽略默认值】非法 {} 默认值: {}", "char", value);
                 return null;
         }
     }
