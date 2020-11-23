@@ -332,7 +332,7 @@ final class MapFieldFactory {
             if (isNullString(format)) {
                 String name = INT.equals(setterDeclareType) ? "Int" : getSimpleName(setterWrapped);
                 String mapper = Replacer.name.replace("{setterType}.parse{name}({var})", name);
-                mapper = Replacer.setterType.replace(mapper, setterWrapped);
+                mapper = Replacer.setterType.replace(mapper, manager.onImported(setterWrapped));
                 return mapping.onDeclare(mapper, dftValue);
             } else {
                 CallerInfo info = convert.find(Number.class, String.class, String.class);
@@ -751,18 +751,18 @@ final class MapFieldFactory {
 
     private String declare2Jdk8Time(final MappingModel model, Manager manager) {
         final ConvertManager convert = manager.ofConvert();
+        final MappingManager mapping = manager.getMapping();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
         if (isString(getterDeclareType) && isSubtypeOf(setterDeclareType, TemporalAccessor.class)) {
             String declareVal = defaultDatePattern(setterDeclareType, model.getAttr().formatValue());
             String format = manager.staticVarForDateTimeFormatter(declareVal);
             if (isNullString(format)) {
-                return convert.onMapping(null, "{setterType}.parse({var})", setterDeclareType, getterDeclareType);
+                return mapping.onDeclare("{setterType}.parse({var})", null);
             } else {
-                return convert.useMapping(null, () -> {
-                    String fmt = "{setterType}.from({format}.parse({var}))";
-                    return Replacer.format.replace(fmt, format);
-                }, setterDeclareType, String.class);
+                String mapper = "{setterType}.from({format}.parse({var}))";
+                mapper = Replacer.format.replace(mapper, format);
+                return mapping.onDeclare(mapper, null);
             }
         }
         if (!isTypeofJdk8DateTime(setterDeclareType)) {
@@ -771,10 +771,8 @@ final class MapFieldFactory {
         String t0;
         if (isPrimitiveNumber(getterDeclareType)) {
             String getterType = isCompatible(LONG, getterDeclareType) ? LONG : DOUBLE;
-            t0 = convert.useConvert(null,
-                info -> info.toString("{fromName}.{getterName}()"),
-                setterDeclareType,
-                getterType);
+            String mapper = convert.find(setterDeclareType, getterType).toString();
+            t0 = mapping.onDeclare(mapper, null);
         } else if (isSubtypeOf(getterDeclareType, Number.class)) {
             t0 = convert.onConvertSimple(setterDeclareType, Number.class);
         } else if (isSubtypeOf(getterDeclareType, Date.class)) {
@@ -801,29 +799,33 @@ final class MapFieldFactory {
     /** long -> Date, Timestamp, java.sql.Date, Calendar */
     private String declare2Date(final MappingModel model, Manager manager) {
         String t0;
+        final MappingManager mapping = manager.getMapping();
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
         if (isTypeofAny(setterDeclareType, Date.class, java.sql.Date.class, Timestamp.class, Time.class)) {
             if (isPrimitiveNumber(getterDeclareType)) {
                 String getterType = isCompatible(LONG, getterDeclareType) ? LONG : DOUBLE;
-                t0 = convert.useConvert(null, info -> {
-                    return info.toString("{fromName}.{getterName}()");
-                }, setterDeclareType, getterType);
+                CallerInfo info = convert.find(setterDeclareType, getterType);
+                t0 = mapping.get(setterDeclareType, getterType, info.toString(), null);
             } else if (isSubtypeOf(getterDeclareType, Number.class)) {
-                t0 = convert.onConvertSimple(setterDeclareType, Number.class);
+                CallerInfo info = convert.find(setterDeclareType, Number.class);
+                t0 = mapping.onDeclare(info.toString(), null);
             } else if (isTypeof(getterDeclareType, Calendar.class)) {
-                t0 = convert.onConvertSimple(setterDeclareType, Calendar.class);
+                CallerInfo info = convert.find(setterDeclareType, Calendar.class);
+                t0 = mapping.onDeclare(info.toString(), null);
             } else if (isTypeofJdk8Date(getterDeclareType)) {
-                t0 = convert.onConvertSimple(setterDeclareType, getterDeclareType);
+                CallerInfo info = convert.find(setterDeclareType, getterDeclareType);
+                t0 = mapping.onDeclare(info.toString(), null);
             } else if (isString(getterDeclareType)) {
                 final String format = defaultDatePattern(setterDeclareType, model.getAttr().formatValue());
                 if (isNullString(format)) {
-                    t0 = convert.onConvertSimple(setterDeclareType, String.class);
+                    CallerInfo info = convert.find(setterDeclareType, getterDeclareType);
+                    t0 = mapping.onDeclare(info.toString(), null);
                 } else {
-                    t0 = convert.useConvert(null, info -> {
-                        return info.toString(null, strWrapped(format));
-                    }, setterDeclareType, String.class, String.class);
+                    CallerInfo info = convert.find(setterDeclareType, String.class, String.class);
+                    String mapper = info.toString(null, strWrapped(format));
+                    t0 = mapping.onDeclare(mapper, null);
                 }
             } else {
                 t0 = onImportedJodaTime(model, convert);
@@ -836,29 +838,33 @@ final class MapFieldFactory {
 
     private String declare2Calendar(final MappingModel model, Manager manager) {
         String t0;
+        final MappingManager mapping = manager.getMapping();
         final ConvertManager convert = manager.ofConvert();
         final String setterDeclareType = model.getSetterDeclareType();
         final String getterDeclareType = model.getGetterDeclareType();
         if (isTypeof(setterDeclareType, Calendar.class)) {
             if (isPrimitiveNumber(getterDeclareType)) {
                 String getterType = isPrimitiveSubtypeOf(getterDeclareType, LONG) ? LONG : DOUBLE;
-                t0 = convert.useConvert(null, info -> {
-                    return info.toString("{fromName}.{getterName}()");
-                }, setterDeclareType, getterType);
+                CallerInfo info = convert.find(setterDeclareType, getterType);
+                t0 = mapping.get(setterDeclareType, getterType, info.toString(), null);
             } else if (isSubtypeOf(getterDeclareType, Number.class)) {
-                t0 = convert.onConvertSimple(setterDeclareType, Number.class);
+                CallerInfo info = convert.find(setterDeclareType, Number.class);
+                t0 = mapping.onDeclare(info.toString(), null);
             } else if (isSubtypeOf(getterDeclareType, Date.class)) {
-                t0 = convert.onConvertSimple(setterDeclareType, Date.class);
+                CallerInfo info = convert.find(setterDeclareType, Date.class);
+                t0 = mapping.onDeclare(info.toString(), null);
             } else if (isTypeofJdk8Date(getterDeclareType)) {
-                t0 = convert.onConvertSimple(setterDeclareType, getterDeclareType);
+                CallerInfo info = convert.find(setterDeclareType, getterDeclareType);
+                t0 = mapping.onDeclare(info.toString(), null);
             } else if (isString(getterDeclareType)) {
                 final String format = defaultDatePattern(setterDeclareType, model.getAttr().formatValue());
                 if (isNullString(format)) {
-                    t0 = convert.onConvertSimple(setterDeclareType, String.class);
+                    CallerInfo info = convert.find(setterDeclareType, getterDeclareType);
+                    t0 = mapping.onDeclare(info.toString(), null);
                 } else {
-                    t0 = convert.useConvert(null, info -> {
-                        return info.toString(null, strWrapped(format));
-                    }, setterDeclareType, String.class, String.class);
+                    CallerInfo info = convert.find(setterDeclareType, String.class, String.class);
+                    String mapper = info.toString(null, strWrapped(format));
+                    t0 = mapping.onDeclare(mapper, null);
                 }
             } else {
                 t0 = onImportedJodaTime(model, convert);
