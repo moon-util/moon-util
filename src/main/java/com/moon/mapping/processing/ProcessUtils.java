@@ -92,9 +92,10 @@ final class ProcessUtils {
     }
 
     @SuppressWarnings("all")
-    private static BasicDefinition parseRootPropertiesMap(final TypeElement rootElement) {
+    private static BasicDefinition parseRootPropertiesMap(
+        final TypeElement rootElement, Map<String, GenericModel> thisGenericMap
+    ) {
         BasicDefinition definition = new BasicDefinition(rootElement);
-        Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
         List<? extends Element> elements = rootElement.getEnclosedElements();
         Set<String> presents = new HashSet<>();
         for (Element element : CollectUtils.emptyIfNull(elements)) {
@@ -105,7 +106,11 @@ final class ProcessUtils {
     }
 
     private static void parseSuperPropertiesMap(
-        Set<String> presentKeys, BasicDefinition definition, TypeElement thisElement, TypeElement rootElement
+        Map<String, GenericModel> thisGenericMap,
+        Set<String> presentKeys,
+        BasicDefinition definition,
+        TypeElement thisElement,
+        TypeElement rootElement
     ) {
         TypeMirror superclass = thisElement.getSuperclass();
         if (superclass.toString().equals(TOP_CLASS)) {
@@ -116,19 +121,19 @@ final class ProcessUtils {
         if (superElement == null) {
             return;
         }
-        Map<String, GenericModel> genericModelMap = GenericUtils.parse(superclass, superElement);
         List<? extends Element> elements = superElement.getEnclosedElements();
         for (Element element : elements) {
-            handleEnclosedElem(presentKeys, definition, element, genericModelMap, superElement, rootElement);
+            handleEnclosedElem(presentKeys, definition, element, thisGenericMap, superElement, rootElement);
         }
         presentKeys = new HashSet<>(definition.keySet());
-        parseSuperPropertiesMap(presentKeys, definition, superElement, rootElement);
+        parseSuperPropertiesMap(thisGenericMap, presentKeys, definition, superElement, rootElement);
     }
 
     static BasicDefinition toPropertiesMap(TypeElement rootElement) {
         DetectUtils.assertRootElement(rootElement);
-        BasicDefinition definition = parseRootPropertiesMap(rootElement);
-        parseSuperPropertiesMap(new HashSet<>(), definition, rootElement, rootElement);
+        Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
+        BasicDefinition definition = parseRootPropertiesMap(rootElement, thisGenericMap);
+        parseSuperPropertiesMap(thisGenericMap, new HashSet<>(), definition, rootElement, rootElement);
         definition.onCompleted();
         return definition;
     }

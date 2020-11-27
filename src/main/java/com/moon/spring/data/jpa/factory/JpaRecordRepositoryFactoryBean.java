@@ -2,9 +2,7 @@ package com.moon.spring.data.jpa.factory;
 
 import com.moon.data.accessor.BaseAccessor;
 import com.moon.spring.data.jpa.JpaRecord;
-import com.moon.spring.data.jpa.repository.BaseRepository;
-import com.moon.spring.data.jpa.repository.DataRepository;
-import com.moon.spring.data.jpa.repository.DataStringRepository;
+import com.moon.spring.data.jpa.repository.*;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -108,8 +106,12 @@ public class JpaRecordRepositoryFactoryBean<ID, T extends BaseRepository<E, ID>,
 
     @NoRepositoryBean
     @Transactional(readOnly = true)
-    static class DataLongRepositoryImpl<T extends JpaRecord<Long>> extends AbstractRepositoryImpl<T, Long>
-        implements DataRepository<T, Long>, BaseRepository<T, Long>, BaseAccessor<T, Long> {
+    static class DataLongRepositoryImpl<T extends JpaRecord<Long>> extends AbstractRepositoryImpl<T, Long>//
+        implements BaseLongRepository<T>,
+                   DataLongRepository<T>,
+                   DataRepository<T, Long>,
+                   BaseRepository<T, Long>,
+                   BaseAccessor<T, Long> {
 
         public DataLongRepositoryImpl(
             RepositoryInformation repositoryInformation,
@@ -122,7 +124,7 @@ public class JpaRecordRepositoryFactoryBean<ID, T extends BaseRepository<E, ID>,
     @NoRepositoryBean
     @Transactional(readOnly = true)
     static class DataStringRepositoryImpl<T extends JpaRecord<String>> extends AbstractRepositoryImpl<T, String>
-        implements DataStringRepository<T> {
+        implements BaseStringRepository<T>, DataStringRepository<T> {
 
         public DataStringRepositoryImpl(
             RepositoryInformation repositoryInformation,

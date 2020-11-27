@@ -16,19 +16,26 @@ final class GenericUtils {
     private GenericUtils() {}
 
     static Map<String, GenericModel> parse(TypeElement element) {
-        return parse(element.asType(), element);
+        Map<String, GenericModel> thisGenericMap = new HashMap<>();
+        parse(thisGenericMap,element.asType(), element);
+        do {
+            TypeMirror superclass = element.getSuperclass();
+            if (DetectUtils.isTypeof(superclass.toString(), Object.class)) {
+                return thisGenericMap;
+            }
+            element = (TypeElement) EnvUtils.getTypes().asElement(superclass);
+            parse(thisGenericMap, superclass, element);
+        } while (true);
     }
 
-    static Map<String, GenericModel> parse(TypeMirror elementTyped, TypeElement element) {
-        Map<String, GenericModel> genericMap = new HashMap<>();
+    static void parse(Map<String, GenericModel> genericMap,TypeMirror elementTyped, TypeElement element) {
         List<String> actuals = Extract.splitSuperclass(elementTyped.toString());
         int index = 0;
         for (TypeParameterElement param : element.getTypeParameters()) {
             String actual = index < actuals.size() ? actuals.get(index++) : null;
             GenericModel model = new GenericModel(param, actual);
-            genericMap.put(model.getDeclareType(), model);
+            genericMap.putIfAbsent(model.getDeclareType(), model);
         }
-        return genericMap;
     }
 
     static String findActualType(Map<String, GenericModel> generics, String declareType) {

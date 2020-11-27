@@ -1,43 +1,62 @@
 package com.moon.mapping.processing;
 
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.MonthDay;
+import org.joda.time.YearMonth;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author moonsky
  */
 final class Manager {
 
-    private final MappingModel model;
+    private final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private final Map<String, String> defaultFormats = new HashMap<>();
+
+    {
+        defaultFormats.put(java.time.LocalDate.class.getName(), "yyyy-MM-dd");
+        defaultFormats.put(java.time.LocalTime.class.getName(), "HH:mm:ss");
+        defaultFormats.put(java.time.YearMonth.class.getName(), "yyyy-MM");
+        defaultFormats.put(java.time.Year.class.getName(), "yyyy");
+        defaultFormats.put(java.time.MonthDay.class.getName(), "MM-dd");
+        if (Imported.JODA_TIME) {
+            defaultFormats.put(MonthDay.class.getName(), "MM-dd");
+            defaultFormats.put(YearMonth.class.getName(), "yyyy-MM");
+            defaultFormats.put(LocalTime.class.getName(), "HH:mm:ss");
+            defaultFormats.put(LocalDate.class.getName(), "yyyy-MM-dd");
+        }
+    }
+
     private final ImportManager importManager;
     private final StaticManager staticManager;
     private final MappingManager mappingManager;
+    private final TransferManager transferManager;
     private final ConvertManager convertManager;
-    private final ScopedManager scopedManager;
-    private final WarningManager warningManager;
 
     public Manager() {
         final MappingModel model = new MappingModel();
         final ImportManager importManager = new ImportManager();
         final StaticManager staticManager = new StaticManager(importManager);
-        final ScopedManager scopedManager = new ScopedManager(importManager);
-        final WarningManager warningManager = new WarningManager(model);
         final MappingManager mappingManager = new MappingManager(model, importManager);
-        this.convertManager = new ConvertManager(mappingManager, warningManager, importManager);
+        this.transferManager = new TransferManager(importManager);
+        this.convertManager = new ConvertManager(importManager);
         this.mappingManager = mappingManager;
-        this.warningManager = warningManager;
         this.importManager = importManager;
         this.staticManager = staticManager;
-        this.scopedManager = scopedManager;
-        this.model = model;
     }
 
     public boolean canUsableModel(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
         return getModel().onConvert(thisProp, thatProp, attr, strategy).isUsable();
     }
 
-    public MappingModel getModel() { return model; }
+    public MappingModel getModel() { return getMapping().getModel(); }
+
+    public TransferManager getTransfer() { return transferManager; }
 
     public MappingManager getMapping() { return mappingManager; }
-
-    public ScopedManager ofScoped() { return scopedManager; }
 
     public ConvertManager ofConvert() { return convertManager; }
 
@@ -49,11 +68,22 @@ final class Manager {
 
     public String onImported(Class<?> classname) { return ofImport().onImported(classname); }
 
-    public void setupWarning() { warningManager.reset(); }
-
     public String toStringForImports() { return ofImport().toString(); }
 
     public String toStringForStaticVars() { return ofStatic().toString(); }
+
+    public String getFormatPatternVal() {
+        return getModel().getAttr().formatValue();
+    }
+
+    public String getFormatPatternVal(String type, boolean isDefaultDate) {
+        String pattern = getModel().getAttr().formatValue();
+        return pattern == null//
+               ? (isDefaultDate//
+                  ? defaultFormats.getOrDefault(type, DATE_FORMAT)//
+                  : defaultFormats.get(type))//
+               : pattern;
+    }
 
     /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,23 +91,23 @@ final class Manager {
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public String staticVarForEnumValuesOnDeclare() {
-        return staticVarForEnumValues(setterDeclareType());
+    public String staticForEnumValuesOnDeclare() {
+        return staticForEnumValues(setterType());
     }
 
-    public String staticVarForEnumValues(String enumClassname) {
+    public String staticForEnumValues(String enumClassname) {
         return ofStatic().onEnumValues(enumClassname);
     }
 
-    public String staticVarForJodaDateTimeFormatter(String formatVal) {
+    public String staticForJodaDateTimeFormatter(String formatVal) {
         return ofStatic().onJodaDateTimeFormat(formatVal);
     }
 
-    public String staticVarForDateTimeFormatter(String formatVal) {
+    public String staticForDateTimeFormatter(String formatVal) {
         return ofStatic().onDateTimeFormatter(formatVal);
     }
 
-    public String staticVarForDefaultBigInteger() {
+    public String staticForDefaultBigInteger() {
         String defaultValue = defaultVal();
         if (defaultValue != null) {
             return ofStatic().onDefaultBigInteger(defaultValue);
@@ -85,7 +115,7 @@ final class Manager {
         return ofStatic().defaultNull();
     }
 
-    public String staticVarForDefaultBigDecimal() {
+    public String staticForDefaultBigDecimal() {
         String defaultValue = defaultVal();
         if (defaultValue != null) {
             return ofStatic().onDefaultBigDecimal(defaultValue);
@@ -93,23 +123,23 @@ final class Manager {
         return ofStatic().defaultNull();
     }
 
-    public String staticVarForDefaultChar() {
+    public String staticForDefaultChar() {
         return ofStatic().onDefaultChar(defaultVal());
     }
 
-    public String staticVarForDefaultBooleanOnDeclare() {
-        return staticVarForDefaultBoolean(setterDeclareType());
+    public String staticForDefaultBoolean() {
+        return staticForDefaultBoolean(setterType());
     }
 
-    public String staticVarForDefaultBoolean(String classname) {
+    public String staticForDefaultBoolean(String classname) {
         return ofStatic().onDefaultBoolean(classname, defaultVal());
     }
 
-    public String staticVarForDefaultNumberOnDeclare() {
-        return staticVarForDefaultNumber(setterDeclareType());
+    public String staticForDefaultNumber() {
+        return staticForDefaultNumber(setterType());
     }
 
-    public String staticVarForDefaultNumber(String expectedClass) {
+    public String staticForDefaultNumber(String expectedClass) {
         String defaultValue = defaultVal();
         if (defaultValue != null) {
             return ofStatic().onDefaultNumber(expectedClass, defaultValue);
@@ -117,16 +147,16 @@ final class Manager {
         return ofStatic().defaultNull();
     }
 
-    public String staticVarForDefaultNumberValueOf(String classname, String value) {
+    public String staticForDefaultNumberValueOf(String classname, String value) {
         return ofStatic().onDefaultNumber(classname, value);
     }
 
-    public String staticVarForDefaultString() {
+    public String staticForDefaultString() {
         return ofStatic().onString(defaultVal());
     }
 
-    public String staticVarForDefaultEnumOnDeclare() {
-        return doStaticVarForDefaultEnum(setterDeclareType());
+    public String staticForDefaultEnumOnDeclare() {
+        return doStaticVarForDefaultEnum(setterType());
     }
 
     private String doStaticVarForDefaultEnum(String enumClassname) {
@@ -140,7 +170,7 @@ final class Manager {
         }
     }
 
-    private String setterDeclareType() { return getModel().getSetterDeclareType(); }
+    private String setterType() { return getMapping().getSetterType(); }
 
     private String defaultVal() { return getModel().getAttr().defaultValue(); }
 }

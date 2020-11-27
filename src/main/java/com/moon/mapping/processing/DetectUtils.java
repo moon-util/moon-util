@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import java.util.Set;
 
 import static com.moon.mapping.processing.ElementUtils.getQualifiedName;
@@ -83,6 +84,13 @@ abstract class DetectUtils {
         return false;
     }
 
+    static boolean isEnum(String value) {
+        if (value == null) {
+            return false;
+        }
+        TypeElement elem = EnvUtils.getUtils().getTypeElement(value);
+        return elem != null && elem.getKind() == ElementKind.ENUM;
+    }
 
     static boolean isPublic(Element elem) { return isAny(elem, Modifier.PUBLIC); }
 
@@ -203,5 +211,19 @@ abstract class DetectUtils {
 
     static boolean isTypeof(String actual, String expected) {
         return expected.equals(actual);
+    }
+
+    static boolean isSubtypeOf(String actualType, Class<?> superclass) {
+        return isSubtypeOf(actualType, superclass.getCanonicalName());
+    }
+
+    static boolean isSubtypeOf(String actualType, String superClass) {
+        if (actualType == null || superClass == null) {
+            return false;
+        }
+        Elements utils = EnvUtils.getUtils();
+        TypeElement elem1 = utils.getTypeElement(actualType);
+        TypeElement elem2 = utils.getTypeElement(superClass);
+        return elem1 != null && elem2 != null && EnvUtils.getTypes().isSubtype(elem1.asType(), elem2.asType());
     }
 }

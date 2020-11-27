@@ -329,13 +329,10 @@ public abstract class Convert {
         return new SimpleDateFormat(pattern).format(date.getTime());
     }
 
-    //
     public static String toString(Number number, String pattern) { return new DecimalFormat(pattern).format(number); }
 
-    //
     public static String toString(double number, String pattern) { return new DecimalFormat(pattern).format(number); }
 
-    //
     public static String toString(long number, String pattern) { return new DecimalFormat(pattern).format(number); }
 
     public static double toDoubleValue(String val, String pattern) { return toNumber(val, pattern).doubleValue(); }

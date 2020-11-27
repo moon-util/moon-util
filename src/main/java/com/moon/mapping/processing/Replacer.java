@@ -49,4 +49,8 @@ public enum Replacer {
     public String replace(String template, String type) {
         return template.replaceAll(pattern, String.valueOf(toReplacement(type)));
     }
+
+    public String replace(String template, Class<?> type) {
+        return replace(template, type.getCanonicalName());
+    }
 }

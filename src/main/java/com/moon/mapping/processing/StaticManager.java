@@ -138,7 +138,7 @@ public class StaticManager {
                     valExp = " new {type0}(\"{value}\");";
                     break;
                 } catch (Throwable t) {
-                    Logger.warn("【已忽略默认值】非法 {} 默认值: {}.", type.getSimpleName(), value);
+                    Logger.printWarn("【已忽略默认值】非法 {} 默认值: {}.", type.getSimpleName(), value);
                     return null;
                 }
         }

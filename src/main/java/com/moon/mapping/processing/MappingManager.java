@@ -5,6 +5,7 @@ package com.moon.mapping.processing;
  */
 final class MappingManager {
 
+    private PropertyType type;
     private final MappingModel model;
     private final ImportManager importManager;
 
@@ -13,12 +14,26 @@ final class MappingManager {
         this.importManager = importManager;
     }
 
-    private MappingModel getModel() { return model; }
+    private PropertyType getType() { return type == null ? PropertyType.DECLARE : type; }
 
-    public String onDeclare(String mapping, String defaultVal) { return onDeclare(getModel(), mapping, defaultVal); }
+    private void withPropertyType(PropertyType type) { this.type = type; }
 
-    private String onDeclare(MappingModel model, String mapping, String defaultVal) {
-        return get(model.getSetterDeclareType(), model.getGetterDeclareType(), mapping, defaultVal);
+    final MappingModel getModel() { return model; }
+
+    public void withDeclarePropertyType() { withPropertyType(PropertyType.DECLARE); }
+
+    public void withFinalPropertyType() { withPropertyType(PropertyType.FINALLY); }
+
+    public String getSetterType() { return getType().getSetterType(getModel()); }
+
+    public String getGetterType() { return getType().getGetterType(getModel()); }
+
+    public String normalized(String mapping, String defaultVal) {
+        return normalized(getModel(), mapping, defaultVal);
+    }
+
+    private String normalized(MappingModel model, String mapping, String defaultVal) {
+        return get(getType().getSetterType(model), getType().getGetterType(model), mapping, defaultVal);
     }
 
     public String get(String setterType, String getterType, String mapping, String defaultVal) {
@@ -61,20 +76,40 @@ final class MappingManager {
     }
 
     private String object2object(String setterType, String getterType, String mapping, String defaultVal) {
-        @SuppressWarnings("all") final String nonDefaultVal = "" +//
-            "{getterType} {var} = {fromName}.{getterName}();" +//
-            "{toName}.{setterName}({var} == null ? null : {MAPPINGS});";
-        @SuppressWarnings("all") final String hasDefaultVal = "" +//
+        mapping = mapping == null ? "{var}" : mapping;
+        @SuppressWarnings("all")
+        final String nonDefaultVal;
+        @SuppressWarnings("all")
+        final String hasDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
             "{toName}.{setterName}({var} == null ? {value} : {MAPPINGS});";
+        if (defaultVal == null) {
+            String t0 = "{toName}.{setterName}({MAPPINGS});";
+            final int count = StringUtils.count(mapping, "{var}");
+            if (count == 0) {
+                nonDefaultVal = t0;
+            } else if (count == 1) {
+                nonDefaultVal = t0;
+                final String getValue = "{fromName}.{getterName}()";
+                mapping = Replacer.var.replace(mapping, getValue);
+            } else {
+                nonDefaultVal = "" +//
+                    "{getterType} {var} = {fromName}.{getterName}();" +//
+                    "{toName}.{setterName}({MAPPINGS});";
+            }
+        } else {
+            nonDefaultVal = null;
+        }
         return doReplaceVariables(setterType, getterType, mapping, defaultVal, nonDefaultVal, hasDefaultVal);
     }
 
     private String object2primitive(String setterType, String getterType, String mapping, String defaultVal) {
-        @SuppressWarnings("all") final String nonDefaultVal = "" +//
+        @SuppressWarnings("all")
+        final String nonDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
             "if ({var} != null) { {toName}.{setterName}({MAPPINGS}); }";
-        @SuppressWarnings("all") final String hasDefaultVal = "" +//
+        @SuppressWarnings("all")
+        final String hasDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
             "{toName}.{setterName}({var} == null ? {value} :{MAPPINGS});";
         return doReplaceVariables(setterType, getterType, mapping, defaultVal, nonDefaultVal, hasDefaultVal);

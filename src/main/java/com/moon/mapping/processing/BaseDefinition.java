@@ -141,7 +141,6 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     private boolean unsafeConvert(
         StringAdder adder, final BaseDefinition thatDef, Manager manager, ConvertStrategy strategy
     ) {
-        manager.ofScoped().onStartScoped();
         Collection<String> fields = reducing(thisProp -> {
             PropertyAttr attr = getPropertyAttr(thatDef, thisProp, strategy);
             if (strategy.isIgnore(attr)) {

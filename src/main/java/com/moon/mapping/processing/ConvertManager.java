@@ -19,13 +19,9 @@ final class ConvertManager {
 
     private final Map<String, CallerInfo> converter = new HashMap<>();
 
-    private final MappingManager mappingManager;
-    private final WarningManager warningManager;
     private final ImportManager importManager;
 
-    public ConvertManager(MappingManager mappingManager,WarningManager warningManager, ImportManager importManager) {
-        this.mappingManager = mappingManager;
-        this.warningManager = warningManager;
+    public ConvertManager(ImportManager importManager) {
         this.importManager = importManager;
         loadPredefinedConvert(Convert.class);
         if (Imported.JODA_TIME) {

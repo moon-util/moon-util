@@ -1,6 +1,7 @@
 package com.moon.mapping.processing;
 
 import java.beans.Introspector;
+import java.util.Arrays;
 
 /**
  * @author moonsky
@@ -85,6 +86,44 @@ abstract class StringUtils {
             startIdx = idx + searchLen;
             count++;
         } while (true);
+    }
+
+    static String[] getClassnamesOrEmpty(Class<?>... classes) {
+        return classes == null ? new String[0] : Arrays.stream(classes)
+            .map(Class::getCanonicalName)
+            .toArray(String[]::new);
+    }
+
+    static String strWrapped(String str) { return '"' + str + '"'; }
+
+    static String bracketed(String str) { return "(" + str + ")"; }
+
+    static boolean isPrimitiveLt(String thisPrimitiveType, String thatPrimitiveType) {
+        String all = "byte,short,int,long,float,double";
+        int thisIdx = all.indexOf(thisPrimitiveType);
+        int thatIdx = all.indexOf(thatPrimitiveType);
+        return thisIdx < thatIdx;
+    }
+
+    static boolean isPrimitiveGt(String thisPrimitiveType, String thatPrimitiveType) {
+        String all = "byte,short,int,long,float,double";
+        int thisIdx = all.indexOf(thisPrimitiveType);
+        int thatIdx = all.indexOf(thatPrimitiveType);
+        return thisIdx > thatIdx;
+    }
+
+    static boolean isPrimitiveNotGt(String thisType, String thatType) {
+        String all = "byte,short,int,long,float,double";
+        int thisIdx = all.indexOf(thisType);
+        int thatIdx = all.indexOf(thatType);
+        return thisIdx <= thatIdx;
+    }
+
+    static boolean isPrimitiveNotLt(String thisType, String thatType) {
+        String all = "byte,short,int,long,float,double";
+        int thisIdx = all.indexOf(thisType);
+        int thatIdx = all.indexOf(thatType);
+        return thisIdx >= thatIdx;
     }
 
     static boolean isPrimitive(String type) {
