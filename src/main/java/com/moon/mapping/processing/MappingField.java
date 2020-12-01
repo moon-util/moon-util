@@ -26,7 +26,7 @@ final class MappingField {
 
     static {
         MAPPERS.put(type -> isTypeof(type, String.class), ToString.class);
-        MAPPERS.put(type -> isTypeof(type, Number.class), ToNumber.class);
+        // MAPPERS.put(type -> isTypeof(type, Number.class), ToNumber.class);
         MAPPERS.put(type -> isTypeof(type, BigInteger.class), ToBigInteger.class);
         MAPPERS.put(type -> isTypeof(type, BigDecimal.class), ToBigDecimal.class);
         MAPPERS.put(type -> isSubtypeOf(type, Date.class), ToUtilDate.class);
@@ -35,7 +35,7 @@ final class MappingField {
         MAPPERS.put(MappingField::isJodaSpecialDate, ToJodaTime.class);
         MAPPERS.put(type -> isTypeof(type, "long") || isTypeof(type, Long.class), ToLongValue.class);
         MAPPERS.put(type -> isTypeof(type, "char") || isTypeof(type, Character.class), ToCharValue.class);
-        MAPPERS.put(type -> isTypeof(type, "boolean") || isTypeof(type, Boolean.class), ToBoolean.class);
+        // MAPPERS.put(type -> isTypeof(type, "boolean") || isTypeof(type, Boolean.class), ToBoolean.class);
         MAPPERS.put(StringUtils::isWrappedNumber, ToWrappedNumber.class);
         MAPPERS.put(StringUtils::isPrimitiveNumber, ToPrimitiveNumber.class);
         MAPPERS.put(type -> isTypeof(type, Calendar.class), ToCalendar.class);
@@ -198,10 +198,10 @@ final class MappingField {
                 String getterType = mapping.getGetterType();
                 String pattern = manager.getFormatPatternVal(getterType, true);
                 if (pattern == null) {
-                    TransferInfo info = transfer.find(Date.class, String.class);
+                    TransferInfo info = transfer.findInAll(Date.class, String.class);
                     return mapping.normalized(info.toString(), null);
                 } else {
-                    TransferInfo info = transfer.find(Date.class, String.class, String.class);
+                    TransferInfo info = transfer.findInAll(Date.class, String.class, String.class);
                     return mapping.normalized(info.toString(null, strWrapped(pattern)), null);
                 }
             }
@@ -344,7 +344,7 @@ final class MappingField {
                 String getterType = getGetterType(manager);
                 String byType = isPrimitiveGt(LONG, getterType) ? LONG : DOUBLE;
                 TransferManager transfer = manager.getTransfer();
-                TransferInfo info = transfer.find(setterType, byType);
+                TransferInfo info = transfer.findInAll(setterType, byType);
                 return mapping.normalized(info.toString(), null);
             }
         },
@@ -359,7 +359,7 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 TransferManager transfer = manager.getTransfer();
                 String setterType = getSetterType(manager);
-                TransferInfo info = transfer.find(setterType, Number.class);
+                TransferInfo info = transfer.findInAll(setterType, Number.class);
                 return mapping.normalized(info.toString(), null);
             }
         },
@@ -374,7 +374,7 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 TransferManager transfer = manager.getTransfer();
                 String setterType = getSetterType(manager);
-                TransferInfo info = transfer.find(setterType, Date.class);
+                TransferInfo info = transfer.findInAll(setterType, Date.class);
                 return mapping.normalized(info.toString(), null);
             }
         },
@@ -389,7 +389,7 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 TransferManager transfer = manager.getTransfer();
                 String setterType = getSetterType(manager);
-                TransferInfo info = transfer.find(setterType, Calendar.class);
+                TransferInfo info = transfer.findInAll(setterType, Calendar.class);
                 return mapping.normalized(info.toString(), null);
             }
         },
@@ -404,7 +404,7 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 TransferManager transfer = manager.getTransfer();
                 String setterType = getSetterType(manager);
-                TransferInfo info = transfer.find(setterType, ReadableInstant.class);
+                TransferInfo info = transfer.findInAll(setterType, ReadableInstant.class);
                 return mapping.normalized(info.toString(), null);
             }
         },
@@ -420,7 +420,7 @@ final class MappingField {
                 TransferManager transfer = manager.getTransfer();
                 String setterType = getSetterType(manager);
                 String getterType = getGetterType(manager);
-                TransferInfo info = transfer.find(setterType, getterType);
+                TransferInfo info = transfer.findInAll(setterType, getterType);
                 return mapping.normalized(info.toString(), null);
             }
         }
@@ -991,7 +991,7 @@ final class MappingField {
                 String setterWrapped = getSetterType(manager);
                 String var = manager.staticForDefaultNumber();
                 String setterPrimitive = toPrimitiveType(setterWrapped);
-                String cast = isPrimitiveGt(setterPrimitive, INT) ? bracketed(INT) : "";
+                String cast = isPrimitiveLt(setterPrimitive, INT) ? bracketed(setterPrimitive) : "";
                 String t0 = "{setterType}.valueOf({cast}{var}.ordinal())";
                 t0 = Replacer.cast.replace(t0, cast);
                 return mapping.normalized(t0, var);
@@ -1013,7 +1013,6 @@ final class MappingField {
                 String t0 = "{setterType}.valueOf({cast}{var}.charValue())";
                 t0 = Replacer.cast.replace(t0, cast);
                 return mapping.normalized(t0, var);
-
             }
         },
         fromNumber {

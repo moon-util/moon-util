@@ -83,6 +83,12 @@ final class MapFieldFactory {
             manager.getMapping().withFinalPropertyType();
             field = doMappingField(manager);
         }
+        String mapped = MappingField.doMapping(manager);
+        if (mapped != null) {
+            Logger.warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Logger.warn(onDeclareCompleted(mapped, model));
+            Logger.warn(onDeclareCompleted(field, model));
+        }
         return onDeclareCompleted(field, model);
     }
 
