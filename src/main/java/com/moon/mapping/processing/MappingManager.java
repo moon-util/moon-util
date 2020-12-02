@@ -16,13 +16,9 @@ final class MappingManager {
 
     private PropertyType getType() { return type == null ? PropertyType.DECLARE : type; }
 
-    private void withPropertyType(PropertyType type) { this.type = type; }
+    public void withPropertyType(PropertyType type) { this.type = type; }
 
     final MappingModel getModel() { return model; }
-
-    public void withDeclarePropertyType() { withPropertyType(PropertyType.DECLARE); }
-
-    public void withFinalPropertyType() { withPropertyType(PropertyType.FINALLY); }
 
     public String getSetterType() { return getType().getSetterType(getModel()); }
 
@@ -33,32 +29,37 @@ final class MappingManager {
     }
 
     private String normalized(MappingModel model, String mapping, String defaultVal) {
-        return get(getType().getSetterType(model), getType().getGetterType(model), mapping, defaultVal);
+        boolean mandatory = model.isSetterGeneric() || model.isGetterGeneric();
+        return get(getType().getSetterType(model), getType().getGetterType(model), mapping, defaultVal, mandatory);
     }
 
-    public String get(String setterType, String getterType, String mapping, String defaultVal) {
+    public String get(String setterType, String getterType, String mapping, String defaultVal, boolean mandatory) {
         if (StringUtils.isPrimitive(getterType)) {
             if (StringUtils.isPrimitive(setterType)) {
-                return primitive2primitive(setterType, getterType, mapping, defaultVal);
+                return primitive2primitive(setterType, getterType, mapping, defaultVal, mandatory);
             } else {
-                return primitive2object(setterType, getterType, mapping, defaultVal);
+                return primitive2object(setterType, getterType, mapping, defaultVal, mandatory);
             }
         } else {
             if (StringUtils.isPrimitive(setterType)) {
-                return object2primitive(setterType, getterType, mapping, defaultVal);
+                return object2primitive(setterType, getterType, mapping, defaultVal, mandatory);
             } else {
-                return object2object(setterType, getterType, mapping, defaultVal);
+                return object2object(setterType, getterType, mapping, defaultVal, mandatory);
             }
         }
     }
 
 
-    private String primitive2primitive(String setterType, String getterType, String mapping, String defaultVal) {
-        return primitive2object(setterType, getterType, mapping, defaultVal);
+    private String primitive2primitive(
+        String setterType, String getterType, String mapping, String defaultVal, boolean mandatory
+    ) {
+        return primitive2object(setterType, getterType, mapping, defaultVal, mandatory);
     }
 
-    private String primitive2object(String setterType, String getterType, String mapping, String defaultVal) {
-        mapping = mapping == null ? "{var}" : mapping;
+    private String primitive2object(
+        String setterType, String getterType, String mapping, String defaultVal, boolean mandatory
+    ) {
+        mapping = formatMapping(mapping, mandatory);
         int count = StringUtils.count(mapping, "{var}");
         final String getValue = "{fromName}.{getterName}()";
         final String singletonVar = "{toName}.{setterName}({MAPPINGS});";
@@ -75,8 +76,10 @@ final class MappingManager {
         return doReplaceVariables(t0, setterType, getterType, mapping);
     }
 
-    private String object2object(String setterType, String getterType, String mapping, String defaultVal) {
-        mapping = mapping == null ? "{var}" : mapping;
+    private String object2object(
+        String setterType, String getterType, String mapping, String defaultVal, boolean mandatory
+    ) {
+        mapping = formatMapping(mapping, mandatory);
         @SuppressWarnings("all")
         final String nonDefaultVal;
         @SuppressWarnings("all")
@@ -103,7 +106,10 @@ final class MappingManager {
         return doReplaceVariables(setterType, getterType, mapping, defaultVal, nonDefaultVal, hasDefaultVal);
     }
 
-    private String object2primitive(String setterType, String getterType, String mapping, String defaultVal) {
+    private String object2primitive(
+        String setterType, String getterType, String mapping, String defaultVal, boolean mandatory
+    ) {
+        mapping = formatMapping(mapping, mandatory);
         @SuppressWarnings("all")
         final String nonDefaultVal = "" +//
             "{getterType} {var} = {fromName}.{getterName}();" +//
@@ -128,11 +134,18 @@ final class MappingManager {
         return doReplaceVariables(t0, setterType, getterType, mapping);
     }
 
+    private final static String CAST_2_SETTER_TYPE = "({setterType})";
+
     private String doReplaceVariables(
         String t0, String setterType, String getterType, String mapping
     ) {
-        t0 = Replacer.MAPPINGS.replace(t0, mapping == null ? "{var}" : mapping);
+        t0 = Replacer.MAPPINGS.replace(t0, mapping);
         t0 = Replacer.setterType.replace(t0, importManager.onImported(setterType));
         return Replacer.getterType.replace(t0, importManager.onImported(getterType));
+    }
+
+    private static String formatMapping(String mapping, boolean mandatory) {
+        mapping = mapping == null ? "{var}" : mapping;
+        return mandatory ? CAST_2_SETTER_TYPE + mapping : mapping;
     }
 }

@@ -196,6 +196,14 @@ abstract class DetectUtils {
         return false;
     }
 
+    static boolean isTypeofAny(String actual, String... expected) {
+        for (String aClass : expected) {
+            if (isTypeof(actual, aClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
     static boolean isTypeofAny(String actual, Class<?>... expected) {
         for (Class<?> aClass : expected) {
             if (isTypeof(actual, aClass)) {

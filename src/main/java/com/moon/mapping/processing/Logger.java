@@ -19,20 +19,12 @@ abstract class Logger {
 
     private final static LongAdder ADDER = new LongAdder();
 
-    static void warn(ProcessingEnvironment env, Object obj) {
-        warn(env.getMessager(), obj);
-    }
-
     static void warn(Messager messager, Object obj) {
         int idx = ADDER.intValue();
         ADDER.increment();
         StringBuilder builder = new StringBuilder().append(">> ").append(idx);
         builder.append(" : ").append(obj == null ? null : obj.toString());
         messager.printMessage(Diagnostic.Kind.WARNING, builder);
-    }
-
-    static void warn(ProcessingEnvironment env, String template, Object... values) {
-        warn(env.getMessager(), template, values);
     }
 
     static void warn(Messager messager, String template, Object... values) {

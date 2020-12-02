@@ -24,14 +24,14 @@ class SelectorTestTest {
 
     @Test
     void testSelect() throws Exception {
-        Selector.select()
-            .column(EmployeeDetail::getName)
-            .column(EmployeeDetail::getCreateDate)
-            .columns(EmployeeDetail::getCreateDate, EmployeeDetail::getName)
-            .columns(EmployeeDetail.class, NameGetter.class)
-            .from(EmployeeDetail.class)
-            .leftJoin(EmployeeDetail.class)
-            .on(EmployeeDetail::getName)
-            .eq(EmployeeDetail::getName);
+        // Selector.select()
+        //     .column(EmployeeDetail::getName)
+        //     .column(EmployeeDetail::getCreateDate)
+        //     .columns(EmployeeDetail::getCreateDate, EmployeeDetail::getName)
+        //     .columns(EmployeeDetail.class, NameGetter.class)
+        //     .from(EmployeeDetail.class)
+        //     .leftJoin(EmployeeDetail.class)
+        //     .on(EmployeeDetail::getName)
+        //     .eq(EmployeeDetail::getName);
     }
 }
