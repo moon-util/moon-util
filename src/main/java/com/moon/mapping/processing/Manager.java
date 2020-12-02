@@ -91,7 +91,7 @@ final class Manager {
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    public String staticForEnumValuesOnDeclare() {
+    public String staticForEnumValues() {
         return staticForEnumValues(setterType());
     }
 
@@ -155,7 +155,7 @@ final class Manager {
         return ofStatic().onString(defaultVal());
     }
 
-    public String staticForDefaultEnumOnDeclare() {
+    public String staticForDefaultEnumValue() {
         return doStaticVarForDefaultEnum(setterType());
     }
 

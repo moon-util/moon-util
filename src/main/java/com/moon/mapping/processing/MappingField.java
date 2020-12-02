@@ -16,6 +16,7 @@ import static com.moon.mapping.processing.StringUtils.*;
 /**
  * @author moonsky
  */
+@SuppressWarnings("all")
 final class MappingField {
 
     private final static Map<Predicate<String>, Class<? extends Mapper>> MAPPERS = new HashMap<>();
@@ -25,24 +26,35 @@ final class MappingField {
     private final static String INT = "int";
 
     static {
-        MAPPERS.put(type -> isTypeof(type, String.class), ToString.class);
-        MAPPERS.put(type -> isTypeof(type, Number.class), ToNumber.class);
-        MAPPERS.put(type -> isTypeof(type, BigInteger.class), ToBigInteger.class);
-        MAPPERS.put(type -> isTypeof(type, BigDecimal.class), ToBigDecimal.class);
-        MAPPERS.put(type -> isSubtypeOf(type, Date.class), ToUtilDate.class);
-        MAPPERS.put(type -> isSubtypeOf(type, Calendar.class), ToCalendar.class);
+        MAPPERS.put(DetectUtils::isEnum, ToEnum.class);
+
         MAPPERS.put(MappingField::isJdk8Date, ToJdk8Time.class);
         MAPPERS.put(MappingField::isJodaSpecialDate, ToJodaTime.class);
+
+        MAPPERS.put(StringUtils::isWrappedNumber, ToWrappedNumber.class);
+        MAPPERS.put(StringUtils::isPrimitiveNumber, ToPrimitiveNumber.class);
+
+        MAPPERS.put(type -> isTypeof(type, String.class), ToString.class);
+        MAPPERS.put(type -> isTypeof(type, Number.class), ToNumber.class);
+        MAPPERS.put(type -> isTypeof(type, Calendar.class), ToCalendar.class);
+        MAPPERS.put(type -> isTypeof(type, BigInteger.class), ToBigInteger.class);
+        MAPPERS.put(type -> isTypeof(type, BigDecimal.class), ToBigDecimal.class);
+
+        MAPPERS.put(type -> isSubtypeOf(type, Date.class), ToUtilDate.class);
+        MAPPERS.put(type -> isSubtypeOf(type, Calendar.class), ToCalendar.class);
+        MAPPERS.put(type -> isSubtypeOf(type, TemporalAccessor.class), ToJdk8TimeByString.class);
+
         MAPPERS.put(type -> isTypeofAny(type, long.class, Long.class), DateToLong.class);
         MAPPERS.put(type -> isTypeofAny(type, double.class, Double.class), DateToDouble.class);
         MAPPERS.put(type -> isTypeofAny(type, char.class, Character.class), ToCharValue.class);
         MAPPERS.put(type -> isTypeofAny(type, boolean.class, Boolean.class), ToBoolean.class);
-        MAPPERS.put(StringUtils::isWrappedNumber, ToWrappedNumber.class);
-        MAPPERS.put(StringUtils::isPrimitiveNumber, ToPrimitiveNumber.class);
-        MAPPERS.put(type -> isTypeof(type, Calendar.class), ToCalendar.class);
     }
 
     public static String doMapping(Manager manager) {
+        String mapping = doMappingIfAssignable(manager);
+        if (mapping != null) {
+            return mapping;
+        }
         for (Map.Entry<Predicate<String>, Class<? extends Mapper>> clsEntry : MAPPERS.entrySet()) {
             String setterType = getSetterType(manager);
             if (clsEntry.getKey().test(setterType)) {
@@ -52,6 +64,34 @@ final class MappingField {
                     }
                 }
             }
+        }
+        return null;
+    }
+
+    private static String doMappingIfAssignable(Manager manager) {
+        String setterType = getSetterType(manager);
+        String getterType = getGetterType(manager);
+        PropertyAttr attr = manager.getModel().getAttr();
+        String fmt = attr.formatValue(), dft = attr.defaultValue();
+
+        TransferManager transferManager = manager.getTransfer();
+        TransferInfo info = null;
+        if (dft != null) {
+            String[] types = {getterType, String.class.getCanonicalName(), String.class.getCanonicalName()};
+            info = transferManager.find(setterType, types);
+        }
+        if (info == null && fmt != null) {
+            info = transferManager.find(setterType, getterType, String.class.getCanonicalName());
+        }
+        if (info == null) {
+            info = transferManager.find(setterType, getterType);
+        }
+        if (info != null) {
+            // TODO
+        }
+
+        if (fmt == null && dft == null && isSubtypeOf(getterType, setterType)) {
+            return manager.getMapping().normalized(null, null);
         }
         return null;
     }
@@ -267,9 +307,7 @@ final class MappingField {
             public String doMapping(Manager mgr) {
                 MappingManager mapping = mgr.getMapping();
                 TransferManager transfer = mgr.getTransfer();
-                String getterType = getGetterType(mgr);
-                String returnType = mapping.getSetterType();
-                TransferInfo info = transfer.findInAll(returnType, getterType);
+                TransferInfo info = getBasicTransfer(mgr);
                 return mapping.normalized(info.toString(), null);
             }
         },
@@ -303,21 +341,18 @@ final class MappingField {
             @Override
             public String doMapping(Manager mgr) {
                 MappingManager mapping = mgr.getMapping();
-                String getterType = mapping.getGetterType();
-                String setterType = getSetterType(mgr);
                 TransferManager transfer = mgr.getTransfer();
-                TransferInfo info = transfer.findInAll(setterType, getterType);
+                TransferInfo info = getBasicTransfer(mgr);
                 return mgr.getMapping().normalized(info.toString(), null);
             }
         }
     }
 
-    private enum ToJdk8Time implements Mapper {
+    private enum ToJdk8TimeByString implements Mapper {
         fromString {
             @Override
             public boolean support(Manager manager) {
-                return isGetterTypeOf(manager, String.class)//
-                    && isSubtypeOf(getSetterType(manager), TemporalAccessor.class);
+                return isGetterTypeOf(manager, String.class);
             }
 
             @Override
@@ -334,7 +369,10 @@ final class MappingField {
                     return mapping.normalized(mapper, null);
                 }
             }
-        },
+        }
+    }
+
+    private enum ToJdk8Time implements Mapper {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
@@ -355,23 +393,13 @@ final class MappingField {
         fromJdk8Date {
             @Override
             public boolean support(Manager manager) {
-                return isJdk8Date(getGetterType(manager));
+                return getBasicTransfer(manager) != null;
             }
 
             @Override
             public String doMapping(Manager manager) {
                 MappingManager mapping = manager.getMapping();
-                TransferManager transfer = manager.getTransfer();
-                String setterType = getSetterType(manager);
-                String getterType = getGetterType(manager);
-                TransferInfo info = transfer.findInAll(setterType, getterType);
-                if (info == null) {
-                    if (Objects.equals(setterType, getterType)) {
-                        return mapping.normalized(null, null);
-                    }
-                    return null;
-                }
-                return mapping.normalized(info.toString(), null);
+                return mapping.normalized(getBasicTransfer(manager).toString(), null);
             }
         },
         fromNumber {
@@ -444,9 +472,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 MappingManager mapping = manager.getMapping();
                 TransferManager transfer = manager.getTransfer();
-                String setterType = getSetterType(manager);
-                String getterType = getGetterType(manager);
-                TransferInfo info = transfer.findInAll(setterType, getterType);
+                TransferInfo info = getBasicTransfer(manager);
                 return mapping.normalized(info.toString(), null);
             }
         }
@@ -557,6 +583,19 @@ final class MappingField {
                 return manager.getMapping().normalized(mapper, var);
             }
         },
+        fromEnum {
+            @Override
+            public boolean support(Manager manager) {
+                return isEnum(getGetterType(manager));
+            }
+
+            @Override
+            public String doMapping(Manager manager) {
+                String var = manager.staticForDefaultBigInteger();
+                String mapper = "{setterType}.valueOf({var}.ordinal())";
+                return manager.getMapping().normalized(mapper, var);
+            }
+        },
         fromNumber {
             @Override
             public boolean support(Manager manager) {
@@ -617,6 +656,19 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 String var = manager.staticForDefaultBigDecimal();
                 return mapping.normalized("new {setterType}({var})", var);
+            }
+        },
+        fromEnum {
+            @Override
+            public boolean support(Manager manager) {
+                return isEnum(getGetterType(manager));
+            }
+
+            @Override
+            public String doMapping(Manager manager) {
+                String var = manager.staticForDefaultBigDecimal();
+                String mapper = "{setterType}.valueOf({var}.ordinal())";
+                return manager.getMapping().normalized(mapper, var);
             }
         },
         fromPrimitiveNumber {
@@ -1019,7 +1071,7 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isWrappedNumber(getGetterType(manager));
+                return isPrimitiveNumber(getGetterType(manager));
             }
 
             @Override
@@ -1151,6 +1203,55 @@ final class MappingField {
         }
     }
 
+    private enum ToEnum implements Mapper {
+        fromPrimitiveNumber {
+            @Override
+            public boolean support(Manager manager) {
+                return isPrimitiveNumber(getGetterType(manager));
+            }
+
+            @Override
+            public String doMapping(Manager manager) {
+                String getterType = getGetterType(manager);
+                String cast = isPrimitiveGt(getterType, INT) ? "(int)" : "";
+                String dftValue = manager.staticForDefaultEnumValue();
+                String values = manager.staticForEnumValues();
+                String mapper = "{value}[{cast}{var}]";
+                mapper = Replacer.cast.replace(mapper, cast);
+                mapper = Replacer.value.replace(mapper, values);
+                return manager.getMapping().normalized(mapper, dftValue);
+            }
+        },
+        fromNumber {
+            @Override
+            public boolean support(Manager manager) {
+                return isSubtypeOf(getGetterType(manager), Number.class);
+            }
+
+            @Override
+            public String doMapping(Manager manager) {
+                String dftValue = manager.staticForDefaultEnumValue();
+                String values = manager.staticForEnumValues();
+                String mapper = "{value}[{var}.intValue()]";
+                mapper = Replacer.value.replace(mapper, values);
+                return manager.getMapping().normalized(mapper, dftValue);
+            }
+        },
+        fromString {
+            @Override
+            public boolean support(Manager manager) {
+                return isTypeof(getGetterType(manager), String.class);
+            }
+
+            @Override
+            public String doMapping(Manager manager) {
+                String dftValue = manager.staticForDefaultEnumValue();
+                String mapper = "{setterType}.valueOf({var})";
+                return manager.getMapping().normalized(mapper, dftValue);
+            }
+        },
+    }
+
     private enum ToPrimitiveNumber implements Mapper {
         fromPrimitiveNumber {
             @Override
@@ -1224,7 +1325,7 @@ final class MappingField {
         fromEnum {
             @Override
             public boolean support(Manager manager) {
-                return isGetterSubtypeOf(manager, Enum.class);
+                return isEnum(getGetterType(manager));
             }
 
             @Override
@@ -1422,6 +1523,14 @@ final class MappingField {
         }
     }
 
+
+    private static TransferInfo getBasicTransfer(Manager manager) {
+        String setterType = getSetterType(manager);
+        String getterType = getGetterType(manager);
+        TransferManager transfer = manager.getTransfer();
+        return transfer.findInAll(setterType, getterType);
+    }
+
     private static TransferInfo findFormatter(Manager manager, String setterType, String getterType) {
         TransferManager transfer = manager.getTransfer();
         String stringType = String.class.getCanonicalName();
@@ -1445,24 +1554,15 @@ final class MappingField {
     }
 
     private static boolean isJodaSpecialDate(String type) {
-        return Imported.JODA_TIME && isTypeofAny(type,
-            MutableDateTime.class,
-            DateTime.class,
-            LocalDateTime.class,
-            LocalDate.class,
-            LocalTime.class,
-            YearMonth.class,
-            Instant.class,
-            MonthDay.class);
+        return Imported.JODA_TIME &&
+            isTypeofAny(type, MutableDateTime.class, DateTime.class, LocalDateTime.class, LocalDate.class,
+                LocalTime.class, YearMonth.class, Instant.class, MonthDay.class);
     }
 
     private static boolean isJdk8Date(String type) {
-        return isTypeofAny(type,
-            java.time.LocalDateTime.class,
-            java.time.ZonedDateTime.class,
-            java.time.OffsetDateTime.class,
-            java.time.Instant.class,
-            java.time.LocalDate.class);
+        return isTypeofAny(type, java.time.LocalDateTime.class, java.time.ZonedDateTime.class,
+            java.time.OffsetDateTime.class, java.time.Instant.class, java.time.LocalDate.class,
+            java.time.LocalTime.class);
     }
 
     private static String getGetterType(Manager manager) {

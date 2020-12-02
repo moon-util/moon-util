@@ -49,18 +49,6 @@ final class TransferManager {
         convertsOfAll.add(0, load(importManager, classname));
     }
 
-    public TransferInfo findBuiltIn(Class<?> returnType, Class<?>... getterTypes) {
-        return findBuiltIn(toTypedKey(returnType.getCanonicalName(), getterTypes));
-    }
-
-    public TransferInfo findBuiltIn(String returnType, Class<?>... getterTypes) {
-        return findBuiltIn(toTypedKey(returnType, getterTypes));
-    }
-
-    public TransferInfo findBuiltIn(String returnType, String... getterTypes) {
-        return findBuiltIn(toTypedKey(returnType, getterTypes));
-    }
-
     public TransferInfo find(Class<?> returnType, Class<?>... getterTypes) {
         return find(toTypedKey(returnType.getCanonicalName(), getterTypes));
     }
@@ -93,8 +81,7 @@ final class TransferManager {
     private TransferInfo findBuiltIn(String key) { return this.builtIn.get(key); }
 
     private TransferInfo find(String key) {
-        List<Map<String, TransferInfo>> list = this.convertsOfAll;
-        for (Map<String, TransferInfo> transferInfoMap : list) {
+        for (Map<String, TransferInfo> transferInfoMap : this.convertsOfAll) {
             TransferInfo info = transferInfoMap.get(key);
             if (info != null) {
                 return info;
@@ -105,8 +92,8 @@ final class TransferManager {
 
     private static Map<String, TransferInfo> load(ImportManager importManager, String... classnames) {
         Map<String, TransferInfo> converts = new HashMap<>();
-        for (int i = 0; i < classnames.length; i++) {
-            load(converts, importManager, classnames[i]);
+        for (String classname : classnames) {
+            load(converts, importManager, classname);
         }
         return converts;
     }
