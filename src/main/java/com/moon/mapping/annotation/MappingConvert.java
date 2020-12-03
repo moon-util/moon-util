@@ -1,5 +1,6 @@
 package com.moon.mapping.annotation;
 
+import java.beans.Introspector;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,4 +41,24 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-@interface MappingConvert {}
+@interface MappingConvert {
+
+    /**
+     * 重载方法将要被截取的部分，如：
+     * <p>
+     * public void setUsername(String username) {}
+     * <p>
+     * 接取后，再执行{@link Introspector#decapitalize(String)}
+     * 将首字母小写，得到的就是对应的字段名{@code username}
+     *
+     * @return 将要接取的前缀，默认是{@code setter}重载，也可自定义任意前缀
+     */
+    String prefix() default "set";
+
+    /**
+     * 从哪个类向当前属性映射时执行的转换，默认任意类
+     *
+     * @return 类名
+     */
+    Class<?> fromClass() default void.class;
+}

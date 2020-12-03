@@ -9,6 +9,7 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import java.util.Set;
 
 import static com.moon.mapping.processing.ElemUtils.getQualifiedName;
@@ -35,7 +36,7 @@ abstract class DetectUtils {
         if (isElemKind(element, ElementKind.INTERFACE)) {
             throw new IllegalStateException("不能映射接口: " + getQualifiedName(element));
         }
-        if (isElemKind(element, ENUM)) {
+        if (isEnum(element)) {
             throw new IllegalStateException("不能映射枚举类: " + getQualifiedName(element));
         }
         if (isAny(element, Modifier.ABSTRACT)) {
@@ -85,11 +86,7 @@ abstract class DetectUtils {
     }
 
     static boolean isEnum(String value) {
-        if (value == null) {
-            return false;
-        }
-        TypeElement elem = EnvUtils.getUtils().getTypeElement(value);
-        return elem != null && elem.getKind() == ElementKind.ENUM;
+        return value != null && isEnum(EnvUtils.getUtils().getTypeElement(value));
     }
 
     static boolean isPublic(Element elem) { return isAny(elem, Modifier.PUBLIC); }
@@ -100,7 +97,9 @@ abstract class DetectUtils {
         return elem instanceof ExecutableElement && isElemKind(elem, METHOD);
     }
 
-    static boolean isNotEnum(Element elem) { return !isElemKind(elem, ENUM); }
+    static boolean isEnum(Element elem) { return isElemKind(elem, ENUM); }
+
+    static boolean isNotEnum(Element elem) { return !isEnum(elem); }
 
     static boolean isField(Element elem) {
         return elem instanceof VariableElement && isElemKind(elem, FIELD);
@@ -204,6 +203,7 @@ abstract class DetectUtils {
         }
         return false;
     }
+
     static boolean isTypeofAny(String actual, Class<?>... expected) {
         for (Class<?> aClass : expected) {
             if (isTypeof(actual, aClass)) {
@@ -230,8 +230,11 @@ abstract class DetectUtils {
             return false;
         }
         Elements utils = EnvUtils.getUtils();
-        TypeElement elem1 = utils.getTypeElement(actualType);
-        TypeElement elem2 = utils.getTypeElement(superClass);
-        return elem1 != null && elem2 != null && EnvUtils.getTypes().isSubtype(elem1.asType(), elem2.asType());
+        return isSubtypeOf(utils.getTypeElement(actualType), utils.getTypeElement(superClass));
+    }
+
+    static boolean isSubtypeOf(TypeElement elem1, TypeElement elem2) {
+        Types types = EnvUtils.getTypes();
+        return elem1 != null && elem2 != null && types.isSubtype(elem1.asType(), elem2.asType());
     }
 }

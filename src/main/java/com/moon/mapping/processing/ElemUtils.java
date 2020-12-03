@@ -61,7 +61,7 @@ abstract class ElemUtils {
         } while (true);
     }
 
-    public static Element findEnumIndexOf(String classname, int index) {
+    public static Element findEnumAt(String classname, int index) {
         TypeElement elem = EnvUtils.getUtils().getTypeElement(classname);
         if (elem == null) {
             return null;
@@ -79,7 +79,7 @@ abstract class ElemUtils {
         return null;
     }
 
-    public static Element findEnumNameOf(String classname, String name) {
+    public static Element findEnumAs(String classname, String name) {
         TypeElement elem = EnvUtils.getUtils().getTypeElement(classname);
         if (elem == null) {
             return null;

@@ -144,9 +144,8 @@ public class LocalStorage<T> implements Storage<String, T> {
     public void set(String key, T value, boolean forceCache) {
         if (isPlaceholder(value)) {
             remove(key);
-            return;
         } else {
-            doStorage(key, value, false);
+            doStorage(key, value, forceCache);
         }
     }
 

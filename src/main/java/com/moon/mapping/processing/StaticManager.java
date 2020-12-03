@@ -223,7 +223,7 @@ public class StaticManager {
         if (varName != null) {
             return varName;
         }
-        Element enumConst = ElemUtils.findEnumIndexOf(enumClassname, idx);
+        Element enumConst = ElemUtils.findEnumAt(enumClassname, idx);
         if (enumConst == null) {
             Logger.printWarn("【已忽略默认值】{} 不存在第 '{}' 个枚举项", enumClassname, index);
             return null;
@@ -247,7 +247,7 @@ public class StaticManager {
         if (varName != null) {
             return varName;
         }
-        Element enumConst = ElemUtils.findEnumNameOf(enumClassname, name);
+        Element enumConst = ElemUtils.findEnumAs(enumClassname, name);
         if (enumConst == null) {
             Logger.printWarn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
             return null;
