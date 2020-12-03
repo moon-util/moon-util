@@ -33,32 +33,28 @@ final class Manager {
     private final ImportManager importManager;
     private final StaticManager staticManager;
     private final MappingManager mappingManager;
-    private final TransferManager transferManager;
-    private final ConvertManager convertManager;
+    private final CallerManager callerManager;
 
     public Manager() {
         final MappingModel model = new MappingModel();
         final ImportManager importManager = new ImportManager();
         final StaticManager staticManager = new StaticManager(importManager);
         final MappingManager mappingManager = new MappingManager(model, importManager);
-        this.transferManager = new TransferManager(importManager);
-        this.convertManager = new ConvertManager(importManager);
+        this.callerManager = new CallerManager(importManager);
         this.mappingManager = mappingManager;
         this.importManager = importManager;
         this.staticManager = staticManager;
     }
 
-    public boolean canUsableModel(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
+    public boolean isModelUsable(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
         return getModel().onConvert(thisProp, thatProp, attr, strategy).isUsable();
     }
 
     public MappingModel getModel() { return getMapping().getModel(); }
 
-    public TransferManager getTransfer() { return transferManager; }
+    public CallerManager getCaller() { return callerManager; }
 
     public MappingManager getMapping() { return mappingManager; }
-
-    public ConvertManager ofConvert() { return convertManager; }
 
     private StaticManager ofStatic() { return staticManager; }
 

@@ -7,9 +7,9 @@ import java.util.Objects;
 /**
  * @author benshaoye
  */
-abstract class ElementUtils {
+abstract class ElemUtils {
 
-    private ElementUtils() {}
+    private ElemUtils() {}
 
     public static String getFieldDeclareType(VariableElement elem) {
         return stringifyTypeMirror(elem.asType());
@@ -27,7 +27,7 @@ abstract class ElementUtils {
         Element typeElem = EnvUtils.getTypes().asElement(type);
         @SuppressWarnings("all")//
         String declareType = typeElem instanceof QualifiedNameable//
-                             ? ElementUtils.getQualifiedName((QualifiedNameable) typeElem) //
+                             ? ElemUtils.getQualifiedName((QualifiedNameable) typeElem) //
                              : (typeElem == null ? type.toString() : typeElem.toString());
         return declareType;
     }

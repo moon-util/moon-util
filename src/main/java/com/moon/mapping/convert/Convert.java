@@ -14,7 +14,7 @@ import java.util.Date;
 import static java.time.ZoneId.systemDefault;
 
 /**
- * 数据转换器：此转始终使用系统默认格式，且不对任何数据进行空指针判断
+ * 数据转换器不对任何数据进行空指针判断
  *
  * @author benshaoye
  * @see JodaConvert

@@ -83,7 +83,7 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
     public TypeElement getEnclosingElement() { return enclosingElement; }
 
     public String getEnclosingElementName() {
-        return ElementUtils.getQualifiedName(getEnclosingElement());
+        return ElemUtils.getQualifiedName(getEnclosingElement());
     }
 
     public void addSetterMethod(M setter) { ensureSetterArr().add(setter); }

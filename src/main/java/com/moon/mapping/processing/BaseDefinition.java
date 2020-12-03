@@ -44,7 +44,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     public final MapFieldFactory getFieldFactory() { return fieldFactory; }
 
     @Override
-    public final String getCanonicalName() { return ElementUtils.getQualifiedName(getThisElement()); }
+    public final String getCanonicalName() { return ElemUtils.getQualifiedName(getThisElement()); }
 
     final void addFieldAttr(String name, PropertyAttr attr) {
         getFieldAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);
@@ -69,7 +69,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
      *
      * @return 包名
      */
-    public final String getPackageName() { return ElementUtils.getPackageName(getThisElement()); }
+    public final String getPackageName() { return ElemUtils.getPackageName(getThisElement()); }
 
     /**
      * {@link #getThisElement()}的类名，如果是内部类，也只返回最后一部分
@@ -77,14 +77,14 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
      * @return
      */
     @Override
-    public final String getSimpleName() { return ElementUtils.getSimpleName(getThisElement()); }
+    public final String getSimpleName() { return ElemUtils.getSimpleName(getThisElement()); }
 
     /**
      * {@link #getThisElement()}的完整合法名称
      *
      * @return
      */
-    public final String getQualifiedName() { return ElementUtils.getQualifiedName(getThisElement()); }
+    public final String getQualifiedName() { return ElemUtils.getQualifiedName(getThisElement()); }
 
     @Override
     public void onCompleted() { forEach((name, prop) -> prop.onCompleted()); }
@@ -148,7 +148,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
             }
             String targetName = attr.getField(thisProp.getName());
             Mappable thatProp = (Mappable) thatDef.get(targetName);
-            if (manager.canUsableModel(thisProp, thatProp, attr, strategy)) {
+            if (manager.isModelUsable(thisProp, thatProp, attr, strategy)) {
                 return getFieldFactory().doConvertField(manager);
             }
             return null;

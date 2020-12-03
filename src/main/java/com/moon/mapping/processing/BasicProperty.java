@@ -33,23 +33,23 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
 
     @Override
     public String getThisClassname() {
-        return ElementUtils.getQualifiedName(thisElement);
+        return ElemUtils.getQualifiedName(thisElement);
     }
 
     public void setField(VariableElement field, Map<String, GenericModel> genericMap) {
         this.field = field;
-        String declareType = ElementUtils.getFieldDeclareType(field);
+        String declareType = ElemUtils.getFieldDeclareType(field);
         setDeclareType(declareType);
         setActualType(findActualType(genericMap, declareType));
     }
 
     public void setSetter(ExecutableElement setter, Map<String, GenericModel> genericMap) {
-        String declareType = ElementUtils.getSetterDeclareType(setter);
+        String declareType = ElemUtils.getSetterDeclareType(setter);
         addSetterMethod(toMethod(declareType, setter, genericMap));
     }
 
     public void setGetter(ExecutableElement getter, Map<String, GenericModel> genericMap) {
-        String declareType = ElementUtils.getGetterDeclareType(getter);
+        String declareType = ElemUtils.getGetterDeclareType(getter);
         addGetterMethod(toMethod(declareType, getter, genericMap));
     }
 

@@ -49,10 +49,6 @@ final class MappingModel {
         return hasGetter && hasSetter;
     }
 
-    public boolean hasAnnotatedMapProperty() { return attr != PropertyAttr.DFT; }
-
-    public boolean nonAnnotatedMapProperty() { return attr == PropertyAttr.DFT; }
-
     public Mappable getFromProp() { return fromProp; }
 
     public Mappable getToProp() { return toProp; }

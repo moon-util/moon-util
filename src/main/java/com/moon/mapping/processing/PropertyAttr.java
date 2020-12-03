@@ -13,18 +13,18 @@ class PropertyAttr {
 
     private final String targetCls;
     private final String field;
-    private final IgnoreMode ignoreType;
+    private final IgnoreMode ignoreMode;
     private final String format;
     private final String defaultValue;
 
     PropertyAttr(
-        String targetCls, String field, String format, String defaultValue, IgnoreMode ignoreType
+        String targetCls, String field, String format, String defaultValue, IgnoreMode ignoreMode
     ) {
         this.field = StringUtils.isBlank(field) ? null : field.trim();
         this.format = StringUtils.isBlank(format) ? null : format;
         this.defaultValue = StringUtils.isEmpty(defaultValue) ? null : defaultValue;
         this.targetCls = targetCls == null ? null : defaultTargetCls(targetCls);
-        this.ignoreType = ignoreType;
+        this.ignoreMode = ignoreMode;
     }
 
     private static String defaultTargetCls(String cls) {
@@ -38,11 +38,11 @@ class PropertyAttr {
     }
 
     public boolean isIgnoreForward() {
-        return ignoreType == ALL || ignoreType == FORWARD;
+        return ignoreMode == ALL || ignoreMode == FORWARD;
     }
 
     public boolean isIgnoreBackward() {
-        return ignoreType == ALL || ignoreType == BACKWARD;
+        return ignoreMode == ALL || ignoreMode == BACKWARD;
     }
 
     public String formatValue() { return format; }

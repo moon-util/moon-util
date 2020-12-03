@@ -20,12 +20,12 @@ final class NameGenerator {
     public NameGenerator() { }
 
     public NameGenerator atFromClass(String thisClass) {
-        this.thisSimpleName = ElementUtils.getSimpleName(thisClass);
+        this.thisSimpleName = ElemUtils.getSimpleName(thisClass);
         return this;
     }
 
     public String get(String targetClass) {
-        String thatSimpleName = ElementUtils.getSimpleName(targetClass);
+        String thatSimpleName = ElemUtils.getSimpleName(targetClass);
         final StringBuilder builder = defaultName(new StringBuilder(), thatSimpleName);
         String beanName = builder.toString();
         // 保证 bean name 的唯一性

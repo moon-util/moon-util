@@ -11,7 +11,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import java.util.Set;
 
-import static com.moon.mapping.processing.ElementUtils.getQualifiedName;
+import static com.moon.mapping.processing.ElemUtils.getQualifiedName;
 import static javax.lang.model.element.ElementKind.*;
 
 /**

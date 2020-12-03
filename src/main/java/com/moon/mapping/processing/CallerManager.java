@@ -17,19 +17,19 @@ import static com.moon.mapping.processing.StringUtils.getClassnamesOrEmpty;
 /**
  * @author moonsky
  */
-final class TransferManager {
+final class CallerManager {
 
-    private final List<Map<String, TransferInfo>> convertsOfAll = new ArrayList<>();
+    private final List<Map<String, CallerInfo>> convertsOfAll = new ArrayList<>();
 
-    private final Map<String, TransferInfo> builtIn = new HashMap<>();
+    private final Map<String, CallerInfo> builtIn = new HashMap<>();
 
     private final ImportManager importManager;
 
-    public TransferManager(ImportManager importManager, Class<?>... transfers) {
+    public CallerManager(ImportManager importManager, Class<?>... transfers) {
         this(importManager, null, getClassnamesOrEmpty(transfers));
     }
 
-    public TransferManager(ImportManager importManager, String classname, String... transfers) {
+    public CallerManager(ImportManager importManager, String classname, String... transfers) {
         this.importManager = importManager;
         String[] names = getClassnamesOrEmpty(JodaConvert.class, Convert.class);
         for (String name : names) {
@@ -41,7 +41,7 @@ final class TransferManager {
         }
     }
 
-    private void loadConverter(Map<String, TransferInfo> transfers, String classname) {
+    private void loadConverter(Map<String, CallerInfo> transfers, String classname) {
         load(transfers, importManager, classname);
     }
 
@@ -49,40 +49,40 @@ final class TransferManager {
         convertsOfAll.add(0, load(importManager, classname));
     }
 
-    public TransferInfo find(Class<?> returnType, Class<?>... getterTypes) {
+    public CallerInfo find(Class<?> returnType, Class<?>... getterTypes) {
         return find(toTypedKey(returnType.getCanonicalName(), getterTypes));
     }
 
-    public TransferInfo find(String returnType, Class<?>... getterTypes) {
+    public CallerInfo find(String returnType, Class<?>... getterTypes) {
         return find(toTypedKey(returnType, getterTypes));
     }
 
-    public TransferInfo find(String returnType, String... getterTypes) {
+    public CallerInfo find(String returnType, String... getterTypes) {
         return find(toTypedKey(returnType, getterTypes));
     }
 
-    public TransferInfo findInAll(Class<?> returnType, Class<?>... getterTypes) {
+    public CallerInfo findInAll(Class<?> returnType, Class<?>... getterTypes) {
         return findInAll(toTypedKey(returnType.getCanonicalName(), getterTypes));
     }
 
-    public TransferInfo findInAll(String returnType, Class<?>... getterTypes) {
+    public CallerInfo findInAll(String returnType, Class<?>... getterTypes) {
         return findInAll(toTypedKey(returnType, getterTypes));
     }
 
-    public TransferInfo findInAll(String returnType, String... getterTypes) {
+    public CallerInfo findInAll(String returnType, String... getterTypes) {
         return findInAll(toTypedKey(returnType, getterTypes));
     }
 
-    private TransferInfo findInAll(String key) {
-        TransferInfo info = find(key);
+    private CallerInfo findInAll(String key) {
+        CallerInfo info = find(key);
         return info == null ? findBuiltIn(key) : info;
     }
 
-    private TransferInfo findBuiltIn(String key) { return this.builtIn.get(key); }
+    private CallerInfo findBuiltIn(String key) { return this.builtIn.get(key); }
 
-    private TransferInfo find(String key) {
-        for (Map<String, TransferInfo> transferInfoMap : this.convertsOfAll) {
-            TransferInfo info = transferInfoMap.get(key);
+    private CallerInfo find(String key) {
+        for (Map<String, CallerInfo> transferInfoMap : this.convertsOfAll) {
+            CallerInfo info = transferInfoMap.get(key);
             if (info != null) {
                 return info;
             }
@@ -90,15 +90,15 @@ final class TransferManager {
         return null;
     }
 
-    private static Map<String, TransferInfo> load(ImportManager importManager, String... classnames) {
-        Map<String, TransferInfo> converts = new HashMap<>();
+    private static Map<String, CallerInfo> load(ImportManager importManager, String... classnames) {
+        Map<String, CallerInfo> converts = new HashMap<>();
         for (String classname : classnames) {
             load(converts, importManager, classname);
         }
         return converts;
     }
 
-    private static void load(Map<String, TransferInfo> converts, ImportManager importManager, String classname) {
+    private static void load(Map<String, CallerInfo> converts, ImportManager importManager, String classname) {
         if (classname == null) {
             return;
         }
@@ -113,9 +113,9 @@ final class TransferManager {
                     .stream()
                     .map(var -> var.asType().toString().replaceAll("[^\\w\\d.]", ""))
                     .collect(Collectors.toList());
-                String methodName = ElementUtils.getSimpleName(convert);
+                String methodName = ElemUtils.getSimpleName(convert);
                 String returnType = convert.getReturnType().toString();
-                TransferInfo info = new TransferInfo(importManager, classname, methodName, params);
+                CallerInfo info = new CallerInfo(importManager, classname, methodName, params);
                 converts.put(toTypedKey(returnType, params), info);
             }
         }

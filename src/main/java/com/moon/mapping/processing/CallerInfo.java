@@ -1,52 +1,74 @@
 package com.moon.mapping.processing;
 
+import java.util.List;
+
+import static com.moon.mapping.processing.StringUtils.bracketed;
+
 /**
  * @author moonsky
  */
 final class CallerInfo {
 
+    private final ImportManager importManager;
     /**
-     * 形如: UnsafeConvert.toCalendar
+     * 类全名
      */
     private final String caller;
     /**
-     * 形如: ({var})、({var}, {var0})、({var}, {var0}, {var1}) 等
+     * 方法名
      */
-    private final String params;
+    private final String method;
 
-    private final String types;
+    private final String[] parametersType;
 
-    public CallerInfo(String caller, String params, String types) {
+    public CallerInfo(
+        ImportManager importManager, String caller, String method, List<String> parametersType
+    ) {
+        this.parametersType = parametersType.toArray(new String[parametersType.size()]);
+        this.importManager = importManager;
         this.caller = caller;
-        this.params = params;
-        this.types = types;
+        this.method = method;
     }
 
-    public String getCaller() { return caller; }
+    private String getCallerMethod() {
+        String clsName = importManager.onImported(this.caller);
+        return String.join(".", clsName, this.method);
+    }
 
-    public String getParams() { return params; }
+    private String getVarName(int index) {
+        return index > 0 ? ("{var" + (index) + "}") : "{var}";
+    }
 
-    public String formatParams(String first, String... params) {
-        final String var = "var";
-        String t0 = getParams();
-        if (first != null) {
-            t0 = Replacer.var.replace(t0, first);
-        }
-        if (params != null) {
-            for (int i = 0; i < params.length; i++) {
-                String indexedP = params[i];
-                if (indexedP != null) {
-                    t0 = t0.replaceAll("\\{" + (var + i) + "\\}", indexedP);
-                }
+    public String toString(String... varsName) {
+        String[] vars = new String[parametersType.length];
+        final int l1 = vars.length, l2 = varsName.length;
+        if (l2 < l1) {
+            int index = 0;
+            for (; index < l2; index++) {
+                String name = varsName[index];
+                vars[index] = name == null ? getVarName(index) : name;
+            }
+            for (; index < l1; index++) {
+                vars[index] = getVarName(index);
+            }
+        } else {
+            for (int i = 0; i < l1; i++) {
+                String name = varsName[i];
+                vars[i] = name == null ? getVarName(i) : name;
             }
         }
-        return t0;
-    }
-
-    public String toString(String first, String... params) {
-        return getCaller() + formatParams(first, params);
+        String args = bracketed(String.join(",", vars));
+        return getCallerMethod() + args;
     }
 
     @Override
-    public String toString() { return getCaller() + getParams(); }
+    public String toString() {
+        String[] params = this.parametersType;
+        String[] vars = new String[params.length];
+        for (int i = 0; i < params.length; i++) {
+            vars[i] = getVarName(i);
+        }
+        String args = bracketed(String.join(",", vars));
+        return getCallerMethod() + args;
+    }
 }

@@ -19,6 +19,6 @@ interface CanonicalNameable {
      * @return
      */
     default String getSimpleName() {
-        return ElementUtils.getSimpleName(getCanonicalName());
+        return ElemUtils.getSimpleName(getCanonicalName());
     }
 }

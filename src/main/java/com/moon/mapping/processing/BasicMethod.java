@@ -13,7 +13,7 @@ class BasicMethod extends BaseMethod {
     private final ExecutableElement elem;
 
     public BasicMethod(ExecutableElement element, String declareType, String actualType, boolean declaration) {
-        super(ElementUtils.getSimpleName(element), declareType, actualType, declaration);
+        super(ElemUtils.getSimpleName(element), declareType, actualType, declaration);
         this.elem = element;
     }
 

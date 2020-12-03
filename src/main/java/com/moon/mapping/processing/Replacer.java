@@ -28,11 +28,11 @@ public enum Replacer {
     modifiers,
     thisName {
         @Override
-        String toReplacement(String value) { return ElementUtils.getSimpleName(value); }
+        String toReplacement(String value) { return ElemUtils.getSimpleName(value); }
     },
     thatName {
         @Override
-        String toReplacement(String value) { return ElementUtils.getSimpleName(value); }
+        String toReplacement(String value) { return ElemUtils.getSimpleName(value); }
     },
     ;
 

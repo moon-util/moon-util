@@ -31,7 +31,7 @@ public class Mappings {
         try {
             return (BeanMapping) valueOf(toEnumCls(cls1), "TO_" + under(cls2));
         } catch (Throwable e) {
-            throw new NoSuchMappingException(clsName(cls1), cls2);
+            throw new NoSuchMappingException(clsName(cls1), cls2, e);
         }
     }
 

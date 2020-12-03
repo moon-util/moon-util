@@ -22,7 +22,7 @@ public class MappingProcessor extends AbstractProcessor {
     private final static String SUPPORTED_TYPE = MappingFor.class.getName();
 
     @Override
-    public SourceVersion getSupportedSourceVersion() { return SourceVersion.RELEASE_8; }
+    public SourceVersion getSupportedSourceVersion() { return SourceVersion.latestSupported(); }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {

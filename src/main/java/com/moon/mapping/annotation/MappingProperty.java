@@ -3,14 +3,14 @@ package com.moon.mapping.annotation;
 import java.lang.annotation.*;
 
 /**
- * 映射属性, 只能注解在 getter/setter/field 上
+ * 映射属性, 注解在 getter/setter/field 上
  *
  * @author moonsky
  */
-@Repeatable(MapProperty.List.class)
+@Repeatable(MappingProperty.List.class)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface MapProperty {
+public @interface MappingProperty {
 
     /**
      * 指定映射为{@link #target()}类里的字段
@@ -52,9 +52,9 @@ public @interface MapProperty {
     String defaultValue() default "";
 
     /**
-     * 是否忽略这个字段的映射
+     * 忽略模式
      *
-     * @return 当返回值为 true 时，会忽略这个字段到目标的映射
+     * @return 当返回不同值时，觉得字段之间是否忽略映射，具体参考{@link IgnoreMode}
      */
     IgnoreMode ignore() default IgnoreMode.NONE;
 
@@ -62,6 +62,6 @@ public @interface MapProperty {
     @Retention(RetentionPolicy.SOURCE)
     @interface List {
 
-        MapProperty[] value() default {};
+        MappingProperty[] value() default {};
     }
 }

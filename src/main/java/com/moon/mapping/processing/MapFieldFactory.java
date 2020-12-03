@@ -2,7 +2,7 @@ package com.moon.mapping.processing;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.moon.mapping.processing.ElementUtils.getSimpleName;
+import static com.moon.mapping.processing.ElemUtils.getSimpleName;
 
 /**
  * @author benshaoye
@@ -15,7 +15,6 @@ final class MapFieldFactory {
         return onDeclareCompleted(mapped, manager.getModel());
     }
 
-    @SuppressWarnings("all")
     private String onDeclareCompleted(String t0, MappingModel model) {
         if (t0 != null) {
             t0 = Replacer.fromName.replace(t0, model.getFromName());

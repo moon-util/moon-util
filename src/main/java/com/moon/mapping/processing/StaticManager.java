@@ -13,10 +13,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
-import static com.moon.mapping.processing.ElementUtils.getSimpleName;
+import static com.moon.mapping.processing.ElemUtils.getSimpleName;
 import static com.moon.mapping.processing.StringUtils.isPrimitiveNumber;
 import static com.moon.mapping.processing.StringUtils.isWrappedNumber;
-import static javax.tools.Diagnostic.Kind.MANDATORY_WARNING;
 
 /**
  * 静态变量遍历器
@@ -100,7 +99,7 @@ public class StaticManager {
                 return null;
             }
             if (DetectUtils.isTypeofAny(type, Float.class, Double.class, Long.class)) {
-                value += ElementUtils.getSimpleName(type).charAt(0);
+                value += ElemUtils.getSimpleName(type).charAt(0);
             }
             String t0 = "{type0} {var} = {value};";
             return Replacer.value.replace(t0, value);
@@ -224,7 +223,7 @@ public class StaticManager {
         if (varName != null) {
             return varName;
         }
-        Element enumConst = ElementUtils.findEnumIndexOf(enumClassname, idx);
+        Element enumConst = ElemUtils.findEnumIndexOf(enumClassname, idx);
         if (enumConst == null) {
             Logger.printWarn("【已忽略默认值】{} 不存在第 '{}' 个枚举项", enumClassname, index);
             return null;
@@ -248,7 +247,7 @@ public class StaticManager {
         if (varName != null) {
             return varName;
         }
-        Element enumConst = ElementUtils.findEnumNameOf(enumClassname, name);
+        Element enumConst = ElemUtils.findEnumNameOf(enumClassname, name);
         if (enumConst == null) {
             Logger.printWarn("【已忽略默认值】{} 不存在枚举项: {}", enumClassname, name);
             return null;

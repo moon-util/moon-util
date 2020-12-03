@@ -27,7 +27,7 @@ final class ImportManager {
         if (shortName != null) {
             return shortName;
         }
-        shortName = ElementUtils.getSimpleName(classname);
+        shortName = ElemUtils.getSimpleName(classname);
         if (importCached.containsKey(shortName)) {
             return classname;
         } else if (StringUtils.isPrimitive(classname)) {

@@ -43,7 +43,7 @@ public abstract class MappingUtil {
      *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.thisMappingFor(Car.class);
      *     // 所有声明的映射都可以这样获取: {@link #resolve(Class, Class)}
      *     // 这个方法不像{@code thisXxx}方法, 可以在任意位置使用
-     *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.resolve(Auto.class, Car.class);
+     *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.get(Auto.class, Car.class);
      *
      *     private String name;
      *     // other fields & getter & setter
@@ -66,7 +66,7 @@ public abstract class MappingUtil {
     /**
      * 当前类{@code THIS}到目标类{@code thatClass}的映射器
      * <p>
-     * 要求{@code thisClass}在当前类注解{@link MappingFor#value()}中
+     * 要求{@code thatClass}在当前类注解{@link MappingFor#value()}中
      *
      * @param thatClass 目标类
      * @param <THIS>    当前类

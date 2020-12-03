@@ -9,7 +9,7 @@ import javax.annotation.processing.Filer;
 import java.io.IOException;
 import java.util.*;
 
-import static com.moon.mapping.processing.ElementUtils.getSimpleName;
+import static com.moon.mapping.processing.ElemUtils.getSimpleName;
 import static com.moon.mapping.processing.StringUtils.toMappingClassname;
 
 /**

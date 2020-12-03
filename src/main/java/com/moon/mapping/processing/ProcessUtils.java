@@ -1,7 +1,7 @@
 package com.moon.mapping.processing;
 
 import com.moon.mapping.annotation.IgnoreMode;
-import com.moon.mapping.annotation.MapProperty;
+import com.moon.mapping.annotation.MappingProperty;
 import com.moon.mapping.annotation.MappingFor;
 
 import javax.lang.model.element.*;
@@ -10,7 +10,6 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -36,8 +35,8 @@ final class ProcessUtils {
     }
 
     private static void handleMapProperty(Element element, Consumer<PropertyAttr> handler) {
-        MapProperty[] properties = element.getAnnotationsByType(MapProperty.class);
-        for (MapProperty property : properties) {
+        MappingProperty[] properties = element.getAnnotationsByType(MappingProperty.class);
+        for (MappingProperty property : properties) {
             IgnoreMode ignore = property.ignore();
             String value = property.value();
             String format = property.format();
@@ -70,7 +69,7 @@ final class ProcessUtils {
             handleMapProperty(element, attr -> definition.addFieldAttr(name, attr));
         } else if (DetectUtils.isSetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
-            String name = ElementUtils.toPropertyName(elem);
+            String name = ElemUtils.toPropertyName(elem);
             if (presentKeys.contains(name)) {
                 return;
             }
@@ -79,7 +78,7 @@ final class ProcessUtils {
             prop.setSetter(elem, genericMap);
         } else if (DetectUtils.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
-            String name = ElementUtils.toPropertyName(elem);
+            String name = ElemUtils.toPropertyName(elem);
             if (presentKeys.contains(name)) {
                 return;
             }
@@ -117,7 +116,7 @@ final class ProcessUtils {
             return;
         }
         Types types = EnvUtils.getTypes();
-        TypeElement superElement = ElementUtils.cast(types.asElement(superclass));
+        TypeElement superElement = ElemUtils.cast(types.asElement(superclass));
         if (superElement == null) {
             return;
         }
