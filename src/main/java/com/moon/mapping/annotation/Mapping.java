@@ -7,10 +7,10 @@ import java.lang.annotation.*;
  *
  * @author moonsky
  */
-@Repeatable(MappingProperty.List.class)
+@Repeatable(Mapping.List.class)
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface MappingProperty {
+public @interface Mapping {
 
     /**
      * 指定映射为{@link #target()}类里的字段
@@ -62,6 +62,6 @@ public @interface MappingProperty {
     @Retention(RetentionPolicy.SOURCE)
     @interface List {
 
-        MappingProperty[] value() default {};
+        Mapping[] value() default {};
     }
 }

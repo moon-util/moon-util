@@ -2,7 +2,9 @@ package com.moon.mapping.processing;
 
 import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author benshaoye
@@ -41,6 +43,10 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
      * getter 方法不可能被重写，这里是为了和 setter 沿用统一结构
      */
     private List<M> getterArr;
+    /**
+     * 所有转换器
+     */
+    private Map<String, M> convertMap;
 
     BaseProperty(String name, TypeElement enclosingElement) {
         this.enclosingElement = enclosingElement;
@@ -59,6 +65,8 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
 
     public List<M> getGetterArr() { return getterArr; }
 
+    public Map<String, M> getConvertMap() { return convertMap; }
+
     public M getSetter() { return setter; }
 
     public M getGetter() { return getter; }
@@ -69,6 +77,16 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
 
     public List<M> ensureGetterArr() {
         return getterArr == null ? (getterArr = new ArrayList<>()) : getterArr;
+    }
+
+    public Map<String, M> ensureConvertMap() {
+        return convertMap == null ? (convertMap = new HashMap<>()) : convertMap;
+    }
+
+    @Override
+    public String findConvertMethod(String key) {
+        M convert = ensureConvertMap().get(key);
+        return convert == null ? null : convert.getMethodName();
     }
 
     @Override
@@ -89,4 +107,6 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
     public void addSetterMethod(M setter) { ensureSetterArr().add(setter); }
 
     public void addGetterMethod(M getter) { ensureGetterArr().add(getter); }
+
+    public void putConvertMethod(String key, M convert) { ensureConvertMap().putIfAbsent(key, convert); }
 }

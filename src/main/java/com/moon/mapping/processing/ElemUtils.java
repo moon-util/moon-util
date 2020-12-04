@@ -27,7 +27,7 @@ abstract class ElemUtils {
         Element typeElem = EnvUtils.getTypes().asElement(type);
         @SuppressWarnings("all")//
         String declareType = typeElem instanceof QualifiedNameable//
-                             ? ElemUtils.getQualifiedName((QualifiedNameable) typeElem) //
+                             ? getQualifiedName((QualifiedNameable) typeElem) //
                              : (typeElem == null ? type.toString() : typeElem.toString());
         return declareType;
     }
@@ -41,6 +41,18 @@ abstract class ElemUtils {
     static String toPropertyName(ExecutableElement element) {
         String name = element.getSimpleName().toString();
         return StringUtils.decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
+    }
+
+    static String toConvertKey(String fromClass, String propertySimpleClass, String propertyName) {
+        return fromClass + '#' + propertySimpleClass + '#' + propertyName;
+    }
+
+    static String toSimpleGenericTypename(String value) {
+        if (value == null) {
+            return null;
+        }
+        int index = value.indexOf('<');
+        return index < 0 ? value : value.substring(0, index);
     }
 
     public static String getSimpleName(Element elem) {

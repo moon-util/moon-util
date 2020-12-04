@@ -1,7 +1,7 @@
 package com.moon.mapping.processing;
 
 import com.moon.mapping.annotation.IgnoreMode;
-import com.moon.mapping.annotation.MappingProperty;
+import com.moon.mapping.annotation.Mapping;
 import com.moon.mapping.annotation.MappingFor;
 
 import javax.lang.model.element.*;
@@ -35,8 +35,8 @@ final class ProcessUtils {
     }
 
     private static void handleMapProperty(Element element, Consumer<PropertyAttr> handler) {
-        MappingProperty[] properties = element.getAnnotationsByType(MappingProperty.class);
-        for (MappingProperty property : properties) {
+        Mapping[] properties = element.getAnnotationsByType(Mapping.class);
+        for (Mapping property : properties) {
             IgnoreMode ignore = property.ignore();
             String value = property.value();
             String format = property.format();
@@ -133,6 +133,7 @@ final class ProcessUtils {
         Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
         BasicDefinition definition = parseRootPropertiesMap(rootElement, thisGenericMap);
         parseSuperPropertiesMap(thisGenericMap, new HashSet<>(), definition, rootElement, rootElement);
+        ConverterUtils.parseMappingConverts(thisGenericMap, rootElement, definition);
         definition.onCompleted();
         return definition;
     }

@@ -1,5 +1,7 @@
 package com.moon.mapping.processing;
 
+import javax.lang.model.element.TypeElement;
+
 /**
  * @author benshaoye
  */
@@ -11,6 +13,13 @@ interface Mappable {
      * @return property name
      */
     String getName();
+
+    /**
+     * 返回当前属性所属于的最终类
+     *
+     * @return 最终类
+     */
+    TypeElement getThisClass();
 
     /**
      * 返回当前属性所在的最终类
@@ -28,7 +37,18 @@ interface Mappable {
      *
      * @return 实际使用这个属性的最终类
      */
-    String getThisClassname();
+    default String getThisClassname() {
+        return ElemUtils.getQualifiedName(getThisClass());
+    }
+
+    /**
+     * 查找自定义类型转换器的方法名
+     *
+     * @param key {@link ElemUtils#toConvertKey(String, String, String)}
+     *
+     * @return
+     */
+    String findConvertMethod(String key);
 
     /**
      * 是否有 getter

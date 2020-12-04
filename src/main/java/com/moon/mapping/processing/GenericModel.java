@@ -46,17 +46,7 @@ final class GenericModel {
         return act == null || Objects.equals(act, declare) ? bound : act;
     }
 
-    public String getSimpleFinalType() {
-        return simpleGenericTypename(getFinalType());
-    }
-
-    private static String simpleGenericTypename(String value) {
-        if (value == null) {
-            return null;
-        }
-        int index = value.indexOf('<');
-        return index < 0 ? value : value.substring(0, index);
-    }
+    public String getSimpleFinalType() { return ElemUtils.toSimpleGenericTypename(getFinalType()); }
 
     @Override
     public String toString() {

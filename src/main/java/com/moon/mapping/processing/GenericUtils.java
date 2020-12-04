@@ -3,6 +3,7 @@ package com.moon.mapping.processing;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,30 +18,56 @@ final class GenericUtils {
 
     static Map<String, GenericModel> parse(TypeElement element) {
         Map<String, GenericModel> thisGenericMap = new HashMap<>();
-        parse(thisGenericMap,element.asType(), element);
+        parse(thisGenericMap, element.asType(), element);
+        Types types = EnvUtils.getTypes();
         do {
+            parseInterfaces(thisGenericMap, element.getInterfaces());
             TypeMirror superclass = element.getSuperclass();
             if (DetectUtils.isTypeof(superclass.toString(), Object.class)) {
                 return thisGenericMap;
             }
-            element = (TypeElement) EnvUtils.getTypes().asElement(superclass);
+            element = (TypeElement) types.asElement(superclass);
             parse(thisGenericMap, superclass, element);
         } while (true);
     }
 
-    static void parse(Map<String, GenericModel> genericMap,TypeMirror elementTyped, TypeElement element) {
+    private static void parseInterfaces(Map<String, GenericModel> genericMap, List<? extends TypeMirror> elements) {
+        if (elements == null) {
+            return;
+        }
+        Types types = EnvUtils.getTypes();
+        for (TypeMirror mirror : elements) {
+            TypeElement element = (TypeElement) types.asElement(mirror);
+            parse(genericMap, mirror, element);
+        }
+    }
+
+    private static void parse(Map<String, GenericModel> genericMap, TypeMirror elementTyped, TypeElement element) {
         List<String> actuals = Extract.splitSuperclass(elementTyped.toString());
+        String declareClassname = ElemUtils.getQualifiedName(element);
         int index = 0;
         for (TypeParameterElement param : element.getTypeParameters()) {
             String actual = index < actuals.size() ? actuals.get(index++) : null;
             GenericModel model = new GenericModel(param, actual);
-            genericMap.putIfAbsent(model.getDeclareType(), model);
+            String key = toFullKey(declareClassname, model.getDeclareType());
+            genericMap.putIfAbsent(key, model);
         }
     }
 
-    static String findActualType(Map<String, GenericModel> generics, String declareType) {
-        GenericModel model = generics.get(declareType);
+    static String findActualType(Map<String, GenericModel> generics, String declareClassname, String declareType) {
+        GenericModel model = generics.get(toFullKey(declareClassname, declareType));
         return model == null ? null : model.getSimpleFinalType();
+    }
+
+    static String findActualTypeOrDeclare(
+        Map<String, GenericModel> generics, String declareClassname, String declareType
+    ) {
+        String actualType = findActualType(generics, declareClassname, declareType);
+        return actualType == null ? declareType : actualType;
+    }
+
+    private static String toFullKey(String declareClassname, String declareType) {
+        return declareClassname + '#' + declareType;
     }
 
     private static class Extract {

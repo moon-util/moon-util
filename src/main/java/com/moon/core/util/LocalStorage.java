@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * 仿{@code JavaScript#localStorage}实现，可以简单实现键值对本地文件存储；
+ * 仿{@code JavaScript#localStorage}实现，可以没有任何依赖实现键值对本地文件存储；
  * <p>
  * 现在{@code java}存储媒介已经非常多并且非常成熟，{@link LocalStorage}通常并不是合适的选择，
  * <p>

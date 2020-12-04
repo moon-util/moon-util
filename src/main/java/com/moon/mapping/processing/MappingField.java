@@ -69,29 +69,20 @@ final class MappingField {
     }
 
     private static String doMappingIfAssignable(Manager manager) {
+        String convertMethod = manager.findConvertMethod();
+        if (convertMethod != null) {
+            String template = "{toName}.{setterName}({fromName}.{getterName}());";
+            return Replacer.setterName.replace(template, convertMethod);
+        }
+
         String setterType = getSetterType(manager);
         String getterType = getGetterType(manager);
-        PropertyAttr attr = manager.getModel().getAttr();
+        PropertyModel model = manager.getModel();
+        PropertyAttr attr = model.getAttr();
         String fmt = attr.formatValue(), dft = attr.defaultValue();
 
-        CallerManager callerManager = manager.getCaller();
-        CallerInfo info = null;
-        if (dft != null) {
-            String[] types = {getterType, String.class.getCanonicalName(), String.class.getCanonicalName()};
-            info = callerManager.find(setterType, types);
-        }
-        if (info == null && fmt != null) {
-            info = callerManager.find(setterType, getterType, String.class.getCanonicalName());
-        }
-        if (info == null) {
-            info = callerManager.find(setterType, getterType);
-        }
-        if (info != null) {
-            // TODO
-        }
-
         if (fmt == null && dft == null && isSubtypeOf(getterType, setterType)) {
-            return manager.getMapping().normalized(null, null);
+            return manager.getMapping().doMap(null, null);
         }
         return null;
     }
@@ -111,11 +102,11 @@ final class MappingField {
                 String fmt = manager.getFormatPatternVal(returnType, true);
                 if (fmt == null) {
                     CallerInfo info = transfer.findInAll(returnType, String.class);
-                    return mapping.normalized(info.toString(), null);
+                    return mapping.doMap(info.toString(), null);
                 } else {
                     CallerInfo info = transfer.findInAll(returnType, String.class, String.class);
                     String mapper = info.toString(null, strWrapped(fmt));
-                    return mapping.normalized(mapper, null);
+                    return mapping.doMap(mapper, asNull(manager, null));
                 }
             }
         },
@@ -148,7 +139,7 @@ final class MappingField {
                 MappingManager mapping = mgr.getMapping();
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = transfer.findInAll(Calendar.class, Number.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromUtilDate {
@@ -162,7 +153,7 @@ final class MappingField {
                 MappingManager mapping = mgr.getMapping();
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = transfer.findInAll(Calendar.class, Date.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromJdk8Date {
@@ -178,7 +169,7 @@ final class MappingField {
                 String getterType = getGetterType(mgr);
                 String returnType = Calendar.class.getCanonicalName();
                 CallerInfo info = transfer.findInAll(returnType, getterType);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromJodaReadableInstant {
@@ -194,7 +185,7 @@ final class MappingField {
             public String doMapping(Manager mgr) {
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = transfer.findInAll(Calendar.class, ReadableInstant.class);
-                return mgr.getMapping().normalized(info.toString(), null);
+                return mgr.getMapping().doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromJodaDate {
@@ -214,7 +205,7 @@ final class MappingField {
                 String returnType = Calendar.class.getCanonicalName();
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = transfer.findInAll(returnType, getterType);
-                return mgr.getMapping().normalized(info.toString(), null);
+                return mgr.getMapping().doMap(info.toString(), asNull(mgr, null));
             }
         }
     }
@@ -235,10 +226,10 @@ final class MappingField {
                 String pattern = manager.getFormatPatternVal(getterType, true);
                 if (pattern == null) {
                     CallerInfo info = transfer.findInAll(setterType, String.class);
-                    return mapping.normalized(info.toString(), null);
+                    return mapping.doMap(info.toString(), null);
                 } else {
                     CallerInfo info = transfer.findInAll(setterType, String.class, String.class);
-                    return mapping.normalized(info.toString(null, strWrapped(pattern)), null);
+                    return mapping.doMap(info.toString(null, strWrapped(pattern)), asNull(manager, null));
                 }
             }
         },
@@ -272,7 +263,7 @@ final class MappingField {
                 String setterType = mapping.getSetterType();
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = transfer.findInAll(setterType, Number.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromCalendar {
@@ -287,7 +278,7 @@ final class MappingField {
                 String setterType = mapping.getSetterType();
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = transfer.findInAll(setterType, Calendar.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromJdk8Date {
@@ -301,7 +292,7 @@ final class MappingField {
                 MappingManager mapping = mgr.getMapping();
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = getBasicTransfer(mgr);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromJodaReadableInstant {
@@ -318,7 +309,7 @@ final class MappingField {
                 CallerManager transfer = mgr.getCaller();
                 String setterType = getSetterType(mgr);
                 CallerInfo info = transfer.findInAll(setterType, ReadableInstant.class);
-                return mgr.getMapping().normalized(info.toString(), null);
+                return mgr.getMapping().doMap(info.toString(), asNull(mgr, null));
             }
         },
         fromJodaDate {
@@ -336,7 +327,7 @@ final class MappingField {
                 MappingManager mapping = mgr.getMapping();
                 CallerManager transfer = mgr.getCaller();
                 CallerInfo info = getBasicTransfer(mgr);
-                return mgr.getMapping().normalized(info.toString(), null);
+                return mgr.getMapping().doMap(info.toString(), asNull(mgr, null));
             }
         }
     }
@@ -354,12 +345,12 @@ final class MappingField {
                 String getterType = getGetterType(manager);
                 String pattern = manager.getFormatPatternVal(getterType, true);
                 if (pattern == null) {
-                    return mapping.normalized("{setterType}.parse({var})", null);
+                    return mapping.doMap("{setterType}.parse({var})", asNull(manager, null));
                 } else {
                     String format = manager.staticForDateTimeFormatter(pattern);
                     String mapper = "{setterType}.from({format}.parse({var}))";
                     mapper = Replacer.format.replace(mapper, format);
-                    return mapping.normalized(mapper, null);
+                    return mapping.doMap(mapper, asNull(manager, null));
                 }
             }
         }
@@ -380,7 +371,7 @@ final class MappingField {
                 String byType = isPrimitiveGt(LONG, getterType) ? LONG : DOUBLE;
                 CallerManager transfer = manager.getCaller();
                 CallerInfo info = transfer.findInAll(setterType, byType);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), null);
             }
         },
         fromJdk8Date {
@@ -392,7 +383,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 MappingManager mapping = manager.getMapping();
-                return mapping.normalized(getBasicTransfer(manager).toString(), null);
+                return mapping.doMap(getBasicTransfer(manager).toString(), asNull(manager, null));
             }
         },
         fromNumber {
@@ -407,7 +398,7 @@ final class MappingField {
                 CallerManager transfer = manager.getCaller();
                 String setterType = getSetterType(manager);
                 CallerInfo info = transfer.findInAll(setterType, Number.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(manager, null));
             }
         },
         fromUtilDate {
@@ -422,7 +413,7 @@ final class MappingField {
                 CallerManager transfer = manager.getCaller();
                 String setterType = getSetterType(manager);
                 CallerInfo info = transfer.findInAll(setterType, Date.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(manager, null));
             }
         },
         fromCalendar {
@@ -437,7 +428,7 @@ final class MappingField {
                 CallerManager transfer = manager.getCaller();
                 String setterType = getSetterType(manager);
                 CallerInfo info = transfer.findInAll(setterType, Calendar.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(manager, null));
             }
         },
         fromJodaReadableInstant {
@@ -452,7 +443,7 @@ final class MappingField {
                 CallerManager transfer = manager.getCaller();
                 String setterType = getSetterType(manager);
                 CallerInfo info = transfer.findInAll(setterType, ReadableInstant.class);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(manager, null));
             }
         },
         fromJodaDate {
@@ -466,7 +457,7 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 CallerManager transfer = manager.getCaller();
                 CallerInfo info = getBasicTransfer(manager);
-                return mapping.normalized(info.toString(), null);
+                return mapping.doMap(info.toString(), asNull(manager, null));
             }
         }
     }
@@ -485,12 +476,12 @@ final class MappingField {
                 String pattern = manager.getFormatPatternVal(getterType, true);
                 if (pattern == null) {
                     String mapper = "{setterType}.parse({var})";
-                    return mapping.normalized(mapper, null);
+                    return mapping.doMap(mapper, asNull(manager, null));
                 } else {
                     String fmt = manager.staticForJodaDateTimeFormatter(pattern);
                     String tx = "{setterType}.parse({var}, {format})";
                     String mapper = Replacer.format.replace(tx, fmt);
-                    return mapping.normalized(mapper, null);
+                    return mapping.doMap(mapper, asNull(manager, null));
                 }
             }
         },
@@ -503,7 +494,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String mapper = "new {setterType}({var}.longValue())";
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, asNull(manager, null));
             }
         },
         fromPrimitiveNumber {
@@ -518,7 +509,7 @@ final class MappingField {
                 String cast = isPrimitiveGt(getterType, LONG) ? bracketed(LONG) : "";
                 String mapper = "new {setterType}({cast}{var})";
                 mapper = Replacer.cast.replace(mapper, cast);
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, null);
             }
         },
         fromUtilDate {
@@ -530,7 +521,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String mapper = "new {setterType}({var})";
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, asNull(manager, null));
             }
         },
         fromCalendar {
@@ -542,7 +533,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String mapper = "new {setterType}({var}.getTime())";
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, asNull(manager, null));
             }
         }
     }
@@ -557,7 +548,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String var = manager.staticForDefaultBigInteger();
-                return manager.getMapping().normalized(null, var);
+                return manager.getMapping().doMap(null, asNull(manager, var));
             }
         },
         fromPrimitiveNumber {
@@ -573,7 +564,7 @@ final class MappingField {
                 String cast = isPrimitiveGt(getterType, LONG) ? bracketed(LONG) : "";
                 String mapper = "{setterType}.valueOf({cast}{var})";
                 mapper = Replacer.cast.replace(mapper, cast);
-                return manager.getMapping().normalized(mapper, var);
+                return manager.getMapping().doMap(mapper, var);
             }
         },
         fromEnum {
@@ -586,7 +577,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 String var = manager.staticForDefaultBigInteger();
                 String mapper = "{setterType}.valueOf({var}.ordinal())";
-                return manager.getMapping().normalized(mapper, var);
+                return manager.getMapping().doMap(mapper, asNull(manager, var));
             }
         },
         fromNumber {
@@ -599,7 +590,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 String var = manager.staticForDefaultBigInteger();
                 String mapper = "{setterType}.valueOf({var}.longValue())";
-                return manager.getMapping().normalized(mapper, var);
+                return manager.getMapping().doMap(mapper, asNull(manager, var));
             }
         },
         fromString {
@@ -615,11 +606,11 @@ final class MappingField {
                 String var = manager.staticForDefaultBigInteger();
                 MappingManager mapping = manager.getMapping();
                 if (pattern == null) {
-                    return mapping.normalized("new {setterType}({var})", var);
+                    return mapping.doMap("new {setterType}({var})", asNull(manager, var));
                 } else {
                     CallerManager transfer = manager.getCaller();
                     CallerInfo info = transfer.findInAll(BigInteger.class, String.class, String.class);
-                    return mapping.normalized(info.toString(null, strWrapped(pattern)), var);
+                    return mapping.doMap(info.toString(null, strWrapped(pattern)), asNull(manager, var));
                 }
             }
         }
@@ -635,7 +626,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String var = manager.staticForDefaultBigDecimal();
-                return manager.getMapping().normalized(null, var);
+                return manager.getMapping().doMap(null, var);
             }
         },
         fromBigInteger {
@@ -648,7 +639,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 MappingManager mapping = manager.getMapping();
                 String var = manager.staticForDefaultBigDecimal();
-                return mapping.normalized("new {setterType}({var})", var);
+                return mapping.doMap("new {setterType}({var})", asNull(manager, var));
             }
         },
         fromEnum {
@@ -661,7 +652,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 String var = manager.staticForDefaultBigDecimal();
                 String mapper = "{setterType}.valueOf({var}.ordinal())";
-                return manager.getMapping().normalized(mapper, var);
+                return manager.getMapping().doMap(mapper, asNull(manager, var));
             }
         },
         fromPrimitiveNumber {
@@ -674,7 +665,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 MappingManager mapping = manager.getMapping();
                 String var = manager.staticForDefaultBigDecimal();
-                return mapping.normalized("{setterType}.valueOf({var})", var);
+                return mapping.doMap("{setterType}.valueOf({var})", var);
             }
         },
         fromWrappedNumber {
@@ -694,7 +685,7 @@ final class MappingField {
                 }
                 String var = manager.staticForDefaultBigDecimal();
                 MappingManager mapping = manager.getMapping();
-                return mapping.normalized(mapper, var);
+                return mapping.doMap(mapper, asNull(manager, var));
             }
         },
         fromNumber {
@@ -709,7 +700,7 @@ final class MappingField {
                 CallerInfo info = transfer.findInAll(BigDecimal.class, Number.class);
                 String var = manager.staticForDefaultBigDecimal();
                 MappingManager mapping = manager.getMapping();
-                return mapping.normalized(info.toString(), var);
+                return mapping.doMap(info.toString(), asNull(manager, var));
             }
         },
         fromString {
@@ -725,11 +716,11 @@ final class MappingField {
                 String var = manager.staticForDefaultBigDecimal();
                 MappingManager mapping = manager.getMapping();
                 if (pattern == null) {
-                    return mapping.normalized("new {setterType}({var})", var);
+                    return mapping.doMap("new {setterType}({var})", asNull(manager, var));
                 } else {
                     CallerManager transfer = manager.getCaller();
                     CallerInfo info = transfer.findInAll(BigDecimal.class, String.class, String.class);
-                    return mapping.normalized(info.toString(null, strWrapped(pattern)), var);
+                    return mapping.doMap(info.toString(null, strWrapped(pattern)), asNull(manager, var));
                 }
             }
         }
@@ -744,7 +735,7 @@ final class MappingField {
 
             @Override
             public String doMapping(Manager manager) {
-                return manager.getMapping().normalized(null, null);
+                return manager.getMapping().doMap(null, null);
             }
         },
         fromCharacter {
@@ -756,7 +747,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 final String dftValue = manager.staticForDefaultChar();
-                return manager.getMapping().normalized(null, dftValue);
+                return manager.getMapping().doMap(null, dftValue);
             }
         },
         fromPrimitiveNumber {
@@ -773,7 +764,7 @@ final class MappingField {
                 String type0 = manager.onImported(Character.class);
                 t0 = Replacer.cast.replace(t0, cast);
                 t0 = Replacer.type0.replace(t0, type0);
-                return manager.getMapping().normalized(t0, null);
+                return manager.getMapping().doMap(t0, null);
             }
         },
         fromNumber {
@@ -787,7 +778,7 @@ final class MappingField {
                 String t0 = "{type0}.forDigit({var}.intValue(), 10)";
                 String type0 = manager.onImported(Character.class);
                 t0 = Replacer.type0.replace(t0, type0);
-                return manager.getMapping().normalized(t0, null);
+                return manager.getMapping().doMap(t0, null);
             }
         }
     }
@@ -801,7 +792,7 @@ final class MappingField {
 
             @Override
             public String doMapping(Manager manager) {
-                return manager.getMapping().normalized("{var} != 0", null);
+                return manager.getMapping().doMap("{var} != 0", null);
             }
         },
         fromPrimitiveBoolean {
@@ -812,7 +803,7 @@ final class MappingField {
 
             @Override
             public String doMapping(Manager manager) {
-                return manager.getMapping().normalized("{var}", null);
+                return manager.getMapping().doMap("{var}", null);
             }
         },
         fromString {
@@ -828,7 +819,7 @@ final class MappingField {
                 String var = manager.staticForDefaultBoolean();
                 String mapper = "{type0}.parseBoolean({var})";
                 mapper = Replacer.type0.replace(mapper, bool);
-                return manager.getMapping().normalized(mapper, var);
+                return manager.getMapping().doMap(mapper, var);
             }
         },
         fromWrappedNumber {
@@ -844,7 +835,7 @@ final class MappingField {
                 String mapper = "{name}.equals({var})";
                 String var = manager.staticForDefaultBoolean();
                 mapper = Replacer.name.replace(mapper, staticVar);
-                return manager.getMapping().normalized(mapper, var);
+                return manager.getMapping().doMap(mapper, var);
             }
         },
         fromBoolean {
@@ -856,7 +847,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String var = manager.staticForDefaultBoolean();
-                return manager.getMapping().normalized("{var}", var);
+                return manager.getMapping().doMap("{var}", var);
             }
         }
     }
@@ -870,7 +861,7 @@ final class MappingField {
 
             @Override
             public String doMapping(Manager manager) {
-                return manager.getMapping().normalized(null, null);
+                return manager.getMapping().doMap(null, null);
             }
         },
         fromPrimitiveChar {
@@ -881,7 +872,7 @@ final class MappingField {
 
             @Override
             public String doMapping(Manager manager) {
-                return manager.getMapping().normalized("(int){var}", null);
+                return manager.getMapping().doMap("(int){var}", null);
             }
         },
         fromNumber {
@@ -893,7 +884,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String dftValue = manager.staticForDefaultNumber(INT);
-                return manager.getMapping().normalized("{var}", dftValue);
+                return manager.getMapping().doMap("{var}", dftValue);
             }
         },
         fromEnum {
@@ -905,7 +896,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String dftValue = manager.staticForDefaultNumber(INT);
-                return manager.getMapping().normalized("{var}.ordinal()", dftValue);
+                return manager.getMapping().doMap("{var}.ordinal()", asNull(manager, dftValue));
             }
         },
         fromString {
@@ -923,7 +914,7 @@ final class MappingField {
                 CallerInfo info = transfer.findInAll(Number.class, String.class, String.class);
                 String mapper = info.toString(null, strWrapped(attr.formatValue()));
                 final String dftValue = manager.staticForDefaultNumber(INT);
-                return manager.getMapping().normalized(mapper, dftValue);
+                return manager.getMapping().doMap(mapper, asNull(manager, dftValue));
             }
         }
     }
@@ -939,7 +930,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 final String dftValue = manager.staticForDefaultNumber();
                 MappingManager mapping = manager.getMapping();
-                return mapping.normalized("{var}.getTime()", dftValue);
+                return mapping.doMap("{var}.getTime()", asNull(manager, dftValue));
             }
         },
         fromCalendar {
@@ -952,7 +943,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 final String dftValue = manager.staticForDefaultNumber();
                 MappingManager mapping = manager.getMapping();
-                return mapping.normalized("{var}.getTimeInMillis()", dftValue);
+                return mapping.doMap("{var}.getTimeInMillis()", asNull(manager, dftValue));
             }
         },
         fromJdk8Time {
@@ -968,7 +959,7 @@ final class MappingField {
                 String getter = getGetterType(manager);
                 CallerInfo info = manager.getCaller().findInAll(setter, getter);
                 String dftValue = manager.staticForDefaultNumber();
-                return manager.getMapping().normalized(info.toString(), dftValue);
+                return manager.getMapping().doMap(info.toString(), asNull(manager, dftValue));
             }
         },
         fromJodaTime {
@@ -987,7 +978,7 @@ final class MappingField {
                 String getter = getGetterType(manager);
                 CallerInfo info = manager.getCaller().findInAll(setter, getter);
                 String dftValue = manager.staticForDefaultNumber();
-                return manager.getMapping().normalized(info.toString(), dftValue);
+                return manager.getMapping().doMap(info.toString(), asNull(manager, dftValue));
             }
         }
     }
@@ -1005,7 +996,7 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 String cast = isTypeof(getSetterType(manager), Double.class) ? "(double)" : "";
                 String mapper = Replacer.cast.replace("{cast}{var}.getTime()", cast);
-                return mapping.normalized(mapper, dftValue);
+                return mapping.doMap(mapper, asNull(manager, dftValue));
             }
         },
         fromCalendar {
@@ -1020,7 +1011,7 @@ final class MappingField {
                 MappingManager mapping = manager.getMapping();
                 String cast = isTypeof(getSetterType(manager), Double.class) ? "(double)" : "";
                 String mapper = Replacer.cast.replace("{cast}{var}.getTimeInMillis()", cast);
-                return mapping.normalized(mapper, dftValue);
+                return mapping.doMap(mapper, asNull(manager, dftValue));
             }
         },
         fromJdk8Time {
@@ -1036,7 +1027,7 @@ final class MappingField {
                 String getter = getGetterType(manager);
                 CallerInfo info = manager.getCaller().findInAll(setter, getter);
                 String dftValue = manager.staticForDefaultNumber();
-                return manager.getMapping().normalized(info.toString(), dftValue);
+                return manager.getMapping().doMap(info.toString(), asNull(manager, dftValue));
             }
         },
         fromJodaTime {
@@ -1055,7 +1046,7 @@ final class MappingField {
                 String getter = getGetterType(manager);
                 CallerInfo info = manager.getCaller().findInAll(setter, getter);
                 String dftValue = manager.staticForDefaultNumber();
-                return manager.getMapping().normalized(info.toString(), dftValue);
+                return manager.getMapping().doMap(info.toString(), asNull(manager, dftValue));
             }
         }
     }
@@ -1075,7 +1066,7 @@ final class MappingField {
                 String setterPrimitive = toPrimitiveType(setterWrapped);
                 String cast = getterWrapped.equals(setterPrimitive) ? "" : bracketed(setterPrimitive);
                 String mapper = Replacer.cast.replace("{cast}{var}", cast);
-                return mapping.normalized(mapper, null);
+                return mapping.doMap(mapper, null);
             }
         },
         fromPrimitiveChar {
@@ -1091,7 +1082,7 @@ final class MappingField {
                 String setterPrimitive = toPrimitiveType(setterWrapped);
                 String cast = bracketed(setterPrimitive);
                 String mapper = Replacer.cast.replace("{cast}{var}", cast);
-                return mapping.normalized(mapper, null);
+                return mapping.doMap(mapper, null);
             }
         },
         fromWrappedNumber {
@@ -1107,12 +1098,12 @@ final class MappingField {
                 String getterWrapped = getGetterType(manager);
                 String dftValue = manager.staticForDefaultNumber();
                 if (Objects.equals(setterWrapped, getterWrapped)) {
-                    return mapping.normalized(null, dftValue);
+                    return mapping.doMap(null, dftValue);
                 } else {
                     String setterPrimitive = toPrimitiveType(setterWrapped);
                     String tx = "{var}.{type0}Value()";
                     tx = Replacer.type0.replace(tx, setterPrimitive);
-                    return mapping.normalized(tx, dftValue);
+                    return mapping.doMap(tx, asNull(manager, dftValue));
                 }
             }
         },
@@ -1132,12 +1123,12 @@ final class MappingField {
                 if (pattern == null) {
                     String name = INT.equals(setterPrimitive) ? "Int" : getSimpleName(setterWrapped);
                     String mapper = Replacer.name.replace("{setterType}.parse{name}({var})", name);
-                    return mapping.normalized(mapper, var);
+                    return mapping.doMap(mapper, asNull(manager, var));
                 } else {
                     CallerManager transfer = manager.getCaller();
                     CallerInfo info = transfer.findInAll(setterWrapped, String.class, String.class);
                     String mapper = info.toString(null, strWrapped(pattern));
-                    return mapping.normalized(mapper, var);
+                    return mapping.doMap(mapper, asNull(manager, var));
                 }
             }
         },
@@ -1156,7 +1147,7 @@ final class MappingField {
                 String cast = isPrimitiveLt(setterPrimitive, INT) ? bracketed(setterPrimitive) : "";
                 String t0 = "{setterType}.valueOf({cast}{var}.ordinal())";
                 t0 = Replacer.cast.replace(t0, cast);
-                return mapping.normalized(t0, var);
+                return mapping.doMap(t0, asNull(manager, var));
             }
         },
         fromCharacter {
@@ -1174,7 +1165,7 @@ final class MappingField {
                 String cast = isPrimitiveGt(setterPrimitive, INT) ? bracketed(INT) : "";
                 String t0 = "{setterType}.valueOf({cast}{var}.charValue())";
                 t0 = Replacer.cast.replace(t0, cast);
-                return mapping.normalized(t0, var);
+                return mapping.doMap(t0, asNull(manager, var));
             }
         },
         fromNumber {
@@ -1191,7 +1182,7 @@ final class MappingField {
                 String setterPrimitive = toPrimitiveType(setterWrapped);
                 String t0 = "{var}.{type0}Value()";
                 t0 = Replacer.type0.replace(t0, setterPrimitive);
-                return mapping.normalized(t0, var);
+                return mapping.doMap(t0, asNull(manager, var));
             }
         }
     }
@@ -1212,7 +1203,7 @@ final class MappingField {
                 String mapper = "{value}[{cast}{var}]";
                 mapper = Replacer.cast.replace(mapper, cast);
                 mapper = Replacer.value.replace(mapper, values);
-                return manager.getMapping().normalized(mapper, dftValue);
+                return manager.getMapping().doMap(mapper, dftValue);
             }
         },
         fromNumber {
@@ -1227,7 +1218,7 @@ final class MappingField {
                 String values = manager.staticForEnumValues();
                 String mapper = "{value}[{var}.intValue()]";
                 mapper = Replacer.value.replace(mapper, values);
-                return manager.getMapping().normalized(mapper, dftValue);
+                return manager.getMapping().doMap(mapper, asNull(manager, dftValue));
             }
         },
         fromString {
@@ -1240,7 +1231,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 String dftValue = manager.staticForDefaultEnumValue();
                 String mapper = "{setterType}.valueOf({var})";
-                return manager.getMapping().normalized(mapper, dftValue);
+                return manager.getMapping().doMap(mapper, asNull(manager, dftValue));
             }
         },
     }
@@ -1258,7 +1249,7 @@ final class MappingField {
                 String getter = getGetterType(manager);
                 String cast = isPrimitiveLt(setter, getter) ? bracketed(setter) : "";
                 String mapper = Replacer.cast.replace("{cast}{var}", cast);
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, null);
             }
         },
         fromPrimitiveChar {
@@ -1272,7 +1263,7 @@ final class MappingField {
                 String setter = getSetterType(manager);
                 String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
                 String mapper = Replacer.cast.replace("{cast}{var}", cast);
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, null);
             }
         },
         fromNumber {
@@ -1285,7 +1276,7 @@ final class MappingField {
             public String doMapping(Manager manager) {
                 String mapper = "{var}.{setterType}Value()";
                 String dftValue = manager.staticForDefaultNumber();
-                return manager.getMapping().normalized(mapper, dftValue);
+                return manager.getMapping().doMap(mapper, dftValue);
             }
         },
         fromString {
@@ -1305,13 +1296,13 @@ final class MappingField {
                     String name = INT.equals(setter) ? "Int" : getSimpleName(wrappedType);
                     String mapper = Replacer.name.replace("{setterType}.parse{name}({var})", name);
                     mapper = Replacer.setterType.replace(mapper, manager.onImported(wrappedType));
-                    return mapping.normalized(mapper, dftValue);
+                    return mapping.doMap(mapper, dftValue);
                 } else {
                     CallerManager transfer = manager.getCaller();
                     CallerInfo info = transfer.findInAll(Number.class, String.class, String.class);
                     String suffix = Replacer.type0.replace(".{type0}Value()", setter);
                     String mapper = info.toString(null, strWrapped(fmt)) + suffix;
-                    return mapping.normalized(mapper, dftValue);
+                    return mapping.doMap(mapper, dftValue);
                 }
             }
         },
@@ -1327,7 +1318,7 @@ final class MappingField {
                 String dft = manager.staticForDefaultNumber();
                 String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
                 String mapper = cast + "{var}.ordinal()";
-                return manager.getMapping().normalized(mapper, dft);
+                return manager.getMapping().doMap(mapper, dft);
             }
         },
         fromCharacter {
@@ -1342,7 +1333,7 @@ final class MappingField {
                 String dft = manager.staticForDefaultNumber();
                 String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
                 String mapper = cast + "{var}.charValue()";
-                return manager.getMapping().normalized(mapper, dft);
+                return manager.getMapping().doMap(mapper, dft);
             }
         }
     }
@@ -1357,7 +1348,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 final String dftValue = manager.staticForDefaultString();
-                return manager.getMapping().normalized(null, dftValue);
+                return manager.getMapping().doMap(null, dftValue);
             }
         },
         fromPrimitiveNumber {
@@ -1371,14 +1362,14 @@ final class MappingField {
                 final MappingManager mapping = manager.getMapping();
                 String formatVal = manager.getModel().getAttr().formatValue();
                 if (formatVal == null) {
-                    return mapping.normalized("{setterType}.valueOf({var})", null);
+                    return mapping.doMap("{setterType}.valueOf({var})", null);
                 } else {
                     String stringType = String.class.getCanonicalName();
                     boolean isAllowLong = isPrimitiveNotLt(LONG, mapping.getGetterType());
                     String targetType = isAllowLong ? LONG : DOUBLE;
                     CallerInfo tInfo = findFormatter(manager, stringType, targetType);
                     String mapper = tInfo.toString(null, strWrapped(formatVal));
-                    return mapping.normalized(mapper, null);
+                    return mapping.doMap(mapper, null);
                 }
             }
         },
@@ -1391,7 +1382,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String mapper = "{setterType}.valueOf({var})";
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, null);
             }
         },
         fromPrimitiveChar {
@@ -1403,7 +1394,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 String mapper = "{setterType}.valueOf({var})";
-                return manager.getMapping().normalized(mapper, null);
+                return manager.getMapping().doMap(mapper, null);
             }
         },
         fromEnum {
@@ -1415,7 +1406,7 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 final String dftValue = manager.staticForDefaultString();
-                return manager.getMapping().normalized("{var}.name()", dftValue);
+                return manager.getMapping().doMap("{var}.name()", asNull(manager, dftValue));
             }
         },
         fromNumber {
@@ -1456,11 +1447,11 @@ final class MappingField {
 
             @Override
             public String doMapping(Manager manager) {
-                return onDateFormattable(manager, (mgr, pattern) -> {
+                return onFormattable(manager, (mgr, pattern) -> {
                     String dftValue = mgr.staticForDefaultString();
                     String format = mgr.staticForJodaDateTimeFormatter(pattern);
                     String fmt = Replacer.format.replace("{format}.print({var})", format);
-                    return mgr.getMapping().normalized(fmt, dftValue);
+                    return mgr.getMapping().doMap(fmt, asNull(manager, dftValue));
                 }, true);
             }
         },
@@ -1472,11 +1463,11 @@ final class MappingField {
 
             @Override
             public String doMapping(Manager manager) {
-                return onDateFormattable(manager, (mgr, pattern) -> {
+                return onFormattable(manager, (mgr, pattern) -> {
                     String dftValue = mgr.staticForDefaultString();
                     String format = mgr.staticForDateTimeFormatter(pattern);
                     String fmt = Replacer.format.replace("{format}.format({var})", format);
-                    return mgr.getMapping().normalized(fmt, dftValue);
+                    return mgr.getMapping().doMap(fmt, asNull(manager, dftValue));
                 }, true);
             }
         },
@@ -1487,13 +1478,12 @@ final class MappingField {
             @Override
             public String doMapping(Manager manager) {
                 final String dftValue = manager.staticForDefaultString();
-                String mapper = "{var} == null ? null : {var}.toString()";
-                return manager.getMapping().normalized(mapper, dftValue);
+                return manager.getMapping().doMap("{var}.toString()", asNull(manager, dftValue));
             }
         };
 
-        private static String asMapping(Manager mgr, Class<?> type,boolean isDateType) {
-            return onDateFormattable(mgr, (m, pattern) -> {
+        private static String asMapping(Manager mgr, Class<?> type, boolean isDateType) {
+            return onFormattable(mgr, (m, pattern) -> {
                 MappingManager mapping = m.getMapping();
                 CallerManager transfer = m.getCaller();
                 String setterType = mapping.getSetterType();
@@ -1501,14 +1491,12 @@ final class MappingField {
                 String stringType = String.class.getCanonicalName();
                 CallerInfo info = transfer.findInAll(setterType, getterType, stringType);
                 String mapper = info.toString(null, strWrapped(pattern));
-                return mapping.normalized(mapper, null);
+                return mapping.doMap(mapper, asNull(mgr, null));
             }, isDateType);
         }
 
-        private static String onDateFormattable(
-            Manager manager,
-            BiFunction<Manager, String, String> formatter,
-            boolean isDateType
+        private static String onFormattable(
+            Manager manager, BiFunction<Manager, String, String> formatter, boolean isDateType
         ) {
             String type = getGetterType(manager);
             String pattern = manager.getFormatPatternVal(type, isDateType);
@@ -1520,6 +1508,26 @@ final class MappingField {
         }
     }
 
+    /**
+     * null 值默认值，调用条件如下:
+     * <p>
+     * 1. 存在可能导致空指针异常的数据转换(就单独一个 {var} 就不用了)
+     * 2. 转换双向均不是基本数据类型
+     *
+     * @param dftValue
+     *
+     * @return
+     */
+    private static String asNull(Manager mgr, String dftValue) {
+        String getterType = getGetterType(mgr);
+        String setterType = getSetterType(mgr);
+        if (isPrimitive(getterType)) {
+            return null;
+        } else if (isPrimitive(setterType)) {
+            return dftValue;
+        }
+        return (dftValue == null ? "null" : dftValue);
+    }
 
     private static CallerInfo getBasicTransfer(Manager manager) {
         String setterType = getSetterType(manager);

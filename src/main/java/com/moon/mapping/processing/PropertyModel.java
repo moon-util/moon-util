@@ -1,9 +1,11 @@
 package com.moon.mapping.processing;
 
+import javax.lang.model.element.TypeElement;
+
 /**
  * @author benshaoye
  */
-final class MappingModel {
+final class PropertyModel {
 
     private Mappable fromProp;
     private Mappable toProp;
@@ -11,15 +13,15 @@ final class MappingModel {
     private String toName;
     private PropertyAttr attr;
 
-    public MappingModel() {}
+    public PropertyModel() {}
 
-    public MappingModel onConvert(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
+    public PropertyModel onConvert(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
         return strategy == ConvertStrategy.FORWARD//
                ? forward(thisProp, thatProp, attr)//
                : backward(thisProp, thatProp, attr);
     }
 
-    private MappingModel forward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
+    private PropertyModel forward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
         this.fromProp = thisProp;
         this.toProp = thatProp;
         this.fromName = "self";
@@ -28,7 +30,7 @@ final class MappingModel {
         return this;
     }
 
-    private MappingModel backward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
+    private PropertyModel backward(Mappable thisProp, Mappable thatProp, PropertyAttr attr) {
         this.fromProp = thatProp;
         this.toProp = thisProp;
         this.fromName = "that";

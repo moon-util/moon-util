@@ -10,12 +10,12 @@ import static com.moon.mapping.processing.ElemUtils.getSimpleName;
 final class MapFieldFactory {
 
     public String doConvertField(final Manager manager) {
-        manager.getMapping().withPropertyType(PropertyType.FINALLY);
+        manager.getMapping().withPropertyType(ModeStrategy.FINALLY);
         String mapped = MappingField.doMapping(manager);
         return onDeclareCompleted(mapped, manager.getModel());
     }
 
-    private String onDeclareCompleted(String t0, MappingModel model) {
+    private String onDeclareCompleted(String t0, PropertyModel model) {
         if (t0 != null) {
             t0 = Replacer.fromName.replace(t0, model.getFromName());
             t0 = Replacer.toName.replace(t0, model.getToName());
@@ -28,7 +28,7 @@ final class MapFieldFactory {
         }
     }
 
-    private String warningAndIgnored(final MappingModel model) {
+    private String warningAndIgnored(final PropertyModel model) {
         String fromType = getSimpleName(model.getFromClassname());
         String toType = getSimpleName(model.getToClassname());
         @SuppressWarnings("all")

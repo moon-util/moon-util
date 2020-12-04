@@ -5,30 +5,30 @@ package com.moon.mapping.processing;
  */
 final class MappingManager {
 
-    private PropertyType type;
-    private final MappingModel model;
+    private ModeStrategy type;
+    private final PropertyModel model;
     private final ImportManager importManager;
 
-    MappingManager(MappingModel model, ImportManager importManager) {
+    MappingManager(PropertyModel model, ImportManager importManager) {
         this.model = model;
         this.importManager = importManager;
     }
 
-    private PropertyType getType() { return type == null ? PropertyType.DECLARE : type; }
+    private ModeStrategy getType() { return type == null ? ModeStrategy.DECLARE : type; }
 
-    public void withPropertyType(PropertyType type) { this.type = type; }
+    public void withPropertyType(ModeStrategy type) { this.type = type; }
 
-    final MappingModel getModel() { return model; }
+    final PropertyModel getModel() { return model; }
 
     public String getSetterType() { return getType().getSetterType(getModel()); }
 
     public String getGetterType() { return getType().getGetterType(getModel()); }
 
-    public String normalized(String mapping, String defaultVal) {
-        return normalized(getModel(), mapping, defaultVal);
+    public String doMap(String mapping, String defaultVal) {
+        return doMap(getModel(), mapping, defaultVal);
     }
 
-    private String normalized(MappingModel model, String mapping, String defaultVal) {
+    private String doMap(PropertyModel model, String mapping, String defaultVal) {
         boolean mandatory = model.isSetterGeneric() || model.isGetterGeneric();
         return get(getType().getSetterType(model), getType().getGetterType(model), mapping, defaultVal, mandatory);
     }
@@ -134,7 +134,6 @@ final class MappingManager {
         return doReplaceVariables(t0, setterType, getterType, mapping);
     }
 
-    private final static String CAST_2_SETTER_TYPE = "({setterType})";
 
     private String doReplaceVariables(
         String t0, String setterType, String getterType, String mapping
@@ -146,6 +145,6 @@ final class MappingManager {
 
     private static String formatMapping(String mapping, boolean mandatory) {
         mapping = mapping == null ? "{var}" : mapping;
-        return mandatory ? CAST_2_SETTER_TYPE + mapping : mapping;
+        return mandatory ? "({setterType})" + mapping : mapping;
     }
 }

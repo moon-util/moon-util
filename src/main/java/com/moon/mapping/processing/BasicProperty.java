@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.moon.mapping.processing.GenericUtils.findActualType;
+import static com.moon.mapping.processing.GenericUtils.findActualTypeOrDeclare;
 import static com.moon.mapping.processing.StringUtils.capitalize;
 
 /**
@@ -32,6 +33,9 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
     public VariableElement getField() { return field; }
 
     @Override
+    public TypeElement getThisClass() { return thisElement; }
+
+    @Override
     public String getThisClassname() {
         return ElemUtils.getQualifiedName(thisElement);
     }
@@ -39,8 +43,10 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
     public void setField(VariableElement field, Map<String, GenericModel> genericMap) {
         this.field = field;
         String declareType = ElemUtils.getFieldDeclareType(field);
+        TypeElement nameable = (TypeElement) field.getEnclosingElement();
+        String declareClassname = ElemUtils.getQualifiedName(nameable);
         setDeclareType(declareType);
-        setActualType(findActualType(genericMap, declareType));
+        setActualType(findActualType(genericMap, declareClassname, declareType));
     }
 
     public void setSetter(ExecutableElement setter, Map<String, GenericModel> genericMap) {
@@ -53,8 +59,22 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         addGetterMethod(toMethod(declareType, getter, genericMap));
     }
 
+    public void setConvert(String fromClass, ExecutableElement convert, Map<String, GenericModel> genericMap) {
+        String declareType = ElemUtils.getSetterDeclareType(convert);
+        BasicMethod method = toMethod(declareType, convert, genericMap);
+
+        TypeElement nameable = (TypeElement) convert.getEnclosingElement();
+        String declareClassname = ElemUtils.getQualifiedName(nameable);
+        String actualType = findActualTypeOrDeclare(genericMap, declareClassname, declareType);
+        String convertByClass = ElemUtils.toSimpleGenericTypename(actualType);
+        String key = ElemUtils.toConvertKey(fromClass, convertByClass, getName());
+        putConvertMethod(key, method);
+    }
+
     private BasicMethod toMethod(String declareType, ExecutableElement method, Map<String, GenericModel> generics) {
-        return new BasicMethod(method, declareType, findActualType(generics, declareType), true);
+        TypeElement nameable = (TypeElement) method.getEnclosingElement();
+        String declareClassname = ElemUtils.getQualifiedName(nameable);
+        return new BasicMethod(method, declareType, findActualType(generics, declareClassname, declareType), true);
     }
 
     /*

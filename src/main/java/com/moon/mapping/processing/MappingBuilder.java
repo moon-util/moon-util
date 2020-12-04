@@ -19,7 +19,7 @@ interface MappingBuilder {
      *
      * @param manager manager，主要使用 manager 当前指向的属性以及周边方法
      *
-     * @return 当前所指向属性的单向映射语句，由{@link MappingModel}控制映射方向
+     * @return 当前所指向属性的单向映射语句，由{@link PropertyModel}控制映射方向
      */
     String doMapping(Manager manager);
 }

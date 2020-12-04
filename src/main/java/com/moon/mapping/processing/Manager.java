@@ -5,7 +5,11 @@ import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
 import org.joda.time.YearMonth;
 
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,7 +40,7 @@ final class Manager {
     private final CallerManager callerManager;
 
     public Manager() {
-        final MappingModel model = new MappingModel();
+        final PropertyModel model = new PropertyModel();
         final ImportManager importManager = new ImportManager();
         final StaticManager staticManager = new StaticManager(importManager);
         final MappingManager mappingManager = new MappingManager(model, importManager);
@@ -46,11 +50,57 @@ final class Manager {
         this.staticManager = staticManager;
     }
 
+    public String findConvertMethod() {
+        String getterType = ElemUtils.toSimpleGenericTypename(getMapping().getGetterType());
+        PropertyModel model = getModel();
+        Mappable to = model.getToProp();
+        Mappable from = model.getFromProp();
+        String propName = to.getName();
+        TypeElement element = from.getThisClass();
+        Types types = EnvUtils.getTypes();
+        do {
+            String classname = ElemUtils.getQualifiedName(element);
+            if (DetectUtils.isTypeof(classname, Object.class)) {
+                return null;
+            }
+            String convertMethodName = getConvertMethodName(classname, getterType, propName);
+            if (convertMethodName != null) {
+                return convertMethodName;
+            }
+            List<? extends TypeMirror> interfaces = element.getInterfaces();
+            if (interfaces != null) {
+                for (TypeMirror anInterface : interfaces) {
+                    TypeElement interElem = (TypeElement) types.asElement(anInterface);
+                    String interClassname = ElemUtils.getQualifiedName(interElem);
+                    convertMethodName = getConvertMethodName(interClassname, getterType, propName);
+                    if (convertMethodName != null) {
+                        return convertMethodName;
+                    }
+                }
+            }
+            element = (TypeElement) types.asElement(element.getSuperclass());
+        } while (true);
+    }
+
+    private final String voidClassname = void.class.getCanonicalName();
+
+    private String getConvertMethodName(String classname, String getterType, String propName) {
+        PropertyModel model = getModel();
+        Mappable to = model.getToProp();
+        String key = ElemUtils.toConvertKey(classname, getterType, propName);
+        String convertMethodName = to.findConvertMethod(key);
+        if (convertMethodName == null) {
+            key = ElemUtils.toConvertKey(voidClassname, getterType, propName);
+            return to.findConvertMethod(key);
+        }
+        return convertMethodName;
+    }
+
     public boolean isModelUsable(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
         return getModel().onConvert(thisProp, thatProp, attr, strategy).isUsable();
     }
 
-    public MappingModel getModel() { return getMapping().getModel(); }
+    public PropertyModel getModel() { return getMapping().getModel(); }
 
     public CallerManager getCaller() { return callerManager; }
 

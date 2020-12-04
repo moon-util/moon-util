@@ -169,8 +169,12 @@ abstract class DetectUtils {
 
     static boolean isMemberField(Element elem) { return isField(elem) && isMember(elem); }
 
+    static boolean isPublicMemberMethod(Element elem) {
+        return isMethod(elem) && isMember(elem) && isPublic(elem);
+    }
+
     static boolean isSetterMethod(Element elem) {
-        if (isMethod(elem) && isMember(elem) && isPublic(elem)) {
+        if (isPublicMemberMethod(elem)) {
             ExecutableElement exe = (ExecutableElement) elem;
             String name = exe.getSimpleName().toString();
             boolean maybeSet = name.length() > 3 && name.startsWith(SET);
@@ -182,7 +186,7 @@ abstract class DetectUtils {
     }
 
     static boolean isGetterMethod(Element elem) {
-        if (isMethod(elem) && isMember(elem) && isPublic(elem)) {
+        if (isPublicMemberMethod(elem)) {
             ExecutableElement exe = (ExecutableElement) elem;
             String name = exe.getSimpleName().toString();
             boolean maybeGet = exe.getParameters().isEmpty();
