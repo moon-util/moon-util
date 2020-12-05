@@ -48,7 +48,7 @@ public abstract class ValidatorUtil extends ValidateUtil {
      * @return 如果验证通过，会返回一个空集合，否则返回的集合非空，里面包含错误信息
      */
     public static <T> Set<ConstraintViolation<T>> validateValue(
-        Class beanType, String fieldName, Object fieldValue, Class... groups
+        Class<T> beanType, String fieldName, Object fieldValue, Class<?>... groups
     ) {
         return HibernateValidator6_1_18.getValidator().validateValue(beanType, fieldName, fieldValue, groups);
     }
@@ -63,7 +63,7 @@ public abstract class ValidatorUtil extends ValidateUtil {
      *
      * @return 如果验证通过，会返回一个空集合，否则返回的集合非空，里面包含错误信息
      */
-    public static <T> Set<ConstraintViolation<T>> validateField(T data, String fieldName, Class... groups) {
+    public static <T> Set<ConstraintViolation<T>> validateField(T data, String fieldName, Class<?>... groups) {
         return HibernateValidator6_1_18.getValidator().validateProperty(data, fieldName, groups);
     }
 
@@ -76,7 +76,7 @@ public abstract class ValidatorUtil extends ValidateUtil {
      *
      * @return 如果验证通过，会返回一个空集合，否则返回的集合非空，里面包含错误信息
      */
-    public static <T> Set<ConstraintViolation<T>> validate(T data, Class... groups) {
+    public static <T> Set<ConstraintViolation<T>> validate(T data, Class<?>... groups) {
         return HibernateValidator6_1_18.getValidator().validate(data, groups);
     }
 

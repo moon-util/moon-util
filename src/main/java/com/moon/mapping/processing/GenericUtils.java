@@ -3,6 +3,7 @@ package com.moon.mapping.processing;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,37 +19,53 @@ final class GenericUtils {
 
     static Map<String, GenericModel> parse(TypeElement element) {
         Map<String, GenericModel> thisGenericMap = new HashMap<>();
-        parse(thisGenericMap, element.asType(), element);
+        parse(thisGenericMap, element.asType(), element, null);
         Types types = EnvUtils.getTypes();
         do {
-            parseInterfaces(thisGenericMap, element.getInterfaces());
+            parseInterfaces(thisGenericMap, element.getInterfaces(), element);
             TypeMirror superclass = element.getSuperclass();
             if (DetectUtils.isTypeof(superclass.toString(), Object.class)) {
                 return thisGenericMap;
             }
-            element = (TypeElement) types.asElement(superclass);
-            parse(thisGenericMap, superclass, element);
+            TypeElement superElem = (TypeElement) types.asElement(superclass);
+            parse(thisGenericMap, superclass, superElem, element);
+            element = superElem;
         } while (true);
     }
 
-    private static void parseInterfaces(Map<String, GenericModel> genericMap, List<? extends TypeMirror> elements) {
-        if (elements == null) {
+    private static void parseInterfaces(
+        Map<String, GenericModel> genericMap, List<? extends TypeMirror> elements, TypeElement implElement
+    ) {
+        if (elements == null || elements.isEmpty()) {
             return;
         }
         Types types = EnvUtils.getTypes();
         for (TypeMirror mirror : elements) {
             TypeElement element = (TypeElement) types.asElement(mirror);
-            parse(genericMap, mirror, element);
+            parse(genericMap, mirror, element, implElement);
+            parseInterfaces(genericMap, element.getInterfaces(), element);
         }
     }
 
-    private static void parse(Map<String, GenericModel> genericMap, TypeMirror elementTyped, TypeElement element) {
+    private static void parse(
+        Map<String, GenericModel> genericMap, TypeMirror elementTyped, TypeElement element, TypeElement subClass
+    ) {
         List<String> actuals = Extract.splitSuperclass(elementTyped.toString());
         String declareClassname = ElemUtils.getQualifiedName(element);
+        String subClassname = subClass == null ? "" : ElemUtils.getQualifiedName(subClass);
+        Elements utils = EnvUtils.getUtils();
         int index = 0;
         for (TypeParameterElement param : element.getTypeParameters()) {
             String actual = index < actuals.size() ? actuals.get(index++) : null;
-            GenericModel model = new GenericModel(param, actual);
+            // 追溯实际类
+            String fullKey = toFullKey(subClassname, actual);
+            GenericModel subGenericModel = genericMap.get(fullKey);
+            if (subGenericModel != null && utils.getTypeElement(actual) == null) {
+                actual = subGenericModel.getActualType();
+            }
+            String bound = param.getBounds().toString();
+            String declare = GenericUtils.getDeclareType(param);
+            GenericModel model = new GenericModel(declare, actual, bound);
             String key = toFullKey(declareClassname, model.getDeclareType());
             genericMap.putIfAbsent(key, model);
         }
@@ -68,6 +85,10 @@ final class GenericUtils {
 
     private static String toFullKey(String declareClassname, String declareType) {
         return declareClassname + '#' + declareType;
+    }
+
+    static String getDeclareType(TypeParameterElement parameterElement) {
+        return parameterElement.toString();
     }
 
     private static class Extract {

@@ -48,7 +48,6 @@ import java.lang.annotation.*;
  *
  * @author moonsky
  */
-@Repeatable(MappingConverter.List.class)
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface MappingConverter {
@@ -62,6 +61,12 @@ public @interface MappingConverter {
      * <pre>
      * &#64;MappingConverter
      * public void setUsername(String username) {} // = {@code username}
+     *
+     * &#64;MappingConverter
+     * public void withAge(String username) {} // = {@code age}
+     *
+     * &#64;MappingConverter
+     * public void address(String username) {} // = {@code address}
      * </pre>
      * 或者直接指定属性名，如:
      * <pre>
@@ -69,7 +74,7 @@ public @interface MappingConverter {
      * public void anyMethodName(String username) {} // = {@code username}
      * </pre>
      *
-     * @return 将要截取的前缀，默认是{@code setter}重载，也可自定义任意前缀
+     * @return 转换器用于设置的属性名
      */
     String set() default "";
 
@@ -79,11 +84,4 @@ public @interface MappingConverter {
      * @return 类名
      */
     Class<?> fromClass() default void.class;
-
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.SOURCE)
-    @interface List {
-
-        MappingConverter[] value() default {};
-    }
 }

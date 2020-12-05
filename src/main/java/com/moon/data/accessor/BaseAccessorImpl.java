@@ -1,7 +1,6 @@
 package com.moon.data.accessor;
 
 import com.moon.data.Record;
-import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
@@ -95,13 +94,12 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> extends Abstrac
      *
      * @param first    将要保存的对象
      * @param second   将要保存的对象
-     * @param entities 将要保存的对象
      *
      * @return 保存后的对象
      */
     @Override
     @Transactional
-    public List<T> saveAll(T first, T second, T... entities) { return getAccessor().saveAll(first, second, entities); }
+    public List<T> saveAll(T first, T second) { return getAccessor().saveAll(first, second); }
 
     /**
      * 查询
@@ -111,94 +109,6 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> extends Abstrac
     @Override
     @Transactional
     public List<T> findAll() { return getAccessor().findAll(); }
-
-    /**
-     * 查询
-     *
-     * @param sort 排序
-     *
-     * @return 排序后的所有对象
-     */
-    @Override
-    @Transactional
-    public List<T> findAll(Sort sort) { return getAccessor().findAll(sort); }
-
-    /**
-     * 查询
-     *
-     * @param pageable 分页
-     *
-     * @return 所有分页对象
-     */
-    @Override
-    @Transactional
-    public Page<T> findAll(Pageable pageable) { return getAccessor().findAll(pageable); }
-
-    /**
-     * 查询
-     *
-     * @param example
-     * @param <S>
-     *
-     * @return 所有符合条件的对象
-     */
-    @Override
-    @Transactional
-    public <S extends T> Iterable<S> findAll(Example<S> example) { return getAccessor().findAll(example); }
-
-    /**
-     * 查询
-     *
-     * @param example
-     * @param sort    排序
-     * @param <S>
-     *
-     * @return 排序后的所有对象
-     */
-    @Override
-    @Transactional
-    public <S extends T> List<S> findAll(Example<S> example, Sort sort) { return getAccessor().findAll(example, sort); }
-
-    /**
-     * 查询
-     *
-     * @param example
-     * @param pageable 分页
-     * @param <S>
-     *
-     * @return 分页对象
-     */
-    @Override
-    @Transactional
-    public <S extends T> Page<S> findAll(Example<S> example, Pageable pageable) {
-        return getAccessor().findAll(example, pageable);
-    }
-
-    /**
-     * 下一页切片
-     *
-     * @param pageable 分页
-     *
-     * @return 分页对象
-     */
-    @Override
-    @Transactional
-    public Slice<T> sliceAll(Pageable pageable) { return getAccessor().sliceAll(pageable); }
-
-    /**
-     * 下一页切片
-     *
-     * @param example
-     * @param pageable
-     * @param <S>
-     *
-     * @return
-     */
-    @Override
-    @Transactional
-    public <S extends T> Slice<S> sliceAll(Example<S> example, Pageable pageable) {
-        return getAccessor().sliceAll(example, pageable);
-    }
 
     /**
      * 查询
@@ -216,14 +126,13 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> extends Abstrac
      *
      * @param first  ID
      * @param second ID
-     * @param id     ID
      *
      * @return ID 匹配的对象
      */
     @Override
     @Transactional
-    public List<T> findAllById(ID first, ID second, ID... ids) {
-        return getAccessor().findAllById(first, second, ids);
+    public List<T> findAllById(ID first, ID second) {
+        return getAccessor().findAllById(first, second);
     }
 
     /**
@@ -335,9 +244,8 @@ public abstract class BaseAccessorImpl<T extends Record<ID>, ID> extends Abstrac
      *
      * @param first    将要删除的对象
      * @param second   将要删除的对象
-     * @param entities 将要删除的对象
      */
     @Override
     @Transactional
-    public void deleteAll(T first, T second, T... entities) { getAccessor().deleteAll(first, second, entities); }
+    public void deleteAll(T first, T second) { getAccessor().deleteAll(first, second); }
 }

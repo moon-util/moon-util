@@ -88,7 +88,6 @@ final class MappingWriter implements JavaFileWritable {
                 // 类全名
                 String thatCls = definition.getCanonicalName();
                 String thatSimpleName = manager.onImported(thatCls);
-                fullClasses.add(thatCls);
                 // bean name
                 String thisBeanName = generator.get(thatCls);
                 // @Bean @ConditionalOnMissingBean

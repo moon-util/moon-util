@@ -11,14 +11,14 @@ public interface ConsumerWriter extends Consumer<PrintWriter> {
     /**
      * write content
      *
-     * @param writer
+     * @param writer writer
      */
     void write(PrintWriter writer);
 
     /**
      * write content
      *
-     * @param writer
+     * @param writer writer
      */
     @Override
     default void accept(PrintWriter writer) { write(writer); }

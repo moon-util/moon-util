@@ -3,7 +3,7 @@ package com.moon.mapping.processing;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.moon.mapping.processing.MapScripts.*;
+import static com.moon.mapping.processing.MappingScripts.*;
 
 /**
  * @author moonsky
@@ -53,7 +53,7 @@ final class MapMethodFactory {
     }
 
     final String fromMapMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(MapScripts.fromMap, thisType);
+        String result = Replacer.thisType.replace(MappingScripts.fromMap, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
@@ -71,12 +71,12 @@ final class MapMethodFactory {
     }
 
     final String toMapMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(MapScripts.toMap, thisType);
+        String result = Replacer.thisType.replace(MappingScripts.toMap, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
     final String newThisAsMapMethod(String thisType) {
-        return Replacer.thisType.replace(MapScripts.newThisAsMap, thisType);
+        return Replacer.thisType.replace(MappingScripts.newThisAsMap, thisType);
     }
 
     final String toStringField(Mappable model, boolean first) {
@@ -93,19 +93,19 @@ final class MapMethodFactory {
     }
 
     final String toStringMethod(String thisType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(MapScripts.toString, thisType);
+        String result = Replacer.thisType.replace(MappingScripts.toString, thisType);
         result = Replacer.thisName.replace(result, thisType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
     final String unsafeForward(String thisType, String thatType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(MapScripts.unsafeForward, thisType);
+        String result = Replacer.thisType.replace(MappingScripts.unsafeForward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 
     final String unsafeBackward(String thisType, String thatType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(MapScripts.unsafeBackward, thisType);
+        String result = Replacer.thisType.replace(MappingScripts.unsafeBackward, thisType);
         result = Replacer.thatType.replace(result, thatType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
@@ -120,7 +120,7 @@ final class MapMethodFactory {
     }
 
     final String cloneMethod(String thisType, String implType, Iterable<String> fields) {
-        String result = Replacer.thisType.replace(MapScripts.clone, thisType);
+        String result = Replacer.thisType.replace(MappingScripts.clone, thisType);
         result = Replacer.implType.replace(result, implType);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }

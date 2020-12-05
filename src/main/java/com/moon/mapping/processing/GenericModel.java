@@ -1,6 +1,5 @@
 package com.moon.mapping.processing;
 
-import javax.lang.model.element.TypeParameterElement;
 import java.util.Objects;
 
 /**
@@ -11,10 +10,6 @@ final class GenericModel {
     private final String declare;
     private final String actual;
     private final String bound;
-
-    public GenericModel(TypeParameterElement parameterElement, String actual) {
-        this(parameterElement.toString(), actual, parameterElement.getBounds().toString());
-    }
 
     public GenericModel(String declare, String actual, String bound) {
         this.declare = declare;
@@ -43,6 +38,7 @@ final class GenericModel {
 
     public String getFinalType() {
         String act = getActualType(), bound = getBoundType();
+        // 这里的 equals 判断是多余的，而且不会走
         return act == null || Objects.equals(act, declare) ? bound : act;
     }
 

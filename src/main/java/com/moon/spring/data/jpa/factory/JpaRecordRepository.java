@@ -31,13 +31,13 @@ public interface JpaRecordRepository<T extends JpaRecord<ID>, ID>
     void disableAll(Iterable<? extends T> entities);
 
     @Override
-    <S extends T> void disableAll(S first, S second, S... entities);
+    <S extends T> void disableAll(S first, S second);
 
     @Override
     <S extends T> S insert(S entity);
 
     @Override
-    List<T> saveAll(T first, T second, T... entities);
+    List<T> saveAll(T first, T second);
 
     @Override
     Slice<T> sliceAll(Pageable pageable);
@@ -46,7 +46,7 @@ public interface JpaRecordRepository<T extends JpaRecord<ID>, ID>
     <S extends T> Slice<S> sliceAll(Example<S> example, Pageable pageable);
 
     @Override
-    List<T> findAllById(ID first, ID second, ID... ids);
+    List<T> findAllById(ID first, ID second);
 
     @Override
     T getById(ID id);
@@ -61,7 +61,7 @@ public interface JpaRecordRepository<T extends JpaRecord<ID>, ID>
     T getOrNull(ID id);
 
     @Override
-    void deleteAll(T first, T second, T... entities);
+    void deleteAll(T first, T second);
 
     @Override
     List<T> findAll();

@@ -60,7 +60,7 @@ public class ResultBody<T> {
     public ResultBody<T> failed() { return status(Boolean.FALSE); }
 
     public ResultBody<T> status(Boolean status) {
-        this.status = status == null ? true : status;
+        this.status = status == null || status;
         return this;
     }
 
@@ -84,7 +84,7 @@ public class ResultBody<T> {
         return this;
     }
 
-    public boolean getStatus() { return status == null ? true : status; }
+    public boolean getStatus() { return status == null || status; }
 
     public void setStatus(Boolean status) { this.status = status; }
 

@@ -132,7 +132,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     @Override
     @Transactional
-    public List<T> saveAll(T first, T second, T... entities) { return saveAll(asList(first, second, entities)); }
+    public List<T> saveAll(T first, T second) { return saveAll(asList(first, second)); }
 
     @Override
     @Transactional
@@ -236,7 +236,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
      */
 
     @Override
-    public List<T> findAllById(ID first, ID second, ID... ids) { return findAllById(asList(first, second, ids)); }
+    public List<T> findAllById(ID first, ID second) { return findAllById(asList(first, second)); }
 
     @Override
     public List<T> findAllById(Iterable<ID> strings) {
@@ -275,15 +275,10 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     @Override
     @Transactional
-    public <S extends T> void disableAll(S first, S second, S... entities) {
+    public <S extends T> void disableAll(S first, S second) {
         Cache cache = getCache();
         doDisableEntity(first, cache);
         doDisableEntity(second, cache);
-        if (entities != null) {
-            for (S entity : entities) {
-                doDisableEntity(entity, cache);
-            }
-        }
     }
 
     /*
@@ -320,7 +315,7 @@ public abstract class AbstractRepositoryImpl<T extends JpaRecord<ID>, ID> extend
 
     @Override
     @Transactional
-    public void deleteAll(T first, T second, T... entities) { deleteAll(asList(first, second, entities)); }
+    public void deleteAll(T first, T second) { deleteAll(asList(first, second)); }
 
     @Override
     @Transactional

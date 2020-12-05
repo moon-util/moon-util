@@ -43,5 +43,5 @@ public interface DataRepository<T extends JpaRecord<ID>, ID> extends BaseReposit
      * @param entities 将要删除的对象
      */
     @Override
-    <S extends T> void disableAll(S first, S second, S... entities);
+    <S extends T> void disableAll(S first, S second);
 }

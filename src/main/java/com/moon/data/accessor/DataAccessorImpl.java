@@ -56,11 +56,10 @@ public abstract class DataAccessorImpl<T extends Record<ID>, ID> extends BaseAcc
      *
      * @param first
      * @param second
-     * @param entities
      */
     @Override
     @Transactional
-    public <S extends T> void disableAll(S first, S second, S... entities) {
-        getAccessor().disableAll(first, second, entities);
+    public <S extends T> void disableAll(S first, S second) {
+        getAccessor().disableAll(first, second);
     }
 }

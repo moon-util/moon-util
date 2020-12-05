@@ -6,7 +6,32 @@ import java.util.Map;
  * @author benshaoye
  */
 @SuppressWarnings("all")
-abstract class MapScripts {
+abstract class MappingScripts {
+
+    private static final String beanMappingStructure = "" +
+        "package {pkg};" +
+        "{imports}" +
+        "{Component}" +
+        "public class {classname} implements {BeanMapping}<{thisType}, {thatType}> {" +
+        "    @Override" +
+        "    public {thatType} unsafeForward({thisType} self, {thatType} that) {" +
+        "        {MAPPINGS}" +
+        "        return that;" +
+        "    }" +
+        "    @Override" +
+        "    public {thisType} unsafeBackward({thisType} self, {thatType} that) {" +
+        "        {MAPPINGS}" +
+        "        return self;" +
+        "    }" +
+        "    @Override" +
+        "    public {thatType} doForward({thisType} self) {" +
+        "        return self == null ? null : unsafeForward(self, new {thatImpl}())" +
+        "    }" +
+        "    @Override" +
+        "    public {thisType} doBackward({thatType} that) {" +
+        "        return that == null ? null : unsafeBackward(new {thisImpl}(), that)" +
+        "    }" +
+        "}";
 
     /**
      * @see com.moon.mapping.BeanMapping#doForward(Object)
@@ -31,7 +56,7 @@ abstract class MapScripts {
         "    return self; " +//
         "}";
 
-    private MapScripts() {}
+    private MappingScripts() {}
 
     /** @see com.moon.mapping.BeanMapping#doForward(Object) */
     final static String newThatAsEmpty = "" +//

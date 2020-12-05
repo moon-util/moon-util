@@ -33,8 +33,7 @@ public interface DataAccessor<T extends Record<ID>, ID> extends BaseAccessor<T, 
      *
      * @param first    将要删除的对象
      * @param second   将要删除的对象
-     * @param entities 将要删除的对象
      * @param <S>      对象子类
      */
-    <S extends T> void disableAll(S first, S second, S... entities);
+    <S extends T> void disableAll(S first, S second);
 }

@@ -1,8 +1,6 @@
 package com.moon.data.accessor;
 
-import com.moon.core.model.BaseSupporter;
 import com.moon.data.Record;
-import org.springframework.data.domain.*;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -12,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
+public interface BaseAccessor<T extends Record<ID>, ID> {
 
     /**
      * 总是用 insert 语句插入一条数据，这是为了支持手动指定 ID 而设计的
@@ -55,6 +53,16 @@ public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
     /**
      * 保存
      *
+     * @param first  将要保存的对象
+     * @param second 将要保存的对象
+     *
+     * @return 保存后的对象
+     */
+    List<T> saveAll(T first, T second);
+
+    /**
+     * 保存
+     *
      * @param entities 将要保存的对象
      *
      * @return 保存后的对象
@@ -62,92 +70,11 @@ public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
     <S extends T> List<S> saveAll(Iterable<S> entities);
 
     /**
-     * 保存
-     *
-     * @param first    将要保存的对象
-     * @param second   将要保存的对象
-     * @param entities 将要保存的对象
-     *
-     * @return 保存后的对象
-     */
-    List<T> saveAll(T first, T second, T... entities);
-
-    /**
      * 查询
      *
      * @return 返回所有记录结果
      */
     List<T> findAll();
-
-    /**
-     * 查询
-     *
-     * @param sort 排序方式
-     *
-     * @return 返回排序后的所有对象
-     */
-    List<T> findAll(Sort sort);
-
-    /**
-     * 查询
-     *
-     * @param pageable 分页
-     *
-     * @return 返回分页结果
-     */
-    Page<T> findAll(Pageable pageable);
-
-    /**
-     * 查询
-     *
-     * @param example
-     * @param <S>
-     *
-     * @return 符合条件的所有对象
-     */
-    <S extends T> Iterable<S> findAll(Example<S> example);
-
-    /**
-     * 查询
-     *
-     * @param example
-     * @param sort    排序方式
-     * @param <S>
-     *
-     * @return 符合条件的所有对象
-     */
-    <S extends T> List<S> findAll(Example<S> example, Sort sort);
-
-    /**
-     * 查询
-     *
-     * @param example
-     * @param pageable 分页
-     * @param <S>
-     *
-     * @return 符合条件的所有分页对象
-     */
-    <S extends T> Page<S> findAll(Example<S> example, Pageable pageable);
-
-    /**
-     * 下一页切片
-     *
-     * @param pageable 分页
-     *
-     * @return 所有符合条件的片段，与 page 的区别是，page 会返回总数，这个不需要返回数据总数
-     */
-    Slice<T> sliceAll(Pageable pageable);
-
-    /**
-     * 下一页切片
-     *
-     * @param example
-     * @param pageable 分页
-     * @param <S>
-     *
-     * @return 所有符合条件的片段，与 page 的区别是，page 会返回总数，这个不需要返回数据总数
-     */
-    <S extends T> Slice<S> sliceAll(Example<S> example, Pageable pageable);
 
     /**
      * 查询
@@ -163,11 +90,10 @@ public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
      *
      * @param first  ID
      * @param second ID
-     * @param ids    ID 列表
      *
      * @return 符合 ID 的所有对象
      */
-    List<T> findAllById(ID first, ID second, ID... ids);
+    List<T> findAllById(ID first, ID second);
 
     /**
      * 查询
@@ -272,9 +198,8 @@ public interface BaseAccessor<T extends Record<ID>, ID> extends BaseSupporter {
     /**
      * 删除
      *
-     * @param first    将要删除的对象
-     * @param second   将要删除的对象
-     * @param entities 将要删除的对象
+     * @param first  将要删除的对象
+     * @param second 将要删除的对象
      */
-    void deleteAll(T first, T second, T... entities);
+    void deleteAll(T first, T second);
 }

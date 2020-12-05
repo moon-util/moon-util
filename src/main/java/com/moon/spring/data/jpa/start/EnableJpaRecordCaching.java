@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 import java.util.function.Function;
 
 /**
- * 【不建议使用，视情况将删除】
+ * 随着现在各种缓存中间件逐渐成熟，不太建议使用
  * <p>
  * 开启 Record 缓存支持
  * <p>

@@ -15,8 +15,10 @@ public class CookieUtil {
 
     /**
      * 获取 Cookie
+     *
      * @param request 请求
-     * @param name Cookie 名
+     * @param name    Cookie 名
+     *
      * @return Cookie
      */
     public static Cookie get(HttpServletRequest request, String name) {
@@ -33,8 +35,10 @@ public class CookieUtil {
 
     /**
      * 获取请求客户端 Cookie 值
+     *
      * @param request 请求
-     * @param name  Cookie 名
+     * @param name    Cookie 名
+     *
      * @return Cookie 值
      */
     public static String getValue(HttpServletRequest request, String name) {
@@ -45,8 +49,8 @@ public class CookieUtil {
     /**
      * 删除 Cookie
      *
-     * @param response
-     * @param name Cookie 名
+     * @param response HttpServletResponse
+     * @param name     Cookie 名
      */
     public static void remove(HttpServletResponse response, String name) { set(response, name, null, 0); }
 

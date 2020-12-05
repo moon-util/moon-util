@@ -11,14 +11,14 @@ public interface ConsumerStream extends Consumer<OutputStream> {
     /**
      * write data
      *
-     * @param writer
+     * @param writer writer
      */
     void write(OutputStream writer);
 
     /**
      * write data
      *
-     * @param writer
+     * @param writer writer
      */
     @Override
     default void accept(OutputStream writer) { write(writer); }

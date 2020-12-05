@@ -42,7 +42,7 @@ public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaReposito
      * @return 保存后的对象
      */
     @Override
-    List<T> saveAll(T first, T second, T... entities);
+    List<T> saveAll(T first, T second);
 
     /**
      * 下一页切片
@@ -51,7 +51,6 @@ public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaReposito
      *
      * @return 所有符合条件的片段，与 page 的区别是，page 会返回总数，这个不需要返回数据总数
      */
-    @Override
     Slice<T> sliceAll(Pageable pageable);
 
     /**
@@ -62,11 +61,10 @@ public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaReposito
      *
      * @return 所有符合条件的片段，与 page 的区别是，page 会返回总数，这个不需要返回数据总数
      */
-    @Override
     <S extends T> Slice<S> sliceAll(Example<S> example, Pageable pageable);
 
     /**
-     * 查询
+     * 查询，返回存在关联 ID 的集合
      *
      * @param first  ID
      * @param second ID
@@ -75,10 +73,10 @@ public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaReposito
      * @return 符合 ID 的所有对象
      */
     @Override
-    List<T> findAllById(ID first, ID second, ID... ids);
+    List<T> findAllById(ID first, ID second);
 
     /**
-     * 查询
+     * 查询，不存在时抛出异常
      *
      * @param id ID
      *
@@ -90,18 +88,20 @@ public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaReposito
     T getById(ID id);
 
     /**
-     * 查询
+     * 查询，不存在时抛出异常
      *
      * @param id                    ID
      * @param throwsMessageIfAbsent 异常消息
      *
      * @return ID 匹配的对象，不存在是抛出异常
+     *
+     * @throws IllegalArgumentException 数据不存在
      */
     @Override
     T getById(ID id, String throwsMessageIfAbsent);
 
     /**
-     * 查询，抛出指定异常
+     * 查询，不存在时抛出指定异常
      *
      * @param id            ID
      * @param throwIfAbsent 异常
@@ -131,7 +131,7 @@ public interface BaseRepository<T extends JpaRecord<ID>, ID> extends JpaReposito
      * @param entities 将要删除的对象
      */
     @Override
-    void deleteAll(T first, T second, T... entities);
+    void deleteAll(T first, T second);
 
     /**
      * 查询
