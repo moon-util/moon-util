@@ -1,7 +1,10 @@
 package com.moon.mapping.annotation;
 
 import java.beans.Introspector;
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 自定义转换器
@@ -11,7 +14,6 @@ import java.lang.annotation.*;
  * 如果一个属性到另一个属性的映射是不同类型，可通过{@code setter}重载的方式
  * 自定义转换器，此时在重载的{@code setter}方法上注解{@link MappingConverter}即可
  * 标记这个方法将被用作转换器。如:
- *
  * <pre>
  * public class Car {
  *     private Integer kilometers;
@@ -29,14 +31,14 @@ import java.lang.annotation.*;
  *     }
  *
  *     // 也可以这样自定义转换器
- *     &#64;MappingConverter(prefix = "with")
+ *     &#64;MappingConverter
  *     public void withKilometers(Long km) {
  *         this.setKilometers(km == null ? null : km.toString());
  *     }
  *
  *     // 或者这样从指定类转换时使用的转换器
- *     &#64;MappingConverter(prefix = "use", fromClass = Transportation.class)
- *     public void useKilometers(Long km) {
+ *     &#64;MappingConverter(fromClass = Transportation.class)
+ *     public void kilometers(Long km) {
  *         this.setKilometers(km == null ? null : km.toString());
  *     }
  *
@@ -55,7 +57,7 @@ public @interface MappingConverter {
     /**
      * 注解{@link MappingConverter}的方法将被用作哪个字段的转换器
      * <p>
-     * 默认是{@code setter}方法重载，或{@code withXxxProperty}方法，
+     * 默认是{@code setter}方法重载，或{@code withXxx}方法，
      * 从方法名中去掉{@code set/with}前缀后执行{@link Introspector#decapitalize(String)}
      * 得到的结果就是将要设置的属性名，如:
      * <pre>
@@ -67,16 +69,15 @@ public @interface MappingConverter {
      *
      * &#64;MappingConverter
      * public void address(String username) {} // = {@code address}
-     * </pre>
-     * 或者直接指定属性名，如:
-     * <pre>
+     *
+     * // 或者直接指定属性名，如:
      * &#64;MappingConverter(set = "username")
      * public void anyMethodName(String username) {} // = {@code username}
      * </pre>
      *
      * @return 转换器用于设置的属性名
      */
-    String set() default "";
+    String value() default "";
 
     /**
      * 从哪个类向当前属性映射时执行的转换，默认任意类

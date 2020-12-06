@@ -50,20 +50,32 @@ final class Manager {
         this.staticManager = staticManager;
     }
 
-    public String findConvertMethod() {
-        String getterType = ElemUtils.toSimpleGenericTypename(getMapping().getGetterType());
+    public String findProviderMethod() {
         PropertyModel model = getModel();
         Mappable to = model.getToProp();
         Mappable from = model.getFromProp();
-        String propName = to.getName();
-        TypeElement element = from.getThisClass();
+        String setterType = ElemUtils.toSimpleGenericTypename(getMapping().getSetterType());
+        return doFindMethod(to.getThisClass(), from, setterType, to.getName());
+    }
+
+    public String findConverterMethod() {
+        PropertyModel model = getModel();
+        Mappable to = model.getToProp();
+        Mappable from = model.getFromProp();
+        String getterType = ElemUtils.toSimpleGenericTypename(getMapping().getGetterType());
+        return doFindMethod(from.getThisClass(), to, getterType, to.getName());
+    }
+
+    private final String voidClassname = void.class.getCanonicalName();
+
+    private String doFindMethod(TypeElement element, Mappable mappable, String targetType, String propName) {
         Types types = EnvUtils.getTypes();
         do {
             String classname = ElemUtils.getQualifiedName(element);
             if (DetectUtils.isTypeof(classname, Object.class)) {
                 return null;
             }
-            String convertMethodName = getConvertMethodName(classname, getterType, propName);
+            String convertMethodName = getMethodName(mappable, classname, targetType, propName);
             if (convertMethodName != null) {
                 return convertMethodName;
             }
@@ -71,8 +83,8 @@ final class Manager {
             if (interfaces != null) {
                 for (TypeMirror anInterface : interfaces) {
                     TypeElement interElem = (TypeElement) types.asElement(anInterface);
-                    String interClassname = ElemUtils.getQualifiedName(interElem);
-                    convertMethodName = getConvertMethodName(interClassname, getterType, propName);
+                    String interClass = ElemUtils.getQualifiedName(interElem);
+                    convertMethodName = getMethodName(mappable, interClass, targetType, propName);
                     if (convertMethodName != null) {
                         return convertMethodName;
                     }
@@ -82,16 +94,12 @@ final class Manager {
         } while (true);
     }
 
-    private final String voidClassname = void.class.getCanonicalName();
-
-    private String getConvertMethodName(String classname, String getterType, String propName) {
-        PropertyModel model = getModel();
-        Mappable to = model.getToProp();
+    private String getMethodName(Mappable mappable, String classname, String getterType, String propName) {
         String key = ElemUtils.toConvertKey(classname, getterType, propName);
-        String convertMethodName = to.findConvertMethod(key);
+        String convertMethodName = mappable.findConverterMethod(key);
         if (convertMethodName == null) {
             key = ElemUtils.toConvertKey(voidClassname, getterType, propName);
-            return to.findConvertMethod(key);
+            return mappable.findConverterMethod(key);
         }
         return convertMethodName;
     }
@@ -125,10 +133,10 @@ final class Manager {
     public String getFormatPatternVal(String type, boolean isDefaultDate) {
         String pattern = getModel().getAttr().formatValue();
         return pattern == null//
-               ? (isDefaultDate//
-                  ? defaultFormats.getOrDefault(type, DATE_FORMAT)//
-                  : defaultFormats.get(type))//
-               : pattern;
+            ? (isDefaultDate//
+            ? defaultFormats.getOrDefault(type, DATE_FORMAT)//
+            : defaultFormats.get(type))//
+            : pattern;
     }
 
     /*

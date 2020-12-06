@@ -79,8 +79,8 @@ final class GenericUtils {
     static String findActualTypeOrDeclare(
         Map<String, GenericModel> generics, String declareClassname, String declareType
     ) {
-        String actualType = findActualType(generics, declareClassname, declareType);
-        return actualType == null ? declareType : actualType;
+        GenericModel model = generics.get(toFullKey(declareClassname, declareType));
+        return model == null ? declareType : model.getFinalType();
     }
 
     private static String toFullKey(String declareClassname, String declareType) {

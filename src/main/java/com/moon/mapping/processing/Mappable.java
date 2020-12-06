@@ -48,7 +48,16 @@ interface Mappable {
      *
      * @return
      */
-    String findConvertMethod(String key);
+    String findConverterMethod(String key);
+
+    /**
+     * 查找自定义类型转换器的方法名
+     *
+     * @param key {@link ElemUtils#toConvertKey(String, String, String)}
+     *
+     * @return
+     */
+    String findProviderMethod(String key);
 
     /**
      * 是否有 getter

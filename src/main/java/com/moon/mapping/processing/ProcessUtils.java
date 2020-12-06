@@ -133,7 +133,7 @@ final class ProcessUtils {
         Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
         BasicDefinition definition = parseRootPropertiesMap(rootElement, thisGenericMap);
         parseSuperPropertiesMap(thisGenericMap, new HashSet<>(), definition, rootElement, rootElement);
-        ConverterUtils.parseMappingConverts(thisGenericMap, rootElement, definition);
+        ConverterUtils.parseConverters(thisGenericMap, rootElement, definition);
         definition.onCompleted();
         return definition;
     }

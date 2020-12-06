@@ -15,6 +15,14 @@ abstract class ElemUtils {
         return stringifyTypeMirror(elem.asType());
     }
 
+    public static String getGetterFullType(ExecutableElement elem) {
+        return elem.getReturnType().toString();
+    }
+
+    public static String getSetterFullType(ExecutableElement elem) {
+        return elem.getParameters().get(0).asType().toString();
+    }
+
     public static String getGetterDeclareType(ExecutableElement elem) {
         return stringifyTypeMirror(elem.getReturnType());
     }
@@ -27,8 +35,8 @@ abstract class ElemUtils {
         Element typeElem = EnvUtils.getTypes().asElement(type);
         @SuppressWarnings("all")//
         String declareType = typeElem instanceof QualifiedNameable//
-                             ? getQualifiedName((QualifiedNameable) typeElem) //
-                             : (typeElem == null ? type.toString() : typeElem.toString());
+            ? getQualifiedName((QualifiedNameable) typeElem) //
+            : (typeElem == null ? type.toString() : typeElem.toString());
         return declareType;
     }
 

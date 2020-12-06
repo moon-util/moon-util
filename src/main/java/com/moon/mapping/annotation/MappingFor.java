@@ -8,12 +8,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 映射注册
- *
+ * 注册映射器
+ * <p>
  * 将{@code MappingFor}注册在普通 PO、BO、VO、DO、Entity、Model 上, 并指定映射目标
  * 映射目标同样是一个 PO、DO 或其他数据模型
- *
- * 运行是可以通过{@link MappingUtil}获取相应映射。如下:
+ * <p>
+ * 运行时可以通过{@link MappingUtil}获取相应映射。如下:
  *
  * <pre>
  * public class CarEntity {

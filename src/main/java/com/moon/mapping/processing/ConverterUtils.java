@@ -1,6 +1,7 @@
 package com.moon.mapping.processing;
 
 import com.moon.mapping.annotation.MappingConverter;
+import com.moon.mapping.annotation.MappingProvider;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -9,15 +10,21 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author moonsky
  */
 abstract class ConverterUtils {
 
-    static void parseMappingConverts(
+    static void parseConverters(
+        Map<String, GenericModel> thisGenericMap, TypeElement rootElement, BasicDefinition definition
+    ) { parse(thisGenericMap, rootElement, definition); }
+
+    static <T extends Annotation> void parse(
         Map<String, GenericModel> thisGenericMap, TypeElement rootElement, BasicDefinition definition
     ) {
         Types types = EnvUtils.getTypes();
@@ -26,16 +33,16 @@ abstract class ConverterUtils {
             if (element == null) {
                 return;
             }
-            parseConverters(thisGenericMap, element, definition);
+            doParse(thisGenericMap, element, definition);
             for (TypeMirror anInterface : element.getInterfaces()) {
                 TypeElement interElem = (TypeElement) types.asElement(anInterface);
-                parseConverters(thisGenericMap, interElem, definition);
+                doParse(thisGenericMap, interElem, definition);
             }
             element = (TypeElement) types.asElement(element.getSuperclass());
         } while (true);
     }
 
-    private static void parseConverters(
+    private static <T extends Annotation> void doParse(
         Map<String, GenericModel> thisGenericMap, TypeElement classElement, BasicDefinition definition
     ) {
         if (classElement == null) {
@@ -46,12 +53,59 @@ abstract class ConverterUtils {
             return;
         }
         for (Element element : elements) {
-            MappingConverter[] converters = getConverters(element);
-            if (converters == null || converters.length == 0) {
+            MappingConverter[] cs = getConverters(element);
+            if (cs != null && cs.length > 0) {
+                parseMappingConverters(thisGenericMap, element, definition, cs);
+            }
+            MappingProvider[] ps = getProviders(element);
+            if (ps != null && ps.length > 0) {
+                parseMappingProviders(thisGenericMap, element, definition, ps);
+            }
+        }
+    }
+
+    private static void parseMappingProviders(
+        Map<String, GenericModel> thisGenericMap,
+        Element element,
+        BasicDefinition definition,
+        MappingProvider[] providers
+    ) {
+        for (MappingProvider pvd : providers) {
+            ExecutableElement method = (ExecutableElement) element;
+            String propertyName = toPropertyName(method, pvd, MappingProvider::value, GET, PROVIDE);
+            BasicProperty property = definition.get(propertyName);
+            if (property == null) {
                 continue;
             }
-            parseMappingConverters(thisGenericMap, element, definition, converters);
+            String forClass;
+            try {
+                forClass = pvd.provideFor().getCanonicalName();
+            } catch (MirroredTypeException mirrored) {
+                forClass = mirrored.getTypeMirror().toString();
+            }
+            property.setProvider(forClass, method, thisGenericMap);
         }
+    }
+
+    private static final String SET = "set", WITH = "with", GET = "get", PROVIDE = "provide";
+
+    private static <T> String toPropertyName(
+        ExecutableElement m, T annotation, Function<T, String> getter, String... prefixes
+    ) {
+        String name = getter.apply(annotation);
+        if (StringUtils.isBlank(name)) {
+            String propertyName = ElemUtils.getSimpleName(m);
+            if (prefixes != null) {
+                for (String prefix : prefixes) {
+                    if (propertyName.startsWith(prefix)) {
+                        propertyName = propertyName.substring(prefix.length());
+                        break;
+                    }
+                }
+            }
+            return StringUtils.decapitalize(propertyName);
+        }
+        return name;
     }
 
     private static void parseMappingConverters(
@@ -62,7 +116,7 @@ abstract class ConverterUtils {
     ) {
         for (MappingConverter cvt : converters) {
             ExecutableElement method = (ExecutableElement) element;
-            String propertyName = toPropertyName(method, cvt);
+            String propertyName = toPropertyName(method, cvt, MappingConverter::value, SET, WITH);
             BasicProperty property = definition.get(propertyName);
             if (property == null) {
                 continue;
@@ -73,25 +127,8 @@ abstract class ConverterUtils {
             } catch (MirroredTypeException mirrored) {
                 fromClass = mirrored.getTypeMirror().toString();
             }
-            property.setConvert(fromClass, method, thisGenericMap);
+            property.setConverter(fromClass, method, thisGenericMap);
         }
-    }
-
-    private static final String SET = "set", WITH = "with";
-
-    private static String toPropertyName(ExecutableElement method, MappingConverter convert) {
-        String set = convert.set();
-        if (StringUtils.isBlank(set)) {
-            String simpleName = ElemUtils.getSimpleName(method);
-            String propertyName=simpleName;
-            if (simpleName.startsWith(SET)) {
-                propertyName = simpleName.substring(3);
-            } else if (simpleName.startsWith(WITH)) {
-                propertyName = simpleName.substring(4);
-            }
-            return StringUtils.decapitalize(propertyName);
-        }
-        return set;
     }
 
     private static MappingConverter[] getConverters(Element elem) {
@@ -100,6 +137,16 @@ abstract class ConverterUtils {
             int size = method.getParameters().size();
             if (size == 1 && DetectUtils.isTypeKind(method.getReturnType(), TypeKind.VOID)) {
                 return elem.getAnnotationsByType(MappingConverter.class);
+            }
+        }
+        return null;
+    }
+
+    private static MappingProvider[] getProviders(Element elem) {
+        if (DetectUtils.isPublicMemberMethod(elem)) {
+            ExecutableElement method = (ExecutableElement) elem;
+            if (method.getParameters().size() == 0) {
+                return elem.getAnnotationsByType(MappingProvider.class);
             }
         }
         return null;

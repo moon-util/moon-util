@@ -69,10 +69,15 @@ final class MappingField {
     }
 
     private static String doMappingIfAssignable(Manager manager) {
-        String convertMethod = manager.findConvertMethod();
+        // 转换优先级顺序: setter 转换器、getter 转换器、内置默认转换器
+        String template = "{toName}.{setterName}({fromName}.{getterName}());";
+        String convertMethod = manager.findConverterMethod();
         if (convertMethod != null) {
-            String template = "{toName}.{setterName}({fromName}.{getterName}());";
             return Replacer.setterName.replace(template, convertMethod);
+        }
+        String provideMethod = manager.findProviderMethod();
+        if (provideMethod != null) {
+            return Replacer.getterName.replace(template, provideMethod);
         }
 
         String setterType = getSetterType(manager);
@@ -1559,24 +1564,14 @@ final class MappingField {
     }
 
     private static boolean isJodaSpecialDate(String type) {
-        return Imported.JODA_TIME && isTypeofAny(type,
-            MutableDateTime.class,
-            DateTime.class,
-            LocalDateTime.class,
-            LocalDate.class,
-            LocalTime.class,
-            YearMonth.class,
-            Instant.class,
-            MonthDay.class);
+        return Imported.JODA_TIME &&
+            isTypeofAny(type, MutableDateTime.class, DateTime.class, LocalDateTime.class, LocalDate.class,
+                LocalTime.class, YearMonth.class, Instant.class, MonthDay.class);
     }
 
     private static boolean isJdk8Date(String type) {
-        return isTypeofAny(type,
-            java.time.LocalDateTime.class,
-            java.time.ZonedDateTime.class,
-            java.time.OffsetDateTime.class,
-            java.time.Instant.class,
-            java.time.LocalDate.class,
+        return isTypeofAny(type, java.time.LocalDateTime.class, java.time.ZonedDateTime.class,
+            java.time.OffsetDateTime.class, java.time.Instant.class, java.time.LocalDate.class,
             java.time.LocalTime.class);
     }
 

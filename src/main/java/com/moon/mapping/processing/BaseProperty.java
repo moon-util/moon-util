@@ -46,7 +46,11 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
     /**
      * 所有转换器
      */
-    private Map<String, M> convertMap;
+    private Map<String, M> converterMap;
+    /**
+     * 所有转换器
+     */
+    private Map<String, M> providerMap;
 
     BaseProperty(String name, TypeElement enclosingElement) {
         this.enclosingElement = enclosingElement;
@@ -65,7 +69,9 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
 
     public List<M> getGetterArr() { return getterArr; }
 
-    public Map<String, M> getConvertMap() { return convertMap; }
+    public Map<String, M> getConverterMap() { return converterMap; }
+
+    public Map<String, M> getProviderMap() { return providerMap; }
 
     public M getSetter() { return setter; }
 
@@ -79,13 +85,23 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
         return getterArr == null ? (getterArr = new ArrayList<>()) : getterArr;
     }
 
-    public Map<String, M> ensureConvertMap() {
-        return convertMap == null ? (convertMap = new HashMap<>()) : convertMap;
+    public Map<String, M> ensureConverterMap() {
+        return converterMap == null ? (converterMap = new HashMap<>()) : converterMap;
+    }
+
+    public Map<String, M> ensureProviderMap() {
+        return providerMap == null ? (providerMap = new HashMap<>()) : providerMap;
     }
 
     @Override
-    public String findConvertMethod(String key) {
-        M convert = ensureConvertMap().get(key);
+    public String findConverterMethod(String key) {
+        M convert = ensureConverterMap().get(key);
+        return convert == null ? null : convert.getMethodName();
+    }
+
+    @Override
+    public String findProviderMethod(String key) {
+        M convert = ensureProviderMap().get(key);
         return convert == null ? null : convert.getMethodName();
     }
 
@@ -108,5 +124,7 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
 
     public void addGetterMethod(M getter) { ensureGetterArr().add(getter); }
 
-    public void putConvertMethod(String key, M convert) { ensureConvertMap().putIfAbsent(key, convert); }
+    public void putConverterMethod(String key, M convert) { ensureConverterMap().putIfAbsent(key, convert); }
+
+    public void putProviderMethod(String key, M convert) { ensureProviderMap().putIfAbsent(key, convert); }
 }

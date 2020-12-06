@@ -59,16 +59,24 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         addGetterMethod(toMethod(declareType, getter, genericMap));
     }
 
-    public void setConvert(String fromClass, ExecutableElement convert, Map<String, GenericModel> genericMap) {
-        String declareType = ElemUtils.getSetterDeclareType(convert);
-        BasicMethod method = toMethod(declareType, convert, genericMap);
+    public void setConverter(String fromClass, ExecutableElement converter, Map<String, GenericModel> genericMap) {
+        String declareType = ElemUtils.getSetterFullType(converter);
+        String key = toConvertKey(fromClass, declareType, converter, genericMap);
+        super.putConverterMethod(key, toMethod(declareType, converter, genericMap));
+    }
 
-        TypeElement nameable = (TypeElement) convert.getEnclosingElement();
+    public void setProvider(String forClass, ExecutableElement provider, Map<String, GenericModel> genericMap) {
+        String declareType = ElemUtils.getGetterFullType(provider);
+        String key = toConvertKey(forClass, declareType, provider, genericMap);
+        super.putProviderMethod(key, toMethod(declareType, provider, genericMap));
+    }
+
+    private String toConvertKey(String targetClass,String declareType, ExecutableElement method, Map<String, GenericModel> genericMap){
+        TypeElement nameable = (TypeElement) method.getEnclosingElement();
         String declareClassname = ElemUtils.getQualifiedName(nameable);
         String actualType = findActualTypeOrDeclare(genericMap, declareClassname, declareType);
         String convertByClass = ElemUtils.toSimpleGenericTypename(actualType);
-        String key = ElemUtils.toConvertKey(fromClass, convertByClass, getName());
-        putConvertMethod(key, method);
+        return ElemUtils.toConvertKey(targetClass, convertByClass, getName());
     }
 
     private BasicMethod toMethod(String declareType, ExecutableElement method, Map<String, GenericModel> generics) {
