@@ -10,5 +10,4 @@ import com.moon.data.accessor.DataAccessor;
  * @see com.moon.data.accessor.BaseAccessor
  * @see DataAccessor
  */
-@SuppressWarnings("all")
 public interface DataSynchronizer<T extends Record<ID>, ID> extends BaseSynchronizer<T, ID>, DataAccessor<T, ID> {}

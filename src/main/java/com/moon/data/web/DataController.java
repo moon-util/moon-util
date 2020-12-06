@@ -91,7 +91,7 @@ public abstract class DataController<T extends Record<ID>, ID> extends DataAcces
     protected final <T> void registryVo2Entity(
         Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends DataService> serviceSupplier
     ) {
-        RecordRegistry.registry(type, id -> {
+        RecordRegistry.register(type, id -> {
             if (id == null) {
                 return defaultEntitySupplier.get();
             } else if (id instanceof CharSequence && StringUtil.isEmpty((CharSequence) id)) {
