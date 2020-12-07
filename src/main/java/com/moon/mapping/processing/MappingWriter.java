@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Generated;
 import javax.annotation.processing.Filer;
 import java.io.IOException;
 import java.util.*;
@@ -51,6 +52,7 @@ final class MappingWriter implements JavaFileWritable {
         // 类内容: public class BeanMappingConfigurationXXXXAtXXXX { beans }
         final StringAdder configurationAdder = new StringAdder();
         configurationAdder.add("@").add(manager.onImported(Configuration.class));
+        annotationGenerated(configurationAdder, manager);
         configurationAdder.add("@SuppressWarnings({\"all\",\"unchecked\"})");
         configurationAdder.add(" public class ").add(configName).add(" {");
         configurationAdder.add(beansAddr).add("}");
@@ -133,9 +135,20 @@ final class MappingWriter implements JavaFileWritable {
         // StringAdder shardAdder = def.implMappingSharedMethods(manager);
         StringAdder adder = new StringAdder();
         adder.add("package ").pkg(BeanMapping.class).add(';').add(manager.toStringForImports());
+        annotationGenerated(adder, manager);
         adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
         adder.impl(BeanMapping.class).add("{TO,").add(enumAdder).add(';').add(manager.toStringForStaticVars());
         return adder.add("}");
+    }
+
+    private static void annotationGenerated(StringAdder adder, Manager manager){
+        adder.add("@")
+            .add(manager.onImported(Generated.class))
+            .add("(value = \"")
+            .add(MappingProcessor.class.getCanonicalName())
+            .add("\", date = \"")
+            .add(new Date())
+            .add("\")");
     }
 
     private String toSourceName(final BaseDefinition def) {

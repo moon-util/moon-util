@@ -11,8 +11,7 @@ public class Mappings {
     private final static String NS;
 
     static {
-        String packageName = Mappings.class.getPackage().getName();
-        NS = packageName + ".BeanMapping_";
+        NS = Mappings.class.getPackage().getName() + ".BM_";
     }
 
     private Mappings() {}

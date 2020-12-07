@@ -5,12 +5,16 @@ import org.joda.time.LocalTime;
 import org.joda.time.MonthDay;
 import org.joda.time.YearMonth;
 
+import javax.annotation.Generated;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+
+import static com.moon.mapping.processing.ElemUtils.toConvertKey;
 
 /**
  * @author moonsky
@@ -48,6 +52,9 @@ final class Manager {
         this.mappingManager = mappingManager;
         this.importManager = importManager;
         this.staticManager = staticManager;
+
+        onImported(Generated.class);
+        onImported(Generated.class);
     }
 
     public String findProviderMethod() {
@@ -55,7 +62,7 @@ final class Manager {
         Mappable to = model.getToProp();
         Mappable from = model.getFromProp();
         String setterType = ElemUtils.toSimpleGenericTypename(getMapping().getSetterType());
-        return doFindMethod(to.getThisClass(), from, setterType, to.getName());
+        return doFindMethod(to.getThisClass(), from::findProviderMethod, setterType, to.getName());
     }
 
     public String findConverterMethod() {
@@ -63,19 +70,21 @@ final class Manager {
         Mappable to = model.getToProp();
         Mappable from = model.getFromProp();
         String getterType = ElemUtils.toSimpleGenericTypename(getMapping().getGetterType());
-        return doFindMethod(from.getThisClass(), to, getterType, to.getName());
+        return doFindMethod(from.getThisClass(), to::findConverterMethod, getterType, to.getName());
     }
 
-    private final String voidClassname = void.class.getCanonicalName();
+    private final String voidClass = void.class.getCanonicalName();
 
-    private String doFindMethod(TypeElement element, Mappable mappable, String targetType, String propName) {
+    private String doFindMethod(
+        TypeElement element, Function<String, String> getter, String targetType, String propName
+    ) {
         Types types = EnvUtils.getTypes();
         do {
             String classname = ElemUtils.getQualifiedName(element);
             if (DetectUtils.isTypeof(classname, Object.class)) {
                 return null;
             }
-            String convertMethodName = getMethodName(mappable, classname, targetType, propName);
+            String convertMethodName = getMethodName(getter, classname, targetType, propName);
             if (convertMethodName != null) {
                 return convertMethodName;
             }
@@ -84,7 +93,7 @@ final class Manager {
                 for (TypeMirror anInterface : interfaces) {
                     TypeElement interElem = (TypeElement) types.asElement(anInterface);
                     String interClass = ElemUtils.getQualifiedName(interElem);
-                    convertMethodName = getMethodName(mappable, interClass, targetType, propName);
+                    convertMethodName = getMethodName(getter, interClass, targetType, propName);
                     if (convertMethodName != null) {
                         return convertMethodName;
                     }
@@ -94,14 +103,11 @@ final class Manager {
         } while (true);
     }
 
-    private String getMethodName(Mappable mappable, String classname, String getterType, String propName) {
-        String key = ElemUtils.toConvertKey(classname, getterType, propName);
-        String convertMethodName = mappable.findConverterMethod(key);
-        if (convertMethodName == null) {
-            key = ElemUtils.toConvertKey(voidClassname, getterType, propName);
-            return mappable.findConverterMethod(key);
-        }
-        return convertMethodName;
+    private String getMethodName(
+        Function<String, String> getter, String classname, String getterType, String propName
+    ) {
+        String cvt = getter.apply(toConvertKey(classname, getterType, propName));
+        return cvt == null ? getter.apply(toConvertKey(voidClass, getterType, propName)) : cvt;
     }
 
     public boolean isModelUsable(Mappable thisProp, Mappable thatProp, PropertyAttr attr, ConvertStrategy strategy) {
@@ -133,10 +139,10 @@ final class Manager {
     public String getFormatPatternVal(String type, boolean isDefaultDate) {
         String pattern = getModel().getAttr().formatValue();
         return pattern == null//
-            ? (isDefaultDate//
-            ? defaultFormats.getOrDefault(type, DATE_FORMAT)//
-            : defaultFormats.get(type))//
-            : pattern;
+               ? (isDefaultDate//
+                  ? defaultFormats.getOrDefault(type, DATE_FORMAT)//
+                  : defaultFormats.get(type))//
+               : pattern;
     }
 
     /*

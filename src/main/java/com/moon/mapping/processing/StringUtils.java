@@ -13,7 +13,7 @@ abstract class StringUtils {
     static String underscore(String classname) { return classname.replace('.', '_'); }
 
     static String toMappingClassname(String classname) {
-        return "BeanMapping_" + underscore(classname);
+        return "BM_" + underscore(classname);
     }
 
     static String decapitalize(String name) {

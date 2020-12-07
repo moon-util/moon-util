@@ -9,7 +9,6 @@ import com.moon.core.lang.ref.LongAccessor;
 import com.moon.core.time.CalendarUtil;
 import com.moon.core.time.DateUtil;
 import com.moon.poi.excel.CellFactory;
-import sun.util.BuddhistCalendar;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -156,7 +155,7 @@ enum TransferForGet implements GetTransfer {
     /**
      * 日历
      */
-    CALENDAR(Calendar.class, GregorianCalendar.class, BuddhistCalendar.class) {
+    CALENDAR(Calendar.class, GregorianCalendar.class) {
         @Override
         public boolean test(Object data) { return data instanceof Calendar; }
 

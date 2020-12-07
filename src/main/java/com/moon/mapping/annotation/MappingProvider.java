@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * <pre>
  * 为{@link #provideFor()}类中{@link #value()}字段提供值。
  * </pre>
- * 要求 getter 方法返回值和转换对应的字段类型完全相同
+ * 要求 getter 方法返回值和转换对应的字段类型完全相同，否则就忽略掉
  *
  * @author benshaoye
  */

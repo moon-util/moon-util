@@ -17,7 +17,6 @@ import org.joda.time.MutableDateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 import org.joda.time.format.DateTimeFormat;
-import sun.util.BuddhistCalendar;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -241,7 +240,7 @@ class JSONStringer implements Stringify {
 
             @Override
             public Set<Class> getSupportsCls() {
-                return SetUtil.newSet(Calendar.class, GregorianCalendar.class, BuddhistCalendar.class);
+                return SetUtil.newSet(Calendar.class, GregorianCalendar.class);
             }
         },
         DATE {

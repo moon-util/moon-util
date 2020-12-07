@@ -69,17 +69,6 @@ final class MappingField {
     }
 
     private static String doMappingIfAssignable(Manager manager) {
-        // 转换优先级顺序: setter 转换器、getter 转换器、内置默认转换器
-        String template = "{toName}.{setterName}({fromName}.{getterName}());";
-        String convertMethod = manager.findConverterMethod();
-        if (convertMethod != null) {
-            return Replacer.setterName.replace(template, convertMethod);
-        }
-        String provideMethod = manager.findProviderMethod();
-        if (provideMethod != null) {
-            return Replacer.getterName.replace(template, provideMethod);
-        }
-
         String setterType = getSetterType(manager);
         String getterType = getGetterType(manager);
         PropertyModel model = manager.getModel();
@@ -572,6 +561,7 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, var);
             }
         },
+        /*
         fromEnum {
             @Override
             public boolean support(Manager manager) {
@@ -585,6 +575,7 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, asNull(manager, var));
             }
         },
+         */
         fromNumber {
             @Override
             public boolean support(Manager manager) {
@@ -647,6 +638,7 @@ final class MappingField {
                 return mapping.doMap("new {setterType}({var})", asNull(manager, var));
             }
         },
+        /*
         fromEnum {
             @Override
             public boolean support(Manager manager) {
@@ -660,6 +652,7 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, asNull(manager, var));
             }
         },
+         */
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
@@ -755,6 +748,7 @@ final class MappingField {
                 return manager.getMapping().doMap(null, dftValue);
             }
         },
+        /*
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
@@ -772,6 +766,8 @@ final class MappingField {
                 return manager.getMapping().doMap(t0, null);
             }
         },
+         */
+        /*
         fromNumber {
             @Override
             public boolean support(Manager manager) {
@@ -786,9 +782,11 @@ final class MappingField {
                 return manager.getMapping().doMap(t0, null);
             }
         }
+         */
     }
 
     private enum ToBoolean implements MappingBuilder {
+        /*
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
@@ -800,6 +798,7 @@ final class MappingField {
                 return manager.getMapping().doMap("{var} != 0", null);
             }
         },
+         */
         fromPrimitiveBoolean {
             @Override
             public boolean support(Manager manager) {
@@ -827,6 +826,7 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, var);
             }
         },
+        /*
         fromWrappedNumber {
             @Override
             public boolean support(Manager manager) {
@@ -843,6 +843,7 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, var);
             }
         },
+         */
         fromBoolean {
             @Override
             public boolean support(Manager manager) {
@@ -869,6 +870,7 @@ final class MappingField {
                 return manager.getMapping().doMap(null, null);
             }
         },
+        /*
         fromPrimitiveChar {
             @Override
             public boolean support(Manager manager) {
@@ -880,6 +882,7 @@ final class MappingField {
                 return manager.getMapping().doMap("(int){var}", null);
             }
         },
+         */
         fromNumber {
             @Override
             public boolean support(Manager manager) {
@@ -1074,6 +1077,7 @@ final class MappingField {
                 return mapping.doMap(mapper, null);
             }
         },
+        /*
         fromPrimitiveChar {
             @Override
             public boolean support(Manager manager) {
@@ -1090,6 +1094,7 @@ final class MappingField {
                 return mapping.doMap(mapper, null);
             }
         },
+         */
         fromWrappedNumber {
             @Override
             public boolean support(Manager manager) {
@@ -1155,6 +1160,7 @@ final class MappingField {
                 return mapping.doMap(t0, asNull(manager, var));
             }
         },
+        /*
         fromCharacter {
             @Override
             public boolean support(Manager manager) {
@@ -1173,6 +1179,7 @@ final class MappingField {
                 return mapping.doMap(t0, asNull(manager, var));
             }
         },
+         */
         fromNumber {
             @Override
             public boolean support(Manager manager) {
@@ -1257,20 +1264,20 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, null);
             }
         },
-        fromPrimitiveChar {
-            @Override
-            public boolean support(Manager manager) {
-                return isGetterTypeOf(manager, "char");
-            }
-
-            @Override
-            public String doMapping(Manager manager) {
-                String setter = getSetterType(manager);
-                String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
-                String mapper = Replacer.cast.replace("{cast}{var}", cast);
-                return manager.getMapping().doMap(mapper, null);
-            }
-        },
+        // fromPrimitiveChar {
+        //     @Override
+        //     public boolean support(Manager manager) {
+        //         return isGetterTypeOf(manager, "char");
+        //     }
+        //
+        //     @Override
+        //     public String doMapping(Manager manager) {
+        //         String setter = getSetterType(manager);
+        //         String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
+        //         String mapper = Replacer.cast.replace("{cast}{var}", cast);
+        //         return manager.getMapping().doMap(mapper, null);
+        //     }
+        // },
         fromNumber {
             @Override
             public boolean support(Manager manager) {
@@ -1326,21 +1333,21 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, dft);
             }
         },
-        fromCharacter {
-            @Override
-            public boolean support(Manager manager) {
-                return isGetterTypeOf(manager, Character.class);
-            }
-
-            @Override
-            public String doMapping(Manager manager) {
-                String setter = getSetterType(manager);
-                String dft = manager.staticForDefaultNumber();
-                String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
-                String mapper = cast + "{var}.charValue()";
-                return manager.getMapping().doMap(mapper, dft);
-            }
-        }
+        // fromCharacter {
+        //     @Override
+        //     public boolean support(Manager manager) {
+        //         return isGetterTypeOf(manager, Character.class);
+        //     }
+        //
+        //     @Override
+        //     public String doMapping(Manager manager) {
+        //         String setter = getSetterType(manager);
+        //         String dft = manager.staticForDefaultNumber();
+        //         String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
+        //         String mapper = cast + "{var}.charValue()";
+        //         return manager.getMapping().doMap(mapper, dft);
+        //     }
+        // }
     }
 
     private enum ToString implements MappingBuilder {
