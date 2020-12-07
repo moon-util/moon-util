@@ -18,27 +18,27 @@ import java.util.Objects;
  */
 public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements BaseAccessor<T, ID> {
 
-    private static boolean isExtendOf(Class thisClass, Class superClass) {
+    private static boolean isExtendOf(Class<?> thisClass, Class<?> superClass) {
         return thisClass != null && superClass != null && superClass.isAssignableFrom(thisClass);
     }
 
-    protected static boolean isAccessorType(Class cls) { return isExtendOf(cls, BaseAccessor.class); }
+    protected static boolean isAccessorType(Class<?> cls) { return isExtendOf(cls, BaseAccessor.class); }
 
-    protected static boolean isRecordableType(Class cls) { return isExtendOf(cls, Record.class); }
+    protected static boolean isRecordableType(Class<?> cls) { return isExtendOf(cls, Record.class); }
 
-    protected final Class deduceDomainClass() {
-        Class domainClass = null;
+    protected final Class<?> deduceDomainClass() {
+        Class<?> domainClass = null;
         final Type type = getClass().getGenericSuperclass();
         if (type instanceof ParameterizedType) {
             ParameterizedType paramType = (ParameterizedType) type;
             Type[] types = paramType.getActualTypeArguments();
             if (types.length == 1) {
-                domainClass = (Class) types[0];
+                domainClass = (Class<?>) types[0];
             } else {
-                Class recordable = null;
+                Class<?> recordable = null;
                 for (Type entityType : types) {
                     if (entityType instanceof Class) {
-                        Class cls = (Class) entityType;
+                        Class<?> cls = (Class<?>) entityType;
                         if (isRecordableType(cls)) {
                             recordable = cls;
                         }
@@ -56,7 +56,7 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
     @Autowired(required = false)
     private WebApplicationContext webContext;
 
-    protected final Class domainClass;
+    protected final Class<T> domainClass;
     protected final Class<BaseAccessor<T, ID>> accessServeClass;
 
     /**
@@ -69,7 +69,7 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
     protected AbstractAccessorImpl(
         Class<? extends BaseAccessor<T, ID>> accessServeClass, Class<T> domainClass
     ) {
-        Class access = accessServeClass, domain = domainClass;
+        Class<?> access = accessServeClass, domain = domainClass;
 
         // 自动推测和交换领域实例类和数据访问类
         if (domain == null) {
@@ -77,7 +77,7 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
             domain = deduceDomainClass();
         } else if (!isRecordableType(domain)) {
             if (isAccessorType(domain)) {
-                Class tempClass = null;
+                Class<?> tempClass = null;
                 if (!isAccessorType(access)) {
                     tempClass = access;
                     access = domain;
@@ -98,8 +98,8 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
             access = null;
         }
 
-        this.accessServeClass = access;
-        this.domainClass = domain == null ? deduceDomainClass() : domain;
+        this.accessServeClass = (Class) access;
+        this.domainClass = (Class) (domain == null ? deduceDomainClass() : domain);
         LayerRegistry.registry(provideThisLayer(), getDomainClass(), this);
     }
 

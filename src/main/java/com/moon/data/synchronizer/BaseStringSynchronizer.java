@@ -11,5 +11,4 @@ import com.moon.data.accessor.DataAccessor;
  * @see com.moon.data.accessor.BaseAccessor
  * @see DataAccessor
  */
-@SuppressWarnings("all")
 public interface BaseStringSynchronizer<T extends Record<String>> extends BaseAccessor<T, String> {}

@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 /**
  * @author moonsky
  */
-@SuppressWarnings("all")
 public abstract class BaseController<T extends Record<ID>, ID> extends BaseAccessorImpl<T, ID> {
 
     private final static Logger logger = LoggerUtil.getLogger();
@@ -36,7 +35,7 @@ public abstract class BaseController<T extends Record<ID>, ID> extends BaseAcces
 
     @PostConstruct
     public void postConstruct() {
-        Class domainClass = this.getDomainClass();
+        Class<T> domainClass = this.getDomainClass();
         if (domainClass != null) {
             try {
                 registryVo2Entity(domainClass);
@@ -91,7 +90,7 @@ public abstract class BaseController<T extends Record<ID>, ID> extends BaseAcces
     protected final <T> void registryVo2Entity(
         Class<T> type, Supplier<T> defaultEntitySupplier, Supplier<? extends BaseService> serviceSupplier
     ) {
-        RecordRegistry.registry(type, id -> {
+        RecordRegistry.register(type, id -> {
             if (id == null) {
                 return defaultEntitySupplier.get();
             } else if (id instanceof CharSequence && StringUtil.isEmpty((CharSequence) id)) {

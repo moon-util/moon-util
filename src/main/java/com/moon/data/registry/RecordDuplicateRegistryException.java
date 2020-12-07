@@ -7,7 +7,7 @@ public class RecordDuplicateRegistryException extends RuntimeException {
 
     public RecordDuplicateRegistryException() { this("不能重复注册实体"); }
 
-    public RecordDuplicateRegistryException(Class clazz) { this(String.format("不能重复注册：%s", clazz)); }
+    public RecordDuplicateRegistryException(Class<?> clazz) { this(String.format("不能重复注册：%s", clazz)); }
 
     public RecordDuplicateRegistryException(String message) { super(message); }
 

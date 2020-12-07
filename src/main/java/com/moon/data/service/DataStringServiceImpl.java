@@ -9,8 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author moonsky
  */
-@Transactional
-@SuppressWarnings("all")
+@Transactional(rollbackFor = RuntimeException.class)
 public abstract class DataStringServiceImpl<T extends Record<String>> extends DataAccessorImpl<T, String>
     implements DataStringService<T> {
 

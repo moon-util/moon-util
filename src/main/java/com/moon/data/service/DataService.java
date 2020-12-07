@@ -15,5 +15,4 @@ import java.util.function.Supplier;
  * @see com.moon.data.accessor.BaseAccessor
  * @see DataAccessor
  */
-@SuppressWarnings("all")
 public interface DataService<T extends Record<ID>, ID> extends BaseService<T, ID>, DataAccessor<T, ID> {}
