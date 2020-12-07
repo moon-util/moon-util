@@ -118,7 +118,9 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager,//
+                    m -> isTypeof(getGetterType(m), long.class),//
+                    m -> isPrimitiveNumber(getGetterType(m)));
             }
 
             @Override
@@ -135,8 +137,10 @@ final class MappingField {
         },
         fromNumber {
             @Override
-            public boolean support(Manager mgr) {
-                return isGetterSubtypeOf(mgr, Number.class);
+            public boolean support(Manager manager) {
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, Long.class),//
+                    m -> isGetterSubtypeOf(m, Number.class));
             }
 
             @Override
@@ -241,7 +245,9 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, long.class),//
+                    m -> isPrimitiveNumber(getGetterType(m)));
             }
 
             @Override
@@ -258,8 +264,10 @@ final class MappingField {
         },
         fromNumber {
             @Override
-            public boolean support(Manager mgr) {
-                return isGetterSubtypeOf(mgr, Number.class);
+            public boolean support(Manager manager) {
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, Long.class),//
+                    m -> isGetterSubtypeOf(m, Number.class));
             }
 
             @Override
@@ -365,7 +373,9 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, long.class),//
+                    m -> isPrimitiveNumber(getGetterType(m)));
             }
 
             @Override
@@ -394,7 +404,9 @@ final class MappingField {
         fromNumber {
             @Override
             public boolean support(Manager manager) {
-                return isSubtypeOf(getGetterType(manager), Number.class);
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, Long.class),//
+                    m -> isGetterSubtypeOf(m, Number.class));
             }
 
             @Override
@@ -493,7 +505,9 @@ final class MappingField {
         fromNumber {
             @Override
             public boolean support(Manager manager) {
-                return isSubtypeOf(getGetterType(manager), Number.class);
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, Long.class),//
+                    m -> isGetterSubtypeOf(m, Number.class));
             }
 
             @Override
@@ -505,7 +519,9 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, long.class),//
+                    m -> isPrimitiveNumber(getGetterType(m)));
             }
 
             @Override
@@ -575,7 +591,8 @@ final class MappingField {
         fromEnum {
             @Override
             public boolean support(Manager manager) {
-                return isEnum(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isEnum(getGetterType(m)));
             }
 
             @Override
@@ -588,7 +605,7 @@ final class MappingField {
         fromNumber {
             @Override
             public boolean support(Manager manager) {
-                return isSubtypeOf(getGetterType(manager), Number.class);
+                return isGetterSubtypeOf(manager, Number.class);
             }
 
             @Override
@@ -650,7 +667,8 @@ final class MappingField {
         fromEnum {
             @Override
             public boolean support(Manager manager) {
-                return isEnum(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isEnum(getGetterType(m)));
             }
 
             @Override
@@ -758,7 +776,8 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isPrimitiveNumber(getGetterType(m)));
             }
 
             @Override
@@ -775,7 +794,8 @@ final class MappingField {
         fromNumber {
             @Override
             public boolean support(Manager manager) {
-                return isSubtypeOf(getGetterType(manager), Number.class);
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isGetterSubtypeOf(m, Number.class));
             }
 
             @Override
@@ -792,7 +812,8 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isPrimitiveNumber(getGetterType(m)));
             }
 
             @Override
@@ -830,7 +851,8 @@ final class MappingField {
         fromWrappedNumber {
             @Override
             public boolean support(Manager manager) {
-                return isWrappedNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isWrappedNumber(getGetterType(m)));
             }
 
             @Override
@@ -872,7 +894,8 @@ final class MappingField {
         fromPrimitiveChar {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveChar(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isPrimitiveChar(getGetterType(m)));
             }
 
             @Override
@@ -895,7 +918,7 @@ final class MappingField {
         fromEnum {
             @Override
             public boolean support(Manager manager) {
-                return isEnum(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false, m -> isEnum(getGetterType(m)));
             }
 
             @Override
@@ -1077,7 +1100,8 @@ final class MappingField {
         fromPrimitiveChar {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveChar(getGetterType(manager));
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isPrimitiveChar(getGetterType(m)));
             }
 
             @Override
@@ -1140,7 +1164,9 @@ final class MappingField {
         fromEnum {
             @Override
             public boolean support(Manager manager) {
-                return isEnum(getGetterType(manager));
+                return onBasicOrGeneralized(manager,//
+                    m -> isTypeof(getSetterType(m), Integer.class) && isEnum(getGetterType(m)),//
+                    m -> isEnum(getGetterType(m)));
             }
 
             @Override
@@ -1196,7 +1222,9 @@ final class MappingField {
         fromPrimitiveNumber {
             @Override
             public boolean support(Manager manager) {
-                return isPrimitiveNumber(getGetterType(manager));
+                return onBasicOrGeneralized(manager,//
+                    m -> isTypeof(getGetterType(m), int.class) && isEnum(getSetterType(m)),//
+                    m -> isPrimitiveNumber(getGetterType(manager)));
             }
 
             @Override
@@ -1214,7 +1242,9 @@ final class MappingField {
         fromNumber {
             @Override
             public boolean support(Manager manager) {
-                return isSubtypeOf(getGetterType(manager), Number.class);
+                return onBasicOrGeneralized(manager,//
+                    m -> isTypeof(getGetterType(m), Integer.class) && isEnum(getSetterType(m)),//
+                    m -> isGetterSubtypeOf(m, Number.class));
             }
 
             @Override
@@ -1314,7 +1344,9 @@ final class MappingField {
         fromEnum {
             @Override
             public boolean support(Manager manager) {
-                return isEnum(getGetterType(manager));
+                return onBasicOrGeneralized(manager,//
+                    m -> isTypeof(getSetterType(m), int.class) && isEnum(getGetterType(m)),//
+                    m -> isEnum(getGetterType(manager)));
             }
 
             @Override
@@ -1329,7 +1361,8 @@ final class MappingField {
         fromCharacter {
             @Override
             public boolean support(Manager manager) {
-                return isGetterTypeOf(manager, Character.class);
+                return onBasicOrGeneralized(manager, m -> false,//
+                    m -> isGetterTypeOf(manager, Character.class));
             }
 
             @Override
@@ -1476,6 +1509,17 @@ final class MappingField {
                 }, true);
             }
         },
+        fromArray {
+            @Override
+            public boolean support(Manager manager) {
+                return false;
+            }
+
+            @Override
+            public String doMapping(Manager manager) {
+                return null;
+            }
+        },
         fromObject {
             @Override
             public boolean support(Manager manager) { return true; }
@@ -1512,6 +1556,15 @@ final class MappingField {
             }
         }
     }
+
+    private interface BoolFun {
+
+        boolean apply(Manager manager);
+    }
+
+    private static boolean onBasicOrGeneralized(
+        Manager manager, BoolFun onBasic, BoolFun onGeneralized
+    ) { return (true ? onBasic : onGeneralized).apply(manager); }
 
     /**
      * null 值默认值，调用条件如下:
