@@ -84,18 +84,18 @@ final class Manager {
             if (DetectUtils.isTypeof(classname, Object.class)) {
                 return null;
             }
-            String convertMethodName = getMethodName(getter, classname, targetType, propName);
-            if (convertMethodName != null) {
-                return convertMethodName;
+            String methodName = getMethodName(getter, classname, targetType, propName);
+            if (methodName != null) {
+                return methodName;
             }
             List<? extends TypeMirror> interfaces = element.getInterfaces();
             if (interfaces != null) {
                 for (TypeMirror anInterface : interfaces) {
                     TypeElement interElem = (TypeElement) types.asElement(anInterface);
                     String interClass = ElemUtils.getQualifiedName(interElem);
-                    convertMethodName = getMethodName(getter, interClass, targetType, propName);
-                    if (convertMethodName != null) {
-                        return convertMethodName;
+                    methodName = getMethodName(getter, interClass, targetType, propName);
+                    if (methodName != null) {
+                        return methodName;
                     }
                 }
             }

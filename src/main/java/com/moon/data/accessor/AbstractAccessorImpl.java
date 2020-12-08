@@ -56,7 +56,8 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
     @Autowired(required = false)
     private WebApplicationContext webContext;
 
-    protected final Class<T> domainClass;
+    @SuppressWarnings("all")
+    protected final Class domainClass;
     protected final Class<BaseAccessor<T, ID>> accessServeClass;
 
     /**
@@ -99,7 +100,7 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
         }
 
         this.accessServeClass = (Class) access;
-        this.domainClass = (Class) (domain == null ? deduceDomainClass() : domain);
+        this.domainClass = (domain == null ? deduceDomainClass() : domain);
         LayerRegistry.registry(provideThisLayer(), getDomainClass(), this);
     }
 

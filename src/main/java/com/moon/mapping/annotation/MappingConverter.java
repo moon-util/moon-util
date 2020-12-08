@@ -50,6 +50,8 @@ import java.lang.annotation.Target;
  *     }
  * }
  * </pre>
+ * <p>
+ * 被注解的方法应该是公共成员方法接受一个参数切返回值是{@code void}
  *
  * @author moonsky
  */
@@ -74,7 +76,7 @@ public @interface MappingConverter {
      * public void address(String username) {} // = {@code address}
      *
      * // 或者直接指定属性名，如:
-     * &#64;MappingConverter(set = "username")
+     * &#64;MappingConverter(value = "username")
      * public void anyMethodName(String username) {} // = {@code username}
      * </pre>
      *

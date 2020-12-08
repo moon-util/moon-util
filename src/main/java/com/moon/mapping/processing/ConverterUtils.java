@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
+ * 解析基于{@link MappingConverter}、{@link MappingProvider}的自定义转换器
  * @author moonsky
  */
 abstract class ConverterUtils {
@@ -24,7 +25,7 @@ abstract class ConverterUtils {
         Map<String, GenericModel> thisGenericMap, TypeElement rootElement, BasicDefinition definition
     ) { parse(thisGenericMap, rootElement, definition); }
 
-    static <T extends Annotation> void parse(
+    private static void parse(
         Map<String, GenericModel> thisGenericMap, TypeElement rootElement, BasicDefinition definition
     ) {
         Types types = EnvUtils.getTypes();
@@ -42,7 +43,7 @@ abstract class ConverterUtils {
         } while (true);
     }
 
-    private static <T extends Annotation> void doParse(
+    private static void doParse(
         Map<String, GenericModel> thisGenericMap, TypeElement classElement, BasicDefinition definition
     ) {
         if (classElement == null) {
@@ -87,27 +88,6 @@ abstract class ConverterUtils {
         }
     }
 
-    private static final String SET = "set", WITH = "with", CONVERT = "convert", GET = "get", PROVIDE = "provide";
-
-    private static <T> String toPropertyName(
-        ExecutableElement m, T annotation, Function<T, String> getter, String... prefixes
-    ) {
-        String name = getter.apply(annotation);
-        if (StringUtils.isBlank(name)) {
-            String propertyName = ElemUtils.getSimpleName(m);
-            if (prefixes != null) {
-                for (String prefix : prefixes) {
-                    if (propertyName.startsWith(prefix)) {
-                        propertyName = propertyName.substring(prefix.length());
-                        break;
-                    }
-                }
-            }
-            return StringUtils.decapitalize(propertyName);
-        }
-        return name;
-    }
-
     private static void parseMappingConverters(
         Map<String, GenericModel> thisGenericMap,
         Element element,
@@ -129,6 +109,27 @@ abstract class ConverterUtils {
             }
             property.setConverter(fromClass, method, thisGenericMap);
         }
+    }
+
+    private static final String SET = "set", WITH = "with", CONVERT = "convert", GET = "get", PROVIDE = "provide";
+
+    private static <T> String toPropertyName(
+        ExecutableElement m, T annotation, Function<T, String> getter, String... prefixes
+    ) {
+        String name = getter.apply(annotation);
+        if (StringUtils.isBlank(name)) {
+            String propertyName = ElemUtils.getSimpleName(m);
+            if (prefixes != null) {
+                for (String prefix : prefixes) {
+                    if (propertyName.startsWith(prefix)) {
+                        propertyName = propertyName.substring(prefix.length());
+                        break;
+                    }
+                }
+            }
+            return StringUtils.decapitalize(propertyName);
+        }
+        return name.trim();
     }
 
     private static MappingConverter[] getConverters(Element elem) {

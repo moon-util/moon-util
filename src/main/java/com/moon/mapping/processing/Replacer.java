@@ -23,8 +23,9 @@ public enum Replacer {
     getterType,
     setterType,
     thisType,
-    implType,
+    thisImpl,
     thatType,
+    thatImpl,
     modifiers,
     thisName {
         @Override
