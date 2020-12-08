@@ -1218,10 +1218,10 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, dftValue);
             }
         },
-        fromNumber {
+        fromWrappedNumber {
             @Override
             public boolean support(Manager manager) {
-                return isSubtypeOf(getGetterType(manager), Number.class);
+                return isWrappedNumber(getGetterType(manager));
             }
 
             @Override

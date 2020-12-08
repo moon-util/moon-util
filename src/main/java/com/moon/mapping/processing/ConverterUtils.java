@@ -87,7 +87,7 @@ abstract class ConverterUtils {
         }
     }
 
-    private static final String SET = "set", WITH = "with", GET = "get", PROVIDE = "provide";
+    private static final String SET = "set", WITH = "with", CONVERT = "convert", GET = "get", PROVIDE = "provide";
 
     private static <T> String toPropertyName(
         ExecutableElement m, T annotation, Function<T, String> getter, String... prefixes
@@ -116,7 +116,7 @@ abstract class ConverterUtils {
     ) {
         for (MappingConverter cvt : converters) {
             ExecutableElement method = (ExecutableElement) element;
-            String propertyName = toPropertyName(method, cvt, MappingConverter::value, SET, WITH);
+            String propertyName = toPropertyName(method, cvt, MappingConverter::value, SET, WITH, CONVERT);
             BasicProperty property = definition.get(propertyName);
             if (property == null) {
                 continue;
