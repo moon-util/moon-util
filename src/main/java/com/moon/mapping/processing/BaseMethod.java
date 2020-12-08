@@ -42,7 +42,17 @@ abstract class BaseMethod implements TypeGetter {
     @Override
     public String getActualType() { return actualType; }
 
+    /**
+     * 是否是原始声明的，原始声明的可以被重写
+     *
+     * @return true/false
+     */
     public boolean isDeclaration() { return declaration; }
 
+    /**
+     * 是否是自动生成的
+     *
+     * @return true/false
+     */
     public boolean isGenerated() { return !isDeclaration(); }
 }

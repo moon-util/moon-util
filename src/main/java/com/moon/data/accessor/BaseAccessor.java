@@ -3,11 +3,21 @@ package com.moon.data.accessor;
 import com.moon.data.Record;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
+import java.util.*;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
+ * 数据库访问对象：
+ * <p>
+ * 命名规则:
+ * <ul>
+ *     <li>1. 返回值是{@link List}、{@link Map}、数组时，不返回 null，可以返回空集合；</li>
+ *     <li>2. findXxx 查询单条数据时返回值可以为 null、{@link Optional}或对应数据；</li>
+ *     <li>3. getXxx 查询单条数据时如不存在对应数据应抛出合适的异常；</li>
+ *     <li>4. getXxx 方法若允许返回 null 应在方法名中体现，比如{@code getXxxOrNull}</li>
+ * </ul>
+ *
  * @author moonsky
  */
 public interface BaseAccessor<T extends Record<ID>, ID> {
@@ -32,26 +42,25 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     <S extends T> S insert(S entity);
 
     /**
-     * 保存
+     * 保存：存在主键时执行{@code update}语句，不存在主键时执行{@code insert}语句
      *
      * @param entity 将要保存的对象
      *
-     * @return 返回保存后的对象；对于新对象，返回的对象 == 保存前的对象，且返回对象有 ID 值；
-     * 对于旧对象，返回值就是保存前的对象
+     * @return 返回保存后的对象，且主键正确对应数据库的一条有效数据；返回的对象 == 保存前的对象
      */
     <S extends T> S save(S entity);
 
     /**
-     * 保存
+     * 保存：存在主键时执行{@code update}语句，不存在主键时执行{@code insert}语句
      *
      * @param entity 将要保存的对象
      *
-     * @return
+     * @return 返回保存后的对象，且主键正确对应数据库的一条有效数据；返回的对象 == 保存前的对象
      */
     <S extends T> S saveAndFlush(S entity);
 
     /**
-     * 保存
+     * 保存：单个对象存在主键时执行{@code update}语句，不存在主键时执行{@code insert}语句
      *
      * @param first  将要保存的对象
      * @param second 将要保存的对象
@@ -61,7 +70,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     List<T> saveAll(T first, T second);
 
     /**
-     * 保存
+     * 保存：单个对象存在主键时执行{@code update}语句，不存在主键时执行{@code insert}语句
      *
      * @param entities 将要保存的对象
      *
@@ -70,14 +79,14 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     <S extends T> List<S> saveAll(Iterable<S> entities);
 
     /**
-     * 查询
+     * 查询返回所有数据
      *
      * @return 返回所有记录结果
      */
     List<T> findAll();
 
     /**
-     * 查询
+     * 查询返回对应{@code id}列表的结果
      *
      * @param ids ID 列表
      *
@@ -86,7 +95,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     List<T> findAllById(Iterable<ID> ids);
 
     /**
-     * 查询
+     * 查询返回对应{@code id}列表的结果
      *
      * @param first  ID
      * @param second ID
@@ -96,7 +105,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     List<T> findAllById(ID first, ID second);
 
     /**
-     * 查询
+     * 查询返回对应{@code id}结果
      *
      * @param id ID
      *
@@ -105,7 +114,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     Optional<T> findById(ID id);
 
     /**
-     * 表中是否存在对应 ID 存在的值
+     * 表中是否存在对应 ID 的数据
      *
      * @param id ID
      *
@@ -121,7 +130,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     long count();
 
     /**
-     * 查询
+     * 查询返回 ID 对应的结果，不存在对应数据时抛出异常
      *
      * @param id ID
      *
@@ -132,17 +141,19 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     T getById(ID id);
 
     /**
-     * 查询
+     * 查询返回 ID 对应的结果，不存在对应数据时抛出异常
      *
      * @param id                    ID
      * @param throwsMessageIfAbsent 异常消息
      *
      * @return ID 匹配的对象，不存在是抛出异常
+     *
+     * @throws IllegalArgumentException {@code throwsMessageIfAbsent}
      */
     T getById(ID id, String throwsMessageIfAbsent);
 
     /**
-     * 查询，抛出指定异常
+     * 查询返回 ID 对应的结果，不存在对应数据时抛出异常
      *
      * @param id            ID
      * @param throwIfAbsent 异常
@@ -155,7 +166,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     <X extends Throwable> T getById(ID id, Supplier<? extends X> throwIfAbsent) throws X;
 
     /**
-     * 查询
+     * 查询返回 ID 对应的结果，不存在对应数据时抛出异常
      *
      * @param id ID
      *
@@ -166,7 +177,7 @@ public interface BaseAccessor<T extends Record<ID>, ID> {
     T getOne(ID id);
 
     /**
-     * 查询
+     * 查询返回 ID 对应的结果，不存在对应数据时返回 null
      *
      * @param id ID
      *
