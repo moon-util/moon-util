@@ -9,11 +9,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 聚合{@code Mapping}组件
+ * 【未实现】聚合{@code Mapping}组件
  * <p>
- * 将多个无关的映射类通过同一个接口达到访问目的，如：
+ * 将多个无关的映射类聚合到同一个接口达到访问目的，如：
  * <pre>
- * &#64;BeanMapper
+ * &#64;MappingComponent
  * public interface MappingMapper {
  *
  *     // 将多个不同类型的转换器声明在同一个接口里
@@ -34,12 +34,14 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface MappingComponent {
+@interface MappingComponent {
 
     /**
-     * 实现类后缀
+     * 实现类类名
+     * <p>
+     * 默认是接口名加后缀{@code Impl}
      *
-     * @return 接口实现类后缀
+     * @return 实现类类名
      */
-    String suffix() default "Impl";
+    String value() default "";
 }
