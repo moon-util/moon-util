@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 自定义转换器【注意与{@link MappingConverter}的区别】
+ * 自定义转换器【注意与{@link MappingInjector}的区别】
  * <p>
  * 注解在{@code getter}方法上，意为：
  * <pre>

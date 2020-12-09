@@ -1,6 +1,6 @@
 package com.moon.mapping.processing;
 
-import com.moon.mapping.annotation.MappingConverter;
+import com.moon.mapping.annotation.MappingInjector;
 import com.moon.mapping.annotation.MappingProvider;
 
 import javax.lang.model.element.Element;
@@ -53,7 +53,7 @@ abstract class ConverterUtils {
             return;
         }
         for (Element element : elements) {
-            MappingConverter[] cs = getConverters(element);
+            MappingInjector[] cs = getConverters(element);
             if (cs != null && cs.length > 0) {
                 parseMappingConverters(thisGenericMap, element, definition, cs);
             }
@@ -87,7 +87,7 @@ abstract class ConverterUtils {
         }
     }
 
-    private static final String SET = "set", WITH = "with", CONVERT = "convert", GET = "get", PROVIDE = "provide";
+    private static final String SET = "set", WITH = "with", INJECT = "inject", GET = "get", PROVIDE = "provide";
 
     private static <T> String toPropertyName(
         ExecutableElement m, T annotation, Function<T, String> getter, String... prefixes
@@ -112,18 +112,18 @@ abstract class ConverterUtils {
         Map<String, GenericModel> thisGenericMap,
         Element element,
         BasicDefinition definition,
-        MappingConverter[] converters
+        MappingInjector[] converters
     ) {
-        for (MappingConverter cvt : converters) {
+        for (MappingInjector cvt : converters) {
             ExecutableElement method = (ExecutableElement) element;
-            String propertyName = toPropertyName(method, cvt, MappingConverter::value, SET, WITH, CONVERT);
+            String propertyName = toPropertyName(method, cvt, MappingInjector::value, SET, WITH, INJECT);
             BasicProperty property = definition.get(propertyName);
             if (property == null) {
                 continue;
             }
             String fromClass;
             try {
-                fromClass = cvt.fromClass().getCanonicalName();
+                fromClass = cvt.injectBy().getCanonicalName();
             } catch (MirroredTypeException mirrored) {
                 fromClass = mirrored.getTypeMirror().toString();
             }
@@ -131,12 +131,12 @@ abstract class ConverterUtils {
         }
     }
 
-    private static MappingConverter[] getConverters(Element elem) {
+    private static MappingInjector[] getConverters(Element elem) {
         if (DetectUtils.isPublicMemberMethod(elem)) {
             ExecutableElement method = (ExecutableElement) elem;
             int size = method.getParameters().size();
             if (size == 1 && DetectUtils.isTypeKind(method.getReturnType(), TypeKind.VOID)) {
-                return elem.getAnnotationsByType(MappingConverter.class);
+                return elem.getAnnotationsByType(MappingInjector.class);
             }
         }
         return null;

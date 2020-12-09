@@ -11,7 +11,7 @@
 <dependency>
     <groupId>com.github.moon-util</groupId>
     <artifactId>moon-util</artifactId>
-    <version>0.0.33</version>
+    <version>0.0.45</version>
 </dependency>
 ```
 
