@@ -10,12 +10,12 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 /**
+ * 解析基于{@link MappingInjector}、{@link MappingProvider}的自定义转换器
  * @author moonsky
  */
 abstract class ConverterUtils {
@@ -24,7 +24,7 @@ abstract class ConverterUtils {
         Map<String, GenericModel> thisGenericMap, TypeElement rootElement, BasicDefinition definition
     ) { parse(thisGenericMap, rootElement, definition); }
 
-    static <T extends Annotation> void parse(
+    private static void parse(
         Map<String, GenericModel> thisGenericMap, TypeElement rootElement, BasicDefinition definition
     ) {
         Types types = EnvUtils.getTypes();
@@ -42,7 +42,7 @@ abstract class ConverterUtils {
         } while (true);
     }
 
-    private static <T extends Annotation> void doParse(
+    private static void doParse(
         Map<String, GenericModel> thisGenericMap, TypeElement classElement, BasicDefinition definition
     ) {
         if (classElement == null) {
@@ -53,9 +53,9 @@ abstract class ConverterUtils {
             return;
         }
         for (Element element : elements) {
-            MappingInjector[] cs = getConverters(element);
+            MappingInjector[] cs = getInjectors(element);
             if (cs != null && cs.length > 0) {
-                parseMappingConverters(thisGenericMap, element, definition, cs);
+                parseMappingInjectors(thisGenericMap, element, definition, cs);
             }
             MappingProvider[] ps = getProviders(element);
             if (ps != null && ps.length > 0) {
@@ -87,28 +87,7 @@ abstract class ConverterUtils {
         }
     }
 
-    private static final String SET = "set", WITH = "with", INJECT = "inject", GET = "get", PROVIDE = "provide";
-
-    private static <T> String toPropertyName(
-        ExecutableElement m, T annotation, Function<T, String> getter, String... prefixes
-    ) {
-        String name = getter.apply(annotation);
-        if (StringUtils.isBlank(name)) {
-            String propertyName = ElemUtils.getSimpleName(m);
-            if (prefixes != null) {
-                for (String prefix : prefixes) {
-                    if (propertyName.startsWith(prefix)) {
-                        propertyName = propertyName.substring(prefix.length());
-                        break;
-                    }
-                }
-            }
-            return StringUtils.decapitalize(propertyName);
-        }
-        return name;
-    }
-
-    private static void parseMappingConverters(
+    private static void parseMappingInjectors(
         Map<String, GenericModel> thisGenericMap,
         Element element,
         BasicDefinition definition,
@@ -131,7 +110,28 @@ abstract class ConverterUtils {
         }
     }
 
-    private static MappingInjector[] getConverters(Element elem) {
+    private static final String SET = "set", WITH = "with", INJECT = "inject", GET = "get", PROVIDE = "provide";
+
+    private static <T> String toPropertyName(
+        ExecutableElement m, T annotation, Function<T, String> getter, String... prefixes
+    ) {
+        String name = getter.apply(annotation);
+        if (StringUtils.isBlank(name)) {
+            String propertyName = ElemUtils.getSimpleName(m);
+            if (prefixes != null) {
+                for (String prefix : prefixes) {
+                    if (propertyName.startsWith(prefix)) {
+                        propertyName = propertyName.substring(prefix.length());
+                        break;
+                    }
+                }
+            }
+            return StringUtils.decapitalize(propertyName);
+        }
+        return name.trim();
+    }
+
+    private static MappingInjector[] getInjectors(Element elem) {
         if (DetectUtils.isPublicMemberMethod(elem)) {
             ExecutableElement method = (ExecutableElement) elem;
             int size = method.getParameters().size();

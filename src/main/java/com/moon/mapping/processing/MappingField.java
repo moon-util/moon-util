@@ -36,6 +36,7 @@ final class MappingField {
 
         MAPPERS.put(type -> isTypeof(type, String.class), ToString.class);
         MAPPERS.put(type -> isTypeof(type, Number.class), ToNumber.class);
+        MAPPERS.put(type -> isTypeof(type, Object.class), ToObject.class);
         MAPPERS.put(type -> isTypeof(type, Calendar.class), ToCalendar.class);
         MAPPERS.put(type -> isTypeof(type, BigInteger.class), ToBigInteger.class);
         MAPPERS.put(type -> isTypeof(type, BigDecimal.class), ToBigDecimal.class);
@@ -71,14 +72,25 @@ final class MappingField {
     private static String doMappingIfAssignable(Manager manager) {
         String setterType = getSetterType(manager);
         String getterType = getGetterType(manager);
-        PropertyModel model = manager.getModel();
-        PropertyAttr attr = model.getAttr();
+        PropertyAttr attr = manager.getModel().getAttr();
         String fmt = attr.formatValue(), dft = attr.defaultValue();
 
-        if (fmt == null && dft == null && isSubtypeOf(getterType, setterType)) {
+        if (fmt == null && dft == null && (isTypeof(getterType, setterType) || isSubtypeOf(getterType, setterType))) {
             return manager.getMapping().doMap(null, null);
         }
         return null;
+    }
+
+    private enum ToObject implements MappingBuilder {
+        fromAny {
+            @Override
+            public boolean support(Manager manager) { return true; }
+
+            @Override
+            public String doMapping(Manager manager) {
+                return manager.getMapping().doMap(null, null);
+            }
+        }
     }
 
     private enum ToCalendar implements MappingBuilder {
@@ -1294,20 +1306,22 @@ final class MappingField {
                 return manager.getMapping().doMap(mapper, null);
             }
         },
-        // fromPrimitiveChar {
-        //     @Override
-        //     public boolean support(Manager manager) {
-        //         return isGetterTypeOf(manager, "char");
-        //     }
-        //
-        //     @Override
-        //     public String doMapping(Manager manager) {
-        //         String setter = getSetterType(manager);
-        //         String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
-        //         String mapper = Replacer.cast.replace("{cast}{var}", cast);
-        //         return manager.getMapping().doMap(mapper, null);
-        //     }
-        // },
+        fromPrimitiveChar {
+            @Override
+            public boolean support(Manager manager) {
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, char.class) && isSetterTypeOf(m, int.class),//
+                    m -> isGetterTypeOf(m, char.class));
+            }
+
+            @Override
+            public String doMapping(Manager manager) {
+                String setter = getSetterType(manager);
+                String cast = isPrimitiveLt(setter, INT) ? bracketed(setter) : "";
+                String mapper = Replacer.cast.replace("{cast}{var}", cast);
+                return manager.getMapping().doMap(mapper, null);
+            }
+        },
         fromNumber {
             @Override
             public boolean support(Manager manager) {
@@ -1368,8 +1382,9 @@ final class MappingField {
         fromCharacter {
             @Override
             public boolean support(Manager manager) {
-                return onBasicOrGeneralized(manager, m -> false,//
-                    m -> isGetterTypeOf(manager, Character.class));
+                return onBasicOrGeneralized(manager,//
+                    m -> isGetterTypeOf(m, Character.class) && isSetterTypeOf(m, int.class),//
+                    m -> isGetterTypeOf(m, Character.class));
             }
 
             @Override
@@ -1519,12 +1534,20 @@ final class MappingField {
         fromArray {
             @Override
             public boolean support(Manager manager) {
-                return false;
+                String getterType = getGetterType(manager);
+                return isTypeofAny(getterType, char[].class, boolean[].class, byte[].class,//
+                    short[].class, int[].class, long[].class, float[].class, double[].class,//
+                    Float[].class, Boolean[].class, Byte[].class, Short[].class, Long[].class, //
+                    Integer[].class, Character[].class, Double[].class, String[].class)//
+                    || isSubtypeOf(getterType, CharSequence[].class);
             }
 
             @Override
             public String doMapping(Manager manager) {
-                return null;
+                String dftValue = manager.staticForDefaultString();
+                String t0 = "{type0}.toString({var})";
+                t0 = Replacer.type0.replace(t0, manager.onImported(Arrays.class));
+                return manager.getMapping().doMap(t0, dftValue);
             }
         },
         fromObject {
@@ -1613,6 +1636,14 @@ final class MappingField {
 
     private static boolean isGetterTypeOf(Manager manager, String type) {
         return isTypeof(getGetterType(manager), type);
+    }
+
+    private static boolean isSetterTypeOf(Manager manager, Class<?> type) {
+        return isTypeof(getSetterType(manager), type);
+    }
+
+    private static boolean isSetterTypeOf(Manager manager, String type) {
+        return isTypeof(getSetterType(manager), type);
     }
 
     private static boolean isGetterSubtypeOf(Manager manager, Class<?> type) {

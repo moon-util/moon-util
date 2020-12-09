@@ -119,9 +119,9 @@ final class MapMethodFactory {
         return "";
     }
 
-    final String cloneMethod(String thisType, String implType, Iterable<String> fields) {
+    final String cloneMethod(String thisType, String thisImpl, Iterable<String> fields) {
         String result = Replacer.thisType.replace(MappingScripts.clone, thisType);
-        result = Replacer.implType.replace(result, implType);
+        result = Replacer.thisImpl.replace(result, thisImpl);
         return Replacer.MAPPINGS.replace(result, String.join("", fields));
     }
 

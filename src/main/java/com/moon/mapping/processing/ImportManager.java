@@ -13,7 +13,16 @@ final class ImportManager {
     private final Map<String, String> shortNameCached = new HashMap<>();
     private final Map<String, String> importCached = new HashMap<>();
 
-    public ImportManager() {}
+    public ImportManager() {
+        shortNameCached.put("byte[]", "");
+        shortNameCached.put("short[]", "");
+        shortNameCached.put("int[]", "");
+        shortNameCached.put("long[]", "");
+        shortNameCached.put("float[]", "");
+        shortNameCached.put("double[]", "");
+        shortNameCached.put("char[]", "");
+        shortNameCached.put("boolean[]", "");
+    }
 
     public String onImported(Class<?> classname) {
         return onImported(classname.getCanonicalName());
@@ -26,6 +35,9 @@ final class ImportManager {
         String shortName = shortNameCached.get(classname);
         if (shortName != null) {
             return shortName;
+        }
+        if (classname.endsWith("[]")) {
+            classname = classname.substring(0, classname.length() - 2);
         }
         shortName = ElemUtils.getSimpleName(classname);
         if (importCached.containsKey(shortName)) {

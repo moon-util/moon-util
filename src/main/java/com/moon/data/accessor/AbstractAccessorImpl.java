@@ -56,6 +56,10 @@ public abstract class AbstractAccessorImpl<T extends Record<ID>, ID> implements 
     @Autowired(required = false)
     private WebApplicationContext webContext;
 
+<<<<<<< HEAD
+=======
+    @SuppressWarnings("all")
+>>>>>>> ed0fb6e3b176c9aed692c4d171837a07782d0760
     protected final Class domainClass;
     protected final Class<BaseAccessor<T, ID>> accessServeClass;
 

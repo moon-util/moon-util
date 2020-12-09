@@ -54,7 +54,7 @@ public @interface Mapping {
     /**
      * 忽略模式
      *
-     * @return 当返回不同值时，觉得字段之间是否忽略映射，具体参考{@link IgnoreMode}
+     * @return 忽略模式
      */
     IgnoreMode ignore() default IgnoreMode.NONE;
 
