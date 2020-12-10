@@ -33,7 +33,12 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
      */
     private final TypeElement thisElement;
 
-    public BaseDefinition(TypeElement enclosingElement) { this.thisElement = enclosingElement; }
+    private final String implClassname;
+
+    public BaseDefinition(TypeElement enclosingElement, String implClassname) {
+        this.thisElement = enclosingElement;
+        this.implClassname = implClassname;
+    }
 
     public final TypeElement getThisElement() { return thisElement; }
 
@@ -45,6 +50,8 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     @Override
     public final String getCanonicalName() { return ElemUtils.getQualifiedName(getThisElement()); }
+
+    public final String getImplClassname() { return implClassname; }
 
     final void addFieldAttr(String name, PropertyAttr attr) {
         getFieldAttrMap().computeIfAbsent(attr.getTargetCls(), k -> new HashMap<>(4)).put(name, attr);

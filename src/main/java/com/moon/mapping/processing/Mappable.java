@@ -59,6 +59,8 @@ interface Mappable {
      */
     String findProviderMethod(String key);
 
+    boolean isGetterDeclared();
+
     /**
      * 是否有 getter
      *

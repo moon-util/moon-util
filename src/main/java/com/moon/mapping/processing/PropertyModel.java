@@ -48,7 +48,7 @@ final class PropertyModel {
         Mappable from = fromProp, to = toProp;
         boolean hasGetter = from != null && from.hasGetterMethod();
         boolean hasSetter = to != null && to.hasSetterMethod();
-        return hasGetter && hasSetter;
+        return hasGetter && hasSetter && from.isGetterDeclared();
     }
 
     public Mappable getFromProp() { return fromProp; }

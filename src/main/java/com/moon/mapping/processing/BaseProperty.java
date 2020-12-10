@@ -106,6 +106,12 @@ abstract class BaseProperty<M extends BaseMethod> implements Mappable, TypeGette
     }
 
     @Override
+    public boolean isGetterDeclared() {
+        M method = getGetter();
+        return method != null && method.isDeclaration();
+    }
+
+    @Override
     public String getName() { return name; }
 
     @Override
