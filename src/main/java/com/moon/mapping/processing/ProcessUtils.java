@@ -3,7 +3,7 @@ package com.moon.mapping.processing;
 import com.moon.mapping.annotation.IgnoreMode;
 import com.moon.mapping.annotation.Mapping;
 import com.moon.mapping.annotation.MappingFor;
-import com.moon.mapping.annotation.MappingIgnoring;
+import com.moon.mapping.annotation.MappingIgnoreFields;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
@@ -60,10 +60,7 @@ final class ProcessUtils {
             }
         }
         if (ignoredWasUnused && ignored != null) {
-            if (ignored != null) {
-                handler.accept(new PropertyAttr(ignored.targetCls, "", "", "", ignored.mode));
-            }
-            return;
+            handler.accept(new PropertyAttr(ignored.targetCls, "", "", "", ignored.mode));
         }
     }
 
@@ -166,11 +163,11 @@ final class ProcessUtils {
      */
     static Map<String, IgnoreModel> parseMappingIgnoring(TypeElement rootElement) {
         Map<String, IgnoreModel> ignoringMap = new HashMap<>(8);
-        MappingIgnoring[] ignoringAll = rootElement.getAnnotationsByType(MappingIgnoring.class);
+        MappingIgnoreFields[] ignoringAll = rootElement.getAnnotationsByType(MappingIgnoreFields.class);
         if (ignoringAll != null) {
-            for (MappingIgnoring ignoring : ignoringAll) {
-                IgnoreMode mode = ignoring.mode();
-                String targetCls = getTargetCls(ignoring, MappingIgnoring::target);
+            for (MappingIgnoreFields ignoring : ignoringAll) {
+                IgnoreMode mode = ignoring.ignore();
+                String targetCls = getTargetCls(ignoring, MappingIgnoreFields::target);
                 for (String name : ignoring.value()) {
                     ignoringMap.put(name, new IgnoreModel(targetCls, mode));
                 }

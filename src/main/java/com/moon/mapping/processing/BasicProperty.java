@@ -162,10 +162,8 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
     public boolean isGetterDeclared() {
         if (hasPublicDefaultGetter()) {
             return super.isGetterDeclared();
-        } else if (hasLombokGetter()) {
-            return true;
         }
-        return false;
+        return hasLombokGetter();
     }
 
     /**
