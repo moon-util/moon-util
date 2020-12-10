@@ -1,8 +1,10 @@
 package com.moon.mapping.processing;
 
 import javax.lang.model.element.*;
+import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * @author benshaoye
@@ -21,6 +23,14 @@ abstract class ElemUtils {
 
     public static String getSetterFullType(ExecutableElement elem) {
         return elem.getParameters().get(0).asType().toString();
+    }
+
+    public static <T> String getAnnotatedClass(T t, Function<T, Class<?>> classGetter) {
+        try {
+            return classGetter.apply(t).getCanonicalName();
+        } catch (MirroredTypeException mirrored) {
+            return mirrored.getTypeMirror().toString();
+        }
     }
 
     public static String getGetterDeclareType(ExecutableElement elem) {

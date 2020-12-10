@@ -71,7 +71,9 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
         super.putProviderMethod(key, toMethod(declareType, provider, genericMap));
     }
 
-    private String toConvertKey(String targetClass,String declareType, ExecutableElement method, Map<String, GenericModel> genericMap){
+    private String toConvertKey(
+        String targetClass, String declareType, ExecutableElement method, Map<String, GenericModel> genericMap
+    ) {
         TypeElement nameable = (TypeElement) method.getEnclosingElement();
         String declareClassname = ElemUtils.getQualifiedName(nameable);
         String actualType = findActualTypeOrDeclare(genericMap, declareClassname, declareType);
@@ -155,6 +157,16 @@ final class BasicProperty extends BaseProperty<BasicMethod> {
      */
     @Override
     public boolean hasGetterMethod() { return hasPublicDefaultGetter() || hasLombokGetter(); }
+
+    @Override
+    public boolean isGetterDeclared() {
+        if (hasPublicDefaultGetter()) {
+            return super.isGetterDeclared();
+        } else if (hasLombokGetter()) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * getter method name

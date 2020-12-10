@@ -13,7 +13,7 @@ class PropertyAttr {
 
     private final String targetCls;
     private final String field;
-    private final IgnoreMode ignoreMode;
+     final IgnoreMode ignoreMode;
     private final String format;
     private final String defaultValue;
 
@@ -23,18 +23,8 @@ class PropertyAttr {
         this.field = StringUtils.isBlank(field) ? null : field.trim();
         this.format = StringUtils.isBlank(format) ? null : format;
         this.defaultValue = StringUtils.isEmpty(defaultValue) ? null : defaultValue;
-        this.targetCls = targetCls == null ? null : defaultTargetCls(targetCls);
         this.ignoreMode = ignoreMode;
-    }
-
-    private static String defaultTargetCls(String cls) {
-        @SuppressWarnings("all") boolean isLang = cls.split("\\.").length == 3//
-            && (cls.startsWith("java.lang.") || cls.startsWith("java.util."));
-        return (isLang || StringUtils.isPrimitive(cls)) ? "void" : cls;
-    }
-
-    public boolean isIgnore(boolean forward) {
-        return forward ? isIgnoreForward() : isIgnoreBackward();
+        this.targetCls = targetCls;
     }
 
     public boolean isIgnoreForward() {

@@ -6,7 +6,6 @@ import com.moon.mapping.annotation.MappingProvider;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
@@ -77,12 +76,7 @@ abstract class ConverterUtils {
             if (property == null) {
                 continue;
             }
-            String forClass;
-            try {
-                forClass = pvd.provideFor().getCanonicalName();
-            } catch (MirroredTypeException mirrored) {
-                forClass = mirrored.getTypeMirror().toString();
-            }
+            String forClass = ElemUtils.getAnnotatedClass(pvd, MappingProvider::provideFor);
             property.setProvider(forClass, method, thisGenericMap);
         }
     }
@@ -100,12 +94,7 @@ abstract class ConverterUtils {
             if (property == null) {
                 continue;
             }
-            String fromClass;
-            try {
-                fromClass = cvt.injectBy().getCanonicalName();
-            } catch (MirroredTypeException mirrored) {
-                fromClass = mirrored.getTypeMirror().toString();
-            }
+            String fromClass = ElemUtils.getAnnotatedClass(cvt, MappingInjector::injectBy);
             property.setConverter(fromClass, method, thisGenericMap);
         }
     }

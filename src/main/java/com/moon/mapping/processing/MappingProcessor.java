@@ -56,7 +56,7 @@ public class MappingProcessor extends AbstractProcessor {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }Logger.warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         return true;
     }
 
