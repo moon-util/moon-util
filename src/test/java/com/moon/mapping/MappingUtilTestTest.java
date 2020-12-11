@@ -23,7 +23,7 @@ class MappingUtilTestTest {
 
     @Test
     void testOverride() throws Exception {
-        BeanMapping<UserDetailEntity, UserVO> mapping = MappingUtil.thisPrimary();
+        BeanMapper<UserDetailEntity, UserVO> mapping = MapperUtil.thisPrimary();
         // UserVO vo = mapping.newThat(new UserDetailEntity());
     }
 }

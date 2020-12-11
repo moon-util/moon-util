@@ -1,5 +1,7 @@
 package com.moon.mapping.processing;
 
+import com.moon.mapping.BeanMapper;
+
 import java.util.Map;
 
 /**
@@ -34,8 +36,8 @@ abstract class MappingScripts {
         "}";
 
     /**
-     * @see com.moon.mapping.BeanMapping#doForward(Object)
-     * @see com.moon.mapping.BeanMapping#doForward(Object, Object)
+     * @see BeanMapper#doForward(Object)
+     * @see BeanMapper#doForward(Object, Object)
      */
     final static String unsafeForward = "" +//
         "@Override public Object unsafeForward(Object thisObject, Object thatObject) {" +//
@@ -45,8 +47,8 @@ abstract class MappingScripts {
         "    return thatObject;" +//
         "}";
     /**
-     * @see com.moon.mapping.BeanMapping#doBackward(Object)
-     * @see com.moon.mapping.BeanMapping#doBackward(Object, Object)
+     * @see BeanMapper#doBackward(Object)
+     * @see BeanMapper#doBackward(Object, Object)
      */
     final static String unsafeBackward = "" +//
         "@Override public Object unsafeBackward(Object thisObject, Object thatObject) {" +//
@@ -58,7 +60,7 @@ abstract class MappingScripts {
 
     private MappingScripts() {}
 
-    /** @see com.moon.mapping.BeanMapping#doForward(Object) */
+    /** @see BeanMapper#doForward(Object) */
     final static String newThatAsEmpty = "" +//
         "@Override " +//
         "public Object doForward(Object thisObject) {" +//
@@ -68,14 +70,14 @@ abstract class MappingScripts {
         "@Override " +//
         "public Object doForward(Object thisObject) {return thisObject == null ? null : new {thatType}();}";
 
-    /** @see com.moon.mapping.BeanMapping#doBackward(Object) */
+    /** @see BeanMapper#doBackward(Object) */
     final static String newThisAsEmpty = "" +//
         "@Override " +//
         "public Object doBackward(Object thatObject) {" +//
         "    return thatObject == null ? null : unsafeBackward(new {thisType}(), thatObject);" +//
         "}";
 
-    /** @see com.moon.mapping.BeanMapping#doBackward(Object) */
+    /** @see BeanMapper#doBackward(Object) */
     final static String newThisAsEmpty4NonFields = "" +//
         "@Override " +//
         "public Object doBackward(Object thatObject) {return thatObject == null ? null : new {thisType}();}";

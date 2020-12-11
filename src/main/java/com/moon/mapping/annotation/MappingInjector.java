@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  *     // ...
  * }
  *
- * &#64;MappingFor(Car.class)
+ * &#64;MapperFor(Car.class)
  * public class CarVO {
  *     private String kilometers;
  *

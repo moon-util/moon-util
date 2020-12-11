@@ -1,6 +1,6 @@
 package com.moon.mapping.annotation;
 
-import com.moon.mapping.BeanMapping;
+import com.moon.mapping.BeanMapper;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.lang.annotation.ElementType;
@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 开启 Spring 支持后会向容器中注册名称形如{@code mapUserToPersonal}的{@link BeanMapping}, 例：
+ * 开启 Spring 支持后会向容器中注册名称形如{@code mapUserToPersonal}的{@link BeanMapper}, 例：
  *
  * <pre>
  * public class Car {
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  *     // other fields & setters & getters
  * }
  *
- * &#64;MappingFor({Car.class}) // {@link MappingFor}
+ * &#64;MapperFor({Car.class}) // {@link MapperFor}
  * public class Bus {
  *     private String name;
  *     // other fields & setters & getters
@@ -44,7 +44,7 @@ import java.lang.annotation.Target;
  *
  * @author moonsky
  */
-@ComponentScan(basePackageClasses = BeanMapping.class)
+@ComponentScan(basePackageClasses = BeanMapper.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnableBeanMapping {}

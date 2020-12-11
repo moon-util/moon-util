@@ -1,7 +1,7 @@
 package com.moon.mapping.processing;
 
-import com.moon.mapping.BeanMapping;
-import com.moon.mapping.annotation.MappingFor;
+import com.moon.mapping.BeanMapper;
+import com.moon.mapping.annotation.MapperFor;
 
 import javax.lang.model.element.TypeElement;
 import java.util.*;
@@ -29,7 +29,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     private final Map<String, Map<String, PropertyAttr>> getterAttrMap = new HashMap<>();
 
     /**
-     * 声明注解{@link com.moon.mapping.annotation.MappingFor}的类
+     * 声明注解{@link MapperFor}的类
      */
     private final TypeElement thisElement;
 
@@ -72,7 +72,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     public Map<String, Map<String, PropertyAttr>> getSetterAttrMap() { return setterAttrMap; }
 
     /**
-     * 声明{@link MappingFor}的类{@link #getThisElement()}所在包的完整名
+     * 声明{@link MapperFor}的类{@link #getThisElement()}所在包的完整名
      *
      * @return 包名
      */
@@ -97,7 +97,7 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     public void onCompleted() { forEach((name, prop) -> prop.onCompleted()); }
 
     /**
-     * 实现{@link BeanMapping}的公共方法
+     * 实现{@link BeanMapper}的公共方法
      */
     public StringAdder implMappingSharedMethods(final Manager manager) {
         final StringAdder adder = new StringAdder();

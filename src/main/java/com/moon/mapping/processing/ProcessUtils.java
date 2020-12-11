@@ -2,8 +2,8 @@ package com.moon.mapping.processing;
 
 import com.moon.mapping.annotation.IgnoreMode;
 import com.moon.mapping.annotation.Mapping;
-import com.moon.mapping.annotation.MappingFor;
-import com.moon.mapping.annotation.MappingIgnoreFields;
+import com.moon.mapping.annotation.MapperFor;
+import com.moon.mapping.annotation.MapperIgnoreFields;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
@@ -18,7 +18,7 @@ import java.util.function.Function;
  */
 final class ProcessUtils {
 
-    private final static String MAPPING_FOR_CLASSNAME = MappingFor.class.getCanonicalName();
+    private final static String MAPPING_FOR_CLASSNAME = MapperFor.class.getCanonicalName();
     private final static String CLASS_SUFFIX = ".class";
     private final static String TOP_CLASS = Object.class.getName();
 
@@ -163,11 +163,11 @@ final class ProcessUtils {
      */
     static Map<String, IgnoreModel> parseMappingIgnoring(TypeElement rootElement) {
         Map<String, IgnoreModel> ignoringMap = new HashMap<>(8);
-        MappingIgnoreFields[] ignoringAll = rootElement.getAnnotationsByType(MappingIgnoreFields.class);
+        MapperIgnoreFields[] ignoringAll = rootElement.getAnnotationsByType(MapperIgnoreFields.class);
         if (ignoringAll != null) {
-            for (MappingIgnoreFields ignoring : ignoringAll) {
+            for (MapperIgnoreFields ignoring : ignoringAll) {
                 IgnoreMode mode = ignoring.ignore();
-                String targetCls = getTargetCls(ignoring, MappingIgnoreFields::target);
+                String targetCls = getTargetCls(ignoring, MapperIgnoreFields::target);
                 for (String name : ignoring.value()) {
                     ignoringMap.put(name, new IgnoreModel(targetCls, mode));
                 }

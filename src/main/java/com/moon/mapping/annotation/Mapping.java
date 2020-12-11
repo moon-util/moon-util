@@ -20,7 +20,7 @@ public @interface Mapping {
     String value() default "";
 
     /**
-     * 映射目标类，如果{@link MappingFor#value()}指定了多个类，这里
+     * 映射目标类，如果{@link MapperFor#value()}指定了多个类，这里
      * 可以为每个不同的类指定不同属性
      *
      * @return 目标类

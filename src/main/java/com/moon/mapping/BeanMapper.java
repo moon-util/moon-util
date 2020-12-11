@@ -3,7 +3,7 @@ package com.moon.mapping;
 /**
  * @author moonsky
  */
-public interface BeanMapping<THIS, THAT> {
+public interface BeanMapper<THIS, THAT> {
 
     /**
      * null 不安全的属性映射，不会对{@code thisObject}和{@code thatObject}进行{@code null}检查
@@ -59,8 +59,11 @@ public interface BeanMapping<THIS, THAT> {
      * @param thisObject 当前类实例，属性数据源
      *
      * @return {@code THAT}类实例
+     *
+     * @see #unsafeForward(Object, Object)
      */
     default THAT doForward(THIS thisObject) {
+        // return thisObject == null ? null : unsafeForward(thisObject, new <THAT>());
         throw new UnsupportedOperationException("unknown target type of: doForward(Object, Object)");
     }
 
@@ -70,8 +73,11 @@ public interface BeanMapping<THIS, THAT> {
      * @param thatObject 属性数据源对象
      *
      * @return {@code THIS}类实例
+     *
+     * @see #unsafeBackward(Object, Object)
      */
     default THIS doBackward(THAT thatObject) {
+        // return thatObject == null ? null : unsafeBackward(new <THIS>(), thatObject);
         throw new UnsupportedOperationException("unknown target type of: doBackward(Object, Object)");
     }
 }

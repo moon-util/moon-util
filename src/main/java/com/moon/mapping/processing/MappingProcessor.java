@@ -1,7 +1,7 @@
 package com.moon.mapping.processing;
 
 import com.google.auto.service.AutoService;
-import com.moon.mapping.annotation.MappingFor;
+import com.moon.mapping.annotation.MapperFor;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -19,7 +19,7 @@ import static com.moon.mapping.processing.ProcessUtils.toPropertiesMap;
 @AutoService(Processor.class)
 public class MappingProcessor extends AbstractProcessor {
 
-    private final static String SUPPORTED_TYPE = MappingFor.class.getName();
+    private final static String SUPPORTED_TYPE = MapperFor.class.getName();
 
     @Override
     public SourceVersion getSupportedSourceVersion() { return SourceVersion.latestSupported(); }
@@ -56,7 +56,7 @@ public class MappingProcessor extends AbstractProcessor {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }Logger.warn("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        }
         return true;
     }
 
@@ -64,7 +64,7 @@ public class MappingProcessor extends AbstractProcessor {
         final List<MappingWriter> models = new ArrayList<>();
         for (TypeElement annotation : annotations) {
             if (annotation.getQualifiedName().contentEquals(SUPPORTED_TYPE)) {
-                for (Element element : env.getElementsAnnotatedWith(MappingFor.class)) {
+                for (Element element : env.getElementsAnnotatedWith(MapperFor.class)) {
                     if (DetectUtils.isMappableElement(element)) {
                         models.add(onAnnotatedClass((TypeElement) element));
                     }

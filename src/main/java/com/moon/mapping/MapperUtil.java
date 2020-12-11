@@ -1,6 +1,6 @@
 package com.moon.mapping;
 
-import com.moon.mapping.annotation.MappingFor;
+import com.moon.mapping.annotation.MapperFor;
 
 import static com.moon.mapping.Mappings.classAs;
 import static java.lang.Thread.currentThread;
@@ -10,17 +10,17 @@ import static java.lang.Thread.currentThread;
  * <p>
  * 推荐获取后用静态变量的方式保存，没必要获取多次
  * <p>
- * 如果两个类之间没有用{@link MappingFor}关联映射关系，就会获取不到，并抛出异常
+ * 如果两个类之间没有用{@link MapperFor}关联映射关系，就会获取不到，并抛出异常
  *
  * @author moonsky
  */
 @SuppressWarnings("all")
-public abstract class MappingUtil {
+public abstract class MapperUtil {
 
-    private MappingUtil() { }
+    private MapperUtil() { }
 
     /**
-     * 获取当前类注解{@link MappingFor#value()}的第一个映射，如：
+     * 获取当前类注解{@link MapperFor#value()}的第一个映射，如：
      * <pre>
      * public class Car {
      *     private String name;
@@ -32,10 +32,10 @@ public abstract class MappingUtil {
      *     // other fields & getter & setter
      * }
      *
-     * &#64;MappingFor({Bus.class, Car.class})
+     * &#64;MapperFor({Bus.class, Car.class})
      * public class Auto {
      *
-     *     // thisXxx 方法只能在注解了 {@link MappingFor}的类使用
+     *     // thisXxx 方法只能在注解了 {@link MapperFor}的类使用
      *     // thisPrimary 获取第一个映射
      *     final static BeanMapping&lt;Auto, Bus&gt; = MappingUtil.thisPrimary();
      *
@@ -58,16 +58,16 @@ public abstract class MappingUtil {
      *
      * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
      */
-    public static <THIS, THAT> BeanMapping<THIS, THAT> thisPrimary() {
+    public static <THIS, THAT> BeanMapper<THIS, THAT> thisPrimary() {
         Class<THIS> thisClass = classAs(currentThread().getStackTrace()[2].getClassName());
-        MappingFor mappingFor = thisClass.getAnnotation(MappingFor.class);
-        return get(thisClass, (Class<THAT>) mappingFor.value()[0]);
+        MapperFor mapperFor = thisClass.getAnnotation(MapperFor.class);
+        return get(thisClass, (Class<THAT>) mapperFor.value()[0]);
     }
 
     /**
      * 当前类{@code THIS}到目标类{@code thatClass}的映射器
      * <p>
-     * 要求{@code thatClass}在当前类注解{@link MappingFor#value()}中
+     * 要求{@code thatClass}在当前类注解{@link MapperFor#value()}中
      *
      * @param thatClass 目标类
      * @param <THIS>    当前类
@@ -77,24 +77,24 @@ public abstract class MappingUtil {
      *
      * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
      */
-    public static <THIS, THAT> BeanMapping<THIS, THAT> thisMappingFor(Class<THAT> thatClass) {
+    public static <THIS, THAT> BeanMapper<THIS, THAT> thisMappingFor(Class<THAT> thatClass) {
         return get(classAs(currentThread().getStackTrace()[2].getClassName()), thatClass);
     }
 
     /**
      * 获取从类{@code fromClass}到{@code toClass}的映射器;
      * <p>
-     * {@code toClass}必须存在于{@code fromClass}的注解{@link MappingFor#value()}声明中
+     * {@code toClass}必须存在于{@code fromClass}的注解{@link MapperFor#value()}声明中
      *
      * @param fromClass 数据源类
-     * @param toClass   应声明在{@code fromClass}注解的{@link MappingFor#value()}中
+     * @param toClass   应声明在{@code fromClass}注解的{@link MapperFor#value()}中
      *
      * @return 当存在时返回对应映射器
      *
      * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
-     * @see MappingFor#value()
+     * @see MapperFor#value()
      */
-    public static <F, T> BeanMapping<F, T> get(Class<F> fromClass, Class<T> toClass) {
+    public static <F, T> BeanMapper<F, T> get(Class<F> fromClass, Class<T> toClass) {
         return Mappings.resolve(fromClass, toClass);
     }
 }
