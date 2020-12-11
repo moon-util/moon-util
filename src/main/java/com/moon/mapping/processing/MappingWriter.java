@@ -51,8 +51,8 @@ final class MappingWriter implements JavaFileWritable {
 
         // 类内容: public class BeanMappingConfigurationXXXXAtXXXX { beans }
         final StringAdder configurationAdder = new StringAdder();
-        configurationAdder.add("@").add(manager.onImported(Configuration.class));
         annotationGenerated(configurationAdder, manager);
+        configurationAdder.add("@").add(manager.onImported(Configuration.class));
         configurationAdder.add("@SuppressWarnings({\"all\",\"unchecked\"})");
         configurationAdder.add(" public class ").add(configName).add(" {");
         configurationAdder.add(beansAddr).add("}");
@@ -68,8 +68,10 @@ final class MappingWriter implements JavaFileWritable {
 
     private static String getBeanMappingConfigName(Collection<String> fullClasses) {
         // 所包含映射器的 hash 码
-        int hashCode = Arrays.hashCode(fullClasses.toArray(new String[0]));
-        String hash = Integer.toString(Math.abs(hashCode), 36);
+        // int hashCode = Arrays.hashCode(fullClasses.toArray(new String[0]));
+        // 通过这样计算保证新编译的代码始终在旧编译代码前面
+        long timestamp = Long.MAX_VALUE - System.currentTimeMillis();
+        String hash = Long.toString(timestamp, 36);
         return "BeanMappingConfiguration" + hash;
     }
 
