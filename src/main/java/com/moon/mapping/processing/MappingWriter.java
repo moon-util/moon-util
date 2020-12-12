@@ -43,9 +43,12 @@ final class MappingWriter implements JavaFileWritable {
         }
         final Manager manager = getAllImportsNameForConfiguration();
         final Set<String> classes = new TreeSet<>();
-
         // beans
         final StringAdder beansAddr = getBeansDefinition(writers, manager, classes);
+        if (classes.isEmpty()) {
+            return;
+        }
+
         // 类名: BeanMappingConfigurationXXXXAtXXXX
         final String configName = getBeanMappingConfigName(classes);
 
