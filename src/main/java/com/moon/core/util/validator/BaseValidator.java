@@ -413,13 +413,27 @@ abstract class BaseValidator<T, IMPL extends BaseValidator<T, IMPL>> extends Val
     /**
      * 当验证不通过时执行处理
      *
-     * @param consumer 处理器
+     * @param consumer 处理器吗，接受一个参数: 源对象
      *
      * @return 当前 Validator 对象
      */
     public IMPL ifInvalid(Consumer<? super T> consumer) {
         if (isInvalid()) {
             consumer.accept(value);
+        }
+        return current();
+    }
+
+    /**
+     * 当验证不通过时执行处理
+     *
+     * @param consumer 处理器，接受两个参数: 源对象，错误消息
+     *
+     * @return 当前 Validator 对象
+     */
+    public IMPL ifInvalid(BiConsumer<? super T, List<String>> consumer) {
+        if (isInvalid()) {
+            consumer.accept(value, getMessages());
         }
         return current();
     }

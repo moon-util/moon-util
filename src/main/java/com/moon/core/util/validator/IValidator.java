@@ -11,7 +11,7 @@ interface IValidator<T, IMPL extends IValidator<T, IMPL>> {
     /**
      * 条件验证
      * <p>
-     * 在前置条件匹配的情况下会执行 when 和 end 之间的验证或其他逻辑
+     * 只有在{@code tester}返回 true 时，才执行后面{@code scopedValidator}验证器
      *
      * @param tester          进入条件验证的函数
      * @param scopedValidator 符合验证条件下的验证函数

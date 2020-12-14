@@ -12,6 +12,13 @@ import java.util.function.Predicate;
 interface ICollectValidator<C extends Collection<E>, E, IMPL extends ICollectValidator<C, E, IMPL>>
     extends IValidator<C, IMPL> {
 
+    /**
+     * 依次验证集合中每一个单项
+     *
+     * @param itemValidator 单项验证器
+     *
+     * @return 当前对象
+     */
     IMPL forEach(Consumer<Validator<E>> itemValidator);
 
     /**

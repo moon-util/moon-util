@@ -114,10 +114,8 @@ public class Joiner
 
     public Joiner setPrefix(CharSequence prefix) {
         String old = this.prefix, now = this.prefix = emptyIfNull(prefix);
-        if (old != null) {
+        if (StringUtil.isNotEmpty(old)) {
             container.replace(0, old.length(), now);
-        } else {
-            container.delete(0, old.length());
         }
         return this;
     }
