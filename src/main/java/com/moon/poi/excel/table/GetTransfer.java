@@ -1,6 +1,6 @@
 package com.moon.poi.excel.table;
 
-import com.moon.poi.excel.CellFactory;
+import com.moon.poi.excel.CellWriter;
 
 /**
  * @author moonsky
@@ -13,5 +13,5 @@ interface GetTransfer {
      * @param factory
      * @param value
      */
-    void transfer(CellFactory factory, Object value);
+    void transfer(CellWriter factory, Object value);
 }

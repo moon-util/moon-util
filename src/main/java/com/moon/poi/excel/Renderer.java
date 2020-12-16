@@ -13,14 +13,14 @@ public interface Renderer {
      * @param factory sheet 渲染器
      * @param title   标题
      */
-    void title(SheetFactory factory, TableTitle title);
+    void title(SheetWriter factory, TableTitle title);
 
     /**
      * 渲染表头
      *
      * @param sheetFactory sheet 渲染器
      */
-    void renderHead(SheetFactory sheetFactory);
+    void renderHead(SheetWriter sheetFactory);
 
     /**
      * 渲染一条数据
@@ -32,5 +32,5 @@ public interface Renderer {
      * @param first        第一项数据（有些数据类型不能获取到第一条数据，所以要单独传第一条数据）
      */
     @SuppressWarnings("rawtypes")
-    void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first);
+    void renderBody(SheetWriter sheetFactory, Iterator iterator, Object first);
 }

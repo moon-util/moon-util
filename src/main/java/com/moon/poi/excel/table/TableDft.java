@@ -2,8 +2,8 @@ package com.moon.poi.excel.table;
 
 import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.util.SetUtil;
-import com.moon.poi.excel.CellFactory;
-import com.moon.poi.excel.RowFactory;
+import com.moon.poi.excel.CellWriter;
+import com.moon.poi.excel.RowWriter;
 import com.moon.poi.excel.annotation.value.DefaultNumber;
 import com.moon.poi.excel.annotation.value.DefaultValue;
 
@@ -31,7 +31,7 @@ abstract class TableDft extends TableCol {
 
     final boolean isAlways() { return always; }
 
-    final void setMatchedVal(CellFactory factory) {
+    final void setMatchedVal(CellWriter factory) {
         if (useSuperSetter) {
             setNormalVal(factory, defaultVal);
         } else {
@@ -51,7 +51,7 @@ abstract class TableDft extends TableCol {
     abstract boolean isMatched(Object rowData, Object propertyValue);
 
     @Override
-    final void render(IntAccessor indexer, RowFactory rowFactory, Object data) {
+    final void render(IntAccessor indexer, RowWriter rowFactory, Object data) {
         if (data == null) {
             if (isAlways()) {
                 setMatchedVal(indexedCell(rowFactory, indexer));
@@ -59,7 +59,7 @@ abstract class TableDft extends TableCol {
                 skip(rowFactory, indexer);
             }
         } else {
-            CellFactory factory = indexedCell(rowFactory, indexer);
+            CellWriter factory = indexedCell(rowFactory, indexer);
             Object propertyValue = getControl().control(data);
             if (isMatched(data, propertyValue)) {
                 setMatchedVal(factory);
@@ -78,7 +78,7 @@ abstract class TableDft extends TableCol {
                 proxy.skip(getOffset(), isFillSkipped());
             }
         } else {
-            CellFactory factory = proxy.indexedCell(getOffset(), isFillSkipped());
+            CellWriter factory = proxy.indexedCell(getOffset(), isFillSkipped());
             Object thisData = proxy.getThisData(getControl());
             if (isMatched(proxy.getRowData(), thisData)) {
                 setMatchedVal(factory);

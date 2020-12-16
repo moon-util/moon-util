@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  *
  *     public static void main(String[] args) {
  *         // 获取映射器 {@link MapperUtil#get(Class, Class)}
- *         BeanMapping&lt;CarVO, CarEntity&gt; mapping = MappingUtil.get(CarVO.class, CarEntity.class);
+ *         BeanMapper&lt;CarVO, CarEntity&gt; mapping = MapperUtil.get(CarVO.class, CarEntity.class);
  *     }
  * }
  * </pre>

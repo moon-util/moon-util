@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 /**
  * @author moonsky
  */
-public class TemplateFactory extends BaseFactory<Sheet, TableFactory, SheetFactory> {
+public class TemplateWriter extends BaseWriter<Sheet, TableWriter, SheetWriter> {
 
     private TemplateRegion region;
     /**
@@ -13,7 +13,7 @@ public class TemplateFactory extends BaseFactory<Sheet, TableFactory, SheetFacto
      */
     private Sheet sheet;
 
-    public TemplateFactory(WorkbookProxy proxy, SheetFactory parent) { super(proxy, parent); }
+    public TemplateWriter(WorkbookProxy proxy, SheetWriter parent) { super(proxy, parent); }
 
     public Sheet getSheet() { return sheet; }
 

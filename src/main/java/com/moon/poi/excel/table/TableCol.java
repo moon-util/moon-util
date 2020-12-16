@@ -3,9 +3,9 @@ package com.moon.poi.excel.table;
 import com.moon.core.lang.JoinerUtil;
 import com.moon.core.lang.StringUtil;
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.poi.excel.CellFactory;
+import com.moon.poi.excel.CellWriter;
 import com.moon.poi.excel.PropertyControl;
-import com.moon.poi.excel.RowFactory;
+import com.moon.poi.excel.RowWriter;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
 
 import java.util.List;
@@ -154,7 +154,7 @@ class TableCol implements Comparable<TableCol> {
      * @param factory
      * @param indexer
      */
-    private final void doOffsetCells(RowFactory factory, IntAccessor indexer) {
+    private final void doOffsetCells(RowWriter factory, IntAccessor indexer) {
         int offset = this.offset;
         if (fillSkipped) {
             int start = indexer.get();
@@ -173,7 +173,7 @@ class TableCol implements Comparable<TableCol> {
      *
      * @return
      */
-    final CellFactory indexedCell(RowFactory rowFactory, IntAccessor indexer) {
+    final CellWriter indexedCell(RowWriter rowFactory, IntAccessor indexer) {
         doOffsetCells(rowFactory, indexer);
         return rowFactory.index(indexer.getAndIncrement());
     }
@@ -184,7 +184,7 @@ class TableCol implements Comparable<TableCol> {
      * @param factory
      * @param indexer
      */
-    final void skip(RowFactory factory, IntAccessor indexer) {
+    final void skip(RowWriter factory, IntAccessor indexer) {
         if (fillSkipped) {
             indexedCell(factory, indexer);
         } else {
@@ -192,13 +192,13 @@ class TableCol implements Comparable<TableCol> {
         }
     }
 
-    final void applyClassname(CellFactory factory) {
+    final void applyClassname(CellWriter factory) {
         if (defaultClassname != null) {
             factory.styleAs(defaultClassname);
         }
     }
 
-    final void setNormalVal(CellFactory factory, Object value) {
+    final void setNormalVal(CellWriter factory, Object value) {
         setter.set(factory, value);
         applyClassname(factory);
     }
@@ -207,17 +207,17 @@ class TableCol implements Comparable<TableCol> {
         if (proxy.isSkipped()) {
             proxy.skip(getOffset(), isFillSkipped());
         } else {
-            CellFactory cellFactory = proxy.indexedCell(getOffset(), isFillSkipped());
+            CellWriter cellFactory = proxy.indexedCell(getOffset(), isFillSkipped());
             Object thisData = proxy.getThisData(getControl());
             setNormalVal(cellFactory, thisData);
         }
     }
 
-    void render(IntAccessor indexer, RowFactory factory, Object data) {
+    void render(IntAccessor indexer, RowWriter factory, Object data) {
         if (data == null) {
             skip(factory, indexer);
         } else {
-            CellFactory cellFactory = indexedCell(factory, indexer);
+            CellWriter cellFactory = indexedCell(factory, indexer);
             setNormalVal(cellFactory, control.control(data));
         }
     }

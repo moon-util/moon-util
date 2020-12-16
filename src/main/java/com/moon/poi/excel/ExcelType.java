@@ -77,7 +77,7 @@ public enum ExcelType implements Supplier<Workbook>, Predicate<String> {
      *
      * @return ExcelFactory
      */
-    public WorkbookFactory newFactory() { return new WorkbookFactory(get()); }
+    public ExcelWriter newFactory() { return new ExcelWriter(get()); }
 
     /**
      * 检测文件名是否匹配

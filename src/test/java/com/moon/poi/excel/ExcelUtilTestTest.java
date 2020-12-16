@@ -23,7 +23,7 @@ class ExcelUtilTestTest {
     @Test
     @Disabled
     void testXlsx() {
-        WorkbookFactory excelFactory = ExcelUtil.xlsx();
+        ExcelWriter excelFactory = ExcelUtil.xlsx();
         excelFactory.sheet("招聘进度分析", sheetFactory -> {
             sheetFactory.definitionStyle("header", (style, font) -> {
                 font.setColor(IndexedColors.RED.index);

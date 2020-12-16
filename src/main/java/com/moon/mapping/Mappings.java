@@ -30,7 +30,7 @@ public class Mappings {
         try {
             return (BeanMapper) valueOf(toEnumCls(cls1), "TO_" + under(cls2));
         } catch (Throwable e) {
-            throw new NoSuchMappingException(clsName(cls1), cls2, e);
+            throw new NoSuchMapperException(clsName(cls1), cls2, e);
         }
     }
 

@@ -6,7 +6,7 @@ import static com.moon.mapping.Mappings.classAs;
 import static java.lang.Thread.currentThread;
 
 /**
- * 获取两个类之间的映射，获取不到时会抛出异常{@link NoSuchMappingException}
+ * 获取两个类之间的映射，获取不到时会抛出异常{@link NoSuchMapperException}
  * <p>
  * 推荐获取后用静态变量的方式保存，没必要获取多次
  * <p>
@@ -37,14 +37,14 @@ public abstract class MapperUtil {
      *
      *     // thisXxx 方法只能在注解了 {@link MapperFor}的类使用
      *     // thisPrimary 获取第一个映射
-     *     final static BeanMapping&lt;Auto, Bus&gt; = MappingUtil.thisPrimary();
+     *     final static BeanMapper&lt;Auto, Bus&gt; = MapperUtil.thisPrimary();
      *
-     *     // 不是第一个映射这样获取: {@link #thisMappingFor(Class)}
-     *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.thisMappingFor(Car.class);
+     *     // 不是第一个映射这样获取: {@link #thisMapperFor(Class)}
+     *     final static BeanMapper&lt;Auto, Car&gt; = MapperUtil.thisMappingFor(Car.class);
      *
      *     // 所有声明的映射都可以这样获取: {@link #get(Class, Class)}
      *     // 这个方法不像{@code thisXxx}方法, 可以在任意位置使用
-     *     final static BeanMapping&lt;Auto, Car&gt; = MappingUtil.get(Auto.class, Car.class);
+     *     final static BeanMapper&lt;Auto, Car&gt; = MapperUtil.get(Auto.class, Car.class);
      *
      *     private String name;
      *     // other fields & getter & setter
@@ -56,7 +56,7 @@ public abstract class MapperUtil {
      *
      * @return 映射器
      *
-     * @throws NoSuchMappingException 不存在对应的映射器是抛出异常
+     * @throws NoSuchMapperException 不存在对应的映射器是抛出异常
      */
     public static <THIS, THAT> BeanMapper<THIS, THAT> thisPrimary() {
         Class<THIS> thisClass = classAs(currentThread().getStackTrace()[2].getClassName());
@@ -75,9 +75,9 @@ public abstract class MapperUtil {
      *
      * @return 映射器
      *
-     * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
+     * @throws NoSuchMapperException 不存在对应的映射器时抛出异常
      */
-    public static <THIS, THAT> BeanMapper<THIS, THAT> thisMappingFor(Class<THAT> thatClass) {
+    public static <THIS, THAT> BeanMapper<THIS, THAT> thisMapperFor(Class<THAT> thatClass) {
         return get(classAs(currentThread().getStackTrace()[2].getClassName()), thatClass);
     }
 
@@ -91,7 +91,7 @@ public abstract class MapperUtil {
      *
      * @return 当存在时返回对应映射器
      *
-     * @throws NoSuchMappingException 不存在对应的映射器时抛出异常
+     * @throws NoSuchMapperException 不存在对应的映射器时抛出异常
      * @see MapperFor#value()
      */
     public static <F, T> BeanMapper<F, T> get(Class<F> fromClass, Class<T> toClass) {

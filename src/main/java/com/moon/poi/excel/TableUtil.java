@@ -7,7 +7,7 @@ import com.moon.poi.excel.table.TableParser;
  */
 final class TableUtil extends TableParser {
 
-    static Renderer parse(Class targetClass, TableFactory factory, boolean cacheDisabled) {
+    static Renderer parse(Class targetClass, TableWriter factory, boolean cacheDisabled) {
         return parseConfiguration(targetClass, factory, cacheDisabled);
     }
 }

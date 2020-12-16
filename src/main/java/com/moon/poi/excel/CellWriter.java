@@ -19,11 +19,11 @@ import java.util.function.Function;
 /**
  * @author moonsky
  */
-public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
+public class CellWriter extends BaseWriter<Cell, CellWriter, RowWriter> {
 
     private final TypeCaster caster = TypeUtil.cast();
 
-    private ImageFactory imageFactory;
+    private ImageWriter imageFactory;
 
     /**
      * 当前正在操作的单元格
@@ -44,14 +44,14 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @param proxy  Excel 集中代理
      * @param parent 父节点
      */
-    public CellFactory(WorkbookProxy proxy, RowFactory parent) { super(proxy, parent); }
+    public CellWriter(WorkbookProxy proxy, RowWriter parent) { super(proxy, parent); }
 
-    private synchronized ImageFactory newImageFactory() {
-        return this.imageFactory = new ImageFactory(getProxy(), this);
+    private synchronized ImageWriter newImageFactory() {
+        return this.imageFactory = new ImageWriter(getProxy(), this);
     }
 
-    private ImageFactory obtainImageFactory() {
-        ImageFactory factory = this.imageFactory;
+    private ImageWriter obtainImageFactory() {
+        ImageWriter factory = this.imageFactory;
         return factory == null ? newImageFactory() : factory;
     }
 
@@ -139,7 +139,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @return 当前对象
      */
     @Override
-    public CellFactory definitionComment(String uniqueName, Consumer<Comment> commentBuilder) {
+    public CellWriter definitionComment(String uniqueName, Consumer<Comment> commentBuilder) {
         super.definitionComment(uniqueName, commentBuilder);
         return this;
     }
@@ -153,7 +153,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      * @return 当前对象
      */
     @Override
-    public CellFactory definitionComment(String uniqueName, String comment) {
+    public CellWriter definitionComment(String uniqueName, String comment) {
         super.definitionComment(uniqueName, comment);
         return this;
     }
@@ -176,7 +176,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @see #definitionStyle(String, BiConsumer)
      */
-    public CellFactory styleAs(String classname) {
+    public CellWriter styleAs(String classname) {
         proxy.addSetter(newSetter(), classname);
         return this;
     }
@@ -188,7 +188,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前对象
      */
-    public CellFactory cloneStyleAs(String classname) { return doCloneStyleAs(classname); }
+    public CellWriter cloneStyleAs(String classname) { return doCloneStyleAs(classname); }
 
     /**
      * 复制当前单元格样式并命名为指定名称
@@ -197,7 +197,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前对象
      */
-    public CellFactory cloneStyleAs(Integer classname) { return doCloneStyleAs(classname); }
+    public CellWriter cloneStyleAs(Integer classname) { return doCloneStyleAs(classname); }
 
     /**
      * 复制当前单元格样式并命名为指定名称
@@ -206,7 +206,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前对象
      */
-    private CellFactory doCloneStyleAs(Object classname) {
+    private CellWriter doCloneStyleAs(Object classname) {
         ProxyStyleBuilder builder = proxy.findBuilder(newSetter());
         if (builder != null) {
             proxy.definitionBuilder(new ProxyStyleBuilder(classname, builder));
@@ -226,7 +226,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory hide() {
+    public CellWriter hide() {
         getSheet().setColumnHidden(getColumnIndex(), true);
         return this;
     }
@@ -236,7 +236,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory show() {
+    public CellWriter show() {
         getSheet().setColumnHidden(getColumnIndex(), false);
         return this;
     }
@@ -248,10 +248,10 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      *
-     * @see SheetFactory#setColumnsWidth(Integer...)
-     * @see SheetFactory#setWidth(int, int)
+     * @see SheetWriter#setColumnsWidth(Integer...)
+     * @see SheetWriter#setWidth(int, int)
      */
-    public CellFactory width(int width) {
+    public CellWriter width(int width) {
         getProxy().setColumnWidth(getSheet(), getColumnIndex(), width);
         return this;
     }
@@ -261,9 +261,9 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      *
-     * @see SheetFactory#columnsAutoWidth(int...)
+     * @see SheetWriter#columnsAutoWidth(int...)
      */
-    public CellFactory autoWidth() {
+    public CellWriter autoWidth() {
         Sheet sheet = getSheet();
         int index = getColumnIndex();
         if (getProxy().isAllowAutoWidth(sheet, index)) {
@@ -280,10 +280,10 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      *
-     * @see SheetFactory#columnsAutoWidth(int...)
-     * @see SheetFactory#columnsAutoWidth(boolean, int...)
+     * @see SheetWriter#columnsAutoWidth(int...)
+     * @see SheetWriter#columnsAutoWidth(boolean, int...)
      */
-    public CellFactory autoWidth(boolean useMergedCells) {
+    public CellWriter autoWidth(boolean useMergedCells) {
         getSheet().autoSizeColumn(getColumnIndex(), useMergedCells);
         return this;
     }
@@ -291,13 +291,13 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
     /**
      * 为当前单元格应用预定义注释
      * <p>
-     * {@link CellFactory}提供了多种方式使用注释，如果是复杂的注释内容建议使用预定义方式进行集中管理
+     * {@link CellWriter}提供了多种方式使用注释，如果是复杂的注释内容建议使用预定义方式进行集中管理
      *
      * @param definedCommentName 预定义注释唯一命名
      *
      * @return 当前 CellFactory
      */
-    public CellFactory commentAs(String definedCommentName) {
+    public CellWriter commentAs(String definedCommentName) {
         proxy.addSetter(ensureSetter(), definedCommentName);
         return this;
     }
@@ -307,7 +307,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    private CellFactory removeComment() {
+    private CellWriter removeComment() {
         cell.removeCellComment();
         if (this.getSetter() != null) {
             proxy.removeSetter(setter);
@@ -325,7 +325,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory comment(String comment) {
+    public CellWriter comment(String comment) {
         Cell cell = getCell();
         if (StringUtil.isEmpty(comment)) {
             removeComment();
@@ -344,7 +344,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory comment(Comment comment) {
+    public CellWriter comment(Comment comment) {
         Cell cell = getCell();
         if (comment == null) {
             removeComment();
@@ -359,7 +359,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory active() {
+    public CellWriter active() {
         getCell().setAsActiveCell();
         return this;
     }
@@ -375,7 +375,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory val(Date value) {
+    public CellWriter val(Date value) {
         getCell().setCellValue(value);
         return this;
     }
@@ -387,7 +387,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory val(String value) {
+    public CellWriter val(String value) {
         getCell().setCellValue(value);
         return this;
     }
@@ -399,7 +399,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory val(double value) {
+    public CellWriter val(double value) {
         getCell().setCellValue(value);
         return this;
     }
@@ -411,7 +411,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory val(boolean value) {
+    public CellWriter val(boolean value) {
         getCell().setCellValue(value);
         return this;
     }
@@ -423,7 +423,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory val(Calendar value) {
+    public CellWriter val(Calendar value) {
         getCell().setCellValue(value);
         return this;
     }
@@ -435,7 +435,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory val(LocalDate value) {
+    public CellWriter val(LocalDate value) {
         getCell().setCellValue(value);
         return this;
     }
@@ -447,12 +447,12 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory val(LocalDateTime value) {
+    public CellWriter val(LocalDateTime value) {
         getCell().setCellValue(value);
         return this;
     }
 
-    ImageFactory image() {
+    ImageWriter image() {
         return obtainImageFactory();
     }
 
@@ -461,7 +461,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory valBlank() {
+    public CellWriter valBlank() {
         getCell().setBlank();
         return this;
     }
@@ -508,7 +508,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory useVal(Consumer<Object> consumer) {
+    public CellWriter useVal(Consumer<Object> consumer) {
         consumer.accept(getValue());
         return this;
     }
@@ -521,7 +521,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public <T> CellFactory useVal(Class<? extends T> type, Consumer<? super T> consumer) {
+    public <T> CellWriter useVal(Class<? extends T> type, Consumer<? super T> consumer) {
         consumer.accept(getValue(type));
         return this;
     }
@@ -534,7 +534,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public <T> CellFactory useVal(Function<Object, ? extends T> converter, Consumer<? super T> consumer) {
+    public <T> CellWriter useVal(Function<Object, ? extends T> converter, Consumer<? super T> consumer) {
         consumer.accept(getValue(converter));
         return this;
     }
@@ -546,7 +546,7 @@ public class CellFactory extends BaseFactory<Cell, CellFactory, RowFactory> {
      *
      * @return 当前 CellFactory
      */
-    public CellFactory controlCell(Consumer<? super Cell> consumer) {
+    public CellWriter controlCell(Consumer<? super Cell> consumer) {
         consumer.accept(getCell());
         return this;
     }

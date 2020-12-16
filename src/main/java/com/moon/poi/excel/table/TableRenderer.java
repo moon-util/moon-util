@@ -112,7 +112,7 @@ final class TableRenderer implements Renderer {
         return cell != null && cell.getHeight() > otherHeight ? cell.getHeight() : otherHeight;
     }
 
-    private void maxHeight(RowFactory factory, List<HeaderCell> cells) {
+    private void maxHeight(RowWriter factory, List<HeaderCell> cells) {
         short finalHeight = -1;
         if (cells != null) {
             for (HeaderCell cell : cells) {
@@ -125,7 +125,7 @@ final class TableRenderer implements Renderer {
     }
 
     @Override
-    public void title(SheetFactory factory, TableTitle title) {
+    public void title(SheetWriter factory, TableTitle title) {
         if (title == null || title.getTitle() == null) {
             return;
         }
@@ -137,8 +137,8 @@ final class TableRenderer implements Renderer {
             colspan = getHeaderColsCount();
         }
 
-        RowFactory rowFactory = factory.row();
-        CellFactory cellFactory = rowFactory.newCell(1, colspan).val(title.getTitle());
+        RowWriter rowFactory = factory.row();
+        CellWriter cellFactory = rowFactory.newCell(1, colspan).val(title.getTitle());
         if (title.getClassname() != null) {
             cellFactory.styleAs(title.getClassname());
         }
@@ -153,12 +153,12 @@ final class TableRenderer implements Renderer {
      * @param sheetFactory sheet 渲染器
      */
     @Override
-    public void renderHead(SheetFactory sheetFactory) {
+    public void renderHead(SheetWriter sheetFactory) {
         Sheet sheet = sheetFactory.getSheet();
         List<HeaderCell>[] headerCells = this.headerCells;
         final int rowIdx = sheetFactory.getRowIndex();
         for (List<HeaderCell> rowCells : headerCells) {
-            RowFactory factory = sheetFactory.row();
+            RowWriter factory = sheetFactory.row();
             for (HeaderCell cell : rowCells) {
                 // 设置表头标题
                 if (cell.isOffsetCell()) {
@@ -178,7 +178,7 @@ final class TableRenderer implements Renderer {
         sheetFactory.setColumnsWidthBegin(0, this.columnsWidth);
     }
 
-    final void definitionStyles(TableFactory factory) {
+    final void definitionStyles(TableWriter factory) {
         for (Map.Entry<String, StyleBuilder> builderEntry : definitions.entrySet()) {
             final String classname = builderEntry.getKey();
             StyleBuilder builder = builderEntry.getValue();
@@ -201,11 +201,11 @@ final class TableRenderer implements Renderer {
      * @param first        第一项数据（有些数据类型不能获取到第一条数据，所以要单独传第一条数据）
      */
     @Override
-    public void renderBody(SheetFactory sheetFactory, Iterator iterator, Object first) {
+    public void renderBody(SheetWriter sheetFactory, Iterator iterator, Object first) {
         doRenderBody1(sheetFactory, iterator, first);
     }
 
-    private void doRenderBody1(SheetFactory sheetFactory, Iterator iterator, Object first) {
+    private void doRenderBody1(SheetWriter sheetFactory, Iterator iterator, Object first) {
         TableProxy proxy = new TableProxy(sheetFactory, definitions, depth);
         if (first != null) {
             renderRecord(proxy, first);
@@ -229,7 +229,7 @@ final class TableRenderer implements Renderer {
         }
     }
 
-    final void doRenderRow(IntAccessor indexer, RowFactory rowFactory, Object entityData) {
+    final void doRenderRow(IntAccessor indexer, RowWriter rowFactory, Object entityData) {
         for (TableCol column : columns) {
             column.render(indexer, rowFactory, entityData);
         }

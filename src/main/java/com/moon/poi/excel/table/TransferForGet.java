@@ -8,7 +8,7 @@ import com.moon.core.lang.ref.IntAccessor;
 import com.moon.core.lang.ref.LongAccessor;
 import com.moon.core.time.CalendarUtil;
 import com.moon.core.time.DateUtil;
-import com.moon.poi.excel.CellFactory;
+import com.moon.poi.excel.CellWriter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -39,7 +39,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             if (value != null) {
                 factory.val((Boolean) value);
             }
@@ -58,7 +58,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             if (value != null) {
                 factory.val((Double) value);
             }
@@ -83,7 +83,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             if (value != null) {
                 factory.val(value.toString());
             }
@@ -123,7 +123,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             if (value instanceof Number) {
                 factory.val(((Number) value).doubleValue());
             } else {
@@ -144,7 +144,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             if (value instanceof Number) {
                 factory.val((Date) value);
             } else {
@@ -165,7 +165,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             if (value instanceof Calendar) {
                 factory.val((Calendar) value);
             } else {
@@ -185,7 +185,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             if (value != null) {
                 factory.val(((LocalTime) value).format(formatter));
             }
@@ -201,7 +201,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             factory.val((LocalDate) value);
         }
     },
@@ -215,7 +215,7 @@ enum TransferForGet implements GetTransfer {
         }
 
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             factory.val((LocalDateTime) value);
         }
     },
@@ -230,13 +230,13 @@ enum TransferForGet implements GetTransfer {
         boolean test(Class propertyType) { return false; }
 
         @Override
-        public void transfer(CellFactory factory, Object data) {
+        public void transfer(CellWriter factory, Object data) {
             factory.getCell().setBlank();
         }
     },
     UTIL_OPTIONAL_INT {
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             OptionalInt optional = (OptionalInt) value;
             if (optional.isPresent()) {
                 factory.getCell().setCellValue(optional.getAsInt());
@@ -253,7 +253,7 @@ enum TransferForGet implements GetTransfer {
     },
     UTIL_OPTIONAL_LONG {
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             OptionalLong optional = (OptionalLong) value;
             if (optional.isPresent()) {
                 factory.getCell().setCellValue(optional.getAsLong());
@@ -270,7 +270,7 @@ enum TransferForGet implements GetTransfer {
     },
     UTIL_OPTIONAL_DOUBLE {
         @Override
-        public void transfer(CellFactory factory, Object value) {
+        public void transfer(CellWriter factory, Object value) {
             OptionalDouble optional = (OptionalDouble) value;
             if (optional.isPresent()) {
                 factory.getCell().setCellValue(optional.getAsDouble());
@@ -296,7 +296,7 @@ enum TransferForGet implements GetTransfer {
         boolean test(Class propertyType) { return true; }
 
         @Override
-        public void transfer(CellFactory factory, Object data) {
+        public void transfer(CellWriter factory, Object data) {
             if (data != null) {
                 factory.val(data.toString());
             }

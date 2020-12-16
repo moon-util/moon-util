@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * @author moonsky
  */
-abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFactory> {
+abstract class BaseWriter<T, F extends BaseWriter<T, F, P>, P extends BaseWriter> {
 
     protected final static boolean DFT_APPEND_TYPE = true;
     /**
@@ -22,7 +22,7 @@ abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFact
      */
     protected final P parent;
 
-    public BaseFactory(WorkbookProxy proxy, P parent) {
+    public BaseWriter(WorkbookProxy proxy, P parent) {
         this.parent = parent == null ? (P) this : parent;
         this.proxy = proxy;
     }
@@ -151,7 +151,7 @@ abstract class BaseFactory<T, F extends BaseFactory<T, F, P>, P extends BaseFact
     }
 
     /**
-     * 返回父节点工厂，如果当前是“根”（{@link WorkbookFactory}），则返回自身
+     * 返回父节点工厂，如果当前是“根”（{@link ExcelWriter}），则返回自身
      * <p>
      * <strong>不建议调用这个方法</strong>
      *

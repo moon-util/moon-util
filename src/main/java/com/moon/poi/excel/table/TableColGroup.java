@@ -1,7 +1,7 @@
 package com.moon.poi.excel.table;
 
 import com.moon.core.lang.ref.IntAccessor;
-import com.moon.poi.excel.RowFactory;
+import com.moon.poi.excel.RowWriter;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
 
 import java.util.List;
@@ -67,7 +67,7 @@ final class TableColGroup extends TableCol {
     }
 
     @Override
-    void render(IntAccessor indexer, RowFactory factory, Object data) {
+    void render(IntAccessor indexer, RowWriter factory, Object data) {
         Object entityData = getControl().control(data);
         child.doRenderRow(indexer, factory, entityData);
     }

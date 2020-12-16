@@ -2,7 +2,7 @@ package com.moon.poi.excel.table;
 
 import com.moon.core.util.Table;
 import com.moon.core.util.TableImpl;
-import com.moon.poi.excel.CellFactory;
+import com.moon.poi.excel.CellWriter;
 import com.moon.poi.excel.annotation.format.DateTimePattern;
 import com.moon.poi.excel.annotation.format.NumberPattern;
 import org.joda.time.ReadableInstant;
@@ -62,7 +62,7 @@ abstract class CellSetter {
      * @param factory
      * @param value
      */
-    abstract void set(CellFactory factory, Object value);
+    abstract void set(CellWriter factory, Object value);
 
     final GetTransfer getTransfer() { return transformer; }
 
@@ -110,7 +110,7 @@ abstract class CellSetter {
         String format(Object value) { return formatter.format(value); }
 
         @Override
-        final void set(CellFactory factory, Object value) {
+        final void set(CellWriter factory, Object value) {
             if (value != null) {
                 getTransfer().transfer(factory, format(value));
             }
@@ -232,7 +232,7 @@ abstract class CellSetter {
         abstract Date toDate(Object value);
 
         @Override
-        final void set(CellFactory factory, Object value) {
+        final void set(CellWriter factory, Object value) {
             if (value != null) {
                 String date = getFormatter().format(toDate(value));
                 getTransfer().transfer(factory, date);
@@ -304,7 +304,7 @@ abstract class CellSetter {
         abstract String toFormat(Object value);
 
         @Override
-        final void set(CellFactory factory, Object value) {
+        final void set(CellWriter factory, Object value) {
             if (value != null) {
                 getTransfer().transfer(factory, toFormat(value));
             }
@@ -355,7 +355,7 @@ abstract class CellSetter {
         }
 
         @Override
-        final void set(CellFactory factory, Object value) {
+        final void set(CellWriter factory, Object value) {
             if (factory != null) {
                 String val = toFormat(value, formatter);
                 getTransfer().transfer(factory, val);
@@ -374,6 +374,6 @@ abstract class CellSetter {
         BasicSetter(GetTransfer transformer) { super(transformer); }
 
         @Override
-        void set(CellFactory factory, Object value) { getTransfer().transfer(factory, value); }
+        void set(CellWriter factory, Object value) { getTransfer().transfer(factory, value); }
     }
 }

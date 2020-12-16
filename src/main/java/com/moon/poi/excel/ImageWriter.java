@@ -5,18 +5,18 @@ import org.apache.poi.ss.usermodel.Cell;
 /**
  * @author moonsky
  */
-public class ImageFactory extends BaseFactory<Cell, ImageFactory, CellFactory> {
+public class ImageWriter extends BaseWriter<Cell, ImageWriter, CellWriter> {
 
     /**
      * 当前正在操作的单元格
      */
     private Cell cell;
 
-    public ImageFactory(WorkbookProxy proxy, CellFactory parent) {
+    public ImageWriter(WorkbookProxy proxy, CellWriter parent) {
         super(proxy, parent);
     }
 
-    final ImageFactory setCell(Cell cell) {
+    final ImageWriter setCell(Cell cell) {
         this.cell = cell;
         return this;
     }

@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  *
  * @author moonsky
  */
-public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFactory> {
+public class SheetWriter extends BaseWriter<Sheet, SheetWriter, ExcelWriter> {
 
     /**
      * @see Sheet#setColumnWidth(int, int)
@@ -23,8 +23,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     /**
      * row 工厂
      */
-    private final RowFactory factory;
-    private final TemplateFactory templateFactory;
+    private final RowWriter factory;
+    private final TemplateWriter templateFactory;
     /**
      * 当前正在操作的 sheet 表
      */
@@ -36,10 +36,10 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @param proxy  代理中心
      * @param parent 父节点
      */
-    public SheetFactory(WorkbookProxy proxy, WorkbookFactory parent) {
+    public SheetWriter(WorkbookProxy proxy, ExcelWriter parent) {
         super(proxy, parent);
-        factory = new RowFactory(proxy, this);
-        templateFactory = new TemplateFactory(proxy, this);
+        factory = new RowWriter(proxy, this);
+        templateFactory = new TemplateWriter(proxy, this);
     }
 
     /**
@@ -64,7 +64,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
     @Override
     protected Sheet get() { return getSheet(); }
 
-    private RowFactory getRowFactory() { return this.factory; }
+    private RowWriter getRowFactory() { return this.factory; }
 
     /**
      * 预定义注释
@@ -75,7 +75,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return 当前对象
      */
     @Override
-    public SheetFactory definitionComment(String uniqueName, Consumer<Comment> commentBuilder) {
+    public SheetWriter definitionComment(String uniqueName, Consumer<Comment> commentBuilder) {
         super.definitionComment(uniqueName, commentBuilder);
         return this;
     }
@@ -89,7 +89,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @return 当前对象
      */
     @Override
-    public SheetFactory definitionComment(String uniqueName, String comment) {
+    public SheetWriter definitionComment(String uniqueName, String comment) {
         super.definitionComment(uniqueName, comment);
         return this;
     }
@@ -104,7 +104,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @see Sheet#autoSizeColumn(int, boolean)
      */
-    public SheetFactory columnsAutoWidth(boolean useMergedCells, int... columnIndexes) {
+    public SheetWriter columnsAutoWidth(boolean useMergedCells, int... columnIndexes) {
         if (columnIndexes != null) {
             for (int columnIndex : columnIndexes) {
                 sheet.autoSizeColumn(columnIndex, useMergedCells);
@@ -122,7 +122,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @see Sheet#autoSizeColumn(int)
      */
-    public SheetFactory columnsAutoWidth(int... columnIndexes) {
+    public SheetWriter columnsAutoWidth(int... columnIndexes) {
         if (columnIndexes != null) {
             for (int columnIndex : columnIndexes) {
                 sheet.autoSizeColumn(columnIndex);
@@ -138,7 +138,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory setColumnsWidth(Integer... widths) { return setColumnsWidthBegin(0, widths); }
+    public SheetWriter setColumnsWidth(Integer... widths) { return setColumnsWidthBegin(0, widths); }
 
     /**
      * 按索引给各列设置指定宽度
@@ -148,7 +148,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory setColumnsWidthBegin(int startIdx, Integer[] widths) {
+    public SheetWriter setColumnsWidthBegin(int startIdx, Integer[] widths) {
         int len = widths == null ? 0 : widths.length;
         if (len > 0) {
             Integer columnWidth;
@@ -179,7 +179,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory setWidth(int columnIndex, int width) {
+    public SheetWriter setWidth(int columnIndex, int width) {
         getProxy().setColumnWidth(getSheet(), columnIndex, width);
         return this;
     }
@@ -189,7 +189,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory active() {
+    public SheetWriter active() {
         Workbook workbook = proxy.getWorkbook();
         workbook.setActiveSheet(workbook.getSheetIndex(getSheet()));
         return this;
@@ -208,8 +208,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory row(Consumer<RowFactory> consumer) {
-        RowFactory rowFactory = getRowFactory();
+    public SheetWriter row(Consumer<RowWriter> consumer) {
+        RowWriter rowFactory = getRowFactory();
         rowFactory.setRow(proxy.nextRow());
         consumer.accept(rowFactory);
         return this;
@@ -223,8 +223,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory row(int offset, Consumer<RowFactory> consumer) {
-        RowFactory rowFactory = getRowFactory();
+    public SheetWriter row(int offset, Consumer<RowWriter> consumer) {
+        RowWriter rowFactory = getRowFactory();
         rowFactory.setRow(proxy.nextRow(offset));
         consumer.accept(rowFactory);
         return this;
@@ -235,8 +235,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 行操作器
      */
-    public RowFactory row() {
-        RowFactory rowFactory = getRowFactory();
+    public RowWriter row() {
+        RowWriter rowFactory = getRowFactory();
         rowFactory.setRow(proxy.nextRow());
         return rowFactory;
     }
@@ -248,8 +248,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 行操作器
      */
-    public RowFactory row(int offset) {
-        RowFactory rowFactory = getRowFactory();
+    public RowWriter row(int offset) {
+        RowWriter rowFactory = getRowFactory();
         rowFactory.setRow(proxy.nextRow(offset));
         return rowFactory;
     }
@@ -262,7 +262,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory useRow(int rowIndex, Consumer<RowFactory> consumer) {
+    public SheetWriter useRow(int rowIndex, Consumer<RowWriter> consumer) {
         return useRow(rowIndex, DFT_APPEND_TYPE, consumer);
     }
 
@@ -277,7 +277,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory useRow(int rowIndex, boolean appendCell, Consumer<RowFactory> consumer) {
+    public SheetWriter useRow(int rowIndex, boolean appendCell, Consumer<RowWriter> consumer) {
         consumer.accept(useRow(rowIndex, appendCell));
         return this;
     }
@@ -289,7 +289,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 行操作器
      */
-    public RowFactory useRow(int rowIndex) {
+    public RowWriter useRow(int rowIndex) {
         return useRow(rowIndex, DFT_APPEND_TYPE);
     }
 
@@ -303,8 +303,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 行操作器
      */
-    public RowFactory useRow(int rowIndex, boolean appendCell) {
-        RowFactory rowFactory = getRowFactory();
+    public RowWriter useRow(int rowIndex, boolean appendCell) {
+        RowWriter rowFactory = getRowFactory();
         rowFactory.setRow(proxy.useOrCreateRow(rowIndex, appendCell));
         return rowFactory;
     }
@@ -316,7 +316,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory forEach(Consumer<RowFactory> consumer) {
+    public SheetWriter forEach(Consumer<RowWriter> consumer) {
         return forEach(0, consumer);
     }
 
@@ -328,7 +328,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory forEach(int fromRowIndex, Consumer<RowFactory> consumer) {
+    public SheetWriter forEach(int fromRowIndex, Consumer<RowWriter> consumer) {
         return forEach(fromRowIndex, getSheet().getLastRowNum() + 1, consumer);
     }
 
@@ -341,8 +341,8 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前 SheetFactory
      */
-    public SheetFactory forEach(int fromRowIndex, int toRowIndex, Consumer<RowFactory> consumer) {
-        RowFactory rowFactory = getRowFactory();
+    public SheetWriter forEach(int fromRowIndex, int toRowIndex, Consumer<RowWriter> consumer) {
+        RowWriter rowFactory = getRowFactory();
         for (int i = fromRowIndex; i < toRowIndex; i++) {
             rowFactory.setRow(proxy.useOrCreateRow(i, true));
             consumer.accept(rowFactory);
@@ -355,11 +355,11 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前对象 SheetFactory
      */
-    private SheetFactory reduce() {
+    private SheetWriter reduce() {
         throw new UnsupportedOperationException();
     }
 
-    private SheetFactory reduceAll() {
+    private SheetWriter reduceAll() {
         throw new UnsupportedOperationException();
     }
 
@@ -379,14 +379,14 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      * @see TableIndexer at field or method if present {@link TableColumn} or {@link TableColumnGroup}
      * @see TableRecord at type
      */
-    public SheetFactory table(Consumer<TableFactory> consumer) {
-        TableFactory factory = new TableFactory(proxy, this);
+    public SheetWriter table(Consumer<TableWriter> consumer) {
+        TableWriter factory = new TableWriter(proxy, this);
         factory.setSheet(getSheet());
         consumer.accept(factory);
         return this;
     }
 
-    private SheetFactory table(int rowIndex, int colIndex) {
+    private SheetWriter table(int rowIndex, int colIndex) {
         return this;
     }
 
@@ -401,7 +401,7 @@ public class SheetFactory extends BaseFactory<Sheet, SheetFactory, WorkbookFacto
      *
      * @return 当前对象 SheetFactory
      */
-    SheetFactory template(TemplateRegion region, Consumer<TemplateFactory> consumer) {
+    SheetWriter template(TemplateRegion region, Consumer<TemplateWriter> consumer) {
         templateFactory.setSheet(getSheet());
         templateFactory.setRegion(region);
         consumer.accept(templateFactory);

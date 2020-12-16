@@ -14,13 +14,13 @@ import java.util.function.Consumer;
 /**
  * @author moonsky
  */
-public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, WorkbookFactory> {
+public class ExcelWriter extends BaseWriter<Workbook, ExcelWriter, ExcelWriter> {
 
-    private final SheetFactory factory;
+    private final SheetWriter factory;
 
-    public WorkbookFactory(Workbook workbook) {
+    public ExcelWriter(Workbook workbook) {
         super(new WorkbookProxy(workbook), null);
-        factory = new SheetFactory(proxy, this);
+        factory = new SheetWriter(proxy, this);
     }
 
     /**
@@ -38,7 +38,7 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
     @Override
     protected Workbook get() { return proxy.getWorkbook(); }
 
-    private SheetFactory getSheetFactory() { return factory; }
+    private SheetWriter getSheetFactory() { return factory; }
 
     /**
      * 创建工作表，如果存在则使用已存在的
@@ -49,7 +49,7 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
      *
      * @return 当前 WorkbookFactory
      */
-    public WorkbookFactory sheet(String sheetName, boolean append, Consumer<SheetFactory> operator) {
+    public ExcelWriter sheet(String sheetName, boolean append, Consumer<SheetWriter> operator) {
         factory.setSheet(proxy.useSheet(sheetName, append));
         operator.accept(getSheetFactory());
         return this;
@@ -64,7 +64,7 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
      *
      * @return 当前 WorkbookFactory
      */
-    public WorkbookFactory sheetAt(int index, boolean append, Consumer<SheetFactory> operator) {
+    public ExcelWriter sheetAt(int index, boolean append, Consumer<SheetWriter> operator) {
         factory.setSheet(proxy.useSheet(index, append));
         operator.accept(getSheetFactory());
         return this;
@@ -78,7 +78,7 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
      *
      * @return 当前 WorkbookFactory
      */
-    public WorkbookFactory sheetAt(int index, Consumer<SheetFactory> operator) {
+    public ExcelWriter sheetAt(int index, Consumer<SheetWriter> operator) {
         return sheetAt(index, true, operator);
     }
 
@@ -90,7 +90,7 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
      *
      * @return 当前 WorkbookFactory
      */
-    public WorkbookFactory sheet(String sheetName, Consumer<SheetFactory> operator) {
+    public ExcelWriter sheet(String sheetName, Consumer<SheetWriter> operator) {
         return sheet(sheetName, DFT_APPEND_TYPE, operator);
     }
 
@@ -101,7 +101,7 @@ public class WorkbookFactory extends BaseFactory<Workbook, WorkbookFactory, Work
      *
      * @return 当前 WorkbookFactory
      */
-    public WorkbookFactory sheet(Consumer<SheetFactory> operator) { return sheet(null, operator); }
+    public ExcelWriter sheet(Consumer<SheetWriter> operator) { return sheet(null, operator); }
 
     /**
      * 将 Excel 写入到指定路径文件

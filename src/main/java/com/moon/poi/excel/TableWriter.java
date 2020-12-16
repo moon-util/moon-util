@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  * * @see TableListable 标记一个列表字段，一个实体里最多只能有一列可迭代
  // * @see TableIndexer 标记一列索引
  */
-public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory> {
+public class TableWriter extends BaseWriter<Sheet, TableWriter, SheetWriter> {
 
     private final PartRenderer HEAD_RENDERER
 
@@ -51,7 +51,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      */
     private boolean cacheDisabled = false;
 
-    public TableFactory(WorkbookProxy proxy, SheetFactory parent) { super(proxy, parent); }
+    public TableWriter(WorkbookProxy proxy, SheetWriter parent) { super(proxy, parent); }
 
     void setSheet(Sheet sheet) { this.sheet = sheet; }
 
@@ -69,7 +69,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory title(String title) {
+    public TableWriter title(String title) {
         return titleOf(title == null ? null : TableTitle.of(title));
     }
 
@@ -81,7 +81,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory title(String title, String classname) {
+    public TableWriter title(String title, String classname) {
         return titleOf(title == null ? null : TableTitle.of(title, classname));
     }
 
@@ -92,7 +92,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory titleOf(TableTitle title) {
+    public TableWriter titleOf(TableTitle title) {
         this.title = title;
         return this;
     }
@@ -105,7 +105,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory config(boolean renderHead, boolean renderBody) {
+    public TableWriter config(boolean renderHead, boolean renderBody) {
         this.renderHead = renderHead;
         this.renderBody = renderBody;
         return this;
@@ -127,7 +127,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return this
      */
-    public TableFactory cacheDisabled(boolean disabled) {
+    public TableWriter cacheDisabled(boolean disabled) {
         this.cacheDisabled = disabled;
         return this;
     }
@@ -146,7 +146,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return this
      */
-    public <T> TableFactory render(Iterator<? extends T> iterator) { return render(iterator, null); }
+    public <T> TableWriter render(Iterator<? extends T> iterator) { return render(iterator, null); }
 
     /**
      * 渲染列表数据，如果{@code targetClass}不为{@code null}，则解析{@code targetClass}
@@ -158,7 +158,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return this
      */
-    public <T> TableFactory render(Iterator<? extends T> iterator, Class<? super T> targetClass) {
+    public <T> TableWriter render(Iterator<? extends T> iterator, Class<? super T> targetClass) {
         return doRenderData(iterator, targetClass, getHeaderRenderer());
     }
 
@@ -170,7 +170,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return this
      */
-    public <T> TableFactory render(Iterable<? extends T> iterable) { return render(iterable.iterator()); }
+    public <T> TableWriter render(Iterable<? extends T> iterable) { return render(iterable.iterator()); }
 
     /**
      * 渲染列表数据，如果{@code targetClass}不为{@code null}，则解析{@code targetClass}
@@ -182,7 +182,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return this
      */
-    public <T> TableFactory render(Iterable<? extends T> iterable, Class<? super T> targetClass) {
+    public <T> TableWriter render(Iterable<? extends T> iterable, Class<? super T> targetClass) {
         return render(iterable.iterator(), targetClass);
     }
 
@@ -194,7 +194,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return this
      */
-    public <T> TableFactory render(Stream<? extends T> stream) { return render(stream.iterator()); }
+    public <T> TableWriter render(Stream<? extends T> stream) { return render(stream.iterator()); }
 
     /**
      * 渲染列表数据，如果{@code targetClass}不为{@code null}，则解析{@code targetClass}
@@ -206,7 +206,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return this
      */
-    public <T> TableFactory render(Stream<? extends T> stream, Class<? super T> targetClass) {
+    public <T> TableWriter render(Stream<? extends T> stream, Class<? super T> targetClass) {
         return render(stream.iterator(), targetClass);
     }
 
@@ -219,7 +219,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      * @return this
      */
     @SafeVarargs
-    public final <T> TableFactory render(T... data) {
+    public final <T> TableWriter render(T... data) {
         if (data == null) {
             return this;
         }
@@ -237,7 +237,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      * @return this
      */
     @SafeVarargs
-    public final <T> TableFactory render(Class<? super T> targetClass, T... data) {
+    public final <T> TableWriter render(Class<? super T> targetClass, T... data) {
         return data == null ? this : render(IteratorUtil.of(data), targetClass);
     }
 
@@ -250,7 +250,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory renderAll(Object collect) { return renderAll(collect, null); }
+    public TableWriter renderAll(Object collect) { return renderAll(collect, null); }
 
     /**
      * 渲染任意集合类型，用于预先未知集合数据类型的情况，这里会自动选择合适的类型进行渲染
@@ -262,7 +262,7 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      *
      * @return TableFactory
      */
-    public TableFactory renderAll(Object collect, Class targetClass) {
+    public TableWriter renderAll(Object collect, Class targetClass) {
         if (collect == null) {
             return this;
         }
@@ -288,12 +288,12 @@ public class TableFactory extends BaseFactory<Sheet, TableFactory, SheetFactory>
      * ~~~~ actual executor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      */
 
-    protected SheetFactory end() { return getParentFactory(); }
+    protected SheetWriter end() { return getParentFactory(); }
 
-    private <T> TableFactory doRenderData(
+    private <T> TableWriter doRenderData(
         Iterator<? extends T> iterator, Class<? super T> targetClass, PartRenderer headRenderer
     ) {
-        SheetFactory factory = end();
+        SheetWriter factory = end();
         Renderer renderer = null;
         Object first = null;
         if (targetClass == null) {

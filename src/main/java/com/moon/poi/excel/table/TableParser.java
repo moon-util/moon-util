@@ -1,6 +1,6 @@
 package com.moon.poi.excel.table;
 
-import com.moon.poi.excel.TableFactory;
+import com.moon.poi.excel.TableWriter;
 
 /**
  * @author moonsky
@@ -18,7 +18,7 @@ public class TableParser {
     }
 
     protected final static TableRenderer parseConfiguration(
-        Class targetClass, TableFactory factory, boolean cacheDisabled
+        Class targetClass, TableWriter factory, boolean cacheDisabled
     ) {
         TableRenderer renderer = parseOnly(targetClass, cacheDisabled);
         renderer.definitionStyles(factory);

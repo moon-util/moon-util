@@ -100,21 +100,21 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory xls() { return of(ExcelType.XLS); }
+    public static ExcelWriter xls() { return of(ExcelType.XLS); }
 
     /**
      * 创建 Excel 2007 工厂
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory xlsx() { return of(ExcelType.XLSX); }
+    public static ExcelWriter xlsx() { return of(ExcelType.XLSX); }
 
     /**
      * 创建 Excel 2007 工厂
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory stream() { return of(ExcelType.SUPER); }
+    public static ExcelWriter stream() { return of(ExcelType.SUPER); }
 
     /**
      * 使用预定义类型创建 Excel 工厂
@@ -123,7 +123,7 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory of(ExcelType type) { return of(type.get()); }
+    public static ExcelWriter of(ExcelType type) { return of(type.get()); }
 
     /**
      * 自定义实现创建 Excel 工厂
@@ -132,7 +132,7 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory of(Supplier<Workbook> creator) { return of(creator.get()); }
+    public static ExcelWriter of(Supplier<Workbook> creator) { return of(creator.get()); }
 
     /**
      * 自定义创建 Excel 工厂
@@ -141,7 +141,7 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory of(Workbook workbook) { return new WorkbookFactory(workbook); }
+    public static ExcelWriter of(Workbook workbook) { return new ExcelWriter(workbook); }
 
     /**
      * 从已知 Excel 文件加载
@@ -150,7 +150,7 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory load(String absoluteFilepath) { return load(new File(absoluteFilepath)); }
+    public static ExcelWriter load(String absoluteFilepath) { return load(new File(absoluteFilepath)); }
 
     /**
      * 从已知 Excel 文件加载
@@ -159,7 +159,7 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory load(Path absoluteFilepath) { return load(absoluteFilepath.toFile()); }
+    public static ExcelWriter load(Path absoluteFilepath) { return load(absoluteFilepath.toFile()); }
 
     /**
      * 从已知 Excel 文件加载
@@ -171,7 +171,7 @@ public final class ExcelUtil extends LoadUtil {
      * @throws NullPointerException          excelFile is null
      * @throws UnsupportedOperationException excelFile type is unknown
      */
-    public static WorkbookFactory load(File excelFile) {
+    public static ExcelWriter load(File excelFile) {
         return load(excelFile, deduceType(excelFile).orElseGet(() -> {
             // 这里用文件内容的方式判断类型
             throw new UnsupportedOperationException("等待支持.");
@@ -186,7 +186,7 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory load(File excelFile, ExcelType type) { return of(type.load(excelFile)); }
+    public static ExcelWriter load(File excelFile, ExcelType type) { return of(type.load(excelFile)); }
 
     /**
      * 从已知 Excel 文件流加载
@@ -195,7 +195,7 @@ public final class ExcelUtil extends LoadUtil {
      *
      * @return Excel 操作工厂（代理）
      */
-    public static WorkbookFactory load(InputStream excelInputStream, ExcelType type) {
+    public static ExcelWriter load(InputStream excelInputStream, ExcelType type) {
         return of(type.load(excelInputStream));
     }
 

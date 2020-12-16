@@ -357,7 +357,7 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- MappingUtil -->
+    <!-- MapperUtil -->
     <dependency>
       <groupId>com.google.auto.service</groupId>
       <artifactId>auto-service</artifactId>

@@ -13,18 +13,18 @@ import java.util.function.Consumer;
 /**
  * @author moonsky
  */
-public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
+public class RowWriter extends BaseWriter<Row, RowWriter, SheetWriter> {
 
-    private final CellFactory factory;
+    private final CellWriter factory;
 
     private Row row;
 
-    public RowFactory(WorkbookProxy proxy, SheetFactory parent) {
+    public RowWriter(WorkbookProxy proxy, SheetWriter parent) {
         super(proxy, parent);
-        this.factory = new CellFactory(proxy, this);
+        this.factory = new CellWriter(proxy, this);
     }
 
-    private CellFactory getCellFactory() { return factory; }
+    private CellWriter getCellFactory() { return factory; }
 
     public Row getRow() { return row; }
 
@@ -42,7 +42,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      * @return 当前对象
      */
     @Override
-    public RowFactory definitionComment(String uniqueName, Consumer<Comment> commentBuilder) {
+    public RowWriter definitionComment(String uniqueName, Consumer<Comment> commentBuilder) {
         super.definitionComment(uniqueName, commentBuilder);
         return this;
     }
@@ -56,7 +56,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      * @return 当前对象
      */
     @Override
-    public RowFactory definitionComment(String uniqueName, String comment) {
+    public RowWriter definitionComment(String uniqueName, String comment) {
         super.definitionComment(uniqueName, comment);
         return this;
     }
@@ -68,7 +68,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory height(int height) {
+    public RowWriter height(int height) {
         getRow().setHeight((short) height);
         return this;
     }
@@ -80,7 +80,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory style(String classname) {
+    public RowWriter style(String classname) {
         proxy.addSetter(new ProxyStyleSetter(proxy.getRow()), classname);
         return this;
     }
@@ -267,7 +267,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory newCell() { return newCell(1, 1); }
+    public CellWriter newCell() { return newCell(1, 1); }
 
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
@@ -276,7 +276,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory newCell(int offset) { return newCell(1, 1, offset); }
+    public CellWriter newCell(int offset) { return newCell(1, 1, offset); }
 
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
@@ -286,7 +286,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory newCell(int rowspan, int colspan) { return newCell(rowspan, colspan, 0); }
+    public CellWriter newCell(int rowspan, int colspan) { return newCell(rowspan, colspan, 0); }
 
     /**
      * 创建下一个单元格，返回对下一个单元格的操作器
@@ -297,7 +297,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return CellFactory
      */
-    public CellFactory newCell(int rowspan, int colspan, int offset) {
+    public CellWriter newCell(int rowspan, int colspan, int offset) {
         nextCell(rowspan, colspan, offset);
         return getCellFactory();
     }
@@ -313,7 +313,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory newCell(Consumer<CellFactory> consumer) { return newCell(0, consumer); }
+    public RowWriter newCell(Consumer<CellWriter> consumer) { return newCell(0, consumer); }
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器
@@ -323,7 +323,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory newCell(int offset, Consumer<CellFactory> consumer) { return newCell(1, 1, offset, consumer); }
+    public RowWriter newCell(int offset, Consumer<CellWriter> consumer) { return newCell(1, 1, offset, consumer); }
 
     /**
      * 创建下一个单元格，并使用下一个单元格的操作器
@@ -334,7 +334,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory newCell(int rowspan, int colspan, Consumer<CellFactory> consumer) {
+    public RowWriter newCell(int rowspan, int colspan, Consumer<CellWriter> consumer) {
         return newCell(rowspan, colspan, 0, consumer);
     }
 
@@ -348,7 +348,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory newCell(int rowspan, int colspan, int offset, Consumer<CellFactory> consumer) {
+    public RowWriter newCell(int rowspan, int colspan, int offset, Consumer<CellWriter> consumer) {
         nextCell(rowspan, colspan, offset);
         consumer.accept(getCellFactory());
         return this;
@@ -405,7 +405,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 单元格操作器
      */
-    public CellFactory index(int index) {
+    public CellWriter index(int index) {
         factory.setCell(proxy.useOrCreateCell(index));
         return factory;
     }
@@ -418,7 +418,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 单元格操作器
      */
-    public CellFactory index(int index, boolean create) {
+    public CellWriter index(int index, boolean create) {
         factory.setCell(proxy.useOrCreateCell(index, create));
         return factory;
     }
@@ -432,7 +432,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory index(int index, Consumer<CellFactory> consumer) {
+    public RowWriter index(int index, Consumer<CellWriter> consumer) {
         factory.setCell(proxy.useOrCreateCell(index));
         consumer.accept(factory);
         return this;
@@ -447,7 +447,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory index(int index, boolean create, Consumer<CellFactory> consumer) {
+    public RowWriter index(int index, boolean create, Consumer<CellWriter> consumer) {
         factory.setCell(proxy.useOrCreateCell(index, create));
         consumer.accept(factory);
         return this;
@@ -463,7 +463,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    public RowFactory useCell(int cellIndexInRow, Consumer<CellFactory> consumer) {
+    public RowWriter useCell(int cellIndexInRow, Consumer<CellWriter> consumer) {
         consumer.accept(useCell(cellIndexInRow));
         return this;
     }
@@ -475,7 +475,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 单元格操作器
      */
-    public CellFactory useCell(int cellIndexInRow) {
+    public CellWriter useCell(int cellIndexInRow) {
         factory.setCell(proxy.useOrCreateCell(cellIndexInRow));
         return factory;
     }
@@ -490,7 +490,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 当前 RowFactory
      */
-    private RowFactory useCell(int cellIndexInRow, int rowspan, int colspan, Consumer<CellFactory> consumer) {
+    private RowWriter useCell(int cellIndexInRow, int rowspan, int colspan, Consumer<CellWriter> consumer) {
         consumer.accept(useCell(cellIndexInRow, rowspan, colspan));
         return this;
     }
@@ -504,7 +504,7 @@ public class RowFactory extends BaseFactory<Row, RowFactory, SheetFactory> {
      *
      * @return 单元格操作器
      */
-    private CellFactory useCell(int cellIndexInRow, int rowspan, int colspan) {
+    private CellWriter useCell(int cellIndexInRow, int rowspan, int colspan) {
         factory.setCell(proxy.useOrCreateCell(cellIndexInRow));
         return factory;
     }
