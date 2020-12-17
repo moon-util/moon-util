@@ -1,5 +1,6 @@
 package com.moon.mapping.annotation;
 
+import com.moon.mapping.BeanConverter;
 import com.moon.mapping.MapperUtil;
 
 import java.lang.annotation.ElementType;
@@ -47,4 +48,21 @@ import java.lang.annotation.Target;
 public @interface MapperFor {
 
     Class<?>[] value();
+
+    /**
+     * 是否支持转换器
+     * <p>
+     * 当{@code converter}为 true 时，转换双方都不能是接口或抽象类，因为不能实例化
+     * <p>
+     * 如果{@link #value()}中包含接口/抽象类，或{@link MapperFor}所注解的是接口/抽象类
+     * 那么{@code converter}必须是{@code false}
+     * <p>
+     * 这个属性在编译时就发现{@link MapperUtil#getConverter(Class, Class)}是否可用，而不是在运行时
+     * 才发现程序不能运行
+     *
+     * @return 是否支持转换器
+     *
+     * @see BeanConverter
+     */
+    boolean converter() default true;
 }

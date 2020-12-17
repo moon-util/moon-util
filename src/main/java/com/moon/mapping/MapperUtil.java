@@ -2,7 +2,7 @@ package com.moon.mapping;
 
 import com.moon.mapping.annotation.MapperFor;
 
-import static com.moon.mapping.Mappings.classAs;
+import static com.moon.mapping.Mappers.classAs;
 import static java.lang.Thread.currentThread;
 
 /**
@@ -56,7 +56,7 @@ public abstract class MapperUtil {
      *
      * @return 映射器
      *
-     * @throws NoSuchMapperException 不存在对应的映射器是抛出异常
+     * @throws NoSuchMapperException 不存在对应的映射器时抛出异常
      */
     public static <THIS, THAT> BeanMapper<THIS, THAT> thisPrimary() {
         Class<THIS> thisClass = classAs(currentThread().getStackTrace()[2].getClassName());
@@ -85,9 +85,18 @@ public abstract class MapperUtil {
      * 获取从类{@code fromClass}到{@code toClass}的映射器;
      * <p>
      * {@code toClass}必须存在于{@code fromClass}的注解{@link MapperFor#value()}声明中
+     * <p>
+     * 注意:
+     * <p>
+     * 1. 本类虽是通过{@link #getConverter(Class, Class)}获取的，但如果强转为{@link BeanConverter}
+     * 可能会抛异常，如果要使其可用需指定: {@link MapperFor#converter()}为{@code true}
+     * <p>
+     * 2. 如果指定了{@link MapperFor#converter()}为{@code true}，那么转换双方都可能是接口或抽象类
      *
      * @param fromClass 数据源类
      * @param toClass   应声明在{@code fromClass}注解的{@link MapperFor#value()}中
+     * @param <F>       数据源类
+     * @param <T>       目标类
      *
      * @return 当存在时返回对应映射器
      *
@@ -95,6 +104,27 @@ public abstract class MapperUtil {
      * @see MapperFor#value()
      */
     public static <F, T> BeanMapper<F, T> get(Class<F> fromClass, Class<T> toClass) {
-        return Mappings.resolve(fromClass, toClass);
+        return getConverter(fromClass, toClass);
+    }
+
+    /**
+     * 获取转换器
+     * <p>
+     * 只有{@code fromClass}的{@link MapperFor#converter()}为{@code true}时, 返回的
+     * {@link BeanConverter#doForward(Object)}、{@link BeanConverter#doBackward(Object)}是可用的
+     *
+     * @param fromClass 数据源类
+     * @param toClass   应声明在{@code fromClass}注解的{@link MapperFor#value()}中
+     * @param <F>       数据源类
+     * @param <T>       目标类
+     *
+     * @return 当存在时返回对应映射器
+     *
+     * @throws NoSuchMapperException 不存在对应的映射器时抛出异常
+     * @see MapperFor#value()
+     * @see MapperFor#converter()
+     */
+    public static <F, T> BeanConverter<F, T> getConverter(Class<F> fromClass, Class<T> toClass) {
+        return Mappers.resolve(fromClass, toClass);
     }
 }

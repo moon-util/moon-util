@@ -1,6 +1,6 @@
 package com.moon.mapping.processing;
 
-import com.moon.mapping.BeanMapper;
+import com.moon.mapping.BeanConverter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,6 @@ import static com.moon.mapping.processing.StringUtils.toMappingClassname;
 /**
  * @author moonsky
  */
-@ConditionalOnMissingBean(MappingWriter.class)
 final class MappingWriter implements JavaFileWritable {
 
     private final BaseDefinition thisDefined;
@@ -61,9 +60,9 @@ final class MappingWriter implements JavaFileWritable {
         configurationAdder.add(beansAddr).add("}");
 
         // 类文件: 包名 + import + 类内容
-        StringAdder configAdder = new StringAdder().add("package ").pkg(BeanMapper.class).add(";");
+        StringAdder configAdder = new StringAdder().add("package ").pkg(BeanConverter.class).add(";");
         configAdder.add(manager.toStringForImports()).add(configurationAdder);
-        StringAdder src = new StringAdder().pkg(BeanMapper.class).dot().add(configName);
+        StringAdder src = new StringAdder().pkg(BeanConverter.class).dot().add(configName);
 
         // 生成文件
         EnvUtils.newJavaFile(filer, src.toString(), configAdder);
@@ -99,7 +98,7 @@ final class MappingWriter implements JavaFileWritable {
                 String thisBeanName = generator.get(thatCls);
                 // @Bean @ConditionalOnMissingBean
                 conditionalOnMissingBean(beansAdder, thisBeanName, manager);
-                beansAdder.add(" public ").add(manager.onImported(BeanMapper.class));
+                beansAdder.add(" public ").add(manager.onImported(BeanConverter.class));
                 beansAdder.add("<").add(thisSimpleName).add(',').add(thatSimpleName).add("> ");
                 beansAdder.add(thisBeanName).add("() {");
                 beansAdder.add("return ").add(toEnumClass(thisCls)).dot();
@@ -114,7 +113,7 @@ final class MappingWriter implements JavaFileWritable {
         if (Imported.CONDITIONAL_ON_MISSING_BEAN) { manager.onImported(ConditionalOnMissingBean.class); }
         if (Imported.CONFIGURATION) { manager.onImported(Configuration.class); }
         if (Imported.BEAN) { manager.onImported(Bean.class); }
-        manager.onImported(BeanMapper.class);
+        manager.onImported(BeanConverter.class);
         return manager;
     }
 
@@ -139,10 +138,10 @@ final class MappingWriter implements JavaFileWritable {
         // 暂时不实现 MapMapping 和 ObjectMapping 了
         // StringAdder shardAdder = def.implMappingSharedMethods(manager);
         StringAdder adder = new StringAdder();
-        adder.add("package ").pkg(BeanMapper.class).add(';').add(manager.toStringForImports());
+        adder.add("package ").pkg(BeanConverter.class).add(';').add(manager.toStringForImports());
         annotationGenerated(adder, manager);
         adder.add("@SuppressWarnings({\"all\",\"unchecked\"}) enum ").add(getSimpleName(classname));
-        adder.impl(BeanMapper.class).add("{TO,").add(enumAdder).add(';').add(manager.toStringForStaticVars());
+        adder.impl(BeanConverter.class).add("{TO,").add(enumAdder).add(';').add(manager.toStringForStaticVars());
         return adder.add("}");
     }
 
@@ -157,7 +156,7 @@ final class MappingWriter implements JavaFileWritable {
     }
 
     private String toSourceName(final BaseDefinition def) {
-        return new StringAdder().pkg(BeanMapper.class).dot().add(toEnumClass(def)).toString();
+        return new StringAdder().pkg(BeanConverter.class).dot().add(toEnumClass(def)).toString();
     }
 
     private static String toEnumClass(final BaseDefinition def) { return toEnumClass(def.getQualifiedName()); }

@@ -32,15 +32,15 @@ abstract class DetectUtils {
         }
     }
 
-    static void assertRootElement(TypeElement element) {
-        if (isElemKind(element, ElementKind.INTERFACE)) {
+    static void assertRootElement(TypeElement element, boolean converter) {
+        if (converter && isElemKind(element, ElementKind.INTERFACE)) {
             throw new IllegalStateException("不能映射接口: " + getQualifiedName(element));
+        }
+        if (converter && isAny(element, Modifier.ABSTRACT)) {
+            throw new IllegalStateException("不能映射抽象类: " + getQualifiedName(element));
         }
         if (isEnum(element)) {
             throw new IllegalStateException("不能映射枚举类: " + getQualifiedName(element));
-        }
-        if (isAny(element, Modifier.ABSTRACT)) {
-            throw new IllegalStateException("不能映射抽象类: " + getQualifiedName(element));
         }
         for (; true; ) {
             requireOf(element, Modifier.PUBLIC);
@@ -48,7 +48,17 @@ abstract class DetectUtils {
             if (isPackage(enclosing)) {
                 break;
             }
-            requireOf(element, Modifier.STATIC);
+            Set<Modifier> modifiers =element.getModifiers();
+            if (!modifiers.contains(Modifier.STATIC)) {
+                switch (element.getKind()) {
+                    case CLASS:
+                        requireOf(element, Modifier.STATIC);
+                        break;
+                    case ENUM:
+                    case INTERFACE:
+                    default:
+                }
+            }
             element = (TypeElement) enclosing;
         }
     }
@@ -100,6 +110,10 @@ abstract class DetectUtils {
     static boolean isEnum(Element elem) { return isElemKind(elem, ENUM); }
 
     static boolean isNotEnum(Element elem) { return !isEnum(elem); }
+
+    static boolean isAbstractClass(TypeElement type) {
+        return isElemKind(type, INTERFACE) || isAny(type, Modifier.ABSTRACT);
+    }
 
     static boolean isField(Element elem) {
         return elem instanceof VariableElement && isElemKind(elem, FIELD);

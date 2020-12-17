@@ -5,10 +5,7 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author moonsky
@@ -18,7 +15,13 @@ final class GenericUtils {
     private GenericUtils() {}
 
     static Map<String, GenericModel> parse(TypeElement element) {
-        Map<String, GenericModel> thisGenericMap = new HashMap<>();
+        return parse(element, new HashMap<>(16));
+    }
+
+    private static Map<String, GenericModel> parse(TypeElement element, Map<String, GenericModel> thisGenericMap) {
+        if (element == null) {
+            return thisGenericMap;
+        }
         parse(thisGenericMap, element.asType(), element, null);
         Types types = EnvUtils.getTypes();
         do {
@@ -28,6 +31,9 @@ final class GenericUtils {
                 return thisGenericMap;
             }
             TypeElement superElem = (TypeElement) types.asElement(superclass);
+            if (superElem == null) {
+                return thisGenericMap;
+            }
             parse(thisGenericMap, superclass, superElem, element);
             element = superElem;
         } while (true);
@@ -47,16 +53,28 @@ final class GenericUtils {
         }
     }
 
+    /**
+     * 解析泛型
+     * public UsernameGetter&lt;ID&gt; implements Supplier&lt;String&gt; {}
+     *
+     * @param genericMap   所有泛型 com.name.UsernameGetter#ID == String
+     * @param elementTyped 等于 element
+     * @param element      等于 elementTyped
+     * @param subClass     element 的直接子类
+     */
     private static void parse(
         Map<String, GenericModel> genericMap, TypeMirror elementTyped, TypeElement element, TypeElement subClass
     ) {
-        List<String> actuals = Extract.splitSuperclass(elementTyped.toString());
+        if (element == null || elementTyped == null || subClass == null) {
+            return;
+        }
+        List<String> actualAll = Extract.splitSuperclass(elementTyped.toString());
         String declareClassname = ElemUtils.getQualifiedName(element);
-        String subClassname = subClass == null ? "" : ElemUtils.getQualifiedName(subClass);
+        String subClassname = ElemUtils.getQualifiedName(subClass);
         Elements utils = EnvUtils.getUtils();
         int index = 0;
         for (TypeParameterElement param : element.getTypeParameters()) {
-            String actual = index < actuals.size() ? actuals.get(index++) : null;
+            String actual = index < actualAll.size() ? actualAll.get(index++) : null;
             // 追溯实际类
             String fullKey = toFullKey(subClassname, actual);
             GenericModel subGenericModel = genericMap.get(fullKey);

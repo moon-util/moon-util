@@ -112,8 +112,12 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         final String thatCls = manager.onImported(thatDef.getCanonicalName());
         final boolean emptyForward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.FORWARD);
         final boolean emptyBackward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.BACKWARD);
-        adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
-        adder.add(getMethodFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
+        if (!DetectUtils.isAbstractClass(thatDef.getThisElement())) {
+            adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
+        }
+        if (!DetectUtils.isAbstractClass(this.getThisElement())) {
+            adder.add(getMethodFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
+        }
         adder.add("},");
     }
 

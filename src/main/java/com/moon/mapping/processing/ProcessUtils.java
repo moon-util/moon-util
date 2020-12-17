@@ -8,7 +8,6 @@ import com.moon.mapping.annotation.MapperIgnoreFields;
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -36,7 +35,7 @@ final class ProcessUtils {
     }
 
     private static void handleMapProperty(
-        IgnoreModel ignored, Element element, Consumer<PropertyAttr> handler
+        IgnoredModel ignored, Element element, Consumer<PropertyAttr> handler
     ) {
         boolean ignoredWasUnused = true;
         Mapping[] properties = element.getAnnotationsByType(Mapping.class);
@@ -69,7 +68,7 @@ final class ProcessUtils {
         BasicDefinition definition,
         Element element,
         Map<String, GenericModel> genericMap,
-        Map<String, IgnoreModel> ignoring,
+        Map<String, IgnoredModel> ignoring,
         TypeElement parsingElement,
         TypeElement thisElement
     ) {
@@ -106,7 +105,9 @@ final class ProcessUtils {
 
     @SuppressWarnings("all")
     private static BasicDefinition parseRootPropertiesMap(
-        final TypeElement rootElement, Map<String, GenericModel> thisGenericMap, Map<String, IgnoreModel> ignoring
+        final TypeElement rootElement,
+        Map<String, GenericModel> thisGenericMap,
+        Map<String, IgnoredModel> ignoring
     ) {
         BasicDefinition definition = new BasicDefinition(rootElement);
         List<? extends Element> elements = rootElement.getEnclosedElements();
@@ -120,21 +121,18 @@ final class ProcessUtils {
 
     private static void parseSuperPropertiesMap(
         Map<String, GenericModel> thisGenericMap,
-        Map<String, IgnoreModel> ignoring,
+        Map<String, IgnoredModel> ignoring,
         Set<String> presentKeys,
         BasicDefinition definition,
         TypeElement thisElement,
         TypeElement rootElement
     ) {
         TypeMirror superclass = thisElement.getSuperclass();
-        if (superclass.toString().equals(TOP_CLASS)) {
+        Element superElem = EnvUtils.getTypes().asElement(superclass);
+        if (superElem == null || superclass.toString().equals(TOP_CLASS)) {
             return;
         }
-        Types types = EnvUtils.getTypes();
-        TypeElement superElement = ElemUtils.cast(types.asElement(superclass));
-        if (superElement == null) {
-            return;
-        }
+        TypeElement superElement = ElemUtils.cast(superElem);
         List<? extends Element> elements = superElement.getEnclosedElements();
         for (Element element : elements) {
             handleEnclosedElem(presentKeys, definition, element, thisGenericMap, ignoring, superElement, rootElement);
@@ -143,12 +141,12 @@ final class ProcessUtils {
         parseSuperPropertiesMap(thisGenericMap, ignoring, presentKeys, definition, superElement, rootElement);
     }
 
-    private final static class IgnoreModel {
+    private final static class IgnoredModel {
 
         private final IgnoreMode mode;
         private final String targetCls;
 
-        private IgnoreModel(String targetCls, IgnoreMode mode) {
+        private IgnoredModel(String targetCls, IgnoreMode mode) {
             this.targetCls = targetCls;
             this.mode = mode;
         }
@@ -161,15 +159,15 @@ final class ProcessUtils {
      *
      * @return
      */
-    static Map<String, IgnoreModel> parseMappingIgnoring(TypeElement rootElement) {
-        Map<String, IgnoreModel> ignoringMap = new HashMap<>(8);
+    static Map<String, IgnoredModel> parseMappingIgnoring(TypeElement rootElement) {
+        Map<String, IgnoredModel> ignoringMap = new HashMap<>(8);
         MapperIgnoreFields[] ignoringAll = rootElement.getAnnotationsByType(MapperIgnoreFields.class);
         if (ignoringAll != null) {
             for (MapperIgnoreFields ignoring : ignoringAll) {
                 IgnoreMode mode = ignoring.ignore();
                 String targetCls = getTargetCls(ignoring, MapperIgnoreFields::target);
                 for (String name : ignoring.value()) {
-                    ignoringMap.put(name, new IgnoreModel(targetCls, mode));
+                    ignoringMap.put(name, new IgnoredModel(targetCls, mode));
                 }
             }
         }
@@ -184,9 +182,9 @@ final class ProcessUtils {
         return (isLang || StringUtils.isPrimitive(cls)) ? "void" : cls;
     }
 
-    static BasicDefinition toPropertiesMap(TypeElement rootElement) {
-        DetectUtils.assertRootElement(rootElement);
-        Map<String, IgnoreModel> ignoringMap = parseMappingIgnoring(rootElement);
+    static BasicDefinition toPropertiesMap(TypeElement rootElement, boolean converter) {
+        DetectUtils.assertRootElement(rootElement, converter);
+        Map<String, IgnoredModel> ignoringMap = parseMappingIgnoring(rootElement);
         Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
         BasicDefinition definition = parseRootPropertiesMap(rootElement, thisGenericMap, ignoringMap);
         parseSuperPropertiesMap(thisGenericMap, ignoringMap, new HashSet<>(), definition, rootElement, rootElement);
