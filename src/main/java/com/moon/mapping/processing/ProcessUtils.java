@@ -106,9 +106,12 @@ final class ProcessUtils {
 
     @SuppressWarnings("all")
     private static BasicDefinition parseRootPropertiesMap(
-        final TypeElement rootElement, Map<String, GenericModel> thisGenericMap, Map<String, IgnoreModel> ignoring
+        final TypeElement rootElement,
+        Map<String, GenericModel> thisGenericMap,
+        Map<String, IgnoreModel> ignoring,
+        boolean converter
     ) {
-        BasicDefinition definition = new BasicDefinition(rootElement);
+        BasicDefinition definition = new BasicDefinition(rootElement, converter);
         List<? extends Element> elements = rootElement.getEnclosedElements();
         Set<String> presents = new HashSet<>();
         for (Element element : CollectUtils.emptyIfNull(elements)) {
@@ -184,11 +187,11 @@ final class ProcessUtils {
         return (isLang || StringUtils.isPrimitive(cls)) ? "void" : cls;
     }
 
-    static BasicDefinition toPropertiesMap(TypeElement rootElement) {
-        DetectUtils.assertRootElement(rootElement);
+    static BasicDefinition toPropertiesMap(TypeElement rootElement, boolean converter) {
+        DetectUtils.assertRootElement(rootElement, converter);
         Map<String, IgnoreModel> ignoringMap = parseMappingIgnoring(rootElement);
         Map<String, GenericModel> thisGenericMap = GenericUtils.parse(rootElement);
-        BasicDefinition definition = parseRootPropertiesMap(rootElement, thisGenericMap, ignoringMap);
+        BasicDefinition definition = parseRootPropertiesMap(rootElement, thisGenericMap, ignoringMap, converter);
         parseSuperPropertiesMap(thisGenericMap, ignoringMap, new HashSet<>(), definition, rootElement, rootElement);
         ConverterUtils.parseConverters(thisGenericMap, rootElement, definition);
         definition.onCompleted();

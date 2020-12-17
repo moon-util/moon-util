@@ -77,8 +77,9 @@ public class MappingProcessor extends AbstractProcessor {
     private MappingWriter onAnnotatedClass(final TypeElement thisElement) {
         final Elements utils = EnvUtils.getUtils();
         final Map<String, BasicDefinition> mappingForDetailsMap = new HashMap<>(4);
+        final boolean converter = thisElement.getAnnotation(MapperFor.class).converter();
         final Collection<String> classes = ProcessUtils.getMappingForClasses(thisElement);
-        BasicDefinition thisDefined = toPropertiesMap(thisElement);
+        BasicDefinition thisDefined = toPropertiesMap(thisElement, converter);
         MappingWriter writable = new MappingWriter(thisDefined, mappingForDetailsMap);
         if (classes.isEmpty()) {
             return writable;
@@ -88,7 +89,7 @@ public class MappingProcessor extends AbstractProcessor {
             if (!DetectUtils.isMappableElement(target)) {
                 continue;
             }
-            mappingForDetailsMap.put(thatClassname, toPropertiesMap(target));
+            mappingForDetailsMap.put(thatClassname, toPropertiesMap(target, converter));
         }
         return writable;
     }

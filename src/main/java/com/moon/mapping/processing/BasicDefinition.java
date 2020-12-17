@@ -7,7 +7,7 @@ import javax.lang.model.element.TypeElement;
  */
 final class BasicDefinition extends BaseDefinition<BasicMethod, BasicProperty> {
 
-    public BasicDefinition(TypeElement enclosingElement) {
-        super(enclosingElement, ElemUtils.getQualifiedName(enclosingElement));
+    public BasicDefinition(TypeElement enclosingElement,boolean converter) {
+        super(enclosingElement, ElemUtils.getQualifiedName(enclosingElement), converter);
     }
 }

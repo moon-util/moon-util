@@ -1,5 +1,6 @@
 package com.moon.mapping.annotation;
 
+import com.moon.mapping.BeanConverter;
 import com.moon.mapping.MapperUtil;
 
 import java.lang.annotation.ElementType;
@@ -47,4 +48,15 @@ import java.lang.annotation.Target;
 public @interface MapperFor {
 
     Class<?>[] value();
+
+    /**
+     * 是否支持转换器
+     * <p>
+     * 当{@code converter}为 true 时，转换双方都不能是接口或抽象类，因为不能实例化
+     *
+     * @return 是否支持转换器
+     *
+     * @see BeanConverter
+     */
+    boolean converter() default false;
 }
