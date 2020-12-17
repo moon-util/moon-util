@@ -52,9 +52,9 @@ abstract class ConverterUtils {
             return;
         }
         for (Element element : elements) {
-            MappingInjector[] cs = getInjectors(element);
-            if (cs != null && cs.length > 0) {
-                parseMappingInjectors(thisGenericMap, element, definition, cs);
+            MappingInjector[] is = getInjectors(element);
+            if (is != null && is.length > 0) {
+                parseMappingInjectors(thisGenericMap, element, definition, is);
             }
             MappingProvider[] ps = getProviders(element);
             if (ps != null && ps.length > 0) {
@@ -85,16 +85,16 @@ abstract class ConverterUtils {
         Map<String, GenericModel> thisGenericMap,
         Element element,
         BasicDefinition definition,
-        MappingInjector[] converters
+        MappingInjector[] injectors
     ) {
-        for (MappingInjector cvt : converters) {
+        for (MappingInjector ijt : injectors) {
             ExecutableElement method = (ExecutableElement) element;
-            String propertyName = toPropertyName(method, cvt, MappingInjector::value, SET, WITH, INJECT);
+            String propertyName = toPropertyName(method, ijt, MappingInjector::value, SET, WITH, INJECT);
             BasicProperty property = definition.get(propertyName);
             if (property == null) {
                 continue;
             }
-            String fromClass = ElemUtils.getAnnotatedClass(cvt, MappingInjector::injectBy);
+            String fromClass = ElemUtils.getAnnotatedClass(ijt, MappingInjector::injectBy);
             property.setConverter(fromClass, method, thisGenericMap);
         }
     }
