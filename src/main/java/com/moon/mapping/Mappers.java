@@ -1,20 +1,22 @@
 package com.moon.mapping;
 
+import java.lang.reflect.Modifier;
+
 import static java.lang.Enum.valueOf;
 
 /**
  * @author benshaoye
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class Mappings {
+abstract class Mappers {
 
     private final static String NS;
 
     static {
-        NS = Mappings.class.getPackage().getName() + ".BM_";
+        NS = Mappers.class.getPackage().getName() + ".BM_";
     }
 
-    private Mappings() {}
+    private Mappers() {}
 
     private static Class toEnumCls(Class<?> cls) { return classAs(NS + under(clsName(cls))); }
 

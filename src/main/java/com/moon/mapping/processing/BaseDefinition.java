@@ -35,12 +35,9 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
 
     private final String implClassname;
 
-    private final boolean converter;
-
-    public BaseDefinition(TypeElement enclosingElement, String implClassname, boolean converter) {
+    public BaseDefinition(TypeElement enclosingElement, String implClassname) {
         this.thisElement = enclosingElement;
         this.implClassname = implClassname;
-        this.converter = converter;
     }
 
     public final TypeElement getThisElement() { return thisElement; }
@@ -50,8 +47,6 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
     public final MapMethodFactory getMethodFactory() { return methodFactory; }
 
     public final MapFieldFactory getFieldFactory() { return fieldFactory; }
-
-    public final boolean isConvertible(){ return converter; }
 
     @Override
     public final String getCanonicalName() { return ElemUtils.getQualifiedName(getThisElement()); }
@@ -117,8 +112,10 @@ abstract class BaseDefinition<M extends BaseMethod, P extends BaseProperty<M>> e
         final String thatCls = manager.onImported(thatDef.getCanonicalName());
         final boolean emptyForward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.FORWARD);
         final boolean emptyBackward = unsafeConvert(adder, thatDef, manager, ConvertStrategy.BACKWARD);
-        if (isConvertible()) {
+        if (!DetectUtils.isAbstractClass(thatDef.getThisElement())) {
             adder.add(getMethodFactory().newThatOnEmptyConstructor(thisCls, thatCls, emptyForward));
+        }
+        if (!DetectUtils.isAbstractClass(this.getThisElement())) {
             adder.add(getMethodFactory().newThisOnEmptyConstructor(thisCls, thatCls, emptyBackward));
         }
         adder.add("},");

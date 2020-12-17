@@ -47,4 +47,4 @@ import java.lang.annotation.Target;
 @ComponentScan(basePackageClasses = BeanMapper.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EnableBeanMapping {}
+public @interface EnableBeanMapper {}

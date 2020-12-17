@@ -56,6 +56,7 @@ abstract class DetectUtils {
                         break;
                     case ENUM:
                     case INTERFACE:
+                    default:
                 }
             }
             element = (TypeElement) enclosing;
@@ -109,6 +110,10 @@ abstract class DetectUtils {
     static boolean isEnum(Element elem) { return isElemKind(elem, ENUM); }
 
     static boolean isNotEnum(Element elem) { return !isEnum(elem); }
+
+    static boolean isAbstractClass(TypeElement type) {
+        return isElemKind(type, INTERFACE) || isAny(type, Modifier.ABSTRACT);
+    }
 
     static boolean isField(Element elem) {
         return elem instanceof VariableElement && isElemKind(elem, FIELD);

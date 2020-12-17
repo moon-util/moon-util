@@ -2,7 +2,7 @@ package com.moon.mapping;
 
 import com.moon.mapping.annotation.MapperFor;
 
-import static com.moon.mapping.Mappings.classAs;
+import static com.moon.mapping.Mappers.classAs;
 import static java.lang.Thread.currentThread;
 
 /**
@@ -56,7 +56,7 @@ public abstract class MapperUtil {
      *
      * @return 映射器
      *
-     * @throws NoSuchMapperException 不存在对应的映射器是抛出异常
+     * @throws NoSuchMapperException 不存在对应的映射器时抛出异常
      */
     public static <THIS, THAT> BeanMapper<THIS, THAT> thisPrimary() {
         Class<THIS> thisClass = classAs(currentThread().getStackTrace()[2].getClassName());
@@ -125,6 +125,6 @@ public abstract class MapperUtil {
      * @see MapperFor#converter()
      */
     public static <F, T> BeanConverter<F, T> getConverter(Class<F> fromClass, Class<T> toClass) {
-        return Mappings.resolve(fromClass, toClass);
+        return Mappers.resolve(fromClass, toClass);
     }
 }

@@ -80,6 +80,9 @@ final class Manager {
     ) {
         Types types = EnvUtils.getTypes();
         do {
+            if (element == null) {
+                return null;
+            }
             String classname = ElemUtils.getQualifiedName(element);
             if (DetectUtils.isTypeof(classname, Object.class)) {
                 return null;
