@@ -37,6 +37,7 @@ import java.util.Set;
  *
  * // 查询
  * UserInfoGetter findById(String id); // select username, password, id from t_user where id = ?
+ * UserInfoGetter fetchById(String id); // select username, password, id from t_user where id = ?
  * UserInfoGetter selectById(String id); // select username, password, id from t_user where id = ?
  * UserInfoGetter queryById(String id); // select username, password, id from t_user where id = ?
  * UserInfoGetter readById(String id); // select username, password, id from t_user where id = ?
