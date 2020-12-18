@@ -34,7 +34,7 @@ public interface UserAccessor {
             if (username == null) {
                 wheres.add(" username IS NULL ");
             } else {
-                wheres.add(" username = ? ");
+                wheres.add(" username LIKE ? ");
                 params.add(username);
             }
 

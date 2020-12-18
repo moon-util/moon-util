@@ -1,7 +1,6 @@
 package com.moon.data.jdbc;
 
 import com.moon.data.IdentifierGenerator;
-import com.moon.data.jdbc.annotation.IdentifierStrategy;
 
 import java.io.Serializable;
 
@@ -14,17 +13,15 @@ import java.io.Serializable;
  *
  * @author benshaoye
  */
-@IdentifierStrategy(IdentifierInjector.class)
 public interface IdentifierInjector<T, ID extends Serializable, METADATA> extends IdentifierGenerator<ID, METADATA> {
 
     /**
      * 给 object 设置主键值
      * <p>
-     * {@link IdentifierGenerator}通常可用于给单主键设置值
-     * {@link IdentifierInjector}通常可用于给任意主键策略设置值，因为这里需要主动将 id 设置到 object 里，如
+     * {@link IdentifierGenerator}通常可用于给单主键设置，执行 insert 语句时，自动将 ID 设置到实体上
+     * {@link IdentifierInjector}可用于给任意主键策略设置，因为这里需要主动将 id 设置到 object 里，如
      *
      * <pre>
-     *
      * public class IdInjector implements IdentifierInjector {
      *
      *     public void injectId(T object, METADATA metadata) {
