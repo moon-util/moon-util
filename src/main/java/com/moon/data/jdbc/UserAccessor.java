@@ -10,14 +10,13 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-@Accessor
 public interface UserAccessor {
 
     UserLoginInfo findByUsernameLikeAndUserType(@IfNotEmpty String username, @IfNotBlank String userType);
 
     List<String> findUsernameByUsernameLike(String username);
 
-    class UserAccessorImpl implements UserAccessor{
+    class UserAccessorImpl implements UserAccessor {
 
         @Override
         public List<String> findUsernameByUsernameLike(String username) {
@@ -27,7 +26,7 @@ public interface UserAccessor {
         @Override
         public UserLoginInfo findByUsernameLikeAndUserType(@IfNotEmpty String username, @IfNotBlank String userType) {
             StringBuilder builder = new StringBuilder("SELECT id, username, password FROM t_user");
-            List params = new ArrayList();
+            List<Object> params = new ArrayList<>();
             List<String> wheres = new ArrayList<>();
 
             // default
