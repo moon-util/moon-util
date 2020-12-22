@@ -4,7 +4,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.moon.data.jdbc.processing.StringUtils.nextLine;
 
@@ -24,27 +26,42 @@ final class MethodModel {
         StringBuilder builder = new StringBuilder();
         nextLine(builder.append(space).append("@Override"));
         String type = importer.onImported(returnType);
-        String params = toParameters(importer, method);
         String declare = "public {type} {name}({params}) {";
+        Map<String, String> parameters = toDeclareParameters(importer, method);
         Replacer.Group group = Replacer.of(Replacer.type, Replacer.name, Replacer.params);
-        builder.append(space).append(group.replace(declare, type, methodName, params));
+        builder.append(space).append(group.replace(declare, type, methodName, toString(parameters)));
+        // TODO impl
         toDefaultReturnScript(builder, indent, returnType);
         return builder.toString();
     }
 
-    private static String toParameters(Importer importer, ExecutableElement elem) {
+    private static LinkedHashMap<String, String> toDeclareParameters(Importer importer, ExecutableElement elem) {
+        LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
         List<? extends VariableElement> vars = elem.getParameters();
         if (vars == null || vars.isEmpty()) {
+            return parameters;
+        }
+        for (int i = 0; i < vars.size(); i++) {
+            VariableElement var = vars.get(i);
+            String name = StringUtils.getSimpleName(var);
+            String type = importer.onImported(var.asType());
+            parameters.put(name, type);
+        }
+        return parameters;
+    }
+
+    private static String toString(Map<String, String> parameters) {
+        if (parameters.isEmpty()) {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < vars.size(); i++) {
-            VariableElement var = vars.get(i);
-            if (i > 0) {
+        int index = 0;
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            if (index++ > 0) {
                 builder.append(", ");
             }
-            builder.append(importer.onImported(var.asType()));
-            builder.append(" ").append(var.getSimpleName());
+            builder.append(entry.getValue());
+            builder.append(" ").append(entry.getKey());
         }
         return builder.toString();
     }

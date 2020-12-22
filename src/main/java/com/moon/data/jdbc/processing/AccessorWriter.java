@@ -92,7 +92,7 @@ public class AccessorWriter {
     }
 
     public AccessorWriter addProvidedMethod(ProvidedMethod model) {
-        this.providedMap.put(model.getFieldDeclaration(importer), model);
+        this.providedMap.put(model.getFieldName(), model);
         return this;
     }
 
@@ -140,7 +140,7 @@ public class AccessorWriter {
 
         addAbstractMethods(sb, indent, methods, importer);
 
-        String declaration = nextLine(sb).append('}').toString();
+        String declaration = sb.append('}').toString();
         return Replacer.IMPORTS.replace(declaration, importer.toString("\n"));
     }
 
@@ -153,15 +153,12 @@ public class AccessorWriter {
             nextLine(sb);
         }
         for (MethodModel model : models) {
-            nextLine(sb);
-            sb.append(model.toString(indent, importer));
-            nextLine(sb);
+            nextLine(nextLine(sb).append(model.toString(indent, importer)));
         }
     }
 
     private StringBuilder addClassDeclaration(StringBuilder sb) {
-        nextLine(sb);
-        sb.append(getAccess().toString()).append(" class ").append(classname);
+        nextLine(sb).append(getAccess().toString()).append(" class ").append(classname);
         if (StringUtils.isNotBlank(extend)) {
             sb.append(" extends ").append(extend);
         }
@@ -200,9 +197,7 @@ public class AccessorWriter {
         StringBuilder sb, int indent, Importer importer, Map<String, ProvidedMethod> providedMap
     ) {
         newLine(sb);
-        String space = indent(indent);
         for (Map.Entry<String, ProvidedMethod> providedEntry : providedMap.entrySet()) {
-            nextLine(sb).append(space).append(providedEntry.getKey());
             newLine(sb).append(providedEntry.getValue().toString(importer, indent));
         }
     }
@@ -210,10 +205,11 @@ public class AccessorWriter {
     private static void addMemberFields(StringBuilder sb, int indent, Map<String, String> fields) {
         if (!fields.isEmpty()) {
             String space = indent(indent);
-            nextLine(nextLine(sb));
+            nextLine(sb);
             for (Map.Entry<String, String> entry : fields.entrySet()) {
-                sb.append(space).append(entry.getValue()).append('\n');
+                newLine(sb).append(space).append(entry.getValue());
             }
+            nextLine(sb);
         }
     }
 
@@ -232,23 +228,20 @@ public class AccessorWriter {
         }
     }
 
-    private void addAnnotatedImpl(StringBuilder sb, String targetClass) {
+    private void addAnnotatedImpl(StringBuilder sb, String comment) {
         String space = indent(4);
-        nextLine(sb);
         String generated = onImported(Generated.class);
-        sb.append("@").append(generated).append("(");
-        nextLine(sb);
+        nextLine(sb).append("@").append(generated).append("(");
+
         String cls = AccessorProcessor.class.getCanonicalName();
-        sb.append(space).append("value = \"").append(cls).append("\",");
-        nextLine(sb);
-        sb.append(space).append("date = \"").append(new Date()).append("\",");
-        nextLine(sb);
-        String name = targetClass == null ? "" : targetClass;
-        sb.append(space).append("comments = \"").append(name).append("\"");
+        nextLine(sb).append(space).append("value = \"").append(cls).append("\",");
+        nextLine(sb).append(space).append("date = \"").append(new Date()).append("\",");
+        if (StringUtils.isNotBlank(comment)) {
+            nextLine(sb).append(space).append("comments = \"").append(comment).append("\"");
+        }
         nextLine(sb).append(")");
         if (Imported.REPOSITORY) {
-            String repository = onImported(Repository.class);
-            nextLine(sb).append('@').append(repository);
+            nextLine(sb).append('@').append(onImported(Repository.class));
         }
     }
 

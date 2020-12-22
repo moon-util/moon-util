@@ -17,22 +17,19 @@ final class ProvidedMethod {
 
     private final ExecutableElement element;
     private final Provided provided;
+    private final String fieldName;
 
     public ProvidedMethod(ExecutableElement element, Provided provided) {
+        this.fieldName = getPropertyName(element);
         this.element = element;
         this.provided = provided;
     }
 
-    public String getFieldDeclaration(Importer importer) {
-        String fieldType = importer.onImported(element.getReturnType());
-        return StringUtils.toDeclareField(getFieldName(), fieldType);
-    }
+    public String getFieldName() { return fieldName; }
 
-    private String getFieldName() {
-        return StringUtils.decapitalize(getCapitalizedPropertyName());
-    }
+    private String getCapitalizedPropertyName() { return StringUtils.capitalize(getFieldName()); }
 
-    private String getCapitalizedPropertyName() {
+    private static String getPropertyName(ExecutableElement element) {
         TypeMirror type = element.getReturnType();
         boolean isBool = TestUtils.isTypeKind(type, TypeKind.BOOLEAN);
         String name = StringUtils.getSimpleName(element);
@@ -40,8 +37,10 @@ final class ProvidedMethod {
             name = name.substring(2);
         } else if (name.startsWith(Const.GET) && name.length() > 3) {
             name = name.substring(3);
+        } else if (name.startsWith(Const.SET) && name.length() > 3) {
+            name = name.substring(3);
         }
-        return StringUtils.capitalize(name);
+        return StringUtils.decapitalize(name);
     }
 
     public String toString(Importer importer, int indent) {
@@ -51,6 +50,10 @@ final class ProvidedMethod {
         String fieldName = getFieldName();
         String methodName = StringUtils.getSimpleName(element);
         String type = importer.onImported(element.getReturnType());
+
+        // field
+        String field = StringUtils.toDeclareField(getFieldName(), type);
+        newLine(builder).append(space).append(field);
 
         String getter = StringUtils.toGetterMethod(methodName, fieldName, type);
         newLine(builder).append(space).append("@Override");

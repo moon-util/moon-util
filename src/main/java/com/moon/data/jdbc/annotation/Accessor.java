@@ -1,5 +1,7 @@
 package com.moon.data.jdbc.annotation;
 
+import com.moon.data.jdbc.dialect.Dialect;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,4 +42,11 @@ public @interface Accessor {
      * @return 实现类类名
      */
     String classname() default "<interface>Impl";
+
+    /**
+     * 数据库方言
+     *
+     * @return
+     */
+    Dialect dialect() default Dialect.AUTO;
 }

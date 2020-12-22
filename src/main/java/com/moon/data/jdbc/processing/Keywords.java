@@ -1,14 +1,16 @@
 package com.moon.data.jdbc.processing;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author benshaoye
  */
 final class Keywords {
+
+    /**
+     * 插入/更新
+     */
+    private final static String SAVE = "save";
 
     /**
      * 插入
@@ -45,25 +47,27 @@ final class Keywords {
     /**
      * 普通查询
      */
-    private final static String SELECTS = "select|fetch|query|find|read";
+    private final static String SELECTS = "select|fetch|query|find|read|search";
 
-    public boolean isInsert(String methodName) { return is(methodName, INSERT); }
+    public static boolean isSave(String methodName) { return is(methodName, SAVE); }
 
-    public boolean isDelete(String methodName) { return is(methodName, DELETE); }
+    public static boolean isInsert(String methodName) { return is(methodName, INSERT); }
 
-    public boolean isUpdate(String methodName) { return is(methodName, UPDATE); }
+    public static boolean isDelete(String methodName) { return is(methodName, DELETE); }
 
-    public boolean isUpdateNull(String methodName) { return is(methodName, CLEAR); }
+    public static boolean isUpdate(String methodName) { return is(methodName, UPDATE); }
 
-    public boolean isSelectExists(String methodName) { return is(methodName, EXISTS); }
+    public static boolean isUpdateNull(String methodName) { return is(methodName, CLEAR); }
 
-    public boolean isSelectCount(String methodName) { return is(methodName, COUNT); }
+    public static boolean isSelectExists(String methodName) { return is(methodName, EXISTS); }
 
-    public boolean isSelectList(String methodName) { return is(methodName, LIST); }
+    public static boolean isSelectCount(String methodName) { return is(methodName, COUNT); }
 
-    public boolean isSelectGet(String methodName) { return is(methodName, GET); }
+    public static boolean isSelectList(String methodName) { return is(methodName, LIST); }
 
-    public boolean isSelect(String methodName) { return SELECTS.contains(key(methodName)); }
+    public static boolean isSelectGet(String methodName) { return is(methodName, GET); }
+
+    public static boolean isSelect(String methodName) { return SELECTS.contains(key(methodName)); }
 
     private static boolean is(String str, String start) { return Objects.equals(key(str), start); }
 
