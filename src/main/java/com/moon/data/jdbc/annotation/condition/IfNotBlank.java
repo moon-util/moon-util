@@ -1,4 +1,4 @@
-package com.moon.data.jdbc.annotation;
+package com.moon.data.jdbc.annotation.condition;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

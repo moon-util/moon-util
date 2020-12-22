@@ -1,4 +1,4 @@
-package com.moon.data.jdbc.annotation;
+package com.moon.data.jdbc.annotation.condition;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,9 +10,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.SOURCE)
-public @interface IfOver {
+public @interface IfGt {
 
-    double min();
-
-    double max();
+    double value();
 }

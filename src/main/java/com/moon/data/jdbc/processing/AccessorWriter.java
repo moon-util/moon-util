@@ -1,6 +1,5 @@
 package com.moon.data.jdbc.processing;
 
-import com.moon.data.jdbc.annotation.Provided;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Generated;
@@ -14,14 +13,11 @@ import java.io.Writer;
 import java.util.*;
 
 import static com.moon.data.jdbc.processing.StringUtils.*;
-import static com.moon.data.jdbc.processing.Const.*;
 
 /**
  * @author benshaoye
  */
 public class AccessorWriter {
-
-    private final Nameable nameable = new Nameable();
 
     private String pkg;
 
@@ -45,7 +41,7 @@ public class AccessorWriter {
 
     private final Map<String, ProvidedMethod> providedMap = new HashMap<>();
 
-    private final List<MethodModel> methods = new ArrayList<>();
+    private final List<CreationMethod> methods = new ArrayList<>();
 
     public AccessorWriter() { }
 
@@ -96,7 +92,7 @@ public class AccessorWriter {
         return this;
     }
 
-    public AccessorWriter addImplMethod(MethodModel model) {
+    public AccessorWriter addImplMethod(CreationMethod model) {
         this.methods.add(model);
         return this;
     }
@@ -145,14 +141,14 @@ public class AccessorWriter {
     }
 
     private static void addAbstractMethods(
-        StringBuilder sb, int indent, Collection<MethodModel> models, Importer importer
+        StringBuilder sb, int indent, Collection<CreationMethod> models, Importer importer
     ) {
         if (models == null || models.isEmpty()) {
             return;
         } else {
             nextLine(sb);
         }
-        for (MethodModel model : models) {
+        for (CreationMethod model : models) {
             nextLine(nextLine(sb).append(model.toString(indent, importer)));
         }
     }

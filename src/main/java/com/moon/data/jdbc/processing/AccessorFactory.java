@@ -55,7 +55,7 @@ final class AccessorFactory {
         for (ExecutableElement method : methods) {
             Provided provided = method.getAnnotation(Provided.class);
             if (provided == null) {
-                writer.addImplMethod(new MethodModel(method));
+                writer.addImplMethod(new CreationMethod(method));
             } else {
                 Assert.assertProvidedMethod(method, provided);
                 writer.addProvidedMethod(new ProvidedMethod(method, provided));

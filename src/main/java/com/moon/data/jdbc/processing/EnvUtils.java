@@ -13,7 +13,7 @@ abstract class EnvUtils {
 
     private static ProcessingEnvironment ENV;
 
-    private EnvUtils() {}
+    private EnvUtils() { }
 
     public static void initialize(ProcessingEnvironment env) { ENV = env; }
 

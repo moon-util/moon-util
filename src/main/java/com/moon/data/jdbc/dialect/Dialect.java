@@ -11,10 +11,23 @@ public enum Dialect {
         @Override
         public DialectDescriptor getDescriptor() { return new MySqlDialectDescriptor(); }
     },
+    /**
+     * MariaDB
+     */
+    MariaDB {
+        @Override
+        public DialectDescriptor getDescriptor() { return new MariaDBDialectDescriptor(); }
+    },
+    /**
+     * MariaDB
+     */
     MS_SQL {
         @Override
         public DialectDescriptor getDescriptor() { return new MsSqlDialectDescriptor(); }
     },
+    /**
+     * Oracle
+     */
     ORACLE {
         @Override
         public DialectDescriptor getDescriptor() { return new OracleDialectDescriptor(); }

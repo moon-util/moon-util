@@ -10,10 +10,12 @@ import java.lang.annotation.Target;
 
 /**
  * @author benshaoye
+ * @see IdentifierGenerator
+ * @see com.moon.data.jdbc.IdentifierInjector
  */
 @Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IdentifierStrategy {
+public @interface IdStrategy {
 
     Class<? extends IdentifierGenerator<? extends Serializable, ?>> value();
 }

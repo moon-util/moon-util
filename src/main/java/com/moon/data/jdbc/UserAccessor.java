@@ -1,9 +1,9 @@
 package com.moon.data.jdbc;
 
 import com.moon.core.lang.StringUtil;
-import com.moon.data.jdbc.annotation.*;
+import com.moon.data.jdbc.annotation.condition.IfNotBlank;
+import com.moon.data.jdbc.annotation.condition.IfNotEmpty;
 
-import javax.persistence.Access;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -19,7 +19,7 @@ final class Keywords {
     /**
      * 删除
      */
-    private final static String DELETE = "delete";
+    private final static String DELETE = "delete|remove";
     /**
      * 更新
      */
@@ -53,7 +53,7 @@ final class Keywords {
 
     public static boolean isInsert(String methodName) { return is(methodName, INSERT); }
 
-    public static boolean isDelete(String methodName) { return is(methodName, DELETE); }
+    public static boolean isDelete(String methodName) { return DELETE.contains(key(methodName)); }
 
     public static boolean isUpdate(String methodName) { return is(methodName, UPDATE); }
 

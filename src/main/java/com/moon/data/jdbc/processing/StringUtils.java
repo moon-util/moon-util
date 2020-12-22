@@ -21,13 +21,9 @@ abstract class StringUtils {
         return getQualifiedName(EnvUtils.getUtils().getPackageOf(elem));
     }
 
-    public static String getQualifiedName(QualifiedNameable elem) {
-        return elem.getQualifiedName().toString();
-    }
+    public static String getQualifiedName(QualifiedNameable elem) { return elem.getQualifiedName().toString(); }
 
-    public static String getSimpleName(Element elem) {
-        return elem.getSimpleName().toString();
-    }
+    public static String getSimpleName(Element elem) { return elem.getSimpleName().toString(); }
 
     public static String getSimpleName(String fullName) {
         int last = fullName.indexOf("<"), idx;
@@ -167,11 +163,9 @@ abstract class StringUtils {
 
     public static void addBlockComment(StringBuilder sb, int indent, String... comments) {
         String space = indent(indent);
-        nextLine(sb);
-        sb.append(space).append("/*");
+        nextLine(sb).append(space).append("/*");
         for (String comment : comments) {
-            nextLine(sb);
-            sb.append(space).append(" * ").append(comment);
+            nextLine(sb).append(space).append(" * ").append(comment);
         }
         nextLine(sb).append(space).append(" */");
     }

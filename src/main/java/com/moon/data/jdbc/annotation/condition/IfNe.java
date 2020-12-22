@@ -1,4 +1,4 @@
-package com.moon.data.jdbc.annotation;
+package com.moon.data.jdbc.annotation.condition;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,15 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 声明普通列列名
- * <p>
- * 主键字段列名也需用{@link TableColumn}声明
- *
  * @author benshaoye
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.SOURCE)
-public @interface TableColumn {
+public @interface IfNe {
 
-    String name() default "";
+    double value();
 }

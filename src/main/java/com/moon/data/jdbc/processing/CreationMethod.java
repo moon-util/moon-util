@@ -13,11 +13,11 @@ import static com.moon.data.jdbc.processing.StringUtils.nextLine;
 /**
  * @author benshaoye
  */
-final class MethodModel {
+final class CreationMethod {
 
     private final ExecutableElement method;
 
-    public MethodModel(ExecutableElement method) { this.method = method; }
+    public CreationMethod(ExecutableElement method) { this.method = method; }
 
     public String toString(int indent, Importer importer) {
         String space = StringUtils.indent(indent);
@@ -41,8 +41,7 @@ final class MethodModel {
         if (vars == null || vars.isEmpty()) {
             return parameters;
         }
-        for (int i = 0; i < vars.size(); i++) {
-            VariableElement var = vars.get(i);
+        for (VariableElement var : vars) {
             String name = StringUtils.getSimpleName(var);
             String type = importer.onImported(var.asType());
             parameters.put(name, type);
