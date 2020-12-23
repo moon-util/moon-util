@@ -1,6 +1,7 @@
 package com.moon.data.jdbc.annotation;
 
 import com.moon.data.IdentifierGenerator;
+import com.moon.data.jdbc.identifier.IdentifierInjector;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
@@ -11,7 +12,7 @@ import java.lang.annotation.Target;
 /**
  * @author benshaoye
  * @see IdentifierGenerator
- * @see com.moon.data.jdbc.IdentifierInjector
+ * @see IdentifierInjector
  */
 @Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

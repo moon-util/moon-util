@@ -1,5 +1,7 @@
 package com.moon.data.jdbc.annotation;
 
+import com.moon.data.jdbc.identifier.AutoIdentifierGenerator;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,6 +17,7 @@ import java.lang.annotation.Target;
  * 即：ID 不是必须的，也可以由任意多列组成联合主键
  *
  * @author benshaoye
+ * @see AutoIdentifierGenerator 数据库自增主键
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
