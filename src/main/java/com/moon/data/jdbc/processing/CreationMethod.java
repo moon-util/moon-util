@@ -25,11 +25,12 @@ final class CreationMethod {
         TypeMirror returnType = method.getReturnType();
         StringBuilder builder = new StringBuilder();
         nextLine(builder.append(space).append("@Override"));
-        String type = importer.onImported(returnType);
+        String type = importer.onImported(method.getReturnType());
         String declare = "public {type} {name}({params}) {";
         Map<String, String> parameters = toDeclareParameters(importer, method);
         Replacer.Group group = Replacer.of(Replacer.type, Replacer.name, Replacer.params);
-        builder.append(space).append(group.replace(declare, type, methodName, toString(parameters)));
+        String methodImpl = group.replace(declare, type, methodName, toString(parameters));
+        builder.append(space).append(methodImpl);
         // TODO impl
         toDefaultReturnScript(builder, indent, returnType);
         return builder.toString();

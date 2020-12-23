@@ -19,14 +19,25 @@ import static com.moon.data.jdbc.processing.StringUtils.*;
  */
 public class AccessorWriter {
 
+    /**
+     * package xxx.xxx.xx;
+     */
     private String pkg;
-
+    /**
+     * {@link Generated#comments()}
+     */
     private String comment;
-
+    /**
+     * public|protected|private
+     */
     private Modifier access;
-
+    /**
+     * this classname
+     */
     private String classname;
-
+    /**
+     * super classname
+     */
     private String extend;
 
     private final Importer importer = new Importer();
