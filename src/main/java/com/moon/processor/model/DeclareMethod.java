@@ -1,4 +1,4 @@
-package com.moon.mapper.processing;
+package com.moon.processor.model;
 
 /**
  * @author benshaoye

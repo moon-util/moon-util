@@ -1,7 +1,11 @@
-package com.moon.mapper.processing;
+package com.moon.processor.model;
 
-import java.util.*;
-import java.util.function.Consumer;
+import com.moon.processor.utils.Test2;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author benshaoye
@@ -79,30 +83,9 @@ public class DeclareProperty {
     private static void putConverter(
         Map<String, Map<String, String>> map, String type, String propType, String name
     ) {
-        type = StringUtils.isPrimitive(type) || BASIC_TYPES.contains(type) ? PUBLIC : type;
+        type = Test2.isBasicType(type) ? PUBLIC : type;
         map.computeIfAbsent(type, k -> new HashMap<>(2)).put(propType, name);
     }
 
     private final static String PUBLIC = "public";
-
-    private static final Set<String> BASIC_TYPES = new HashSet<>();
-
-    static {
-        Consumer<Class<?>> consumer = cls -> BASIC_TYPES.add(cls.getCanonicalName());
-        consumer.accept(Object.class);
-        consumer.accept(String.class);
-        consumer.accept(Integer.class);
-        consumer.accept(Long.class);
-        consumer.accept(Short.class);
-        consumer.accept(Byte.class);
-        consumer.accept(Character.class);
-        consumer.accept(Boolean.class);
-        consumer.accept(Float.class);
-        consumer.accept(Double.class);
-        consumer.accept(Number.class);
-        consumer.accept(CharSequence.class);
-        consumer.accept(StringBuilder.class);
-        consumer.accept(StringBuffer.class);
-        BASIC_TYPES.add("void");
-    }
 }

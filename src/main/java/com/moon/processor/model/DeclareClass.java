@@ -1,4 +1,4 @@
-package com.moon.mapper.processing;
+package com.moon.processor.model;
 
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashMap;
