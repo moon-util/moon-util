@@ -89,8 +89,8 @@ public enum Generic2 {
             return;
         }
         List<String> actualAll = splitSuperclass(elementTyped.toString());
-        String declareClassname = String2.getQualifiedName(element);
-        String subClassname = String2.getQualifiedName(subClass);
+        String declareClassname = Element2.getQualifiedName(element);
+        String subClassname = Element2.getQualifiedName(subClass);
         Elements utils = Environment2.getUtils();
         int index = 0;
         for (TypeParameterElement param : element.getTypeParameters()) {

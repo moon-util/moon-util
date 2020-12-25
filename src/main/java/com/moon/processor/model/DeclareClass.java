@@ -1,8 +1,10 @@
 package com.moon.processor.model;
 
+import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Test2;
 
+import javax.annotation.processing.Filer;
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashMap;
 
@@ -17,9 +19,7 @@ import java.util.LinkedHashMap;
  *
  * @author benshaoye
  */
-public class DeclareClass extends LinkedHashMap<String, DeclareProperty> {
-
-    private final static String SUFFIX = "Implementation";
+public class DeclareClass extends LinkedHashMap<String, DeclareProperty> implements JavaFileWriteable {
 
     /**
      * 声明类
@@ -45,7 +45,7 @@ public class DeclareClass extends LinkedHashMap<String, DeclareProperty> {
         this.abstracted = Test2.isAbstractClass(declareElement);
         String name = this.getThisClassname();
         if (abstracted) {
-            name = registry.nextOrderedImplClass(name);
+            name = registry.getImplClassname(declareElement);
         }
         this.implClassname = name;
     }
@@ -57,4 +57,19 @@ public class DeclareClass extends LinkedHashMap<String, DeclareProperty> {
     public String getImplClassname() { return implClassname; }
 
     public boolean isAbstract() { return abstracted; }
+
+
+    @Override
+    public void writeJavaFile(Filer filer) {
+        if (isAbstract() && !written) {
+            this.doWriteJavaFile(filer);
+        }
+    }
+    private boolean written = false;
+
+    private void doWriteJavaFile(Filer filer) {
+
+        // TODO write implementation java file
+        written = true;
+    }
 }

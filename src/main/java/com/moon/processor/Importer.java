@@ -1,6 +1,7 @@
 package com.moon.processor;
 
 import com.moon.core.lang.StringUtil;
+import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
@@ -79,7 +80,7 @@ public class Importer {
         if (classname.endsWith("[]")) {
             classname = classname.substring(0, classname.length() - 2);
         }
-        shortName = String2.getSimpleName(classname);
+        shortName = Element2.getSimpleName(classname);
         if (importCached.containsKey(shortName)) {
             return classname;
         } else if (Test2.isPrimitive(classname) || "void".equals(classname)) {

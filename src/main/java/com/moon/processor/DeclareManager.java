@@ -1,7 +1,7 @@
 package com.moon.processor;
 
 import com.moon.processor.model.DeclareClass;
-import com.moon.processor.utils.String2;
+import com.moon.processor.utils.Element2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class DeclareManager {
     }
 
     public DeclareClass by(TypeElement element) {
-        String classname = String2.getQualifiedName(element);
+        String classname = Element2.getQualifiedName(element);
         DeclareClass declared = typeDeclareMap.get(classname);
         if (declared == null) {
 
