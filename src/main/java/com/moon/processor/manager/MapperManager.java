@@ -1,7 +1,7 @@
-package com.moon.processor;
+package com.moon.processor.manager;
 
 import com.moon.processor.model.DeclareClass;
-import com.moon.processor.model.MapperWriterDef;
+import com.moon.processor.model.DefMapper;
 import com.moon.processor.utils.Element2;
 
 import java.util.HashMap;
@@ -12,14 +12,14 @@ import java.util.Map;
  */
 public class MapperManager {
 
-    private final Map<String, MapperWriterDef> registryMap = new HashMap<>();
+    private final Map<String, DefMapper> registryMap = new HashMap<>();
 
     public MapperManager() {
     }
 
-    public MapperWriterDef mapperOf(DeclareClass thisClass, DeclareClass thatClass) {
+    public DefMapper mapperOf(DeclareClass thisClass, DeclareClass thatClass) {
         String mapperKey = toMapperKey(thisClass, thatClass);
-        MapperWriterDef registry = registryMap.get(mapperKey);
+        DefMapper registry = registryMap.get(mapperKey);
         if (registry == null) {
             registry = buildMapperWriterDef(thisClass, thatClass);
             registryMap.put(mapperKey, registry);
@@ -27,7 +27,7 @@ public class MapperManager {
         return registry;
     }
 
-    private static MapperWriterDef buildMapperWriterDef(DeclareClass thisClass, DeclareClass thatClass) {
+    private static DefMapper buildMapperWriterDef(DeclareClass thisClass, DeclareClass thatClass) {
         String pkg = Element2.getPackageName(thisClass.getDeclareElement());
 
         // String classname =

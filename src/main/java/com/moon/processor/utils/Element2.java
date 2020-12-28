@@ -1,9 +1,11 @@
 package com.moon.processor.utils;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.QualifiedNameable;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 import java.util.function.Function;
 
 /**
@@ -12,13 +14,7 @@ import java.util.function.Function;
 public enum Element2 {
     ;
 
-    public static String toImplemented(TypeElement elem) {
-        String classname = getQualifiedName(elem);
-        if (Test2.isAbstractClass(elem)) {
-
-        }
-        return classname;
-    }
+    public static <T> T cast(Object obj) { return (T) obj; }
 
     public static String getPackageName(Element elem) {
         return getQualifiedName(Environment2.getUtils().getPackageOf(elem));
@@ -37,6 +33,27 @@ public enum Element2 {
             last = fullName.length();
         }
         return fullName.substring(Math.max(idx + 1, 0), last);
+    }
+
+    public static String toPropertyName(ExecutableElement element) {
+        String name = element.getSimpleName().toString();
+        return String2.decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
+    }
+
+    public static String getGetterDeclareType(ExecutableElement elem) {
+        return stringifyTypeMirror(elem.getReturnType());
+    }
+
+    public static String getSetterDeclareType(ExecutableElement elem) {
+        return stringifyTypeMirror(elem.getParameters().get(0).asType());
+    }
+
+    public static String getFieldDeclareType(VariableElement elem) {
+        return stringifyTypeMirror(elem.asType());
+    }
+
+    private static String stringifyTypeMirror(TypeMirror mirror) {
+        return mirror.toString();
     }
 
     public static <T> String getClassname(T t, Function<T, Class<?>> classGetter) {

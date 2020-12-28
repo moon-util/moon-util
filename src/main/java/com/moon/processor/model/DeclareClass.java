@@ -1,5 +1,6 @@
 package com.moon.processor.model;
 
+import com.moon.processor.manager.ClassnameManager;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Test2;
@@ -39,7 +40,7 @@ public class DeclareClass extends LinkedHashMap<String, DeclareProperty> impleme
      */
     private final boolean abstracted;
 
-    public DeclareClass(TypeElement declareElement, Registry registry) {
+    public DeclareClass(TypeElement declareElement, ClassnameManager registry) {
         this.declareElement = declareElement;
         this.thisClassname = Element2.getQualifiedName(declareElement);
         this.abstracted = Test2.isAbstractClass(declareElement);

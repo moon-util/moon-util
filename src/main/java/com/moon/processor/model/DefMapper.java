@@ -1,6 +1,6 @@
 package com.moon.processor.model;
 
-import com.moon.processor.ClassImplementor;
+import com.moon.processor.manager.ClassnameManager;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.utils.Element2;
 
@@ -10,12 +10,12 @@ import javax.lang.model.element.TypeElement;
 /**
  * @author benshaoye
  */
-public class MapperWriterDef implements JavaFileWriteable {
+public class DefMapper implements JavaFileWriteable {
 
     private final DeclareClass thisClass, thatClass;
     private final String pkg, classname;
 
-    public MapperWriterDef(DeclareClass thisClass, DeclareClass thatClass, Registry registry) {
+    public DefMapper(DeclareClass thisClass, DeclareClass thatClass, ClassnameManager registry) {
         this.thisClass = thisClass;
         this.thatClass = thatClass;
         this.pkg = Element2.getPackageName(thisClass.getDeclareElement());
@@ -45,7 +45,7 @@ public class MapperWriterDef implements JavaFileWriteable {
     private boolean written = false;
 
     private void doWriteJavaFile(Filer filer) {
-        ClassImplementor implementor = new ClassImplementor(ClassImplementor.Type.ENUM, getPkg(), getClassname());
+        DefClassWriter implementor = new DefClassWriter(DefClassWriter.Type.ENUM, getPkg(), getClassname());
         // TODO write mapper java file
         written = true;
     }

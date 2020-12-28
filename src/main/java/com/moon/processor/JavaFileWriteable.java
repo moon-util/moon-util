@@ -1,6 +1,7 @@
 package com.moon.processor;
 
 import javax.annotation.processing.Filer;
+import java.io.IOException;
 
 /**
  * @author benshaoye
@@ -13,5 +14,5 @@ public interface JavaFileWriteable {
      *
      * @param filer filer
      */
-    void writeJavaFile(Filer filer);
+    void writeJavaFile(Filer filer) throws IOException;
 }

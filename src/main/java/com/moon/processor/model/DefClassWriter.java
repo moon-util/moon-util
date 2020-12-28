@@ -1,9 +1,17 @@
-package com.moon.processor;
+package com.moon.processor.model;
 
-import com.moon.processor.model.DefMethod;
+import com.moon.processor.Holder;
+import com.moon.processor.HolderGroup;
+import com.moon.processor.Importer;
+import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.utils.Collect2;
 import com.moon.processor.utils.String2;
 
+import javax.annotation.processing.Filer;
+import javax.tools.JavaFileObject;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.*;
 
 import static com.moon.processor.utils.String2.newLine;
@@ -11,7 +19,7 @@ import static com.moon.processor.utils.String2.newLine;
 /**
  * @author benshaoye
  */
-public class ClassImplementor {
+public class DefClassWriter implements JavaFileWriteable {
 
     private final Importer importer;
     private final Set<String> interfaces;
@@ -19,11 +27,11 @@ public class ClassImplementor {
 
     private final String pkg, classname;
     private String[] enums;
-    private String extend;
+    private String superclass;
 
     private final Map<String, DefMethod> methodsDecl = new LinkedHashMap<>();
 
-    public ClassImplementor(Type type, String pkg, String classname) {
+    public DefClassWriter(Type type, String pkg, String classname) {
         this.interfaces = new LinkedHashSet<>();
         this.importer = new Importer();
         this.classname = classname;
@@ -32,7 +40,13 @@ public class ClassImplementor {
     }
 
     public enum Type {
+        /**
+         * 枚举
+         */
         ENUM,
+        /**
+         * 类
+         */
         CLASS
     }
 
@@ -44,7 +58,7 @@ public class ClassImplementor {
 
     public String getClassname() { return classname; }
 
-    public String getExtend() { return extend; }
+    public String getSuperclass() { return superclass; }
 
     public Type getType() { return type; }
 
@@ -52,29 +66,33 @@ public class ClassImplementor {
 
     public Map<String, DefMethod> getMethodsDecl() { return methodsDecl; }
 
-    public ClassImplementor enumsOf(String... names) {
+    public DefClassWriter enumsOf(String... names) {
         if (type == Type.ENUM) {
             this.enums = names;
         }
         return this;
     }
 
-    public ClassImplementor extend(String superclass) {
+    public DefClassWriter extend(String superclass) {
         if (type == Type.CLASS) {
-            this.extend = getImporter().onImported(superclass);
+            this.superclass = onImported(superclass);
         }
         return this;
     }
 
-    public ClassImplementor implement(String... interfaces) {
+    public DefClassWriter implement(String... interfaces) {
         if (interfaces != null) {
-            Arrays.stream(interfaces).forEach(it -> this.interfaces.add(getImporter().onImported(it)));
+            Arrays.stream(interfaces).forEach(it -> this.interfaces.add(onImported(it)));
         }
         return this;
     }
 
     public DefMethod publicMethod(
-        boolean isStatic, String name, String returnClass, LinkedHashMap<String, String> parameters
+        String name, String returnClass, DefParameters parameters
+    ) { return publicMethod(false, name, returnClass, parameters); }
+
+    public DefMethod publicMethod(
+        boolean isStatic, String name, String returnClass, DefParameters parameters
     ) {
         String methodDecl = "{name}({params})";
         String declare = "public {static}{return} {name}({params})";
@@ -93,28 +111,30 @@ public class ClassImplementor {
         return method;
     }
 
-    public DefMethod getDefMethod(String name, String returnClass, LinkedHashMap<String, String> parameters) {
+    public DefMethod getDefMethod(String name, DefParameters parameters) {
         String methodDecl = "{name}({params})";
         String params = toParametersDecl(parameters);
         String key = Holder.of(Holder.name, Holder.params).on(methodDecl, name, params);
         return getMethodsDecl().get(key);
     }
 
+    private String onImported(String fulled) { return getImporter().onImported(fulled); }
+
     private String toParametersDecl(Map<String, String> parameters) {
         parameters = parameters == null ? Collections.emptyMap() : parameters;
         List<String> list = new ArrayList<>(parameters.size());
         parameters.forEach((name, type) -> {
-            Holder.Group group = Holder.of(Holder.type, Holder.name);
-            list.add(group.on("{type} {name}", getImporter().onImported(type), name));
+            HolderGroup group = Holder.of(Holder.type, Holder.name);
+            list.add(group.on("{type} {name}", onImported(type), name));
         });
         return String.join(", ", list);
     }
 
     private String getClassDeclareScript() {
         final StringBuilder sb = new StringBuilder();
-        sb.append("public ").append(getType().name().toLowerCase(Locale.ROOT));
-        sb.append(getClassname());
-        String superclass = getExtend();
+        sb.append("public ").append(getType().name().toLowerCase());
+        sb.append(' ').append(getClassname());
+        String superclass = getSuperclass();
         if (String2.isNotEmpty(superclass)) {
             sb.append(" extends ").append(superclass).append(' ');
         }
@@ -132,12 +152,22 @@ public class ClassImplementor {
         newLine(sb).append(getClassDeclareScript()).append(" {");
         if (getType() == Type.ENUM) {
             newLine(sb);
-            if (getEnums() == null) {
+            if (getEnums() != null) {
                 sb.append(String.join(", ", getEnums()));
             }
             sb.append(';');
         }
         getMethodsDecl().forEach((key, method) -> newLine(sb).append(method));
         return newLine(sb).append("}").toString();
+    }
+
+    private String getFullClassname() { return String.format("%s.%s", getPkg(), getClassname()); }
+
+    @Override
+    public void writeJavaFile(Filer filer) throws IOException {
+        JavaFileObject file = filer.createSourceFile(getFullClassname());
+        try (Writer jw = file.openWriter(); PrintWriter writer = new PrintWriter(jw)) {
+            writer.write(toString());
+        }
     }
 }

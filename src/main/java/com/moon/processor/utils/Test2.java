@@ -19,6 +19,7 @@ import static javax.lang.model.element.ElementKind.*;
  */
 public enum Test2 {
     ;
+    private final static String GET = "get", SET = "set", IS = "is", GET_CLASS = "getClass";
 
     public static boolean isEnum(String value) {
         return value != null && isEnum(Environment2.getUtils().getTypeElement(value));
@@ -102,10 +103,35 @@ public enum Test2 {
 
     public static boolean isMemberField(Element elem) { return isField(elem) && isMember(elem); }
 
-    public static boolean isPublicMemberMethod(Element elem) {
+    static boolean isPublicMemberMethod(Element elem) {
         return isMethod(elem) && isMember(elem) && isPublic(elem);
     }
 
+    static boolean isSetterMethod(Element elem) {
+        if (isPublicMemberMethod(elem)) {
+            ExecutableElement exe = (ExecutableElement) elem;
+            String name = exe.getSimpleName().toString();
+            boolean maybeSet = name.length() > 3 && name.startsWith(SET);
+            maybeSet = maybeSet && exe.getParameters().size() == 1;
+            maybeSet = maybeSet && isTypeKind(exe.getReturnType(), TypeKind.VOID);
+            return maybeSet;
+        }
+        return false;
+    }
+
+    static boolean isGetterMethod(Element elem) {
+        if (isPublicMemberMethod(elem)) {
+            ExecutableElement exe = (ExecutableElement) elem;
+            String name = exe.getSimpleName().toString();
+            boolean maybeGet = exe.getParameters().isEmpty();
+            if (name.startsWith(GET)) {
+                return maybeGet && name.length() > 3 && !name.equals(GET_CLASS);
+            } else if (name.startsWith(IS)) {
+                return maybeGet && name.length() > 2 && isTypeKind(exe.getReturnType(), TypeKind.BOOLEAN);
+            }
+        }
+        return false;
+    }
 
     public static boolean isTypeofAny(String actual, String... expected) {
         for (String aClass : expected) {

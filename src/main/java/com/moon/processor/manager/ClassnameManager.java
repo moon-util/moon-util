@@ -1,4 +1,4 @@
-package com.moon.processor.model;
+package com.moon.processor.manager;
 
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Test2;
@@ -8,13 +8,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 类全名管理器
+ *
  * @author benshaoye
  */
-public class Registry {
+public class ClassnameManager {
 
     private final Map<String, String> registeredClasses = new HashMap<>();
 
-    public Registry() {}
+    public ClassnameManager() { }
 
     /**
      * 获取接口/抽象类实现类类名
