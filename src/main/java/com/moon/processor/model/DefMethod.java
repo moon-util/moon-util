@@ -48,8 +48,8 @@ public class DefMethod extends ArrayList<String> {
 
     public void setQualifierName(String qualifierName) { this.qualifierName = qualifierName; }
 
-    public void returning(String varName) {
-        this.add(Holder.var.on("return {var};", varName));
+    public void returning(String script) {
+        this.add(Holder.var.on("return {var};", script));
     }
 
     public String toString(int indent) {

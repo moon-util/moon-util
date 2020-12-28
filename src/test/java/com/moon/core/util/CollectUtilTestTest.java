@@ -13,6 +13,8 @@ class CollectUtilTestTest {
 
     @Test
     void testIsEmpty() {
+        List<String> data = ListUtil.newList("111", "222", "333", "id", "name");
+        CollectUtil.orderBy(new ArrayList<>(), data, it -> it, "id", "name");
     }
 
     @Test

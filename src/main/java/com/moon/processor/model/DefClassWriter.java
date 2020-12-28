@@ -103,7 +103,7 @@ public class DefClassWriter implements JavaFileWriteable {
 
         String staticStr = isStatic ? "static" : "";
         String returned = importer.onImported(returnClass);
-        declare = Holder.of(Holder.STATIC, Holder.RETURN, Holder.name, Holder.params)
+        declare = Holder.of(Holder.static_, Holder.return_, Holder.name, Holder.params)
             .on(declare, staticStr, returned, name, params);
 
         DefMethod method = new DefMethod(declare, getImporter());
@@ -151,13 +151,14 @@ public class DefClassWriter implements JavaFileWriteable {
         newLine(newLine(sb).append(getImporter().toString("\n")));
         newLine(sb).append(getClassDeclareScript()).append(" {");
         if (getType() == Type.ENUM) {
-            newLine(sb);
-            if (getEnums() != null) {
-                sb.append(String.join(", ", getEnums()));
+            newLine(sb, String2.indent(4));
+            String[] enums = getEnums();
+            if (enums != null && enums.length > 1) {
+                sb.append(String.join(", ", enums));
             }
             sb.append(';');
         }
-        getMethodsDecl().forEach((key, method) -> newLine(sb).append(method));
+        getMethodsDecl().forEach((key, method) -> newLine(sb).append(method.toString()));
         return newLine(sb).append("}").toString();
     }
 

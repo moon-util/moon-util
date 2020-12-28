@@ -1,8 +1,6 @@
 package com.moon.processor.model;
 
-import com.moon.mapper.processing.BasicMethod;
-import com.moon.mapper.processing.ElemUtils;
-import com.moon.mapper.processing.GenericModel;
+import com.moon.processor.Completable;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Generic2;
 import com.moon.processor.utils.Test2;
@@ -15,13 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.moon.mapper.processing.GenericUtils.findActualType;
-import static com.moon.mapper.processing.GenericUtils.findActualTypeOrDeclare;
-
 /**
  * @author benshaoye
  */
-public class DeclareProperty {
+public class DeclareProperty implements Completable {
 
     /**
      * 所在的声明类，如在类 A 中声明了属性 b，这个就是 A
@@ -155,7 +150,14 @@ public class DeclareProperty {
     private DeclareMethod toMethod(String declareType, ExecutableElement method, Map<String, DeclareGeneric> generics) {
         TypeElement nameable = (TypeElement) method.getEnclosingElement();
         String declareClassname = Element2.getQualifiedName(nameable);
-        return new DeclareMethod(method, declareType, Generic2.findActual(generics, declareClassname, declareType),
+        return new DeclareMethod(method,
+            declareType,
+            Generic2.findActual(generics, declareClassname, declareType),
             true);
+    }
+
+    @Override
+    public void onCompleted() {
+        // TODO 将字段、getter、setter 对应
     }
 }

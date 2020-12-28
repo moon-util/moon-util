@@ -34,6 +34,7 @@ public class ClassnameManager {
             }
             String packageName = Element2.getPackageName(interfaceClass);
             String simpleName = Element2.getSimpleName(interfaceClass);
+            // 没考虑泛型
             implName = packageName + '.' + simpleName + "Implementation";
             return ensureOnly(thisName, implName);
         }

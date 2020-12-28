@@ -8,10 +8,7 @@ import com.moon.core.util.function.BiIntFunction;
 import com.moon.core.util.function.TableIntFunction;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
@@ -33,9 +30,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 集合长度，集合为 null 时返回 0
      */
-    public final static int size(Collection collect) {
-        return collect == null ? 0 : collect.size();
-    }
+    public final static int size(Collection<?> collect) { return collect == null ? 0 : collect.size(); }
 
     /**
      * 返回集合长度，当有时候集合可能使用{@link Object}表示的，这个方法可避免手动类型强转
@@ -44,7 +39,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 集合内元素总数，集合为 null 时返回 0
      */
-    public final static int sizeByObject(Object collect) { return collect == null ? 0 : ((Collection) collect).size(); }
+    public final static int sizeByObject(Object collect) { return collect == null ? 0 : ((Collection<?>) collect).size(); }
 
     /**
      * 返回所有集合的总长度
@@ -53,7 +48,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 所有集合的总长度，为 null 的集合长度为 0
      */
-    public final static int sizeOfAll(Collection... cs) {
+    public final static int sizeOfTotal(Collection<?>... cs) {
         if (cs == null) {
             return 0;
         }
@@ -115,9 +110,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合为 null 或集合中不包含任何元素时返回 true，否则返回 false
      */
-    public final static boolean isEmpty(Collection collect) {
-        return collect == null || collect.isEmpty();
-    }
+    public final static boolean isEmpty(Collection<?> collect) { return collect == null || collect.isEmpty(); }
 
     /**
      * 集合是否不为空
@@ -126,7 +119,58 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合不等于 null 并且集合中至少包含一个元素时返回 true，否则返回 false
      */
-    public final static boolean isNotEmpty(Collection collect) { return !isEmpty(collect); }
+    public final static boolean isNotEmpty(Collection<?> collect) { return !isEmpty(collect); }
+
+    /**
+     * 将集合按指定顺序排序
+     *
+     * @param collect        待排序顺序
+     * @param propertyGetter 排序参照字段
+     * @param orderKeys      指定顺序
+     * @param <K>            参照字段数据类型
+     * @param <E>            集合单项数据类型
+     * @param <C>            集合类型
+     *
+     * @return collect 集合
+     */
+    public final static <K, E, C extends Collection<E>> C orderBy(
+        C collect, Function<? super E, ? extends K> propertyGetter, E... orderKeys
+    ) { return orderBy(collect, collect, propertyGetter, orderKeys); }
+
+    /**
+     * 将集合按指定顺序排序
+     *
+     * @param resultCollect  集合排序返回结果容器
+     * @param collect        待排序集合
+     * @param propertyGetter 排序参照字段
+     * @param orderKeys      指定顺序
+     * @param <K>            参照字段数据类型
+     * @param <E>            集合单项数据类型
+     * @param <CR>           集合类型
+     *
+     * @return resultCollect
+     */
+    public final static <K, E, CR extends Collection<E>> CR orderBy(
+        CR resultCollect, Iterable<E> collect, Function<? super E, ? extends K> propertyGetter, E... orderKeys
+    ) {
+        // pre group
+        Map<K, Collection<E>> grouped = GroupUtil.groupBy(new LinkedHashMap<>(), collect, propertyGetter);
+        // clear source collection
+        if (collect == resultCollect) {
+            resultCollect.clear();
+        }
+        // sort
+        for (E orderKey : orderKeys) {
+            resultCollect.addAll(grouped.get(orderKey));
+        }
+        if (!grouped.isEmpty()) {
+            // add rest items
+            for (Map.Entry<K, Collection<E>> kCollectionEntry : grouped.entrySet()) {
+                resultCollect.addAll(kCollectionEntry.getValue());
+            }
+        }
+        return resultCollect;
+    }
 
     /*
      * ---------------------------------------------------------------------------------
@@ -245,7 +289,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合包含指定元素时，返回 true，否则返回 false
      */
-    public final static boolean contains(Collection collect, Object item) {
+    public final static boolean contains(Collection<?> collect, Object item) {
         return collect != null && collect.contains(item);
     }
 
@@ -258,7 +302,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合至少包含元素 1 和元素 2 中至少一个时返回 true，否则返回 false
      */
-    public final static boolean containsAny(Collection collect, Object item1, Object item2) {
+    public final static boolean containsAny(Collection<?> collect, Object item1, Object item2) {
         return collect != null && (collect.contains(item1) || collect.contains(item2));
     }
 
@@ -271,7 +315,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合同时包含所有待测元素是返回 true，否则返回 false
      */
-    public final static boolean containsAll(Collection collect, Object item1, Object item2) {
+    public final static boolean containsAll(Collection<?> collect, Object item1, Object item2) {
         return collect != null && (collect.contains(item1) && collect.contains(item2));
     }
 
@@ -283,7 +327,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合至少包含所有待测元素中至少一个时，返回 true，否则返回 false
      */
-    public final static boolean containsAny(Collection collect, Object... items) {
+    public final static boolean containsAny(Collection<?> collect, Object... items) {
         if (collect == null) {
             return false;
         }
@@ -303,7 +347,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合同时包含所有待测元素是返回 true，否则返回 false
      */
-    public final static boolean containsAll(Collection collect, Object... items) {
+    public final static boolean containsAll(Collection<?> collect, Object... items) {
         if (collect == null) {
             return false;
         }
@@ -338,7 +382,7 @@ public class CollectUtil extends BaseCollectUtil {
      *
      * @return 当集合 1 包含集合 2 中所有元素时返回 true，否则返回 false
      */
-    public final static boolean containsAll(Collection collect1, Collection collect2) {
+    public final static boolean containsAll(Collection<?> collect1, Collection<?> collect2) {
         return collect1 == collect2 || (collect1 != null && collect1.containsAll(collect2));
     }
 

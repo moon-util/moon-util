@@ -1,7 +1,6 @@
 package com.moon.processor.utils;
 
 import com.moon.mapper.annotation.IgnoreMode;
-import com.moon.mapper.annotation.MapperFor;
 import com.moon.mapper.annotation.MapperIgnoreFields;
 import com.moon.mapper.annotation.Mapping;
 import com.moon.processor.manager.ClassnameManager;
@@ -14,6 +13,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,10 +24,7 @@ import java.util.function.Function;
 public enum ProcessClass2 {
     ;
 
-    private final static String MAPPING_FOR_CLASSNAME = MapperFor.class.getCanonicalName();
-    private final static String CLASS_SUFFIX = ".class";
     private final static String TOP_CLASS = Object.class.getName();
-
 
     private static void handleMapping(
         IgnoredModel ignored, Element element, Consumer<DeclareMapping> handler
@@ -58,7 +55,7 @@ public enum ProcessClass2 {
         }
     }
 
-    private static DeclareProperty findDeclareProperty(
+    private static DeclareProperty declareProperty(
         DeclareClass declared, String name, TypeElement parsingElement, TypeElement thisElement
     ) {
         DeclareProperty detail = declared.get(name);
@@ -83,7 +80,7 @@ public enum ProcessClass2 {
             if (presentKeys.contains(name)) {
                 return;
             }
-            DeclareProperty prop = findDeclareProperty(declared, name, parsingElement, thisElement);
+            DeclareProperty prop = declareProperty(declared, name, parsingElement, thisElement);
             prop.setField((VariableElement) element, genericMap);
             handleMapping(ignoring.get(name), element, attr -> declared.addFieldAttr(name, attr));
         } else if (Test2.isSetterMethod(element)) {
@@ -92,7 +89,7 @@ public enum ProcessClass2 {
             if (presentKeys.contains(name)) {
                 return;
             }
-            DeclareProperty prop = findDeclareProperty(declared, name, parsingElement, thisElement);
+            DeclareProperty prop = declareProperty(declared, name, parsingElement, thisElement);
             handleMapping(ignoring.get(name), element, attr -> declared.addSetterAttr(name, attr));
             prop.setSetter(elem, genericMap);
         } else if (Test2.isGetterMethod(element)) {
@@ -101,7 +98,7 @@ public enum ProcessClass2 {
             if (presentKeys.contains(name)) {
                 return;
             }
-            DeclareProperty prop = findDeclareProperty(declared, name, parsingElement, thisElement);
+            DeclareProperty prop = declareProperty(declared, name, parsingElement, thisElement);
             handleMapping(ignoring.get(name), element, attr -> declared.addGetterAttr(name, attr));
             prop.setGetter(elem, genericMap);
         } else if (Test2.isConstructor(element)) {
@@ -110,9 +107,7 @@ public enum ProcessClass2 {
     }
 
     private static void parseRootPropertiesMap(
-        DeclareClass declared,
-        Map<String, DeclareGeneric> thisGenericMap,
-        Map<String, IgnoredModel> ignoring
+        DeclareClass declared, Map<String, DeclareGeneric> thisGenericMap, Map<String, IgnoredModel> ignoring
     ) {
         TypeElement rootElement = declared.getDeclareElement();
         List<? extends Element> elements = rootElement.getEnclosedElements();
@@ -123,13 +118,35 @@ public enum ProcessClass2 {
         }
     }
 
-    static DeclareClass toPropertiesMap(TypeElement rootElement, ClassnameManager classnameManager) {
+    private static void parseSuperPropertiesMap(
+        Map<String, DeclareGeneric> thisGenericMap,
+        Map<String, IgnoredModel> ignoring,
+        Set<String> presentKeys,
+        DeclareClass declared,
+        TypeElement thisElement,
+        TypeElement rootElement
+    ) {
+        TypeMirror superclass = thisElement.getSuperclass();
+        Element superElem = Environment2.getTypes().asElement(superclass);
+        if (superElem == null || superclass.toString().equals(TOP_CLASS)) {
+            return;
+        }
+        TypeElement superElement = Element2.cast(superElem);
+        List<? extends Element> elements = superElement.getEnclosedElements();
+        for (Element element : elements) {
+            handleEnclosedElem(presentKeys, declared, element, thisGenericMap, ignoring, superElement, rootElement);
+        }
+        presentKeys = new HashSet<>(declared.keySet());
+        parseSuperPropertiesMap(thisGenericMap, ignoring, presentKeys, declared, superElement, rootElement);
+    }
+
+    public static DeclareClass toPropertiesMap(TypeElement rootElement, ClassnameManager classnameManager) {
         Map<String, IgnoredModel> ignoringMap = parseMappingIgnoring(rootElement);
         Map<String, DeclareGeneric> thisGenericMap = Generic2.from(rootElement);
         DeclareClass declared = new DeclareClass(rootElement, classnameManager);
         parseRootPropertiesMap(declared, thisGenericMap, ignoringMap);
         parseSuperPropertiesMap(thisGenericMap, ignoringMap, new HashSet<>(), declared, rootElement, rootElement);
-        definition.onCompleted();
+        declared.onCompleted();
         return declared;
     }
 
@@ -148,7 +165,7 @@ public enum ProcessClass2 {
         public String getTargetCls() { return targetCls; }
     }
 
-    private static <T> String getTargetCls(T t, Function<T, Class<?>> classGetter){
+    private static <T> String getTargetCls(T t, Function<T, Class<?>> classGetter) {
         String targetCls = Element2.getClassname(t, classGetter);
         return Test2.isBasicType(targetCls) ? "void" : targetCls;
     }
@@ -160,7 +177,7 @@ public enum ProcessClass2 {
      *
      * @return
      */
-    static Map<String, IgnoredModel> parseMappingIgnoring(TypeElement rootElement) {
+    private static Map<String, IgnoredModel> parseMappingIgnoring(TypeElement rootElement) {
         Map<String, IgnoredModel> ignoringMap = new HashMap<>(8);
         MapperIgnoreFields[] ignoringAll = rootElement.getAnnotationsByType(MapperIgnoreFields.class);
         if (ignoringAll != null) {

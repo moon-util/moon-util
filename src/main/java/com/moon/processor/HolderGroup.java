@@ -9,9 +9,7 @@ public class HolderGroup {
 
     private final Holder[] holders;
 
-    HolderGroup(Holder[] holders) {
-        this.holders = holders == null ? EMPTY : holders;
-    }
+    HolderGroup(Holder[] holders) { this.holders = holders == null ? EMPTY : holders; }
 
     public String on(String template, String... vars) {
         for (int i = 0; i < holders.length; i++) {

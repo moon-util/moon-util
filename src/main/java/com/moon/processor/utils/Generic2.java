@@ -162,9 +162,7 @@ public enum Generic2 {
         return str.substring(str.indexOf('<'), str.lastIndexOf('>') + 1);
     }
 
-    private static String unBracketAngle(String str) {
-        return str.substring(1, str.length() - 1);
-    }
+    private static String unBracketAngle(String str) { return str.substring(1, str.length() - 1); }
 
     private static boolean isLeft(int ch) { return ch == '<'; }
 

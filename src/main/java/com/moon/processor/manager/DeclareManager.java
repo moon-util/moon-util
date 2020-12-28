@@ -4,6 +4,7 @@ import com.moon.processor.model.DeclareClass;
 import com.moon.processor.model.DeclareGeneric;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Generic2;
+import com.moon.processor.utils.ProcessClass2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
@@ -24,16 +25,9 @@ public class DeclareManager {
         String classname = Element2.getQualifiedName(element);
         DeclareClass declared = typeDeclareMap.get(classname);
         if (declared == null) {
-            declared = parseDeclareClass(element, classnameManager);
+            declared = ProcessClass2.toPropertiesMap(element, classnameManager);
             typeDeclareMap.put(classname, declared);
         }
-        return declared;
-    }
-
-    private static DeclareClass parseDeclareClass(TypeElement elem, ClassnameManager classnameManager) {
-        Map<String, DeclareGeneric> genericMap = Generic2.from(elem);
-        DeclareClass declared = new DeclareClass(elem, classnameManager);
-
         return declared;
     }
 }

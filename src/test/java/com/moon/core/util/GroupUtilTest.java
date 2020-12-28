@@ -10,9 +10,8 @@ import java.util.List;
  */
 public class GroupUtilTest {
 
-    public static class Employee implements Groupable<String>{
+    public static class Employee{
 
-        @Override
         public String group() {
             return null;
         }
@@ -24,6 +23,6 @@ public class GroupUtilTest {
     @Test
     void testSimplifyGroup() throws Exception {
         List<Employee> list = new ArrayList<>();
-        GroupUtil.simplifyGroup(list, Groupable::group);
+        GroupUtil.simplifyGroup(list, Employee::group);
     }
 }

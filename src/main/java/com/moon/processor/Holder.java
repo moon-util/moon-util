@@ -12,9 +12,9 @@ public enum Holder {
     var,
     name,
     type,
-    STATIC("static"),
+    static_("static"),
     params,
-    RETURN("return"),
+    return_("return"),
     ;
 
     private final String search;
