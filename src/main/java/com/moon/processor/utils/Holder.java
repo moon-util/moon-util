@@ -1,6 +1,4 @@
-package com.moon.processor;
-
-import com.moon.processor.utils.String2;
+package com.moon.processor.utils;
 
 /**
  * @author benshaoye

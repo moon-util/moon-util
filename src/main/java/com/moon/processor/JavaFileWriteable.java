@@ -12,9 +12,9 @@ public interface JavaFileWriteable {
     /**
      * 生成 java 文件
      *
-     * @param filer filer
+     * @param writer writer
      *
      * @throws IOException {@link Filer#createSourceFile(CharSequence, Element...)}
      */
-    void writeJavaFile(Filer filer) throws IOException;
+    void writeJavaFile(JavaWriter writer) throws IOException;
 }

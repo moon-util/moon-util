@@ -1,17 +1,13 @@
 package com.moon.processor.model;
 
-import com.moon.processor.Holder;
-import com.moon.processor.HolderGroup;
-import com.moon.processor.Importer;
+import com.moon.processor.manager.Importer;
 import com.moon.processor.JavaFileWriteable;
+import com.moon.processor.JavaWriter;
 import com.moon.processor.utils.Collect2;
+import com.moon.processor.utils.Holder;
+import com.moon.processor.utils.HolderGroup;
 import com.moon.processor.utils.String2;
 
-import javax.annotation.processing.Filer;
-import javax.tools.JavaFileObject;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.*;
 
 import static com.moon.processor.utils.String2.newLine;
@@ -19,7 +15,7 @@ import static com.moon.processor.utils.String2.newLine;
 /**
  * @author benshaoye
  */
-public class DefClassWriter implements JavaFileWriteable {
+public class DefJavaFiler implements JavaFileWriteable {
 
     private final Importer importer;
     private final Set<String> interfaces;
@@ -31,12 +27,20 @@ public class DefClassWriter implements JavaFileWriteable {
 
     private final Map<String, DefMethod> methodsDecl = new LinkedHashMap<>();
 
-    public DefClassWriter(Type type, String pkg, String classname) {
+    private DefJavaFiler(Type type, String pkg, String classname) {
         this.interfaces = new LinkedHashSet<>();
         this.importer = new Importer();
         this.classname = classname;
         this.type = type;
         this.pkg = pkg;
+    }
+
+    public static DefJavaFiler enumOf(String pkg, String classname) {
+        return new DefJavaFiler(Type.ENUM, pkg, classname);
+    }
+
+    public static DefJavaFiler classOf(String pkg, String classname) {
+        return new DefJavaFiler(Type.CLASS, pkg, classname);
     }
 
     public enum Type {
@@ -66,21 +70,21 @@ public class DefClassWriter implements JavaFileWriteable {
 
     public Map<String, DefMethod> getMethodsDecl() { return methodsDecl; }
 
-    public DefClassWriter enumsOf(String... names) {
+    public DefJavaFiler enumsOf(String... names) {
         if (type == Type.ENUM) {
             this.enums = names;
         }
         return this;
     }
 
-    public DefClassWriter extend(String superclass) {
+    public DefJavaFiler extend(String superclass) {
         if (type == Type.CLASS) {
             this.superclass = onImported(superclass);
         }
         return this;
     }
 
-    public DefClassWriter implement(String... interfaces) {
+    public DefJavaFiler implement(String... interfaces) {
         if (interfaces != null) {
             Arrays.stream(interfaces).forEach(it -> this.interfaces.add(onImported(it)));
         }
@@ -101,10 +105,10 @@ public class DefClassWriter implements JavaFileWriteable {
 
         methodDecl = Holder.of(Holder.name, Holder.params).on(methodDecl, name, params);
 
-        String staticStr = isStatic ? "static" : "";
+        String staticStr = isStatic ? "static " : "";
         String returned = importer.onImported(returnClass);
-        declare = Holder.of(Holder.static_, Holder.return_, Holder.name, Holder.params)
-            .on(declare, staticStr, returned, name, params);
+        HolderGroup group = Holder.of(Holder.static_, Holder.return_, Holder.name, Holder.params);
+        declare = group.on(declare, staticStr, returned, name, params);
 
         DefMethod method = new DefMethod(declare, getImporter());
         methodsDecl.put(methodDecl, method);
@@ -165,10 +169,7 @@ public class DefClassWriter implements JavaFileWriteable {
     private String getFullClassname() { return String.format("%s.%s", getPkg(), getClassname()); }
 
     @Override
-    public void writeJavaFile(Filer filer) throws IOException {
-        JavaFileObject file = filer.createSourceFile(getFullClassname());
-        try (Writer jw = file.openWriter(); PrintWriter writer = new PrintWriter(jw)) {
-            writer.write(toString());
-        }
+    public void writeJavaFile(JavaWriter filer) {
+        filer.write(getFullClassname(), writer -> writer.write(toString()));
     }
 }

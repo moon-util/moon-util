@@ -2,6 +2,7 @@ package com.moon.processor.model;
 
 import com.moon.processor.Completable;
 import com.moon.processor.JavaFileWriteable;
+import com.moon.processor.JavaWriter;
 import com.moon.processor.manager.ClassnameManager;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Test2;
@@ -90,7 +91,7 @@ public class DeclareClass extends LinkedHashMap<String, DeclareProperty> impleme
     }
 
     @Override
-    public void writeJavaFile(Filer filer) {
+    public void writeJavaFile(JavaWriter filer) {
         if (isAbstract() && !written) {
             this.doWriteJavaFile(filer);
         }
@@ -98,7 +99,7 @@ public class DeclareClass extends LinkedHashMap<String, DeclareProperty> impleme
 
     private boolean written = false;
 
-    private void doWriteJavaFile(Filer filer) {
+    private void doWriteJavaFile(JavaWriter filer) {
 
         // TODO write implementation java file
         written = true;

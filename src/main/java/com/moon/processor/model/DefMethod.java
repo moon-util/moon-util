@@ -1,7 +1,7 @@
 package com.moon.processor.model;
 
-import com.moon.processor.Holder;
-import com.moon.processor.Importer;
+import com.moon.processor.utils.Holder;
+import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.Imported;
 import com.moon.processor.utils.String2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +30,17 @@ public class DefMethod extends ArrayList<String> {
 
     public boolean isOverride() { return override; }
 
-    public void setOverride(boolean override) { this.override = override; }
+    public DefMethod override(boolean override) {
+        this.override = override;
+        return this;
+    }
 
     public boolean isAutowired() { return autowired; }
 
-    public void setAutowired(boolean autowired) { this.autowired = autowired; }
+    public DefMethod setAutowired(boolean autowired) {
+        this.autowired = autowired;
+        return this;
+    }
 
     public Importer getImporter() { return importer; }
 
@@ -42,11 +48,17 @@ public class DefMethod extends ArrayList<String> {
 
     public boolean isAutowiredRequired() { return autowiredRequired; }
 
-    public void setAutowiredRequired(boolean autowiredRequired) { this.autowiredRequired = autowiredRequired; }
+    public DefMethod setAutowiredRequired(boolean autowiredRequired) {
+        this.autowiredRequired = autowiredRequired;
+        return this;
+    }
 
     public String getQualifierName() { return qualifierName; }
 
-    public void setQualifierName(String qualifierName) { this.qualifierName = qualifierName; }
+    public DefMethod setQualifierName(String qualifierName) {
+        this.qualifierName = qualifierName;
+        return this;
+    }
 
     public void returning(String script) {
         this.add(Holder.var.on("return {var};", script));
