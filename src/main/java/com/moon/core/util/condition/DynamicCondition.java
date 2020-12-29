@@ -2,6 +2,9 @@ package com.moon.core.util.condition;
 
 import java.util.function.BooleanSupplier;
 
+import static com.moon.core.util.condition.DynamicCondition.BooleanStrategy.FALSE;
+import static com.moon.core.util.condition.DynamicCondition.BooleanStrategy.TRUE;
+
 /**
  * @author benshaoye
  */
@@ -10,7 +13,7 @@ public final class DynamicCondition implements Conditional {
     private final BooleanSupplier dynamicCondition;
 
     public DynamicCondition(boolean matched) {
-        this(matched ? BooleanStrategy.TRUE : BooleanStrategy.FALSE);
+        this(matched ? TRUE : FALSE);
     }
 
     public DynamicCondition(BooleanSupplier dynamicCondition) {

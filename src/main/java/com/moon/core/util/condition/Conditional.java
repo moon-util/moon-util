@@ -6,12 +6,23 @@ import com.moon.core.util.function.ThrowingSupplier;
 import java.util.function.BooleanSupplier;
 
 /**
- * 条件执行
+ * 条件执行，实际开发和生产中可能有一些场景需要条件执行，比如：
+ *
+ * <pre>
+ * if (开发环境) {
+ *     // do something
+ * } else if (生产环境) {
+ *     // do something
+ * }
+ * </pre>
+ * <p>
+ * 虽然{@code Spring}提供了条件加载，但能满足的场景也有些，且
+ * 一旦条件多了，多个场景都写多个 bean 也比较麻烦；这提供另一种方式
  *
  * @author moonsky
  */
 @FunctionalInterface
-public interface Conditional extends BooleanSupplier {
+public interface Conditional {
 
     /**
      * 返回固定条件执行器
@@ -62,14 +73,6 @@ public interface Conditional extends BooleanSupplier {
      * @return
      */
     default boolean isFalseAnd(boolean expected) { return expected && isFalse(); }
-
-    /**
-     * 返回是否符合条件
-     *
-     * @return true: 符合条件
-     */
-    @Override
-    default boolean getAsBoolean() { return isTrue(); }
 
     /**
      * 执行
@@ -190,4 +193,11 @@ public interface Conditional extends BooleanSupplier {
     default <T> T defaultIfTrue(T falseValue, T defaultForTrueValue) {
         return isFalse() ? falseValue : defaultForTrueValue;
     }
+
+    /**
+     * 转换为 BooleanSupplier
+     *
+     * @return BooleanSupplier#getAsBoolean()
+     */
+    default BooleanSupplier asBooleanSupplier() { return this::isTrue; }
 }
