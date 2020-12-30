@@ -1,22 +1,24 @@
 package com.moon.processor.utils;
 
 import com.moon.mapper.annotation.IgnoreMode;
+import com.moon.mapper.annotation.MapperFor;
 import com.moon.mapper.annotation.MapperIgnoreFields;
 import com.moon.mapper.annotation.Mapping;
-import com.moon.processor.manager.ClassnameManager;
-import com.moon.processor.model.DeclareClass;
+import com.moon.processor.manager.NameManager;
+import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.model.DeclareGeneric;
 import com.moon.processor.model.DeclareMapping;
 import com.moon.processor.model.DeclareProperty;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author benshaoye
@@ -24,6 +26,8 @@ import java.util.function.Function;
 public enum ProcessClass2 {
     ;
 
+    private final static String MAPPING_FOR_CLASSNAME = MapperFor.class.getCanonicalName();
+    private final static String CLASS_SUFFIX = ".class";
     private final static String TOP_CLASS = Object.class.getName();
 
     private static void handleMapping(
@@ -56,7 +60,7 @@ public enum ProcessClass2 {
     }
 
     private static DeclareProperty declareProperty(
-        DeclareClass declared, String name, TypeElement parsingElement, TypeElement thisElement
+        DeclaredPojo declared, String name, TypeElement parsingElement, TypeElement thisElement
     ) {
         DeclareProperty detail = declared.get(name);
         if (detail == null) {
@@ -68,7 +72,7 @@ public enum ProcessClass2 {
 
     private static void handleEnclosedElem(
         Set<String> presentKeys,
-        DeclareClass declared,
+        DeclaredPojo declared,
         Element element,
         Map<String, DeclareGeneric> genericMap,
         Map<String, IgnoredModel> ignoring,
@@ -81,8 +85,8 @@ public enum ProcessClass2 {
                 return;
             }
             DeclareProperty prop = declareProperty(declared, name, parsingElement, thisElement);
+            handleMapping(ignoring.get(name), element, prop::addFieldMapping);
             prop.setField((VariableElement) element, genericMap);
-            handleMapping(ignoring.get(name), element, attr -> declared.addFieldAttr(name, attr));
         } else if (Test2.isSetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             String name = Element2.toPropertyName(elem);
@@ -90,7 +94,7 @@ public enum ProcessClass2 {
                 return;
             }
             DeclareProperty prop = declareProperty(declared, name, parsingElement, thisElement);
-            handleMapping(ignoring.get(name), element, attr -> declared.addSetterAttr(name, attr));
+            handleMapping(ignoring.get(name), element, prop::addSetterMapping);
             prop.setSetter(elem, genericMap);
         } else if (Test2.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
@@ -99,7 +103,7 @@ public enum ProcessClass2 {
                 return;
             }
             DeclareProperty prop = declareProperty(declared, name, parsingElement, thisElement);
-            handleMapping(ignoring.get(name), element, attr -> declared.addGetterAttr(name, attr));
+            handleMapping(ignoring.get(name), element, prop::addGetterMapping);
             prop.setGetter(elem, genericMap);
         } else if (Test2.isConstructor(element)) {
             // definition.addConstructor((ExecutableElement) element);
@@ -107,7 +111,7 @@ public enum ProcessClass2 {
     }
 
     private static void parseRootPropertiesMap(
-        DeclareClass declared, Map<String, DeclareGeneric> thisGenericMap, Map<String, IgnoredModel> ignoring
+        DeclaredPojo declared, Map<String, DeclareGeneric> thisGenericMap, Map<String, IgnoredModel> ignoring
     ) {
         TypeElement rootElement = declared.getDeclareElement();
         List<? extends Element> elements = rootElement.getEnclosedElements();
@@ -122,7 +126,7 @@ public enum ProcessClass2 {
         Map<String, DeclareGeneric> thisGenericMap,
         Map<String, IgnoredModel> ignoring,
         Set<String> presentKeys,
-        DeclareClass declared,
+        DeclaredPojo declared,
         TypeElement thisElement,
         TypeElement rootElement
     ) {
@@ -140,10 +144,10 @@ public enum ProcessClass2 {
         parseSuperPropertiesMap(thisGenericMap, ignoring, presentKeys, declared, superElement, rootElement);
     }
 
-    public static DeclareClass toPropertiesMap(TypeElement rootElement, ClassnameManager classnameManager) {
+    public static DeclaredPojo toPropertiesMap(TypeElement rootElement, NameManager nameManager) {
         Map<String, IgnoredModel> ignoringMap = parseMappingIgnoring(rootElement);
         Map<String, DeclareGeneric> thisGenericMap = Generic2.from(rootElement);
-        DeclareClass declared = new DeclareClass(rootElement, classnameManager);
+        DeclaredPojo declared = new DeclaredPojo(rootElement, nameManager);
         parseRootPropertiesMap(declared, thisGenericMap, ignoringMap);
         parseSuperPropertiesMap(thisGenericMap, ignoringMap, new HashSet<>(), declared, rootElement, rootElement);
         declared.onCompleted();
@@ -159,10 +163,6 @@ public enum ProcessClass2 {
             this.targetCls = targetCls;
             this.mode = mode;
         }
-
-        public IgnoreMode getMode() { return mode; }
-
-        public String getTargetCls() { return targetCls; }
     }
 
     private static <T> String getTargetCls(T t, Function<T, Class<?>> classGetter) {
@@ -190,5 +190,28 @@ public enum ProcessClass2 {
             }
         }
         return ignoringMap;
+    }
+
+    public static Collection<TypeElement> getMapperForClasses(TypeElement element) {
+        Types types = Environment2.getTypes();
+        Elements elements = Environment2.getUtils();
+        TypeMirror supportedType = elements.getTypeElement(MAPPING_FOR_CLASSNAME).asType();
+        Collection<String> classes = new HashSet<>();
+        for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+            DeclaredType declaredType = mirror.getAnnotationType();
+            if (!types.isSameType(supportedType, declaredType)) {
+                continue;
+            }
+            for (AnnotationValue value : mirror.getElementValues().values()) {
+                String[] classnames = value.getValue().toString().split(",");
+                for (String classname : classnames) {
+                    if (classname.endsWith(CLASS_SUFFIX)) {
+                        classname = classname.substring(0, classname.length() - 6);
+                    }
+                    classes.add(classname);
+                }
+            }
+        }
+        return classes.stream().map(elements::getTypeElement).collect(Collectors.toList());
     }
 }

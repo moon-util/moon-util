@@ -10,6 +10,8 @@ public enum Holder {
     var,
     name,
     type,
+    field,
+    value,
     static_("static"),
     params,
     return_("return"),
@@ -17,9 +19,9 @@ public enum Holder {
 
     private final String search;
 
-    Holder() {this.search = name();}
+    Holder() { this.search = wrap(name()); }
 
-    Holder(String search) {this.search = search;}
+    Holder(String search) { this.search = wrap(search); }
 
     public String getSearch() { return search; }
 
@@ -28,4 +30,6 @@ public enum Holder {
     }
 
     public static HolderGroup of(Holder... holders) { return new HolderGroup(holders); }
+
+    private static String wrap(String string) { return "{" + string + "}"; }
 }

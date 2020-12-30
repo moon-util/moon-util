@@ -1,20 +1,20 @@
 package com.moon.processor.model;
 
-import com.moon.processor.utils.Holder;
 import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.Imported;
 import com.moon.processor.utils.String2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.moon.processor.utils.String2.newLine;
 
 /**
  * @author benshaoye
  */
-public class DefMethod extends ArrayList<String> {
+public class DefMethod extends LinkedHashMap<String, DefMapping> {
 
     private final String declare;
     private final Importer importer;
@@ -30,16 +30,28 @@ public class DefMethod extends ArrayList<String> {
 
     public boolean isOverride() { return override; }
 
+    public DefMethod override() { return override(true); }
+
     public DefMethod override(boolean override) {
+        setOverride(override);
+        return this;
+    }
+
+    public void setOverride(boolean override) {
         this.override = override;
+    }
+
+    public DefMethod autowired() { return autowired(true); }
+
+    public DefMethod autowired(boolean autowired) {
+        this.setAutowired(autowired);
         return this;
     }
 
     public boolean isAutowired() { return autowired; }
 
-    public DefMethod setAutowired(boolean autowired) {
+    public void setAutowired(boolean autowired) {
         this.autowired = autowired;
-        return this;
     }
 
     public Importer getImporter() { return importer; }
@@ -61,7 +73,7 @@ public class DefMethod extends ArrayList<String> {
     }
 
     public void returning(String script) {
-        this.add(Holder.var.on("return {var};", script));
+        this.put(null, DefMapping.returning(script));
     }
 
     public String toString(int indent) {
@@ -83,12 +95,28 @@ public class DefMethod extends ArrayList<String> {
             }
         }
         newLine(sb, space).append(declare).append(" {");
-        for (String script : this) {
-            newLine(sb, space).append(space).append(script);
+        // mappings
+        for (Map.Entry<String, DefMapping> mappingEntry : this.entrySet()) {
+            if (mappingEntry.getKey() == null) {
+                continue;
+            }
+            appendScript(sb, space, mappingEntry.getValue());
         }
-        return newLine(sb, space).toString();
+        // return
+        appendScript(sb, space, get(null));
+        return newLine(sb, space).append('}').toString();
     }
 
     @Override
     public String toString() { return toString(4); }
+
+    private static void appendScript(StringBuilder sb, String space, DefMapping mapping) {
+        String[] scripts = mapping.getScripts();
+        if (scripts == null) {
+            return;
+        }
+        for (String script : scripts) {
+            newLine(sb, space).append(space).append(script);
+        }
+    }
 }

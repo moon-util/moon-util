@@ -16,5 +16,5 @@ public interface JavaFileWriteable {
      *
      * @throws IOException {@link Filer#createSourceFile(CharSequence, Element...)}
      */
-    void writeJavaFile(JavaWriter writer) throws IOException;
+    void writeJavaFile(JavaWriter writer);
 }

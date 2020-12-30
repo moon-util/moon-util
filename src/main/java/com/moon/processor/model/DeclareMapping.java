@@ -42,6 +42,14 @@ public class DeclareMapping {
 
     public String getTargetCls() { return targetCls; }
 
+    public String getField() { return field; }
+
+    public IgnoreMode getIgnoreMode() { return ignoreMode; }
+
+    public String getFormat() { return format; }
+
+    public String getDefaultValue() { return defaultValue; }
+
     public String getField(String fromProperty) {
         return field == null ? fromProperty : field;
     }

@@ -1,12 +1,9 @@
 package com.moon.processor.model;
 
-import com.moon.processor.manager.Importer;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
-import com.moon.processor.utils.Collect2;
-import com.moon.processor.utils.Holder;
-import com.moon.processor.utils.HolderGroup;
-import com.moon.processor.utils.String2;
+import com.moon.processor.manager.Importer;
+import com.moon.processor.utils.*;
 
 import java.util.*;
 
@@ -21,8 +18,8 @@ public class DefJavaFiler implements JavaFileWriteable {
     private final Set<String> interfaces;
     private final Type type;
 
-    private final String pkg, classname;
-    private String[] enums;
+    private final String pkg, classname, simpleClassname;
+    private Set<String> enums = new LinkedHashSet<>();
     private String superclass;
 
     private final Map<String, DefMethod> methodsDecl = new LinkedHashMap<>();
@@ -30,6 +27,7 @@ public class DefJavaFiler implements JavaFileWriteable {
     private DefJavaFiler(Type type, String pkg, String classname) {
         this.interfaces = new LinkedHashSet<>();
         this.importer = new Importer();
+        this.simpleClassname = Element2.getSimpleName(classname);
         this.classname = classname;
         this.type = type;
         this.pkg = pkg;
@@ -62,17 +60,21 @@ public class DefJavaFiler implements JavaFileWriteable {
 
     public String getClassname() { return classname; }
 
+    public String getSimpleClassname() { return simpleClassname; }
+
     public String getSuperclass() { return superclass; }
 
     public Type getType() { return type; }
 
-    public String[] getEnums() { return enums; }
+    public Set<String> getEnums() { return enums; }
 
     public Map<String, DefMethod> getMethodsDecl() { return methodsDecl; }
 
     public DefJavaFiler enumsOf(String... names) {
-        if (type == Type.ENUM) {
-            this.enums = names;
+        if (enums != null) {
+            for (String name : names) {
+                this.enums.add(name);
+            }
         }
         return this;
     }
@@ -137,7 +139,7 @@ public class DefJavaFiler implements JavaFileWriteable {
     private String getClassDeclareScript() {
         final StringBuilder sb = new StringBuilder();
         sb.append("public ").append(getType().name().toLowerCase());
-        sb.append(' ').append(getClassname());
+        sb.append(' ').append(getSimpleClassname());
         String superclass = getSuperclass();
         if (String2.isNotEmpty(superclass)) {
             sb.append(" extends ").append(superclass).append(' ');
@@ -154,13 +156,19 @@ public class DefJavaFiler implements JavaFileWriteable {
         newLine(sb.append("package ").append(getPkg()).append(';'));
         newLine(newLine(sb).append(getImporter().toString("\n")));
         newLine(sb).append(getClassDeclareScript()).append(" {");
+        String indented = String2.indent(4);
         if (getType() == Type.ENUM) {
-            newLine(sb, String2.indent(4));
-            String[] enums = getEnums();
-            if (enums != null && enums.length > 1) {
-                sb.append(String.join(", ", enums));
+            newLine(sb, indented);
+            if (Collect2.isNotEmpty(getEnums())) {
+                sb.append(String.join(", ", getEnums()));
             }
             sb.append(';');
+        } else if (Collect2.isNotEmpty(getEnums())) {
+            String template = "private final static {type} {name} = new {type}();";
+            template = Holder.type.on(template, getSimpleClassname());
+            for (String anEnum : getEnums()) {
+                newLine(sb, indented).append(Holder.name.on(template, anEnum));
+            }
         }
         getMethodsDecl().forEach((key, method) -> newLine(sb).append(method.toString()));
         return newLine(sb).append("}").toString();

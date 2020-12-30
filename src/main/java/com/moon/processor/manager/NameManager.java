@@ -12,11 +12,11 @@ import java.util.Map;
  *
  * @author benshaoye
  */
-public class ClassnameManager {
+public class NameManager {
 
     private final Map<String, String> registeredClasses = new HashMap<>();
 
-    public ClassnameManager() { }
+    public NameManager() { }
 
     /**
      * 获取接口/抽象类实现类类名
@@ -60,7 +60,7 @@ public class ClassnameManager {
         String packageName = Element2.getPackageName(thisClass);
         String thisSimple = Element2.getSimpleName(thisName);
         String thatSimple = Element2.getSimpleName(thatClass);
-        mapperName = String.format("%s.Default%sTo%sMapper", packageName, thisSimple, thatSimple);
+        mapperName = String.format("%s.%sTo%sMapper", packageName, thisSimple, thatSimple);
         return ensureOnly(key, mapperName);
     }
 

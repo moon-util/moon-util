@@ -79,4 +79,36 @@ public enum String2 {
         sb.append(input, idx, input.length());
         return sb.toString();
     }
+
+    private final static HolderGroup GROUP = Holder.of(Holder.type, Holder.name, Holder.field);
+
+    public static String toConstField(String type, String name, String value) {
+        // 这里实际应该是 {value}，为了重用 GROUP，就写成了 {field}
+        String template = "private final static {type} {name} = {field};";
+        return GROUP.on(template, type, name, value);
+    }
+
+    public static String toDeclareField(String field, String type) {
+        String template = "private {type} {field};";
+        return GROUP.on(template, type, "", field);
+    }
+
+    public static String toGetterMethod(String field, String type) {
+        String prefix = "boolean".equals(type) ? Const2.IS : Const2.GET;
+        return toGetterMethod(prefix + capitalize(field), field, type);
+    }
+
+    public static String toGetterMethod(String getterName, String field, String type) {
+        String template = "public {type} {name}() { return this.{field}; }";
+        return GROUP.on(template, type, getterName, field);
+    }
+
+    public static String toSetterMethod(String field, String type) {
+        return toSetterMethod(Const2.SET + capitalize(field), field, type);
+    }
+
+    public static String toSetterMethod(String setterName, String field, String type) {
+        String template = "public void {name}({type} {field}) { this.{field} = {field}; }";
+        return GROUP.on(template, type, setterName, field);
+    }
 }

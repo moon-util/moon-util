@@ -3,10 +3,7 @@ package com.moon.mapper.annotation;
 import com.moon.mapper.BeanConverter;
 import com.moon.mapper.MapperUtil;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 注册映射器
@@ -43,6 +40,7 @@ import java.lang.annotation.Target;
  *
  * @author moonsky
  */
+@Repeatable(MapperFor.List.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MapperFor {
@@ -65,4 +63,54 @@ public @interface MapperFor {
      * @see BeanConverter
      */
     boolean converter() default true;
+
+    /**
+     * Mapper 实现类命名模式，有四个占位符：
+     * <p>
+     * 1. {thisName}: 注解{@link MapperFor}的类名，如下面的: UserDetailDO
+     * <p>
+     * 2. {thatName}: {@link MapperFor#value()}的类名，如: NameGetter
+     * <p>
+     * 3. {thisImpl}: 注解{@link MapperFor}的类如果是接口就是接口实现的类名，
+     * <p>
+     * 4. {thatImpl}: {@link MapperFor#value()}中的类是接口就是其实现的类型，如: UserVO/NameGetterImpl
+     * <p>
+     * <strong>示例:</strong>
+     * <pre>
+     * public interface NameGetter {
+     *     String getName();
+     * }
+     *
+     * // 多个包存在命名冲突时可分开写，然后定义不同的 namePattern，否则会命名冲突
+     * &#64;MapperFor({com.pkg1.UserVO.class, NameGetter.class})
+     * &#64;MapperFor(
+     *     value = {com.pkg2.UserVO.class},
+     *     namePattern = "{thisImpl}To{thatImpl}2Mapper"
+     * )
+     * public class UserDetailDO {
+     *
+     *     private String name;
+     *
+     *     // other fields and methods
+     * }
+     *
+     * e.g.
+     *
+     * {thisName}To{thatName}Mapper = UserDetailDOToUserVOMapper
+     * {thisName}To{thatName}2Mapper = UserDetailDOToUserVO2Mapper
+     * {thisName}To{thatName}Mapper = UserDetailDOToNameGetterMapper
+     * {thisImpl}To{thatImpl}Mapper = UserDetailDOToUserVOMapper
+     * {thisImpl}To{thatImpl}Mapper = UserDetailDOToNameGetterImplMapper
+     * </pre>
+     *
+     * @return 生成类名的规则
+     */
+    String namePattern() default "{thisName}To{thatName}Mapper";
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface List {
+
+        MapperFor[] value();
+    }
 }

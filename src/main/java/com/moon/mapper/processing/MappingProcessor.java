@@ -16,7 +16,7 @@ import static com.moon.mapper.processing.ProcessUtils.toPropertiesMap;
 /**
  * @author moonsky
  */
-@AutoService(Processor.class)
+// @AutoService(Processor.class)
 public class MappingProcessor extends AbstractProcessor {
 
     private final static String SUPPORTED_TYPE = MapperFor.class.getName();

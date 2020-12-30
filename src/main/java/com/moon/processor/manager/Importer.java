@@ -69,10 +69,11 @@ public class Importer {
         return result.toString();
     }
 
-    private String doImported(String classname) {
-        if (StringUtil.isBlank(classname)) {
+    private String doImported(String fullName) {
+        if (StringUtil.isBlank(fullName)) {
             return EMPTY;
         }
+        String classname = fullName.trim();
         String shortName = shortNameCached.get(classname);
         if (shortName != null) {
             return shortName;

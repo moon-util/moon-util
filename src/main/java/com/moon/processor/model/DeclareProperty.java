@@ -8,10 +8,7 @@ import com.moon.processor.utils.Test2;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author benshaoye
@@ -55,7 +52,18 @@ public class DeclareProperty implements Completable {
     private final List<DeclareMethod> getters = new ArrayList<>();
     private final List<DeclareMethod> setters = new ArrayList<>();
 
+    private final Map<String, DeclareMapping> fieldMappings = new HashMap<>();
+    private final Map<String, DeclareMapping> setterMappings = new HashMap<>();
+    private final Map<String, DeclareMapping> getterMappings = new HashMap<>();
+
+    /**
+     * targetClass : propertyType : methodName
+     */
     private final Map<String, Map<String, String>> injectorsMap = new HashMap<>();
+
+    /**
+     * targetClass : propertyType : methodName
+     */
     private final Map<String, Map<String, String>> providersMap = new HashMap<>();
 
     public DeclareProperty(String name, TypeElement enclosingElement, TypeElement thisElement) {
@@ -94,6 +102,12 @@ public class DeclareProperty implements Completable {
 
     public List<DeclareMethod> getSetters() { return setters; }
 
+    public Map<String, DeclareMapping> getFieldMappings() { return fieldMappings; }
+
+    public Map<String, DeclareMapping> getGetterMappings() { return getterMappings; }
+
+    public Map<String, DeclareMapping> getSetterMappings() { return setterMappings; }
+
     public Map<String, Map<String, String>> getInjectorsMap() { return injectorsMap; }
 
     public Map<String, Map<String, String>> getProvidersMap() { return providersMap; }
@@ -106,12 +120,45 @@ public class DeclareProperty implements Completable {
         putConverter(getInjectorsMap(), toType, providedType, providerMethodName);
     }
 
+    public DeclareMapping getForwardMapping(String targetClass) {
+        return getMapping(getGetterMappings(), getFieldMappings(), targetClass);
+    }
+
+    public DeclareMapping getBackwardMapping(String targetClass) {
+        return getMapping(getSetterMappings(), getFieldMappings(), targetClass);
+    }
+
+    private static DeclareMapping getMapping(
+        Map<String, DeclareMapping> atMethod, Map<String, DeclareMapping> atField, String targetClass
+    ) {
+        DeclareMapping mapping = atMethod.get(targetClass);
+        return mapping == null ? atField.getOrDefault(targetClass, DeclareMapping.DFT) : mapping;
+    }
+
+    public void addFieldMapping(DeclareMapping mapping) { putMapping(getFieldMappings(), mapping); }
+
+    public void addSetterMapping(DeclareMapping mapping) { putMapping(getSetterMappings(), mapping); }
+
+    public void addGetterMapping(DeclareMapping mapping) { putMapping(getGetterMappings(), mapping); }
+
+    private static void putMapping(Map<String, DeclareMapping> mappings, DeclareMapping mapping) {
+        mappings.put(mapping.getTargetCls(), mapping);
+    }
+
     public String findInjector(String type, String propertyType) {
         return find(getProvidersMap(), type, propertyType);
     }
 
     public String findProvider(String type, String propertyType) {
         return find(getProvidersMap(), type, propertyType);
+    }
+
+    public Map<String, String> findInjectorsFor(String targetClass) {
+        return getInjectorsMap().getOrDefault(targetClass, Collections.emptyMap());
+    }
+
+    public Map<String, String> findProvidersFor(String targetClass) {
+        return getProvidersMap().getOrDefault(targetClass, Collections.emptyMap());
     }
 
     private static String find(Map<String, Map<String, String>> map, String type, String propertyType) {
