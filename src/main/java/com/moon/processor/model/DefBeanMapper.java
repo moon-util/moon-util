@@ -62,8 +62,9 @@ public class DefBeanMapper {
                 continue;
             }
             DeclareProperty that = thatPojo.get(mapping.getField(propertyEntry.getKey()));
-            DefMapping propMapping = DefMapping.forward(self, that, mapping);
-            forward.put(propertyEntry.getKey(), propMapping);
+            if (that != null) {
+                forward.forward(propertyEntry.getKey(), self, that, mapping);
+            }
         }
         return forward;
     }
@@ -79,8 +80,9 @@ public class DefBeanMapper {
                 continue;
             }
             DeclareProperty that = thatPojo.get(mapping.getField(propertyEntry.getKey()));
-            DefMapping propMapping = DefMapping.backward(self, that, mapping);
-            backward.put(propertyEntry.getKey(), propMapping);
+            if (that != null) {
+                backward.backward(propertyEntry.getKey(), self, that, mapping);
+            }
         }
         return backward;
     }

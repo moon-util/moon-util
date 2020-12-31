@@ -10,6 +10,10 @@ import java.util.List;
 public enum Collect2 {
     ;
 
+    public static int size(Collection<?> collect) {
+        return collect == null ? 0 : collect.size();
+    }
+
     public static <T> List<? extends T> emptyIfNull(List<? extends T> list) {
         return list == null ? Collections.emptyList() : list;
     }

@@ -10,6 +10,8 @@ public enum Holder {
     var,
     name,
     type,
+    type0,
+    type1,
     field,
     value,
     static_("static"),

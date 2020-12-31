@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.moon.processor.utils.Environment2.getTypes;
 import static javax.lang.model.element.ElementKind.*;
@@ -187,6 +188,64 @@ public enum Test2 {
         WITHER.with(BASIC_TYPES, String.class, StringBuilder.class, StringBuffer.class, CharSequence.class);
         WITHER.with(BASIC_TYPES, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class);
         WITHER.with(BASIC_TYPES, void.class, char.class, boolean.class, Character.class, Boolean.class, Number.class);
+    }
+
+    public static boolean isBasicValue(String type, String value) {
+        return isBasicNumberValue(type, value) || isBasicBooleanValue(type, value) || isBasicCharValue(type, value);
+    }
+
+    public static boolean isBasicCharValue(String type, String value) {
+        switch (type) {
+            case "char":
+            case "java.lang.Character":
+                return value.trim().length() == 1;
+            default:
+                return false;
+        }
+    }
+
+    public static boolean isBasicBooleanValue(String type, String value) {
+        switch (type) {
+            case "boolean":
+            case "java.lang.Boolean":
+                return isValid(value, Boolean::valueOf);
+            default:
+                return false;
+        }
+    }
+
+    public static boolean isBasicNumberValue(String type, String value) {
+        switch (type) {
+            case "byte":
+            case "java.lang.Byte":
+                return isValid(value, Byte::valueOf);
+            case "short":
+            case "java.lang.Short":
+                return isValid(value, Short::valueOf);
+            case "int":
+            case "java.lang.Integer":
+                return isValid(value, Integer::valueOf);
+            case "long":
+            case "java.lang.Long":
+                return isValid(value, Long::valueOf);
+            case "float":
+            case "java.lang.Float":
+                return isValid(value, Float::valueOf);
+            case "double":
+            case "java.lang.Double":
+                return isValid(value, Double::valueOf);
+            default:
+                return false;
+        }
+    }
+
+    public static boolean isValid(String value, Consumer<String> consumer) {
+        try {
+            consumer.accept(value);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     public static boolean isBasicType(Class<?> type) { return isBasicType(getName(type)); }

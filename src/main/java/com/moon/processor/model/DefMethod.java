@@ -1,5 +1,6 @@
 package com.moon.processor.model;
 
+import com.moon.processor.manager.ConstManager;
 import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.Imported;
 import com.moon.processor.utils.String2;
@@ -12,18 +13,24 @@ import java.util.Map;
 import static com.moon.processor.utils.String2.newLine;
 
 /**
+ * property name : property mapping
+ *
  * @author benshaoye
  */
-public class DefMethod extends LinkedHashMap<String, DefMapping> {
+public class DefMethod {
 
     private final String declare;
     private final Importer importer;
+    private final ConstManager constManager;
     private boolean override;
     private boolean autowired;
     private boolean autowiredRequired;
     private String qualifierName;
 
-    public DefMethod(String declare, Importer importer) {
+    private final LinkedHashMap<String, DefMapping> mappings = new LinkedHashMap<>();
+
+    public DefMethod(String declare, Importer importer, ConstManager constManager) {
+        this.constManager = constManager;
         this.declare = declare;
         this.importer = importer;
     }
@@ -37,9 +44,7 @@ public class DefMethod extends LinkedHashMap<String, DefMapping> {
         return this;
     }
 
-    public void setOverride(boolean override) {
-        this.override = override;
-    }
+    public void setOverride(boolean override) { this.override = override; }
 
     public DefMethod autowired() { return autowired(true); }
 
@@ -50,9 +55,7 @@ public class DefMethod extends LinkedHashMap<String, DefMapping> {
 
     public boolean isAutowired() { return autowired; }
 
-    public void setAutowired(boolean autowired) {
-        this.autowired = autowired;
-    }
+    public void setAutowired(boolean autowired) { this.autowired = autowired; }
 
     public Importer getImporter() { return importer; }
 
@@ -72,9 +75,23 @@ public class DefMethod extends LinkedHashMap<String, DefMapping> {
         return this;
     }
 
-    public void returning(String script) {
-        this.put(null, DefMapping.returning(script));
+    public DefMapping forward(
+        String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
+    ) {
+        DefMapping def = DefMapping.forward(thisProp, thatProp, mapping, constManager);
+        mappings.put(name, def);
+        return def;
     }
+
+    public DefMapping backward(
+        String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
+    ) {
+        DefMapping def = DefMapping.backward(thisProp, thatProp, mapping, constManager);
+        mappings.put(name, def);
+        return def;
+    }
+
+    public void returning(String script) { mappings.put(null, DefMapping.returning(script)); }
 
     public String toString(int indent) {
         String space = String2.indent(indent);
@@ -96,14 +113,15 @@ public class DefMethod extends LinkedHashMap<String, DefMapping> {
         }
         newLine(sb, space).append(declare).append(" {");
         // mappings
-        for (Map.Entry<String, DefMapping> mappingEntry : this.entrySet()) {
+        for (Map.Entry<String, DefMapping> mappingEntry : mappings.entrySet()) {
             if (mappingEntry.getKey() == null) {
+                // ignore return script
                 continue;
             }
             appendScript(sb, space, mappingEntry.getValue());
         }
-        // return
-        appendScript(sb, space, get(null));
+        // return script
+        appendScript(sb, space, mappings.get(null));
         return newLine(sb, space).append('}').toString();
     }
 

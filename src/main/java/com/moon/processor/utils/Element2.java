@@ -1,11 +1,9 @@
 package com.moon.processor.utils;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.QualifiedNameable;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -62,5 +60,36 @@ public enum Element2 {
         } catch (MirroredTypeException mirrored) {
             return mirrored.getTypeMirror().toString();
         }
+    }
+
+    public static Element findEnumAt(String classname, int index) {
+        TypeElement elem = Environment2.getUtils().getTypeElement(classname);
+        if (elem == null) {
+            return null;
+        }
+        int indexer = 0;
+        for (Element child : elem.getEnclosedElements()) {
+            if (child.getKind() == ElementKind.ENUM_CONSTANT) {
+                if (index == indexer) {
+                    return child;
+                } else {
+                    indexer++;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Element findEnumAs(String classname, String name) {
+        TypeElement elem = Environment2.getUtils().getTypeElement(classname);
+        if (elem == null) {
+            return null;
+        }
+        for (Element child : elem.getEnclosedElements()) {
+            if (child.getKind() == ElementKind.ENUM_CONSTANT && Objects.equals(getSimpleName(child), name)) {
+                return child;
+            }
+        }
+        return null;
     }
 }

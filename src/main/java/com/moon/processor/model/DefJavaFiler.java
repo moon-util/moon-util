@@ -2,6 +2,7 @@ package com.moon.processor.model;
 
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
+import com.moon.processor.manager.ConstManager;
 import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.*;
 
@@ -14,6 +15,7 @@ import static com.moon.processor.utils.String2.newLine;
  */
 public class DefJavaFiler implements JavaFileWriteable {
 
+    private final ConstManager constManager;
     private final Importer importer;
     private final Set<String> interfaces;
     private final Type type;
@@ -27,6 +29,7 @@ public class DefJavaFiler implements JavaFileWriteable {
     private DefJavaFiler(Type type, String pkg, String classname) {
         this.interfaces = new LinkedHashSet<>();
         this.importer = new Importer();
+        this.constManager = new ConstManager(importer);
         this.simpleClassname = Element2.getSimpleName(classname);
         this.classname = classname;
         this.type = type;
@@ -112,7 +115,7 @@ public class DefJavaFiler implements JavaFileWriteable {
         HolderGroup group = Holder.of(Holder.static_, Holder.return_, Holder.name, Holder.params);
         declare = group.on(declare, staticStr, returned, name, params);
 
-        DefMethod method = new DefMethod(declare, getImporter());
+        DefMethod method = new DefMethod(declare, getImporter(), constManager);
         methodsDecl.put(methodDecl, method);
         return method;
     }
@@ -157,6 +160,7 @@ public class DefJavaFiler implements JavaFileWriteable {
         newLine(newLine(sb).append(getImporter().toString("\n")));
         newLine(sb).append(getClassDeclareScript()).append(" {");
         String indented = String2.indent(4);
+        // enums
         if (getType() == Type.ENUM) {
             newLine(sb, indented);
             if (Collect2.isNotEmpty(getEnums())) {
@@ -168,6 +172,14 @@ public class DefJavaFiler implements JavaFileWriteable {
             template = Holder.type.on(template, getSimpleClassname());
             for (String anEnum : getEnums()) {
                 newLine(sb, indented).append(Holder.name.on(template, anEnum));
+            }
+        }
+        // final static vars
+        String[] scripts = constManager.getScripts();
+        if (scripts != null && scripts.length > 0) {
+            newLine(sb);
+            for (String script : scripts) {
+                newLine(sb, indented).append(script);
             }
         }
         getMethodsDecl().forEach((key, method) -> newLine(sb).append(method.toString()));

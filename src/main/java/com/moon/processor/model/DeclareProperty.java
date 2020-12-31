@@ -50,7 +50,7 @@ public class DeclareProperty implements Completable {
     private DeclareMethod setter;
 
     private final List<DeclareMethod> getters = new ArrayList<>();
-    private final List<DeclareMethod> setters = new ArrayList<>();
+    private final Map<String, DeclareMethod> setters = new HashMap<>();
 
     private final Map<String, DeclareMapping> fieldMappings = new HashMap<>();
     private final Map<String, DeclareMapping> setterMappings = new HashMap<>();
@@ -100,7 +100,7 @@ public class DeclareProperty implements Completable {
 
     public List<DeclareMethod> getGetters() { return getters; }
 
-    public List<DeclareMethod> getSetters() { return setters; }
+    public Map<String, DeclareMethod> getSetters() { return setters; }
 
     public Map<String, DeclareMapping> getFieldMappings() { return fieldMappings; }
 
@@ -145,13 +145,9 @@ public class DeclareProperty implements Completable {
         mappings.put(mapping.getTargetCls(), mapping);
     }
 
-    public String findInjector(String type, String propertyType) {
-        return find(getProvidersMap(), type, propertyType);
-    }
+    public String findInjector(String type, String propertyType) { return find(getProvidersMap(), type, propertyType); }
 
-    public String findProvider(String type, String propertyType) {
-        return find(getProvidersMap(), type, propertyType);
-    }
+    public String findProvider(String type, String propertyType) { return find(getProvidersMap(), type, propertyType); }
 
     public Map<String, String> findInjectorsFor(String targetClass) {
         return getInjectorsMap().getOrDefault(targetClass, Collections.emptyMap());
@@ -185,8 +181,8 @@ public class DeclareProperty implements Completable {
     }
 
     public void setSetter(ExecutableElement setter, Map<String, DeclareGeneric> genericMap) {
-        String declareType = Element2.getSetterDeclareType(setter);
-        setters.add(toMethod(declareType, setter, genericMap));
+        DeclareMethod method = toMethod(Element2.getSetterDeclareType(setter), setter, genericMap);
+        setters.put(method.getActualType(), method);
     }
 
     public void setGetter(ExecutableElement getter, Map<String, DeclareGeneric> genericMap) {
@@ -205,6 +201,49 @@ public class DeclareProperty implements Completable {
 
     @Override
     public void onCompleted() {
-        // TODO 将字段、getter、setter 对应
+        List<DeclareMethod> getters = getGetters();
+        Map<String, DeclareMethod> settersMap = getSetters();
+        if (!getters.isEmpty()) {
+            DeclareMethod getter = getters.get(0);
+            this.setGetter(getter);
+            DeclareMethod setter = settersMap.get(getter.getActualType());
+            if (setter != null) {
+                this.setSetter(setter);
+                return;
+            }
+        }
+        // if missing matches getter method
+        // 不同 jdk、JVM 对默认 setter 的处理方式不一样
+        // 故这里自定义了 setter 默认实现
+        this.setSetter(filterSetterMethod(settersMap));
+    }
+
+    private static DeclareMethod filterSetterMethod(Map<String, DeclareMethod> settersMap) {
+        if (settersMap.isEmpty()) {
+            return null;
+        }
+        DeclareMethod setter = findMethod(settersMap, "boolean,byte,short,char,int,long,float,double", false);
+        if (setter != null) {
+            return setter;
+        }
+        setter = findMethod(settersMap, "Boolean,Byte,Short,Character,Integer,Long,Float,Double", true);
+        if (setter != null) {
+            return setter;
+        }
+        return new TreeMap<>(settersMap).pollFirstEntry().getValue();
+    }
+
+    private static DeclareMethod findMethod(Map<String, DeclareMethod> settersMap, String classes, boolean lang) {
+        String[] types = classes.split(",");
+        if (lang) {
+            types = Arrays.stream(types).map(type -> "java.lang." + type).toArray(String[]::new);
+        }
+        for (String type : types) {
+            DeclareMethod setter = settersMap.remove(type);
+            if (type != null) {
+                return setter;
+            }
+        }
+        return null;
     }
 }
