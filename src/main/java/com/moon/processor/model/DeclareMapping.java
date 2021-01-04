@@ -54,6 +54,18 @@ public class DeclareMapping {
         return field == null ? fromProperty : field;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("DeclareMapping{");
+        sb.append("targetCls='").append(targetCls).append('\'');
+        sb.append(", field='").append(field).append('\'');
+        sb.append(", ignoreMode=").append(ignoreMode);
+        sb.append(", format='").append(format).append('\'');
+        sb.append(", defaultValue='").append(defaultValue).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
     private static class Dft extends DeclareMapping {
 
         public Dft() { super(null, null, null, null, IgnoreMode.NONE); }

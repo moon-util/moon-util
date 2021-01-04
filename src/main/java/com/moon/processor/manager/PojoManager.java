@@ -5,7 +5,7 @@ import com.moon.processor.JavaWriter;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.model.DefJavaFiler;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.ProcessClass2;
+import com.moon.processor.utils.Process2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class PojoManager implements JavaFileWriteable {
             synchronized (classMap) {
                 declared = classMap.get(classname);
                 if (declared == null) {
-                    declared = ProcessClass2.toPropertiesMap(typeElement, nameManager);
+                    declared = Process2.toPropertiesMap(typeElement, nameManager);
                     classMap.put(classname, declared);
                 }
             }

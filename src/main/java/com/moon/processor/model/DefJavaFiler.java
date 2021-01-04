@@ -21,7 +21,7 @@ public class DefJavaFiler implements JavaFileWriteable {
     private final Type type;
 
     private final String pkg, classname, simpleClassname;
-    private Set<String> enums = new LinkedHashSet<>();
+    private final Set<String> enums = new LinkedHashSet<>();
     private String superclass;
 
     private final Map<String, DefMethod> methodsDecl = new LinkedHashMap<>();
@@ -74,10 +74,8 @@ public class DefJavaFiler implements JavaFileWriteable {
     public Map<String, DefMethod> getMethodsDecl() { return methodsDecl; }
 
     public DefJavaFiler enumsOf(String... names) {
-        if (enums != null) {
-            for (String name : names) {
-                this.enums.add(name);
-            }
+        if (names != null) {
+            this.enums.addAll(Arrays.asList(names));
         }
         return this;
     }
@@ -186,7 +184,7 @@ public class DefJavaFiler implements JavaFileWriteable {
         return newLine(sb).append("}").toString();
     }
 
-    private String getFullClassname() { return String.format("%s.%s", getPkg(), getClassname()); }
+    private String getFullClassname() { return classname; }
 
     @Override
     public void writeJavaFile(JavaWriter filer) {

@@ -8,7 +8,7 @@ import com.moon.processor.manager.PojoManager;
 import com.moon.processor.manager.MapperManager;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Log2;
-import com.moon.processor.utils.ProcessClass2;
+import com.moon.processor.utils.Process2;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -66,7 +66,7 @@ public class CompileProcessor extends AbstractProcessor {
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(MapperFor.class);
         for (Element element : elements) {
             TypeElement typeElement = (TypeElement) element;
-            ProcessClass2.getMapperForClasses(typeElement).forEach(that -> {
+            Process2.getMapperForClasses(typeElement).forEach(that -> {
                 mapperManager.with(typeElement, that);
             });
         }

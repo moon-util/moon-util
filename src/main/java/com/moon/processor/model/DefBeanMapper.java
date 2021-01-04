@@ -1,12 +1,12 @@
 package com.moon.processor.model;
 
 import com.moon.mapper.BeanConverter;
-import com.moon.mapper.annotation.IgnoreMode;
 import com.moon.processor.manager.Importer;
 import com.moon.processor.manager.NameManager;
 import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Holder;
+import com.moon.processor.utils.Log2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashSet;
@@ -51,40 +51,32 @@ public class DefBeanMapper {
         return filer;
     }
 
-    private DefMethod unsafeForward(DefMethod forward) {
+    private DefMethod unsafeConvert(DefMethod method, ConvertType type) {
         DeclaredPojo thisPojo = getThisPojo();
         DeclaredPojo thatPojo = getThatPojo();
         String thatClassname = thatPojo.getThisClassname();
         for (Map.Entry<String, DeclareProperty> propertyEntry : thisPojo.entrySet()) {
             DeclareProperty self = propertyEntry.getValue();
-            DeclareMapping mapping = self.getForwardMapping(thatClassname);
-            if (mapping.isIgnoreForward()) {
+            DeclareMapping mapping = type.getMappingFor(self, thatClassname);
+            Log2.warning(propertyEntry.getKey() + "\t" + mapping.toString());
+            if (type.isIgnored(mapping)) {
                 continue;
             }
             DeclareProperty that = thatPojo.get(mapping.getField(propertyEntry.getKey()));
             if (that != null) {
-                forward.forward(propertyEntry.getKey(), self, that, mapping);
+                switch (type) {
+                    case FORWARD:
+                        method.forward(propertyEntry.getKey(), self, that, mapping);
+                        break;
+                    case BACKWARD:
+                        method.backward(propertyEntry.getKey(), self, that, mapping);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-        return forward;
-    }
-
-    private DefMethod unsafeBackward(DefMethod backward) {
-        DeclaredPojo thisPojo = getThisPojo();
-        DeclaredPojo thatPojo = getThatPojo();
-        String thatClassname = thatPojo.getThisClassname();
-        for (Map.Entry<String, DeclareProperty> propertyEntry : thisPojo.entrySet()) {
-            DeclareProperty self = propertyEntry.getValue();
-            DeclareMapping mapping = self.getBackwardMapping(thatClassname);
-            if (mapping.isIgnoreBackward()) {
-                continue;
-            }
-            DeclareProperty that = thatPojo.get(mapping.getField(propertyEntry.getKey()));
-            if (that != null) {
-                backward.backward(propertyEntry.getKey(), self, that, mapping);
-            }
-        }
-        return backward;
+        return method;
     }
 
     private void buildUnsafeConvertMethods(DefJavaFiler filer) {
@@ -94,11 +86,11 @@ public class DefBeanMapper {
 
         // forward
         DefMethod forward = filer.publicMethod("unsafeForward", thatName, parameters).override();
-        unsafeForward(forward).returning("that");
+        unsafeConvert(forward, ConvertType.FORWARD).returning("that");
 
         // backward
         DefMethod backward = filer.publicMethod("unsafeBackward", thisName, parameters).override();
-        unsafeBackward(backward).returning("self");
+        unsafeConvert(backward, ConvertType.BACKWARD).returning("self");
     }
 
     private void buildConvertMethods(DefJavaFiler filer) {

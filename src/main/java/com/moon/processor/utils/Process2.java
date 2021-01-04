@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * @author benshaoye
  */
-public enum ProcessClass2 {
+public enum Process2 {
     ;
 
     private final static String MAPPING_FOR_CLASSNAME = MapperFor.class.getCanonicalName();

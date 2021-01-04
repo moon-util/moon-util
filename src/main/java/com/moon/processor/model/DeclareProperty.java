@@ -112,6 +112,18 @@ public class DeclareProperty implements Completable {
 
     public Map<String, Map<String, String>> getProvidersMap() { return providersMap; }
 
+    public String getFinalActualType() {
+        DeclareMethod method = getGetter();
+        if (method != null) {
+            return method.getActualType();
+        }
+        method = getSetter();
+        if (method != null) {
+            return method.getActualType();
+        }
+        return null;
+    }
+
     public void addInjector(String fromType, String injectedType, String injectorMethodName) {
         putConverter(getInjectorsMap(), fromType, injectedType, injectorMethodName);
     }
@@ -193,29 +205,32 @@ public class DeclareProperty implements Completable {
     private DeclareMethod toMethod(String declareType, ExecutableElement method, Map<String, DeclareGeneric> generics) {
         TypeElement nameable = (TypeElement) method.getEnclosingElement();
         String declareClassname = Element2.getQualifiedName(nameable);
-        return new DeclareMethod(method,
-            declareType,
-            Generic2.findActual(generics, declareClassname, declareType),
+        return new DeclareMethod(method, declareType, Generic2.findActual(generics, declareClassname, declareType),
             true);
     }
 
     @Override
     public void onCompleted() {
+        DeclareMethod setter;
         List<DeclareMethod> getters = getGetters();
         Map<String, DeclareMethod> settersMap = getSetters();
         if (!getters.isEmpty()) {
             DeclareMethod getter = getters.get(0);
             this.setGetter(getter);
-            DeclareMethod setter = settersMap.get(getter.getActualType());
+            setter = settersMap.get(getter.getActualType());
             if (setter != null) {
                 this.setSetter(setter);
                 return;
             }
         }
-        // if missing matches getter method
-        // 不同 jdk、JVM 对默认 setter 的处理方式不一样
-        // 故这里自定义了 setter 默认实现
-        this.setSetter(filterSetterMethod(settersMap));
+        // if missing matches setter method
+        // 当 setter 重载时，不同 jdk 以及不同版本对默认处理方式不一样
+        // 故这里自定义了默认 setter 处理方式
+        setter = settersMap.get(getActualType());
+        if (setter == null) {
+            setter = filterSetterMethod(settersMap);
+        }
+        this.setSetter(setter);
     }
 
     private static DeclareMethod filterSetterMethod(Map<String, DeclareMethod> settersMap) {
@@ -230,7 +245,7 @@ public class DeclareProperty implements Completable {
         if (setter != null) {
             return setter;
         }
-        return new TreeMap<>(settersMap).pollFirstEntry().getValue();
+        return new TreeMap<>(settersMap).firstEntry().getValue();
     }
 
     private static DeclareMethod findMethod(Map<String, DeclareMethod> settersMap, String classes, boolean lang) {
@@ -239,7 +254,7 @@ public class DeclareProperty implements Completable {
             types = Arrays.stream(types).map(type -> "java.lang." + type).toArray(String[]::new);
         }
         for (String type : types) {
-            DeclareMethod setter = settersMap.remove(type);
+            DeclareMethod setter = settersMap.get(type);
             if (type != null) {
                 return setter;
             }

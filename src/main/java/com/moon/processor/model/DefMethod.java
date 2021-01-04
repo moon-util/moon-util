@@ -78,7 +78,7 @@ public class DefMethod {
     public DefMapping forward(
         String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
     ) {
-        DefMapping def = DefMapping.forward(thisProp, thatProp, mapping, constManager);
+        DefMapping def = DefMapping.forward(ConvertType.FORWARD, constManager, thisProp, thatProp, mapping);
         mappings.put(name, def);
         return def;
     }
@@ -86,7 +86,7 @@ public class DefMethod {
     public DefMapping backward(
         String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
     ) {
-        DefMapping def = DefMapping.backward(thisProp, thatProp, mapping, constManager);
+        DefMapping def = DefMapping.backward(ConvertType.BACKWARD, constManager, thisProp, thatProp, mapping);
         mappings.put(name, def);
         return def;
     }
@@ -129,6 +129,9 @@ public class DefMethod {
     public String toString() { return toString(4); }
 
     private static void appendScript(StringBuilder sb, String space, DefMapping mapping) {
+        if (mapping == null) {
+            return;
+        }
         String[] scripts = mapping.getScripts();
         if (scripts == null) {
             return;
