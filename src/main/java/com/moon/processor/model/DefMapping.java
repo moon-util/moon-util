@@ -94,7 +94,7 @@ public class DefMapping {
         Map<String, String> providers = from.findProvidersFor(toClass);
         Map<String, DeclareMethod> toSettersMethod = to.getSetters();
         String type = to.getFinalActualType();
-        // 首先根据指定类型值查找是否有对应 setter
+        // 首先根据指定类型值查找是否有对应 provider -> setter
         if (type != null) {
             DeclareMethod setter = toSettersMethod.get(type);
             String provideMethod = providers.get(type);
@@ -102,7 +102,7 @@ public class DefMapping {
                 return onSimpleMapping(getFromName(), provideMethod, getToName(), setter.getName());
             }
         }
-        // 然后根据遍历 setter，查找对应类型的转换器
+        // 然后根据己方 provider 遍历是否存在类型一致的 setter，查找对应类型的转换器
         for (Map.Entry<String, DeclareMethod> entry : toSettersMethod.entrySet()) {
             String provideMethod = providers.get(entry.getKey());
             if (provideMethod == null) {
@@ -113,8 +113,24 @@ public class DefMapping {
         // TODO 然后执行默认转换规则（这也是大多数情况）
 
         // 最后进行 getter/setter 相似类型匹配
-        DeclareMethod getter = from.getGetter();
+        return defaultMappingWithSetterMethod();
+    }
+
+    private String[] getBackwardScripts() {
+        DeclareProperty from = getFromProp(), to = getToProp();
+        String fromClass = Element2.getQualifiedName(from.getThisElement());
+        String toClass = Element2.getQualifiedName(to.getThisElement());
+        Map<String, String> injectors = to.findProvidersFor(fromClass);
+
+
+        // 最后进行 getter/setter 相似类型匹配
+        return defaultMappingWithSetterMethod();
+    }
+
+    private String[] defaultMappingWithSetterMethod(){
+        DeclareMethod getter = getFromProp().getGetter();
         if (getter != null) {
+            Map<String, DeclareMethod> toSettersMethod = getToProp().getSetters();
             String getterActualType = getter.getActualType();
             DeclareMethod setter = toSettersMethod.get(getterActualType);
             if (setter != null) {
@@ -144,15 +160,6 @@ public class DefMapping {
         HolderGroup group = Holder.of(Holder.fromName, Holder.getter, Holder.toName, Holder.setter);
         String script = group.on(t0, fromName, getter, toName, setter);
         return new String[]{script};
-    }
-
-    private String[] getBackwardScripts() {
-        DeclareProperty from = getFromProp(), to = getToProp();
-        String fromClass = Element2.getQualifiedName(from.getThisElement());
-        String toClass = Element2.getQualifiedName(to.getThisElement());
-        Map<String, String> injectors = to.findProvidersFor(fromClass);
-
-        return EMPTY;
     }
 
     private static final class Returning extends DefMapping {
