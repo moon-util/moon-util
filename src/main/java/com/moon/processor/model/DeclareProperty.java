@@ -133,6 +133,14 @@ public class DeclareProperty implements Completable {
         putConverter(getProvidersMap(), toType, providedType, providerMethodName);
     }
 
+    public DeclareMapping getForwardMapping(TypeElement targetClass) {
+        return getForwardMapping(Element2.getQualifiedName(targetClass));
+    }
+
+    public DeclareMapping getBackwardMapping(TypeElement targetClass) {
+        return getBackwardMapping(Element2.getQualifiedName(targetClass));
+    }
+
     public DeclareMapping getForwardMapping(String targetClass) {
         return getMapping(getGetterMappings(), getFieldMappings(), targetClass);
     }
@@ -181,8 +189,7 @@ public class DeclareProperty implements Completable {
     }
 
     private static String find(Map<String, Map<String, String>> map, String type, String propertyType) {
-        Map<String, String> maybePresentMap = convertersFor(map, type);
-        return maybePresentMap == null ? null : maybePresentMap.get(propertyType);
+        return convertersFor(map, type).get(propertyType);
     }
 
     private static Map<String, String> convertersFor(Map<String, Map<String, String>> map, String type) {

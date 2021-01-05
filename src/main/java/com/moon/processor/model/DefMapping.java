@@ -1,10 +1,7 @@
 package com.moon.processor.model;
 
 import com.moon.processor.manager.ConstManager;
-import com.moon.processor.utils.Holder;
-import com.moon.processor.utils.HolderGroup;
-import com.moon.processor.utils.Log2;
-import com.moon.processor.utils.Test2;
+import com.moon.processor.utils.*;
 
 import java.util.Map;
 
@@ -93,10 +90,20 @@ public class DefMapping {
             return scripts;
         }
 
-        // TODO 4. 注入方和输出方的格式化和默认值
+        DeclareMapping pMapping = from.getForwardMapping(to.getThisElement());
+        DeclareMapping iMapping = to.getBackwardMapping(from.getThisElement());
 
-        // 5. getter/setter 相似类型匹配
-        return defaultMappingWithSetterMethod();
+        // 4. getter/setter 相似类型匹配(要求 getter 类型是 setter 类型的子类)
+        MappingDetail detail = defaultMappingWithSetterMethod();
+        if (detail != null) {
+            // TODO 默认值
+
+            return detail.getScripts();
+        }
+
+        // TODO 5. 注入方和输出方的格式化、默认值和类型转换
+
+        return EMPTY;
     }
 
     private String[] mappingWithConverters(
@@ -132,21 +139,21 @@ public class DefMapping {
         return null;
     }
 
-    private String[] defaultMappingWithSetterMethod() {
+    private MappingDetail defaultMappingWithSetterMethod() {
         DeclareProperty from = getFromProp();
         DeclareMethod getter = from.getGetter();
         if (getter != null) {
             String getterActualType = getter.getActualType();
             return defaultMappingWithSetterMethod(getterActualType, getter.getName());
         }
-        return EMPTY;
+        return null;
     }
 
-    private String[] defaultMappingWithSetterMethod(String getterType, String getterName) {
+    private MappingDetail defaultMappingWithSetterMethod(String getterType, String getterName) {
         Map<String, DeclareMethod> toSettersMethod = getToProp().getSetters();
         DeclareMethod setter = toSettersMethod.get(getterType);
         if (setter != null) {
-            return onSimpleMapping(getterName, setter.getName());
+            return onMappingDetail(getterName, setter.getName(), getterType, setter.getActualType());
         }
         String setterType = null;
         DeclareMethod matchedSetter = null;
@@ -161,20 +168,62 @@ public class DefMapping {
             }
         }
         if (matchedSetter != null) {
-            return onSimpleMapping(getterName, matchedSetter.getName());
+            return onMappingDetail(getterName, matchedSetter.getName(), getterType, matchedSetter.getActualType());
         }
-        return EMPTY;
+        return null;
     }
 
     private String[] onSimpleMapping(String getterName, String setterName) {
         return onSimpleMapping(getFromName(), getterName, getToName(), setterName);
     }
 
-    private static String[] onSimpleMapping(String fromName, String getter, String toName, String setter) {
+    private static String[] onSimpleMapping(
+        String fromName, String getterName, String toName, String setterName
+    ) {
+        return new String[]{mappingAs(fromName, getterName, toName, setterName)};
+    }
+
+    private MappingDetail onMappingDetail(String getterName, String setterName, String getterType, String setterType) {
+        return onMappingDetail(getFromName(), getterName, getToName(), setterName, getterType, setterType);
+    }
+
+    private static MappingDetail onMappingDetail(
+        String fromName, String getterName, String toName, String setterName, String getterType, String setterType
+    ) {
+        return new MappingDetail(fromName, toName, getterName, setterName, getterType, setterType);
+    }
+
+    private final static HolderGroup GROUP = Holder.of(Holder.fromName, Holder.getter, Holder.toName, Holder.setter);
+
+    private static String mappingAs(String fromName, String getter, String toName, String setter) {
         String t0 = "{toName}.{setter}({fromName}.{getter}());";
-        HolderGroup group = Holder.of(Holder.fromName, Holder.getter, Holder.toName, Holder.setter);
-        String script = group.on(t0, fromName, getter, toName, setter);
-        return new String[]{script};
+        return GROUP.on(t0, fromName, getter, toName, setter);
+    }
+
+    private static class MappingDetail {
+
+        private final String fromName;
+        private final String toName;
+        private final String getterName;
+        private final String setterName;
+        private final String getterType;
+        private final String setterType;
+
+        private MappingDetail(
+            String fromName, String toName, String getterName, String setterName, String getterType, String setterType
+        ) {
+            this.fromName = fromName;
+            this.toName = toName;
+            this.getterName = getterName;
+            this.setterName = setterName;
+            this.getterType = getterType;
+            this.setterType = setterType;
+        }
+
+        public String[] getScripts() { return new String[]{toString()}; }
+
+        @Override
+        public String toString() { return mappingAs(fromName, getterName, toName, setterName); }
     }
 
     private static final class Returning extends DefMapping {
