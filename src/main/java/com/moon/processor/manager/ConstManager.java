@@ -24,9 +24,9 @@ public class ConstManager {
 
     public ConstManager(Importer importer) { this.importer = importer; }
 
-    private String onImported(String classname) { return importer.onImported(classname); }
+    public String onImported(String classname) { return importer.onImported(classname); }
 
-    private String onImported(Class<?> classname) { return importer.onImported(classname); }
+    public String onImported(Class<?> classname) { return importer.onImported(classname); }
 
     private String nextVar() { return "V" + indexer.getAndIncrement(); }
 
@@ -69,7 +69,7 @@ public class ConstManager {
                 String t0 = "{type} {var} = '{value}';";
                 return typeValue.on(t0, onImported(t), v.substring(0, 1));
             } else {
-                return ignored(t, v);
+                return null;
             }
         });
     }
@@ -133,7 +133,7 @@ public class ConstManager {
             return null;
         }
         return computeConst(DateTimeFormatter.class, pattern, (t, v) -> {
-            if (Test2.isValid(v, DateTimeFormatter::ofPattern)) {
+            if (Test2.isValidOnTrimmed(v, DateTimeFormatter::ofPattern)) {
                 String t0 = "{type} {var} = {type}.ofPattern(\"{value}\");";
                 return typeValue.on(t0, onImported(t), v);
             }
@@ -146,7 +146,7 @@ public class ConstManager {
             return null;
         }
         return computeConst(org.joda.time.format.DateTimeFormatter.class, pattern, (t, v) -> {
-            if (Test2.isValid(v, DateTimeFormatter::ofPattern)) {
+            if (Test2.isValidOnTrimmed(v, DateTimeFormatter::ofPattern)) {
                 String t0 = "{type} {var} = {type0}.ofPattern(\"{value}\");";
                 t0 = typeValue.on(t0, onImported(t), v);
                 return Holder.type0.on(t0, onImported(DateTimeFormat.class));
@@ -162,19 +162,19 @@ public class ConstManager {
         value = value.trim();
         char first = value.charAt(0);
         if (first > 47 && first < 58) {
-            return indexedEnumOf(type, value);
+            return enumAt(type, value);
         } else {
-            return namedEnumOf(type, value);
+            return enumAs(type, value);
         }
     }
 
-    public String indexedEnumOf(String type, String index) {
+    public String enumAt(String type, String index) {
         if (String2.isBlank(index)) {
             return null;
         }
         return computeConst(type, index.trim(), (t, v) -> {
-            if (Test2.isValid(v, Integer::valueOf)) {
-                int idx = Integer.valueOf(v);
+            if (Test2.isValidOnTrimmed(v, Integer::parseInt)) {
+                int idx = Integer.parseInt(v);
                 Element enumConst = Element2.findEnumAt(t, idx);
                 if (enumConst != null) {
                     String name = Element2.getSimpleName(enumConst);
@@ -182,24 +182,22 @@ public class ConstManager {
                     return typeValue.on(t0, onImported(t), name);
                 }
             }
-            return ignored(t, v);
+            return null;
         });
     }
 
-    public String namedEnumOf(String type, String name) {
+    public String enumAs(String type, String name) {
         if (String2.isBlank(name)) {
             return null;
         }
         return computeConst(type, name.trim(), (t, v) -> {
-            if (Test2.isValid(v, Integer::valueOf)) {
-                Element enumConst = Element2.findEnumAs(t, v);
-                if (enumConst != null) {
-                    String value = Element2.getSimpleName(enumConst);
-                    String t0 = "{type} {var} = {type}.{value};";
-                    return typeValue.on(t0, onImported(t), value);
-                }
+            Element enumConst = Element2.findEnumAs(t, v);
+            if (enumConst != null) {
+                String value = Element2.getSimpleName(enumConst);
+                String t0 = "{type} {var} = {type}.{value};";
+                return typeValue.on(t0, onImported(t), value);
             }
-            return ignored(t, v);
+            return null;
         });
     }
 
@@ -242,20 +240,20 @@ public class ConstManager {
                     constant = "{type}.TEN;";
                     break;
                 default:
-                    boolean isBigInteger = mathType == BigInteger.class && Test2.isValid(v, BigInteger::new);
-                    boolean isBigDecimal = mathType == BigDecimal.class && Test2.isValid(v, BigDecimal::new);
+                    boolean isBigInteger = mathType == BigInteger.class && Test2.isValidOnTrimmed(v, BigInteger::new);
+                    boolean isBigDecimal = mathType == BigDecimal.class && Test2.isValidOnTrimmed(v, BigDecimal::new);
                     if (isBigInteger || isBigDecimal) {
                         constant = "new {type}({value});";
                         break;
                     } else {
-                        return ignored(t, v);
+                        return null;
                     }
             }
             return typeValue.on("{type} {var} = " + constant, onImported(t), v);
         });
     }
 
-    private static String ignored(String type, String value) {
+    public String ignored(String type, String value) {
         Log2.warning("【已忽略默认值】{}: {}", type, value);
         return null;
     }

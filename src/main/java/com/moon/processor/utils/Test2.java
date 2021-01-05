@@ -244,40 +244,44 @@ public enum Test2 {
         switch (type) {
             case "boolean":
             case "java.lang.Boolean":
-                return isValid(value, Boolean::valueOf);
+                return isValidOnTrimmed(value, Boolean::valueOf);
             default:
                 return false;
         }
+    }
+
+    public static boolean isIntValue(String value) {
+        return isValidOnTrimmed(value, Integer::parseInt);
     }
 
     public static boolean isBasicNumberValue(String type, String value) {
         switch (type) {
             case "byte":
             case "java.lang.Byte":
-                return isValid(value, Byte::valueOf);
+                return isValidOnTrimmed(value, Byte::valueOf);
             case "short":
             case "java.lang.Short":
-                return isValid(value, Short::valueOf);
+                return isValidOnTrimmed(value, Short::valueOf);
             case "int":
             case "java.lang.Integer":
-                return isValid(value, Integer::valueOf);
+                return isValidOnTrimmed(value, Integer::valueOf);
             case "long":
             case "java.lang.Long":
-                return isValid(value, Long::valueOf);
+                return isValidOnTrimmed(value, Long::valueOf);
             case "float":
             case "java.lang.Float":
-                return isValid(value, Float::valueOf);
+                return isValidOnTrimmed(value, Float::valueOf);
             case "double":
             case "java.lang.Double":
-                return isValid(value, Double::valueOf);
+                return isValidOnTrimmed(value, Double::valueOf);
             default:
                 return false;
         }
     }
 
-    public static boolean isValid(String value, Consumer<String> consumer) {
+    public static boolean isValidOnTrimmed(String value, Consumer<String> consumer) {
         try {
-            consumer.accept(value);
+            consumer.accept(value.trim());
             return true;
         } catch (Throwable t) {
             return false;
