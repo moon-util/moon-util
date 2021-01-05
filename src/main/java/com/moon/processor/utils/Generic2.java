@@ -18,16 +18,33 @@ import java.util.Map;
 public enum Generic2 {
     ;
 
-    public static String findActual(Map<String, DeclareGeneric> generics, String declareClassname, String declareType) {
-        DeclareGeneric model = generics.get(toFullKey(declareClassname, declareType));
-        return model == null ? null : model.getSimpleEffectType();
-    }
-
-    public static String findActualOrDeclared(
-        Map<String, DeclareGeneric> generics, String declareClassname, String declareType
+    public static String mappingToActual(
+        Map<String, DeclareGeneric> generics, String enclosingClassname, String declareType
     ) {
-        DeclareGeneric model = generics.get(toFullKey(declareClassname, declareType));
-        return model == null ? declareType : model.getEffectType();
+        StringBuilder resultBuilder = new StringBuilder();
+        StringBuilder tempBuilder = new StringBuilder();
+        char[] chars = declareType.toCharArray();
+        for (char ch : chars) {
+            switch (ch) {
+                case ' ':
+                    break;
+                case '<':
+                case '>':
+                case ',':
+                    String declared = tempBuilder.toString().trim();
+                    String key = toFullKey(enclosingClassname, declared);
+                    DeclareGeneric generic = generics.get(key);
+                    String actual = generic == null ? declared : generic.getActual();
+                    resultBuilder.append(actual).append(ch);
+                    tempBuilder.setLength(0);
+                    break;
+                default:
+                    tempBuilder.append(ch);
+                    break;
+            }
+        }
+        resultBuilder.append(tempBuilder);
+        return resultBuilder.toString().trim();
     }
 
     /*
@@ -127,6 +144,9 @@ public enum Generic2 {
         StringBuilder builder = new StringBuilder();
         int bracket = 0;
         for (char ch : chars) {
+            if (ch == ' ') {
+                continue;
+            }
             if (isLeft(ch)) {
                 builder.append(ch);
                 bracket++;

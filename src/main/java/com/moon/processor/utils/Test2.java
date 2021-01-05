@@ -1,6 +1,10 @@
 package com.moon.processor.utils;
 
 import com.moon.processor.Args;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
@@ -103,6 +107,38 @@ public enum Test2 {
     public static boolean isPackage(Element elem) { return isElemKind(elem, PACKAGE); }
 
     public static boolean isMemberField(Element elem) { return isField(elem) && isMember(elem); }
+
+    public static boolean hasLombokSetter(VariableElement field) {
+        if (Imported.LOMBOK) {
+            if (field == null) {
+                return false;
+            }
+            Setter setter = field.getAnnotation(Setter.class);
+            if (setter != null) {
+                return setter.value() == AccessLevel.PUBLIC;
+            } else {
+                Element element = field.getEnclosingElement();
+                return element.getAnnotation(Data.class) != null;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasLombokGetter(VariableElement field) {
+        if (Imported.LOMBOK) {
+            if (field == null) {
+                return false;
+            }
+            Getter getter = field.getAnnotation(Getter.class);
+            if (getter != null) {
+                return getter.value() == AccessLevel.PUBLIC;
+            } else {
+                Element element = field.getEnclosingElement();
+                return element.getAnnotation(Data.class) != null;
+            }
+        }
+        return false;
+    }
 
     static boolean isPublicMemberMethod(Element elem) {
         return isMethod(elem) && isMember(elem) && isPublic(elem);
@@ -261,6 +297,8 @@ public enum Test2 {
     public static boolean isPrimitiveNumber(Class<?> type) { return isPrimitiveNumber(getName(type)); }
 
     public static boolean isPrimitiveNumber(String type) { return PRIMITIVE_NUMS.contains(type); }
+
+    public static boolean isPrimitiveBool(TypeMirror type) { return isTypeKind(type, TypeKind.BOOLEAN); }
 
     public static boolean isPrimitiveBool(Class<?> type) { return isPrimitiveBool(getName(type)); }
 

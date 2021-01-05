@@ -3,6 +3,7 @@ package com.moon.processor.model;
 import com.moon.processor.Completable;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Generic2;
+import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
@@ -129,7 +130,7 @@ public class DeclareProperty implements Completable {
     }
 
     public void addProvider(String toType, String providedType, String providerMethodName) {
-        putConverter(getInjectorsMap(), toType, providedType, providerMethodName);
+        putConverter(getProvidersMap(), toType, providedType, providerMethodName);
     }
 
     public DeclareMapping getForwardMapping(String targetClass) {
@@ -157,21 +158,40 @@ public class DeclareProperty implements Completable {
         mappings.put(mapping.getTargetCls(), mapping);
     }
 
-    public String findInjector(String type, String propertyType) { return find(getProvidersMap(), type, propertyType); }
+    public String findInjector(String type, String propertyType) { return find(getInjectorsMap(), type, propertyType); }
 
     public String findProvider(String type, String propertyType) { return find(getProvidersMap(), type, propertyType); }
 
+    public Map<String, String> findInjectorsFor(TypeElement targetClass) {
+        return findInjectorsFor(Element2.getQualifiedName(targetClass));
+    }
+
+    public Map<String, String> findProvidersFor(TypeElement targetClass) {
+        return findProvidersFor(Element2.getQualifiedName(targetClass));
+    }
+
     public Map<String, String> findInjectorsFor(String targetClass) {
-        return getInjectorsMap().getOrDefault(targetClass, Collections.emptyMap());
+        Map<String, String> converters = convertersFor(getInjectorsMap(), targetClass);
+        return converters == null ? Collections.emptyMap() : converters;
     }
 
     public Map<String, String> findProvidersFor(String targetClass) {
-        return getProvidersMap().getOrDefault(targetClass, Collections.emptyMap());
+        Map<String, String> converters = convertersFor(getProvidersMap(), targetClass);
+        return converters == null ? Collections.emptyMap() : converters;
     }
 
     private static String find(Map<String, Map<String, String>> map, String type, String propertyType) {
-        Map<String, String> maybePresentMap = map.getOrDefault(type, map.get(PUBLIC));
+        Map<String, String> maybePresentMap = convertersFor(map, type);
         return maybePresentMap == null ? null : maybePresentMap.get(propertyType);
+    }
+
+    private static Map<String, String> convertersFor(Map<String, Map<String, String>> map, String type) {
+        Map<String, String> maybePresentMap = map.get(type);
+        if (maybePresentMap == null) {
+            maybePresentMap = new HashMap<>();
+        }
+        map.getOrDefault(PUBLIC, Collections.emptyMap()).forEach(maybePresentMap::putIfAbsent);
+        return maybePresentMap;
     }
 
     private static void putConverter(
@@ -189,7 +209,7 @@ public class DeclareProperty implements Completable {
         TypeElement nameable = (TypeElement) field.getEnclosingElement();
         String declareClassname = Element2.getQualifiedName(nameable);
         setDeclareType(declareType);
-        setActualType(Generic2.findActual(genericMap, declareClassname, declareType));
+        setActualType(Generic2.mappingToActual(genericMap, declareClassname, declareType));
     }
 
     public void setSetter(ExecutableElement setter, Map<String, DeclareGeneric> genericMap) {
@@ -205,15 +225,29 @@ public class DeclareProperty implements Completable {
     private DeclareMethod toMethod(String declareType, ExecutableElement method, Map<String, DeclareGeneric> generics) {
         TypeElement nameable = (TypeElement) method.getEnclosingElement();
         String declareClassname = Element2.getQualifiedName(nameable);
-        return new DeclareMethod(method, declareType, Generic2.findActual(generics, declareClassname, declareType),
-            true);
+        String actualType = Generic2.mappingToActual(generics, declareClassname, declareType);
+        return new DeclareMethod(method, declareType, actualType, true, false);
     }
 
     @Override
     public void onCompleted() {
         DeclareMethod setter;
+        VariableElement elementField = getField();
         List<DeclareMethod> getters = getGetters();
         Map<String, DeclareMethod> settersMap = getSetters();
+
+        // 当不存在 getter/setter 时，检查和设置 lombok getter/setter
+        if (getters.isEmpty() && Test2.hasLombokGetter(elementField)) {
+            String getterName = Element2.getLombokGetterName(elementField);
+            getters.add(new DeclareMethod(null, getterName, getDeclareType(), getActualType(), false, true));
+        }
+        if (settersMap.isEmpty() && Test2.hasLombokSetter(elementField)) {
+            String setterName = Element2.getLombokSetterName(elementField);
+            DeclareMethod m = new DeclareMethod(null, setterName, getDeclareType(), getActualType(), false, true);
+            settersMap.put(getActualType(), m);
+        }
+
+        // 执行映射
         if (!getters.isEmpty()) {
             DeclareMethod getter = getters.get(0);
             this.setGetter(getter);

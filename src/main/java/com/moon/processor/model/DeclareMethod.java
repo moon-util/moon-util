@@ -13,14 +13,30 @@ public class DeclareMethod {
     private final String name;
     private final String declareType;
     private final String actualType;
+    /**
+     * 是否是否主动声明的
+     */
     private final boolean declared;
+    private final boolean lombokGenerated;
 
-    public DeclareMethod(ExecutableElement method, String declareType, String actualType, boolean declared) {
+    public DeclareMethod(
+        ExecutableElement method, String declareType, String actualType, boolean declared, boolean lombokGenerated
+    ) { this(method, Element2.getSimpleName(method), declareType, actualType, declared, lombokGenerated); }
+
+    public DeclareMethod(
+        ExecutableElement method,
+        String name,
+        String declareType,
+        String actualType,
+        boolean declared,
+        boolean lombokGenerated
+    ) {
         this.method = method;
-        this.name = Element2.getSimpleName(method);
+        this.name = name;
         this.declareType = declareType;
         this.actualType = actualType;
         this.declared = declared;
+        this.lombokGenerated = lombokGenerated;
     }
 
     public ExecutableElement getMethod() { return method; }
@@ -30,6 +46,8 @@ public class DeclareMethod {
     public String getDeclareType() { return declareType; }
 
     public String getActualType() { return actualType; }
+
+    public boolean isLombokGenerated() { return lombokGenerated; }
 
     /**
      * 是否是生成的

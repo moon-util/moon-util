@@ -27,14 +27,14 @@ public enum Imported {
     public final static boolean CONDITIONAL_ON_MISSING_BEAN;
 
     static {
-        LOMBOK = isNoException(Data.class::toString);
-        CONFIGURATION = isNoException(Configuration.class::toString);
-        CONDITIONAL_ON_MISSING_BEAN = isNoException(ConditionalOnMissingBean.class::toString);
-        BEAN = isNoException(Bean.class::toString);
-        JODA_TIME = isNoException(DateTime.class::toString);
-        AUTOWIRED = isNoException(Autowired.class::toString);
-        QUALIFIER = isNoException(Qualifier.class::toString);
-        REPOSITORY = isNoException(Repository.class::toString);
+        LOMBOK = isNoException(() -> Data.class.toString());
+        CONFIGURATION = isNoException(() -> Configuration.class.toString());
+        CONDITIONAL_ON_MISSING_BEAN = isNoException(() -> ConditionalOnMissingBean.class.toString());
+        BEAN = isNoException(() -> Bean.class.toString());
+        JODA_TIME = isNoException(() -> DateTime.class.toString());
+        AUTOWIRED = isNoException(() -> Autowired.class.toString());
+        QUALIFIER = isNoException(() -> Qualifier.class.toString());
+        REPOSITORY = isNoException(() -> Repository.class.toString());
     }
 
     private static boolean isNoException(Supplier<String> runner) {

@@ -33,6 +33,15 @@ public enum Element2 {
         return fullName.substring(Math.max(idx + 1, 0), last);
     }
 
+    public static String getLombokSetterName(VariableElement field) {
+        return Const2.SET + String2.capitalize(getSimpleName(field));
+    }
+
+    public static String getLombokGetterName(VariableElement field) {
+        String prefix = Test2.isPrimitiveBool(field.asType()) ? Const2.IS : Const2.GET;
+        return prefix + String2.capitalize(getSimpleName(field));
+    }
+
     public static String toPropertyName(ExecutableElement element) {
         String name = element.getSimpleName().toString();
         return String2.decapitalize(name.substring(name.startsWith("is") ? 2 : 3));

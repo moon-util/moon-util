@@ -121,6 +121,9 @@ final class GenericUtils {
             StringBuilder builder = new StringBuilder();
             int bracket = 0;
             for (char ch : chars) {
+                if (ch == ' ') {
+                    continue;
+                }
                 if (Bound.isLeft(ch)) {
                     builder.append(ch);
                     bracket++;

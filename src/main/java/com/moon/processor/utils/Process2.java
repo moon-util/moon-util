@@ -150,6 +150,7 @@ public enum Process2 {
         DeclaredPojo declared = new DeclaredPojo(rootElement, nameManager);
         parseRootPropertiesMap(declared, thisGenericMap, ignoringMap);
         parseSuperPropertiesMap(thisGenericMap, ignoringMap, new HashSet<>(), declared, rootElement, rootElement);
+        Convert2.parseConverters(thisGenericMap, rootElement, declared);
         declared.onCompleted();
         return declared;
     }

@@ -1,9 +1,9 @@
 package com.moon.processor.model;
 
 import com.moon.processor.manager.ConstManager;
-import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Holder;
 import com.moon.processor.utils.HolderGroup;
+import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.Test2;
 
 import java.util.Map;
@@ -78,81 +78,96 @@ public class DefMapping {
     public ConstManager getConstManager() { return constManager; }
 
     public String[] getScripts() {
-        switch (convertType) {
-            case FORWARD:
-                return getForwardScripts();
-            case BACKWARD:
-                return getBackwardScripts();
-            default:
-                return EMPTY;
+        DeclareProperty from = getFromProp(), to = getToProp();
+
+        // 1. 注入方的 injector 和输出方的 provider 匹配
+        // 2. 注入方的 injector 和输出方的 getter 匹配
+        // 3. 注入方的 setter 重载和输出方的 provider 匹配
+        @SuppressWarnings("all")//
+        String[] scripts = mappingWithConverters(//
+            to.findInjectorsFor(from.getThisElement()),
+            from.findProvidersFor(to.getThisElement()),
+            to.getSetters(),
+            from.getGetter());
+        if (scripts != null) {
+            return scripts;
         }
+
+        // TODO 4. 注入方和输出方的格式化和默认值
+
+        // 5. getter/setter 相似类型匹配
+        return defaultMappingWithSetterMethod();
     }
 
-    private String[] getForwardScripts() {
-        DeclareProperty from = getFromProp(), to = getToProp();
-        String toClass = Element2.getQualifiedName(to.getThisElement());
-        Map<String, String> providers = from.findProvidersFor(toClass);
-        Map<String, DeclareMethod> toSettersMethod = to.getSetters();
-        String type = to.getFinalActualType();
-        // 首先根据指定类型值查找是否有对应 provider -> setter
-        if (type != null) {
-            DeclareMethod setter = toSettersMethod.get(type);
-            String provideMethod = providers.get(type);
-            if (provideMethod != null && setter != null) {
-                return onSimpleMapping(getFromName(), provideMethod, getToName(), setter.getName());
+    private String[] mappingWithConverters(
+        Map<String, String> injectors,
+        Map<String, String> providers,
+        Map<String, DeclareMethod> settersMap,
+        DeclareMethod getter
+    ) {
+        // 1. 注入方的 injector 和输出方的 provider 匹配
+        Log2.warning("Injectors: {}", injectors);
+        for (Map.Entry<String, String> injectEntry : injectors.entrySet()) {
+            String provideMethod = providers.get(injectEntry.getKey());
+            if (provideMethod != null) {
+                return onSimpleMapping(provideMethod, injectEntry.getValue());
             }
         }
-        // 然后根据己方 provider 遍历是否存在类型一致的 setter，查找对应类型的转换器
-        for (Map.Entry<String, DeclareMethod> entry : toSettersMethod.entrySet()) {
+        // 2. 注入方的 injector 和输出方的 getter 匹配
+        if (getter != null) {
+            String getterActualType = getter.getActualType();
+            String setterName = injectors.get(getterActualType);
+            if (setterName != null && getter.getName() != null) {
+                return onSimpleMapping(getter.getName(), getterActualType);
+            }
+        }
+        // 3. 注入方的 setter 重载和输出方的 provider 匹配
+        for (Map.Entry<String, DeclareMethod> entry : settersMap.entrySet()) {
             String provideMethod = providers.get(entry.getKey());
             if (provideMethod == null) {
                 continue;
             }
-            return onSimpleMapping(getFromName(), provideMethod, getToName(), entry.getValue().getName());
+            return onSimpleMapping(provideMethod, entry.getValue().getName());
         }
-        // TODO 然后执行默认转换规则（这也是大多数情况）
-
-        // 最后进行 getter/setter 相似类型匹配
-        return defaultMappingWithSetterMethod();
+        return null;
     }
 
-    private String[] getBackwardScripts() {
-        DeclareProperty from = getFromProp(), to = getToProp();
-        String fromClass = Element2.getQualifiedName(from.getThisElement());
-        String toClass = Element2.getQualifiedName(to.getThisElement());
-        Map<String, String> injectors = to.findProvidersFor(fromClass);
-
-
-        // 最后进行 getter/setter 相似类型匹配
-        return defaultMappingWithSetterMethod();
-    }
-
-    private String[] defaultMappingWithSetterMethod(){
-        DeclareMethod getter = getFromProp().getGetter();
+    private String[] defaultMappingWithSetterMethod() {
+        DeclareProperty from = getFromProp();
+        DeclareMethod getter = from.getGetter();
         if (getter != null) {
-            Map<String, DeclareMethod> toSettersMethod = getToProp().getSetters();
             String getterActualType = getter.getActualType();
-            DeclareMethod setter = toSettersMethod.get(getterActualType);
-            if (setter != null) {
-                return onSimpleMapping(getFromName(), getter.getName(), getToName(), setter.getName());
-            }
-            String setterType = null;
-            DeclareMethod matchedSetter = null;
-            for (Map.Entry<String, DeclareMethod> entry : toSettersMethod.entrySet()) {
-                DeclareMethod tempMethod = entry.getValue();
-                String tempSetterType = tempMethod.getActualType();
-                if (Test2.isSubtypeOf(getterActualType, tempSetterType)) {
-                    if (setterType == null || Test2.isSubtypeOf(tempSetterType, setterType)) {
-                        setterType = tempSetterType;
-                        matchedSetter = tempMethod;
-                    }
-                }
-            }
-            if (matchedSetter != null) {
-                return onSimpleMapping(getFromName(), getter.getName(), getToName(), matchedSetter.getName());
-            }
+            return defaultMappingWithSetterMethod(getterActualType, getter.getName());
         }
         return EMPTY;
+    }
+
+    private String[] defaultMappingWithSetterMethod(String getterType, String getterName) {
+        Map<String, DeclareMethod> toSettersMethod = getToProp().getSetters();
+        DeclareMethod setter = toSettersMethod.get(getterType);
+        if (setter != null) {
+            return onSimpleMapping(getterName, setter.getName());
+        }
+        String setterType = null;
+        DeclareMethod matchedSetter = null;
+        for (Map.Entry<String, DeclareMethod> entry : toSettersMethod.entrySet()) {
+            DeclareMethod tempMethod = entry.getValue();
+            String tempSetterType = tempMethod.getActualType();
+            if (Test2.isSubtypeOf(getterType, tempSetterType)) {
+                if (setterType == null || Test2.isSubtypeOf(tempSetterType, setterType)) {
+                    setterType = tempSetterType;
+                    matchedSetter = tempMethod;
+                }
+            }
+        }
+        if (matchedSetter != null) {
+            return onSimpleMapping(getterName, matchedSetter.getName());
+        }
+        return EMPTY;
+    }
+
+    private String[] onSimpleMapping(String getterName, String setterName) {
+        return onSimpleMapping(getFromName(), getterName, getToName(), setterName);
     }
 
     private static String[] onSimpleMapping(String fromName, String getter, String toName, String setter) {

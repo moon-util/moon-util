@@ -58,7 +58,6 @@ public class DefBeanMapper {
         for (Map.Entry<String, DeclareProperty> propertyEntry : thisPojo.entrySet()) {
             DeclareProperty self = propertyEntry.getValue();
             DeclareMapping mapping = type.getMappingFor(self, thatClassname);
-            Log2.warning(propertyEntry.getKey() + "\t" + mapping.toString());
             if (type.isIgnored(mapping)) {
                 continue;
             }
