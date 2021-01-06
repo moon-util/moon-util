@@ -49,7 +49,7 @@ public class DefBeanMapper implements JavaFileWriteable {
     public String getClassname() { return classname; }
 
     private DefJavaFiler getDefJavaFiler() {
-        DefJavaFiler filer = DefJavaFiler.enumOf(getPkg(), getClassname());
+        DefJavaFiler filer = DefJavaFiler.classOf(getPkg(), getClassname());
         filer.implement(getInterfaceDecl()).enumsOf(Const2.INSTANCE);
 
         // copier

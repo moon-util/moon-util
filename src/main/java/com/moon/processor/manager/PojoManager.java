@@ -5,6 +5,7 @@ import com.moon.processor.JavaWriter;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.model.DefJavaFiler;
 import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.Process2;
 
 import javax.lang.model.element.TypeElement;
@@ -42,7 +43,7 @@ public class PojoManager implements JavaFileWriteable {
     public void writeJavaFile(JavaWriter writer) {
         classMap.forEach((classname, declared) -> {
             DefJavaFiler filer = declared.getDefJavaFiler();
-            if (declared.isAbstracted() && filer != null) {
+            if (declared.isAbstract() && filer != null) {
                 filer.writeJavaFile(writer);
             }
         });

@@ -60,6 +60,7 @@ public class CompileProcessor extends AbstractProcessor {
         CopierManager copierManager = new CopierManager(pojoManager, nameManager);
         MapperManager mapperManager = new MapperManager(copierManager, pojoManager, nameManager);
         processMapperFor(roundEnv, mapperManager);
+        pojoManager.writeJavaFile(writer);
         copierManager.writeJavaFile(writer);
         mapperManager.writeJavaFile(writer);
         return true;

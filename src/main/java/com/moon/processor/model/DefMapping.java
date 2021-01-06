@@ -59,7 +59,7 @@ public class DefMapping {
 
     public String[] getScripts() {
         DeclareProperty from = getFromProp(), to = getToProp();
-
+        Log2.warn("From: {}, To: {}.", from, to);
         // 1. 注入方的 injector 和输出方的 provider 匹配
         // 2. 注入方的 injector 和输出方的 getter 匹配
         // 3. 注入方的 setter 重载和输出方的 provider 匹配

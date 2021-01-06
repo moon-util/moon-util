@@ -180,13 +180,11 @@ public class DeclareProperty implements Completable {
     }
 
     public Map<String, String> findInjectorsFor(String targetClass) {
-        Map<String, String> converters = convertersFor(getInjectorsMap(), targetClass);
-        return converters == null ? Collections.emptyMap() : converters;
+        return convertersFor(getInjectorsMap(), targetClass);
     }
 
     public Map<String, String> findProvidersFor(String targetClass) {
-        Map<String, String> converters = convertersFor(getProvidersMap(), targetClass);
-        return converters == null ? Collections.emptyMap() : converters;
+        return convertersFor(getProvidersMap(), targetClass);
     }
 
     private static String find(Map<String, Map<String, String>> map, String type, String propertyType) {

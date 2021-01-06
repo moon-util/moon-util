@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Generated;
@@ -15,6 +16,7 @@ import java.util.function.Supplier;
 /**
  * @author benshaoye
  */
+@SuppressWarnings("all")
 public enum Imported {
     ;
 
@@ -25,6 +27,7 @@ public enum Imported {
     public final static boolean GENERATED;
     public final static boolean JODA_TIME;
     public final static boolean REPOSITORY;
+    public final static boolean COMPONENT;
     public final static boolean CONFIGURATION;
     public final static boolean CONDITIONAL_ON_MISSING_BEAN;
 
@@ -37,6 +40,7 @@ public enum Imported {
         JODA_TIME = isNoException(() -> DateTime.class.toString());
         AUTOWIRED = isNoException(() -> Autowired.class.toString());
         QUALIFIER = isNoException(() -> Qualifier.class.toString());
+        COMPONENT = isNoException(() -> Component.class.toString());
         REPOSITORY = isNoException(() -> Repository.class.toString());
     }
 

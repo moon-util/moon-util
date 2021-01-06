@@ -46,7 +46,7 @@ public class DefBeanCopier implements JavaFileWriteable {
     public Set<String> getOrders() { return orders; }
 
     private DefJavaFiler getDefJavaFiler() {
-        DefJavaFiler filer = DefJavaFiler.enumOf(getPkg(), getClassname());
+        DefJavaFiler filer = DefJavaFiler.classOf(getPkg(), getClassname());
         filer.implement(getInterfaceDecl()).enumsOf(Const2.INSTANCE);
         buildUnsafeCopyMethods(filer);
         buildConvertMethods(filer);
@@ -64,7 +64,9 @@ public class DefBeanCopier implements JavaFileWriteable {
                 continue;
             }
             DeclareProperty that = thatPojo.get(mapping.getField(propertyEntry.getKey()));
-            method.convert(propertyEntry.getKey(), self, that, mapping);
+            if (that != null) {
+                method.convert(propertyEntry.getKey(), self, that, mapping);
+            }
         }
         return method;
     }
