@@ -88,7 +88,7 @@ public abstract class MapperUtil {
      * <p>
      * 注意:
      * <p>
-     * 1. 本类虽是通过{@link #getConverter(Class, Class)}获取的，但如果强转为{@link BeanConverter}
+     * 1. 本类虽是通过{@link #getConverter(Class, Class)}获取的，但如果强转为{@link BeanCopier}
      * 可能会抛异常，如果要使其可用需指定: {@link MapperFor#converter()}为{@code true}
      * <p>
      * 2. 如果指定了{@link MapperFor#converter()}为{@code true}，那么转换双方都可能是接口或抽象类
@@ -111,7 +111,7 @@ public abstract class MapperUtil {
      * 获取转换器
      * <p>
      * 只有{@code fromClass}的{@link MapperFor#converter()}为{@code true}时, 返回的
-     * {@link BeanConverter#doForward(Object)}、{@link BeanConverter#doBackward(Object)}是可用的
+     * {@link BeanCopier#doForward(Object)}、{@link BeanCopier#doBackward(Object)}是可用的
      *
      * @param fromClass 数据源类
      * @param toClass   应声明在{@code fromClass}注解的{@link MapperFor#value()}中
@@ -124,7 +124,7 @@ public abstract class MapperUtil {
      * @see MapperFor#value()
      * @see MapperFor#converter()
      */
-    public static <F, T> BeanConverter<F, T> getConverter(Class<F> fromClass, Class<T> toClass) {
+    public static <F, T> BeanMapper<F, T> getConverter(Class<F> fromClass, Class<T> toClass) {
         return Mappers.resolve(fromClass, toClass);
     }
 }

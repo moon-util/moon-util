@@ -75,18 +75,10 @@ public class DefMethod {
         return this;
     }
 
-    public DefMapping forward(
+    public DefMapping convert(
         String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
     ) {
-        DefMapping def = DefMapping.forward(ConvertType.FORWARD, constManager, thisProp, thatProp, mapping);
-        mappings.put(name, def);
-        return def;
-    }
-
-    public DefMapping backward(
-        String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
-    ) {
-        DefMapping def = DefMapping.backward(ConvertType.BACKWARD, constManager, thisProp, thatProp, mapping);
+        DefMapping def = DefMapping.convert(constManager, thisProp, thatProp, mapping);
         mappings.put(name, def);
         return def;
     }

@@ -31,6 +31,10 @@ public enum String2 {
         return new String(chars);
     }
 
+    public static String keyOf(String... keys) {
+        return String.join(":", keys);
+    }
+
     public static String format(String template, Object... values) {
         if (values != null) {
             List<String> rest = null;

@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
  * 为{@link #injectBy()}映射到本类{@link #value()}属性提供一个指定数据类型转换器。
  * </pre>
  * <p>
+ * 可注解在普通方法上，但与 setter 方法有相同的要求：公共方法、没有返回值且只有一个参数
+ * <p>
  * 如果一个属性到另一个属性的映射是不同类型，可通过{@code setter}重载的方式
  * 自定义转换器，此时在重载的{@code setter}方法上注解{@link MappingInjector}即可
  * 标记这个方法将被用作转换器。如:

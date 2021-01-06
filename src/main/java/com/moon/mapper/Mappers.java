@@ -26,15 +26,15 @@ abstract class Mappers {
         }
     }
 
-    static BeanConverter resolve(Class cls1, String cls2) {
+    static BeanMapper resolve(Class cls1, String cls2) {
         try {
-            return (BeanConverter) valueOf(toEnumCls(cls1), "TO_" + under(cls2));
+            return (BeanMapper) valueOf(toEnumCls(cls1), "TO_" + under(cls2));
         } catch (Throwable e) {
             throw new NoSuchMapperException(clsName(cls1), cls2, e);
         }
     }
 
-    static <F, T> BeanConverter<F, T> resolve(Class cls1, Class cls2) { return resolve(cls1, clsName(cls2)); }
+    static <F, T> BeanMapper<F, T> resolve(Class cls1, Class cls2) { return resolve(cls1, clsName(cls2)); }
 
     private static String under(String classname) { return classname.replace('.', '_'); }
 

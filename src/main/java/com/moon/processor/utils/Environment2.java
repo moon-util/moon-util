@@ -21,6 +21,4 @@ public enum Environment2 {
     public static Types getTypes() { return ENV.getTypeUtils(); }
 
     public static Filer getFiler() { return ENV.getFiler(); }
-
-    public static Messager getMessager() { return ENV.getMessager(); }
 }

@@ -3,6 +3,7 @@ package com.moon.processor;
 import com.google.auto.service.AutoService;
 import com.moon.data.jdbc.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
+import com.moon.processor.manager.CopierManager;
 import com.moon.processor.manager.NameManager;
 import com.moon.processor.manager.PojoManager;
 import com.moon.processor.manager.MapperManager;
@@ -56,8 +57,10 @@ public class CompileProcessor extends AbstractProcessor {
         JavaWriter writer = new JavaWriter(Environment2.getFiler());
         NameManager nameManager = new NameManager();
         PojoManager pojoManager = new PojoManager(nameManager);
-        MapperManager mapperManager = new MapperManager(pojoManager, nameManager);
+        CopierManager copierManager = new CopierManager(pojoManager, nameManager);
+        MapperManager mapperManager = new MapperManager(copierManager, pojoManager, nameManager);
         processMapperFor(roundEnv, mapperManager);
+        copierManager.writeJavaFile(writer);
         mapperManager.writeJavaFile(writer);
         return true;
     }

@@ -1,32 +1,33 @@
 package com.moon.processor.model;
 
-import com.moon.mapper.BeanConverter;
-import com.moon.processor.manager.Importer;
+import com.moon.mapper.BeanMapper;
+import com.moon.processor.JavaFileWriteable;
+import com.moon.processor.JavaWriter;
 import com.moon.processor.manager.NameManager;
 import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Holder;
-import com.moon.processor.utils.Log2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * @author benshaoye
  */
-public class DefBeanMapper {
+public class DefBeanMapper implements JavaFileWriteable {
 
     private final DeclaredPojo thisPojo, thatPojo;
     private final String pkg, classname;
-    private final Importer importer = new Importer();
+    private final DefBeanCopier forward, backward;
 
     private final Set<String> orders = new LinkedHashSet<>();
 
     { orders.add("id"); }
 
-    public DefBeanMapper(DeclaredPojo thisPojo, DeclaredPojo thatPojo, NameManager registry) {
+    public DefBeanMapper(DefBeanCopier forward,DefBeanCopier backward,DeclaredPojo thisPojo, DeclaredPojo thatPojo, NameManager registry) {
+        this.forward = forward;
+        this.backward = backward;
         this.thisPojo = thisPojo;
         this.thatPojo = thatPojo;
         this.pkg = Element2.getPackageName(thisPojo.getDeclareElement());
@@ -39,43 +40,30 @@ public class DefBeanMapper {
 
     public DeclaredPojo getThatPojo() { return thatPojo; }
 
+    public DefBeanCopier getForward() { return forward; }
+
+    public DefBeanCopier getBackward() { return backward; }
+
     public String getPkg() { return pkg; }
 
     public String getClassname() { return classname; }
 
-    public DefJavaFiler getDefJavaFiler() {
+    private DefJavaFiler getDefJavaFiler() {
         DefJavaFiler filer = DefJavaFiler.enumOf(getPkg(), getClassname());
         filer.implement(getInterfaceDecl()).enumsOf(Const2.INSTANCE);
+
+        // copier
+        filer.enumRef(getForward().getClassname(), Const2.FORWARD, Const2.INSTANCE);
+        filer.enumRef(getBackward().getClassname(), Const2.BACKWARD, Const2.INSTANCE);
+
+        // methods
         buildUnsafeConvertMethods(filer);
-        buildConvertMethods(filer);
         return filer;
     }
 
-    private DefMethod unsafeConvert(DefMethod method, ConvertType type) {
-        DeclaredPojo thisPojo = getThisPojo();
-        DeclaredPojo thatPojo = getThatPojo();
-        String thatClassname = thatPojo.getThisClassname();
-        for (Map.Entry<String, DeclareProperty> propertyEntry : thisPojo.entrySet()) {
-            DeclareProperty self = propertyEntry.getValue();
-            DeclareMapping mapping = type.getMappingFor(self, thatClassname);
-            if (type.isIgnored(mapping)) {
-                continue;
-            }
-            DeclareProperty that = thatPojo.get(mapping.getField(propertyEntry.getKey()));
-            if (that != null) {
-                switch (type) {
-                    case FORWARD:
-                        method.forward(propertyEntry.getKey(), self, that, mapping);
-                        break;
-                    case BACKWARD:
-                        method.backward(propertyEntry.getKey(), self, that, mapping);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        return method;
+    @Override
+    public void writeJavaFile(JavaWriter writer) {
+        getDefJavaFiler().writeJavaFile(writer);
     }
 
     private void buildUnsafeConvertMethods(DefJavaFiler filer) {
@@ -85,37 +73,31 @@ public class DefBeanMapper {
 
         // forward
         DefMethod forward = filer.publicMethod("unsafeForward", thatName, parameters).override();
-        unsafeConvert(forward, ConvertType.FORWARD).returning("that");
-
+        forward.returning(Holder.name.on("{name}.unsafeCopy(self, that)", Const2.FORWARD));
         // backward
         DefMethod backward = filer.publicMethod("unsafeBackward", thisName, parameters).override();
-        unsafeConvert(backward, ConvertType.BACKWARD).returning("self");
-    }
+        backward.returning(Holder.name.on("{name}.unsafeCopy(that, self)", Const2.BACKWARD));
 
-    private void buildConvertMethods(DefJavaFiler filer) {
-        DeclaredPojo thisClass = getThisPojo();
-        DeclaredPojo thatClass = getThatPojo();
-        String thisName = thisClass.getThisClassname();
-        String thatName = thatClass.getThisClassname();
-        String thisImpl = thisClass.getImplClassname();
-        String thatImpl = thatClass.getImplClassname();
+        // doForward
+        DefMethod doForward = filer.publicMethod("doForward", thatName, parameters).override();
+        doForward.returning(Holder.name.on("{name}.copy(self, that)", Const2.FORWARD));
+        // doBackward
+        DefMethod doBackward = filer.publicMethod("doBackward", thisName, parameters).override();
+        doBackward.returning(Holder.name.on("{name}.copy(that, self)", Const2.BACKWARD));
 
         // forward
         DefParameters forwardParams = DefParameters.of("self", thisName);
-        String forwardTemplate = "self == null ? null : unsafeForward(self, new {name}())";
-        DefMethod forward = filer.publicMethod("doForward", thatName, forwardParams).override();
-        forward.returning(Holder.name.on(forwardTemplate, filer.getImporter().onImported(thatImpl)));
-
+        DefMethod cForward = filer.publicMethod("doForward", thatName, forwardParams).override();
+        cForward.returning(Holder.name.on("{name}.convert(self)", Const2.FORWARD));
         // backward
         DefParameters backwardParams = DefParameters.of("that", thatName);
-        String backwardTemplate = "that == null ? null : unsafeBackward(new {name}(), that)";
-        DefMethod backward = filer.publicMethod("doBackward", thisName, backwardParams).override();
-        backward.returning(Holder.name.on(backwardTemplate, filer.getImporter().onImported(thisImpl)));
+        DefMethod cBackward = filer.publicMethod("doBackward", thisName, backwardParams).override();
+        cBackward.returning(Holder.name.on("{name}.convert(that)", Const2.BACKWARD));
     }
 
     private String getInterfaceDecl() {
         String thisName = getThisPojo().getThisClassname();
         String thatName = getThatPojo().getThisClassname();
-        return String.format("%s<%s, %s>", BeanConverter.class.getCanonicalName(), thisName, thatName);
+        return String.format("%s<%s, %s>", BeanMapper.class.getCanonicalName(), thisName, thatName);
     }
 }

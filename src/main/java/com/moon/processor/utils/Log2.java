@@ -22,11 +22,15 @@ public enum Log2 {
 
     public static void initialize(ProcessingEnvironment env) { messager = env.getMessager(); }
 
+    public static void warn(Object message) {
+        messager.printMessage(WARNING, String.valueOf(message));
+    }
+
     public static void warn(String message, Object... values) {
         messager.printMessage(WARNING, messageOf(String2.format(message, values)));
     }
 
-    public static void warning(String message, Object... values) {
+    public static void println(String message, Object... values) {
         messager.printMessage(MANDATORY_WARNING, String2.format(message, values));
     }
 }

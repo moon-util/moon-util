@@ -1,6 +1,7 @@
 package com.moon.processor.manager;
 
 import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.TypeElement;
@@ -50,9 +51,17 @@ public class NameManager {
      * @return Mapper 类名
      */
     public String getMapperClassname(TypeElement thisClass, TypeElement thatClass) {
+        return templateClassnameAs("Mapper", thisClass, thatClass, "%s.%sTo%sMapper");
+    }
+
+    public String getCopierClassname(TypeElement thisClass, TypeElement thatClass) {
+        return templateClassnameAs("Copier", thisClass, thatClass, "%s.%sTo%sCopier");
+    }
+
+    private String templateClassnameAs(String impl, TypeElement thisClass, TypeElement thatClass, String template) {
         String thisName = Element2.getQualifiedName(thisClass);
         String thatName = Element2.getQualifiedName(thatClass);
-        String key = thisName + ":" + thatName;
+        String key = String2.keyOf(impl, thisName, thatName);
         String mapperName = registeredClasses.get(key);
         if (mapperName != null) {
             return mapperName;
@@ -60,7 +69,7 @@ public class NameManager {
         String packageName = Element2.getPackageName(thisClass);
         String thisSimple = Element2.getSimpleName(thisName);
         String thatSimple = Element2.getSimpleName(thatClass);
-        mapperName = String.format("%s.%sTo%sMapper", packageName, thisSimple, thatSimple);
+        mapperName = String.format(template, packageName, thisSimple, thatSimple);
         return ensureOnly(key, mapperName);
     }
 

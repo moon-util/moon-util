@@ -8,9 +8,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+
+import static com.moon.processor.utils.Test2.isTypeof;
+import static com.moon.processor.utils.Test2.isValidOnTrimmed;
 
 /**
  * @author benshaoye
@@ -53,7 +57,9 @@ public class ConstManager {
 
     final HolderGroup typeValue = Holder.of(Holder.type, Holder.value);
 
-    public String[] getScripts() { return scriptsMap.values().toArray(new String[0]); }
+    public String[] getScripts() {
+        return scriptsMap.values().toArray(new String[0]);
+    }
 
     public String charOf(String type, String value) {
         if (String2.isEmpty(value)) {
@@ -113,7 +119,7 @@ public class ConstManager {
                 return typeValue.on(t0, onImported(t), v);
             }
             String dbt = "java.lang.Double";
-            if (Test2.isTypeof(t, Number.class) && Test2.isBasicNumberValue(dbt, v)) {
+            if (isTypeof(t, Number.class) && Test2.isBasicNumberValue(dbt, v)) {
                 return typeValue.on(t0, onImported(dbt), v);
             }
             return null;
@@ -133,7 +139,7 @@ public class ConstManager {
             return null;
         }
         return computeConst(DateTimeFormatter.class, pattern, (t, v) -> {
-            if (Test2.isValidOnTrimmed(v, DateTimeFormatter::ofPattern)) {
+            if (isValidOnTrimmed(v, DateTimeFormatter::ofPattern)) {
                 String t0 = "{type} {var} = {type}.ofPattern(\"{value}\");";
                 return typeValue.on(t0, onImported(t), v);
             }
@@ -146,7 +152,7 @@ public class ConstManager {
             return null;
         }
         return computeConst(org.joda.time.format.DateTimeFormatter.class, pattern, (t, v) -> {
-            if (Test2.isValidOnTrimmed(v, DateTimeFormatter::ofPattern)) {
+            if (isValidOnTrimmed(v, DateTimeFormatter::ofPattern)) {
                 String t0 = "{type} {var} = {type0}.ofPattern(\"{value}\");";
                 t0 = typeValue.on(t0, onImported(t), v);
                 return Holder.type0.on(t0, onImported(DateTimeFormat.class));
@@ -173,7 +179,7 @@ public class ConstManager {
             return null;
         }
         return computeConst(type, index.trim(), (t, v) -> {
-            if (Test2.isValidOnTrimmed(v, Integer::parseInt)) {
+            if (isValidOnTrimmed(v, Integer::parseInt)) {
                 int idx = Integer.parseInt(v);
                 Element enumConst = Element2.findEnumAt(t, idx);
                 if (enumConst != null) {
@@ -214,7 +220,7 @@ public class ConstManager {
             final char quote = '"';
             String t0 = "{type} {var} = {value};", quoted = v;
             if (!(length > 1 && v.charAt(0) == quote && v.charAt(length - 1) == quote)) {
-                quoted = (quote + String2.replaceAll(v, "\"", "\\\"") + quote);
+                quoted = (quote + v + quote);
             }
             return typeValue.on(t0, onImported(t), quoted);
         });
@@ -224,12 +230,19 @@ public class ConstManager {
         if (String2.isBlank(value)) {
             return null;
         }
-        return computeConst(mathType, value, (t, v) -> {
+        return computeConst(mathType, value.trim(), (t, v) -> {
             if (v == null) {
                 return null;
+            } else {
+                v = v.toUpperCase();
             }
-            String trimmed = v.trim(), constant;
-            switch (trimmed) {
+            int lastIndex = v.length() - 1;
+            char last = v.charAt(lastIndex), L = 'L', F = 'F', D = 'D';
+            if (last == L || last == F || last == D) {
+                v = v.substring(0, lastIndex);
+            }
+            String constant;
+            switch (v) {
                 case "0":
                     constant = "{type}.ZERO;";
                     break;
@@ -240,10 +253,10 @@ public class ConstManager {
                     constant = "{type}.TEN;";
                     break;
                 default:
-                    boolean isBigInteger = mathType == BigInteger.class && Test2.isValidOnTrimmed(v, BigInteger::new);
-                    boolean isBigDecimal = mathType == BigDecimal.class && Test2.isValidOnTrimmed(v, BigDecimal::new);
+                    boolean isBigInteger = isTypeof(t, BigInteger.class) && isValidOnTrimmed(v, BigInteger::new);
+                    boolean isBigDecimal = isTypeof(t, BigDecimal.class) && isValidOnTrimmed(v, BigDecimal::new);
                     if (isBigInteger || isBigDecimal) {
-                        constant = "new {type}({value});";
+                        constant = "{type}.valueOf({value});";
                         break;
                     } else {
                         return null;
@@ -254,7 +267,7 @@ public class ConstManager {
     }
 
     public String ignored(String type, String value) {
-        Log2.warning("【已忽略默认值】{}: {}", type, value);
+        Log2.println("【已忽略默认值】{}: {}", type, value);
         return null;
     }
 

@@ -12,7 +12,9 @@ import java.lang.annotation.Target;
  * <pre>
  * 为{@link #provideFor()}类中{@link #value()}字段提供值。
  * </pre>
- * 要求 getter 是公共成员方法，且不包含参数，返回值和转换对应的字段类型完全相同，否则就忽略掉
+ * 要求 getter 是公共成员方法，且不包含参数，返回值和转换对应的字段类型完全相同，否则就忽略掉;
+ * <p>
+ * 也可注解在普通方法上，但与 getter 有相同的要求：公共方法没有参数且有返回值
  *
  * @author benshaoye
  */

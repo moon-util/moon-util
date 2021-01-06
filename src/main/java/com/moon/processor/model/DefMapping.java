@@ -1,10 +1,9 @@
 package com.moon.processor.model;
 
-import com.moon.mapper.convert.Default;
+import com.moon.mapper.convert.DefaultValue;
 import com.moon.processor.manager.ConstManager;
-import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.*;
-import org.apache.poi.ss.formula.functions.T;
+import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -17,7 +16,6 @@ public class DefMapping {
 
     private final static String[] EMPTY = {};
 
-    private final ConvertType convertType;
     private final ConstManager constManager;
     private final DeclareProperty fromProp;
     private final DeclareProperty toProp;
@@ -26,7 +24,6 @@ public class DefMapping {
     private final String toName;
 
     private DefMapping(
-        ConvertType convertType,
         ConstManager constManager,
         DeclareProperty fromProp,
         DeclareProperty toProp,
@@ -34,7 +31,6 @@ public class DefMapping {
         String fromName,
         String toName
     ) {
-        this.convertType = convertType;
         this.constManager = constManager;
         this.fromProp = fromProp;
         this.toProp = toProp;
@@ -43,25 +39,9 @@ public class DefMapping {
         this.toName = toName;
     }
 
-    public static DefMapping forward(
-        ConvertType convertType,
-        ConstManager constManager,
-        DeclareProperty thisProp,
-        DeclareProperty thatProp,
-        DeclareMapping mapping
-    ) {
-        return new DefMapping(convertType, constManager, thisProp, thatProp, mapping, "self", "that");
-    }
-
-    public static DefMapping backward(
-        ConvertType convertType,
-        ConstManager constManager,
-        DeclareProperty thisProp,
-        DeclareProperty thatProp,
-        DeclareMapping mapping
-    ) {
-        return new DefMapping(convertType, constManager, thatProp, thisProp, mapping, "that", "self");
-    }
+    public static DefMapping convert(
+        ConstManager constManager, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
+    ) { return new DefMapping(constManager, thisProp, thatProp, mapping, "self", "that"); }
 
     public static DefMapping returning(String script) { return new Returning(script); }
 
@@ -75,8 +55,6 @@ public class DefMapping {
 
     public String getToName() { return toName; }
 
-    public ConvertType getConvertType() { return convertType; }
-
     public ConstManager getConstManager() { return constManager; }
 
     public String[] getScripts() {
@@ -87,7 +65,9 @@ public class DefMapping {
         // 3. 注入方的 setter 重载和输出方的 provider 匹配
         @SuppressWarnings("all")//
         String[] scripts = mappingWithConverters(//
-            to.findInjectorsFor(from.getThisElement()), from.findProvidersFor(to.getThisElement()), to.getSetters(),
+            to.findInjectorsFor(from.getThisElement()),
+            from.findProvidersFor(to.getThisElement()),
+            to.getSetters(),
             from.getGetter());
         if (scripts != null) {
             return scripts;
@@ -95,6 +75,9 @@ public class DefMapping {
 
         DeclareMapping pMapping = from.getForwardMapping(to.getThisElement());
         DeclareMapping iMapping = to.getBackwardMapping(from.getThisElement());
+
+        Log2.warn("iMapping: {}.", iMapping);
+        Log2.warn("pMapping: {}.", pMapping);
 
         // 4. getter/setter 相似类型匹配(要求 getter 类型是 setter 类型的子类)
         MappingDetail detail = defaultMappingWithSetterMethod();
@@ -105,7 +88,6 @@ public class DefMapping {
             }
             String iDefaultVal = iMapping.getDefaultValue();
             String pDefaultVal = pMapping.getDefaultValue();
-            Log2.warn("iDefaultVal: {}, pDefaultVal", iDefaultVal, pDefaultVal);
             String var = defaultVarFor(constManager, detail.getSetterType(), iDefaultVal);
             if (var == null) {
                 var = defaultVarFor(constManager, detail.getGetterType(), pDefaultVal);
@@ -227,6 +209,8 @@ public class DefMapping {
                 return cm.bigIntegerOf(value);
             } else if (Test2.isEnum(type)) {
                 return cm.enumOf(type, value);
+            } else if (Test2.isTypeof(type, String.class)) {
+                return cm.stringOf(value);
             }
         }
         return null;
@@ -237,8 +221,10 @@ public class DefMapping {
         private final String[] scripts;
 
         public Returning(String script) {
-            super(null, null, null, null, null, null, null);
-            this.scripts = new String[]{"return " + script + ";"};
+            super(null, null, null, null, null, null);
+            String trimmed = script.trim();
+            char last = trimmed.charAt(trimmed.length() - 1);
+            this.scripts = new String[]{"return " + script + (last == ';' ? "" : ";")};
         }
 
         @Override
@@ -268,7 +254,7 @@ public class DefMapping {
         public String[] getScriptsOnDefaultVal(String var, ConstManager cm) {
             String t0 = "{toName}.{setter}({type}.ifNull({fromName}.{getter}(), {var}));";
             t0 = GROUP.on(t0, getFromName(), getGetterName(), getToName(), getSetterName());
-            String script = TYPE_VAR.on(t0, cm.onImported(Default.class), var);
+            String script = TYPE_VAR.on(t0, cm.onImported(DefaultValue.class), var);
             return new String[]{script};
         }
 

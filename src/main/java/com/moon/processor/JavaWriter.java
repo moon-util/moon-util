@@ -1,5 +1,7 @@
 package com.moon.processor;
 
+import com.moon.processor.model.ThrowingConsumer;
+
 import javax.annotation.processing.Filer;
 import java.io.PrintWriter;
 import java.io.Writer;

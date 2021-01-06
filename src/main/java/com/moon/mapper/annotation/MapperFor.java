@@ -1,6 +1,6 @@
 package com.moon.mapper.annotation;
 
-import com.moon.mapper.BeanConverter;
+import com.moon.mapper.BeanCopier;
 import com.moon.mapper.MapperUtil;
 
 import java.lang.annotation.*;
@@ -60,7 +60,7 @@ public @interface MapperFor {
      *
      * @return 是否支持转换器
      *
-     * @see BeanConverter
+     * @see BeanCopier
      */
     boolean converter() default true;
 

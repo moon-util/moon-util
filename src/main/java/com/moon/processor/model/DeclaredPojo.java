@@ -1,14 +1,11 @@
 package com.moon.processor.model;
 
-import com.moon.processor.Completable;
 import com.moon.processor.manager.NameManager;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.TypeElement;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * POJO 定义

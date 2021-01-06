@@ -1,9 +1,7 @@
 package com.moon.processor.model;
 
-import com.moon.processor.Completable;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Generic2;
-import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
@@ -153,7 +151,9 @@ public class DeclareProperty implements Completable {
         Map<String, DeclareMapping> atMethod, Map<String, DeclareMapping> atField, String targetClass
     ) {
         DeclareMapping mapping = atMethod.get(targetClass);
-        return mapping == null ? atField.getOrDefault(targetClass, DeclareMapping.DFT) : mapping;
+        if (mapping == null) { mapping = atMethod.get(PUBLIC); }
+        if (mapping == null) { mapping = atField.get(targetClass); }
+        return mapping == null ? atField.getOrDefault(PUBLIC, DeclareMapping.DFT) : mapping;
     }
 
     public void addFieldMapping(DeclareMapping mapping) { putMapping(getFieldMappings(), mapping); }
@@ -163,7 +163,8 @@ public class DeclareProperty implements Completable {
     public void addGetterMapping(DeclareMapping mapping) { putMapping(getGetterMappings(), mapping); }
 
     private static void putMapping(Map<String, DeclareMapping> mappings, DeclareMapping mapping) {
-        mappings.put(mapping.getTargetCls(), mapping);
+        String mappingClass = Test2.isBasicType(mapping.getTargetCls()) ? PUBLIC : mapping.getTargetCls();
+        mappings.put(mappingClass, mapping);
     }
 
     public String findInjector(String type, String propertyType) { return find(getInjectorsMap(), type, propertyType); }

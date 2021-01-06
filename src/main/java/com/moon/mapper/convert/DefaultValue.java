@@ -3,7 +3,7 @@ package com.moon.mapper.convert;
 /**
  * @author benshaoye
  */
-public enum Default {
+public enum DefaultValue {
     ;
 
     public static <T> T ifNull(T value, T defaultValue) {

@@ -72,5 +72,8 @@ public class DeclareMapping {
 
         @Override
         public String getField(String fromProperty) { return fromProperty; }
+
+        @Override
+        public String toString() { return getClass().getSimpleName() + "{null}"; }
     }
 }
