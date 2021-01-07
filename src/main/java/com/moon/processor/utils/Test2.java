@@ -142,11 +142,11 @@ public enum Test2 {
         return false;
     }
 
-    static boolean isPublicMemberMethod(Element elem) {
+    public static boolean isPublicMemberMethod(Element elem) {
         return isMethod(elem) && isMember(elem) && isPublic(elem);
     }
 
-    static boolean isSetterMethod(Element elem) {
+    public static boolean isSetterMethod(Element elem) {
         if (isPublicMemberMethod(elem)) {
             ExecutableElement exe = (ExecutableElement) elem;
             String name = exe.getSimpleName().toString();
@@ -158,7 +158,7 @@ public enum Test2 {
         return false;
     }
 
-    static boolean isGetterMethod(Element elem) {
+    public static boolean isGetterMethod(Element elem) {
         if (isPublicMemberMethod(elem)) {
             ExecutableElement exe = (ExecutableElement) elem;
             String name = exe.getSimpleName().toString();

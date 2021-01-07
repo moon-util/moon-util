@@ -235,17 +235,24 @@ public class DeclareProperty implements Completable {
         return new DeclareMethod(method, declareType, actualType, true, false);
     }
 
+    private boolean isThisAbstract() { return Test2.isAbstractClass(getThisElement()); }
+
     @Override
     public void onCompleted() {
         DeclareMethod setter;
         VariableElement elementField = getField();
         List<DeclareMethod> getters = getGetters();
         Map<String, DeclareMethod> settersMap = getSetters();
+        final boolean thisIsAbstract = isThisAbstract();
 
         // 当不存在 getter/setter 时，检查和设置 lombok getter/setter
-        if (getters.isEmpty() && Test2.hasLombokGetter(elementField)) {
-            String getterName = Element2.getLombokGetterName(elementField);
-            getters.add(new DeclareMethod(null, getterName, getDeclareType(), getActualType(), false, true));
+        if (getters.isEmpty()) {
+            if (thisIsAbstract) {
+                // TODO 生成接口/抽象方法的默认声明
+            } else if (Test2.hasLombokGetter(elementField)) {
+                String getterName = Element2.getLombokGetterName(elementField);
+                getters.add(new DeclareMethod(null, getterName, getDeclareType(), getActualType(), false, true));
+            }
         }
         if (settersMap.isEmpty() && Test2.hasLombokSetter(elementField)) {
             String setterName = Element2.getLombokSetterName(elementField);
@@ -267,7 +274,6 @@ public class DeclareProperty implements Completable {
             DeclareMethod getter = getters.get(0);
             this.setGetter(getter);
             this.setSetter(settersMap.get(getter.getActualType()));
-            return;
         }
     }
 

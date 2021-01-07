@@ -49,8 +49,7 @@ public enum Generic2 {
         String declared = declareBuilder.toString().trim();
         String key = toFullKey(enclosingClassname, declared);
         DeclareGeneric generic = generics.get(key);
-        String actual = generic == null ? declared : generic.getEffectType();
-        return actual;
+        return generic == null ? declared : generic.getEffectType();
     }
 
     /*
@@ -124,7 +123,7 @@ public enum Generic2 {
             if (subGenericModel != null && utils.getTypeElement(actual) == null) {
                 actual = subGenericModel.getActual();
             }
-            String bound = param.getBounds().toString();
+            String bound = param.getBounds().get(0).toString();
             String declare = getDeclareType(param);
             DeclareGeneric model = new DeclareGeneric(declare, actual, bound);
             String key = toFullKey(declareClassname, model.getDeclare());

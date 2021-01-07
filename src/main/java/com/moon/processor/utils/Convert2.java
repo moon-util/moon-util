@@ -22,7 +22,7 @@ import java.util.function.Function;
 public enum Convert2 {
     ;
 
-    static void parseConverters(
+    public static void parseConverters(
         Map<String, DeclareGeneric> thisGenericMap, TypeElement rootElement, DeclaredPojo definition
     ) { parse(thisGenericMap, rootElement, definition); }
 
@@ -57,10 +57,12 @@ public enum Convert2 {
         for (Element element : elements) {
             MappingInjector[] is = getInjectors(element);
             if (is != null && is.length > 0) {
+                Assert2.assertNotAbstract((ExecutableElement) element);
                 parseMappingInjectors(thisGenericMap, element, classElement, definition, is);
             }
             MappingProvider[] ps = getProviders(element);
             if (ps != null && ps.length > 0) {
+                Assert2.assertNotAbstract((ExecutableElement) element);
                 parseMappingProviders(thisGenericMap, element, classElement, definition, ps);
             }
         }
