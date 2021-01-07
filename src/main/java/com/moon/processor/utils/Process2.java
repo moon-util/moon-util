@@ -79,6 +79,7 @@ public enum Process2 {
         TypeElement parsingElement,
         TypeElement thisElement
     ) {
+        boolean isAbstract = Test2.isAbstractClass(parsingElement);
         if (Test2.isMemberField(element)) {
             String name = element.getSimpleName().toString();
             if (presentKeys.contains(name)) {
@@ -107,6 +108,8 @@ public enum Process2 {
             prop.setGetter(elem, genericMap);
         } else if (Test2.isConstructor(element)) {
             // definition.addConstructor((ExecutableElement) element);
+        } else if (Test2.isMethod(element)) {
+            //
         }
     }
 

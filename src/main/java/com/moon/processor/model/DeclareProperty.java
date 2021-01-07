@@ -257,11 +257,8 @@ public class DeclareProperty implements Completable {
         if (!getters.isEmpty()) {
             DeclareMethod getter = getters.get(0);
             this.setGetter(getter);
-            setter = settersMap.get(getter.getActualType());
-            if (setter != null) {
-                this.setSetter(setter);
-                return;
-            }
+            this.setSetter(settersMap.get(getter.getActualType()));
+            return;
         }
         // if missing matches setter method
         // 当 setter 重载时，不同 jdk 以及不同版本对默认处理方式不一样

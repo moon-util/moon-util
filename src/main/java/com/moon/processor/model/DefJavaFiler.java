@@ -31,6 +31,8 @@ public class DefJavaFiler implements JavaFileWriteable {
     private final Map<String, String> constantsMap = new LinkedHashMap<>();
     private final Map<String, DefMethod> methodsDecl = new LinkedHashMap<>();
 
+    private boolean component = true;
+
     private DefJavaFiler(Type type, String pkg, String classname) {
         this.interfaces = new LinkedHashSet<>();
         this.importer = new Importer();
@@ -60,6 +62,10 @@ public class DefJavaFiler implements JavaFileWriteable {
         CLASS
     }
 
+    public boolean isComponent() { return component; }
+
+    public void setComponent(boolean component) { this.component = component; }
+
     public Importer getImporter() { return importer; }
 
     public String onImported(String classname) { return getImporter().onImported(classname); }
@@ -69,6 +75,15 @@ public class DefJavaFiler implements JavaFileWriteable {
     public String getPkg() { return pkg; }
 
     public Type getType() { return type; }
+
+    public DefJavaFiler component() {
+        return component(true);
+    }
+
+    public DefJavaFiler component(boolean component) {
+        setComponent(component);
+        return this;
+    }
 
     public Set<String> getEnums() { return enums; }
 
@@ -124,9 +139,30 @@ public class DefJavaFiler implements JavaFileWriteable {
 
     public DefJavaFiler privateField(String name, String type) {
         if (String2.isNotBlank(type) && String2.isNotBlank(name)) {
-            fieldsMap.put(name, String2.toDeclareField(name, type));
+            fieldsMap.put(name, String2.toDeclareField(name, onImported(type)));
         }
         return this;
+    }
+
+    private final static DefParameters PARAMS = DefParameters.of();
+
+    public DefMethod publicGetterMethod(String fieldName, String type) {
+        String getterName = String2.toGetterName(fieldName, type);
+        return publicGetterMethod(getterName, fieldName, type);
+    }
+
+    public DefMethod publicSetterMethod(String fieldName, String type) {
+        String setterName = Const2.SET + String2.capitalize(fieldName);
+        return publicGetterMethod(setterName, fieldName, type);
+    }
+
+    public DefMethod publicGetterMethod(String getterName, String fieldName, String type) {
+        return publicMethod(getterName, type, PARAMS).returning(fieldName);
+    }
+
+    public DefMethod publicSetterMethod(String setterName, String fieldName, String type) {
+        DefParameters params = DefParameters.of(fieldName, type);
+        return publicMethod(setterName, "void", params).scriptOfAssign(fieldName);
     }
 
     public DefMethod publicMethod(
@@ -221,8 +257,14 @@ public class DefJavaFiler implements JavaFileWriteable {
         sb.insert(importIndex + appendedLength, importsBuilder);
         appendedLength += importsBuilder.length();
 
-        // const of custom
+        // fields
         StringBuilder constBuilder = newLine(new StringBuilder());
+        for (String value : fieldsMap.values()) {
+            newLine(constBuilder, indented).append(value);
+        }
+
+        // const of custom
+        newLine(constBuilder);
         for (String value : constantsMap.values()) {
             newLine(constBuilder, indented).append(value);
         }
@@ -254,7 +296,7 @@ public class DefJavaFiler implements JavaFileWriteable {
             newLine(sb, indented).append("date = \"").append(NOW).append("\"");
             newLine(sb).append(')');
         }
-        if (Imported.COMPONENT) {
+        if (isComponent() && Imported.COMPONENT) {
             newLine(sb).append('@').append(onImported(Component.class));
         }
     }

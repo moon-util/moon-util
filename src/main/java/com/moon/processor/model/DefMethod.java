@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.moon.processor.utils.String2.newLine;
 
@@ -83,7 +84,22 @@ public class DefMethod {
         return def;
     }
 
-    public void returning(String script) { mappings.put(null, DefMapping.returning(script)); }
+    public DefMethod returning(String script) {
+        mappings.put(null, DefMapping.returning(script));
+        return this;
+    }
+
+    private final AtomicInteger indexer = new AtomicInteger();
+
+    public DefMethod scriptOfAssign(String name) {
+        return scriptOf(String2.format("this.{} = {}", name, name));
+    }
+
+    public DefMethod scriptOf(String script) {
+        String placeholder = String2.format("<{}>", indexer.getAndIncrement());
+        mappings.put(placeholder, DefMapping.scriptOf(script));
+        return this;
+    }
 
     public String toString(int indent) {
         String space = String2.indent(indent);

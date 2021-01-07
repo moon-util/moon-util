@@ -3,7 +3,6 @@ package com.moon.processor.model;
 import com.moon.mapper.convert.DefaultValue;
 import com.moon.processor.manager.ConstManager;
 import com.moon.processor.utils.*;
-import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -45,6 +44,8 @@ public class DefMapping {
 
     public static DefMapping returning(String script) { return new Returning(script); }
 
+    public static DefMapping scriptOf(String script) { return new Script(script); }
+
     public DeclareProperty getFromProp() { return fromProp; }
 
     public DeclareProperty getToProp() { return toProp; }
@@ -65,9 +66,7 @@ public class DefMapping {
         // 3. 注入方的 setter 重载和输出方的 provider 匹配
         @SuppressWarnings("all")//
         String[] scripts = mappingWithConverters(//
-            to.findInjectorsFor(from.getThisElement()),
-            from.findProvidersFor(to.getThisElement()),
-            to.getSetters(),
+            to.findInjectorsFor(from.getThisElement()), from.findProvidersFor(to.getThisElement()), to.getSetters(),
             from.getGetter());
         if (scripts != null) {
             return scripts;
@@ -225,6 +224,21 @@ public class DefMapping {
             String trimmed = script.trim();
             char last = trimmed.charAt(trimmed.length() - 1);
             this.scripts = new String[]{"return " + script + (last == ';' ? "" : ";")};
+        }
+
+        @Override
+        public String[] getScripts() { return scripts; }
+    }
+
+    private static final class Script extends DefMapping {
+
+        private final String[] scripts;
+
+        public Script(String script) {
+            super(null, null, null, null, null, null);
+            String trimmed = script.trim();
+            char last = trimmed.charAt(trimmed.length() - 1);
+            this.scripts = new String[]{script + (last == ';' ? "" : ";")};
         }
 
         @Override

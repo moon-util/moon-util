@@ -1,6 +1,7 @@
 package com.moon.processor.model;
 
 import com.moon.processor.manager.NameManager;
+import com.moon.processor.utils.Assert2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Test2;
 
@@ -75,38 +76,77 @@ public class DeclaredPojo extends LinkedHashMap<String, DeclareProperty> impleme
     @Override
     public void onCompleted() { values().forEach(Completable::onCompleted); }
 
-    private final static DefParameters PARAMS = DefParameters.of();
-
     public DefJavaFiler getDefJavaFiler() {
         if (isAbstracted()) {
-            DefJavaFiler filer = newDefJavaFiler();
-            for (Map.Entry<String, DeclareProperty> propertyEntry : entrySet()) {
-                DeclareProperty prop = propertyEntry.getValue();
-                String name = propertyEntry.getKey();
-                DeclareMethod getter = prop.getGetter();
-                if (getter != null) {
-                    String type = getter.getActualType();
-                    filer.privateField(name, type);
-                    filer.publicMethod(getter.getName(), type, PARAMS).override().returning(name);
-                }
+            String implName = getImplClassname(), pkg = "";
+            int lastIdx = implName.lastIndexOf('.');
+            if (lastIdx >= 0) {
+                pkg = implName.substring(0, lastIdx);
             }
-            // return filer;
+            DefJavaFiler filer = DefJavaFiler.classOf(pkg, implName).component(false);
+            if (isInterfaced()) {
+                implementForInterface(filer.implement(getThisClassname()));
+            } else if (isAbstracted()) {
+                extendForAbstractCls(filer.extend(getThisClassname()));
+            }
+            return filer;
         }
         return null;
     }
 
-    private DefJavaFiler newDefJavaFiler() {
-        String implName = getImplClassname(), pkg = "";
-        int lastIdx = implName.lastIndexOf('.');
-        if (lastIdx >= 0) {
-            pkg = implName.substring(0, lastIdx);
+    private void extendForAbstractCls(DefJavaFiler filer) {
+        for (Map.Entry<String, DeclareProperty> propertyEntry : entrySet()) {
+            DeclareProperty prop = propertyEntry.getValue();
+            String name = propertyEntry.getKey();
+            DeclareMethod getter = prop.getGetter();
+            DeclareMethod setter = prop.getSetter();
+            if (getter == null) {
+                if (setter != null && setter.isAbstractMethod()) {
+                    String type = prop.getActualType();
+                    filer.privateField(name, type);
+                    filer.publicGetterMethod(name, type);
+                    filer.publicSetterMethod(name, type).override();
+                }
+            } else if (getter.isAbstractMethod()) {
+                String getterType = getter.getActualType();
+                filer.privateField(name, getter.getActualType());
+                filer.publicGetterMethod(getter.getName(), name, getterType);
+                if (setter == null) {
+                    filer.publicSetterMethod(name, getterType);
+                } else if (Assert2.assertAbstractMethod(setter, "setter")) {
+                    filer.publicSetterMethod(setter.getName(), name, setter.getActualType()).override();
+                }
+            } else if (setter != null) {
+                Assert2.assertNonAbstractMethod(setter, "setter");
+            }
         }
-        DefJavaFiler filer = DefJavaFiler.classOf(pkg, implName);
-        if (isAbstracted()) {
-            filer.extend(getThisClassname());
-        } else if (isInterfaced()) {
-            filer.implement(getThisClassname());
+    }
+
+    private void implementForInterface(DefJavaFiler filer) {
+        for (Map.Entry<String, DeclareProperty> propertyEntry : entrySet()) {
+            DeclareProperty prop = propertyEntry.getValue();
+            String name = propertyEntry.getKey();
+            DeclareMethod getter = prop.getGetter();
+            DeclareMethod setter = prop.getSetter();
+            if (getter == null && setter != null && !setter.isDefaultMethod()) {
+                String type = setter.getActualType();
+                filer.privateField(name, type);
+                filer.publicSetterMethod(setter.getName(), name, type).override();
+                filer.publicGetterMethod(name, type);
+                Assert2.assertNonSetters(prop.getSetters(), type);
+            } else if (getter != null && Assert2.assertEffectMethod(getter, setter)) {
+                String type = getter.getActualType();
+                filer.privateField(name, type);
+                filer.publicGetterMethod(getter.getName(), name, type).override();
+
+                if (setter != null) {
+                    String setterType = setter.getActualType();
+                    filer.publicSetterMethod(setter.getName(), name, setterType).override();
+                } else {
+                    filer.publicSetterMethod(name, type);
+                }
+                Assert2.assertNonSetters(prop.getSetters(), type);
+            }
         }
-        return filer;
     }
 }

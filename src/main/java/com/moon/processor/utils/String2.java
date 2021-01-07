@@ -11,9 +11,9 @@ import java.util.List;
 public enum String2 {
     ;
 
-    static String decapitalize(String name) { return Introspector.decapitalize(name); }
+    public static String decapitalize(String name) { return Introspector.decapitalize(name); }
 
-    static String capitalize(String name) {
+    public static String capitalize(String name) {
         if (name == null || name.length() == 0) {
             return name;
         }
@@ -121,9 +121,12 @@ public enum String2 {
         return GROUP.on(template, type, "", field);
     }
 
+    public static String toGetterName(String field, String type) {
+        return ("boolean".equals(type) ? Const2.IS : Const2.GET) + capitalize(field);
+    }
+
     public static String toGetterMethod(String field, String type) {
-        String prefix = "boolean".equals(type) ? Const2.IS : Const2.GET;
-        return toGetterMethod(prefix + capitalize(field), field, type);
+        return toGetterMethod(toGetterName(field, type), field, type);
     }
 
     public static String toGetterMethod(String getterName, String field, String type) {

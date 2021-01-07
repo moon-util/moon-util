@@ -1,8 +1,10 @@
 package com.moon.processor.model;
 
 import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 
 /**
  * @author benshaoye
@@ -18,6 +20,8 @@ public class DeclareMethod {
      */
     private final boolean declared;
     private final boolean lombokGenerated;
+    private final boolean defaultMethod;
+    private final boolean abstractMethod;
 
     public DeclareMethod(
         ExecutableElement method, String declareType, String actualType, boolean declared, boolean lombokGenerated
@@ -37,6 +41,8 @@ public class DeclareMethod {
         this.actualType = actualType;
         this.declared = declared;
         this.lombokGenerated = lombokGenerated;
+        this.defaultMethod = Test2.isAny(method, Modifier.DEFAULT);
+        this.abstractMethod = Test2.isAny(method, Modifier.ABSTRACT);
     }
 
     public ExecutableElement getMethod() { return method; }
@@ -62,4 +68,8 @@ public class DeclareMethod {
      * @return true|false
      */
     public boolean isDeclared() { return declared; }
+
+    public boolean isDefaultMethod() { return defaultMethod; }
+
+    public boolean isAbstractMethod() { return abstractMethod; }
 }
