@@ -68,6 +68,9 @@ public enum Test2 {
     }
 
     public static boolean isAny(Element elem, Modifier modifier, Modifier... modifiers) {
+        if (elem == null) {
+            return false;
+        }
         Set<Modifier> modifierSet = elem.getModifiers();
         boolean contains = modifierSet.contains(modifier);
         if (contains) {

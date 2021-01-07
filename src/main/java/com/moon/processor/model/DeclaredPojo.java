@@ -131,8 +131,8 @@ public class DeclaredPojo extends LinkedHashMap<String, DeclareProperty> impleme
             if (getter == null && setter != null && !setter.isDefaultMethod()) {
                 String type = setter.getActualType();
                 filer.privateField(name, type);
-                filer.publicSetterMethod(setter.getName(), name, type).override();
                 filer.publicGetterMethod(name, type);
+                filer.publicSetterMethod(setter.getName(), name, type).override();
                 Assert2.assertNonSetters(prop.getSetters(), type);
             } else if (getter != null && Assert2.assertEffectMethod(getter, setter)) {
                 String type = getter.getActualType();

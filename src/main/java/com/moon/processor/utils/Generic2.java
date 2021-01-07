@@ -21,7 +21,7 @@ public enum Generic2 {
     public static String mappingToActual(
         Map<String, DeclareGeneric> generics, String enclosingClassname, String declareType
     ) {
-        StringBuilder resultBuilder = new StringBuilder();
+        StringBuilder actual = new StringBuilder();
         StringBuilder tempBuilder = new StringBuilder();
         char[] chars = declareType.toCharArray();
         for (char ch : chars) {
@@ -31,11 +31,7 @@ public enum Generic2 {
                 case '<':
                 case '>':
                 case ',':
-                    String declared = tempBuilder.toString().trim();
-                    String key = toFullKey(enclosingClassname, declared);
-                    DeclareGeneric generic = generics.get(key);
-                    String actual = generic == null ? declared : generic.getActual();
-                    resultBuilder.append(actual).append(ch);
+                    actual.append(toActual(generics, enclosingClassname, tempBuilder)).append(ch);
                     tempBuilder.setLength(0);
                     break;
                 default:
@@ -43,8 +39,18 @@ public enum Generic2 {
                     break;
             }
         }
-        resultBuilder.append(tempBuilder);
-        return resultBuilder.toString().trim();
+        actual.append(toActual(generics, enclosingClassname, tempBuilder));
+        return actual.toString().trim();
+    }
+
+    private static String toActual(
+        Map<String, DeclareGeneric> generics, String enclosingClassname, StringBuilder declareBuilder
+    ) {
+        String declared = declareBuilder.toString().trim();
+        String key = toFullKey(enclosingClassname, declared);
+        DeclareGeneric generic = generics.get(key);
+        String actual = generic == null ? declared : generic.getEffectType();
+        return actual;
     }
 
     /*
@@ -102,12 +108,12 @@ public enum Generic2 {
     private static void parse(
         Map<String, DeclareGeneric> genericMap, TypeMirror elementTyped, TypeElement element, TypeElement subClass
     ) {
-        if (element == null || elementTyped == null || subClass == null) {
+        if (element == null || elementTyped == null) {
             return;
         }
         List<String> actualAll = splitSuperclass(elementTyped.toString());
         String declareClassname = Element2.getQualifiedName(element);
-        String subClassname = Element2.getQualifiedName(subClass);
+        String subClassname = subClass == null ? "" : Element2.getQualifiedName(subClass);
         Elements utils = Environment2.getUtils();
         int index = 0;
         for (TypeParameterElement param : element.getTypeParameters()) {

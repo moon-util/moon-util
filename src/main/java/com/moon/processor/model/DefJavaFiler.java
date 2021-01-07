@@ -153,7 +153,7 @@ public class DefJavaFiler implements JavaFileWriteable {
 
     public DefMethod publicSetterMethod(String fieldName, String type) {
         String setterName = Const2.SET + String2.capitalize(fieldName);
-        return publicGetterMethod(setterName, fieldName, type);
+        return publicSetterMethod(setterName, fieldName, type);
     }
 
     public DefMethod publicGetterMethod(String getterName, String fieldName, String type) {

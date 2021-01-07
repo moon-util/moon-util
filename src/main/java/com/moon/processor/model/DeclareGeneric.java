@@ -33,7 +33,6 @@ public class DeclareGeneric {
         this.declare = declare;
         this.actual = actual;
         this.bound = bound;
-        // 这里的 equals 判断是多余的，而且不会走
         boolean isBound = actual == null || Objects.equals(actual, declare);
         this.effectType = isBound ? bound : actual;
         this.simpleEffectType = toSimpleGenericTypename(this.effectType);
@@ -55,5 +54,17 @@ public class DeclareGeneric {
         }
         int index = value.indexOf('<');
         return index < 0 ? value : value.substring(0, index);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("DeclareGeneric{");
+        sb.append("declare='").append(declare).append('\'');
+        sb.append(", actual='").append(actual).append('\'');
+        sb.append(", bound='").append(bound).append('\'');
+        sb.append(", effectType='").append(effectType).append('\'');
+        sb.append(", simpleEffectType='").append(simpleEffectType).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

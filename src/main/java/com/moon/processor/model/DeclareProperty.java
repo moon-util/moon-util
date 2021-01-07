@@ -254,20 +254,21 @@ public class DeclareProperty implements Completable {
         }
 
         // 执行映射
-        if (!getters.isEmpty()) {
+        if (getters.isEmpty()) {
+            // if missing matches setter method
+            setter = settersMap.get(getActualType());
+            if (setter == null) {
+                // 当 setter 重载时，不同 jdk 以及不同版本对默认处理方式不一样
+                // 故这里自定义了 setter 选择方式
+                setter = filterSetterMethod(settersMap);
+            }
+            this.setSetter(setter);
+        } else {
             DeclareMethod getter = getters.get(0);
             this.setGetter(getter);
             this.setSetter(settersMap.get(getter.getActualType()));
             return;
         }
-        // if missing matches setter method
-        // 当 setter 重载时，不同 jdk 以及不同版本对默认处理方式不一样
-        // 故这里自定义了默认 setter 处理方式
-        setter = settersMap.get(getActualType());
-        if (setter == null) {
-            setter = filterSetterMethod(settersMap);
-        }
-        this.setSetter(setter);
     }
 
     private static DeclareMethod filterSetterMethod(Map<String, DeclareMethod> settersMap) {

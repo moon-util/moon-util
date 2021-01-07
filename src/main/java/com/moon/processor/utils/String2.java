@@ -134,8 +134,12 @@ public enum String2 {
         return GROUP.on(template, type, getterName, field);
     }
 
+    public static String toSetterName(String field){
+        return Const2.SET + capitalize(field);
+    }
+
     public static String toSetterMethod(String field, String type) {
-        return toSetterMethod(Const2.SET + capitalize(field), field, type);
+        return toSetterMethod(toSetterName(field), field, type);
     }
 
     public static String toSetterMethod(String setterName, String field, String type) {
