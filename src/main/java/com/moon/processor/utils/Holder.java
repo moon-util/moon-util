@@ -8,6 +8,7 @@ public enum Holder {
      * names
      */
     var,
+    cast,
     name,
     type,
     type0,

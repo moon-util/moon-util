@@ -5,6 +5,7 @@ import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import java.util.Objects;
 
 /**
  * @author benshaoye
@@ -45,6 +46,10 @@ public class DeclareMethod {
         this.abstractMethod = Test2.isAny(method, Modifier.ABSTRACT);
     }
 
+    public static DeclareMethod ofDeclared(ExecutableElement method, String declareType, String actualType) {
+        return new DeclareMethod(method, declareType, actualType, true, false);
+    }
+
     public ExecutableElement getMethod() { return method; }
 
     public String getName() { return name; }
@@ -52,6 +57,8 @@ public class DeclareMethod {
     public String getDeclareType() { return declareType; }
 
     public String getActualType() { return actualType; }
+
+    public boolean isGenericDeclared() { return !Objects.equals(getDeclareType(), getActualType()); }
 
     public boolean isLombokGenerated() { return lombokGenerated; }
 

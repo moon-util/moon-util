@@ -3,6 +3,7 @@ package com.moon.processor.utils;
 import com.moon.mapper.annotation.MappingInjector;
 import com.moon.mapper.annotation.MappingProvider;
 import com.moon.processor.model.DeclareGeneric;
+import com.moon.processor.model.DeclareMethod;
 import com.moon.processor.model.DeclareProperty;
 import com.moon.processor.model.DeclaredPojo;
 
@@ -77,16 +78,17 @@ public enum Convert2 {
     ) {
         String enclosingClassname = Element2.getQualifiedName(enclosingElement);
         for (MappingProvider pvd : providers) {
-            ExecutableElement method = (ExecutableElement) element;
-            String propertyName = toPropertyName(method, pvd, MappingProvider::value, GET, PROVIDE);
+            ExecutableElement elem = (ExecutableElement) element;
+            String propertyName = toPropertyName(elem, pvd, MappingProvider::value, GET, PROVIDE);
             DeclareProperty property = definition.get(propertyName);
             if (property == null) {
                 continue;
             }
             String forClass = Element2.getClassname(pvd, MappingProvider::provideFor);
-            String returnType = method.getReturnType().toString();
-            String actualType = Generic2.mappingToActual(thisGenericMap, enclosingClassname, returnType);
-            property.addProvider(forClass, actualType, Element2.getSimpleName(method));
+            String declareType = elem.getReturnType().toString();
+            String actualType = Generic2.mappingToActual(thisGenericMap, enclosingClassname, declareType);
+            DeclareMethod method = DeclareMethod.ofDeclared(elem, declareType, actualType);
+            property.addProvider(forClass, actualType, method);
         }
     }
 
@@ -99,16 +101,17 @@ public enum Convert2 {
     ) {
         String enclosingClassname = Element2.getQualifiedName(enclosingElement);
         for (MappingInjector ijt : injectors) {
-            ExecutableElement method = (ExecutableElement) element;
-            String propertyName = toPropertyName(method, ijt, MappingInjector::value, SET, WITH, INJECT);
+            ExecutableElement elem = (ExecutableElement) element;
+            String propertyName = toPropertyName(elem, ijt, MappingInjector::value, SET, WITH, INJECT);
             DeclareProperty property = definition.get(propertyName);
             if (property == null) {
                 continue;
             }
             String fromClass = Element2.getClassname(ijt, MappingInjector::injectBy);
-            String returnType = method.getParameters().get(0).asType().toString();
-            String actualType = Generic2.mappingToActual(thisGenericMap, enclosingClassname, returnType);
-            property.addInjector(fromClass, actualType, Element2.getSimpleName(method));
+            String declareType = elem.getParameters().get(0).asType().toString();
+            String actualType = Generic2.mappingToActual(thisGenericMap, enclosingClassname, declareType);
+            DeclareMethod method = DeclareMethod.ofDeclared(elem, declareType, actualType);
+            property.addInjector(fromClass, actualType, method);
         }
     }
 

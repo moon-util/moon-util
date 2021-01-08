@@ -4,7 +4,6 @@ import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Generic2;
 import com.moon.processor.utils.Test2;
 
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.*;
@@ -58,12 +57,12 @@ public class DeclareProperty implements Completable {
     /**
      * targetClass : propertyType : methodName
      */
-    private final Map<String, Map<String, String>> injectorsMap = new HashMap<>();
+    private final Map<String, Map<String, DeclareMethod>> injectorsMap = new HashMap<>();
 
     /**
      * targetClass : propertyType : methodName
      */
-    private final Map<String, Map<String, String>> providersMap = new HashMap<>();
+    private final Map<String, Map<String, DeclareMethod>> providersMap = new HashMap<>();
 
     public DeclareProperty(String name, TypeElement enclosingElement, TypeElement thisElement) {
         this.enclosingElement = enclosingElement;
@@ -107,9 +106,9 @@ public class DeclareProperty implements Completable {
 
     public Map<String, DeclareMapping> getSetterMappings() { return setterMappings; }
 
-    public Map<String, Map<String, String>> getInjectorsMap() { return injectorsMap; }
+    public Map<String, Map<String, DeclareMethod>> getInjectorsMap() { return injectorsMap; }
 
-    public Map<String, Map<String, String>> getProvidersMap() { return providersMap; }
+    public Map<String, Map<String, DeclareMethod>> getProvidersMap() { return providersMap; }
 
     public String getFinalActualType() {
         DeclareMethod method = getGetter();
@@ -123,12 +122,12 @@ public class DeclareProperty implements Completable {
         return null;
     }
 
-    public void addInjector(String fromType, String injectedType, String injectorMethodName) {
-        putConverter(getInjectorsMap(), fromType, injectedType, injectorMethodName);
+    public void addInjector(String fromType, String injectedType, DeclareMethod injectorMethod) {
+        putConverter(getInjectorsMap(), fromType, injectedType, injectorMethod);
     }
 
-    public void addProvider(String toType, String providedType, String providerMethodName) {
-        putConverter(getProvidersMap(), toType, providedType, providerMethodName);
+    public void addProvider(String toType, String providedType, DeclareMethod providerMethod) {
+        putConverter(getProvidersMap(), toType, providedType, providerMethod);
     }
 
     public DeclareMapping getForwardMapping(TypeElement targetClass) {
@@ -167,32 +166,32 @@ public class DeclareProperty implements Completable {
         mappings.put(mappingClass, mapping);
     }
 
-    public String findInjector(String type, String propertyType) { return find(getInjectorsMap(), type, propertyType); }
+    public DeclareMethod findInjector(String type, String propertyType) { return find(getInjectorsMap(), type, propertyType); }
 
-    public String findProvider(String type, String propertyType) { return find(getProvidersMap(), type, propertyType); }
+    public DeclareMethod findProvider(String type, String propertyType) { return find(getProvidersMap(), type, propertyType); }
 
-    public Map<String, String> findInjectorsFor(TypeElement targetClass) {
+    public Map<String, DeclareMethod> findInjectorsFor(TypeElement targetClass) {
         return findInjectorsFor(Element2.getQualifiedName(targetClass));
     }
 
-    public Map<String, String> findProvidersFor(TypeElement targetClass) {
+    public Map<String, DeclareMethod> findProvidersFor(TypeElement targetClass) {
         return findProvidersFor(Element2.getQualifiedName(targetClass));
     }
 
-    public Map<String, String> findInjectorsFor(String targetClass) {
+    public Map<String, DeclareMethod> findInjectorsFor(String targetClass) {
         return convertersFor(getInjectorsMap(), targetClass);
     }
 
-    public Map<String, String> findProvidersFor(String targetClass) {
+    public Map<String, DeclareMethod> findProvidersFor(String targetClass) {
         return convertersFor(getProvidersMap(), targetClass);
     }
 
-    private static String find(Map<String, Map<String, String>> map, String type, String propertyType) {
+    private static DeclareMethod find(Map<String, Map<String, DeclareMethod>> map, String type, String propertyType) {
         return convertersFor(map, type).get(propertyType);
     }
 
-    private static Map<String, String> convertersFor(Map<String, Map<String, String>> map, String type) {
-        Map<String, String> maybePresentMap = map.get(type);
+    private static Map<String, DeclareMethod> convertersFor(Map<String, Map<String, DeclareMethod>> map, String type) {
+        Map<String, DeclareMethod> maybePresentMap = map.get(type);
         if (maybePresentMap == null) {
             maybePresentMap = new HashMap<>();
         }
@@ -201,7 +200,7 @@ public class DeclareProperty implements Completable {
     }
 
     private static void putConverter(
-        Map<String, Map<String, String>> map, String type, String propType, String name
+        Map<String, Map<String, DeclareMethod>> map, String type, String propType, DeclareMethod name
     ) {
         type = Test2.isBasicType(type) ? PUBLIC : type;
         map.computeIfAbsent(type, k -> new HashMap<>(2)).put(propType, name);
@@ -218,22 +217,9 @@ public class DeclareProperty implements Completable {
         setActualType(Generic2.mappingToActual(genericMap, declareClassname, declareType));
     }
 
-    public void setSetter(ExecutableElement setter, Map<String, DeclareGeneric> genericMap) {
-        DeclareMethod method = toMethod(Element2.getSetterDeclareType(setter), setter, genericMap);
-        setters.put(method.getActualType(), method);
-    }
+    public void addSetter(DeclareMethod setter) { setters.put(setter.getActualType(), setter); }
 
-    public void setGetter(ExecutableElement getter, Map<String, DeclareGeneric> genericMap) {
-        String declareType = Element2.getGetterDeclareType(getter);
-        getters.add(toMethod(declareType, getter, genericMap));
-    }
-
-    private DeclareMethod toMethod(String declareType, ExecutableElement method, Map<String, DeclareGeneric> generics) {
-        TypeElement nameable = (TypeElement) method.getEnclosingElement();
-        String declareClassname = Element2.getQualifiedName(nameable);
-        String actualType = Generic2.mappingToActual(generics, declareClassname, declareType);
-        return new DeclareMethod(method, declareType, actualType, true, false);
-    }
+    public void addGetter(DeclareMethod getter) { getters.add(getter); }
 
     private boolean isThisAbstract() { return Test2.isAbstractClass(getThisElement()); }
 

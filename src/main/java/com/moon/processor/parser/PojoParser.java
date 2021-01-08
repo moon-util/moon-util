@@ -7,14 +7,13 @@ import com.moon.processor.manager.NameManager;
 import com.moon.processor.model.*;
 import com.moon.processor.utils.*;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author benshaoye
@@ -39,6 +38,17 @@ public class PojoParser {
      * 忽略容器
      */
     private final Map<String, IgnoredModel> ignoringMap;
+    /**
+     * 已解析的属性
+     */
+    private final Set<String> parsedKeys = new HashSet<>();
+    /**
+     * 已解析
+     */
+    private final Set<String> parsedExpandMethods = new HashSet<>();
+
+    private final Types types = Environment2.getTypes();
+
 
     private PojoParser(TypeElement thisElement, NameManager nameManager) {
         this.declaredPojo = new DeclaredPojo(thisElement, nameManager);
@@ -47,11 +57,64 @@ public class PojoParser {
         this.thisElement = thisElement;
     }
 
-    private void handleEnclosedElem(Set<String> presentKeys, Element element, TypeElement parsingElem) {
-        boolean isAbstract = Test2.isAbstractClass(parsingElem);
+    private boolean isParsedProperty(String name) { return parsedKeys.contains(name); }
+
+    private boolean isParsedSetter(String name, String actualType) {
+        if (isParsedProperty(name)) {
+            return declaredPojo.get(name).getSetters().get(actualType) != null;
+        }
+        return false;
+    }
+
+    private boolean isParsedGetter(String name) {
+        if (isParsedProperty(name)) {
+            return !declaredPojo.get(name).getGetters().isEmpty();
+        }
+        return false;
+    }
+
+    private final static String TEMPLATE = "{} {} {}({})";
+
+    /**
+     * 处理扩展方法：
+     * <p>
+     * 1. 抽象方法要求之类必须实现；
+     * 2. 非抽象方法没特殊要求
+     *
+     * @param method
+     * @param parsingElem
+     */
+    private void handleExpandMethod(ExecutableElement method, String parsingElem) {
+        if (Test2.isAny(method, Modifier.ABSTRACT)) {
+
+        } else {
+            String simpleName = Element2.getSimpleName(method);
+            String returnType = Generic2.mappingToActual(thisGenericMap,
+                parsingElem,
+                method.getReturnType().toString());
+            String parameters = method.getParameters()
+                .stream()
+                .map(p -> Generic2.mappingToActual(thisGenericMap, parsingElem, p.asType().toString()))
+                .collect(Collectors.joining(","));
+            if (Test2.isAny(method, Modifier.PUBLIC)) {
+                String.format(TEMPLATE, Const2.PUBLIC, returnType, simpleName, parameters);
+            } else if (Test2.isAny(method, Modifier.PROTECTED)) {
+                String.format(TEMPLATE, Const2.PROTECTED, returnType, simpleName, parameters);
+                String.format(TEMPLATE, Const2.PUBLIC, returnType, simpleName, parameters);
+            }
+        }
+    }
+
+    private String findActualType(String parsingClass, String declaredType) {
+        return Generic2.mappingToActual(thisGenericMap, parsingClass, declaredType);
+    }
+
+    private void handleEnclosedElem(Element element, TypeElement parsingElem) {
+        String parsingClass = Element2.getQualifiedName(parsingElem);
+        String declaredType, actualType;
         if (Test2.isMemberField(element)) {
             String name = element.getSimpleName().toString();
-            if (presentKeys.contains(name)) {
+            if (isParsedProperty(name)) {
                 return;
             }
             DeclareProperty prop = declareProperty(name, parsingElem);
@@ -59,22 +122,26 @@ public class PojoParser {
             prop.setField((VariableElement) element, thisGenericMap);
         } else if (Test2.isSetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
+            declaredType = Element2.getSetterDeclareType(elem);
+            actualType = findActualType(parsingClass, declaredType);
             String name = Element2.toPropertyName(elem);
-            if (presentKeys.contains(name)) {
+            if (isParsedSetter(name, actualType)) {
                 return;
             }
             DeclareProperty prop = declareProperty(name, parsingElem);
             handleMapping(ignoringMap.get(name), element, prop::addSetterMapping);
-            prop.setSetter(elem, thisGenericMap);
+            prop.addSetter(DeclareMethod.ofDeclared(elem, declaredType, actualType));
         } else if (Test2.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
+            declaredType = Element2.getGetterDeclareType(elem);
+            actualType = findActualType(parsingClass, declaredType);
             String name = Element2.toPropertyName(elem);
-            if (presentKeys.contains(name)) {
+            if (isParsedGetter(name)) {
                 return;
             }
             DeclareProperty prop = declareProperty(name, parsingElem);
             handleMapping(ignoringMap.get(name), element, prop::addGetterMapping);
-            prop.setGetter(elem, thisGenericMap);
+            prop.addGetter(DeclareMethod.ofDeclared(elem, declaredType, actualType));
         } else if (Test2.isConstructor(element)) {
             // definition.addConstructor((ExecutableElement) element);
         } else if (Test2.isMethod(element)) {
@@ -85,26 +152,50 @@ public class PojoParser {
         }
     }
 
-    private void parseElements(Set<String> presents, List<? extends Element> elements, TypeElement parsingElem) {
+    private void parseElements(List<? extends Element> elements, TypeElement parsingElem) {
         for (Element element : Collect2.emptyIfNull(elements)) {
-            handleEnclosedElem(presents, element, parsingElem);
+            handleEnclosedElem(element, parsingElem);
         }
     }
 
-    private void parseSuperElements(Set<String> parsedKeys, TypeElement justParsedElement) {
+    private void parseInterfaces(TypeElement parsingElem) {
+        List<? extends TypeMirror> mirrors = parsingElem.getInterfaces();
+        if (Collect2.isEmpty(mirrors)) {
+            return;
+        }
+        for (TypeMirror mirror : mirrors) {
+            Element element = types.asElement(mirror);
+            if (isTopElement(element, mirror)) {
+                continue;
+            }
+            TypeElement interElem = Element2.cast(element);
+            parseElements(interElem.getEnclosedElements(), interElem);
+            parseSuperElements(interElem);
+        }
+    }
+
+    private void parseSuperElements(TypeElement justParsedElement) {
         TypeMirror superclass = justParsedElement.getSuperclass();
-        Element superElem = Environment2.getTypes().asElement(superclass);
-        if (superElem == null || superclass.toString().equals(TOP_CLASS)) {
+        Element superElem = types.asElement(superclass);
+        if (isTopElement(superElem, superclass)) {
             return;
         }
         TypeElement superElement = Element2.cast(superElem);
-        parseElements(parsedKeys, superElement.getEnclosedElements(), superElement);
-        parseSuperElements(new HashSet<>(declaredPojo.keySet()), superElement);
+        parseElements(superElement.getEnclosedElements(), superElement);
+        parseInterfaces(superElement);
+        parsedKeys.addAll(declaredPojo.keySet());
+        parseSuperElements(superElement);
+    }
+
+    private void parseRootElements(){
+        parseElements(thisElement.getEnclosedElements(), thisElement);
+        parseInterfaces(thisElement);
+        parsedKeys.addAll(declaredPojo.keySet());
     }
 
     private DeclaredPojo doParse() {
-        parseElements(Collections.emptySet(), thisElement.getEnclosedElements(), thisElement);
-        parseSuperElements(new HashSet<>(declaredPojo.keySet()), thisElement);
+        parseRootElements();
+        parseSuperElements(thisElement);
         Convert2.parseConverters(thisGenericMap, thisElement, declaredPojo);
         declaredPojo.onCompleted();
         return declaredPojo;
@@ -175,6 +266,10 @@ public class PojoParser {
             declaredPojo.put(name, detail);
         }
         return detail;
+    }
+
+    private static boolean isTopElement(Element element, TypeMirror superclass) {
+        return element == null || superclass.toString().equals(TOP_CLASS);
     }
 
     private static <T> String getTargetCls(T t, Function<T, Class<?>> classGetter) {

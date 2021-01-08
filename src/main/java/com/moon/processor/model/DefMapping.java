@@ -56,48 +56,25 @@ public class DefMapping {
 
     public String getToName() { return toName; }
 
-    public ConstManager getConstManager() { return constManager; }
-
     public String[] getScripts() {
         DeclareProperty from = getFromProp(), to = getToProp();
-        Log2.warn("From: {}, To: {}.", from, to);
         // 1. 注入方的 injector 和输出方的 provider 匹配
         // 2. 注入方的 injector 和输出方的 getter 匹配
         // 3. 注入方的 setter 重载和输出方的 provider 匹配
         @SuppressWarnings("all")//
-        String[] scripts = mappingWithConverters(//
-            to.findInjectorsFor(from.getThisElement()), from.findProvidersFor(to.getThisElement()), to.getSetters(),
+        MappingDetail mapped = mappingWithConverters(//
+            to.findInjectorsFor(from.getThisElement()),
+            from.findProvidersFor(to.getThisElement()),
+            to.getSetters(),
             from.getGetter());
-        if (scripts != null) {
-            return scripts;
+        if (mapped != null) {
+            return mapped.getScripts(constManager);
         }
 
-        DeclareMapping pMapping = from.getForwardMapping(to.getThisElement());
-        DeclareMapping iMapping = to.getBackwardMapping(from.getThisElement());
-
-        Log2.warn("iMapping: {}.", iMapping);
-        Log2.warn("pMapping: {}.", pMapping);
-
         // 4. getter/setter 相似类型匹配(要求 getter 类型是 setter 类型的子类)
-        MappingDetail detail = defaultMappingWithSetterMethod();
-        if (detail != null) {
-            String getterType = detail.getGetterType();
-            if (Test2.isPrimitive(getterType)) {
-                return detail.getScripts();
-            }
-            String iDefaultVal = iMapping.getDefaultValue();
-            String pDefaultVal = pMapping.getDefaultValue();
-            String var = defaultVarFor(constManager, detail.getSetterType(), iDefaultVal);
-            if (var == null) {
-                var = defaultVarFor(constManager, detail.getGetterType(), pDefaultVal);
-            } else {
-                return detail.getScriptsOnDefaultVal(var, constManager);
-            }
-            if (var == null) {
-                return detail.getScripts();
-            } else {
-                return detail.getScriptsOnDefaultVal(var, constManager);
-            }
+        mapped = defaultMappingWithSetterMethod();
+        if (mapped != null) {
+            return onMappingOnSimilar(from, to, mapped);
         }
 
         // TODO 5. 注入方和输出方的格式化、默认值和类型转换
@@ -105,34 +82,76 @@ public class DefMapping {
         return EMPTY;
     }
 
-    private String[] mappingWithConverters(
-        Map<String, String> injectors,
-        Map<String, String> providers,
+    private String[] onMappingOnSimilar(DeclareProperty from, DeclareProperty to, MappingDetail detail) {
+        String getterType = detail.getGetterType();
+        // 返回数据是基本数据类型没有默认值
+        if (Test2.isPrimitive(getterType)) {
+            return detail.getScripts(constManager);
+        }
+
+        DeclareMapping pMapping = from.getForwardMapping(to.getThisElement());
+        DeclareMapping iMapping = to.getBackwardMapping(from.getThisElement());
+
+        // 非基本数据类型可能有默认值
+        String iDefaultVal = iMapping.getDefaultValue();
+        String pDefaultVal = pMapping.getDefaultValue();
+        String var = defaultVarFor(constManager, detail.getSetterType(), iDefaultVal);
+        if (var == null) {
+            var = defaultVarFor(constManager, detail.getGetterType(), pDefaultVal);
+        } else {
+            return detail.getScriptsOnDefaultVal(var, constManager);
+        }
+        if (var == null) {
+            return detail.getScripts(constManager);
+        } else {
+            return detail.getScriptsOnDefaultVal(var, constManager);
+        }
+    }
+
+    private MappingDetail mappingWithConverters(
+        Map<String, DeclareMethod> injectors,
+        Map<String, DeclareMethod> providers,
         Map<String, DeclareMethod> settersMap,
         DeclareMethod getter
     ) {
         // 1. 注入方的 injector 和输出方的 provider 匹配
-        for (Map.Entry<String, String> injectEntry : injectors.entrySet()) {
-            String provideMethod = providers.get(injectEntry.getKey());
+        for (Map.Entry<String, DeclareMethod> injectEntry : injectors.entrySet()) {
+            DeclareMethod provideMethod = providers.get(injectEntry.getKey());
+            DeclareMethod injectMethod = injectEntry.getValue();
             if (provideMethod != null) {
-                return onSimpleMapping(provideMethod, injectEntry.getValue());
+                String getterName = provideMethod.getName();
+                String setterName = injectMethod.getName();
+                return onSimpleMapping(getterName,
+                    setterName,
+                    provideMethod.isGenericDeclared(),
+                    injectMethod.isGenericDeclared());
             }
         }
         // 2. 注入方的 injector 和输出方的 getter 匹配
         if (getter != null) {
             String getterActualType = getter.getActualType();
-            String setterName = injectors.get(getterActualType);
-            if (setterName != null && getter.getName() != null) {
-                return onSimpleMapping(getter.getName(), setterName);
+            DeclareMethod injectMethod = injectors.get(getterActualType);
+            if (injectMethod != null && getter.getName() != null) {
+                String setterName = injectMethod.getName();
+                return onSimpleMapping(getter.getName(),
+                    setterName,
+                    getter.isGenericDeclared(),
+                    injectMethod.isGenericDeclared());
             }
         }
         // 3. 注入方的 setter 重载和输出方的 provider 匹配
         for (Map.Entry<String, DeclareMethod> entry : settersMap.entrySet()) {
-            String provideMethod = providers.get(entry.getKey());
+            DeclareMethod provideMethod = providers.get(entry.getKey());
+            DeclareMethod setterMethod = entry.getValue();
             if (provideMethod == null) {
                 continue;
             }
-            return onSimpleMapping(provideMethod, entry.getValue().getName());
+            String setterName = setterMethod.getName();
+            String getterName = provideMethod.getName();
+            return onSimpleMapping(getterName,
+                setterName,
+                provideMethod.isGenericDeclared(),
+                setterMethod.isGenericDeclared());
         }
         return null;
     }
@@ -141,16 +160,23 @@ public class DefMapping {
         DeclareMethod getter = getFromProp().getGetter();
         if (getter != null) {
             String getterActualType = getter.getActualType();
-            return defaultMappingWithSetterMethod(getterActualType, getter.getName());
+            return defaultMappingWithSetterMethod(getterActualType, getter.getName(), getter.isGenericDeclared());
         }
         return null;
     }
 
-    private MappingDetail defaultMappingWithSetterMethod(String getterType, String getterName) {
+    private MappingDetail defaultMappingWithSetterMethod(
+        String getterType, String getterName, boolean getterGeneric
+    ) {
         Map<String, DeclareMethod> toSettersMethod = getToProp().getSetters();
         DeclareMethod setter = toSettersMethod.get(getterType);
         if (setter != null) {
-            return onMappingDetail(getterName, setter.getName(), getterType, setter.getActualType());
+            return onMappingDetail(getterName,
+                setter.getName(),
+                getterType,
+                setter.getActualType(),
+                getterGeneric,
+                setter.isGenericDeclared());
         }
         String setterType = null;
         DeclareMethod matchedSetter = null;
@@ -165,34 +191,44 @@ public class DefMapping {
             }
         }
         if (matchedSetter != null) {
-            return onMappingDetail(getterName, matchedSetter.getName(), getterType, matchedSetter.getActualType());
+            return onMappingDetail(getterName,
+                matchedSetter.getName(),
+                getterType,
+                matchedSetter.getActualType(),
+                getterGeneric,
+                matchedSetter.isGenericDeclared());
         }
         return null;
     }
 
-    private String[] onSimpleMapping(String getterName, String setterName) {
-        return onSimpleMapping(getFromName(), getterName, getToName(), setterName);
+    private MappingDetail onSimpleMapping(
+        String getterName, String setterName, boolean getterGeneric, boolean setterGeneric
+    ) {
+        return new SimpleDetail(getFromName(), getterName, getToName(), setterName, getterGeneric, setterGeneric);
     }
 
-    private static String[] onSimpleMapping(
-        String fromName, String getterName, String toName, String setterName
-    ) { return new String[]{mappingAs(fromName, getterName, toName, setterName)}; }
-
-    private MappingDetail onMappingDetail(String getterName, String setterName, String getterType, String setterType) {
-        return onMappingDetail(getFromName(), getterName, getToName(), setterName, getterType, setterType);
+    private MappingDetail onMappingDetail(
+        String getterName,
+        String setterName,
+        String getterType,
+        String setterType,
+        boolean getterGeneric,
+        boolean setterGeneric
+    ) {
+        return new MappingDetail(getFromName(),
+            getterName,
+            getToName(),
+            setterName,
+            getterType,
+            setterType,
+            getterGeneric,
+            setterGeneric);
     }
 
-    private static MappingDetail onMappingDetail(
-        String fromName, String getterName, String toName, String setterName, String getterType, String setterType
-    ) { return new MappingDetail(fromName, toName, getterName, setterName, getterType, setterType); }
 
-    private final static HolderGroup GROUP = Holder.of(Holder.fromName, Holder.getter, Holder.toName, Holder.setter);
-    private final static HolderGroup TYPE_VAR = Holder.of(Holder.type, Holder.var);
-
-    private static String mappingAs(String fromName, String getter, String toName, String setter) {
-        String t0 = "{toName}.{setter}({fromName}.{getter}());";
-        return GROUP.on(t0, fromName, getter, toName, setter);
-    }
+    private final static HolderGroup SET = Holder.of(Holder.toName, Holder.setter, Holder.cast);
+    private final static HolderGroup GET = Holder.of(Holder.fromName, Holder.getter, Holder.cast);
+    private final static HolderGroup TYPE_VALUE_VAR = Holder.of(Holder.type, Holder.value, Holder.var);
 
     private static String defaultVarFor(ConstManager cm, String type, String value) {
         if (String2.isNotEmpty(value)) {
@@ -221,9 +257,7 @@ public class DefMapping {
 
         public Returning(String script) {
             super(null, null, null, null, null, null);
-            String trimmed = script.trim();
-            char last = trimmed.charAt(trimmed.length() - 1);
-            this.scripts = new String[]{"return " + script + (last == ';' ? "" : ";")};
+            this.scripts = new String[]{"return " + script};
         }
 
         @Override
@@ -236,13 +270,31 @@ public class DefMapping {
 
         public Script(String script) {
             super(null, null, null, null, null, null);
-            String trimmed = script.trim();
-            char last = trimmed.charAt(trimmed.length() - 1);
-            this.scripts = new String[]{script + (last == ';' ? "" : ";")};
+            this.scripts = new String[]{script};
         }
 
         @Override
         public String[] getScripts() { return scripts; }
+    }
+
+    private static class SimpleDetail extends MappingDetail {
+
+        private SimpleDetail(
+            String fromName,
+            String toName,
+            String getterName,
+            String setterName,
+            boolean getterGeneric,
+            boolean setterGeneric
+        ) {
+            super(fromName, toName, getterName, setterName, null, null, getterGeneric, setterGeneric);
+        }
+
+        @Override
+        public String[] getScriptsOnDefaultVal(String var, ConstManager cm) { return getScripts(cm); }
+
+        @Override
+        public String[] getScripts(ConstManager cm) { return super.getScripts(cm); }
     }
 
     private static class MappingDetail {
@@ -253,9 +305,18 @@ public class DefMapping {
         private final String setterName;
         private final String getterType;
         private final String setterType;
+        private final boolean setterGeneric;
+        private final boolean getterGeneric;
 
         private MappingDetail(
-            String fromName, String toName, String getterName, String setterName, String getterType, String setterType
+            String fromName,
+            String toName,
+            String getterName,
+            String setterName,
+            String getterType,
+            String setterType,
+            boolean getterGeneric,
+            boolean setterGeneric
         ) {
             this.toName = toName;
             this.fromName = fromName;
@@ -263,14 +324,31 @@ public class DefMapping {
             this.setterName = setterName;
             this.getterType = getterType;
             this.setterType = setterType;
+            this.getterGeneric = getterGeneric;
+            this.setterGeneric = setterGeneric;
         }
 
         public String[] getScriptsOnDefaultVal(String var, ConstManager cm) {
-            String t0 = "{toName}.{setter}({type}.ifNull({fromName}.{getter}(), {var}));";
-            t0 = GROUP.on(t0, getFromName(), getGetterName(), getToName(), getSetterName());
-            String script = TYPE_VAR.on(t0, cm.onImported(DefaultValue.class), var);
+            String get = toGetValueScript(cm);
+            String t = "{type}.ifNull({value}, {var})";
+            get = TYPE_VALUE_VAR.on(t, cm.onImported(DefaultValue.class), get, var);
+            String script = Holder.value.on(toSetValueScript(cm), get);
             return new String[]{script};
         }
+
+        private String toSetValueScript(ConstManager cm) {
+            String t0 = "{toName}.{setter}({cast}{value});";
+            String cast = getterGeneric ? "" : (setterGeneric ? toCast(setterType, cm) : "");
+            return SET.on(t0, getToName(), getSetterName(), cast);
+        }
+
+        private String toGetValueScript(ConstManager cm) {
+            String t0 = "{cast}{fromName}.{getter}()";
+            String cast = getterGeneric ? toCast(getterType, cm) : "";
+            return GET.on(t0, getFromName(), getGetterName(), cast);
+        }
+
+        private String toCast(String type, ConstManager cm) { return Holder.cast.on("({cast}) ", cm.onImported(type)); }
 
         public String getToName() { return toName; }
 
@@ -284,9 +362,10 @@ public class DefMapping {
 
         public String getSetterType() { return setterType; }
 
-        public String[] getScripts() { return new String[]{toString()}; }
-
-        @Override
-        public String toString() { return mappingAs(getFromName(), getGetterName(), getToName(), getSetterName()); }
+        public String[] getScripts(ConstManager cm) {
+            String get = toGetValueScript(cm);
+            String set = toSetValueScript(cm);
+            return new String[]{Holder.value.on(set, get)};
+        }
     }
 }

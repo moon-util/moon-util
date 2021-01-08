@@ -5,7 +5,7 @@ package com.moon.processor.utils;
  */
 public enum Const2 {
     ;
-    public final static String VOID = "void";
+    public final static String PUBLIC = "public", PROTECTED = "protected";
 
     public final static String IS = "is", GET = "get", SET = "set";
 

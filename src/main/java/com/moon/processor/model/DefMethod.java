@@ -145,7 +145,12 @@ public class DefMethod {
             return;
         }
         for (String script : scripts) {
+            String thisScript = script.trim();
+            boolean ended = thisScript.endsWith(";");
             newLine(sb, space).append(space).append(script);
+            if (!ended) {
+                sb.append(';');
+            }
         }
     }
 }

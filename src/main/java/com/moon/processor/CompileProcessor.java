@@ -4,9 +4,9 @@ import com.google.auto.service.AutoService;
 import com.moon.data.jdbc.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processor.manager.CopierManager;
+import com.moon.processor.manager.MapperManager;
 import com.moon.processor.manager.NameManager;
 import com.moon.processor.manager.PojoManager;
-import com.moon.processor.manager.MapperManager;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.Process2;
@@ -54,17 +54,23 @@ public class CompileProcessor extends AbstractProcessor {
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        JavaWriter writer = new JavaWriter(Environment2.getFiler());
         NameManager nameManager = new NameManager();
         PojoManager pojoManager = new PojoManager(nameManager);
         CopierManager copierManager = new CopierManager(pojoManager, nameManager);
         MapperManager mapperManager = new MapperManager(copierManager, pojoManager, nameManager);
         processMapperFor(roundEnv, mapperManager);
+        processMapper();
+        processAccessor();
+        JavaWriter writer = new JavaWriter(Environment2.getFiler());
         pojoManager.writeJavaFile(writer);
         copierManager.writeJavaFile(writer);
         mapperManager.writeJavaFile(writer);
         return true;
     }
+
+    private void processMapper() {}
+
+    private void processAccessor() {}
 
     private void processMapperFor(RoundEnvironment roundEnv, MapperManager mapperManager) {
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(MapperFor.class);
