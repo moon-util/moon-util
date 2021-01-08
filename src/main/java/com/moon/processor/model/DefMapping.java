@@ -1,6 +1,5 @@
 package com.moon.processor.model;
 
-import com.moon.mapper.convert.DefaultValue;
 import com.moon.processor.manager.ConstManager;
 import com.moon.processor.utils.*;
 
@@ -204,7 +203,12 @@ public class DefMapping {
     private MappingDetail onSimpleMapping(
         String getterName, String setterName, boolean getterGeneric, boolean setterGeneric
     ) {
-        return new SimpleDetail(getFromName(), getterName, getToName(), setterName, getterGeneric, setterGeneric);
+        return new MappingSimplifyDetail(getFromName(),
+            getterName,
+            getToName(),
+            setterName,
+            getterGeneric,
+            setterGeneric);
     }
 
     private MappingDetail onMappingDetail(
@@ -224,11 +228,6 @@ public class DefMapping {
             getterGeneric,
             setterGeneric);
     }
-
-
-    private final static HolderGroup SET = Holder.of(Holder.toName, Holder.setter, Holder.cast);
-    private final static HolderGroup GET = Holder.of(Holder.fromName, Holder.getter, Holder.cast);
-    private final static HolderGroup TYPE_VALUE_VAR = Holder.of(Holder.type, Holder.value, Holder.var);
 
     private static String defaultVarFor(ConstManager cm, String type, String value) {
         if (String2.isNotEmpty(value)) {
@@ -275,97 +274,5 @@ public class DefMapping {
 
         @Override
         public String[] getScripts() { return scripts; }
-    }
-
-    private static class SimpleDetail extends MappingDetail {
-
-        private SimpleDetail(
-            String fromName,
-            String toName,
-            String getterName,
-            String setterName,
-            boolean getterGeneric,
-            boolean setterGeneric
-        ) {
-            super(fromName, toName, getterName, setterName, null, null, getterGeneric, setterGeneric);
-        }
-
-        @Override
-        public String[] getScriptsOnDefaultVal(String var, ConstManager cm) { return getScripts(cm); }
-
-        @Override
-        public String[] getScripts(ConstManager cm) { return super.getScripts(cm); }
-    }
-
-    private static class MappingDetail {
-
-        private final String fromName;
-        private final String toName;
-        private final String getterName;
-        private final String setterName;
-        private final String getterType;
-        private final String setterType;
-        private final boolean setterGeneric;
-        private final boolean getterGeneric;
-
-        private MappingDetail(
-            String fromName,
-            String toName,
-            String getterName,
-            String setterName,
-            String getterType,
-            String setterType,
-            boolean getterGeneric,
-            boolean setterGeneric
-        ) {
-            this.toName = toName;
-            this.fromName = fromName;
-            this.getterName = getterName;
-            this.setterName = setterName;
-            this.getterType = getterType;
-            this.setterType = setterType;
-            this.getterGeneric = getterGeneric;
-            this.setterGeneric = setterGeneric;
-        }
-
-        public String[] getScriptsOnDefaultVal(String var, ConstManager cm) {
-            String get = toGetValueScript(cm);
-            String t = "{type}.ifNull({value}, {var})";
-            get = TYPE_VALUE_VAR.on(t, cm.onImported(DefaultValue.class), get, var);
-            String script = Holder.value.on(toSetValueScript(cm), get);
-            return new String[]{script};
-        }
-
-        private String toSetValueScript(ConstManager cm) {
-            String t0 = "{toName}.{setter}({cast}{value});";
-            String cast = getterGeneric ? "" : (setterGeneric ? toCast(setterType, cm) : "");
-            return SET.on(t0, getToName(), getSetterName(), cast);
-        }
-
-        private String toGetValueScript(ConstManager cm) {
-            String t0 = "{cast}{fromName}.{getter}()";
-            String cast = getterGeneric ? toCast(getterType, cm) : "";
-            return GET.on(t0, getFromName(), getGetterName(), cast);
-        }
-
-        private String toCast(String type, ConstManager cm) { return Holder.cast.on("({cast}) ", cm.onImported(type)); }
-
-        public String getToName() { return toName; }
-
-        public String getFromName() { return fromName; }
-
-        public String getGetterName() { return getterName; }
-
-        public String getSetterName() { return setterName; }
-
-        public String getGetterType() { return getterType; }
-
-        public String getSetterType() { return setterType; }
-
-        public String[] getScripts(ConstManager cm) {
-            String get = toGetValueScript(cm);
-            String set = toSetValueScript(cm);
-            return new String[]{Holder.value.on(set, get)};
-        }
     }
 }
