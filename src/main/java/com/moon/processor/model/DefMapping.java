@@ -204,8 +204,8 @@ public class DefMapping {
         String getterName, String setterName, boolean getterGeneric, boolean setterGeneric
     ) {
         return new MappingSimplifyDetail(getFromName(),
-            getterName,
             getToName(),
+            getterName,
             setterName,
             getterGeneric,
             setterGeneric);
@@ -220,8 +220,8 @@ public class DefMapping {
         boolean setterGeneric
     ) {
         return new MappingDetail(getFromName(),
-            getterName,
             getToName(),
+            getterName,
             setterName,
             getterType,
             setterType,
