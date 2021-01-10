@@ -3,6 +3,7 @@ package com.moon.processor.manager;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.def.DefEntityModel;
+import com.moon.processor.def.TablesManager;
 import com.moon.processor.utils.Element2;
 
 import javax.lang.model.element.TypeElement;
@@ -16,10 +17,12 @@ public class ModelManager implements JavaFileWriteable {
 
     private final NameManager nameManager;
     private final PojoManager pojoManager;
+    private final TablesManager tablesManager;
 
     private final Map<String, DefEntityModel> modelMap = new HashMap<>();
 
-    public ModelManager(PojoManager pojoManager, NameManager manager) {
+    public ModelManager(PojoManager pojoManager,TablesManager tablesManager, NameManager manager) {
+        this.tablesManager = tablesManager;
         this.pojoManager = pojoManager;
         this.nameManager = manager;
     }
@@ -36,6 +39,7 @@ public class ModelManager implements JavaFileWriteable {
         if (entityModel == null) {
             entityModel = new DefEntityModel(pojoManager.with(element));
             modelMap.put(accessorClassname, entityModel);
+            tablesManager.with(element, entityModel);
         }
         modelMap.put(classname, entityModel);
         return entityModel;

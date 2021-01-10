@@ -177,6 +177,31 @@ public enum String2 {
         return res.toString();
     }
 
+
+
+    public static String toGeneralizableType(String type) {
+        switch (type) {
+            case "byte":
+                return "java.lang.Byte";
+            case "short":
+                return "java.lang.Short";
+            case "int":
+                return "java.lang.Integer";
+            case "long":
+                return "java.lang.Long";
+            case "float":
+                return "java.lang.Float";
+            case "double":
+                return "java.lang.Double";
+            case "boolean":
+                return "java.lang.Boolean";
+            case "char":
+                return "java.lang.Character";
+            default:
+                return type;
+        }
+    }
+
     public static String onInlineCommentOf(String comment) {
         return format("/* {} */", comment);
     }

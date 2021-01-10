@@ -3,6 +3,7 @@ package com.moon.processor;
 import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
+import com.moon.processor.def.TablesManager;
 import com.moon.processor.manager.*;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Log2;
@@ -53,9 +54,11 @@ public class CompileProcessor extends AbstractProcessor {
     ) {
         NameManager nameManager = new NameManager();
         PojoManager pojoManager = new PojoManager(nameManager);
-        ModelManager modelManager = new ModelManager(pojoManager, nameManager);
+        TablesManager tablesManager = new TablesManager();
+        ModelManager modelManager = new ModelManager(pojoManager, tablesManager, nameManager);
         CopierManager copierManager = new CopierManager(pojoManager, nameManager);
         MapperManager mapperManager = new MapperManager(copierManager, pojoManager, nameManager);
+
         AccessorManager accessorManager = new AccessorManager(copierManager, pojoManager, modelManager, nameManager);
         processMapperFor(roundEnv, mapperManager);
         processAccessor(roundEnv, accessorManager);
@@ -65,6 +68,7 @@ public class CompileProcessor extends AbstractProcessor {
         copierManager.writeJavaFile(writer);
         mapperManager.writeJavaFile(writer);
         modelManager.writeJavaFile(writer);
+        tablesManager.writeJavaFile(writer);
         accessorManager.writeJavaFile(writer);
         return true;
     }

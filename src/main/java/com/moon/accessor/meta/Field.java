@@ -1,5 +1,7 @@
 package com.moon.accessor.meta;
 
+import com.moon.accessor.Condition;
+
 /**
  * @author benshaoye
  */
@@ -39,4 +41,40 @@ public interface Field<T, R, TB extends Table<R>> {
      * @return 数据表描述
      */
     TB getTable();
+
+    Condition startsWith(Object value);
+
+    Condition endsWith(Object value);
+
+    Condition contains(Object value);
+
+    Condition like(Object value);
+
+    Condition lt(T value);
+
+    Condition gt(T value);
+
+    Condition le(T value);
+
+    Condition ge(T value);
+
+    Condition eq(T value);
+
+    Condition ne(T value);
+
+    Condition in(T... values);
+
+    Condition notIn(T... values);
+
+    Condition in(Iterable<T>... values);
+
+    Condition notIn(Iterable<T>... values);
+
+    Condition isNull();
+
+    Condition notNull();
+
+    default Condition isNotNull() {
+        return notNull();
+    }
 }
