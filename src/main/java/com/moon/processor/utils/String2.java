@@ -116,7 +116,7 @@ public enum String2 {
         return GROUP.on(template, type, name, value);
     }
 
-    public static String toDeclareField(String field, String type) {
+    public static String toPrivateField(String field, String type) {
         String template = "private {type} {field};";
         return GROUP.on(template, type, "", field);
     }
@@ -134,7 +134,7 @@ public enum String2 {
         return GROUP.on(template, type, getterName, field);
     }
 
-    public static String toSetterName(String field){
+    public static String toSetterName(String field) {
         return Const2.SET + capitalize(field);
     }
 
@@ -145,5 +145,54 @@ public enum String2 {
     public static String toSetterMethod(String setterName, String field, String type) {
         String template = "public void {name}({type} {field}) { this.{field} = {field}; }";
         return GROUP.on(template, type, setterName, field);
+    }
+
+    public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {
+        final int len = str == null ? 0 : str.length();
+        if (len == 0) { return str; }
+        boolean prevIsUpper = false, thisIsUpper;
+        StringBuilder res = new StringBuilder(len + 5);
+        for (int i = 0; i < len; i++) {
+            char ch = str.charAt(i);
+            if (thisIsUpper = Character.isUpperCase(ch)) {
+                ch = Character.toLowerCase(ch);
+                if (i == 0) {
+                    res.append(ch);
+                } else if (prevIsUpper) {
+                    if (continuousSplit) {
+                        res.append(hyphen).append(ch);
+                    } else if (Character.isLowerCase(str.charAt(i + 1))) {
+                        res.append(hyphen).append(ch);
+                    } else {
+                        res.append(ch);
+                    }
+                } else {
+                    res.append(hyphen).append(ch);
+                }
+            } else if (!Character.isWhitespace(ch)) {
+                res.append(ch);
+            }
+            prevIsUpper = thisIsUpper;
+        }
+        return res.toString();
+    }
+
+    public static String onInlineCommentOf(String comment) {
+        return format("/* {} */", comment);
+    }
+
+    public static String onInlineDocCommentOf(String comment) {
+        return format("/** {} */", comment);
+    }
+
+    public static String[] onBlockCommentOf(String... comments) {
+        String[] results = new String[comments.length + 2];
+        int index = 0;
+        results[index++] = "/*";
+        for (String comment : comments) {
+            results[index++] = " * " + comment;
+        }
+        results[index] = " */";
+        return results;
     }
 }

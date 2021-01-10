@@ -93,7 +93,7 @@ import java.util.Set;
  *
  * @author benshaoye
  */
-@AutoService(Processor.class)
+// @AutoService(Processor.class)
 public class AccessorProcessor extends AbstractProcessor {
 
     private final static String ACCESSOR = Accessor.class.getCanonicalName();

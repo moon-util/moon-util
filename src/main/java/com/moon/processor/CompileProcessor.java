@@ -1,12 +1,9 @@
 package com.moon.processor;
 
 import com.google.auto.service.AutoService;
-import com.moon.data.jdbc.annotation.Accessor;
+import com.moon.accessor.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
-import com.moon.processor.manager.CopierManager;
-import com.moon.processor.manager.MapperManager;
-import com.moon.processor.manager.NameManager;
-import com.moon.processor.manager.PojoManager;
+import com.moon.processor.manager.*;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.Process2;
@@ -56,21 +53,33 @@ public class CompileProcessor extends AbstractProcessor {
     ) {
         NameManager nameManager = new NameManager();
         PojoManager pojoManager = new PojoManager(nameManager);
+        ModelManager modelManager = new ModelManager(pojoManager, nameManager);
         CopierManager copierManager = new CopierManager(pojoManager, nameManager);
         MapperManager mapperManager = new MapperManager(copierManager, pojoManager, nameManager);
+        AccessorManager accessorManager = new AccessorManager(copierManager, pojoManager, modelManager, nameManager);
         processMapperFor(roundEnv, mapperManager);
+        processAccessor(roundEnv, accessorManager);
         processMapper();
-        processAccessor();
         JavaWriter writer = new JavaWriter(Environment2.getFiler());
         pojoManager.writeJavaFile(writer);
         copierManager.writeJavaFile(writer);
         mapperManager.writeJavaFile(writer);
+        modelManager.writeJavaFile(writer);
+        accessorManager.writeJavaFile(writer);
         return true;
     }
 
     private void processMapper() {}
 
-    private void processAccessor() {}
+    private void processAccessor(RoundEnvironment roundEnv, AccessorManager accessorManager) {
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Accessor.class);
+        for (Element element : elements) {
+            TypeElement accessor = (TypeElement) element;
+            Process2.getAccessorClasses(accessor).forEach(model -> {
+                accessorManager.with(accessor, model);
+            });
+        }
+    }
 
     private void processMapperFor(RoundEnvironment roundEnv, MapperManager mapperManager) {
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(MapperFor.class);

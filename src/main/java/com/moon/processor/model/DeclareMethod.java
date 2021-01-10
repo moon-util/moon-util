@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public class DeclareMethod {
 
+    private final String thisClassname;
     private final ExecutableElement method;
     private final String name;
     private final String declareType;
@@ -25,10 +26,18 @@ public class DeclareMethod {
     private final boolean abstractMethod;
 
     public DeclareMethod(
-        ExecutableElement method, String declareType, String actualType, boolean declared, boolean lombokGenerated
-    ) { this(method, Element2.getSimpleName(method), declareType, actualType, declared, lombokGenerated); }
+        String thisClassname,
+        ExecutableElement method,
+        String declareType,
+        String actualType,
+        boolean declared,
+        boolean lombokGenerated
+    ) {
+        this(thisClassname, method, Element2.getSimpleName(method), declareType, actualType, declared, lombokGenerated);
+    }
 
     public DeclareMethod(
+        String thisClassname,
         ExecutableElement method,
         String name,
         String declareType,
@@ -41,16 +50,23 @@ public class DeclareMethod {
         this.declareType = declareType;
         this.actualType = actualType;
         this.declared = declared;
+        this.thisClassname = thisClassname;
         this.lombokGenerated = lombokGenerated;
         this.defaultMethod = Test2.isAny(method, Modifier.DEFAULT);
         this.abstractMethod = Test2.isAny(method, Modifier.ABSTRACT);
     }
 
-    public static DeclareMethod ofDeclared(ExecutableElement method, String declareType, String actualType) {
-        return new DeclareMethod(method, declareType, actualType, true, false);
-    }
+    public static DeclareMethod ofLombok(
+        String thisClassname, String setterName, String declareType, String actualType
+    ) { return new DeclareMethod(thisClassname, null, setterName, declareType, actualType, false, true); }
+
+    public static DeclareMethod ofDeclared(
+        String thisClassname, ExecutableElement method, String declareType, String actualType
+    ) { return new DeclareMethod(thisClassname, method, declareType, actualType, true, false); }
 
     public ExecutableElement getMethod() { return method; }
+
+    public String getThisClassname() { return thisClassname; }
 
     public String getName() { return name; }
 

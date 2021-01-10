@@ -1,12 +1,13 @@
 package com.moon.processor.model;
 
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Generic2;
-import com.moon.processor.utils.Test2;
+
+import com.moon.processor.utils.*;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.*;
+
+import static com.moon.processor.utils.Const2.PUBLIC;
 
 /**
  * @author benshaoye
@@ -29,6 +30,8 @@ public class DeclareProperty implements Completable {
      * </pre>
      */
     private final TypeElement thisElement;
+
+    private final String thisClassname;
     /**
      * 字段声明
      */
@@ -65,6 +68,7 @@ public class DeclareProperty implements Completable {
     private final Map<String, Map<String, DeclareMethod>> providersMap = new HashMap<>();
 
     public DeclareProperty(String name, TypeElement enclosingElement, TypeElement thisElement) {
+        this.thisClassname = Element2.getQualifiedName(thisElement);
         this.enclosingElement = enclosingElement;
         this.thisElement = thisElement;
         this.name = name;
@@ -75,6 +79,8 @@ public class DeclareProperty implements Completable {
     public TypeElement getEnclosingElement() { return enclosingElement; }
 
     public TypeElement getThisElement() { return thisElement; }
+
+    public String getThisClassname() { return thisClassname; }
 
     public VariableElement getField() { return field; }
 
@@ -155,6 +161,30 @@ public class DeclareProperty implements Completable {
         return mapping == null ? atField.getOrDefault(PUBLIC, DeclareMapping.DFT) : mapping;
     }
 
+    public DeclareMapping getPushMapping() {
+        return getMappingAssigned(getGetterMappings(), getFieldMappings(), PUBLIC);
+    }
+
+    public DeclareMapping getPullMapping() {
+        return getMappingAssigned(getSetterMappings(), getFieldMappings(), PUBLIC);
+    }
+
+    public DeclareMapping getPushMapping(String targetClass) {
+        return getMappingAssigned(getGetterMappings(), getFieldMappings(), targetClass);
+    }
+
+    public DeclareMapping getPullMapping(String targetClass) {
+        return getMappingAssigned(getSetterMappings(), getFieldMappings(), targetClass);
+    }
+
+    private static DeclareMapping getMappingAssigned(
+        Map<String, DeclareMapping> atMethod, Map<String, DeclareMapping> atField, String targetClass
+    ) {
+        DeclareMapping mapping = atMethod.get(targetClass);
+        if (mapping == null) { mapping = atField.get(targetClass); }
+        return mapping == null ? DeclareMapping.DFT : mapping;
+    }
+
     public void addFieldMapping(DeclareMapping mapping) { putMapping(getFieldMappings(), mapping); }
 
     public void addSetterMapping(DeclareMapping mapping) { putMapping(getSetterMappings(), mapping); }
@@ -166,9 +196,13 @@ public class DeclareProperty implements Completable {
         mappings.put(mappingClass, mapping);
     }
 
-    public DeclareMethod findInjector(String type, String propertyType) { return find(getInjectorsMap(), type, propertyType); }
+    public DeclareMethod findInjector(String type, String propertyType) {
+        return find(getInjectorsMap(), type, propertyType);
+    }
 
-    public DeclareMethod findProvider(String type, String propertyType) { return find(getProvidersMap(), type, propertyType); }
+    public DeclareMethod findProvider(String type, String propertyType) {
+        return find(getProvidersMap(), type, propertyType);
+    }
 
     public Map<String, DeclareMethod> findInjectorsFor(TypeElement targetClass) {
         return findInjectorsFor(Element2.getQualifiedName(targetClass));
@@ -206,8 +240,6 @@ public class DeclareProperty implements Completable {
         map.computeIfAbsent(type, k -> new HashMap<>(2)).put(propType, name);
     }
 
-    private final static String PUBLIC = "public";
-
     public void setField(VariableElement field, Map<String, DeclareGeneric> genericMap) {
         setField(field);
         String declareType = Element2.getFieldDeclareType(field);
@@ -226,6 +258,7 @@ public class DeclareProperty implements Completable {
     @Override
     public void onCompleted() {
         DeclareMethod setter;
+        String thisCls = getThisClassname();
         VariableElement elementField = getField();
         List<DeclareMethod> getters = getGetters();
         Map<String, DeclareMethod> settersMap = getSetters();
@@ -237,12 +270,12 @@ public class DeclareProperty implements Completable {
                 // TODO 生成接口/抽象方法的默认声明
             } else if (Test2.hasLombokGetter(elementField)) {
                 String getterName = Element2.getLombokGetterName(elementField);
-                getters.add(new DeclareMethod(null, getterName, getDeclareType(), getActualType(), false, true));
+                getters.add(DeclareMethod.ofLombok(thisCls, getterName, getDeclareType(), getActualType()));
             }
         }
         if (settersMap.isEmpty() && Test2.hasLombokSetter(elementField)) {
             String setterName = Element2.getLombokSetterName(elementField);
-            DeclareMethod m = new DeclareMethod(null, setterName, getDeclareType(), getActualType(), false, true);
+            DeclareMethod m = DeclareMethod.ofLombok(thisCls, setterName, getDeclareType(), getActualType());
             settersMap.put(getActualType(), m);
         }
 

@@ -3,10 +3,9 @@ package com.moon.processor.manager;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.model.DeclaredPojo;
-import com.moon.processor.model.DefJavaFiler;
+import com.moon.processor.def.DefJavaFiler;
 import com.moon.processor.parser.PojoParser;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Process2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;

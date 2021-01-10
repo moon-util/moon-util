@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class Importer {
+public class Importer implements Importable{
 
     private final static String EMPTY = "";
 
@@ -31,12 +31,14 @@ public class Importer {
         shortNameCached.put("boolean[]", EMPTY);
     }
 
+    @Override
     public String onImported(Class<?> classname) { return onImported(classname.getCanonicalName()); }
 
     public String onImported(TypeElement element) { return onImported(element.asType()); }
 
     public String onImported(TypeMirror mirror) { return onImported(mirror.toString()); }
 
+    @Override
     public String onImported(String classname) {
         int length = classname.length();
         StringBuilder result = new StringBuilder();

@@ -1,7 +1,10 @@
-package com.moon.processor.model;
+package com.moon.processor.def;
 
 import com.moon.processor.manager.ConstManager;
 import com.moon.processor.manager.Importer;
+import com.moon.processor.mapping.MappingType;
+import com.moon.processor.model.DeclareMapping;
+import com.moon.processor.model.DeclareProperty;
 import com.moon.processor.utils.Imported;
 import com.moon.processor.utils.String2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,9 +80,9 @@ public class DefMethod {
     }
 
     public DefMapping convert(
-        String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping
+        String name, DeclareProperty thisProp, DeclareProperty thatProp, DeclareMapping mapping, MappingType type
     ) {
-        DefMapping def = DefMapping.convert(constManager, thisProp, thatProp, mapping);
+        DefMapping def = DefMapping.convert(constManager, thisProp, thatProp, mapping, type);
         mappings.put(name, def);
         return def;
     }
@@ -146,9 +149,8 @@ public class DefMethod {
         }
         for (String script : scripts) {
             String thisScript = script.trim();
-            boolean ended = thisScript.endsWith(";");
-            newLine(sb, space).append(space).append(script);
-            if (!ended) {
+            newLine(sb, space).append(space).append(thisScript);
+            if (!thisScript.endsWith(";")) {
                 sb.append(';');
             }
         }

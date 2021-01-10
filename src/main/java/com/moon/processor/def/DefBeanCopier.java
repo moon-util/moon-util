@@ -1,13 +1,18 @@
-package com.moon.processor.model;
+package com.moon.processor.def;
 
 import com.moon.mapper.BeanCopier;
-import com.moon.mapper.BeanMapper;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.manager.NameManager;
+import com.moon.processor.mapping.MappingMerged;
+import com.moon.processor.mapping.MappingType;
+import com.moon.processor.model.DeclareMapping;
+import com.moon.processor.model.DeclareProperty;
+import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Holder;
+import com.moon.processor.utils.Log2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashSet;
@@ -53,19 +58,43 @@ public class DefBeanCopier implements JavaFileWriteable {
         return filer;
     }
 
-    private DefMethod unsafeCopy(DefMethod method) {
+    private DefMethod unsafeCopy2(DefMethod method) {
         DeclaredPojo thisPojo = getThisPojo();
         DeclaredPojo thatPojo = getThatPojo();
+        String thisClassname = thisPojo.getThisClassname();
         String thatClassname = thatPojo.getThisClassname();
-        for (Map.Entry<String, DeclareProperty> propertyEntry : thisPojo.entrySet()) {
-            DeclareProperty self = propertyEntry.getValue();
-            DeclareMapping mapping = self.getForwardMapping(thatClassname);
-            if (mapping.isIgnoreForward()) {
+        for (Map.Entry<String, DeclareProperty> propertyEntry : thatPojo.entrySet()) {
+            String field = propertyEntry.getKey();
+            DeclareProperty thatProp = propertyEntry.getValue();
+            // 1. 选择注入方声明的指定 @Mapping
+            DeclareMapping mapping = thatProp.getPullMapping(thisClassname);
+            if (!mapping.isDefaultMapping()) {
+                DeclareProperty self = thisPojo.get(mapping.getField(field));
+                method.convert(field, self, thatProp, mapping, MappingType.SETTER);
                 continue;
             }
-            DeclareProperty that = thatPojo.get(mapping.getField(propertyEntry.getKey()));
-            if (that != null) {
-                method.convert(propertyEntry.getKey(), self, that, mapping);
+            // 2. 选择输出方声明的指定 @Mapping
+            MappingMerged merged = thisPojo.findPushMappingAssigned(thatClassname, field);
+            if (merged != null && !merged.isDefaultMapping()) {
+                method.convert(field, merged.getProperty(), thatProp, merged.getMapping(), MappingType.GETTER);
+                continue;
+            }
+            // 3. 选择注入方公共 @Mapping
+            mapping = thatProp.getPullMapping();
+            if (!mapping.isDefaultMapping()) {
+                DeclareProperty self = thisPojo.get(mapping.getField(field));
+                method.convert(field, self, thatProp, mapping, MappingType.SETTER);
+                continue;
+            }
+            // 4. 选择输出方公共 @Mapping
+            merged = thisPojo.findPushMapping(field);
+            if (merged == null || merged.isDefaultMapping()) {
+                // 不存在输出方公共 mapping 或也是默认 mapping
+                DeclareProperty self = thisPojo.get(mapping.getField(field));
+                method.convert(field, self, thatProp, mapping, MappingType.GETTER);
+            } else {
+                // 存在输出方公共 mapping
+                method.convert(field, merged.getProperty(), thatProp, merged.getMapping(), MappingType.GETTER);
             }
         }
         return method;
@@ -78,7 +107,7 @@ public class DefBeanCopier implements JavaFileWriteable {
         // unsafeCopy
         DefParameters parameters = DefParameters.of("self", thisName).add("that", thatName);
         DefMethod forward = filer.publicMethod("unsafeCopy", thatName, parameters).override();
-        unsafeCopy(forward).returning("that");
+        unsafeCopy2(forward).returning("that");
     }
 
     private void buildConvertMethods(DefJavaFiler filer) {

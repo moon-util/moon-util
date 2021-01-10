@@ -1,5 +1,6 @@
 package com.moon.processor.utils;
 
+import com.moon.accessor.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -22,10 +23,23 @@ public enum Process2 {
     private final static String MAPPER_FOR_CLASSNAME = MapperFor.class.getCanonicalName();
     private final static String CLASS_SUFFIX = ".class";
 
+    public static Collection<TypeElement> getAccessorClasses(TypeElement element) {
+        Elements elements = Environment2.getUtils();
+        String accessorClassname = Accessor.class.getCanonicalName();
+        TypeMirror supportedType = elements.getTypeElement(accessorClassname).asType();
+        Collection<String> classes = extractClasses(element, supportedType);
+        return classes.stream().map(elements::getTypeElement).collect(Collectors.toList());
+    }
+
     public static Collection<TypeElement> getMapperForClasses(TypeElement element) {
-        Types types = Environment2.getTypes();
         Elements elements = Environment2.getUtils();
         TypeMirror supportedType = elements.getTypeElement(MAPPER_FOR_CLASSNAME).asType();
+        Collection<String> classes = extractClasses(element, supportedType);
+        return classes.stream().map(elements::getTypeElement).collect(Collectors.toList());
+    }
+
+    private static Collection<String> extractClasses(TypeElement element, TypeMirror supportedType){
+        Types types = Environment2.getTypes();
         Collection<String> classes = new HashSet<>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             DeclaredType declaredType = mirror.getAnnotationType();
@@ -42,6 +56,6 @@ public enum Process2 {
                 }
             }
         }
-        return classes.stream().map(elements::getTypeElement).collect(Collectors.toList());
+        return classes;
     }
 }

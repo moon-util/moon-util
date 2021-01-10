@@ -73,21 +73,21 @@ public enum Convert2 {
         Map<String, DeclareGeneric> thisGenericMap,
         Element element,
         TypeElement enclosingElement,
-        DeclaredPojo definition,
+        DeclaredPojo pojo,
         MappingProvider[] providers
     ) {
         String enclosingClassname = Element2.getQualifiedName(enclosingElement);
         for (MappingProvider pvd : providers) {
             ExecutableElement elem = (ExecutableElement) element;
             String propertyName = toPropertyName(elem, pvd, MappingProvider::value, GET, PROVIDE);
-            DeclareProperty property = definition.get(propertyName);
+            DeclareProperty property = pojo.get(propertyName);
             if (property == null) {
                 continue;
             }
             String forClass = Element2.getClassname(pvd, MappingProvider::provideFor);
             String declareType = elem.getReturnType().toString();
             String actualType = Generic2.mappingToActual(thisGenericMap, enclosingClassname, declareType);
-            DeclareMethod method = DeclareMethod.ofDeclared(elem, declareType, actualType);
+            DeclareMethod method = DeclareMethod.ofDeclared(pojo.getThisClassname(), elem, declareType, actualType);
             property.addProvider(forClass, actualType, method);
         }
     }
@@ -96,21 +96,21 @@ public enum Convert2 {
         Map<String, DeclareGeneric> thisGenericMap,
         Element element,
         TypeElement enclosingElement,
-        DeclaredPojo definition,
+        DeclaredPojo pojo,
         MappingInjector[] injectors
     ) {
         String enclosingClassname = Element2.getQualifiedName(enclosingElement);
         for (MappingInjector ijt : injectors) {
             ExecutableElement elem = (ExecutableElement) element;
             String propertyName = toPropertyName(elem, ijt, MappingInjector::value, SET, WITH, INJECT);
-            DeclareProperty property = definition.get(propertyName);
+            DeclareProperty property = pojo.get(propertyName);
             if (property == null) {
                 continue;
             }
             String fromClass = Element2.getClassname(ijt, MappingInjector::injectBy);
             String declareType = elem.getParameters().get(0).asType().toString();
             String actualType = Generic2.mappingToActual(thisGenericMap, enclosingClassname, declareType);
-            DeclareMethod method = DeclareMethod.ofDeclared(elem, declareType, actualType);
+            DeclareMethod method = DeclareMethod.ofDeclared(pojo.getThisClassname(), elem, declareType, actualType);
             property.addInjector(fromClass, actualType, method);
         }
     }

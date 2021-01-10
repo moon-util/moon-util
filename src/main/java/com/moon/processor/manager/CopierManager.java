@@ -3,7 +3,7 @@ package com.moon.processor.manager;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.model.DeclaredPojo;
-import com.moon.processor.model.DefBeanCopier;
+import com.moon.processor.def.DefBeanCopier;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;
@@ -20,7 +20,7 @@ public class CopierManager implements JavaFileWriteable {
 
     private final NameManager nameManager;
     private final PojoManager pojoManager;
-    private Map<String, DefBeanCopier> definedCopierMap = new LinkedHashMap<>();
+    private final Map<String, DefBeanCopier> definedCopierMap = new LinkedHashMap<>();
 
     public CopierManager(PojoManager pojoManager, NameManager nameManager) {
         this.nameManager = nameManager;

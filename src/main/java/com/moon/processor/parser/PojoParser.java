@@ -22,6 +22,7 @@ public class PojoParser {
 
     private final static String TOP_CLASS = Object.class.getName();
 
+    private final String thisClassname;
     /**
      * 声明的目标类
      */
@@ -51,6 +52,7 @@ public class PojoParser {
 
 
     private PojoParser(TypeElement thisElement, NameManager nameManager) {
+        this.thisClassname = Element2.getQualifiedName(thisElement);
         this.declaredPojo = new DeclaredPojo(thisElement, nameManager);
         this.thisGenericMap = Generic2.from(thisElement);
         this.ignoringMap = parseMappingIgnoring(thisElement);
@@ -72,6 +74,8 @@ public class PojoParser {
         }
         return false;
     }
+
+    public String getThisClassname() { return thisClassname; }
 
     private final static String TEMPLATE = "{} {} {}({})";
 
@@ -130,7 +134,7 @@ public class PojoParser {
             }
             DeclareProperty prop = declareProperty(name, parsingElem);
             handleMapping(ignoringMap.get(name), element, prop::addSetterMapping);
-            prop.addSetter(DeclareMethod.ofDeclared(elem, declaredType, actualType));
+            prop.addSetter(DeclareMethod.ofDeclared(getThisClassname(),elem, declaredType, actualType));
         } else if (Test2.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             declaredType = Element2.getGetterDeclareType(elem);
@@ -141,7 +145,7 @@ public class PojoParser {
             }
             DeclareProperty prop = declareProperty(name, parsingElem);
             handleMapping(ignoringMap.get(name), element, prop::addGetterMapping);
-            prop.addGetter(DeclareMethod.ofDeclared(elem, declaredType, actualType));
+            prop.addGetter(DeclareMethod.ofDeclared(getThisClassname(),elem, declaredType, actualType));
         } else if (Test2.isConstructor(element)) {
             // definition.addConstructor((ExecutableElement) element);
         } else if (Test2.isMethod(element)) {

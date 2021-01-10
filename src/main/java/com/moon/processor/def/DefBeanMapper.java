@@ -1,9 +1,10 @@
-package com.moon.processor.model;
+package com.moon.processor.def;
 
 import com.moon.mapper.BeanMapper;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.manager.NameManager;
+import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Holder;
@@ -53,8 +54,8 @@ public class DefBeanMapper implements JavaFileWriteable {
         filer.implement(getInterfaceDecl()).enumsOf(Const2.INSTANCE);
 
         // copier
-        filer.enumRef(getForward().getClassname(), Const2.FORWARD, Const2.INSTANCE);
-        filer.enumRef(getBackward().getClassname(), Const2.BACKWARD, Const2.INSTANCE);
+        filer.privateEnumRef(getForward().getClassname(), Const2.FORWARD, Const2.INSTANCE);
+        filer.privateEnumRef(getBackward().getClassname(), Const2.BACKWARD, Const2.INSTANCE);
 
         // methods
         buildUnsafeConvertMethods(filer);

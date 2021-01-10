@@ -11,8 +11,13 @@ import static com.moon.mapper.annotation.IgnoreMode.*;
 public class DeclareMapping {
 
     public final static DeclareMapping DFT = new Dft();
-
+    /**
+     * 提供给哪个类
+     */
     private final String targetCls;
+    /**
+     * 提供给哪个字段
+     */
     private final String field;
     final IgnoreMode ignoreMode;
     private final String format;
@@ -27,6 +32,8 @@ public class DeclareMapping {
         this.ignoreMode = ignoreMode;
         this.targetCls = targetCls;
     }
+
+    public boolean isDefaultMapping() { return false; }
 
     public boolean isIgnoreForward() {
         return ignoreMode == ALL || ignoreMode == FORWARD;
@@ -69,6 +76,9 @@ public class DeclareMapping {
     private static class Dft extends DeclareMapping {
 
         public Dft() { super(null, null, null, null, IgnoreMode.NONE); }
+
+        @Override
+        public boolean isDefaultMapping() { return true; }
 
         @Override
         public String getField(String fromProperty) { return fromProperty; }

@@ -1,4 +1,4 @@
-package com.moon.processor.model;
+package com.moon.processor.def;
 
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
@@ -27,6 +27,7 @@ public class DefJavaFiler implements JavaFileWriteable {
     private final String pkg, classname, simpleClassname;
     private final Set<String> enums = new LinkedHashSet<>();
 
+    private final Map<String, String> staticBlock = new LinkedHashMap<>();
     private final Map<String, String> fieldsMap = new LinkedHashMap<>();
     private final Map<String, String> constantsMap = new LinkedHashMap<>();
     private final Map<String, DefMethod> methodsDecl = new LinkedHashMap<>();
@@ -106,23 +107,6 @@ public class DefJavaFiler implements JavaFileWriteable {
         return this;
     }
 
-    private final static HolderGroup GROUP = Holder.of(Holder.type, Holder.var, Holder.value);
-    private final static String ENUM_REF = "private final static {type} {var} = {type}.{value};";
-
-    public DefJavaFiler enumRef(String type, String var, String enumValue) {
-        if (String2.isNotBlank(type) && String2.isNotBlank(var) && String2.isNotBlank(enumValue)) {
-            constantsMap.put(var, GROUP.on(ENUM_REF, onImported(type), var, enumValue));
-        }
-        return this;
-    }
-
-    public DefJavaFiler constOf(String type, String name, String value) {
-        if (String2.isNotBlank(type) && String2.isNotBlank(name) && String2.isNotBlank(value)) {
-            constantsMap.put(name, String2.toConstField(onImported(type), name, value));
-        }
-        return this;
-    }
-
     public DefJavaFiler extend(String superclass) {
         if (type == Type.CLASS) {
             this.superclass = onImported(superclass);
@@ -137,9 +121,50 @@ public class DefJavaFiler implements JavaFileWriteable {
         return this;
     }
 
+    private final static HolderGroup GROUP = Holder.of(Holder.type, Holder.var, Holder.value);
+    private final static String ENUM_REF = "private final static {type} {var} = {type}.{value};";
+
+    public DefJavaFiler privateEnumRef(String type, String var, String enumValue) {
+        if (String2.isNotBlank(type) && String2.isNotBlank(var) && String2.isNotBlank(enumValue)) {
+            constantsMap.put(var, GROUP.on(ENUM_REF, onImported(type), var, enumValue));
+        }
+        return this;
+    }
+
+    public DefJavaFiler privateConstField(String type, String name, String value) {
+        if (String2.isNotBlank(type) && String2.isNotBlank(name) && String2.isNotBlank(value)) {
+            constantsMap.put(name, String2.toConstField(onImported(type), name, value));
+        }
+        return this;
+    }
+
     public DefJavaFiler privateField(String name, String type) {
         if (String2.isNotBlank(type) && String2.isNotBlank(name)) {
-            fieldsMap.put(name, String2.toDeclareField(name, onImported(type)));
+            fieldsMap.put(name, String2.toPrivateField(name, onImported(type)));
+        }
+        return this;
+    }
+
+    public DefJavaFiler publicFinalField(String type, String name, String value) {
+        String template = "public final {type} {name} = {value};";
+        HolderGroup group = Holder.of(Holder.type, Holder.name, Holder.value);
+        String declared = group.on(template, onImported(type), name, value);
+        fieldsMap.put(name, declared);
+        return this;
+    }
+
+    public DefJavaFiler publicConstField(String type, String name, String value) {
+        String template = "public final static {type} {name} = {value};";
+        HolderGroup group = Holder.of(Holder.type, Holder.name, Holder.value);
+        String declared = group.on(template, onImported(type), name, value);
+        if (declared.length() > 80) {
+            String t0 = "public final static {} {};", t1 = "{} = {};";
+            String decl = String2.format(t0, onImported(type), name);
+            String assign = String2.format(t1, name, value);
+            constantsMap.put(name, decl);
+            staticBlock.put(decl, assign);
+        } else {
+            constantsMap.put(name, declared);
         }
         return this;
     }
@@ -257,25 +282,39 @@ public class DefJavaFiler implements JavaFileWriteable {
         sb.insert(importIndex + appendedLength, importsBuilder);
         appendedLength += importsBuilder.length();
 
-        // fields
-        StringBuilder constBuilder = newLine(new StringBuilder());
-        for (String value : fieldsMap.values()) {
-            newLine(constBuilder, indented).append(value);
-        }
+        StringBuilder constBuilder = new StringBuilder();
 
         // const of custom
-        newLine(constBuilder);
-        for (String value : constantsMap.values()) {
-            newLine(constBuilder, indented).append(value);
+        if (!constantsMap.isEmpty()) {
+            newLine(newLine(constBuilder));
+            for (String value : constantsMap.values()) {
+                newLine(newLine(constBuilder), indented).append(value);
+            }
         }
 
         // final static vars
         String[] scripts = constManager.getScripts();
         if (scripts != null && scripts.length > 0) {
-            newLine(constBuilder);
+            newLine(newLine(constBuilder));
             for (String script : scripts) {
-                newLine(constBuilder, indented).append(script);
+                newLine(newLine(constBuilder), indented).append(script);
             }
+        }
+
+        // fields
+        newLine(newLine(constBuilder));
+        for (String value : fieldsMap.values()) {
+            newLine(newLine(constBuilder), indented).append(value);
+        }
+
+        // static block
+        List<String> statics = new ArrayList<>(staticBlock.values());
+        if (!statics.isEmpty()) {
+            newLine(newLine(constBuilder)).append(indented).append("static {");
+            for (String value : staticBlock.values()) {
+                newLine(constBuilder, indented).append(indented).append(value);
+            }
+            newLine(constBuilder, indented).append('}');
         }
         sb.insert(constIndex + appendedLength, constBuilder);
         return newLine(sb).append("}").toString();

@@ -19,7 +19,7 @@ import static com.moon.processor.utils.Test2.isValidOnTrimmed;
 /**
  * @author benshaoye
  */
-public class ConstManager {
+public class ConstManager implements Importable {
 
     private final Importer importer;
     private final AtomicInteger indexer = new AtomicInteger();
@@ -28,8 +28,10 @@ public class ConstManager {
 
     public ConstManager(Importer importer) { this.importer = importer; }
 
+    @Override
     public String onImported(String classname) { return importer.onImported(classname); }
 
+    @Override
     public String onImported(Class<?> classname) { return importer.onImported(classname); }
 
     private String nextVar() { return "V" + indexer.getAndIncrement(); }
@@ -264,6 +266,27 @@ public class ConstManager {
             }
             return typeValue.on("{type} {var} = " + constant, onImported(t), v);
         });
+    }
+
+    public String defaultOf(String type, String value) {
+        if (String2.isNotEmpty(value)) {
+            if (Test2.isBasicNumberValue(type, value)) {
+                return this.numberOf(type, value);
+            } else if (Test2.isBasicBooleanValue(type, value)) {
+                return this.booleanOf(type, value);
+            } else if (Test2.isBasicCharValue(type, value)) {
+                return this.charOf(type, value);
+            } else if (Test2.isTypeof(type, BigDecimal.class)) {
+                return this.bigDecimalOf(value);
+            } else if (Test2.isTypeof(type, BigInteger.class)) {
+                return this.bigIntegerOf(value);
+            } else if (Test2.isEnum(type)) {
+                return this.enumOf(type, value);
+            } else if (Test2.isTypeof(type, String.class)) {
+                return this.stringOf(value);
+            }
+        }
+        return null;
     }
 
     public String ignored(String type, String value) {

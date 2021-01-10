@@ -3,8 +3,8 @@ package com.moon.processor.manager;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.model.DeclaredPojo;
-import com.moon.processor.model.DefBeanCopier;
-import com.moon.processor.model.DefBeanMapper;
+import com.moon.processor.def.DefBeanCopier;
+import com.moon.processor.def.DefBeanMapper;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;
@@ -37,8 +37,6 @@ public class MapperManager implements JavaFileWriteable {
     }
 
     public DefBeanMapper with(TypeElement thisElem, TypeElement thatElem) {
-        DefBeanCopier forward = copierManager.with(thisElem, thatElem);
-        DefBeanCopier backward = copierManager.with(thatElem, thisElem);
         String thisClassname = Element2.getQualifiedName(thisElem);
         String thatClassname = Element2.getQualifiedName(thatElem);
         String mapperKey = String2.keyOf(thisClassname, thatClassname);
@@ -46,6 +44,8 @@ public class MapperManager implements JavaFileWriteable {
         if (mapper == null) {
             DeclaredPojo thisClass = pojoManager.with(thisElem);
             DeclaredPojo thatClass = pojoManager.with(thatElem);
+            DefBeanCopier forward = copierManager.with(thisElem, thatElem);
+            DefBeanCopier backward = copierManager.with(thatElem, thisElem);
             mapper = new DefBeanMapper(forward, backward, thisClass, thatClass, nameManager);
             definedMapperMap.put(mapperKey, mapper);
         }

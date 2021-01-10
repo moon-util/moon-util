@@ -1,4 +1,4 @@
-package com.moon.processor.model;
+package com.moon.processor.def;
 
 import java.util.LinkedHashMap;
 
@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 public class DefParameters extends LinkedHashMap<String, String> {
 
     private DefParameters() { }
+
+    public static DefParameters empty() { return DefParameters.of(); }
 
     public static DefParameters of() { return new DefParameters(); }
 
