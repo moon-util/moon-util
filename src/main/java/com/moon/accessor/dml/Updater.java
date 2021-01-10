@@ -1,5 +1,6 @@
 package com.moon.accessor.dml;
 
+import com.moon.accessor.Condition;
 import com.moon.accessor.meta.Field;
 import com.moon.accessor.meta.Table;
 
@@ -8,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class Updater<R> {
+public class Updater<R> implements IWhere {
 
     private final Table<R> table;
 
@@ -20,15 +21,25 @@ public class Updater<R> {
         return this;
     }
 
+    @Override
+    public WhereClause where() {
+        return null;
+    }
+
+    @Override
+    public WhereClause where(Condition condition) {
+        return null;
+    }
+
     public int done() {
         return 0;
     }
 
-    public Updater then(Consumer<Integer> consumer){
+    public Updater<R> then(Consumer<Integer> consumer) {
         return this;
     }
 
-    public Updater onCatch(Consumer<? extends Throwable> consumer) {
+    public Updater<R> onCatch(Consumer<? extends Throwable> consumer) {
         return this;
     }
 }

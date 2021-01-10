@@ -6,7 +6,7 @@ import com.moon.accessor.meta.Table;
 /**
  * @author benshaoye
  */
-public class Selector<R> {
+public class Selector<R> implements IWhere{
 
     public Selector() {
     }
@@ -15,7 +15,13 @@ public class Selector<R> {
         return this;
     }
 
-    public WhereClauser where(Condition condition){
+    @Override
+    public WhereClause where() {
+        return null;
+    }
+
+    @Override
+    public WhereClause where(Condition condition){
         return null;
     }
 }

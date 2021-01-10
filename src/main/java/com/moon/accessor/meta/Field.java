@@ -42,38 +42,227 @@ public interface Field<T, R, TB extends Table<R>> {
      */
     TB getTable();
 
-    Condition startsWith(Object value);
+    /*
+     * 以下是条件查询
+     */
 
-    Condition endsWith(Object value);
+    /**
+     * 字符串以 xxx 开始，这里用{@link Object}是为了兼容别的数据类型，
+     * 内部处理通过{@link String#valueOf(Object)}，最终得到：
+     * <pre>
+     *     field LIKE 'text%'
+     * </pre>
+     *
+     * @param value 期望字符串
+     *
+     * @return where 条件
+     */
+    default Condition startsWith(Object value) {
+        return null;
+    }
 
-    Condition contains(Object value);
+    /**
+     * 字符串以 xxx 开始，这里用{@link Object}是为了兼容别的数据类型，
+     * 内部处理通过{@link String#valueOf(Object)}，最终得到：
+     * <pre>
+     *     field LIKE '%text'
+     * </pre>
+     *
+     * @param value 期望字符串
+     *
+     * @return where 条件
+     */
+    default Condition endsWith(Object value) {
+        return null;
+    }
 
-    Condition like(Object value);
+    /**
+     * 字符串以 xxx 开始，这里用{@link Object}是为了兼容别的数据类型，
+     * 内部处理通过{@link String#valueOf(Object)}，最终得到：
+     * <pre>
+     *     field LIKE '%text%'
+     * </pre>
+     *
+     * @param value 期望字符串
+     *
+     * @return where 条件
+     */
+    default Condition contains(Object value) {
+        return null;
+    }
 
-    Condition lt(T value);
+    /**
+     * 字符串以 xxx 开始，这里用{@link Object}是为了兼容别的数据类型，
+     * 内部处理通过{@link String#valueOf(Object)}，最终得到：
+     * <pre>
+     *     field LIKE 'text'
+     * </pre>
+     * <p>
+     * 注意与{@link #startsWith(Object)}、{@link #endsWith(Object)}、{@link #contains(Object)}
+     * 的区别，这里不会主动添加任何匹配符号（如：%、_)等，只是单纯的转换成字符串
+     * <p>
+     * 这是满足更多自定义条件设计的
+     *
+     * @param value 期望字符串
+     *
+     * @return where 条件
+     */
+    default Condition like(Object value) {
+        return null;
+    }
 
-    Condition gt(T value);
+    /**
+     * 小于某个值
+     *
+     * @param value 期望字段最大值（不包含）
+     *
+     * @return 条件子句
+     */
+    default Condition lt(T value) {
+        return null;
+    }
 
-    Condition le(T value);
+    /**
+     * 大于某个值
+     *
+     * @param value 期望字段最小值（不包含）
+     *
+     * @return 条件子句
+     */
+    default Condition gt(T value) {
+        return null;
+    }
 
-    Condition ge(T value);
+    /**
+     * 小于某个值
+     *
+     * @param value 期望字段最大值（包含）
+     *
+     * @return 条件子句
+     */
+    default Condition le(T value) {
+        return null;
+    }
 
-    Condition eq(T value);
+    /**
+     * 大于某个值
+     *
+     * @param value 期望字段最小值（不包含）
+     *
+     * @return 条件子句
+     */
+    default Condition ge(T value) {
+        return null;
+    }
 
-    Condition ne(T value);
+    /**
+     * 等于某个值
+     *
+     * @param value 期望的字段值
+     *
+     * @return 条件子句
+     *
+     * @see #is(Object) 等价
+     */
+    default Condition eq(T value) {
+        return null;
+    }
 
-    Condition in(T... values);
+    /**
+     * 等于某个值
+     *
+     * @param value 期望的字段值
+     *
+     * @return 条件子句
+     *
+     * @see #eq(Object) 等价
+     */
+    default Condition is(T value) {
+        return null;
+    }
 
-    Condition notIn(T... values);
+    /**
+     * 等不于某个值
+     *
+     * @param value 不期望的字段值
+     *
+     * @return 条件子句
+     */
+    default Condition ne(T value) {
+        return null;
+    }
 
-    Condition in(Iterable<T>... values);
+    /**
+     * 字段是否在指定列表中
+     *
+     * @param values 期望值列表
+     *
+     * @return 条件子句
+     *
+     * @see #in(Iterable) 等价
+     */
+    default Condition any(T... values) {
+        return null;
+    }
 
-    Condition notIn(Iterable<T>... values);
+    /**
+     * 字段是否不在指定列表中
+     *
+     * @param values 字段值不期望的值的列表
+     *
+     * @return 条件子句
+     *
+     * @see #notIn(Iterable) 等价
+     */
+    default Condition notAny(T... values) {
+        return null;
+    }
 
-    Condition isNull();
+    /**
+     * 字段是否在指定列表中
+     *
+     * @param values 期望值列表
+     *
+     * @return 条件子句
+     */
+    default Condition in(Iterable<T> values) {
+        return null;
+    }
 
-    Condition notNull();
+    /**
+     * 字段是否不在指定列表中
+     *
+     * @param values 字段值不期望的值的列表
+     *
+     * @return 条件子句
+     */
+    default Condition notIn(Iterable<T> values) {
+        return null;
+    }
 
+    /**
+     * 期望字段值为 null
+     *
+     * @return 条件
+     */
+    default Condition isNull() {
+        return null;
+    }
+
+    /**
+     * 期望字段值不为 null
+     *
+     * @return 条件
+     */
+    default Condition notNull() {
+        return null;
+    }
+
+    /**
+     * 期望字段值不为 null
+     *
+     * @return 条件
+     */
     default Condition isNotNull() {
         return notNull();
     }
