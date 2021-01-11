@@ -1,5 +1,6 @@
 package com.moon.processor.def;
 
+import com.moon.accessor.annotation.TablePolicy;
 import com.moon.accessor.meta.Field;
 import com.moon.accessor.meta.FieldDetail;
 import com.moon.accessor.meta.Table;
@@ -32,18 +33,57 @@ public class DefEntityModel implements JavaFileWriteable {
     private final String pkg, classname, simpleClassname;
     private final String tableName, tableField, pojoClassname;
 
-    public DefEntityModel(DeclaredPojo declaredPojo) {
+    public DefEntityModel(DeclaredPojo declaredPojo, TablePolicy policy) {
         this.declaredPojo = declaredPojo;
         TypeElement thisElement = declaredPojo.getDeclareElement();
         String clsName = Element2.getSimpleName(thisElement);
-        String name = String2.camelcaseToHyphen(clsName, '_', false);
 
-        this.tableName = name.toUpperCase();
+        String tableName = toDeclaredTableName(clsName, policy);
+        this.tableName = tableName;
+        this.simpleClassname = tableName.toUpperCase();
         this.tableField = deduceTableField(declaredPojo);
         this.pkg = Element2.getPackageName(thisElement);
-        this.simpleClassname = TABLE_PREFIX + tableName;
         this.classname = pkg + "." + simpleClassname;
         this.pojoClassname = declaredPojo.getThisClassname();
+    }
+
+    private static String toDeclaredTableName(String entityName, TablePolicy policy) {
+        String[] prefixes = policy.trimEntityPrefix();
+        String[] suffixes = policy.trimEntitySuffix();
+        for (String prefix : prefixes) {
+            if (entityName.startsWith(prefix)) {
+                entityName = entityName.substring(prefix.length());
+                break;
+            }
+        }
+        for (String suffix : suffixes) {
+            if (entityName.endsWith(suffix)) {
+                entityName = entityName.substring(0, entityName.lastIndexOf(suffix));
+                break;
+            }
+        }
+        String tableName;
+        switch (policy.caseMode()) {
+            case UNDERSCORE_LOWERCASE:
+                tableName = String2.camelcaseToHyphen(entityName, '_', false);
+                tableName = tableName.toLowerCase();
+                break;
+            case LOWERCASE:
+                tableName = entityName.toLowerCase();
+                break;
+            case UNDERSCORE_UPPERCASE:
+                tableName = String2.camelcaseToHyphen(entityName, '_', false);
+                tableName = tableName.toUpperCase();
+                break;
+            case UPPERCASE:
+                tableName = entityName.toUpperCase();
+                break;
+            default:
+                tableName = entityName;
+                break;
+        }
+        String pattern = String2.defaultIfBlank(policy.pattern(), "{}");
+        return String2.replaceAll(pattern, "{}", tableName);
     }
 
     private static String deduceTableField(DeclaredPojo pojo) {
@@ -89,7 +129,7 @@ public class DefEntityModel implements JavaFileWriteable {
                 getPojoClassname(),
                 getClassname());
             String fieldNameString = String2.format("\"{}\"", name);
-            String fieldValue = String2.format("new {}<>({}, {}, {}, {});",
+            String fieldValue = String2.format("new {}<>(this, {}, {}, {}, {});",
                 tableFiler.onImported(FieldDetail.class.getCanonicalName()),
                 tableFiler.onImported(getPojoClassname()) + DOT_CLS,
                 tableFiler.onImported(propertyType) + DOT_CLS,
@@ -120,7 +160,10 @@ public class DefEntityModel implements JavaFileWriteable {
         String classType = Class.class.getCanonicalName() + "<{}>";
         String returnType = String2.format(classType, getPojoClassname());
         DefMethod getEntityType = table.publicMethod(false, "getEntityType", returnType, EMPTY);
-        getEntityType.returning(table.onImported(getPojoClassname()) + DOT_CLS);
+        getEntityType.override().returning(table.onImported(getPojoClassname()) + DOT_CLS);
+        // impl method of: getTableName
+        DefMethod getTableName =table.publicMethod("getTableName", String.class, EMPTY);
+        getTableName.override().returning('"' + getTableName() + '"');
 
         return table;
     }

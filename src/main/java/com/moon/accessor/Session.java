@@ -23,7 +23,7 @@ public class Session {
         return new Inserter<>(table);
     }
 
-    public <R> Updater<R> update(Table<R> table) {
+    public <R, T extends Table<R>> Updater<R, T> update(T table) {
         return new Updater<>(table);
     }
 

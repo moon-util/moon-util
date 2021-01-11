@@ -200,6 +200,10 @@ public class DefJavaFiler implements JavaFileWriteable {
     }
 
     public DefMethod publicMethod(
+        String name, Class<?> returnClass, DefParameters parameters
+    ) { return publicMethod(false, name, returnClass.getCanonicalName(), parameters); }
+
+    public DefMethod publicMethod(
         String name, String returnClass, DefParameters parameters
     ) { return publicMethod(false, name, returnClass, parameters); }
 

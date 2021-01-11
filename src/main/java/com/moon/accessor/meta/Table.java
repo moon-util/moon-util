@@ -11,4 +11,11 @@ public interface Table<R> {
      * @return 实体 java 类型
      */
     Class<R> getEntityType();
+
+    /**
+     * 返回数据库表名
+     *
+     * @return 表名
+     */
+    String getTableName();
 }

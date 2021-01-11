@@ -3,7 +3,7 @@ package com.moon.processor;
 import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
-import com.moon.processor.def.TablesManager;
+import com.moon.processor.manager.TablesManager;
 import com.moon.processor.manager.*;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Log2;
@@ -54,8 +54,9 @@ public class CompileProcessor extends AbstractProcessor {
     ) {
         NameManager nameManager = new NameManager();
         PojoManager pojoManager = new PojoManager(nameManager);
-        TablesManager tablesManager = new TablesManager();
-        ModelManager modelManager = new ModelManager(pojoManager, tablesManager, nameManager);
+        PolicyManager policyManager = new PolicyManager();
+        TablesManager tablesManager = new TablesManager(policyManager);
+        ModelManager modelManager = new ModelManager(pojoManager, tablesManager, policyManager);
         CopierManager copierManager = new CopierManager(pojoManager, nameManager);
         MapperManager mapperManager = new MapperManager(copierManager, pojoManager, nameManager);
 

@@ -11,6 +11,10 @@ import java.util.List;
 public enum String2 {
     ;
 
+    public static String defaultIfBlank(String str, String defaultVal) {
+        return isBlank(str) ? defaultVal : str;
+    }
+
     public static String decapitalize(String name) { return Introspector.decapitalize(name); }
 
     public static String capitalize(String name) {

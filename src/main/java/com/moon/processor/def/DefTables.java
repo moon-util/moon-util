@@ -5,8 +5,8 @@ import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.utils.String2;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author benshaoye
@@ -15,22 +15,22 @@ public class DefTables implements JavaFileWriteable {
 
     private final static String PKG = Table.class.getPackage().getName();
 
-    private final String classname, name;
+    private final String classname;
 
-    private final Set<DefEntityModel> modelSet = new LinkedHashSet<>();
+    private final Map<String, DefEntityModel> modelSet = new LinkedHashMap<>();
 
     public DefTables(String name) {
         this.classname = String.join(".", PKG, name);
-        this.name = name;
     }
 
     public void with(DefEntityModel entityModel) {
-        modelSet.add(entityModel);
+        String tableName = entityModel.getTableName();
+        modelSet.put(tableName, entityModel);
     }
 
     private DefJavaFiler getDefJavaFiler() {
         DefJavaFiler filer = DefJavaFiler.enumOf(PKG, classname).component(false);
-        modelSet.forEach(entityModel -> {
+        modelSet.forEach((name, entityModel) -> {
             String tableName = entityModel.getTableName();
             String tableType = entityModel.getClassname();
             String tableField = entityModel.getTableField();

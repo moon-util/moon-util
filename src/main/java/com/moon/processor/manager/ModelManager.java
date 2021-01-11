@@ -1,9 +1,9 @@
 package com.moon.processor.manager;
 
+import com.moon.accessor.annotation.TablePolicy;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.def.DefEntityModel;
-import com.moon.processor.def.TablesManager;
 import com.moon.processor.utils.Element2;
 
 import javax.lang.model.element.TypeElement;
@@ -15,16 +15,16 @@ import java.util.Map;
  */
 public class ModelManager implements JavaFileWriteable {
 
-    private final NameManager nameManager;
+    private final PolicyManager policyManager;
     private final PojoManager pojoManager;
     private final TablesManager tablesManager;
 
     private final Map<String, DefEntityModel> modelMap = new HashMap<>();
 
-    public ModelManager(PojoManager pojoManager,TablesManager tablesManager, NameManager manager) {
+    public ModelManager(PojoManager pojoManager, TablesManager tablesManager, PolicyManager policyManager) {
         this.tablesManager = tablesManager;
+        this.policyManager = policyManager;
         this.pojoManager = pojoManager;
-        this.nameManager = manager;
     }
 
     public DefEntityModel with(TypeElement element, String accessorClassname) {
@@ -37,7 +37,8 @@ public class ModelManager implements JavaFileWriteable {
         // 一个实体可以按业务区分成多个访问器
         entityModel = modelMap.get(classname);
         if (entityModel == null) {
-            entityModel = new DefEntityModel(pojoManager.with(element));
+            TablePolicy policy = policyManager.with(element);
+            entityModel = new DefEntityModel(pojoManager.with(element), policy);
             modelMap.put(accessorClassname, entityModel);
             tablesManager.with(element, entityModel);
         }

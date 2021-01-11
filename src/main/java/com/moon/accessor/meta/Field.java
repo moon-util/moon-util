@@ -263,7 +263,5 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件
      */
-    default Condition isNotNull() {
-        return notNull();
-    }
+    default Condition isNotNull() { return notNull(); }
 }
