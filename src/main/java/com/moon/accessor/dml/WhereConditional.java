@@ -1,18 +1,18 @@
 package com.moon.accessor.dml;
 
-import com.moon.accessor.Condition;
+import com.moon.accessor.Conditional;
 
 /**
  * @author benshaoye
  */
-public interface IWhere {
+public interface WhereConditional<T extends WhereClauseCapable> {
 
     /**
      * where 子句
      *
      * @return where 子句
      */
-    WhereClause where();
+    T where();
 
     /**
      * where 子句
@@ -21,5 +21,5 @@ public interface IWhere {
      *
      * @return where 子句
      */
-    WhereClause where(Condition condition);
+    T where(Conditional condition);
 }

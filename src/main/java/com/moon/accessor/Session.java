@@ -16,10 +16,22 @@ public class Session {
     }
 
     public Selector select(Field<?, ?, ? extends Table<?>>... fields) {
-        return new Selector();
+        return new Selector(fields);
     }
 
-    public <R> Inserter<R> insert(Table<R> table) {
+    public <T, R, TB extends Table<R>> Selector<R> select(Field<T, R, TB> field) {
+        return new Selector<>(field);
+    }
+
+    public Selector selectDistinct(Field<?, ?, ? extends Table<?>>... fields) {
+        return new Selector(true, fields);
+    }
+
+    public <T, R, TB extends Table<R>> Selector<R> selectDistinct(Field<T, R, TB> field) {
+        return new Selector<>(true, field);
+    }
+
+    public <R, T extends Table<R>> Inserter<R, T> insert(T table) {
         return new Inserter<>(table);
     }
 
@@ -27,7 +39,7 @@ public class Session {
         return new Updater<>(table);
     }
 
-    public <R> Deleter<R> delete(Table<R> table) {
+    public <R, T extends Table<R>> Deleter<R, T> delete(T table) {
         return new Deleter<>(table);
     }
 }

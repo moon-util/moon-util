@@ -1,26 +1,26 @@
 package com.moon.accessor.dml;
 
-import com.moon.accessor.Condition;
+import com.moon.accessor.Conditional;
 import com.moon.accessor.meta.Table;
 
 /**
  * @author benshaoye
  */
-public class Deleter<R> implements IWhere {
+public class Deleter<R, T extends Table<R>> implements WhereConditional<DeleterWhereClause> {
 
-    private final Table<R> table;
+    private final T table;
 
-    public Deleter(Table<R> table) {
+    public Deleter(T table) {
         this.table = table;
     }
 
     @Override
-    public WhereClause where() {
+    public DeleterWhereClause where() {
         return null;
     }
 
     @Override
-    public WhereClause where(Condition condition) {
+    public DeleterWhereClause where(Conditional condition) {
         return null;
     }
 }

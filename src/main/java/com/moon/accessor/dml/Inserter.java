@@ -6,15 +6,15 @@ import com.moon.accessor.meta.Table;
 /**
  * @author benshaoye
  */
-public class Inserter<R> {
+public class Inserter<R, T extends Table<R>> {
 
-    private final Table<R> table;
+    private final T table;
 
-    public Inserter(Table<R> table) {
+    public Inserter(T table) {
         this.table = table;
     }
 
-    public <T> Inserter<R> set(Field<T, R, ? extends Table<R>> field, T value) {
+    public <V> Inserter<R, T> set(Field<V, R, T> field, V value) {
         return this;
     }
 

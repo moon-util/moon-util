@@ -1,6 +1,6 @@
 package com.moon.accessor.dml;
 
-import com.moon.accessor.Condition;
+import com.moon.accessor.Conditional;
 import com.moon.accessor.meta.Field;
 import com.moon.accessor.meta.Table;
 
@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class Updater<R, T extends Table<R>> implements IWhere {
+public class Updater<R, T extends Table<R>> implements WhereConditional<UpdaterWhereClause> {
 
     private final T table;
 
@@ -24,12 +24,12 @@ public class Updater<R, T extends Table<R>> implements IWhere {
     }
 
     @Override
-    public WhereClause where() {
+    public UpdaterWhereClause where() {
         return null;
     }
 
     @Override
-    public WhereClause where(Condition condition) {
+    public UpdaterWhereClause where(Conditional condition) {
         return null;
     }
 

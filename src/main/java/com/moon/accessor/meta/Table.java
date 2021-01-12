@@ -13,6 +13,13 @@ public interface Table<R> {
     Class<R> getEntityType();
 
     /**
+     * 返回实体数据量格式化类名
+     *
+     * @return 实体完整类名
+     */
+    default String getEntityClassname() { return getEntityType().getCanonicalName(); }
+
+    /**
      * 返回数据库表名
      *
      * @return 表名

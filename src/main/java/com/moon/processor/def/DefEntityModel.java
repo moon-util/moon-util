@@ -122,6 +122,8 @@ public class DefEntityModel implements JavaFileWriteable {
             if (prop.getField() == null) {
                 return;
             }
+
+            String importedPojoName = tableFiler.onImported(getPojoClassname());
             String propertyType = String2.toGeneralizableType(prop.getActualType());
             String fieldType = String2.format("{}<{}, {}, {}>",
                 Field.class.getCanonicalName(),
@@ -129,12 +131,22 @@ public class DefEntityModel implements JavaFileWriteable {
                 getPojoClassname(),
                 getClassname());
             String fieldNameString = String2.format("\"{}\"", name);
-            String fieldValue = String2.format("new {}<>(this, {}, {}, {}, {});",
+            String columnNameString = String2.format("\"{}\"", name);
+            String getter = null, setter = null;
+            if (prop.getGetter() != null) {
+                getter = String2.format("{}::{}", importedPojoName, prop.getGetter().getName());
+            }
+            if (prop.getSetter() != null) {
+                setter = String2.format("{}::{}", importedPojoName, prop.getSetter().getName());
+            }
+            String fieldValue = String2.format("new {}<>(this, {}, {}, {}, {}, {}, {});",
                 tableFiler.onImported(FieldDetail.class.getCanonicalName()),
-                tableFiler.onImported(getPojoClassname()) + DOT_CLS,
+                importedPojoName + DOT_CLS,
                 tableFiler.onImported(propertyType) + DOT_CLS,
+                getter,
+                setter,
                 fieldNameString,
-                fieldNameString);
+                columnNameString);
             String fieldName = String2.camelcaseToHyphen(name, '_', false).toUpperCase();
             String finalName = String2.format("{}.{}", getTableField(), name);
             tableFiler.publicFinalField(fieldType, name, fieldValue);
@@ -161,8 +173,11 @@ public class DefEntityModel implements JavaFileWriteable {
         String returnType = String2.format(classType, getPojoClassname());
         DefMethod getEntityType = table.publicMethod(false, "getEntityType", returnType, EMPTY);
         getEntityType.override().returning(table.onImported(getPojoClassname()) + DOT_CLS);
+        // impl method of: getEntityClassname
+        DefMethod getEntityClassname = table.publicMethod("getEntityClassname", String.class, EMPTY);
+        getEntityClassname.override().returning(String2.format("\"{}\"", getPojoClassname()));
         // impl method of: getTableName
-        DefMethod getTableName =table.publicMethod("getTableName", String.class, EMPTY);
+        DefMethod getTableName = table.publicMethod("getTableName", String.class, EMPTY);
         getTableName.override().returning('"' + getTableName() + '"');
 
         return table;

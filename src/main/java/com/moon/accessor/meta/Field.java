@@ -1,11 +1,12 @@
 package com.moon.accessor.meta;
 
-import com.moon.accessor.Condition;
+import com.moon.accessor.Conditional;
+import com.moon.accessor.dml.AliasCapable;
 
 /**
  * @author benshaoye
  */
-public interface Field<T, R, TB extends Table<R>> {
+public interface Field<T, R, TB extends Table<R>> extends AliasCapable<Field<T, R, TB>> {
 
     /**
      * 领域模型类
@@ -22,11 +23,72 @@ public interface Field<T, R, TB extends Table<R>> {
     Class<T> getPropertyType();
 
     /**
+     * 获取属性值
+     *
+     * @param record 实体
+     *
+     * @return 实体对应字段的属性
+     */
+    default T getPropertyValue(R record) {
+        return getPropertyGetter().get(record);
+    }
+
+    /**
+     * 获取属性值
+     *
+     * @param record 实体
+     *
+     * @return 实体对应字段的属性
+     */
+    default void setPropertyValue(R record, T value) {
+        getPropertySetter().set(record, value);
+    }
+
+    /**
+     * 是否可获取属性值，即实体类里是否存在相应 getter
+     *
+     * @return true/false
+     */
+    default boolean isGetterAvailable() {
+        return getPropertyGetter() != null;
+    }
+
+    /**
+     * 是否可设置属性值，即实体类里是否存在相应 setter
+     *
+     * @return true/false
+     */
+    default boolean isSetterAvailable() {
+        return getPropertySetter() != null;
+    }
+
+    /**
+     * 获取属性获取器
+     *
+     * @return 属性获取器
+     */
+    PropertyGetter<R, T> getPropertyGetter();
+
+    /**
+     * 获取属性设置器
+     *
+     * @return 属性设置器
+     */
+    PropertySetter<R, T> getPropertySetter();
+
+    /**
      * 实体字段名
      *
      * @return 实体字段名
      */
     String getPropertyName();
+
+    /**
+     * 获取数据库表名
+     *
+     * @return 数据库表名
+     */
+    default String getTableName() { return getTable().getTableName(); }
 
     /**
      * 获取数据库对应的列名
@@ -36,11 +98,34 @@ public interface Field<T, R, TB extends Table<R>> {
     String getColumnName();
 
     /**
+     * 获取列别名，当设置了别名是返回别名
+     * <p>
+     * 没有设置时可根据系统需要分配或返回实际列名{@link #getColumnName()}
+     *
+     * @return 别名
+     *
+     * @see #as(String) 指定别名
+     */
+    default String getAliasName() {
+        return getColumnName();
+    }
+
+    /**
      * 返回所属数据表
      *
      * @return 数据表描述
      */
     TB getTable();
+
+    /**
+     * 查询时指定别名
+     *
+     * @param alias 别名
+     *
+     * @return
+     */
+    @Override
+    Field<T, R, TB> as(String alias);
 
     /*
      * 以下是条件查询
@@ -57,7 +142,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return where 条件
      */
-    default Condition startsWith(Object value) {
+    default Conditional startsWith(Object value) {
         return null;
     }
 
@@ -72,7 +157,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return where 条件
      */
-    default Condition endsWith(Object value) {
+    default Conditional endsWith(Object value) {
         return null;
     }
 
@@ -87,7 +172,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return where 条件
      */
-    default Condition contains(Object value) {
+    default Conditional contains(Object value) {
         return null;
     }
 
@@ -107,7 +192,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return where 条件
      */
-    default Condition like(Object value) {
+    default Conditional like(Object value) {
         return null;
     }
 
@@ -118,7 +203,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件子句
      */
-    default Condition lt(T value) {
+    default Conditional lt(T value) {
         return null;
     }
 
@@ -129,7 +214,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件子句
      */
-    default Condition gt(T value) {
+    default Conditional gt(T value) {
         return null;
     }
 
@@ -140,7 +225,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件子句
      */
-    default Condition le(T value) {
+    default Conditional le(T value) {
         return null;
     }
 
@@ -151,7 +236,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件子句
      */
-    default Condition ge(T value) {
+    default Conditional ge(T value) {
         return null;
     }
 
@@ -164,7 +249,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @see #is(Object) 等价
      */
-    default Condition eq(T value) {
+    default Conditional eq(T value) {
         return null;
     }
 
@@ -177,7 +262,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @see #eq(Object) 等价
      */
-    default Condition is(T value) {
+    default Conditional is(T value) {
         return null;
     }
 
@@ -188,7 +273,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件子句
      */
-    default Condition ne(T value) {
+    default Conditional ne(T value) {
         return null;
     }
 
@@ -200,8 +285,9 @@ public interface Field<T, R, TB extends Table<R>> {
      * @return 条件子句
      *
      * @see #in(Iterable) 等价
+     * @see #nonOf(Object[])
      */
-    default Condition any(T... values) {
+    default Conditional oneOf(T... values) {
         return null;
     }
 
@@ -213,8 +299,9 @@ public interface Field<T, R, TB extends Table<R>> {
      * @return 条件子句
      *
      * @see #notIn(Iterable) 等价
+     * @see #oneOf(Object[])
      */
-    default Condition notAny(T... values) {
+    default Conditional nonOf(T... values) {
         return null;
     }
 
@@ -225,7 +312,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件子句
      */
-    default Condition in(Iterable<T> values) {
+    default Conditional in(Iterable<T> values) {
         return null;
     }
 
@@ -236,7 +323,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件子句
      */
-    default Condition notIn(Iterable<T> values) {
+    default Conditional notIn(Iterable<T> values) {
         return null;
     }
 
@@ -245,7 +332,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件
      */
-    default Condition isNull() {
+    default Conditional isNull() {
         return null;
     }
 
@@ -254,7 +341,7 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件
      */
-    default Condition notNull() {
+    default Conditional notNull() {
         return null;
     }
 
@@ -263,5 +350,5 @@ public interface Field<T, R, TB extends Table<R>> {
      *
      * @return 条件
      */
-    default Condition isNotNull() { return notNull(); }
+    default Conditional isNotNull() { return notNull(); }
 }
