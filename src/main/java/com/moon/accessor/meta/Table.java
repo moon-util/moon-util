@@ -1,5 +1,7 @@
 package com.moon.accessor.meta;
 
+import com.moon.accessor.Conditional;
+
 /**
  * @author benshaoye
  */
@@ -25,4 +27,26 @@ public interface Table<R> {
      * @return 表名
      */
     String getTableName();
+
+    /**
+     * 左连接
+     *
+     * @param table 连接表
+     *
+     * @return 查询表
+     */
+    default Table<R> leftJoin(Table<?> table) {
+        return this;
+    }
+
+    /**
+     * 连接条件
+     *
+     * @param condition 连接条件
+     *
+     * @return 查询表
+     */
+    default Table<R> on(Conditional condition) {
+        return this;
+    }
 }

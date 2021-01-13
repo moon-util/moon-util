@@ -7,11 +7,11 @@ import java.sql.ResultSet;
 /**
  * @author benshaoye
  */
-public class ExtractRegistry {
+public class QueryRegistry {
 
     static {
         ResultSetGetter<String> getter = ResultSet::getString;
     }
 
-    public ExtractRegistry() {}
+    public QueryRegistry() {}
 }

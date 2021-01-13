@@ -14,6 +14,7 @@ import java.util.Map;
 public class DefTables implements JavaFileWriteable {
 
     private final static String PKG = Table.class.getPackage().getName();
+    private final static String TABLE_NAME = Table.class.getCanonicalName();
 
     private final String classname;
 
@@ -37,6 +38,11 @@ public class DefTables implements JavaFileWriteable {
             String value = String2.format("{}.{};", filer.onImported(tableType), tableField);
             filer.publicConstField(tableType, tableName, value);
         });
+        // impl method of: getTables
+        String returning = String2.format("{}<?>[]", TABLE_NAME);
+        DefMethod m = filer.publicMethod(true, "getTables", returning, DefParameters.of());
+        String tables = String.join(", ", modelSet.keySet());
+        m.returning(String2.format("new {}{{}};", filer.onImported(returning), tables));
         return filer;
     }
 

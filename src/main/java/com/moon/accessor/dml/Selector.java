@@ -1,8 +1,8 @@
 package com.moon.accessor.dml;
 
 import com.moon.accessor.Conditional;
-import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.Table;
+import com.moon.accessor.meta.TableField;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +40,18 @@ public class Selector<R> implements WhereConditional<SelectorWhereClause>, Alias
     }
 
     public Selector<R> count(TableField<?, ?, ? extends Table<?>> field) {
+        return this;
+    }
+
+    public Selector<R> countDistinct(TableField<?, ?, ? extends Table<?>> field) {
+        return this;
+    }
+
+    public Selector<R> avg(TableField<?, ?, ? extends Table<?>> field) {
+        return this;
+    }
+
+    public Selector<R> sum(TableField<?, ?, ? extends Table<?>> field) {
         return this;
     }
 

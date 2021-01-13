@@ -1,6 +1,8 @@
 package com.moon.accessor.meta;
 
-import com.moon.accessor.*;
+import com.moon.accessor.MatchingType;
+import com.moon.accessor.PropertyGetter;
+import com.moon.accessor.PropertySetter;
 import com.moon.accessor.dml.AliasCapable;
 
 /**
@@ -351,4 +353,15 @@ public interface TableField<T, R, TB extends Table<R>> extends AliasCapable<Tabl
      * @return 条件
      */
     default Condition isNotNull() { return notNull(); }
+
+    /**
+     * 与另一个字段相等
+     *
+     * @param field 另一个字段
+     *
+     * @return 条件
+     */
+    default Condition equalsTo(TableField<?, ?, ? extends Table<?>> field) {
+        return null;
+    }
 }

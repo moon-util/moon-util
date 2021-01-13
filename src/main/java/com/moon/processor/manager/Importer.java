@@ -2,7 +2,6 @@ package com.moon.processor.manager;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.TypeElement;
@@ -13,7 +12,7 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class Importer implements Importable{
+public class Importer implements Importable {
 
     private final static String EMPTY = "";
 
@@ -58,6 +57,12 @@ public class Importer implements Importable{
                     if (ch == ',') {
                         result.append(' ');
                     }
+                    break;
+                case '?':
+                case '&':
+                    result.append(ch);
+                    break;
+                case ' ':
                     break;
                 default:
                     cache.append(ch);
