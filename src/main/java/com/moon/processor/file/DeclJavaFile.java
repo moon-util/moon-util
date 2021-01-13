@@ -4,10 +4,7 @@ import com.moon.processor.manager.Importable;
 import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.String2;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,13 +18,13 @@ public class DeclJavaFile implements Importable {
 
     private final String packageName, simpleName;
 
+    private final Set<String> interfaces = new LinkedHashSet<>();
+    private String superclass;
+
     private final Importer importer = new Importer();
 
     private final Set<String> enums = new LinkedHashSet<>();
     private final Map<String, DeclField> fieldMap = new LinkedHashMap<>();
-
-    private Set<String> interfaces = new LinkedHashSet<>();
-    private String superclass;
 
     private DeclJavaFile(JavaType type, String packageName, String simpleName) {
         this.packageName = packageName;
@@ -73,9 +70,7 @@ public class DeclJavaFile implements Importable {
 
     public DeclJavaFile implement(String... interfaces) {
         if (interfaces != null) {
-            for (String anInterface : interfaces) {
-                this.interfaces.add(anInterface);
-            }
+            this.interfaces.addAll(Arrays.asList(interfaces));
         }
         return this;
     }
@@ -90,15 +85,15 @@ public class DeclJavaFile implements Importable {
         return this;
     }
 
-    public DeclField declareField(String name) {
-        DeclField field = new DeclField(importer, name);
+    public DeclField declareField(String name, String typePattern, Object... values) {
+        DeclField field = new DeclField(importer, name,typePattern,values);
         fieldMap.put(name, field);
         enums.remove(name);
         return field;
     }
 
     public DeclField privateField(String name, String typePattern, Object... values) {
-        return declareField(name).withPrivate().withFieldType(typePattern, values);
+        return declareField(name, typePattern, values).withPrivate();
     }
 
     public DeclField privateConstField(String name, String typePattern, Object... values) {
@@ -127,7 +122,7 @@ public class DeclJavaFile implements Importable {
         // methods
 
         importMark.with(importer.toString("\n"));
-        fieldsMark.with(toFieldDeclared(4));
+        fieldsMark.with(toFieldDeclared(indent));
         addr.add(toGetterSetterMethodsDeclared());
         return addr.next().add('}').toString();
     }
@@ -140,6 +135,8 @@ public class DeclJavaFile implements Importable {
         if (fieldMap.isEmpty()) {
             StringAddr constAddr = StringAddr.of().next(2), staticAddr = StringAddr.of();
             StringAddr finalAddr = StringAddr.of(), fieldAddr = StringAddr.of();
+            List<String> instanceBlock = new ArrayList<>();
+            List<String> staticBlock = new ArrayList<>();
             for (DeclField declField : fieldMap.values()) {
                 StringAddr selectedAddr;
                 if (declField.isFinal()) {
@@ -149,13 +146,27 @@ public class DeclJavaFile implements Importable {
                 }
                 String declare = declField.getDeclareFieldScript();
                 selectedAddr.next().indent(indent).addScript(declare);
+                staticBlock.addAll(Arrays.asList(declField.getStaticBlock()));
+                instanceBlock.addAll(Arrays.asList(declField.getInstanceBlock()));
             }
             appendIfNotEmpty(constAddr, staticAddr);
+            appendBlock(constAddr, staticBlock, "static ", indent);
             appendIfNotEmpty(constAddr, finalAddr);
             appendIfNotEmpty(constAddr, fieldAddr);
+            appendBlock(constAddr, instanceBlock, "", indent);
             return constAddr.toString();
         }
         return "";
+    }
+
+    private static void appendBlock(StringAddr appender, List<String> blocks, String starting, int indent){
+        if (!blocks.isEmpty()) {
+            appender.next(2).indent(indent).add(starting).add("{");
+            for (String block : blocks) {
+                appender.next().indent(indent, 2).addScript(block);
+            }
+            appender.next().indent(indent).add("}");
+        }
     }
 
     private static void appendIfNotEmpty(StringAddr appender, StringAddr current) {

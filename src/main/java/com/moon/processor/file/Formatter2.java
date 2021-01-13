@@ -14,7 +14,7 @@ public enum Formatter2 {
 
     public static String toTypedFormatted(Importer importer, String pattern, Object... values) {
         values = values == null ? OBJECTS : values;
-        String[] mapped = new String[values.length];
+        Object[] mapped = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             Object type = values[i];
             if (type instanceof Class<?>) {
@@ -34,7 +34,7 @@ public enum Formatter2 {
 
     public static String toFormatted(Importer importer, String pattern, Object... values) {
         values = values == null ? OBJECTS : values;
-        String[] mapped = new String[values.length];
+        Object[] mapped = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             Object type = values[i];
             if (type instanceof Class<?>) {

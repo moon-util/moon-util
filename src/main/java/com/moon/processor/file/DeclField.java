@@ -7,8 +7,9 @@ import com.moon.processor.utils.String2;
 import javax.lang.model.element.Modifier;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author benshaoye
@@ -17,23 +18,22 @@ public class DeclField implements Importable {
 
     private final static String[] STRINGS = {};
 
-    private Set<Modifier> modifiers = new TreeSet<>();
+    private final Set<Modifier> modifiers = new TreeSet<>();
     private String modifiersDeclared;
-    private Boolean getter, setter;
+    private DeclMethod getter, setter;
     private final Importer importer;
-    private final String name;
-    private String type;
+    private final String name, type;
     private String value;
 
-    public DeclField(Importer importer, String name) {
+    public DeclField(Importer importer, String name, String typePattern, Object... types) {
+        this.type = Formatter2.toTypedFormatted(importer, typePattern, types);
         this.importer = importer;
         this.name = name;
         this.withPrivate();
     }
 
     private void resetModifiersDeclared() {
-        this.modifiersDeclared = String.join(" ",
-            modifiers.stream().map(m -> m.name().toLowerCase()).collect(toList()));
+        this.modifiersDeclared = modifiers.stream().map(m -> m.name().toLowerCase()).collect(joining(" "));
     }
 
     private void removeAccessLevels() {
@@ -95,36 +95,36 @@ public class DeclField implements Importable {
 
     public DeclField withStatic() { return withModifier(Modifier.STATIC); }
 
-    public DeclField withGetterUsed(boolean used) {
-        this.getter = used;
-        return this;
-    }
-
-    public DeclField withSetterUsed(boolean used) {
-        this.setter = used;
-        return this;
-    }
-
-    public DeclField withGetterUsed() { return withGetterUsed(true); }
-
-    public DeclField withSetterUsed() { return withSetterUsed(true); }
-
-    public DeclField withGetterUnused() { return withGetterUsed(false); }
-
-    public DeclField withSetterUnused() { return withSetterUsed(false); }
-
-    public boolean isFinal(){ return modifiers.contains(Modifier.FINAL); }
+    public boolean isFinal() { return modifiers.contains(Modifier.FINAL); }
 
     public boolean isStatic() { return modifiers.contains(Modifier.STATIC); }
 
-    public boolean isHasSetter() {
-        return !isFinal() && Boolean.TRUE.equals(setter);
+    public DeclMethod getGetter() {
+        return getter == null ? DeclMethod.EMPTY : getter.returnTypeof(type).returning(name);
     }
 
-    public boolean isHasGetter() { return Boolean.TRUE.equals(getter); }
+    public DeclMethod getSetter() {
+        if (setter == null || isFinal()) {
+            return DeclMethod.EMPTY;
+        }
+        return setter.scriptOf("this.{} = {}", name, name);
+    }
 
-    public DeclField withFieldType(String pattern, Object... types) {
-        this.type = Formatter2.toTypedFormatted(importer, pattern, types);
+    public DeclField withGetterConfigured() {
+        DeclMethod getter = this.getter;
+        if (getter == null) {
+            getter = DeclMethod.ofGetter(importer, name, type);
+            this.getter = getter;
+        }
+        return this;
+    }
+
+    public DeclField withSetterConfigured() {
+        DeclMethod setter = this.setter;
+        if (setter == null) {
+            setter = DeclMethod.ofSetter(importer, name, type);
+            this.setter = setter;
+        }
         return this;
     }
 
@@ -141,8 +141,7 @@ public class DeclField implements Importable {
         String value = this.value;
         String declare = getDeclareField();
         if (Formatter2.isOverLength(declare.length() + value.length())) {
-            String[] scripts = {name + " = " + value};
-            return scripts;
+            return new String[]{name + " = " + value};
         }
         return STRINGS;
     }

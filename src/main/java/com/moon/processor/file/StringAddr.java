@@ -1,5 +1,7 @@
 package com.moon.processor.file;
 
+import com.moon.processor.utils.Const2;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +39,28 @@ public class StringAddr {
 
     public StringAddr addScript(CharSequence script) { return add(onlyColonTail(script.toString().trim())); }
 
+    public StringAddr addBlockComment(int indent, String comment, String... comments) {
+        next().indent(indent).add("/*");
+        next().indent(indent).add(" * ").add(comment);
+        String[] strings = comments == null ? Const2.EMPTY : comments;
+        for (String string : strings) {
+            next().indent(indent).add(" * ").add(string);
+        }
+        return next().indent(indent).add(" */").next();
+    }
+
+    public StringAddr addDocComment(int indent, String comment, String... comments) {
+        next().indent(indent).add("/** ");
+        if (comments == null || comments.length == 0) {
+            add(comment);
+        } else {
+            for (String string : comments) {
+                next().indent(indent).add(" * ").add(string);
+            }
+        }
+        return next().indent(indent).add(" */").next();
+    }
+
     public StringAddr append(Object sequence) { return add(sequence); }
 
     private StringAddr append(char ch, int count) {
@@ -50,6 +74,8 @@ public class StringAddr {
     public StringAddr next(int line) { return append('\n', line); }
 
     public StringAddr indent(int count) { return append(' ', count); }
+
+    public StringAddr indent(int count, int multi) { return append(' ', count * multi); }
 
     /**
      * 标记，可通过{@link Mark#with(StringAddr)}向标记处插入字符串等数据
@@ -80,8 +106,8 @@ public class StringAddr {
             builder.insert(position, script);
             List<Mark> marks = StringAddr.this.marks;
             int appendedLength = script.length();
-            int lastIdx = marks.size() - 1, topAt = index;
-            for (int i = lastIdx; i > topAt; i--) {
+            int lastIdx = marks.size() - 1;
+            for (int i = lastIdx; i > index; i--) {
                 marks.get(i).position += appendedLength;
             }
             this.markReplaced = true;
@@ -105,8 +131,6 @@ public class StringAddr {
             } else if (Character.isWhitespace(ch)) {
                 if (present) {
                     break;
-                } else {
-                    continue;
                 }
             } else {
                 break;
