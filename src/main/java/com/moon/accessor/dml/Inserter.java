@@ -1,6 +1,6 @@
 package com.moon.accessor.dml;
 
-import com.moon.accessor.meta.Field;
+import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.Table;
 
 /**
@@ -14,7 +14,7 @@ public class Inserter<R, T extends Table<R>> {
         this.table = table;
     }
 
-    public <V> Inserter<R, T> set(Field<V, R, T> field, V value) {
+    public <V> Inserter<R, T> set(TableField<V, R, T> field, V value) {
         return this;
     }
 

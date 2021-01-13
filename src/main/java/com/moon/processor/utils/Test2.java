@@ -102,8 +102,6 @@ public enum Test2 {
 
     public static boolean isElemKind(Element elem, ElementKind kind) { return elem != null && elem.getKind() == kind; }
 
-    public static boolean isMappableElement(Element elem) { return elem != null; }
-
     public static boolean isConstructor(Element elem) { return isElemKind(elem, CONSTRUCTOR); }
 
     public static boolean isPackage(Element elem) { return isElemKind(elem, PACKAGE); }

@@ -1,7 +1,7 @@
 package com.moon.accessor.dml;
 
 import com.moon.accessor.Conditional;
-import com.moon.accessor.meta.Field;
+import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.Table;
 
 import java.util.HashMap;
@@ -15,39 +15,39 @@ public class Selector<R> implements WhereConditional<SelectorWhereClause>, Alias
     private final boolean distinct;
     private final StringBuilder sql;
 
-    public Selector(Field<?, ?, ? extends Table<?>>... fields) {
+    public Selector(TableField<?, ?, ? extends Table<?>>... fields) {
         this(false, fields);
     }
 
-    public Selector(Field<?, ?, ? extends Table<?>> field) {
+    public Selector(TableField<?, ?, ? extends Table<?>> field) {
         this(false, field);
     }
 
-    public Selector(boolean distinct, Field<?, ?, ? extends Table<?>>... fields) {
+    public Selector(boolean distinct, TableField<?, ?, ? extends Table<?>>... fields) {
         this.distinct = distinct;
         Map<Object, String> tableName = new HashMap<>();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
-        for (Field<?, ?, ? extends Table<?>> field : fields) {
+        for (TableField<?, ?, ? extends Table<?>> field : fields) {
             // sql.append();
         }
         this.sql = sql;
     }
 
-    public Selector(boolean distinct, Field<?, ?, ? extends Table<?>> field) {
+    public Selector(boolean distinct, TableField<?, ?, ? extends Table<?>> field) {
         this.distinct = distinct;
         this.sql = new StringBuilder();
     }
 
-    public Selector<R> count(Field<?, ?, ? extends Table<?>> field) {
+    public Selector<R> count(TableField<?, ?, ? extends Table<?>> field) {
         return this;
     }
 
-    public Selector<R> max(Field<?, ?, ? extends Table<?>> field) {
+    public Selector<R> max(TableField<?, ?, ? extends Table<?>> field) {
         return this;
     }
 
-    public Selector<R> min(Field<?, ?, ? extends Table<?>> field) {
+    public Selector<R> min(TableField<?, ?, ? extends Table<?>> field) {
         return this;
     }
 

@@ -1,8 +1,8 @@
 package com.moon.processor.def;
 
 import com.moon.accessor.annotation.TablePolicy;
-import com.moon.accessor.meta.Field;
-import com.moon.accessor.meta.FieldDetail;
+import com.moon.accessor.meta.TableField;
+import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.accessor.meta.Table;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
@@ -126,7 +126,7 @@ public class DefEntityModel implements JavaFileWriteable {
             String importedPojoName = tableFiler.onImported(getPojoClassname());
             String propertyType = String2.toGeneralizableType(prop.getActualType());
             String fieldType = String2.format("{}<{}, {}, {}>",
-                Field.class.getCanonicalName(),
+                TableField.class.getCanonicalName(),
                 propertyType,
                 getPojoClassname(),
                 getClassname());
@@ -140,7 +140,7 @@ public class DefEntityModel implements JavaFileWriteable {
                 setter = String2.format("{}::{}", importedPojoName, prop.getSetter().getName());
             }
             String fieldValue = String2.format("new {}<>(this, {}, {}, {}, {}, {}, {});",
-                tableFiler.onImported(FieldDetail.class.getCanonicalName()),
+                tableFiler.onImported(TableFieldDetail.class.getCanonicalName()),
                 importedPojoName + DOT_CLS,
                 tableFiler.onImported(propertyType) + DOT_CLS,
                 getter,

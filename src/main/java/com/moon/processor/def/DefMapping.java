@@ -131,20 +131,6 @@ public class DefMapping {
         if (Test2.isPrimitive(getterType)) {
             return detail.getScripts(constManager);
         }
-
-        // TODO 这一段暂时注释，不删除
-        // DeclareMapping pMapping = from.getForwardMapping(to.getThisElement());
-        // DeclareMapping iMapping = to.getBackwardMapping(from.getThisElement());
-        //
-        // // 非基本数据类型可能有默认值
-        // String iDefaultVal = iMapping.getDefaultValue();
-        // String pDefaultVal = pMapping.getDefaultValue();
-        // String var = defaultVarFor(constManager, detail.getSetterType(), iDefaultVal);
-        // if (var == null) {
-        //     var = defaultVarFor(constManager, detail.getGetterType(), pDefaultVal);
-        // } else {
-        //     return detail.getScriptsOnDefaultVal(constManager, var);
-        // }
         String defaultVal = mapping.getDefaultValue();
         @SuppressWarnings("all")
         String propType = type == MappingType.SETTER //

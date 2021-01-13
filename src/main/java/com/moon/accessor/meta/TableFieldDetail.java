@@ -1,9 +1,12 @@
 package com.moon.accessor.meta;
 
+import com.moon.accessor.PropertyGetter;
+import com.moon.accessor.PropertySetter;
+
 /**
  * @author benshaoye
  */
-public class FieldDetail<T, R, TB extends Table<R>> implements Field<T, R, TB> {
+public class TableFieldDetail<T, R, TB extends Table<R>> implements TableField<T, R, TB> {
 
     private final Class<R> domainClass;
     private final Class<T> propertyType;
@@ -14,7 +17,7 @@ public class FieldDetail<T, R, TB extends Table<R>> implements Field<T, R, TB> {
     private final PropertyGetter<R, T> getter;
     private final PropertySetter<R, T> setter;
 
-    public FieldDetail(
+    public TableFieldDetail(
         TB table,
         Class<R> domainClass,
         Class<T> propertyType,
@@ -24,7 +27,7 @@ public class FieldDetail<T, R, TB extends Table<R>> implements Field<T, R, TB> {
         String columnName
     ) { this(table, domainClass, propertyType, getter, setter, propertyName, columnName, null); }
 
-    public FieldDetail(
+    public TableFieldDetail(
         TB table,
         Class<R> domainClass,
         Class<T> propertyType,
@@ -44,7 +47,7 @@ public class FieldDetail<T, R, TB extends Table<R>> implements Field<T, R, TB> {
         this.setter = setter;
     }
 
-    public FieldDetail(FieldDetail<T, R, TB> detail, String alias) {
+    public TableFieldDetail(TableFieldDetail<T, R, TB> detail, String alias) {
         this(detail.table,
             detail.domainClass,
             detail.propertyType,
@@ -80,5 +83,5 @@ public class FieldDetail<T, R, TB extends Table<R>> implements Field<T, R, TB> {
     public TB getTable() { return table; }
 
     @Override
-    public Field<T, R, TB> as(String alias) { return new FieldDetail<>(this, alias); }
+    public TableField<T, R, TB> as(String alias) { return new TableFieldDetail<>(this, alias); }
 }

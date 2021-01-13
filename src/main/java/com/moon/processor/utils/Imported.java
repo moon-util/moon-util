@@ -14,6 +14,8 @@ import javax.annotation.Generated;
 import java.util.function.Supplier;
 
 /**
+ * 检查是否引入某些类
+ *
  * @author benshaoye
  */
 @SuppressWarnings("all")

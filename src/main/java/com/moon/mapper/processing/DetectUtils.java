@@ -140,18 +140,7 @@ abstract class DetectUtils {
     }
 
     static boolean isAny(Element elem, Modifier modifier, Modifier... modifiers) {
-        Set<Modifier> modifierSet = elem.getModifiers();
-        boolean contains = modifierSet.contains(modifier);
-        if (contains) {
-            return true;
-        } else if (modifiers != null) {
-            for (Modifier m : modifiers) {
-                if (modifierSet.contains(m)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return a(elem, modifier, modifiers);
     }
 
     static boolean isNotAny(Element elem, Modifier modifier, Modifier... modifiers) {

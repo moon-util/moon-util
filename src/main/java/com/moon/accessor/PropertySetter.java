@@ -1,4 +1,4 @@
-package com.moon.accessor.meta;
+package com.moon.accessor;
 
 /**
  * @author benshaoye

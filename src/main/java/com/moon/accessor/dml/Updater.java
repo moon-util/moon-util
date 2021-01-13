@@ -1,7 +1,7 @@
 package com.moon.accessor.dml;
 
 import com.moon.accessor.Conditional;
-import com.moon.accessor.meta.Field;
+import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.Table;
 
 import java.util.function.Consumer;
@@ -15,7 +15,7 @@ public class Updater<R, T extends Table<R>> implements WhereConditional<UpdaterW
 
     public Updater(T table) { this.table = table; }
 
-    public <V> Updater<R, T> set(Field<V, R, T> field, V value) {
+    public <V> Updater<R, T> set(TableField<V, R, T> field, V value) {
         return this;
     }
 

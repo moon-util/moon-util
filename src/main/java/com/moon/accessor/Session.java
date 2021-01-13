@@ -4,7 +4,7 @@ import com.moon.accessor.dml.Deleter;
 import com.moon.accessor.dml.Inserter;
 import com.moon.accessor.dml.Selector;
 import com.moon.accessor.dml.Updater;
-import com.moon.accessor.meta.Field;
+import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.Table;
 
 /**
@@ -15,19 +15,19 @@ public class Session {
     public Session() {
     }
 
-    public Selector select(Field<?, ?, ? extends Table<?>>... fields) {
+    public Selector select(TableField<?, ?, ? extends Table<?>>... fields) {
         return new Selector(fields);
     }
 
-    public <T, R, TB extends Table<R>> Selector<R> select(Field<T, R, TB> field) {
+    public <T, R, TB extends Table<R>> Selector<R> select(TableField<T, R, TB> field) {
         return new Selector<>(field);
     }
 
-    public Selector selectDistinct(Field<?, ?, ? extends Table<?>>... fields) {
+    public Selector selectDistinct(TableField<?, ?, ? extends Table<?>>... fields) {
         return new Selector(true, fields);
     }
 
-    public <T, R, TB extends Table<R>> Selector<R> selectDistinct(Field<T, R, TB> field) {
+    public <T, R, TB extends Table<R>> Selector<R> selectDistinct(TableField<T, R, TB> field) {
         return new Selector<>(true, field);
     }
 

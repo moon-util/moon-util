@@ -58,9 +58,9 @@ public interface Conditional {
     Conditional or(Conditional condition);
 
     /**
-     * 该条件是否生效，当{@code effective}值为{@code false}时，此条件最终
+     * 该条件是否生效，当{@code available}值为{@code false}时，此条件最终
      * <p>
-     * 不会成为{@code  SQL}查询语句的一部分，它影响的始终是当前整个条件，举例说明如：
+     * 不会成为{@code  SQL}查询语句的一部分，它影响的始终是当前条件，举例说明如：
      *
      * <pre>
      * // EMP.NAME 条件不会出现在条件中
