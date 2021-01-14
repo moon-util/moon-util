@@ -1,10 +1,14 @@
 package com.moon.processor.file;
 
+import com.moon.processor.JavaFileWriteable;
+import com.moon.processor.JavaWriter;
 import com.moon.processor.manager.Importable;
 import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.String2;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -12,12 +16,13 @@ import java.util.stream.Collectors;
  *
  * @author benshaoye
  */
-public class DeclJavaFile implements Importable {
+public class DeclJavaFile implements Importable, JavaFileWriteable {
 
     private final JavaType type;
 
     private final String packageName, simpleName;
 
+    private final List<DeclAnnotation> annotations = new ArrayList<>();
     private final Set<String> interfaces = new LinkedHashSet<>();
     private String superclass;
 
@@ -25,11 +30,13 @@ public class DeclJavaFile implements Importable {
 
     private final Set<String> enums = new LinkedHashSet<>();
     private final Map<String, DeclField> fieldMap = new LinkedHashMap<>();
+    private final Map<String, DeclMethod> methodsMap = new LinkedHashMap<>();
 
     private DeclJavaFile(JavaType type, String packageName, String simpleName) {
         this.packageName = packageName;
         this.simpleName = simpleName;
         this.type = type;
+        annotatedOf(DeclAnnotation.ofGenerated(importer));
     }
 
     public static DeclJavaFile classOf(String packageName, String simpleName) {
@@ -41,22 +48,31 @@ public class DeclJavaFile implements Importable {
     }
 
     @Override
-    public String onImported(Class<?> classname) {
-        return importer.onImported(classname);
-    }
+    public String onImported(Class<?> classname) { return importer.onImported(classname); }
 
     @Override
-    public String onImported(String classname) {
-        return importer.onImported(classname);
+    public String onImported(String classname) { return importer.onImported(classname); }
+
+    public DeclJavaFile annotatedOf(Function<? super Importer,? extends DeclAnnotation> consumer) {
+        return annotatedOf(consumer.apply(importer));
+    }
+
+    public DeclJavaFile annotatedOf(DeclAnnotation annotation) {
+        this.annotations.add(annotation);
+        return this;
+    }
+
+    public DeclAnnotation annotatedOf(Class<?> annotationClass) {
+        DeclAnnotation annotation = new DeclAnnotation(importer, annotationClass);
+        this.annotations.add(annotation);
+        return annotation;
     }
 
     public String getPackageName() { return packageName; }
 
     public String getSimpleName() { return simpleName; }
 
-    public String getCanonicalName() {
-        return String.join(".", getPackageName(), getSimpleName());
-    }
+    public String getCanonicalName() { return String.join(".", getPackageName(), getSimpleName()); }
 
     public DeclJavaFile extend(String superclass) {
         if (type == JavaType.CLASS) {
@@ -86,7 +102,7 @@ public class DeclJavaFile implements Importable {
     }
 
     public DeclField declareField(String name, String typePattern, Object... values) {
-        DeclField field = new DeclField(importer, name,typePattern,values);
+        DeclField field = new DeclField(importer, name, typePattern, values);
         fieldMap.put(name, field);
         enums.remove(name);
         return field;
@@ -97,7 +113,7 @@ public class DeclJavaFile implements Importable {
     }
 
     public DeclField privateConstField(String name, String typePattern, Object... values) {
-        return privateField(name, typePattern, values).withFinal();
+        return privateField(name, typePattern, values).withFinal().withStatic();
     }
 
     public DeclField publicFinalField(String name, String typePattern, Object... values) {
@@ -108,31 +124,65 @@ public class DeclJavaFile implements Importable {
         return privateConstField(name, typePattern, values).withPublic();
     }
 
+    public DeclMethod publicMethod(String name, DeclParams params) {
+        DeclMethod method = new DeclMethod(importer, name, params);
+        methodsMap.put(method.getUniqueDeclaredKey(), method);
+        return method.withPublic();
+    }
+
     @Override
     public String toString() {
-        final int indent = 4;
         final StringAddr addr = StringAddr.of();
         addr.addPackage(getPackageName()).next(2);
         StringAddr.Mark importMark = addr.mark();
         // class declare
+        addr.next(2).addDocComment(0, getCanonicalName(), getDocComments());
+        String annotations = toAnnotationDeclared();
+        if (!annotations.isEmpty()) {
+            addr.addAll(0, annotations);
+        }
         addr.next().add(toClassDeclared()).add(" {");
         // enum values
-        addr.add(toEnumDeclared(indent));
+        addr.add(toEnumDeclared()).newTab(2, 1);
         StringAddr.Mark fieldsMark = addr.mark();
         // methods
+        if (!methodsMap.isEmpty()) {
+            addr.next().addBlockComment(1, "declared methods");
+            methodsMap.forEach((d, method) -> addr.next().newTab(method.getScripts()));
+        }
 
+        // imports
         importMark.with(importer.toString("\n"));
-        fieldsMark.with(toFieldDeclared(indent));
+
+        // fields
+        fieldsMark.with(toFieldDeclared());
+
+        // getters & setters
         addr.add(toGetterSetterMethodsDeclared());
         return addr.next().add('}').toString();
     }
 
     private String toGetterSetterMethodsDeclared() {
-        return "";
+        StringAddr addr = StringAddr.of();
+        StringAddr.Mark commentMark = addr.mark();
+        for (Map.Entry<String, DeclField> entry : fieldMap.entrySet()) {
+            DeclField decl = entry.getValue();
+            List<String> scripts = decl.getGetterMethod().getScripts();
+            if (!scripts.isEmpty()) {
+                commentMark.with("/* getters & setters */");
+                addr.newTab(scripts);
+            }
+            scripts = decl.getSetterMethod().getScripts();
+            if (!scripts.isEmpty()) {
+                commentMark.with("/* getters & setters */");
+                addr.newTab(scripts);
+            }
+        }
+        return addr.isEmpty() ? "" : addr.toString().substring(1);
     }
 
-    private String toFieldDeclared(int indent) {
-        if (fieldMap.isEmpty()) {
+    private String toFieldDeclared() {
+        if (!fieldMap.isEmpty()) {
             StringAddr constAddr = StringAddr.of().next(2), staticAddr = StringAddr.of();
             StringAddr finalAddr = StringAddr.of(), fieldAddr = StringAddr.of();
             List<String> instanceBlock = new ArrayList<>();
@@ -144,28 +194,25 @@ public class DeclJavaFile implements Importable {
                 } else {
                     selectedAddr = declField.isStatic() ? staticAddr : fieldAddr;
                 }
-                String declare = declField.getDeclareFieldScript();
-                selectedAddr.next().indent(indent).addScript(declare);
+                selectedAddr.newTab(2, declField.getDeclareFieldScripts());
                 staticBlock.addAll(Arrays.asList(declField.getStaticBlock()));
                 instanceBlock.addAll(Arrays.asList(declField.getInstanceBlock()));
             }
             appendIfNotEmpty(constAddr, staticAddr);
-            appendBlock(constAddr, staticBlock, "static ", indent);
+            appendBlock(constAddr, staticBlock, "static ");
             appendIfNotEmpty(constAddr, finalAddr);
             appendIfNotEmpty(constAddr, fieldAddr);
-            appendBlock(constAddr, instanceBlock, "", indent);
-            return constAddr.toString();
+            appendBlock(constAddr, instanceBlock, "");
+            return constAddr.toString().trim();
         }
         return "";
     }
 
-    private static void appendBlock(StringAddr appender, List<String> blocks, String starting, int indent){
+    private static void appendBlock(StringAddr appender, List<String> blocks, String starting) {
         if (!blocks.isEmpty()) {
-            appender.next(2).indent(indent).add(starting).add("{");
-            for (String block : blocks) {
-                appender.next().indent(indent, 2).addScript(block);
-            }
-            appender.next().indent(indent).add("}");
+            appender.new2Tab().add(starting).add("{");
+            appender.addAll(2, blocks);
+            appender.newTab().add("}");
         }
     }
 
@@ -175,22 +222,24 @@ public class DeclJavaFile implements Importable {
         }
     }
 
-    private String toEnumDeclared(int indent) {
+    private String toEnumDeclared() {
+        StringAddr addr = StringAddr.of();
         if (!enums.isEmpty()) {
-            StringAddr addr = StringAddr.of();
             if (type == JavaType.ENUM) {
-                addr.indent(indent).addScript(String.join(",", enums));
+                addr.newTab(String.join(",", enums)).add(';');
             } else if (type == JavaType.CLASS) {
                 addr.next();
                 String type = getCanonicalName();
                 for (String anEnum : enums) {
-                    String value = String2.format("new {}()", type);
-                    String script = String2.toConstField(type, anEnum, value);
-                    addr.next(2).indent(indent).addScript(script);
+                    String imported = onImported(type);
+                    String value = String2.format("new {}()", imported);
+                    String script = String2.publicConstField(imported, anEnum, value);
+                    addr.new2Tab().addScript(script);
                 }
             }
+            return addr.toString();
         }
-        return "";
+        return type == JavaType.ENUM ? addr.newTab(";").toString() : "";
     }
 
     private String toClassDeclared() {
@@ -205,5 +254,22 @@ public class DeclJavaFile implements Importable {
             declare.append(" implements ").append(impl);
         }
         return declare.toString();
+    }
+
+    private String toAnnotationDeclared() {
+        List<String> annotations = new ArrayList<>();
+        for (DeclAnnotation annotation : this.annotations) {
+            annotations.addAll(annotation.getScripts());
+        }
+        return String.join("\n", annotations);
+    }
+
+    private String[] getDocComments() {
+        return new String[]{"", "@author " + getClass().getCanonicalName()};
+    }
+
+    @Override
+    public void writeJavaFile(JavaWriter filer) {
+        filer.write(getCanonicalName(), writer -> writer.write(toString()));
     }
 }

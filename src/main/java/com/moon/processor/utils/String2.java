@@ -114,7 +114,13 @@ public enum String2 {
 
     private final static HolderGroup GROUP = Holder.of(Holder.type, Holder.name, Holder.field);
 
-    public static String toConstField(String type, String name, String value) {
+    public static String publicConstField(String type, String name, String value) {
+        // 这里实际应该是 {value}，为了重用 GROUP，就写成了 {field}
+        String template = "public final static {type} {name} = {field};";
+        return GROUP.on(template, type, name, value);
+    }
+
+    public static String privateConstField(String type, String name, String value) {
         // 这里实际应该是 {value}，为了重用 GROUP，就写成了 {field}
         String template = "private final static {type} {name} = {field};";
         return GROUP.on(template, type, name, value);
@@ -180,7 +186,6 @@ public enum String2 {
         }
         return res.toString();
     }
-
 
 
     public static String toGeneralizableType(String type) {

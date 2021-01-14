@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.moon.processor.file.Formatter2.onlyColonTail;
+
 /**
  * @author benshaoye
  */
@@ -13,10 +15,14 @@ public class StringAddr {
 
     private final List<Mark> marks = new ArrayList<>();
     private final StringBuilder builder;
+    private final int indent;
 
-    public StringAddr() { this.builder = new StringBuilder(); }
+    public StringAddr(int indent) {
+        this.builder = new StringBuilder();
+        this.indent = indent;
+    }
 
-    public static StringAddr of() { return new StringAddr(); }
+    public static StringAddr of() { return new StringAddr(4); }
 
     public boolean isEmpty() { return builder.length() < 1; }
 
@@ -35,30 +41,45 @@ public class StringAddr {
         return this;
     }
 
+    public StringAddr addAll(int tabUnit, Object... scripts) {
+        for (Object script : scripts) {
+            next().tab(tabUnit).add(script);
+        }
+        return this;
+    }
+
+    public StringAddr addAll(int tabUnit, Iterable<?> scripts) {
+        for (Object script : scripts) {
+            next().tab(tabUnit).add(script);
+        }
+        return this;
+    }
+
     public StringAddr addPackage(String packageName) { return addScript("package " + packageName); }
 
     public StringAddr addScript(CharSequence script) { return add(onlyColonTail(script.toString().trim())); }
 
-    public StringAddr addBlockComment(int indent, String comment, String... comments) {
-        next().indent(indent).add("/*");
-        next().indent(indent).add(" * ").add(comment);
+    public StringAddr addBlockComment(int tabUnit, String comment, String... comments) {
+        next().tab(tabUnit).add("/*");
+        next().tab(tabUnit).add(" * ").add(comment);
         String[] strings = comments == null ? Const2.EMPTY : comments;
         for (String string : strings) {
-            next().indent(indent).add(" * ").add(string);
+            next().tab(tabUnit).add(" * ").add(string);
         }
-        return next().indent(indent).add(" */").next();
+        return next().tab(tabUnit).add(" */").next();
     }
 
-    public StringAddr addDocComment(int indent, String comment, String... comments) {
-        next().indent(indent).add("/** ");
+    public StringAddr addDocComment(int tabUnit, String comment, String... comments) {
+        next().tab(tabUnit).add("/** ");
         if (comments == null || comments.length == 0) {
-            add(comment);
+            return next().add(comment).add(" */");
         } else {
+            next().tab(tabUnit).add(" * ").add(comment);
             for (String string : comments) {
-                next().indent(indent).add(" * ").add(string);
+                next().tab(tabUnit).add(" * ").add(string);
             }
+            return next().tab(tabUnit).add(" */");
         }
-        return next().indent(indent).add(" */").next();
     }
 
     public StringAddr append(Object sequence) { return add(sequence); }
@@ -69,13 +90,48 @@ public class StringAddr {
         return add(chars);
     }
 
+    /*
+    换行和缩进
+     */
+
     public StringAddr next() { return add('\n'); }
 
     public StringAddr next(int line) { return append('\n', line); }
 
-    public StringAddr indent(int count) { return append(' ', count); }
+    public StringAddr tab() { return indent(indent); }
 
-    public StringAddr indent(int count, int multi) { return append(' ', count * multi); }
+    public StringAddr tab(int tabUnit) { return indent(indent * tabUnit); }
+
+    private StringAddr indent(int indent) { return append(' ', indent); }
+
+    public StringAddr newTab() { return next().tab(); }
+
+    public StringAddr new2Tab() { return newTab(2, 1); }
+
+    public StringAddr newTab2(String script) { return newTab(1, 2).addScript(script); }
+
+    public StringAddr newTab(int line, int tabUnit) { return next(line).tab(tabUnit); }
+
+    public StringAddr newTab(String... scripts) {
+        for (String script : scripts) {
+            newTab().add(script);
+        }
+        return this;
+    }
+
+    public StringAddr newTab(int line, Iterable<String> scripts) {
+        for (String script : scripts) {
+            newTab(line, 1).add(script);
+        }
+        return this;
+    }
+
+    public StringAddr newTab(Iterable<String> scripts) {
+        for (String script : scripts) {
+            newTab().add(script);
+        }
+        return this;
+    }
 
     /**
      * 标记，可通过{@link Mark#with(StringAddr)}向标记处插入字符串等数据
@@ -116,30 +172,4 @@ public class StringAddr {
 
     @Override
     public String toString() { return builder.toString(); }
-
-    private static String onlyColonTail(String script) {
-        final int initLastIndex = script.length() - 1;
-        int lastIndex = initLastIndex;
-        boolean present = false;
-        for (int i = initLastIndex; i >= 0; i--) {
-            char ch = script.charAt(i);
-            if (ch == ';') {
-                if (present) {
-                    lastIndex--;
-                }
-                present = true;
-            } else if (Character.isWhitespace(ch)) {
-                if (present) {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-        if (present) {
-            return script.substring(0, lastIndex + 1);
-        } else {
-            return script + ';';
-        }
-    }
 }

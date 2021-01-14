@@ -3,6 +3,10 @@ package com.moon.processor.def;
 import com.moon.mapper.BeanCopier;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
+import com.moon.processor.file.DeclAnnotation;
+import com.moon.processor.file.DeclJavaFile;
+import com.moon.processor.file.DeclMethod;
+import com.moon.processor.file.DeclParams;
 import com.moon.processor.manager.NameManager;
 import com.moon.processor.mapping.MappingMerged;
 import com.moon.processor.mapping.MappingType;
@@ -25,7 +29,7 @@ import java.util.Set;
 public class DefBeanCopier implements JavaFileWriteable {
 
     private final DeclaredPojo thisPojo, thatPojo;
-    private final String pkg, classname;
+    private final String pkg, classname, simpleName;
 
     private final Set<String> orders = new LinkedHashSet<>();
 
@@ -38,6 +42,7 @@ public class DefBeanCopier implements JavaFileWriteable {
         TypeElement thisElem = thisPojo.getDeclareElement();
         TypeElement thatElem = thatPojo.getDeclareElement();
         this.classname = registry.getCopierClassname(thisElem, thatElem);
+        this.simpleName = Element2.getSimpleName(this.classname);
     }
 
     public DeclaredPojo getThisPojo() { return thisPojo; }
@@ -49,6 +54,15 @@ public class DefBeanCopier implements JavaFileWriteable {
     public String getClassname() { return classname; }
 
     public Set<String> getOrders() { return orders; }
+
+    private DeclJavaFile getDeclJavaFile() {
+        DeclJavaFile filer = DeclJavaFile.classOf(getPkg(), simpleName);
+        filer.annotatedOf(DeclAnnotation::ofComponent);
+        filer.implement(getInterfaceDecl()).enumNamesOf(Const2.INSTANCE);
+        buildUnsafeCopyMethods(filer);
+        buildConvertMethods(filer);
+        return filer;
+    }
 
     private DefJavaFiler getDefJavaFiler() {
         DefJavaFiler filer = DefJavaFiler.classOf(getPkg(), getClassname());
@@ -100,6 +114,10 @@ public class DefBeanCopier implements JavaFileWriteable {
         return method;
     }
 
+    private DeclMethod unsafeCopy2(DeclMethod method) {
+        return method;
+    }
+
     private void buildUnsafeCopyMethods(DefJavaFiler filer) {
         String thisName = getThisPojo().getThisClassname();
         String thatName = getThatPojo().getThisClassname();
@@ -108,6 +126,16 @@ public class DefBeanCopier implements JavaFileWriteable {
         DefParameters parameters = DefParameters.of("self", thisName).add("that", thatName);
         DefMethod forward = filer.publicMethod("unsafeCopy", thatName, parameters).override();
         unsafeCopy2(forward).returning("that");
+    }
+
+    private void buildUnsafeCopyMethods(DeclJavaFile file) {
+        String thisName = getThisPojo().getThisClassname();
+        String thatName = getThatPojo().getThisClassname();
+
+        // unsafeCopy
+        DeclParams params = DeclParams.of("self", thisName).add("that", thatName);
+        DeclMethod forward = file.publicMethod("unsafeCopy", params).override();
+        unsafeCopy2(forward).returnTypeof(thatName).returning("that");
     }
 
     private void buildConvertMethods(DefJavaFiler filer) {
@@ -121,6 +149,20 @@ public class DefBeanCopier implements JavaFileWriteable {
         String template = "self == null ? null : unsafeCopy(self, new {name}())";
         DefMethod convert = filer.publicMethod("convert", thatName, parameters).override();
         convert.returning(Holder.name.on(template, filer.onImported(thatImpl)));
+    }
+
+    private void buildConvertMethods(DeclJavaFile file) {
+        DeclaredPojo thatClass = getThatPojo();
+        String thisName = getThisPojo().getThisClassname();
+        String thatName = thatClass.getThisClassname();
+        String thatImpl = thatClass.getImplClassname();
+
+        // convert
+        DeclParams parameters = DeclParams.of("self", thisName);
+        String template = "self == null ? null : unsafeCopy(self, new {}())";
+        DeclMethod convert = file.publicMethod("convert", parameters).override();
+        convert.returnTypeof(thatName).returning(template, convert.onImported(thatImpl));
+        // convert.returning(Holder.name.on(template, filer.onImported(thatImpl)));
     }
 
     @Override
