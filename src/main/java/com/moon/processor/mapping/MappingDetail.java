@@ -1,10 +1,13 @@
 package com.moon.processor.mapping;
 
 import com.moon.mapper.convert.DefaultValue;
-import com.moon.processor.manager.ConstManager;
-import com.moon.processor.manager.Importable;
+import com.moon.processor.holder.ConstManager;
+import com.moon.processor.holder.Importable;
+import com.moon.processor.utils.Collect2;
 import com.moon.processor.utils.Holder;
 import com.moon.processor.utils.HolderGroup;
+
+import java.util.List;
 
 /**
  * @author benshaoye
@@ -45,12 +48,12 @@ public class MappingDetail implements MappingScripter<ConstManager> {
     }
 
     @Override
-    public String[] getScriptsOnDefaultVal(ConstManager cm, MappingDefaultVal defaultVal) {
+    public List<String> getScriptsOnDefaultVal(ConstManager cm, MappingDefaultVal defaultVal) {
         String get = toGetValueScript(cm);
         String t = "{type}.ifNull({value}, {var})";
         get = TYPE_VALUE_VAR.on(t, cm.onImported(DefaultValue.class), get, defaultVal.getDefaultVar());
         String script = Holder.value.on(toSetValueScript(cm), get);
-        return new String[]{script};
+        return Collect2.list(script);
     }
 
     private String toSetValueScript(ConstManager cm) {
@@ -84,9 +87,10 @@ public class MappingDetail implements MappingScripter<ConstManager> {
     public String getSetterType() { return setterType; }
 
     @Override
-    public String[] getScripts(ConstManager cm) {
+    public List<String> getScripts(ConstManager cm) {
         String get = toGetValueScript(cm);
         String set = toSetValueScript(cm);
-        return new String[]{Holder.value.on(set, get)};
+
+        return Collect2.list(Holder.value.on(set, get));
     }
 }

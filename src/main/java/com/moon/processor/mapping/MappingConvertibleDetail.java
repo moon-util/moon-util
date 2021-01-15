@@ -1,13 +1,15 @@
 package com.moon.processor.mapping;
 
 import com.moon.mapper.convert.DefaultValue;
-import com.moon.processor.manager.ConstManager;
-import com.moon.processor.manager.Importable;
+import com.moon.processor.holder.ConstManager;
+import com.moon.processor.holder.Importable;
 import com.moon.processor.model.DeclareMapping;
 import com.moon.processor.model.DeclareMethod;
-import com.moon.processor.utils.Const2;
+import com.moon.processor.utils.Collect2;
 import com.moon.processor.utils.Holder;
 import com.moon.processor.utils.HolderGroup;
+
+import java.util.List;
 
 /**
  * @author benshaoye
@@ -38,14 +40,10 @@ public class MappingConvertibleDetail implements MappingScripter<ConstManager> {
     }
 
     @Override
-    public String[] getScriptsOnDefaultVal(ConstManager cm, MappingDefaultVal v) {
-        return getScripts(cm);
-    }
+    public List<String> getScriptsOnDefaultVal(ConstManager cm, MappingDefaultVal v) { return getScripts(cm); }
 
     @Override
-    public String[] getScripts(ConstManager cm) {
-        return Const2.EMPTY;
-    }
+    public List<String> getScripts(ConstManager cm) { return Collect2.list(); }
 
     @Override
     public String getGetterType() { return getter.getActualType(); }

@@ -1,5 +1,6 @@
 package com.moon.processor.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,4 +20,15 @@ public enum Collect2 {
     public static boolean isEmpty(Collection<?> collection) { return collection == null || collection.isEmpty(); }
 
     public static boolean isNotEmpty(Collection<?> collection) { return !isEmpty(collection); }
+
+    public static <T> List<T> list(T... values) {
+        List<T> list = new ArrayList<>();
+        if (list == null) {
+            return list;
+        }
+        for (T value : values) {
+            list.add(value);
+        }
+        return list;
+    }
 }

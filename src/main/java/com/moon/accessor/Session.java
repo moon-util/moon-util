@@ -15,31 +15,31 @@ public class Session {
     public Session() {
     }
 
-    public Selector select(TableField<?, ?, ? extends Table<?>>... fields) {
+    public Selector select(TableField<?, ?, ? extends Table<?, ?>>... fields) {
         return new Selector(fields);
     }
 
-    public <T, R, TB extends Table<R>> Selector<R> select(TableField<T, R, TB> field) {
-        return new Selector<>(field);
+    public <T, R, TB extends Table<R, TB>> Selector select(TableField<T, R, TB> field) {
+        return new Selector(field);
     }
 
-    public Selector selectDistinct(TableField<?, ?, ? extends Table<?>>... fields) {
+    public Selector selectDistinct(TableField<?, ?, ? extends Table<?, ?>>... fields) {
         return new Selector(true, fields);
     }
 
-    public <T, R, TB extends Table<R>> Selector<R> selectDistinct(TableField<T, R, TB> field) {
-        return new Selector<>(true, field);
+    public <T, R, TB extends Table<R, TB>> Selector selectDistinct(TableField<T, R, TB> field) {
+        return new Selector(true, field);
     }
 
-    public <R, T extends Table<R>> Inserter<R, T> insert(T table) {
+    public <R, T extends Table<R, T>> Inserter<R, T> insert(T table) {
         return new Inserter<>(table);
     }
 
-    public <R, T extends Table<R>> Updater<R, T> update(T table) {
+    public <R, T extends Table<R, T>> Updater<R, T> update(T table) {
         return new Updater<>(table);
     }
 
-    public <R, T extends Table<R>> Deleter<R, T> delete(T table) {
+    public <R, T extends Table<R, T>> Deleter<R, T> delete(T table) {
         return new Deleter<>(table);
     }
 }

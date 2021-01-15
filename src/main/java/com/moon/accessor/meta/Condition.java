@@ -9,7 +9,7 @@ import com.moon.accessor.MatchingType;
  */
 public class Condition implements Conditional {
 
-    private final TableField<?, ?, ? extends Table<?>> field;
+    private final TableField<?, ?, ? extends Table<?,?>> field;
     private final MatchingType matching;
     private final Object value;
 
@@ -20,14 +20,14 @@ public class Condition implements Conditional {
     private ConditionType type;
 
     Condition(
-        TableField<?, ?, ? extends Table<?>> field, MatchingType matching, Object value
+        TableField<?, ?, ? extends Table<?,?>> field, MatchingType matching, Object value
     ) {
         this.field = field;
         this.matching = matching;
         this.value = value;
     }
 
-    TableField<?, ?, ? extends Table<?>> getField() { return field; }
+    TableField<?, ?, ? extends Table<?,?>> getField() { return field; }
 
     MatchingType getMatching() { return matching; }
 

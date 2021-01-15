@@ -1,7 +1,7 @@
 package com.moon.processor.file;
 
-import com.moon.processor.manager.Importable;
-import com.moon.processor.manager.Importer;
+import com.moon.processor.holder.Importable;
+import com.moon.processor.holder.Importer;
 
 /**
  * @author benshaoye

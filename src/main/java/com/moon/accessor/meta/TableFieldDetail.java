@@ -6,7 +6,7 @@ import com.moon.accessor.PropertySetter;
 /**
  * @author benshaoye
  */
-public class TableFieldDetail<T, R, TB extends Table<R>> implements TableField<T, R, TB> {
+public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableField<T, R, TB> {
 
     private final Class<R> domainClass;
     private final Class<T> propertyType;

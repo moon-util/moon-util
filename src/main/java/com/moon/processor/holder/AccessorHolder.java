@@ -1,4 +1,4 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
@@ -12,27 +12,27 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class AccessorManager implements JavaFileWriteable {
+public class AccessorHolder implements JavaFileWriteable {
 
-    private final CopierManager copierManager;
-    private final ModelManager modelManager;
-    private final PojoManager pojoManager;
-    private final NameManager nameManager;
+    private final CopierHolder copierHolder;
+    private final ModelHolder modelHolder;
+    private final PojoHolder pojoHolder;
+    private final NameHolder nameHolder;
 
     private final Map<String, DefAccessor> accessorHashMap = new HashMap<>();
 
-    public AccessorManager(
-        CopierManager copierManager, PojoManager pojoManager, ModelManager modelManager, NameManager nameManager
+    public AccessorHolder(
+        CopierHolder copierHolder, PojoHolder pojoHolder, ModelHolder modelHolder, NameHolder nameHolder
     ) {
-        this.copierManager = copierManager;
-        this.modelManager = modelManager;
-        this.pojoManager = pojoManager;
-        this.nameManager = nameManager;
+        this.copierHolder = copierHolder;
+        this.modelHolder = modelHolder;
+        this.pojoHolder = pojoHolder;
+        this.nameHolder = nameHolder;
     }
 
     public void with(TypeElement accessorElem, TypeElement modelElem) {
         String classname = Element2.getQualifiedName(accessorElem);
-        modelManager.with(modelElem, classname);
+        modelHolder.with(modelElem, classname);
         accessorHashMap.computeIfAbsent(classname, k -> new DefAccessor(accessorElem));
     }
 

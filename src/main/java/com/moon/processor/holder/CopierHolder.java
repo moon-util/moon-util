@@ -1,36 +1,31 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.mapper.BeanCopier;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.def.DefBeanCopier;
-import com.moon.processor.file.DeclField;
-import com.moon.processor.file.DeclJavaFile;
-import com.moon.processor.file.DeclParams;
 import com.moon.processor.model.DeclaredPojo;
-import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * @author benshaoye
  */
-public class CopierManager implements JavaFileWriteable {
+public class CopierHolder implements JavaFileWriteable {
 
-    private final NameManager nameManager;
-    private final PojoManager pojoManager;
+    private final NameHolder nameHolder;
+    private final PojoHolder pojoHolder;
     private final Map<String, DefBeanCopier> definedCopierMap = new LinkedHashMap<>();
 
-    public CopierManager(PojoManager pojoManager, NameManager nameManager) {
-        this.nameManager = nameManager;
-        this.pojoManager = pojoManager;
+    public CopierHolder(PojoHolder pojoHolder, NameHolder nameHolder) {
+        this.nameHolder = nameHolder;
+        this.pojoHolder = pojoHolder;
     }
 
     public DefBeanCopier with(Class<?> thisClass, Class<?> thatClass) {
@@ -43,9 +38,9 @@ public class CopierManager implements JavaFileWriteable {
         String copierKey = String2.keyOf(thisClassname, thatClassname);
         DefBeanCopier copier = definedCopierMap.get(copierKey);
         if (copier == null) {
-            DeclaredPojo thisClass = pojoManager.with(thisElem);
-            DeclaredPojo thatClass = pojoManager.with(thatElem);
-            copier = new DefBeanCopier(thisClass, thatClass, nameManager);
+            DeclaredPojo thisClass = pojoHolder.with(thisElem);
+            DeclaredPojo thatClass = pojoHolder.with(thatElem);
+            copier = new DefBeanCopier(thisClass, thatClass, nameHolder);
             definedCopierMap.put(copierKey, copier);
         }
         return copier;

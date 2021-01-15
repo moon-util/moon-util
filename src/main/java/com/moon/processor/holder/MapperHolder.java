@@ -1,4 +1,4 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
@@ -17,19 +17,19 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class MapperManager implements JavaFileWriteable {
+public class MapperHolder implements JavaFileWriteable {
 
-    private final NameManager nameManager;
-    private final PojoManager pojoManager;
-    private final CopierManager copierManager;
+    private final NameHolder nameHolder;
+    private final PojoHolder pojoHolder;
+    private final CopierHolder copierHolder;
     private Map<String, DefBeanMapper> definedMapperMap = new LinkedHashMap<>();
 
-    public MapperManager(
-        CopierManager copierManager, PojoManager pojoManager, NameManager nameManager
+    public MapperHolder(
+        CopierHolder copierHolder, PojoHolder pojoHolder, NameHolder nameHolder
     ) {
-        this.copierManager = copierManager;
-        this.pojoManager = pojoManager;
-        this.nameManager = nameManager;
+        this.copierHolder = copierHolder;
+        this.pojoHolder = pojoHolder;
+        this.nameHolder = nameHolder;
     }
 
     public DefBeanMapper with(Class<?> thisClass, Class<?> thatClass) {
@@ -42,11 +42,11 @@ public class MapperManager implements JavaFileWriteable {
         String mapperKey = String2.keyOf(thisClassname, thatClassname);
         DefBeanMapper mapper = definedMapperMap.get(mapperKey);
         if (mapper == null) {
-            DeclaredPojo thisClass = pojoManager.with(thisElem);
-            DeclaredPojo thatClass = pojoManager.with(thatElem);
-            DefBeanCopier forward = copierManager.with(thisElem, thatElem);
-            DefBeanCopier backward = copierManager.with(thatElem, thisElem);
-            mapper = new DefBeanMapper(forward, backward, thisClass, thatClass, nameManager);
+            DeclaredPojo thisClass = pojoHolder.with(thisElem);
+            DeclaredPojo thatClass = pojoHolder.with(thatElem);
+            DefBeanCopier forward = copierHolder.with(thisElem, thatElem);
+            DefBeanCopier backward = copierHolder.with(thatElem, thisElem);
+            mapper = new DefBeanMapper(forward, backward, thisClass, thatClass, nameHolder);
             definedMapperMap.put(mapperKey, mapper);
         }
         return mapper;

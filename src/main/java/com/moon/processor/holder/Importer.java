@@ -1,4 +1,4 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.processor.utils.Element2;
@@ -107,7 +107,5 @@ public class Importer implements Importable {
     @Override
     public String toString() { return toString(EMPTY); }
 
-    public String toString(String delimiter) {
-        return String.join(delimiter, importCached.values());
-    }
+    public String toString(String delimiter) { return String.join(delimiter, importCached.values()); }
 }

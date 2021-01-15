@@ -3,11 +3,8 @@ package com.moon.processor.def;
 import com.moon.mapper.BeanCopier;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
-import com.moon.processor.file.DeclAnnotation;
-import com.moon.processor.file.DeclJavaFile;
-import com.moon.processor.file.DeclMethod;
-import com.moon.processor.file.DeclParams;
-import com.moon.processor.manager.NameManager;
+import com.moon.processor.file.*;
+import com.moon.processor.holder.NameHolder;
 import com.moon.processor.mapping.MappingMerged;
 import com.moon.processor.mapping.MappingType;
 import com.moon.processor.model.DeclareMapping;
@@ -15,8 +12,6 @@ import com.moon.processor.model.DeclareProperty;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Holder;
-import com.moon.processor.utils.Log2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashSet;
@@ -35,7 +30,7 @@ public class DefBeanCopier implements JavaFileWriteable {
 
     { orders.add("id"); }
 
-    public DefBeanCopier(DeclaredPojo thisPojo, DeclaredPojo thatPojo, NameManager registry) {
+    public DefBeanCopier(DeclaredPojo thisPojo, DeclaredPojo thatPojo, NameHolder registry) {
         this.thisPojo = thisPojo;
         this.thatPojo = thatPojo;
         this.pkg = Element2.getPackageName(thisPojo.getDeclareElement());
@@ -57,22 +52,14 @@ public class DefBeanCopier implements JavaFileWriteable {
 
     private DeclJavaFile getDeclJavaFile() {
         DeclJavaFile filer = DeclJavaFile.classOf(getPkg(), simpleName);
-        filer.annotatedOf(DeclAnnotation::ofComponent);
+        filer.markedOf(DeclMarked::ofComponent);
         filer.implement(getInterfaceDecl()).enumNamesOf(Const2.INSTANCE);
         buildUnsafeCopyMethods(filer);
         buildConvertMethods(filer);
         return filer;
     }
 
-    private DefJavaFiler getDefJavaFiler() {
-        DefJavaFiler filer = DefJavaFiler.classOf(getPkg(), getClassname());
-        filer.implement(getInterfaceDecl()).enumsOf(Const2.INSTANCE);
-        buildUnsafeCopyMethods(filer);
-        buildConvertMethods(filer);
-        return filer;
-    }
-
-    private DefMethod unsafeCopy2(DefMethod method) {
+    private DeclMethod unsafeCopy2(DeclMethod method) {
         DeclaredPojo thisPojo = getThisPojo();
         DeclaredPojo thatPojo = getThatPojo();
         String thisClassname = thisPojo.getThisClassname();
@@ -114,41 +101,14 @@ public class DefBeanCopier implements JavaFileWriteable {
         return method;
     }
 
-    private DeclMethod unsafeCopy2(DeclMethod method) {
-        return method;
-    }
-
-    private void buildUnsafeCopyMethods(DefJavaFiler filer) {
-        String thisName = getThisPojo().getThisClassname();
-        String thatName = getThatPojo().getThisClassname();
-
-        // unsafeCopy
-        DefParameters parameters = DefParameters.of("self", thisName).add("that", thatName);
-        DefMethod forward = filer.publicMethod("unsafeCopy", thatName, parameters).override();
-        unsafeCopy2(forward).returning("that");
-    }
-
     private void buildUnsafeCopyMethods(DeclJavaFile file) {
         String thisName = getThisPojo().getThisClassname();
         String thatName = getThatPojo().getThisClassname();
 
         // unsafeCopy
         DeclParams params = DeclParams.of("self", thisName).add("that", thatName);
-        DeclMethod forward = file.publicMethod("unsafeCopy", params).override();
-        unsafeCopy2(forward).returnTypeof(thatName).returning("that");
-    }
-
-    private void buildConvertMethods(DefJavaFiler filer) {
-        DeclaredPojo thatClass = getThatPojo();
-        String thisName = getThisPojo().getThisClassname();
-        String thatName = thatClass.getThisClassname();
-        String thatImpl = thatClass.getImplClassname();
-
-        // convert
-        DefParameters parameters = DefParameters.of("self", thisName);
-        String template = "self == null ? null : unsafeCopy(self, new {name}())";
-        DefMethod convert = filer.publicMethod("convert", thatName, parameters).override();
-        convert.returning(Holder.name.on(template, filer.onImported(thatImpl)));
+        DeclMethod unsafeCopy = file.publicMethod("unsafeCopy", params).override();
+        unsafeCopy2(unsafeCopy).returnTypeof(thatName).returning("that");
     }
 
     private void buildConvertMethods(DeclJavaFile file) {
@@ -162,11 +122,10 @@ public class DefBeanCopier implements JavaFileWriteable {
         String template = "self == null ? null : unsafeCopy(self, new {}())";
         DeclMethod convert = file.publicMethod("convert", parameters).override();
         convert.returnTypeof(thatName).returning(template, convert.onImported(thatImpl));
-        // convert.returning(Holder.name.on(template, filer.onImported(thatImpl)));
     }
 
     @Override
-    public void writeJavaFile(JavaWriter writer) { getDefJavaFiler().writeJavaFile(writer); }
+    public void writeJavaFile(JavaWriter writer) { getDeclJavaFile().writeJavaFile(writer); }
 
     private String getInterfaceDecl() {
         String thisName = getThisPojo().getThisClassname();

@@ -1,4 +1,4 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.accessor.annotation.TableColumnPolicy;
 import com.moon.accessor.annotation.TablePolicy;
@@ -14,18 +14,18 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class ModelManager implements JavaFileWriteable {
+public class ModelHolder implements JavaFileWriteable {
 
-    private final PolicyManager policyManager;
-    private final PojoManager pojoManager;
-    private final TablesManager tablesManager;
+    private final PolicyHolder policyHolder;
+    private final PojoHolder pojoHolder;
+    private final TablesHolder tablesHolder;
 
     private final Map<String, DefEntityModel> modelMap = new HashMap<>();
 
-    public ModelManager(PojoManager pojoManager, TablesManager tablesManager, PolicyManager policyManager) {
-        this.tablesManager = tablesManager;
-        this.policyManager = policyManager;
-        this.pojoManager = pojoManager;
+    public ModelHolder(PojoHolder pojoHolder, TablesHolder tablesHolder, PolicyHolder policyHolder) {
+        this.tablesHolder = tablesHolder;
+        this.policyHolder = policyHolder;
+        this.pojoHolder = pojoHolder;
     }
 
     public DefEntityModel with(TypeElement element, String accessorClassname) {
@@ -38,11 +38,11 @@ public class ModelManager implements JavaFileWriteable {
         // 一个实体可以按业务区分成多个访问器
         entityModel = modelMap.get(classname);
         if (entityModel == null) {
-            TablePolicy policy = policyManager.with(element);
-            TableColumnPolicy columnPolicy = policyManager.withColumnPolicy(element);
-            entityModel = new DefEntityModel(pojoManager.with(element), policy, columnPolicy);
+            TablePolicy policy = policyHolder.with(element);
+            TableColumnPolicy columnPolicy = policyHolder.withColumnPolicy(element);
+            entityModel = new DefEntityModel(pojoHolder.with(element), policy, columnPolicy);
             modelMap.put(accessorClassname, entityModel);
-            tablesManager.with(element, entityModel);
+            tablesHolder.with(element, entityModel);
         }
         modelMap.put(classname, entityModel);
         return entityModel;

@@ -1,6 +1,5 @@
 package com.moon.accessor.dml;
 
-import com.moon.accessor.Conditional;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 
@@ -10,71 +9,61 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class Selector<R> implements WhereConditional<SelectorWhereClause>, AliasCapable {
+public class Selector implements AliasCapable {
 
     private final boolean distinct;
     private final StringBuilder sql;
 
-    public Selector(TableField<?, ?, ? extends Table<?>>... fields) {
+    public Selector(TableField<?, ?, ? extends Table<?, ?>>... fields) {
         this(false, fields);
     }
 
-    public Selector(TableField<?, ?, ? extends Table<?>> field) {
+    public Selector(TableField<?, ?, ? extends Table<?, ?>> field) {
         this(false, field);
     }
 
-    public Selector(boolean distinct, TableField<?, ?, ? extends Table<?>>... fields) {
+    public Selector(boolean distinct, TableField<?, ?, ? extends Table<?, ?>>... fields) {
         this.distinct = distinct;
         Map<Object, String> tableName = new HashMap<>();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
-        for (TableField<?, ?, ? extends Table<?>> field : fields) {
+        for (TableField<?, ?, ? extends Table<?, ?>> field : fields) {
             // sql.append();
         }
         this.sql = sql;
     }
 
-    public Selector(boolean distinct, TableField<?, ?, ? extends Table<?>> field) {
+    public Selector(boolean distinct, TableField<?, ?, ? extends Table<?, ?>> field) {
         this.distinct = distinct;
         this.sql = new StringBuilder();
     }
 
-    public Selector<R> count(TableField<?, ?, ? extends Table<?>> field) {
+    public Selector count(TableField<?, ?, ? extends Table<?, ?>> field) {
         return this;
     }
 
-    public Selector<R> countDistinct(TableField<?, ?, ? extends Table<?>> field) {
+    public Selector countDistinct(TableField<?, ?, ? extends Table<?, ?>> field) {
         return this;
     }
 
-    public Selector<R> avg(TableField<?, ?, ? extends Table<?>> field) {
+    public Selector avg(TableField<?, ?, ? extends Table<?, ?>> field) {
         return this;
     }
 
-    public Selector<R> sum(TableField<?, ?, ? extends Table<?>> field) {
+    public Selector sum(TableField<?, ?, ? extends Table<?, ?>> field) {
         return this;
     }
 
-    public Selector<R> max(TableField<?, ?, ? extends Table<?>> field) {
+    public Selector max(TableField<?, ?, ? extends Table<?, ?>> field) {
         return this;
     }
 
-    public Selector<R> min(TableField<?, ?, ? extends Table<?>> field) {
+    public Selector min(TableField<?, ?, ? extends Table<?, ?>> field) {
         return this;
     }
 
-    public Selector<R> from(Table<R> table) {
-        return this;
-    }
-
-    @Override
-    public SelectorWhereClause where() {
-        return null;
-    }
-
-    @Override
-    public SelectorWhereClause where(Conditional condition) {
-        return null;
+    public SelectorFromClause from(Table<?, ?> table) {
+        return new SelectorFromClause();
     }
 
     @Override

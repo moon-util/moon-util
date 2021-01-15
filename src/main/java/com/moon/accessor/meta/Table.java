@@ -5,7 +5,7 @@ import com.moon.accessor.Conditional;
 /**
  * @author benshaoye
  */
-public interface Table<R> {
+public interface Table<R, TB extends Table<R, TB>> {
 
     /**
      * 返回实体数据类型
@@ -29,15 +29,18 @@ public interface Table<R> {
     String getTableName();
 
     /**
-     * 左连接
+     * 返回实体对应数据表的列数
      *
-     * @param table 连接表
-     *
-     * @return 查询表
+     * @return 数据表列数
      */
-    default Table<R> leftJoin(Table<?> table) {
-        return this;
-    }
+    int getTableFieldsCount();
+
+    /**
+     * 获取所有字段
+     *
+     * @return 数据表所有字段
+     */
+    TableField<?, R, TB>[] getTableFields();
 
     /**
      * 连接条件
@@ -46,7 +49,7 @@ public interface Table<R> {
      *
      * @return 查询表
      */
-    default Table<R> on(Conditional condition) {
+    default Table<R, TB> on(Conditional condition) {
         return this;
     }
 }

@@ -3,8 +3,8 @@ package com.moon.processor;
 import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
-import com.moon.processor.manager.TablesManager;
-import com.moon.processor.manager.*;
+import com.moon.processor.holder.TablesHolder;
+import com.moon.processor.holder.*;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.Process2;
@@ -52,46 +52,46 @@ public class CompileProcessor extends AbstractProcessor {
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        NameManager nameManager = new NameManager();
-        PojoManager pojoManager = new PojoManager(nameManager);
-        PolicyManager policyManager = new PolicyManager();
-        TablesManager tablesManager = new TablesManager(policyManager);
-        ModelManager modelManager = new ModelManager(pojoManager, tablesManager, policyManager);
-        CopierManager copierManager = new CopierManager(pojoManager, nameManager);
-        MapperManager mapperManager = new MapperManager(copierManager, pojoManager, nameManager);
+        NameHolder nameHolder = new NameHolder();
+        PojoHolder pojoHolder = new PojoHolder(nameHolder);
+        PolicyHolder policyHolder = new PolicyHolder();
+        TablesHolder tablesHolder = new TablesHolder(policyHolder);
+        ModelHolder modelHolder = new ModelHolder(pojoHolder, tablesHolder, policyHolder);
+        CopierHolder copierHolder = new CopierHolder(pojoHolder, nameHolder);
+        MapperHolder mapperHolder = new MapperHolder(copierHolder, pojoHolder, nameHolder);
 
-        AccessorManager accessorManager = new AccessorManager(copierManager, pojoManager, modelManager, nameManager);
-        processMapperFor(roundEnv, mapperManager);
-        processAccessor(roundEnv, accessorManager);
+        AccessorHolder accessorHolder = new AccessorHolder(copierHolder, pojoHolder, modelHolder, nameHolder);
+        processMapperFor(roundEnv, mapperHolder);
+        processAccessor(roundEnv, accessorHolder);
         processMapper();
         JavaWriter writer = new JavaWriter(Environment2.getFiler());
-        pojoManager.writeJavaFile(writer);
-        copierManager.writeJavaFile(writer);
-        mapperManager.writeJavaFile(writer);
-        modelManager.writeJavaFile(writer);
-        tablesManager.writeJavaFile(writer);
-        accessorManager.writeJavaFile(writer);
+        pojoHolder.writeJavaFile(writer);
+        copierHolder.writeJavaFile(writer);
+        mapperHolder.writeJavaFile(writer);
+        modelHolder.writeJavaFile(writer);
+        tablesHolder.writeJavaFile(writer);
+        accessorHolder.writeJavaFile(writer);
         return true;
     }
 
     private void processMapper() {}
 
-    private void processAccessor(RoundEnvironment roundEnv, AccessorManager accessorManager) {
+    private void processAccessor(RoundEnvironment roundEnv, AccessorHolder accessorHolder) {
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Accessor.class);
         for (Element element : elements) {
             TypeElement accessor = (TypeElement) element;
             Process2.getAccessorClasses(accessor).forEach(model -> {
-                accessorManager.with(accessor, model);
+                accessorHolder.with(accessor, model);
             });
         }
     }
 
-    private void processMapperFor(RoundEnvironment roundEnv, MapperManager mapperManager) {
+    private void processMapperFor(RoundEnvironment roundEnv, MapperHolder mapperHolder) {
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(MapperFor.class);
         for (Element element : elements) {
             TypeElement typeElement = (TypeElement) element;
             Process2.getMapperForClasses(typeElement).forEach(that -> {
-                mapperManager.with(typeElement, that);
+                mapperHolder.with(typeElement, that);
             });
         }
     }

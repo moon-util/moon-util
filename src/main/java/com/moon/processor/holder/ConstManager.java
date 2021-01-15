@@ -1,4 +1,4 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.processor.utils.*;
 import org.joda.time.format.DateTimeFormat;
@@ -7,8 +7,9 @@ import javax.lang.model.element.Element;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
@@ -59,8 +60,8 @@ public class ConstManager implements Importable {
 
     final HolderGroup typeValue = Holder.of(Holder.type, Holder.value);
 
-    public String[] getScripts() {
-        return scriptsMap.values().toArray(new String[0]);
+    public List<String> getScripts() {
+        return new ArrayList<>(scriptsMap.values());
     }
 
     public String charOf(String type, String value) {

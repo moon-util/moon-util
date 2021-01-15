@@ -1,21 +1,23 @@
-package com.moon.processor.def;
+package com.moon.processor.file;
 
-import com.moon.processor.manager.ConstManager;
+import com.moon.processor.holder.ConstManager;
+import com.moon.processor.holder.Importable;
 import com.moon.processor.mapping.*;
 import com.moon.processor.model.DeclareMapping;
 import com.moon.processor.model.DeclareMethod;
 import com.moon.processor.model.DeclareProperty;
+import com.moon.processor.utils.Collect2;
 import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-
-import static com.moon.processor.utils.Const2.EMPTY;
 
 /**
  * @author benshaoye
  */
-public class DefMapping {
+public class DeclMapping implements ScriptsProvider, ImporterAware {
 
     private final ConstManager constManager;
     private final DeclareProperty fromProp;
@@ -25,7 +27,7 @@ public class DefMapping {
     private final String fromName;
     private final String toName;
 
-    private DefMapping(
+    private DeclMapping(
         ConstManager constManager,
         DeclareProperty fromProp,
         DeclareProperty toProp,
@@ -43,17 +45,20 @@ public class DefMapping {
         this.toName = toName;
     }
 
-    public static DefMapping convert(
+    public static DeclMapping convert(
         ConstManager constManager,
         DeclareProperty thisProp,
         DeclareProperty thatProp,
         DeclareMapping mapping,
         MappingType type
-    ) { return new DefMapping(constManager, thisProp, thatProp, mapping, type, "self", "that"); }
+    ) { return new DeclMapping(constManager, thisProp, thatProp, mapping, type, "self", "that"); }
 
-    public static DefMapping returning(String script) { return new Returning(script); }
+    /* getters & setters */
 
-    public static DefMapping scriptOf(String script) { return new Script(script); }
+    @Override
+    public Importable getImportable() { return getConstManager(); }
+
+    public ConstManager getConstManager() { return constManager; }
 
     public DeclareProperty getFromProp() { return fromProp; }
 
@@ -61,12 +66,15 @@ public class DefMapping {
 
     public DeclareMapping getMapping() { return mapping; }
 
+    public MappingType getType() { return type; }
+
     public String getFromName() { return fromName; }
 
     public String getToName() { return toName; }
 
-    public String[] getScripts() {
-        String[] scriptsForIgnored = mappingOnIgnored();
+    @Override
+    public List<String> getScripts() {
+        List<String> scriptsForIgnored = mappingOnIgnored();
         if (scriptsForIgnored != null) {
             return scriptsForIgnored;
         }
@@ -82,12 +90,12 @@ public class DefMapping {
             to.getSetters(),
             from.getGetter());
         if (scripter != null) {
-            return scripter.getScripts(constManager);
+            return scripter.getScripts(getConstManager());
         }
         DeclareMethod getter = from.getGetter();
         DeclareMethod setter = to.getSetter();
         if (getter == null) {
-            return setter == null ? EMPTY : nonMappingSetter(setter);
+            return setter == null ? Collections.emptyList() : nonMappingSetter(setter);
         }
 
         // 4. getter/setter 相似类型匹配(要求 getter 类型是 setter 类型的子类)
@@ -103,7 +111,7 @@ public class DefMapping {
         // 故这里只考虑默认 getter/setter 直接对应的默认转换
 
         scripter = new MappingConvertibleDetail(getFromName(), getToName(), getter, setter, mapping, type);
-        return scripter.getScripts(constManager);
+        return scripter.getScripts(getConstManager());
     }
 
     /**
@@ -125,37 +133,36 @@ public class DefMapping {
      *
      * @return
      */
-    private String[] onMappingOnSimilar(MappingScripter<ConstManager> detail) {
+    private List<String> onMappingOnSimilar(MappingScripter<ConstManager> detail) {
         String getterType = detail.getGetterType();
         // 返回数据是基本数据类型没有默认值（因为基本数据类型不可能为 null）
         if (Test2.isPrimitive(getterType)) {
-            return detail.getScripts(constManager);
+            return detail.getScripts(getConstManager());
         }
         String defaultVal = mapping.getDefaultValue();
-        @SuppressWarnings("all")
-        String propType = type == MappingType.SETTER //
-            ? detail.getSetterType() : detail.getGetterType();
-        String var = constManager.defaultOf(propType, defaultVal);
+        @SuppressWarnings("all") String propType = type == MappingType.SETTER //
+                                                   ? detail.getSetterType() : detail.getGetterType();
+        String var = getConstManager().defaultOf(propType, defaultVal);
         if (var == null) {
-            return detail.getScripts(constManager);
+            return detail.getScripts(getConstManager());
         } else {
             MappingDefaultVal val = MappingDefaultVal.of(var, type);
-            return detail.getScriptsOnDefaultVal(constManager, val);
+            return detail.getScriptsOnDefaultVal(getConstManager(), val);
         }
     }
 
-    private String[] mappingOnIgnored() {
+    private List<String> mappingOnIgnored() {
         DeclareProperty from = getFromProp(), to = getToProp();
         if (from == null && to == null) {
-            return EMPTY;
+            return Collections.emptyList();
         }
         if (from == null) {
             DeclareMethod setter = to.getSetter();
-            return setter == null ? EMPTY : nonMappingSetter(setter);
+            return setter == null ? Collections.emptyList() : nonMappingSetter(setter);
         }
         if (to == null) {
             DeclareMethod getter = from.getGetter();
-            return getter == null ? EMPTY : nonMappingGetter(getter);
+            return getter == null ? Collections.emptyList() : nonMappingGetter(getter);
         }
         return null;
     }
@@ -219,18 +226,18 @@ public class DefMapping {
         return null;
     }
 
-    private String[] nonMappingGetter(DeclareMethod m) {
-        String classname = constManager.onImported(m.getThisClassname());
+    private List<String> nonMappingGetter(DeclareMethod m) {
+        String classname = getConstManager().onImported(m.getThisClassname());
         String comment = String2.format("忽略: {@link {}#{}()}", classname, m.getName());
-        return new String[]{String2.onInlineDocCommentOf(comment)};
+        return Collect2.list(String2.onInlineDocCommentOf(comment));
     }
 
-    private String[] nonMappingSetter(DeclareMethod m) {
+    private List<String> nonMappingSetter(DeclareMethod m) {
         String comment = "忽略: {@link {}#{}({})}";
-        String classname = constManager.onImported(m.getThisClassname());
-        String setterType = constManager.onImported(m.getActualType());
+        String classname = getConstManager().onImported(m.getThisClassname());
+        String setterType = getConstManager().onImported(m.getActualType());
         comment = String2.format(comment, classname, m.getName(), setterType);
-        return new String[]{String2.onInlineDocCommentOf(comment)};
+        return Collect2.list(String2.onInlineDocCommentOf(comment));
     }
 
     private MappingDetail onSimpleMapping(DeclareMethod getter, DeclareMethod setter) {
@@ -251,31 +258,5 @@ public class DefMapping {
             getter.getActualType(),
             getter.isGenericDeclared(),
             setter.isGenericDeclared());
-    }
-
-    private static final class Returning extends DefMapping {
-
-        private final String[] scripts;
-
-        public Returning(String script) {
-            super(null, null, null, null, null, null, null);
-            this.scripts = new String[]{"return " + script};
-        }
-
-        @Override
-        public String[] getScripts() { return scripts; }
-    }
-
-    private static final class Script extends DefMapping {
-
-        private final String[] scripts;
-
-        public Script(String script) {
-            super(null, null, null, null, null, null, null);
-            this.scripts = new String[]{script};
-        }
-
-        @Override
-        public String[] getScripts() { return scripts; }
     }
 }

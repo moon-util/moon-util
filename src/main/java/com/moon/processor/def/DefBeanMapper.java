@@ -3,15 +3,14 @@ package com.moon.processor.def;
 import com.moon.mapper.BeanMapper;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
-import com.moon.processor.file.DeclAnnotation;
+import com.moon.processor.file.DeclMarked;
 import com.moon.processor.file.DeclJavaFile;
 import com.moon.processor.file.DeclMethod;
 import com.moon.processor.file.DeclParams;
-import com.moon.processor.manager.NameManager;
+import com.moon.processor.holder.NameHolder;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Holder;
 
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashSet;
@@ -35,7 +34,7 @@ public class DefBeanMapper implements JavaFileWriteable {
         DefBeanCopier backward,
         DeclaredPojo thisPojo,
         DeclaredPojo thatPojo,
-        NameManager registry
+        NameHolder registry
     ) {
         this.forward = forward;
         this.backward = backward;
@@ -67,7 +66,7 @@ public class DefBeanMapper implements JavaFileWriteable {
 
     private DeclJavaFile getDeclJavaFile() {
         DeclJavaFile filer = DeclJavaFile.classOf(getPkg(), simpleClassname);
-        filer.implement(getInterfaceDecl()).enumNamesOf(Const2.INSTANCE).annotatedOf(DeclAnnotation::ofComponent);
+        filer.implement(getInterfaceDecl()).enumNamesOf(Const2.INSTANCE).markedOf(DeclMarked::ofComponent);
 
         // copier
         filer.privateEnumRef(Const2.FORWARD, getForward().getClassname(), Const2.INSTANCE);

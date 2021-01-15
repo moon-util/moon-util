@@ -158,6 +158,10 @@ public enum String2 {
     }
 
     public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {
+        return camelcaseToHyphen(str, hyphen, continuousSplit, true);
+    }
+
+    public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit, boolean lowerCaseAtPos) {
         final int len = str == null ? 0 : str.length();
         if (len == 0) { return str; }
         boolean prevIsUpper = false, thisIsUpper;
@@ -165,7 +169,7 @@ public enum String2 {
         for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
             if (thisIsUpper = Character.isUpperCase(ch)) {
-                ch = Character.toLowerCase(ch);
+                ch = lowerCaseAtPos ? Character.toLowerCase(ch) : ch;
                 if (i == 0) {
                     res.append(ch);
                 } else if (prevIsUpper) {
@@ -214,22 +218,11 @@ public enum String2 {
         }
     }
 
-    public static String onInlineCommentOf(String comment) {
-        return format("/* {} */", comment);
-    }
-
     public static String onInlineDocCommentOf(String comment) {
         return format("/** {} */", comment);
     }
 
-    public static String[] onBlockCommentOf(String... comments) {
-        String[] results = new String[comments.length + 2];
-        int index = 0;
-        results[index++] = "/*";
-        for (String comment : comments) {
-            results[index++] = " * " + comment;
-        }
-        results[index] = " */";
-        return results;
+    public static int length(CharSequence sequence) {
+        return sequence == null ? 0 : sequence.length();
     }
 }

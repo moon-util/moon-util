@@ -6,7 +6,7 @@ import com.moon.accessor.meta.Table;
 /**
  * @author benshaoye
  */
-public class Deleter<R, T extends Table<R>> implements WhereConditional<DeleterWhereClause> {
+public class Deleter<R, T extends Table<R, T>> implements WhereConditional<DeleterWhereClause> {
 
     private final T table;
 

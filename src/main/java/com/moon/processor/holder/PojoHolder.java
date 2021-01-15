@@ -1,9 +1,9 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
+import com.moon.processor.file.DeclJavaFile;
 import com.moon.processor.model.DeclaredPojo;
-import com.moon.processor.def.DefJavaFiler;
 import com.moon.processor.parser.PojoParser;
 import com.moon.processor.utils.Element2;
 
@@ -14,13 +14,13 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class PojoManager implements JavaFileWriteable {
+public class PojoHolder implements JavaFileWriteable {
 
-    private final NameManager nameManager;
+    private final NameHolder nameHolder;
     private final Map<String, DeclaredPojo> classMap = new HashMap<>();
 
-    public PojoManager(NameManager nameManager) {
-        this.nameManager = nameManager;
+    public PojoHolder(NameHolder nameHolder) {
+        this.nameHolder = nameHolder;
     }
 
     public DeclaredPojo with(TypeElement typeElement) {
@@ -30,7 +30,7 @@ public class PojoManager implements JavaFileWriteable {
             synchronized (classMap) {
                 declared = classMap.get(classname);
                 if (declared == null) {
-                    declared = PojoParser.parse(typeElement, nameManager);
+                    declared = PojoParser.parse(typeElement, nameHolder);
                     classMap.put(classname, declared);
                 }
             }
@@ -40,8 +40,14 @@ public class PojoManager implements JavaFileWriteable {
 
     @Override
     public void writeJavaFile(JavaWriter writer) {
+        // classMap.forEach((classname, declared) -> {
+        //     DefJavaFiler filer = declared.getDefJavaFiler();
+        //     if (declared.isAbstract() && filer != null) {
+        //         filer.writeJavaFile(writer);
+        //     }
+        // });
         classMap.forEach((classname, declared) -> {
-            DefJavaFiler filer = declared.getDefJavaFiler();
+            DeclJavaFile filer = declared.getDeclJavaFile();
             if (declared.isAbstract() && filer != null) {
                 filer.writeJavaFile(writer);
             }

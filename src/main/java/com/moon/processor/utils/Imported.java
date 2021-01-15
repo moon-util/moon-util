@@ -1,7 +1,7 @@
 package com.moon.processor.utils;
 
 import lombok.Data;
-import org.joda.time.DateTime;
+import org.joda.time.ReadablePeriod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -39,7 +39,7 @@ public enum Imported {
         CONDITIONAL_ON_MISSING_BEAN = isNoException(() -> ConditionalOnMissingBean.class.toString());
         BEAN = isNoException(() -> Bean.class.toString());
         GENERATED = isNoException(() -> Generated.class.toString());
-        JODA_TIME = isNoException(() -> DateTime.class.toString());
+        JODA_TIME = isNoException(() -> ReadablePeriod.class.toString());
         AUTOWIRED = isNoException(() -> Autowired.class.toString());
         QUALIFIER = isNoException(() -> Qualifier.class.toString());
         COMPONENT = isNoException(() -> Component.class.toString());

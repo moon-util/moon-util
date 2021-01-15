@@ -7,5 +7,10 @@ import java.util.List;
  */
 public interface ScriptsProvider {
 
+    /**
+     * 返回语句列表
+     *
+     * @return
+     */
     List<String> getScripts();
 }

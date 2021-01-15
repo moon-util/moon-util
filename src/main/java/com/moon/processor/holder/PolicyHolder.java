@@ -1,4 +1,4 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.accessor.annotation.TableColumnPolicy;
 import com.moon.accessor.annotation.TablePolicy;
@@ -18,12 +18,12 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class PolicyManager {
+public class PolicyHolder {
 
     private final Map<String, TablePolicy> policyMap = new HashMap<>();
     private final Map<String, TableColumnPolicy> columnPolicyMap = new HashMap<>();
 
-    public PolicyManager() {
+    public PolicyHolder() {
     }
 
     private static <A extends Annotation, D extends A, M extends Map<String, A>> A find(

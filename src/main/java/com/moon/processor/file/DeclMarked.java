@@ -1,7 +1,8 @@
 package com.moon.processor.file;
 
-import com.moon.processor.manager.Importable;
+import com.moon.processor.holder.Importable;
 import com.moon.processor.utils.Imported;
+import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.String2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,74 +13,68 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.moon.processor.utils.Imported.*;
+
 /**
  * @author benshaoye
  */
-public class DeclAnnotation implements ImporterAware, ScriptsProvider {
+public class DeclMarked implements ImporterAware, ScriptsProvider {
 
     private final static LocalDateTime NOW = LocalDateTime.now();
-    public final static DeclAnnotation EMPTY = new None();
+    public final static DeclMarked EMPTY = new None();
 
     private final Importable importable;
     private final String annotationClass;
     private final Map<String, String> values;
 
-    public DeclAnnotation(Importable importable, Class<?> annotationClass) {
+    DeclMarked(Importable importable, Class<?> annotationClass) {
         this(importable, annotationClass.getCanonicalName());
     }
 
-    public DeclAnnotation(Importable importable, String annotationClass) {
+    DeclMarked(Importable importable, String annotationClass) {
         this(importable, annotationClass, new LinkedHashMap<>());
     }
 
-    public DeclAnnotation(Importable importable, String annotationClass, Map<String, String> values) {
+    DeclMarked(Importable importable, String annotationClass, Map<String, String> values) {
         this.annotationClass = annotationClass;
         this.importable = importable;
         this.values = values;
     }
 
-    public static DeclAnnotation ofGenerated(Importable importable) {
+    public static DeclMarked ofGenerated(Importable importable) {
         if (Imported.GENERATED) {
-            return new DeclAnnotation(importable, Generated.class).stringOf("value",
-                DeclJavaFile.class.getCanonicalName()).stringOf("date", NOW);
+            DeclMarked marked = new DeclMarked(importable, Generated.class);
+            marked.stringOf("value", DeclJavaFile.class).stringOf("date", NOW);
+            return marked;
         }
         return EMPTY;
     }
 
-    public static DeclAnnotation ofComponent(Importable importable) {
-        if (Imported.COMPONENT) {
-            return new DeclAnnotation(importable, Component.class);
-        }
-        return EMPTY;
+    public static DeclMarked ofComponent(Importable importable) {
+        return COMPONENT ? new DeclMarked(importable, Component.class) : EMPTY;
     }
 
-    public static DeclAnnotation ofAutowired(Importable importable) {
-        if (Imported.AUTOWIRED) {
-            return new DeclAnnotation(importable, Autowired.class);
-        }
-        return EMPTY;
+    public static DeclMarked ofAutowired(Importable importable) {
+        return AUTOWIRED ? new DeclMarked(importable, Autowired.class) : EMPTY;
     }
 
-    public static DeclAnnotation ofBean(Importable importable) {
-        if (Imported.BEAN) {
-            return new DeclAnnotation(importable, Bean.class);
-        }
-        return EMPTY;
+    public static DeclMarked ofBean(Importable importable) {
+        return BEAN ? new DeclMarked(importable, Bean.class) : EMPTY;
     }
 
-    public static DeclAnnotation ofOverride(Importable importable) {
-        return new DeclAnnotation(importable, Override.class);
+    public static DeclMarked ofOverride(Importable importable) {
+        return new DeclMarked(importable, Override.class);
     }
 
     @Override
     public Importable getImportable() { return importable; }
 
-    protected DeclAnnotation add(String method, String formattedValue) {
+    protected DeclMarked add(String method, String formattedValue) {
         values.put(method, formattedValue);
         return this;
     }
 
-    public DeclAnnotation stringsOf(String method, Object... values) {
+    public DeclMarked stringsOf(String method, Object... values) {
         if (values == null || values.length == 0) {
             return add(method, "{}");
         } else {
@@ -90,23 +85,27 @@ public class DeclAnnotation implements ImporterAware, ScriptsProvider {
         }
     }
 
-    public DeclAnnotation stringOf(String method, Object value) {
+    public DeclMarked stringOf(String method, Class<?> value) {
+        return stringOf(method, value.getCanonicalName());
+    }
+
+    public DeclMarked stringOf(String method, Object value) {
         return add(method, String2.format("\"{}\"", value));
     }
 
-    public DeclAnnotation enumOf(String method, Class<?> enumClass, String enumValue) {
+    public DeclMarked enumOf(String method, Class<?> enumClass, String enumValue) {
         return enumOf(method, enumClass.getCanonicalName(), enumValue);
     }
 
-    public DeclAnnotation enumOf(String method, String enumClass, String enumValue) {
+    public DeclMarked enumOf(String method, String enumClass, String enumValue) {
         return add(method, String2.format("{}.{}", onImported(enumClass), enumValue));
     }
 
-    public DeclAnnotation enumsOf(String method, Class<?> enumClass, String... enumValues) {
+    public DeclMarked enumsOf(String method, Class<?> enumClass, String... enumValues) {
         return enumsOf(method, enumClass.getCanonicalName(), enumValues);
     }
 
-    public DeclAnnotation enumsOf(String method, String enumClass, String... enumValues) {
+    public DeclMarked enumsOf(String method, String enumClass, String... enumValues) {
         if (enumValues == null || enumValues.length == 0) {
             return add(method, "{}");
         } else {
@@ -118,23 +117,23 @@ public class DeclAnnotation implements ImporterAware, ScriptsProvider {
         }
     }
 
-    public DeclAnnotation numberOf(String method, long value) {
+    public DeclMarked numberOf(String method, long value) {
         return add(method, String.valueOf(value));
     }
 
-    public DeclAnnotation numberOf(String method, double value) {
+    public DeclMarked numberOf(String method, double value) {
         return add(method, String.valueOf(value));
     }
 
-    public DeclAnnotation classOf(String method, Class<?> valueClass) {
+    public DeclMarked classOf(String method, Class<?> valueClass) {
         return classOf(method, valueClass.getCanonicalName());
     }
 
-    public DeclAnnotation classOf(String method, String valueClass) {
+    public DeclMarked classOf(String method, String valueClass) {
         return add(method, onImported(valueClass));
     }
 
-    public DeclAnnotation classesOf(String method, Class<?>... valueClasses) {
+    public DeclMarked classesOf(String method, Class<?>... valueClasses) {
         if (valueClasses == null || valueClasses.length == 0) {
             return add(method, "{}");
         } else {
@@ -147,14 +146,14 @@ public class DeclAnnotation implements ImporterAware, ScriptsProvider {
 
     @Override
     public List<String> getScripts() {
-        String mark = String2.format("@{}", onImported(annotationClass));
+        String marked = "@" + onImported(annotationClass);
         String declValues = getSimpleValues();
         if (declValues == null) {
-            return Arrays.asList(mark);
+            return Arrays.asList(marked);
         }
-        if (Formatter2.isOverLength(mark.length() + declValues.length())) {
+        if (Formatter2.isOverLength(marked.length() + declValues.length())) {
             LinkedList<String> declares = new LinkedList<>();
-            declares.add(mark + '(');
+            declares.add(marked + '(');
             for (Map.Entry<String, String> entry : values.entrySet()) {
                 declares.add("    " + toDeclared(entry) + ',');
             }
@@ -164,7 +163,7 @@ public class DeclAnnotation implements ImporterAware, ScriptsProvider {
             declares.add(")");
             return declares;
         } else {
-            return Arrays.asList(mark + declValues);
+            return Arrays.asList(marked + declValues);
         }
     }
 
@@ -184,12 +183,12 @@ public class DeclAnnotation implements ImporterAware, ScriptsProvider {
         return String2.format("{} = {}", entry.getKey(), entry.getValue());
     }
 
-    private static class None extends DeclAnnotation {
+    private static class None extends DeclMarked {
 
         public None() { super(null, null, null); }
 
         @Override
-        protected DeclAnnotation add(String method, String formattedValue) { return this; }
+        protected DeclMarked add(String method, String formattedValue) { return this; }
 
         @Override
         public List<String> getScripts() { return Collections.emptyList(); }

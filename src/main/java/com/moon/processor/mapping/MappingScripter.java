@@ -1,15 +1,17 @@
 package com.moon.processor.mapping;
 
-import com.moon.processor.manager.Importable;
+import com.moon.processor.holder.Importable;
+
+import java.util.List;
 
 /**
  * @author benshaoye
  */
 public interface MappingScripter<I extends Importable> {
 
-    String[] getScriptsOnDefaultVal(I importable, MappingDefaultVal var);
+    List<String> getScriptsOnDefaultVal(I importable, MappingDefaultVal var);
 
-    String[] getScripts(I importable);
+    List<String> getScripts(I importable);
 
     String getGetterType();
 

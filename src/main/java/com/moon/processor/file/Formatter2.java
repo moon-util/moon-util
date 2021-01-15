@@ -1,6 +1,6 @@
 package com.moon.processor.file;
 
-import com.moon.processor.manager.Importable;
+import com.moon.processor.holder.Importable;
 import com.moon.processor.utils.String2;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public enum Formatter2 {
     public static boolean isOver(int max, CharSequence... sequences) {
         int sum = 0;
         for (CharSequence sequence : sequences) {
-            if ((sum += sequence.length()) > max) {
+            if ((sum += String2.length(sequence)) > max) {
                 return true;
             }
         }

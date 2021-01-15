@@ -1,4 +1,4 @@
-package com.moon.processor.manager;
+package com.moon.processor.holder;
 
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
@@ -13,11 +13,11 @@ import java.util.Map;
  *
  * @author benshaoye
  */
-public class NameManager {
+public class NameHolder {
 
     private final Map<String, String> registeredClasses = new HashMap<>();
 
-    public NameManager() { }
+    public NameHolder() { }
 
     /**
      * 获取接口/抽象类实现类类名

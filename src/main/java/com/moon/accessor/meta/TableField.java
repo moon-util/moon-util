@@ -5,10 +5,12 @@ import com.moon.accessor.PropertyGetter;
 import com.moon.accessor.PropertySetter;
 import com.moon.accessor.dml.AliasCapable;
 
+import java.sql.PreparedStatement;
+
 /**
  * @author benshaoye
  */
-public interface TableField<T, R, TB extends Table<R>> extends AliasCapable<TableField<T, R, TB>> {
+public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<TableField<T, R, TB>> {
 
     /**
      * 领域模型类
@@ -77,6 +79,19 @@ public interface TableField<T, R, TB extends Table<R>> extends AliasCapable<Tabl
      * @return 属性设置器
      */
     PropertySetter<R, T> getPropertySetter();
+
+    /**
+     * 获取指定属性的值
+     *
+     * @param record 实例数据
+     *
+     * @return 指定字段的值
+     */
+    default T getValue(R record) {
+        return getPropertyGetter().get(record);
+    }
+
+    // void transfer(R record, PreparedStatement statement, int columnIndex);
 
     /**
      * 实体字段名
@@ -361,7 +376,7 @@ public interface TableField<T, R, TB extends Table<R>> extends AliasCapable<Tabl
      *
      * @return 条件
      */
-    default Condition equalsTo(TableField<?, ?, ? extends Table<?>> field) {
+    default Condition equalsTo(TableField<?, ?, ? extends Table<?, ?>> field) {
         return null;
     }
 }

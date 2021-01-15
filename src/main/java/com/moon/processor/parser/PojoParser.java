@@ -3,7 +3,7 @@ package com.moon.processor.parser;
 import com.moon.mapper.annotation.IgnoreMode;
 import com.moon.mapper.annotation.MapperIgnoreFields;
 import com.moon.mapper.annotation.Mapping;
-import com.moon.processor.manager.NameManager;
+import com.moon.processor.holder.NameHolder;
 import com.moon.processor.model.*;
 import com.moon.processor.utils.*;
 
@@ -51,9 +51,9 @@ public class PojoParser {
     private final Types types = Environment2.getTypes();
 
 
-    private PojoParser(TypeElement thisElement, NameManager nameManager) {
+    private PojoParser(TypeElement thisElement, NameHolder nameHolder) {
         this.thisClassname = Element2.getQualifiedName(thisElement);
-        this.declaredPojo = new DeclaredPojo(thisElement, nameManager);
+        this.declaredPojo = new DeclaredPojo(thisElement, nameHolder);
         this.thisGenericMap = Generic2.from(thisElement);
         this.ignoringMap = parseMappingIgnoring(thisElement);
         this.thisElement = thisElement;
@@ -205,8 +205,8 @@ public class PojoParser {
         return declaredPojo;
     }
 
-    public static DeclaredPojo parse(TypeElement thisElement, NameManager nameManager) {
-        return new PojoParser(thisElement, nameManager).doParse();
+    public static DeclaredPojo parse(TypeElement thisElement, NameHolder nameHolder) {
+        return new PojoParser(thisElement, nameHolder).doParse();
     }
 
 

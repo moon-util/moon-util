@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class Updater<R, T extends Table<R>> implements WhereConditional<UpdaterWhereClause> {
+public class Updater<R, T extends Table<R, T>> implements WhereConditional<UpdaterWhereClause> {
 
     private final T table;
 

@@ -6,6 +6,29 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 表名策略
+ * <p>
+ * 沿着当前实体类的继承结构向上查找第一个注解的{@link TablePolicy}为有效处理策略,
+ * <p>
+ * 如果一个都没有将按所有属性的默认值处理，通常项目的数据表策略和实体命名策略一致，
+ * <p>
+ * 一般情况在顶级类声明一个公共父类并添加此注解即可
+ * <p>
+ * <strong>如:</strong>
+ * <pre>
+ * &#064;TablePolicy(tables = "Tables")
+ * public abstract class BaseModel {
+ *
+ *     private String id;
+ * }
+ *
+ * &#064;TablePolicy(tables = "Database") // 实际生效的注解
+ * public class UserModel extends BaseModel {
+ *
+ *     private String username;
+ * }
+ * </pre>
+ *
  * @author benshaoye
  */
 @Target(ElementType.TYPE)
@@ -79,7 +102,7 @@ public @interface TablePolicy {
     /**
      * 表名模式，默认小写字母用下划线分割
      *
-     * @return 模式
+     * @return 命名策略
      */
     CasePolicy casePolicy() default CasePolicy.UNDERSCORE_LOWERCASE;
 }

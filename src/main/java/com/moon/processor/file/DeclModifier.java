@@ -1,8 +1,10 @@
 package com.moon.processor.file;
 
-import com.moon.processor.manager.Importable;
+import com.moon.processor.holder.ConstManager;
 
 import javax.lang.model.element.Modifier;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -14,13 +16,14 @@ import static java.util.stream.Collectors.joining;
 abstract class DeclModifier<T extends DeclModifier<T>> implements ImporterAware {
 
     private final Set<Modifier> modifiers = new TreeSet<>();
-    private final Importable importer;
+    private final ConstManager importer;
     private String modifiersDeclared;
+    private DeclComment comment;
 
-    public DeclModifier(Importable importer) { this.importer = importer; }
+    DeclModifier(ConstManager importer) { this.importer = importer; }
 
     private void resetModifiersDeclared() {
-        this.modifiersDeclared = modifiers.stream().map(m -> m.name().toLowerCase()).collect(joining(" "));
+        this.modifiersDeclared = modifiers.stream().map(m -> m.name().toLowerCase()).collect(joining(" ")) + " ";
     }
 
     private void removeAccessLevels() {
@@ -38,12 +41,30 @@ abstract class DeclModifier<T extends DeclModifier<T>> implements ImporterAware 
         return returning();
     }
 
-    public Importable getImporter() { return importer; }
+    public ConstManager getImporter() { return importer; }
 
     @Override
-    public Importable getImportable() { return importer; }
+    public ConstManager getImportable() { return importer; }
 
-    public final String getModifiersDeclared() { return modifiersDeclared; }
+    /**
+     * 目前是给表字段列举专用，也没考虑其他情况
+     *
+     * @param comments
+     *
+     * @return
+     */
+    public final T commentOf(String... comments) {
+        this.comment = new DeclComment(CommentType.BLOCK, comments);
+        return returning();
+    }
+
+    public final DeclComment getComment() { return comment; }
+
+    public final List<String> getCommentScripts() {
+        return comment == null ? Collections.emptyList() : comment.getScripts();
+    }
+
+    public final String getModifiersDeclared() { return modifiersDeclared == null ? "" : modifiersDeclared; }
 
     public final T remove(Modifier modifier) {
         modifiers.remove(modifier);
@@ -72,7 +93,7 @@ abstract class DeclModifier<T extends DeclModifier<T>> implements ImporterAware 
     }
 
     public final T with(Modifier modifier, boolean using) {
-        return using ? with(modifier) : returning();
+        return using ? withModifier(modifier) : returning();
     }
 
     public final T withPublic() { return with(Modifier.PUBLIC); }
