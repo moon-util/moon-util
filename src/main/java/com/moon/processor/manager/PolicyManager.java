@@ -1,6 +1,8 @@
 package com.moon.processor.manager;
 
+import com.moon.accessor.annotation.TableColumnPolicy;
 import com.moon.accessor.annotation.TablePolicy;
+import com.moon.processor.model.DefaultTableColumnPolicy;
 import com.moon.processor.model.DefaultTablePolicy;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
@@ -9,6 +11,7 @@ import com.moon.processor.utils.Test2;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Types;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,20 +21,23 @@ import java.util.Map;
 public class PolicyManager {
 
     private final Map<String, TablePolicy> policyMap = new HashMap<>();
+    private final Map<String, TableColumnPolicy> columnPolicyMap = new HashMap<>();
 
     public PolicyManager() {
     }
 
-    public TablePolicy with(TypeElement element) {
+    private static <A extends Annotation, D extends A, M extends Map<String, A>> A find(
+        TypeElement element, M map, Class<A> annotationClass, D defaultVal
+    ) {
         String classname = Element2.getQualifiedName(element);
-        TablePolicy tablePolicy = policyMap.get(classname);
-        if (tablePolicy != null) {
-            return tablePolicy;
+        A policy = map.get(classname);
+        if (policy != null) {
+            return policy;
         }
         Types types = Environment2.getTypes();
         do {
-            tablePolicy = element.getAnnotation(TablePolicy.class);
-            if (tablePolicy != null) {
+            policy = element.getAnnotation(annotationClass);
+            if (policy != null) {
                 break;
             }
             Element elem = types.asElement(element.getSuperclass());
@@ -43,8 +49,17 @@ public class PolicyManager {
                 break;
             }
         } while (true);
-        tablePolicy = tablePolicy == null ? DefaultTablePolicy.INSTANCE : tablePolicy;
-        policyMap.put(classname, tablePolicy);
-        return tablePolicy;
+
+        policy = policy == null ? defaultVal : policy;
+        map.put(classname, policy);
+        return policy;
+    }
+
+    public TableColumnPolicy withColumnPolicy(TypeElement element) {
+        return find(element, columnPolicyMap, TableColumnPolicy.class, DefaultTableColumnPolicy.INSTANCE);
+    }
+
+    public TablePolicy with(TypeElement element) {
+        return find(element, policyMap, TablePolicy.class, DefaultTablePolicy.INSTANCE);
     }
 }

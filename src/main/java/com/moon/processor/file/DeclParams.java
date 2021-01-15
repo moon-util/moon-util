@@ -13,7 +13,11 @@ public class DeclParams extends LinkedHashMap<String, String> {
 
     public static DeclParams of() { return new DeclParams(); }
 
+    public static DeclParams of(String name, Class<?> type) { return of().add(name, type); }
+
     public static DeclParams of(String name, String type) { return of().add(name, type); }
+
+    public DeclParams add(String name, Class<?> type) { return add(name, type.getCanonicalName()); }
 
     public DeclParams add(String name, String type) {
         put(name, type);

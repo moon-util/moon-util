@@ -187,6 +187,9 @@ public enum String2 {
         return res.toString();
     }
 
+    public static String dotClass(Class<?> cls) { return dotClass(cls.getCanonicalName()); }
+
+    public static String dotClass(String classname) { return classname + ".class"; }
 
     public static String toGeneralizableType(String type) {
         switch (type) {

@@ -1,15 +1,18 @@
 package com.moon.processor.def;
 
+import com.moon.accessor.annotation.CasePolicy;
+import com.moon.accessor.annotation.TableColumnPolicy;
 import com.moon.accessor.annotation.TablePolicy;
+import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.TableFieldDetail;
-import com.moon.accessor.meta.Table;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
+import com.moon.processor.file.DeclJavaFile;
+import com.moon.processor.file.DeclMethod;
+import com.moon.processor.file.DeclParams;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Holder;
-import com.moon.processor.utils.HolderGroup;
 import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.TypeElement;
@@ -25,15 +28,14 @@ import java.util.stream.Collectors;
 public class DefEntityModel implements JavaFileWriteable {
 
     private final static String TABLE = "TABLE";
-    private final static String TABLE_PREFIX = "TB_";
     private final static String DOT_CLS = ".class";
 
-    private final DefParameters EMPTY = DefParameters.of();
+    private final TableColumnPolicy columnPolicy;
     private final DeclaredPojo declaredPojo;
     private final String pkg, classname, simpleClassname;
     private final String tableName, tableField, pojoClassname;
 
-    public DefEntityModel(DeclaredPojo declaredPojo, TablePolicy policy) {
+    public DefEntityModel(DeclaredPojo declaredPojo, TablePolicy policy, TableColumnPolicy columnPolicy) {
         this.declaredPojo = declaredPojo;
         TypeElement thisElement = declaredPojo.getDeclareElement();
         String clsName = Element2.getSimpleName(thisElement);
@@ -45,6 +47,7 @@ public class DefEntityModel implements JavaFileWriteable {
         this.pkg = Element2.getPackageName(thisElement);
         this.classname = pkg + "." + simpleClassname;
         this.pojoClassname = declaredPojo.getThisClassname();
+        this.columnPolicy = columnPolicy;
     }
 
     private static String toDeclaredTableName(String entityName, TablePolicy policy) {
@@ -62,28 +65,36 @@ public class DefEntityModel implements JavaFileWriteable {
                 break;
             }
         }
-        String tableName;
-        switch (policy.caseMode()) {
+        return deducePlacedName(policy.casePolicy(), entityName, policy.pattern());
+    }
+
+    private static String deducePlacedName(CasePolicy policy, String inputName, String pattern) {
+        String resultName;
+        switch (policy) {
             case UNDERSCORE_LOWERCASE:
-                tableName = String2.camelcaseToHyphen(entityName, '_', false);
-                tableName = tableName.toLowerCase();
+                resultName = String2.camelcaseToHyphen(inputName, '_', false);
+                resultName = resultName.toLowerCase();
                 break;
             case LOWERCASE:
-                tableName = entityName.toLowerCase();
+                resultName = inputName.toLowerCase();
                 break;
             case UNDERSCORE_UPPERCASE:
-                tableName = String2.camelcaseToHyphen(entityName, '_', false);
-                tableName = tableName.toUpperCase();
+                resultName = String2.camelcaseToHyphen(inputName, '_', false);
+                resultName = resultName.toUpperCase();
                 break;
             case UPPERCASE:
-                tableName = entityName.toUpperCase();
+                resultName = inputName.toUpperCase();
                 break;
             default:
-                tableName = entityName;
+                resultName = inputName;
                 break;
         }
-        String pattern = String2.defaultIfBlank(policy.pattern(), "{}");
-        return String2.replaceAll(pattern, "{}", tableName);
+        String effectPattern = String2.defaultIfBlank(pattern, "{}");
+        return String2.replaceAll(effectPattern, "{}", resultName);
+    }
+
+    private String toColumnName(String propertyName) {
+        return deducePlacedName(columnPolicy.casePolicy(), propertyName, columnPolicy.pattern());
     }
 
     private static String deduceTableField(DeclaredPojo pojo) {
@@ -115,23 +126,20 @@ public class DefEntityModel implements JavaFileWriteable {
 
     public String getTableField() { return tableField; }
 
-    private final static HolderGroup GROUP = Holder.of(Holder.type, Holder.type0, Holder.type1, Holder.name);
-
-    private void declareFields(DefJavaFiler tableFiler) {
-        declaredPojo.forEach((name, prop) -> {
+    private void declareFields(DeclJavaFile tableFile) {
+        declaredPojo.forEach((fieldName, prop) -> {
             if (prop.getField() == null) {
                 return;
             }
 
-            String importedPojoName = tableFiler.onImported(getPojoClassname());
+            String tableFieldName = TableField.class.getCanonicalName();
+            String importedPojoName = tableFile.onImported(getPojoClassname());
             String propertyType = String2.toGeneralizableType(prop.getActualType());
-            String fieldType = String2.format("{}<{}, {}, {}>",
-                TableField.class.getCanonicalName(),
-                propertyType,
-                getPojoClassname(),
-                getClassname());
-            String fieldNameString = String2.format("\"{}\"", name);
-            String columnNameString = String2.format("\"{}\"", name);
+            String fieldType = String2
+                .format("{}<{}, {}, {}>", tableFieldName, propertyType, getPojoClassname(), getClassname());
+            String fieldNameString = String2.format("\"{}\"", fieldName);
+            String columnName = toColumnName(fieldName);
+            String columnNameString = String2.format("\"{}\"", columnName);
             String getter = null, setter = null;
             if (prop.getGetter() != null) {
                 getter = String2.format("{}::{}", importedPojoName, prop.getGetter().getName());
@@ -140,58 +148,57 @@ public class DefEntityModel implements JavaFileWriteable {
                 setter = String2.format("{}::{}", importedPojoName, prop.getSetter().getName());
             }
             String fieldValue = String2.format("new {}<>(this, {}, {}, {}, {}, {}, {});",
-                tableFiler.onImported(TableFieldDetail.class.getCanonicalName()),
-                importedPojoName + DOT_CLS,
-                tableFiler.onImported(propertyType) + DOT_CLS,
+                tableFile.onImported(TableFieldDetail.class.getCanonicalName()),
+                String2.dotClass(importedPojoName),
+                String2.dotClass(tableFile.onImported(propertyType)),
                 getter,
                 setter,
                 fieldNameString,
                 columnNameString);
-            String fieldName = String2.camelcaseToHyphen(name, '_', false).toUpperCase();
-            String finalName = String2.format("{}.{}", getTableField(), name);
-            tableFiler.publicFinalField(fieldType, name, fieldValue);
-            tableFiler.publicConstField(fieldType, fieldName, finalName);
+            String constName = columnName.toUpperCase();
+            String constValue = String2.format("{}.{}", getTableField(), columnName);
+            tableFile.publicFinalField(columnName, fieldType).valueOf(fieldValue);
+            tableFile.publicConstField(constName, fieldType).valueOf(constValue);
         });
     }
 
-    private DefJavaFiler getTableDefJavaFiler() {
+    private DeclJavaFile getTableDeclJavaFile() {
         // class declare
-        String classname = getClassname();
-        DefJavaFiler table = DefJavaFiler.enumOf(getPackage(), classname).component(false);
+        String simpleName = getSimpleClassname();
+        DeclJavaFile table = DeclJavaFile.enumOf(getPackage(), simpleName);
         String tableType = Table.class.getCanonicalName() + "<{}>";
         table.implement(String2.format(tableType, getPojoClassname()));
 
-        // String tableConst = String2.format("new {}()", table.onImported(classname));
-        // table.publicConstField(classname, getTableField(), tableConst);
-        table.enumsOf(getTableField());
+        table.enumNamesOf(getTableField());
 
         // 声明字段
         declareFields(table);
 
+        DeclParams empty = DeclParams.of();
         // impl method of: getEntityType
         String classType = Class.class.getCanonicalName() + "<{}>";
         String returnType = String2.format(classType, getPojoClassname());
-        DefMethod getEntityType = table.publicMethod(false, "getEntityType", returnType, EMPTY);
+        DeclMethod getEntityType = table.publicMethod("getEntityType", empty).returnTypeof(returnType);
         getEntityType.override().returning(table.onImported(getPojoClassname()) + DOT_CLS);
         // impl method of: getEntityClassname
-        DefMethod getEntityClassname = table.publicMethod("getEntityClassname", String.class, EMPTY);
+        DeclMethod getEntityClassname = table.publicMethod("getEntityClassname", empty).returnTypeof(String.class);
         getEntityClassname.override().returning(String2.format("\"{}\"", getPojoClassname()));
         // impl method of: getTableName
-        DefMethod getTableName = table.publicMethod("getTableName", String.class, EMPTY);
+        DeclMethod getTableName = table.publicMethod("getTableName", empty).returnTypeof(String.class);
         getTableName.override().returning('"' + getTableName() + '"');
 
         return table;
     }
 
-    private List<DefJavaFiler> getDefJavaFilerAll() {
-        List<DefJavaFiler> filers = new ArrayList<>();
-        filers.add(getTableDefJavaFiler());
+    private List<DeclJavaFile> getDeclJavaFileAll() {
+        List<DeclJavaFile> filers = new ArrayList<>();
+        filers.add(getTableDeclJavaFile());
         return filers;
     }
 
     @Override
     public void writeJavaFile(JavaWriter writer) {
-        for (DefJavaFiler filer : getDefJavaFilerAll()) {
+        for (DeclJavaFile filer : getDeclJavaFileAll()) {
             filer.writeJavaFile(writer);
         }
     }

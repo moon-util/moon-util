@@ -8,6 +8,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author benshaoye
@@ -17,7 +18,7 @@ public class Importer implements Importable {
     private final static String EMPTY = "";
 
     private final Map<String, String> shortNameCached = new HashMap<>();
-    private final Map<String, String> importCached = new HashMap<>();
+    private final Map<String, String> importCached = new TreeMap<>();
 
     public Importer() {
         shortNameCached.put("byte[]", EMPTY);

@@ -1,5 +1,6 @@
 package com.moon.processor.manager;
 
+import com.moon.accessor.annotation.TableColumnPolicy;
 import com.moon.accessor.annotation.TablePolicy;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
@@ -38,7 +39,8 @@ public class ModelManager implements JavaFileWriteable {
         entityModel = modelMap.get(classname);
         if (entityModel == null) {
             TablePolicy policy = policyManager.with(element);
-            entityModel = new DefEntityModel(pojoManager.with(element), policy);
+            TableColumnPolicy columnPolicy = policyManager.withColumnPolicy(element);
+            entityModel = new DefEntityModel(pojoManager.with(element), policy, columnPolicy);
             modelMap.put(accessorClassname, entityModel);
             tablesManager.with(element, entityModel);
         }

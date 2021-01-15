@@ -20,6 +20,7 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
     private final DeclParams params;
     private final String name;
     private String returnType;
+    private String genericDeclared;
 
     public DeclMethod(Importable importer, String name, DeclParams params) {
         super(importer);
@@ -50,8 +51,17 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
         return this;
     }
 
-    public DeclMethod override() {
-        return annotatedOf(DeclAnnotation.ofOverride(getImportable()));
+    public DeclMethod override() { return annotatedOf(DeclAnnotation.ofOverride(getImportable())); }
+
+    public DeclMethod genericOf(String generics, Object... values) {
+        this.genericDeclared = String2.format(generics, Arrays.stream(values).map(value -> {
+            if (value instanceof Class<?>) {
+                return onImported((Class<?>) value);
+            } else {
+                return onImported(value.toString());
+            }
+        }).toArray(Object[]::new));
+        return this;
     }
 
     public String getUniqueDeclaredKey() {
@@ -61,6 +71,8 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
     public String getUniqueDeclaredKey(boolean simplify) {
         return String2.format("{}({})", name, Formatter2.toParamsDeclared(getImporter(), params, simplify));
     }
+
+    public DeclMethod returnTypeof(Class<?> type) { return returnTypeof(type.getCanonicalName()); }
 
     public DeclMethod returnTypeof(String typePattern, Object... values) {
         this.returnType = onImported(Formatter2.toFormatted(typePattern, values));
@@ -83,12 +95,18 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
 
     private String getReturnType() { return String2.isBlank(returnType) ? "void" : returnType; }
 
+    public String getGenericDeclared() {
+        return String2.isBlank(genericDeclared) ? "" : String.format(" %s", genericDeclared);
+    }
+
     @Override
     public List<String> getScripts() {
         List<String> methodScripts = new ArrayList<>();
         annotations.forEach(annotation -> methodScripts.addAll(annotation.getScripts()));
         String declared = getUniqueDeclaredKey(false);
-        methodScripts.add(String2.format("{} {} {} {", getModifiersDeclared(), getReturnType(), declared));
+
+        String methodLeading = getModifiersDeclared() + getGenericDeclared();
+        methodScripts.add(String2.format("{} {} {} {", methodLeading, getReturnType(), declared));
         ScriptsProvider returning = scriptsMap.remove(null);
         scriptsMap.forEach((k, provider) -> methodScripts.addAll(padScripts(provider.getScripts())));
         if (returning != null) {
@@ -98,7 +116,7 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
         return methodScripts;
     }
 
-    private final List<String> padScripts(List<String> scripts) {
+    private List<String> padScripts(List<String> scripts) {
         List<String> result = new ArrayList<>(scripts.size());
         for (String script : scripts) {
             result.add(Formatter2.onlyColonTail("    " + script));
@@ -110,7 +128,7 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
 
         private final String[] scripts;
 
-        public Scripts(String... scripts) {
+        private Scripts(String... scripts) {
             super(null, null, null);
             this.scripts = scripts;
         }

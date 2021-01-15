@@ -2,6 +2,7 @@ package com.moon.processor.file;
 
 import com.moon.processor.manager.Importable;
 import com.moon.processor.manager.Importer;
+import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.Modifier;
@@ -80,7 +81,7 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
     private String[] toScriptsOfBlock() {
         String value = this.value;
         String declare = getDeclareField();
-        if (Formatter2.isOverLength(declare.length() + value.length())) {
+        if (Formatter2.isOverLength(declare, value)) {
             return new String[]{onlyColonTail(name + " = " + value)};
         }
         return STRINGS;
@@ -95,7 +96,7 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
         this.annotations.forEach(annotation -> scripts.addAll(annotation.getScripts()));
         String value = this.value;
         String declare = getDeclareField();
-        if (Formatter2.isOverLength(declare.length() + value.length())) {
+        if (Formatter2.isOverLength(declare, value)) {
             scripts.add(onlyColonTail(declare));
         } else {
             scripts.add(onlyColonTail(declare + " = " + value));

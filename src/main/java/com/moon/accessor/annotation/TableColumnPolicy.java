@@ -10,4 +10,9 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface TableColumnPolicy {}
+public @interface TableColumnPolicy {
+
+    String pattern() default "{}";
+
+    CasePolicy casePolicy() default CasePolicy.UNDERSCORE_LOWERCASE;
+}

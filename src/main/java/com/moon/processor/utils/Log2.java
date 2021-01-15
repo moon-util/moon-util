@@ -23,7 +23,7 @@ public enum Log2 {
     public static void initialize(ProcessingEnvironment env) { messager = env.getMessager(); }
 
     public static void warn(Object message) {
-        messager.printMessage(WARNING, String.valueOf(message));
+        messager.printMessage(WARNING, messageOf(String.valueOf(message)));
     }
 
     public static void warn(String message, Object... values) {

@@ -70,9 +70,9 @@ public class StringAddr {
     }
 
     public StringAddr addDocComment(int tabUnit, String comment, String... comments) {
-        next().tab(tabUnit).add("/** ");
+        next().tab(tabUnit).add("/**");
         if (comments == null || comments.length == 0) {
-            return next().add(comment).add(" */");
+            return add(' ').add(comment).add(" */");
         } else {
             next().tab(tabUnit).add(" * ").add(comment);
             for (String string : comments) {

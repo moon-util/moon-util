@@ -7,7 +7,6 @@ import com.moon.processor.manager.Importer;
 import com.moon.processor.utils.String2;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,6 +30,8 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
     private final Set<String> enums = new LinkedHashSet<>();
     private final Map<String, DeclField> fieldMap = new LinkedHashMap<>();
     private final Map<String, DeclMethod> methodsMap = new LinkedHashMap<>();
+    private final List<String> instanceBlocks = new ArrayList<>();
+    private final List<String> staticBlocks = new ArrayList<>();
 
     private DeclJavaFile(JavaType type, String packageName, String simpleName) {
         this.packageName = packageName;
@@ -53,7 +54,7 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
     @Override
     public String onImported(String classname) { return importer.onImported(classname); }
 
-    public DeclJavaFile annotatedOf(Function<? super Importer,? extends DeclAnnotation> consumer) {
+    public DeclJavaFile annotatedOf(Function<? super Importer, ? extends DeclAnnotation> consumer) {
         return annotatedOf(consumer.apply(importer));
     }
 
@@ -108,8 +109,22 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         return field;
     }
 
+    public DeclJavaFile addInstanceBlock(String pattern, Object... values) {
+        instanceBlocks.add(Formatter2.toFormatted(pattern, values));
+        return this;
+    }
+
+    public DeclJavaFile addStaticBlock(String pattern, Object... values) {
+        staticBlocks.add(Formatter2.toFormatted(pattern, values));
+        return this;
+    }
+
     public DeclField privateField(String name, String typePattern, Object... values) {
         return declareField(name, typePattern, values).withPrivate();
+    }
+
+    public DeclField privateEnumRef(String name, String classname, String enumValue) {
+        return privateConstField(name, classname).valueOf("{}.{}", onImported(classname), enumValue);
     }
 
     public DeclField privateConstField(String name, String typePattern, Object... values) {
@@ -145,6 +160,7 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         // enum values
         addr.add(toEnumDeclared()).newTab(2, 1);
         StringAddr.Mark fieldsMark = addr.mark();
+        StringAddr.Mark blockMark = addr.mark();
         // methods
         if (!methodsMap.isEmpty()) {
             addr.next().addBlockComment(1, "declared methods");
@@ -156,7 +172,7 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
 
         // fields
         fieldsMark.with(toFieldDeclared());
-
+        blockMark.with(toBlockDeclared());
         // getters & setters
         addr.add(toGetterSetterMethodsDeclared());
         return addr.next().add('}').toString();
@@ -179,6 +195,33 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
             }
         }
         return addr.isEmpty() ? "" : addr.toString().substring(1);
+    }
+
+    private String toBlockDeclared() {
+        StringAddr blockAddr = StringAddr.of();
+        if (!staticBlocks.isEmpty()) {
+            blockAddr.next().newTab("static {");
+            if (staticBlocks.size() == 1) {
+                blockAddr.add(' ').addScript(staticBlocks.get(0)).add(" }");
+            } else {
+                for (String block : staticBlocks) {
+                    blockAddr.newTab(1, 2).addScript(block);
+                }
+                blockAddr.newTab("}");
+            }
+        }
+        if (!instanceBlocks.isEmpty()) {
+            blockAddr.next().newTab("{");
+            if (instanceBlocks.size() == 1) {
+                blockAddr.add(' ').addScript(instanceBlocks.get(0)).add(" }");
+            } else {
+                for (String block : instanceBlocks) {
+                    blockAddr.newTab(1, 2).addScript(block);
+                }
+                blockAddr.newTab("}");
+            }
+        }
+        return blockAddr.isEmpty() ? "" : blockAddr.toString();
     }
 
     private String toFieldDeclared() {
@@ -218,7 +261,7 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
 
     private static void appendIfNotEmpty(StringAddr appender, StringAddr current) {
         if (!current.isEmpty()) {
-            appender.next(2).add(current);
+            appender.newTab(2, 1).add(current.toString().trim());
         }
     }
 
@@ -226,6 +269,7 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         StringAddr addr = StringAddr.of();
         if (!enums.isEmpty()) {
             if (type == JavaType.ENUM) {
+                addr.addDocComment(1, "declared table reference");
                 addr.newTab(String.join(",", enums)).add(';');
             } else if (type == JavaType.CLASS) {
                 addr.next();

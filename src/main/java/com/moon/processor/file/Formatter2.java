@@ -15,8 +15,22 @@ public enum Formatter2 {
     ;
     private final static Object[] OBJECTS = {};
 
-    public static String toParamsDeclared(Importable importer, Map<String, String> parameters) {
-        return toParamsDeclared(importer, parameters, false);
+    private final static int MAX = 80;
+
+    public static boolean isOver(int length, int max) { return length > max; }
+
+    public static boolean isOverLength(int length) { return isOver(length, MAX); }
+
+    public static boolean isOverLength(CharSequence... sequences) { return isOver(MAX, sequences); }
+
+    public static boolean isOver(int max, CharSequence... sequences) {
+        int sum = 0;
+        for (CharSequence sequence : sequences) {
+            if ((sum += sequence.length()) > max) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String toParamsDeclared(Importable importer, Map<String, String> parameters, final boolean simplify) {
@@ -41,8 +55,6 @@ public enum Formatter2 {
             return fulledClassname.substring(0, index);
         }
     }
-
-    public static boolean isOverLength(int length) { return length > 80; }
 
     public static String toFormatted(String pattern, Object... values) {
         values = values == null ? OBJECTS : values;

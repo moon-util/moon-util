@@ -3,6 +3,10 @@ package com.moon.processor.def;
 import com.moon.mapper.BeanMapper;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
+import com.moon.processor.file.DeclAnnotation;
+import com.moon.processor.file.DeclJavaFile;
+import com.moon.processor.file.DeclMethod;
+import com.moon.processor.file.DeclParams;
 import com.moon.processor.manager.NameManager;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Const2;
@@ -19,14 +23,20 @@ import java.util.Set;
 public class DefBeanMapper implements JavaFileWriteable {
 
     private final DeclaredPojo thisPojo, thatPojo;
-    private final String pkg, classname;
+    private final String pkg, classname, simpleClassname;
     private final DefBeanCopier forward, backward;
 
     private final Set<String> orders = new LinkedHashSet<>();
 
     { orders.add("id"); }
 
-    public DefBeanMapper(DefBeanCopier forward,DefBeanCopier backward,DeclaredPojo thisPojo, DeclaredPojo thatPojo, NameManager registry) {
+    public DefBeanMapper(
+        DefBeanCopier forward,
+        DefBeanCopier backward,
+        DeclaredPojo thisPojo,
+        DeclaredPojo thatPojo,
+        NameManager registry
+    ) {
         this.forward = forward;
         this.backward = backward;
         this.thisPojo = thisPojo;
@@ -35,6 +45,7 @@ public class DefBeanMapper implements JavaFileWriteable {
         TypeElement thisElem = thisPojo.getDeclareElement();
         TypeElement thatElem = thatPojo.getDeclareElement();
         this.classname = registry.getMapperClassname(thisElem, thatElem);
+        this.simpleClassname = Element2.getSimpleName(this.classname);
     }
 
     public DeclaredPojo getThisPojo() { return thisPojo; }
@@ -49,51 +60,51 @@ public class DefBeanMapper implements JavaFileWriteable {
 
     public String getClassname() { return classname; }
 
-    private DefJavaFiler getDefJavaFiler() {
-        DefJavaFiler filer = DefJavaFiler.classOf(getPkg(), getClassname());
-        filer.implement(getInterfaceDecl()).enumsOf(Const2.INSTANCE);
+    @Override
+    public void writeJavaFile(JavaWriter writer) {
+        getDeclJavaFile().writeJavaFile(writer);
+    }
+
+    private DeclJavaFile getDeclJavaFile() {
+        DeclJavaFile filer = DeclJavaFile.classOf(getPkg(), simpleClassname);
+        filer.implement(getInterfaceDecl()).enumNamesOf(Const2.INSTANCE).annotatedOf(DeclAnnotation::ofComponent);
 
         // copier
-        filer.privateEnumRef(getForward().getClassname(), Const2.FORWARD, Const2.INSTANCE);
-        filer.privateEnumRef(getBackward().getClassname(), Const2.BACKWARD, Const2.INSTANCE);
+        filer.privateEnumRef(Const2.FORWARD, getForward().getClassname(), Const2.INSTANCE);
+        filer.privateEnumRef(Const2.BACKWARD, getBackward().getClassname(), Const2.INSTANCE);
 
         // methods
         buildUnsafeConvertMethods(filer);
         return filer;
     }
 
-    @Override
-    public void writeJavaFile(JavaWriter writer) {
-        getDefJavaFiler().writeJavaFile(writer);
-    }
-
-    private void buildUnsafeConvertMethods(DefJavaFiler filer) {
+    private void buildUnsafeConvertMethods(DeclJavaFile file) {
         String thisName = getThisPojo().getThisClassname();
         String thatName = getThatPojo().getThisClassname();
-        DefParameters parameters = DefParameters.of("self", thisName).add("that", thatName);
+        DeclParams params = DeclParams.of("self", thisName).add("that", thatName);
 
         // forward
-        DefMethod forward = filer.publicMethod("unsafeForward", thatName, parameters).override();
-        forward.returning(Holder.name.on("{name}.unsafeCopy(self, that)", Const2.FORWARD));
+        DeclMethod forward = file.publicMethod("unsafeForward", params).returnTypeof(thatName);
+        forward.override().returning("{}.unsafeCopy(self, that)", Const2.FORWARD);
         // backward
-        DefMethod backward = filer.publicMethod("unsafeBackward", thisName, parameters).override();
-        backward.returning(Holder.name.on("{name}.unsafeCopy(that, self)", Const2.BACKWARD));
+        DeclMethod backward = file.publicMethod("unsafeBackward", params).returnTypeof(thisName);
+        backward.override().returning("{}.unsafeCopy(that, self)", Const2.BACKWARD);
 
         // doForward
-        DefMethod doForward = filer.publicMethod("doForward", thatName, parameters).override();
-        doForward.returning(Holder.name.on("{name}.copy(self, that)", Const2.FORWARD));
+        DeclMethod doForward = file.publicMethod("doForward", params).returnTypeof(thatName);
+        doForward.override().returning("{}.copy(self, that)", Const2.FORWARD);
         // doBackward
-        DefMethod doBackward = filer.publicMethod("doBackward", thisName, parameters).override();
-        doBackward.returning(Holder.name.on("{name}.copy(that, self)", Const2.BACKWARD));
+        DeclMethod doBackward = file.publicMethod("doBackward", params).returnTypeof(thisName);
+        doBackward.override().returning("{}.copy(that, self)", Const2.BACKWARD);
 
         // forward
-        DefParameters forwardParams = DefParameters.of("self", thisName);
-        DefMethod cForward = filer.publicMethod("doForward", thatName, forwardParams).override();
-        cForward.returning(Holder.name.on("{name}.convert(self)", Const2.FORWARD));
+        DeclParams forwardParams = DeclParams.of("self", thisName);
+        DeclMethod cForward = file.publicMethod("doForward", forwardParams).returnTypeof(thatName);
+        cForward.override().returning("{}.convert(self)", Const2.FORWARD);
         // backward
-        DefParameters backwardParams = DefParameters.of("that", thatName);
-        DefMethod cBackward = filer.publicMethod("doBackward", thisName, backwardParams).override();
-        cBackward.returning(Holder.name.on("{name}.convert(that)", Const2.BACKWARD));
+        DeclParams backwardParams = DeclParams.of("that", thatName);
+        DeclMethod cBackward = file.publicMethod("doBackward", backwardParams).returnTypeof(thisName);
+        cBackward.override().returning("{}.convert(that)", Const2.BACKWARD);
     }
 
     private String getInterfaceDecl() {
