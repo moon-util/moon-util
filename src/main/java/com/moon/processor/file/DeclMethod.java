@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static com.moon.processor.file.Formatter2.formatGenericDeclared;
 import static com.moon.processor.file.Formatter2.onlyColonTail;
 
 /**
@@ -64,14 +65,14 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
     public DeclMethod override() { return markedOf(DeclMarked::ofOverride); }
 
     public DeclMethod genericOf(String generics, Object... values) {
-        this.genericDeclared = String2.format(generics, Arrays.stream(values).map(value -> {
-            if (value instanceof Class<?>) {
-                return onImported((Class<?>) value);
-            } else {
-                return onImported(value.toString());
-            }
-        }).toArray(Object[]::new));
+        this.genericDeclared = formatGenericDeclared(getImportable(), generics, values);
         return this;
+    }
+
+    public String getName() { return name; }
+
+    public DeclParams getClonedParams() {
+        return this.params.clone();
     }
 
     public String getUniqueDeclaredKey() { return getUniqueDeclaredKey(true); }
@@ -120,6 +121,16 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
 
     public String getGenericDeclared() {
         return String2.isBlank(genericDeclared) ? "" : String.format("%s ", genericDeclared);
+    }
+
+    public List<String> getScriptsForInterface() {
+        List<String> methodScripts = new ArrayList<>(getCommentScripts());
+        annotations.forEach(annotation -> methodScripts.addAll(annotation.getScripts()));
+        String declared = getUniqueDeclaredKey(false);
+        String methodLeading = getGenericDeclared();
+        String methodDecl = String2.format("{} {} {};", methodLeading, getReturnType(), declared);
+        methodScripts.add(methodDecl);
+        return methodScripts;
     }
 
     @Override

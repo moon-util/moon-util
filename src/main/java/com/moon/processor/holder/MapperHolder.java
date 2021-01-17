@@ -22,7 +22,7 @@ public class MapperHolder implements JavaFileWriteable {
     private final NameHolder nameHolder;
     private final PojoHolder pojoHolder;
     private final CopierHolder copierHolder;
-    private Map<String, DefBeanMapper> definedMapperMap = new LinkedHashMap<>();
+    private final Map<String, DefBeanMapper> definedMapperMap = new LinkedHashMap<>();
 
     public MapperHolder(
         CopierHolder copierHolder, PojoHolder pojoHolder, NameHolder nameHolder

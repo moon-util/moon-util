@@ -1,6 +1,6 @@
 package com.moon.processor.holder;
 
-import com.moon.accessor.annotation.TablePolicy;
+import com.moon.accessor.annotation.TableEntityPolicy;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.def.DefEntityModel;
@@ -26,7 +26,7 @@ public class TablesHolder implements JavaFileWriteable {
     private DefTables getTables(TypeElement thisElement) {
         // 默认 Tables 将来可通过注解自定义，
         // 沿着 thisElement 父类向上追寻，返回第一个声明的 tables 名称，
-        TablePolicy policy = policyHolder.with(thisElement);
+        TableEntityPolicy policy = policyHolder.with(thisElement);
         String tablesName = policy.tables().trim();
         if (String2.isBlank(tablesName)) {
             return null;

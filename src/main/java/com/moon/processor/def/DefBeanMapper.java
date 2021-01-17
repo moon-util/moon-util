@@ -80,7 +80,7 @@ public class DefBeanMapper implements JavaFileWriteable {
     private void buildUnsafeConvertMethods(DeclJavaFile file) {
         String thisName = getThisPojo().getThisClassname();
         String thatName = getThatPojo().getThisClassname();
-        DeclParams params = DeclParams.of("self", thisName).add("that", thatName);
+        DeclParams params = DeclParams.of("self", thisName).addActual("that", thatName);
 
         // forward
         DeclMethod forward = file.publicMethod("unsafeForward", params).returnTypeof(thatName);

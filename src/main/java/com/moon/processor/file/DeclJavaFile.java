@@ -1,47 +1,31 @@
 package com.moon.processor.file;
 
 import com.moon.processor.JavaFileWriteable;
-import com.moon.processor.JavaWriter;
-import com.moon.processor.holder.ConstManager;
 import com.moon.processor.holder.Importable;
-import com.moon.processor.holder.Importer;
-import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.String2;
 
+import javax.lang.model.element.Modifier;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.moon.processor.file.Formatter2.onlyColonTail;
 
 /**
  * 这种文件暂时未考虑会有泛型的情况，但可以实现有泛型的接口和继承有泛型的父类
  *
  * @author benshaoye
  */
-public class DeclJavaFile implements Importable, JavaFileWriteable {
+public class DeclJavaFile extends DeclInterFile implements Importable, JavaFileWriteable {
 
-    private final JavaType type;
-
-    private final String packageName, simpleName;
-
-    private final List<DeclMarked> annotations = new ArrayList<>();
-    private final Set<String> interfaces = new LinkedHashSet<>();
     private String superclass;
-
-    private final Importer importer = new Importer();
-    private final ConstManager constManager = new ConstManager(importer);
+    private final JavaType type;
     private final Set<String> enums = new LinkedHashSet<>();
     private final Map<String, DeclField> fieldMap = new LinkedHashMap<>();
-    private final Map<String, DeclMethod> methodsMap = new LinkedHashMap<>();
     private final List<String> instanceBlocks = new ArrayList<>();
     private final List<String> staticBlocks = new ArrayList<>();
+    private final Map<String, DeclConstruct> constructMap = new LinkedHashMap<>();
 
     private DeclJavaFile(JavaType type, String packageName, String simpleName) {
-        this.packageName = packageName;
-        this.simpleName = simpleName;
+        super(packageName, simpleName);
         this.type = type;
-        markedOf(DeclMarked::ofGenerated);
     }
 
     public static DeclJavaFile classOf(String packageName, String simpleName) {
@@ -52,38 +36,13 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         return new DeclJavaFile(JavaType.ENUM, packageName, simpleName);
     }
 
-    @Override
-    public String onImported(Class<?> classname) { return importer.onImported(classname); }
-
-    @Override
-    public String onImported(String classname) { return importer.onImported(classname); }
-
-    public DeclJavaFile markedOf(Function<? super Importer, ? extends DeclMarked> consumer) {
-        return markedOf(consumer.apply(importer));
+    public DeclJavaFile extend(Class<?> superclass) {
+        return extend(superclass.getCanonicalName());
     }
 
-    public DeclJavaFile markedOf(DeclMarked annotation) {
-        this.annotations.add(annotation);
-        return this;
-    }
-
-    public DeclMarked markedOf(Class<?> annotationClass) {
-        DeclMarked annotation = new DeclMarked(importer, annotationClass);
-        this.annotations.add(annotation);
-        return annotation;
-    }
-
-    public ConstManager getConstManager() { return constManager; }
-
-    public String getPackageName() { return packageName; }
-
-    public String getSimpleName() { return simpleName; }
-
-    public String getCanonicalName() { return String.join(".", getPackageName(), getSimpleName()); }
-
-    public DeclJavaFile extend(String superclass) {
+    public DeclJavaFile extend(String superclass, Object... types) {
         if (type == JavaType.CLASS) {
-            this.superclass = superclass;
+            this.superclass = Formatter2.toFormatted(superclass, types);
         } else {
             String info = String2.format("枚举({})不可继承任何类: {}", getSimpleName(), superclass);
             throw new IllegalStateException(info);
@@ -91,10 +50,9 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         return this;
     }
 
+    @Override
     public DeclJavaFile implement(String... interfaces) {
-        if (interfaces != null) {
-            this.interfaces.addAll(Arrays.asList(interfaces));
-        }
+        super.implement(interfaces);
         return this;
     }
 
@@ -145,22 +103,31 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         return privateConstField(name, typePattern, values).withPublic();
     }
 
-    public DeclMethod publicMethod(String name, DeclParams params) {
-        DeclMethod method = new DeclMethod(getConstManager(), name, params);
-        methodsMap.put(method.getUniqueDeclaredKey(), method);
-        return method.withPublic();
+    public DeclConstruct publicConstruct(DeclParams params) {
+        DeclConstruct construct = new DeclConstruct(getConstManager(), Modifier.PUBLIC, getSimpleName(), params);
+        constructMap.put(construct.getUniqueDeclaredKey(), construct);
+        return construct;
     }
 
+    public Map<String, DeclConstruct> getConstructMap() { return constructMap; }
+
+    /**
+     * 类内容
+     *
+     * @return 类内容
+     *
+     * @see DeclInterFile#getClassContent()
+     */
     @Override
-    public String toString() {
+    public String getClassContent() {
         final StringAddr addr = StringAddr.of();
         addr.addPackage(getPackageName()).next(2);
         StringAddr.Mark importMark = addr.mark();
         // class declare
         addr.next(2).addDocComment(0, getCanonicalName(), getDocComments());
-        String annotations = toAnnotationDeclared();
-        if (!annotations.isEmpty()) {
-            addr.addAll(0, annotations);
+        String annotationsScript = toAnnotationDeclared();
+        if (!annotationsScript.isEmpty()) {
+            addr.addAll(0, annotationsScript);
         }
         addr.next().add(toClassDeclared()).add(" {");
         // enum values
@@ -168,14 +135,18 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         StringAddr.Mark fieldsMark = addr.mark();
         StringAddr.Mark defaultsMark = addr.mark();
         StringAddr.Mark blockMark = addr.mark();
+        // constructs
+        if (!getConstructMap().isEmpty()) {
+            getConstructMap().forEach((d, construct) -> addr.next().newTab(construct.getScripts()));
+        }
         // methods
-        if (!methodsMap.isEmpty()) {
+        if (!getMethodsMap().isEmpty()) {
             addr.next().addBlockComment(1, "declared methods");
-            methodsMap.forEach((d, method) -> addr.next().newTab(method.getScripts()));
+            getMethodsMap().forEach((d, method) -> addr.next().newTab(method.getScripts()));
         }
 
         // imports
-        importMark.with(importer.toString("\n"));
+        importMark.with(getImporter().toString("\n"));
 
         defaultsMark.with(toDefaultFields());
 
@@ -251,6 +222,8 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
                 instanceBlock.addAll(Arrays.asList(declField.getInstanceBlock()));
                 selectedAddr.next();
             }
+            staticBlock.sort(Comparator.comparingInt(String::length));
+            instanceBlock.sort(Comparator.comparingInt(String::length));
             appendIfNotEmpty(constAddr, staticAddr);
             appendBlock(constAddr, staticBlock, "static ");
             appendIfNotEmpty(constAddr, finalAddr);
@@ -259,18 +232,6 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
             return constAddr.toString().trim();
         }
         return "";
-    }
-
-    private String toDefaultFields() {
-        List<String> list = constManager.getScripts();
-        if (list.isEmpty()) {
-            return "";
-        }
-        StringAddr addr = StringAddr.of();
-        for (String script : list) {
-            addr.newTab(onlyColonTail(script));
-        }
-        return addr.toString();
     }
 
     private static void appendBlock(StringAddr appender, List<String> blocks, String starting) {
@@ -312,30 +273,16 @@ public class DeclJavaFile implements Importable, JavaFileWriteable {
         StringBuilder declare = new StringBuilder();
         declare.append("public ").append(type.name().toLowerCase());
         declare.append(" ").append(getSimpleName());
+        if (String2.isNotBlank(getGenericDeclared())) {
+            declare.append(getGenericDeclared().trim());
+        }
         if (superclass != null) {
             declare.append(" extends ").append(onImported(superclass));
         }
-        if (!interfaces.isEmpty()) {
-            String impl = interfaces.stream().map(this::onImported).collect(Collectors.joining(", "));
+        if (!getInterfaces().isEmpty()) {
+            String impl = getInterfaces().stream().map(this::onImported).collect(Collectors.joining(", "));
             declare.append(" implements ").append(impl);
         }
         return declare.toString();
-    }
-
-    private String toAnnotationDeclared() {
-        List<String> annotations = new ArrayList<>();
-        for (DeclMarked annotation : this.annotations) {
-            annotations.addAll(annotation.getScripts());
-        }
-        return String.join("\n", annotations);
-    }
-
-    private String[] getDocComments() {
-        return new String[]{"", "@author " + getClass().getCanonicalName()};
-    }
-
-    @Override
-    public void writeJavaFile(JavaWriter filer) {
-        filer.write(getCanonicalName(), writer -> writer.write(toString()));
     }
 }

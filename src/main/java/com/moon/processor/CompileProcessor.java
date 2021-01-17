@@ -2,8 +2,9 @@ package com.moon.processor;
 
 import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
+import com.moon.accessor.annotation.SubQuery;
+import com.moon.accessor.annotation.TableEntity;
 import com.moon.mapper.annotation.MapperFor;
-import com.moon.processor.holder.TablesHolder;
 import com.moon.processor.holder.*;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Log2;
@@ -42,9 +43,11 @@ public class CompileProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         String mapper = MapperFor.class.getCanonicalName();
         String accessor = Accessor.class.getCanonicalName();
+        String query = SubQuery.class.getCanonicalName();
         Set<String> supportedTypes = new HashSet<>();
         supportedTypes.add(accessor);
         supportedTypes.add(mapper);
+        supportedTypes.add(query);
         return supportedTypes;
     }
 
@@ -53,28 +56,50 @@ public class CompileProcessor extends AbstractProcessor {
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
         NameHolder nameHolder = new NameHolder();
-        PojoHolder pojoHolder = new PojoHolder(nameHolder);
+        SessionManager sessionManager = new SessionManager();
+        PojoHolder pojoHolder = new PojoHolder(nameHolder, sessionManager);
         PolicyHolder policyHolder = new PolicyHolder();
+        AliasesHolder aliasesHolder = new AliasesHolder();
         TablesHolder tablesHolder = new TablesHolder(policyHolder);
-        ModelHolder modelHolder = new ModelHolder(pojoHolder, tablesHolder, policyHolder);
+        ModelHolder modelHolder = new ModelHolder(pojoHolder, tablesHolder, aliasesHolder, policyHolder);
         CopierHolder copierHolder = new CopierHolder(pojoHolder, nameHolder);
         MapperHolder mapperHolder = new MapperHolder(copierHolder, pojoHolder, nameHolder);
 
         AccessorHolder accessorHolder = new AccessorHolder(copierHolder, pojoHolder, modelHolder, nameHolder);
         processMapperFor(roundEnv, mapperHolder);
+        processTableModel(roundEnv, modelHolder);
         processAccessor(roundEnv, accessorHolder);
         processMapper();
+        processSubQuery(roundEnv);
         JavaWriter writer = new JavaWriter(Environment2.getFiler());
         pojoHolder.writeJavaFile(writer);
         copierHolder.writeJavaFile(writer);
         mapperHolder.writeJavaFile(writer);
         modelHolder.writeJavaFile(writer);
         tablesHolder.writeJavaFile(writer);
+        aliasesHolder.writeJavaFile(writer);
+        sessionManager.writeJavaFile(writer);
         accessorHolder.writeJavaFile(writer);
         return true;
     }
 
+    private void processSubQuery(RoundEnvironment roundEnv) {
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(SubQuery.class);
+        for (Element element : elements) {
+            Log2.warn(">> ======== --->>");
+            Log2.warn("Elem: {}", element);
+            Log2.warn("Type: {}", element.asType());
+        }
+    }
+
     private void processMapper() {}
+
+    private void processTableModel(RoundEnvironment roundEnv, ModelHolder modelHolder) {
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(TableEntity.class);
+        for (Element element : elements) {
+            modelHolder.with((TypeElement) element);
+        }
+    }
 
     private void processAccessor(RoundEnvironment roundEnv, AccessorHolder accessorHolder) {
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Accessor.class);

@@ -4,6 +4,7 @@ import java.beans.Introspector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.IntPredicate;
 
 /**
  * @author benshaoye
@@ -87,6 +88,19 @@ public enum String2 {
 
     public static boolean isNotEmpty(String str) { return !isEmpty(str); }
 
+    public static boolean isAny(String str, IntPredicate tester) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        for (int i = 0; i < length; i++) {
+            if (tester.test(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String replaceAll(String input, String search, String replacement) {
         if (isEmpty(input) || isEmpty(search) || replacement == null) {
             return input;
@@ -110,6 +124,19 @@ public enum String2 {
         }
         sb.append(input, idx, input.length());
         return sb.toString();
+    }
+
+    public static int countOf(String str, char ch) {
+        if (str == null || str.length() == 0) {
+            return 0;
+        }
+        int length = str.length(), count = 0;
+        for (int i = 0; i < length; i++) {
+            if (str.charAt(i) == ch) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private final static HolderGroup GROUP = Holder.of(Holder.type, Holder.name, Holder.field);
@@ -191,6 +218,29 @@ public enum String2 {
         return res.toString();
     }
 
+    public static List<String> split(CharSequence str, char separator) {
+        List<String> result = new ArrayList<>();
+        int length = str == null ? 0 : str.length();
+        if (length == 0) {
+            return result;
+        } else {
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; i < length; ++i) {
+                char ch;
+                if ((ch = str.charAt(i)) == separator) {
+                    result.add(builder.toString());
+                    builder.setLength(0);
+                } else {
+                    builder.append(ch);
+                }
+            }
+
+            result.add(builder.toString());
+            return result;
+        }
+    }
+
     public static String dotClass(Class<?> cls) { return dotClass(cls.getCanonicalName()); }
 
     public static String dotClass(String classname) { return classname + ".class"; }
@@ -217,6 +267,8 @@ public enum String2 {
                 return type;
         }
     }
+
+    public static String strWrapped(String value) { return '"' + value + '"'; }
 
     public static String onInlineDocCommentOf(String comment) {
         return format("/** {} */", comment);

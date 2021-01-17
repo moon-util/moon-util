@@ -15,9 +15,9 @@ public class DeclComment implements ScriptsProvider {
     private final static String PREFIX = "   ";
 
     private final CommentType type;
-    private final String[] comments;
+    private final List<String> comments;
 
-    public DeclComment(CommentType type, String... comments) {
+    public DeclComment(CommentType type, List<String> comments) {
         this.type = type;
         this.comments = comments;
     }
@@ -25,7 +25,7 @@ public class DeclComment implements ScriptsProvider {
 
     @Override
     public List<String> getScripts() {
-        List<String> comments = Arrays.stream(this.comments).map(it -> PREFIX + it).collect(toList());
+        List<String> comments = this.comments.stream().map(it -> PREFIX + it).collect(toList());
         comments.add(0, "    /*");
         comments.add(" */");
         comments.add("");

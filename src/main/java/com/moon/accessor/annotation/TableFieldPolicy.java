@@ -10,17 +10,17 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface TableColumnPolicy {
+public @interface TableFieldPolicy {
 
     /**
-     * 参考: {@link TablePolicy#pattern()}文档
+     * 参考: {@link TableEntityPolicy#pattern()}文档
      *
      * @return 表名格式
      */
     String pattern() default "{}";
 
     /**
-     * 参考: {@link TablePolicy#casePolicy()}文档
+     * 参考: {@link TableEntityPolicy#casePolicy()}文档
      *
      * @return 命名策略
      */

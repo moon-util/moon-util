@@ -106,7 +106,7 @@ public class DefBeanCopier implements JavaFileWriteable {
         String thatName = getThatPojo().getThisClassname();
 
         // unsafeCopy
-        DeclParams params = DeclParams.of("self", thisName).add("that", thatName);
+        DeclParams params = DeclParams.of("self", thisName).addActual("that", thatName);
         DeclMethod unsafeCopy = file.publicMethod("unsafeCopy", params).override();
         unsafeCopy2(unsafeCopy).returnTypeof(thatName).returning("that");
     }

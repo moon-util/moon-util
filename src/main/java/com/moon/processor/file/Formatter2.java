@@ -4,9 +4,8 @@ import com.moon.processor.holder.Importable;
 import com.moon.processor.utils.String2;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author benshaoye
@@ -33,16 +32,34 @@ public enum Formatter2 {
         return false;
     }
 
-    public static String toParamsDeclared(Importable importer, Map<String, String> parameters, final boolean simplify) {
-        parameters = parameters == null ? Collections.emptyMap() : parameters;
+    public static String toParamsDeclared(Importable importer, DeclParams parameters, final boolean simplify) {
+        if (parameters == null || parameters.isEmpty()) {
+            return "";
+        }
         List<String> list = new ArrayList<>(parameters.size());
         parameters.forEach((name, type) -> {
-            String imported = importer.onImported(type);
-            if (simplify) {
-                list.add(String2.format("{}", trimToSimplify(imported)));
+            if (type.isGeneric()) {
+                // 如果是泛型
+                if (simplify) {
+                    // 返回方法声明上限
+                    list.add(importer.onImported(type.getBound()));
+                } else {
+                    // 返回实际声明
+                    list.add(String2.format("{} {}", type.getType(), name));
+                }
             } else {
-                list.add(String2.format("{} {}", imported, name));
+                // 不是泛型
+                // java.util.List<java.lang.String> == List<String>
+                String imported = importer.onImported(type.getType());
+                if (simplify) {
+                    // 简化: List<String> == List
+                    list.add(String2.format("{}", trimToSimplify(imported)));
+                } else {
+                    // 返回实际声明
+                    list.add(String2.format("{} {}", imported, name));
+                }
             }
+
         });
         return String.join(", ", list);
     }
@@ -56,6 +73,16 @@ public enum Formatter2 {
         }
     }
 
+    public static String formatGenericDeclared(Importable importer, String generics, Object... values) {
+        return String2.format(generics, Arrays.stream(values).map(value -> {
+            if (value instanceof Class<?>) {
+                return importer.onImported((Class<?>) value);
+            } else {
+                return importer.onImported(value.toString());
+            }
+        }).toArray(Object[]::new));
+    }
+
     public static String toFormatted(String pattern, Object... values) {
         values = values == null ? OBJECTS : values;
         Object[] mapped = new String[values.length];
@@ -67,9 +94,6 @@ public enum Formatter2 {
                 mapped[i] = "";
             } else {
                 String stringify = type.toString();
-                /**
-                 * 两个方法的区别在这里{@link #toTypedFormatted(Importable, String, Object...)}
-                 */
                 mapped[i] = String2.isBlank(stringify) ? "" : stringify;
             }
         }

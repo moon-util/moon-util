@@ -1,0 +1,142 @@
+package com.moon.processor.holder;
+
+import com.moon.accessor.dml.InsertInto;
+import com.moon.accessor.meta.Table;
+import com.moon.processor.file.DeclInterFile;
+import com.moon.processor.file.DeclMethod;
+import com.moon.processor.file.DeclParams;
+import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.String2;
+
+/**
+ * @author benshaoye
+ */
+enum Select2 {
+
+    ;
+    private static final String INSERT_INTO_PKG;
+    private static final String INSERT_INTO;
+
+    static {
+        INSERT_INTO = String2.format("{}<R, TB>", InsertInto.class.getCanonicalName());
+        INSERT_INTO_PKG = Element2.getPackageName(InsertInto.class);
+    }
+
+    static DeclInterFile getForSelectCols(String joined, int i, String genericUsingPlaced, DeclInterFile from) {
+        String selectName = String2.format("SelectCol{}", i);
+        DeclInterFile selectCols = DeclInterFile.interfaceOf(INSERT_INTO_PKG, selectName);
+        selectCols.genericOf(String2.format("<{}>", joined));
+        String implemented = String2.format(genericUsingPlaced, from.getCanonicalName());
+
+        // from
+        DeclParams params = DeclParams.of().addGeneralization("table", "TB", Table.class);
+        DeclMethod fromMethod = selectCols.publicMethod("from", params);
+        fromMethod.genericOf("<R, TB extends {}<R, TB>>", Table.class);
+        fromMethod.returnTypeof(implemented);
+
+        return selectCols;
+    }
+
+    static DeclInterFile getForFrom(
+        String genericDeclPlaced, int i, String genericUsingPlaced, DeclInterFile where
+    ) {
+        DeclInterFile from = interfaceForN("SelectCol{}From", genericDeclPlaced, i);
+        String implemented = String2.format(genericUsingPlaced, where.getCanonicalName());
+
+        // orderBy
+        DeclParams params = DeclParams.of();
+        from.publicMethod("where", params).returnTypeof(implemented);
+
+        from.implement(implemented);
+        return from;
+    }
+
+    static DeclInterFile getForWhere(
+        String genericDeclPlaced, int i, String genericUsingPlaced, DeclInterFile groupBy
+    ) {
+        DeclInterFile where = interfaceForN("SelectCol{}Where", genericDeclPlaced, i);
+        String implemented = String2.format(genericUsingPlaced, groupBy.getCanonicalName());
+
+        // orderBy
+        DeclParams params = DeclParams.of();
+        where.publicMethod("groupBy", params).returnTypeof(implemented);
+
+        where.implement(implemented);
+        return where;
+    }
+
+    static DeclInterFile getForGroupBy(
+        String genericDeclPlaced, int i, String genericUsingPlaced, DeclInterFile orderBy, DeclInterFile having
+    ) {
+        DeclInterFile groupBy = interfaceForN("SelectCol{}GroupBy", genericDeclPlaced, i);
+        String implemented = String2.format(genericUsingPlaced, orderBy.getCanonicalName());
+        String havingImpl = String2.format(genericUsingPlaced, having.getCanonicalName());
+
+        // orderBy
+        DeclParams params = DeclParams.of();
+        groupBy.publicMethod("orderBy", params).returnTypeof(implemented);
+
+        // having
+        groupBy.publicMethod("having", params).returnTypeof(havingImpl);
+
+        groupBy.implement(implemented);
+        return groupBy;
+    }
+
+    static DeclInterFile getForHaving(
+        String genericDeclPlaced, int i, String genericUsingPlaced, DeclInterFile orderBy
+    ) {
+        DeclInterFile having = interfaceForN("SelectCol{}OrderBy", genericDeclPlaced, i);
+        String implemented = String2.format(genericUsingPlaced, orderBy.getCanonicalName());
+
+        // orderBy
+        DeclParams params = DeclParams.of();
+        having.publicMethod("orderBy", params).returnTypeof(implemented);
+
+        having.implement(implemented);
+        return having;
+    }
+
+    static DeclInterFile getForOrderBy(
+        String genericDeclPlaced, int i, String genericUsingPlaced, DeclInterFile limit
+    ) {
+        DeclInterFile orderBy = interfaceForN("SelectCol{}OrderBy", genericDeclPlaced, i);
+        String implemented = String2.format(genericUsingPlaced, limit.getCanonicalName());
+
+        // limit 1
+        DeclParams one = DeclParams.of("count", "int");
+        orderBy.publicMethod("limit", one).returnTypeof(implemented);
+
+        // limit 2
+        DeclParams two = DeclParams.of("offset", "int").addActual("count", "int");
+        orderBy.publicMethod("limit", two).returnTypeof(implemented);
+
+        orderBy.implement(implemented);
+        return orderBy;
+    }
+
+    static DeclInterFile getForLimit(String genericDeclPlaced, int i, String genericUsingPlaced) {
+        return interfaceForN("SelectCol{}Limit", genericDeclPlaced, i);
+    }
+
+    static DeclInterFile getForInsert(
+        String genericDeclPlaced, int i, String genericUsingPlaced, DeclParams thisInterValuesArgs
+    ) {
+        String simpleName = "InsertIntoCol" + i;
+        DeclInterFile inter = interfaceForN("InsertIntoCol{}", genericDeclPlaced, i);
+        inter.implement(INSERT_INTO);
+
+        // values
+        DeclMethod values = inter.publicMethod("values", thisInterValuesArgs);
+        values.returnTypeof(genericUsingPlaced, simpleName);
+
+        // select
+        return inter;
+    }
+
+    private static DeclInterFile interfaceForN(String interNamePattern, String genericDeclPlaced, int i) {
+        String simpleName = String2.format(interNamePattern, i);
+        DeclInterFile inter = DeclInterFile.interfaceOf(INSERT_INTO_PKG, simpleName);
+        return inter.genericOf(genericDeclPlaced, Table.class);
+    }
+}

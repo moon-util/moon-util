@@ -3,6 +3,7 @@ package com.moon.processor.def;
 import com.moon.accessor.meta.Table;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
+import com.moon.processor.file.DeclField;
 import com.moon.processor.file.DeclJavaFile;
 import com.moon.processor.file.DeclMethod;
 import com.moon.processor.file.DeclParams;
@@ -37,8 +38,8 @@ public class DefTables implements JavaFileWriteable {
             String tableType = entityModel.getClassname();
             String tableField = entityModel.getTableField();
 
-            javaFile.publicConstField(tableName, tableType)
-                .valueOf("{}.{}", javaFile.onImported(tableType), tableField);
+            DeclField field = javaFile.publicConstField(tableName, tableType);
+            field.valueOf("{}.{}", javaFile.onImported(tableType), tableField);
         });
         // impl method of: getTables
         String tables = String.join(", ", modelSet.keySet());

@@ -49,13 +49,10 @@ abstract class DeclModifier<T extends DeclModifier<T>> implements ImporterAware 
     /**
      * 目前是给表字段列举专用，也没考虑其他情况
      *
-     * @param comments
-     *
-     * @return
+     * @param comments 注释
      */
-    public final T commentOf(String... comments) {
+    public final void commentOf(List<String> comments) {
         this.comment = new DeclComment(CommentType.BLOCK, comments);
-        return returning();
     }
 
     public final DeclComment getComment() { return comment; }

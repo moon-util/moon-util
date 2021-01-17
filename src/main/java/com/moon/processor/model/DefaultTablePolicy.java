@@ -1,14 +1,12 @@
 package com.moon.processor.model;
 
 import com.moon.accessor.annotation.CasePolicy;
-import com.moon.accessor.annotation.TablePolicy;
-
-import java.lang.annotation.Annotation;
+import com.moon.accessor.annotation.TableEntityPolicy;
 
 /**
  * @author benshaoye
  */
-public enum DefaultTablePolicy implements TablePolicy {
+public enum DefaultTablePolicy implements TableEntityPolicy {
     /** default instance */
     INSTANCE;
 
@@ -30,5 +28,5 @@ public enum DefaultTablePolicy implements TablePolicy {
     public CasePolicy casePolicy() { return CasePolicy.UNDERSCORE_LOWERCASE; }
 
     @Override
-    public Class<TablePolicy> annotationType() { return TablePolicy.class; }
+    public Class<TableEntityPolicy> annotationType() { return TableEntityPolicy.class; }
 }

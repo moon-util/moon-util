@@ -14,6 +14,10 @@ public enum Element2 {
 
     public static <T> T cast(Object obj) { return (T) obj; }
 
+    public static String getPackageName(Class<?> classDeclared) {
+        return classDeclared.getPackage().getName();
+    }
+
     public static String getPackageName(Element elem) {
         return getQualifiedName(Environment2.getUtils().getPackageOf(elem));
     }

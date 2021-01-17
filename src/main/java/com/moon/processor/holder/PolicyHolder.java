@@ -1,8 +1,10 @@
 package com.moon.processor.holder;
 
-import com.moon.accessor.annotation.TableColumnPolicy;
-import com.moon.accessor.annotation.TablePolicy;
+import com.moon.accessor.annotation.TableFieldPolicy;
+import com.moon.accessor.annotation.TableEntity;
+import com.moon.accessor.annotation.TableEntityPolicy;
 import com.moon.processor.model.DefaultTableColumnPolicy;
+import com.moon.processor.model.DefaultTableModel;
 import com.moon.processor.model.DefaultTablePolicy;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
@@ -20,11 +22,10 @@ import java.util.Map;
  */
 public class PolicyHolder {
 
-    private final Map<String, TablePolicy> policyMap = new HashMap<>();
-    private final Map<String, TableColumnPolicy> columnPolicyMap = new HashMap<>();
+    private final Map<String, TableEntityPolicy> policyMap = new HashMap<>();
+    private final Map<String, TableFieldPolicy> columnPolicyMap = new HashMap<>();
 
-    public PolicyHolder() {
-    }
+    public PolicyHolder() { }
 
     private static <A extends Annotation, D extends A, M extends Map<String, A>> A find(
         TypeElement element, M map, Class<A> annotationClass, D defaultVal
@@ -55,11 +56,16 @@ public class PolicyHolder {
         return policy;
     }
 
-    public TableColumnPolicy withColumnPolicy(TypeElement element) {
-        return find(element, columnPolicyMap, TableColumnPolicy.class, DefaultTableColumnPolicy.INSTANCE);
+    public TableEntity withTableModel(TypeElement element) {
+        TableEntity model = element.getAnnotation(TableEntity.class);
+        return model == null ? DefaultTableModel.INSTANCE : model;
     }
 
-    public TablePolicy with(TypeElement element) {
-        return find(element, policyMap, TablePolicy.class, DefaultTablePolicy.INSTANCE);
+    public TableFieldPolicy withColumnPolicy(TypeElement element) {
+        return find(element, columnPolicyMap, TableFieldPolicy.class, DefaultTableColumnPolicy.INSTANCE);
+    }
+
+    public TableEntityPolicy with(TypeElement element) {
+        return find(element, policyMap, TableEntityPolicy.class, DefaultTablePolicy.INSTANCE);
     }
 }

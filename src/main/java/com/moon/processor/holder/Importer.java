@@ -2,6 +2,7 @@ package com.moon.processor.holder;
 
 import com.moon.core.lang.StringUtil;
 import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.TypeElement;
@@ -9,11 +10,14 @@ import javax.lang.model.type.TypeMirror;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author benshaoye
  */
 public class Importer implements Importable {
+
+    private final static Map<String, String> GENERICS_MAP = new HashMap<>();
 
     private final static String EMPTY = "";
 
@@ -96,7 +100,16 @@ public class Importer implements Importable {
             shortNameCached.put(classname, classname);
             return classname;
         } else {
-            if (!(classname.startsWith("java.lang.") && classname.split("\\.").length == 3)) {
+            if (classname.indexOf('.') < 0) {
+                if (GENERICS_MAP.containsKey(classname)) {
+                    return shortName;
+                }
+                if (Environment2.getUtils().getTypeElement(classname) == null) {
+                    GENERICS_MAP.put(classname, shortName);
+                    return shortName;
+                }
+                importCached.put(shortName, "import " + classname + ";");
+            } else if (!(classname.startsWith("java.lang.") && classname.split("\\.").length == 3)) {
                 importCached.put(shortName, "import " + classname + ";");
             }
             shortNameCached.put(classname, shortName);
@@ -107,5 +120,7 @@ public class Importer implements Importable {
     @Override
     public String toString() { return toString(EMPTY); }
 
-    public String toString(String delimiter) { return String.join(delimiter, importCached.values()); }
+    public String toString(String delimiter) {
+        return String.join(delimiter, new TreeSet<>(importCached.values()));
+    }
 }

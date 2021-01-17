@@ -8,5 +8,6 @@ public enum JavaType {
      * 类型
      */
     ENUM,
-    CLASS
+    CLASS,
+    INTERFACE,
 }

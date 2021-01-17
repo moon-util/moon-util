@@ -12,14 +12,14 @@ public interface Table<R, TB extends Table<R, TB>> {
      *
      * @return 实体 java 类型
      */
-    Class<R> getEntityType();
+    Class<R> getEntityClass();
 
     /**
      * 返回实体数据量格式化类名
      *
      * @return 实体完整类名
      */
-    default String getEntityClassname() { return getEntityType().getCanonicalName(); }
+    default String getEntityClassname() { return getEntityClass().getCanonicalName(); }
 
     /**
      * 返回数据库表名

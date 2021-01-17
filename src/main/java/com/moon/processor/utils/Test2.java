@@ -59,12 +59,41 @@ public enum Test2 {
         return true;
     }
 
-    public static boolean isVar(String str) {
+    /**
+     * 是否是正确的变量名
+     *
+     * @param str
+     *
+     * @return
+     */
+    public static boolean isVarStarting(String str) {
         if (String2.isEmpty(str)) {
             return false;
         }
         char value = str.trim().charAt(0);
         return Character.isLetter(value) || value == '_' || value == '$';
+    }
+
+    public static boolean isVar(String str) {
+        if (!isVarStarting(str)) {
+            return false;
+        }
+        for (int i = 1, ch; i < str.length(); i++) {
+            if ((ch = str.charAt(i)) > 47 && ch < 58) {
+                continue;
+            }
+            if (ch > 64 && ch < 91) {
+                continue;
+            }
+            if (ch > 96 && ch < 123) {
+                continue;
+            }
+            if (ch > '_' || ch < '$') {
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 
     public static boolean isAny(Element elem, Modifier modifier, Modifier... modifiers) {
@@ -212,8 +241,7 @@ public enum Test2 {
         return elem1 != null && elem2 != null && getTypes().isSubtype(elem1.asType(), elem2.asType());
     }
 
-    final static Args<Collection<String>, Class<?>> WITHER = (c, cs) -> Arrays.stream(cs)
-        .map(Class::getCanonicalName)
+    final static Args<Collection<String>, Class<?>> WITHER = (c, cs) -> Arrays.stream(cs).map(Class::getCanonicalName)
         .forEach(c::add);
     private final static Set<String> PRIMITIVE_NUMS = new HashSet<>();
     private final static Set<String> BASIC_TYPES = new HashSet<>();
