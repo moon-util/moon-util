@@ -8,7 +8,7 @@ import com.moon.accessor.meta.TableField;
  */
 public interface InsertIntoCol1<T1, R, TB extends Table<R, TB>> extends InsertInto<R, TB> {
 
-    InsertIntoCol1<T1, R, TB> values(T1 v1);
+    InsertIntoVal1<T1, R, TB> values(T1 v1);
 
     SelectCol1<T1> select(TableField<T1, ?, ? extends Table<?, ?>> f1);
 }

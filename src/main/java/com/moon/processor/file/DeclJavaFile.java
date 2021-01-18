@@ -121,14 +121,7 @@ public class DeclJavaFile extends DeclInterFile implements Importable, JavaFileW
     @Override
     public String getClassContent() {
         final StringAddr addr = StringAddr.of();
-        addr.addPackage(getPackageName()).next(2);
-        StringAddr.Mark importMark = addr.mark();
-        // class declare
-        addr.next(2).addDocComment(0, getCanonicalName(), getDocComments());
-        String annotationsScript = toAnnotationDeclared();
-        if (!annotationsScript.isEmpty()) {
-            addr.addAll(0, annotationsScript);
-        }
+        StringAddr.Mark importMark = predefineAntGetImportMark(addr);
         addr.next().add(toClassDeclared()).add(" {");
         // enum values
         addr.add(toEnumDeclared()).newTab(2, 1);

@@ -21,13 +21,13 @@ public class DefTables implements JavaFileWriteable {
 
     private final String name;
 
-    private final Map<String, DefEntityModel> modelSet = new LinkedHashMap<>();
+    private final Map<String, DefTableModel> modelSet = new LinkedHashMap<>();
 
     public DefTables(String name) { this.name = name; }
 
-    public void with(DefEntityModel entityModel) {
-        String tableName = entityModel.getTableName();
-        modelSet.put(tableName, entityModel);
+    public void with(DefTableModel model) {
+        String tableName = model.getTableName();
+        modelSet.put(tableName, model);
     }
 
     private DeclJavaFile getDefJavaFiler() {
@@ -35,8 +35,8 @@ public class DefTables implements JavaFileWriteable {
 
         modelSet.forEach((name, entityModel) -> {
             String tableName = entityModel.getTableName();
-            String tableType = entityModel.getClassname();
-            String tableField = entityModel.getTableField();
+            String tableType = entityModel.getCanonicalName();
+            String tableField = entityModel.getTableEnumFieldVal();
 
             DeclField field = javaFile.publicConstField(tableName, tableType);
             field.valueOf("{}.{}", javaFile.onImported(tableType), tableField);

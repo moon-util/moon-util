@@ -28,8 +28,9 @@ public enum Imported {
     public final static boolean QUALIFIER;
     public final static boolean GENERATED;
     public final static boolean JODA_TIME;
-    public final static boolean REPOSITORY;
     public final static boolean COMPONENT;
+    public final static boolean REPOSITORY;
+    public final static boolean SAFEVARARGS;
     public final static boolean CONFIGURATION;
     public final static boolean CONDITIONAL_ON_MISSING_BEAN;
 
@@ -44,6 +45,7 @@ public enum Imported {
         QUALIFIER = isNoException(() -> Qualifier.class.toString());
         COMPONENT = isNoException(() -> Component.class.toString());
         REPOSITORY = isNoException(() -> Repository.class.toString());
+        SAFEVARARGS = isNoException(() -> SafeVarargs.class.toString());
     }
 
     private static boolean isNoException(Supplier<String> runner) {

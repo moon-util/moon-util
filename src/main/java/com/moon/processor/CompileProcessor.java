@@ -2,8 +2,7 @@ package com.moon.processor;
 
 import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
-import com.moon.accessor.annotation.SubQuery;
-import com.moon.accessor.annotation.TableEntity;
+import com.moon.accessor.annotation.TableModel;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processor.holder.*;
 import com.moon.processor.utils.Environment2;
@@ -43,11 +42,9 @@ public class CompileProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         String mapper = MapperFor.class.getCanonicalName();
         String accessor = Accessor.class.getCanonicalName();
-        String query = SubQuery.class.getCanonicalName();
         Set<String> supportedTypes = new HashSet<>();
         supportedTypes.add(accessor);
         supportedTypes.add(mapper);
-        supportedTypes.add(query);
         return supportedTypes;
     }
 
@@ -84,18 +81,12 @@ public class CompileProcessor extends AbstractProcessor {
     }
 
     private void processSubQuery(RoundEnvironment roundEnv) {
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(SubQuery.class);
-        for (Element element : elements) {
-            Log2.warn(">> ======== --->>");
-            Log2.warn("Elem: {}", element);
-            Log2.warn("Type: {}", element.asType());
-        }
     }
 
     private void processMapper() {}
 
     private void processTableModel(RoundEnvironment roundEnv, ModelHolder modelHolder) {
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(TableEntity.class);
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(TableModel.class);
         for (Element element : elements) {
             modelHolder.with((TypeElement) element);
         }

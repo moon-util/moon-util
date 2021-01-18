@@ -100,6 +100,17 @@ public class DeclInterFile implements Importable, JavaFileWriteable {
         return this;
     }
 
+    protected StringAddr.Mark predefineAntGetImportMark(StringAddr addr) {
+        addr.addPackage(getPackageName()).next(2);
+        StringAddr.Mark importMark = addr.mark();
+        addr.next(2).addDocComment(0, getCanonicalName(), getDocComments());
+        String annotationsScript = toAnnotationDeclared();
+        if (!annotationsScript.isEmpty()) {
+            addr.addAll(0, annotationsScript);
+        }
+        return importMark;
+    }
+
     /**
      * 类内容
      *
@@ -109,13 +120,7 @@ public class DeclInterFile implements Importable, JavaFileWriteable {
      */
     public String getClassContent() {
         final StringAddr addr = StringAddr.of();
-        addr.addPackage(getPackageName()).next(2);
-        StringAddr.Mark importMark = addr.mark();
-        addr.next(2).addDocComment(0, getCanonicalName(), getDocComments());
-        String annotationsScript = toAnnotationDeclared();
-        if (!annotationsScript.isEmpty()) {
-            addr.addAll(0, annotationsScript);
-        }
+        StringAddr.Mark importMark = predefineAntGetImportMark(addr);
         addr.next().add(toInterDeclared()).add(" {");
 
         // methods

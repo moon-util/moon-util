@@ -10,13 +10,6 @@ import java.util.Collection;
 public interface InsertInto<R, TB extends Table<R, TB>> {
 
     /**
-     * 执行并完成 insert 数据
-     *
-     * @return 受影响数据数目
-     */
-    int done();
-
-    /**
      * 按实体数据插入
      *
      * @param record 实体数据

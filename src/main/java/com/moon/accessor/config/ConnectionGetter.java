@@ -15,6 +15,8 @@ public interface ConnectionGetter {
      * @param dataSource 数据源
      *
      * @return 数据库连接
+     *
+     * @throws SQLException 数据库连接或执行错误
      */
-    void getConnection(DataSource dataSource) throws SQLException;
+    Connection getConnection(DataSource dataSource) throws SQLException;
 }

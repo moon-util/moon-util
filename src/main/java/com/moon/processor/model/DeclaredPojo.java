@@ -2,7 +2,6 @@ package com.moon.processor.model;
 
 import com.moon.processor.file.DeclField;
 import com.moon.processor.file.DeclJavaFile;
-import com.moon.processor.file.DeclMarked;
 import com.moon.processor.file.DeclMethod;
 import com.moon.processor.holder.NameHolder;
 import com.moon.processor.mapping.MappingMerged;

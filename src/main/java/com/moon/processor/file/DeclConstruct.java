@@ -36,12 +36,6 @@ public class DeclConstruct implements ScriptsProvider {
         return markedOf(consumer.apply(getImporter()));
     }
 
-    public DeclMarked markedOf(Class<?> annotationClass) {
-        DeclMarked annotation = new DeclMarked(getImporter(), annotationClass);
-        this.annotations.add(annotation);
-        return annotation;
-    }
-
     public DeclConstruct markedOf(DeclMarked annotation) {
         this.annotations.add(annotation);
         return this;

@@ -50,6 +50,10 @@ public class DeclMarked implements ImporterAware, ScriptsProvider {
         return EMPTY;
     }
 
+    public static DeclMarked ofSafeVarargs(Importable importable) {
+        return SAFEVARARGS ? new DeclMarked(importable, SafeVarargs.class) : EMPTY;
+    }
+
     public static DeclMarked ofComponent(Importable importable) {
         return COMPONENT ? new DeclMarked(importable, Component.class) : EMPTY;
     }

@@ -46,18 +46,6 @@ public class InsertIntoValues<T1, T2, T3, T4, R, TB extends Table<R, TB>>
     }
 
     @Override
-    public InsertIntoColImpl<T1, T2, T3, T4, R, TB> values(T1 v1, T2 v2, T3 v3) {
-        valuesOf(this.values, v1, v2, v3);
-        return this;
-    }
-
-    @Override
-    public InsertIntoColImpl<T1, T2, T3, T4, R, TB> values(T1 v1, T2 v2, T3 v3, T4 v4) {
-        valuesOf(this.values, v1, v2, v3, v4);
-        return this;
-    }
-
-    @Override
     public InsertIntoCols<R, TB> valuesRecord(R record) {
         toValues(this.values, record);
         return this;
@@ -74,10 +62,5 @@ public class InsertIntoValues<T1, T2, T3, T4, R, TB extends Table<R, TB>>
     public InsertIntoCols<R, TB> valuesRecord(Collection<? extends R> records) {
         toValues(this.values, records);
         return this;
-    }
-
-    @Override
-    public int done() {
-        return super.done();
     }
 }

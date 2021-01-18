@@ -3,7 +3,7 @@ package com.moon.processor.holder;
 import com.moon.accessor.meta.Table;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
-import com.moon.processor.def.DefEntityModel;
+import com.moon.processor.def.DefTableModel;
 import com.moon.processor.file.DeclField;
 import com.moon.processor.file.DeclJavaFile;
 import com.moon.processor.utils.String2;
@@ -26,7 +26,7 @@ public class AliasesHolder implements JavaFileWriteable {
     public AliasesHolder() {}
 
     @SuppressWarnings("all")
-    public void with(TypeElement element, DefEntityModel model) {
+    public void with(TypeElement element, DefTableModel model) {
         final String aliasGroup = model.getAliasGroup();
         String aliasName = model.getAlias();
         if (String2.isBlank(aliasGroup) || String2.isBlank(aliasName)) {
@@ -37,8 +37,8 @@ public class AliasesHolder implements JavaFileWriteable {
             java = DeclJavaFile.enumOf(PKG, aliasGroup);
             javaMapped.put(aliasGroup, java);
         }
-        String tableType = model.getClassname();
-        String tableField = model.getTableField();
+        String tableType = model.getCanonicalName();
+        String tableField = model.getTableEnumFieldVal();
         DeclField field = java.publicConstField(aliasName.trim(), tableType);
         field.valueOf("{}.{}", java.onImported(tableType), tableField);
     }

@@ -1,11 +1,11 @@
 package com.moon.processor.holder;
 
 import com.moon.accessor.annotation.TableFieldPolicy;
-import com.moon.accessor.annotation.TableEntity;
-import com.moon.accessor.annotation.TableEntityPolicy;
+import com.moon.accessor.annotation.TableModel;
+import com.moon.accessor.annotation.TableModelPolicy;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
-import com.moon.processor.def.DefEntityModel;
+import com.moon.processor.def.DefTableModel;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Element2;
 
@@ -23,7 +23,7 @@ public class ModelHolder implements JavaFileWriteable {
     private final TablesHolder tablesHolder;
     private final AliasesHolder aliasesHolder;
 
-    private final Map<String, DefEntityModel> modelMap = new HashMap<>();
+    private final Map<String, DefTableModel> modelMap = new HashMap<>();
 
     public ModelHolder(
         PojoHolder pojoHolder, TablesHolder tablesHolder, AliasesHolder aliasesHolder, PolicyHolder policyHolder
@@ -34,17 +34,17 @@ public class ModelHolder implements JavaFileWriteable {
         this.pojoHolder = pojoHolder;
     }
 
-    public DefEntityModel with(TypeElement element) {
+    public DefTableModel with(TypeElement element) {
         String classname = Element2.getQualifiedName(element);
         // 一个实体可以按业务区分成多个访问器
-        DefEntityModel entityModel = modelMap.get(classname);
+        DefTableModel entityModel = modelMap.get(classname);
         if (entityModel == null) {
             DeclaredPojo pojo = pojoHolder.with(element);
-            TableEntityPolicy policy = policyHolder.with(element);
-            TableEntity tableModel = policyHolder.withTableModel(element);
+            TableModelPolicy policy = policyHolder.with(element);
+            TableModel tableModel = policyHolder.withTableModel(element);
             TableFieldPolicy columnPolicy = policyHolder.withColumnPolicy(element);
 
-            entityModel = new DefEntityModel(pojo, policy, tableModel, columnPolicy);
+            entityModel = new DefTableModel(pojo, policy, columnPolicy, tableModel);
 
             tablesHolder.with(element, entityModel);
             aliasesHolder.with(element, entityModel);
@@ -53,9 +53,9 @@ public class ModelHolder implements JavaFileWriteable {
         return entityModel;
     }
 
-    public DefEntityModel with(TypeElement element, String accessorClassname) {
+    public DefTableModel with(TypeElement element, String accessorClassname) {
         // 一个被 @Accessor 注解的访问器只对应一个主表（实体）
-        DefEntityModel entityModel;
+        DefTableModel entityModel;
         if (accessorClassname != null) {
             entityModel = modelMap.get(accessorClassname);
             if (entityModel != null) {

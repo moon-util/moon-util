@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 表名策略
  * <p>
- * 沿着当前实体类的继承结构向上查找第一个注解的{@link TableEntityPolicy}为有效处理策略,
+ * 沿着当前实体类的继承结构向上查找第一个注解的{@link TableModelPolicy}为有效处理策略,
  * <p>
  * 如果一个都没有将按所有属性的默认值处理，通常项目的数据表策略和实体命名策略一致，
  * <p>
@@ -16,13 +16,13 @@ import java.lang.annotation.Target;
  * <p>
  * <strong>如:</strong>
  * <pre>
- * &#064;TablePolicy(tables = "Tables")
+ * &#064;TableModelPolicy(tables = "Tables")
  * public abstract class BaseModel {
  *
  *     private String id;
  * }
  *
- * &#064;TablePolicy(tables = "Database") // 实际生效的注解
+ * &#064;TableModelPolicy(tables = "Database") // 实际生效的注解
  * public class UserModel extends BaseModel {
  *
  *     private String username;
@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-public @interface TableEntityPolicy {
+public @interface TableModelPolicy {
 
     /**
      * 表访问“组”，可通过静态字段直接访问表名，如: Tables.t_user_info
@@ -49,7 +49,7 @@ public @interface TableEntityPolicy {
      *
      * <strong>如：</strong>
      * <pre>
-     * &#064;TablePolicy(
+     * &#064;TableModelPolicy(
      *     pattern = "t_{}",
      *     trimEntityPrefix = "Ch",
      *     trimEntitySuffix = "Entity",
@@ -76,7 +76,7 @@ public @interface TableEntityPolicy {
      * <p>
      * 如:
      * <pre>
-     * &#064;TablePolicy(trimEntityPrefix = {"Ch", "Cn"})
+     * &#064;TableModelPolicy(trimEntityPrefix = {"Ch", "Cn"})
      * public class ChCnUserInfo {
      *     private String id;
      *     private String username;

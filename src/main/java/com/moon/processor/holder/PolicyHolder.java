@@ -1,8 +1,8 @@
 package com.moon.processor.holder;
 
 import com.moon.accessor.annotation.TableFieldPolicy;
-import com.moon.accessor.annotation.TableEntity;
-import com.moon.accessor.annotation.TableEntityPolicy;
+import com.moon.accessor.annotation.TableModel;
+import com.moon.accessor.annotation.TableModelPolicy;
 import com.moon.processor.model.DefaultTableColumnPolicy;
 import com.moon.processor.model.DefaultTableModel;
 import com.moon.processor.model.DefaultTablePolicy;
@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class PolicyHolder {
 
-    private final Map<String, TableEntityPolicy> policyMap = new HashMap<>();
+    private final Map<String, TableModelPolicy> policyMap = new HashMap<>();
     private final Map<String, TableFieldPolicy> columnPolicyMap = new HashMap<>();
 
     public PolicyHolder() { }
@@ -56,8 +56,8 @@ public class PolicyHolder {
         return policy;
     }
 
-    public TableEntity withTableModel(TypeElement element) {
-        TableEntity model = element.getAnnotation(TableEntity.class);
+    public TableModel withTableModel(TypeElement element) {
+        TableModel model = element.getAnnotation(TableModel.class);
         return model == null ? DefaultTableModel.INSTANCE : model;
     }
 
@@ -65,7 +65,7 @@ public class PolicyHolder {
         return find(element, columnPolicyMap, TableFieldPolicy.class, DefaultTableColumnPolicy.INSTANCE);
     }
 
-    public TableEntityPolicy with(TypeElement element) {
-        return find(element, policyMap, TableEntityPolicy.class, DefaultTablePolicy.INSTANCE);
+    public TableModelPolicy with(TypeElement element) {
+        return find(element, policyMap, TableModelPolicy.class, DefaultTablePolicy.INSTANCE);
     }
 }

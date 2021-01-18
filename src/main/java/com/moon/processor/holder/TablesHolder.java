@@ -1,9 +1,9 @@
 package com.moon.processor.holder;
 
-import com.moon.accessor.annotation.TableEntityPolicy;
+import com.moon.accessor.annotation.TableModelPolicy;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
-import com.moon.processor.def.DefEntityModel;
+import com.moon.processor.def.DefTableModel;
 import com.moon.processor.def.DefTables;
 import com.moon.processor.utils.String2;
 
@@ -26,7 +26,7 @@ public class TablesHolder implements JavaFileWriteable {
     private DefTables getTables(TypeElement thisElement) {
         // 默认 Tables 将来可通过注解自定义，
         // 沿着 thisElement 父类向上追寻，返回第一个声明的 tables 名称，
-        TableEntityPolicy policy = policyHolder.with(thisElement);
+        TableModelPolicy policy = policyHolder.with(thisElement);
         String tablesName = policy.tables().trim();
         if (String2.isBlank(tablesName)) {
             return null;
@@ -39,10 +39,10 @@ public class TablesHolder implements JavaFileWriteable {
         return tables;
     }
 
-    public void with(TypeElement thisElement, DefEntityModel entityModel) {
+    public void with(TypeElement thisElement, DefTableModel model) {
         DefTables tables = getTables(thisElement);
         if (tables != null) {
-            tables.with(entityModel);
+            tables.with(model);
         }
     }
 

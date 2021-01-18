@@ -132,7 +132,7 @@ public class SessionManager implements JavaFileWriteable {
             DeclMethod insertInto = session.publicMethod("insertInto", params);
             insertInto.genericOf("<{}, R, TB extends {}<R, TB>>", joined, Table.class);
             insertInto.returnTypeof("{}<{}, R, TB>", interFile.getCanonicalName(), joined);
-            insertInto.returning("new {}<>(table, toArr({}))", importedImpl, names);
+            insertInto.returning("new {}<>(getConfig(), table, toArr({}))", importedImpl, names);
         }
 
         return session;
@@ -182,10 +182,11 @@ public class SessionManager implements JavaFileWriteable {
 
         // construct
         String bound = Table.class.getCanonicalName();
-        String fieldsType = String2.format("{}<?, R, TB>[]", TableField.class.getCanonicalName());
-        DeclParams params = DeclParams.of().addGeneralization("table", "TB", bound);
-        DeclConstruct construct = insertImpl.publicConstruct(params.addActual("fields", fieldsType));
-        construct.scriptOf("super(getConfig(), table, fields)");
+        String fieldsType = String2.format("{}<?, R, TB>...", TableField.class.getCanonicalName());
+        DeclParams params = DeclParams.of("config", DSLConfiguration.class);
+        params.addGeneralization("table", "TB", bound).addActual("fields", fieldsType);
+        DeclConstruct construct = insertImpl.publicConstruct(params);
+        construct.scriptOf("super(config, table, fields)").markedOf(DeclMarked::ofSafeVarargs);
 
         return insertImpl;
     }

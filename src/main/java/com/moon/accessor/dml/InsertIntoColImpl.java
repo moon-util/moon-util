@@ -11,11 +11,7 @@ import java.util.List;
  */
 public class InsertIntoColImpl<T1, T2, T3, T4, R, TB extends Table<R, TB>>//
     extends InsertIntoCols<R, TB>//
-    implements InsertInto<R, TB>,
-               InsertIntoCol1<T1, R, TB>,
-               InsertIntoCol2<T1, T2, R, TB>,
-               InsertIntoCol3<T1, T2, T3, R, TB>,
-               InsertIntoCol4<T1, T2, T3, T4, R, TB> {
+    implements InsertInto<R, TB>, InsertIntoVal1<T1, R, TB>, InsertIntoVal2<T1, T2, R, TB> {
 
     @SafeVarargs
     public InsertIntoColImpl(DSLConfiguration config, TB table, TableField<?, R, TB>... fields) {
@@ -30,16 +26,6 @@ public class InsertIntoColImpl<T1, T2, T3, T4, R, TB extends Table<R, TB>>//
     @Override
     public InsertIntoColImpl<T1, T2, T3, T4, R, TB> values(T1 v1, T2 v2) {
         return insertValuesOf(valuesOf(v1, v2));
-    }
-
-    @Override
-    public InsertIntoColImpl<T1, T2, T3, T4, R, TB> values(T1 v1, T2 v2, T3 v3) {
-        return insertValuesOf(valuesOf(v1, v2, v3));
-    }
-
-    @Override
-    public InsertIntoColImpl<T1, T2, T3, T4, R, TB> values(T1 v1, T2 v2, T3 v3, T4 v4) {
-        return insertValuesOf(valuesOf(v1, v2, v3, v4));
     }
 
     private InsertIntoColImpl<T1, T2, T3, T4, R, TB> insertValuesOf(List<Object[]> values) {
@@ -57,22 +43,7 @@ public class InsertIntoColImpl<T1, T2, T3, T4, R, TB extends Table<R, TB>>//
     ) { return new SelectCol2Impl<>(f1, f2); }
 
     @Override
-    public SelectCol3<T1, T2, T3> select(
-        TableField<T1, ?, ? extends Table<?, ?>> f1,
-        TableField<T2, ?, ? extends Table<?, ?>> f2,
-        TableField<T3, ?, ? extends Table<?, ?>> f3
-    ) { return new SelectCol3Impl<>(f1, f2, f3); }
-
-    @Override
-    public SelectCol4<T1, T2, T3, T4> select(
-        TableField<T1, ?, ? extends Table<?, ?>> f1,
-        TableField<T2, ?, ? extends Table<?, ?>> f2,
-        TableField<T3, ?, ? extends Table<?, ?>> f3,
-        TableField<T4, ?, ? extends Table<?, ?>> f4
-    ) { return new SelectCol4Impl<>(f1, f2, f3, f4); }
-
-    @Override
     public int done() {
-        throw new UnsupportedOperationException("没有任何数据插入");
+        return 0;
     }
 }

@@ -1,11 +1,11 @@
 package com.moon.processor.model;
 
-import com.moon.accessor.annotation.TableEntity;
+import com.moon.accessor.annotation.TableModel;
 
 /**
  * @author benshaoye
  */
-public class DefaultTableModel implements TableEntity {
+public class DefaultTableModel implements TableModel {
 
     /** default instance */
     public static final DefaultTableModel INSTANCE = new DefaultTableModel();
@@ -19,5 +19,5 @@ public class DefaultTableModel implements TableEntity {
     public String alias() { return ""; }
 
     @Override
-    public Class<TableEntity> annotationType() { return TableEntity.class; }
+    public Class<TableModel> annotationType() { return TableModel.class; }
 }

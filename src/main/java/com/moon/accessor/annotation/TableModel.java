@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableEntity {
+public @interface TableModel {
 
     /**
      * 指定表名，为实体单独指定表名后会覆盖公共表名策略
@@ -26,8 +26,8 @@ public @interface TableEntity {
      * <p>
      * 示例：
      * <pre>
-     *  // 定义公共表名策略，参考{@link TableEntityPolicy}
-     * &#064;TablePolicy(pattern = "t_{}", trimEntitySuffix = "Entity")
+     *  // 定义公共表名策略，参考{@link TableModelPolicy}
+     * &#064;TableModelPolicy(pattern = "t_{}", trimEntitySuffix = "Entity")
      * public abstract class BaseEntity {
      *     private String id;
      * }
