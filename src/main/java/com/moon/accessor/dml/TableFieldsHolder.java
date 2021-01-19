@@ -21,21 +21,26 @@ abstract class TableFieldsHolder<R, TB extends Table<R, TB>> {
         this.fields = fields == null ? FIELDS : fields;
     }
 
-    protected static List<Object[]> valuesOf(Object... values) {
-        return valuesOf(new ArrayList<>(2), values);
+    protected final List<Object[]> asList(Object... values) {
+        return requireAddAll(new ArrayList<>(2), values);
     }
 
-    protected static int zeroIfNull(Object[] values) {
-        return values == null ? 0 : values.length;
+    protected static int length(Object[] values) { return values == null ? 0 : values.length; }
+
+    protected static void requireLengthEquals(Object[] values1, Object[] values2, String message) {
+        if (length(values1) != length(values2)) {
+            throw new IllegalStateException(message);
+        }
     }
 
-    protected static List<Object[]> valuesOf(List<Object[]> list, Object... values) {
+    protected final List<Object[]> requireAddAll(List<Object[]> list, Object... values) {
+        requireLengthEquals(getFields(), values, "数据长度与字段数不一致。");
         list.add(values);
         return list;
     }
 
-    protected final Object[] getValues(R record) {
-        TableField<?, R, TB>[] fields = this.fields;
+    protected final Object[] getRecordValues(R record) {
+        TableField<?, R, TB>[] fields = this.getFields();
         Object[] values = new Object[fields.length];
         for (int i = 0, l = fields.length; i < l; i++) {
             values[i] = fields[i].getPropertyValue(record);

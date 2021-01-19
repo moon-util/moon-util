@@ -21,8 +21,8 @@ import static com.moon.processor.file.Formatter2.onlyColonTail;
 public class DeclInterFile implements Importable, JavaFileWriteable {
 
     private final String pkg, simpleName;
-    private final Importer importer = new Importer();
-    private final ConstManager constManager = new ConstManager(importer);
+    private final Importer importer;
+    private final ConstManager constManager;
     private final Set<String> interfaces = new LinkedHashSet<>();
     private final List<DeclMarked> annotations = new ArrayList<>();
     private final Map<String, DeclMethod> methodsMap = new LinkedHashMap<>();
@@ -31,6 +31,8 @@ public class DeclInterFile implements Importable, JavaFileWriteable {
     public DeclInterFile(String pkg, String simpleName) {
         this.simpleName = simpleName;
         this.pkg = pkg;
+        this.importer = new Importer(pkg);
+        this.constManager = new ConstManager(importer);
         markedOf(DeclMarked::ofGenerated);
     }
 

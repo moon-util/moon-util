@@ -1,5 +1,6 @@
 package com.moon.processor.holder;
 
+import com.moon.accessor.dml.Done;
 import com.moon.accessor.dml.InsertInto;
 import com.moon.accessor.meta.Table;
 import com.moon.processor.file.DeclInterFile;
@@ -119,10 +120,13 @@ enum Select2 {
         return interfaceForN("SelectCol{}Limit", genericDeclPlaced, i);
     }
 
-    static DeclInterFile getForInsert(
+    private final static String DONE_CLASS = Done.class.getCanonicalName();
+    private final static String INSERT_INTO_VAL_N_PLACED = "InsertIntoVal{}";
+
+    static DeclInterFile forInsertCols(
         String genericDeclPlaced, int i, String genericUsingPlaced, DeclParams thisInterValuesArgs
     ) {
-        String simpleName = "InsertIntoCol" + i;
+        String simpleName = String2.format(INSERT_INTO_VAL_N_PLACED, i);
         DeclInterFile inter = interfaceForN("InsertIntoCol{}", genericDeclPlaced, i);
         inter.implement(INSERT_INTO);
 
@@ -130,8 +134,19 @@ enum Select2 {
         DeclMethod values = inter.publicMethod("values", thisInterValuesArgs);
         values.returnTypeof(genericUsingPlaced, simpleName);
 
-        // select
         return inter;
+    }
+
+    static DeclInterFile forInsertVals(
+        String genericDeclPlaced, int i, String genericUsingPlaced
+    ) {
+        DeclInterFile inter = interfaceForN(INSERT_INTO_VAL_N_PLACED, genericDeclPlaced, i);
+        String colsClassName = String2.format(genericUsingPlaced, getInsertIntoColsClassname(i));
+        return inter.implement(colsClassName, DONE_CLASS);
+    }
+
+    private static String getInsertIntoColsClassname(int i) {
+        return INSERT_INTO_PKG + ".InsertIntoCol" + i;
     }
 
     private static DeclInterFile interfaceForN(String interNamePattern, String genericDeclPlaced, int i) {

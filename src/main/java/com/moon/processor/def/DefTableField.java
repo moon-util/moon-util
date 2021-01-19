@@ -4,6 +4,7 @@ import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.processor.file.DeclField;
 import com.moon.processor.file.DeclJavaFile;
+import com.moon.processor.holder.Importable;
 import com.moon.processor.utils.String2;
 
 import static com.moon.processor.utils.String2.format;

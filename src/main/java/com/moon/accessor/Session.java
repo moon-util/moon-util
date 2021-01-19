@@ -21,16 +21,16 @@ public class Session {
     protected static <T> T[] toArr(T... ts) { return ts; }
 
     public final <R, TB extends Table<R, TB>> InsertInto<R, TB> insertInto(TB table) {
-        return new InsertIntoColImpl<>(getConfig(), table, table.getTableFields());
+        return new InsertIntoColsImpl<>(getConfig(), table, table.getTableFields());
     }
 
     public final <T1, R, TB extends Table<R, TB>> InsertIntoCol1<T1, R, TB> insertInto(
         TB table, TableField<T1, R, TB> f1
-    ) { return new InsertIntoColImpl<>(getConfig(), table, f1); }
+    ) { return new InsertIntoColsImpl<>(getConfig(), table, f1); }
 
     public final <T1, T2, R, TB extends Table<R, TB>> InsertIntoCol2<T1, T2, R, TB> insertInto(
         TB table, TableField<T1, R, TB> f1, TableField<T2, R, TB> f2
-    ) { return new InsertIntoColImpl<>(getConfig(), table, f1, f2); }
+    ) { return new InsertIntoColsImpl<>(getConfig(), table, f1, f2); }
 
     @SafeVarargs
     public final SelectCols select(TableField<?, ?, ? extends Table<?, ?>>... fields) {

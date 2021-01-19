@@ -23,8 +23,11 @@ public class Importer implements Importable {
 
     private final Map<String, String> shortNameCached = new HashMap<>();
     private final Map<String, String> importCached = new TreeMap<>();
+    private final String packageName;
 
-    public Importer() { }
+    public Importer() { this(null); }
+
+    public Importer(String packageName) { this.packageName = packageName; }
 
     @Override
     public String onImported(Class<?> classname) { return onImported(classname.getCanonicalName()); }
@@ -72,7 +75,19 @@ public class Importer implements Importable {
         return result.toString();
     }
 
+    private final static String VARARGS = "...";
+
     private String doImported(String fullName) {
+        if (VARARGS.equals(fullName)) {
+            return fullName;
+        }
+        if (fullName.endsWith(VARARGS)) {
+            return withImported(fullName.replace(VARARGS, "")) + VARARGS;
+        }
+        return withImported(fullName);
+    }
+
+    private String withImported(String fullName) {
         if (StringUtil.isBlank(fullName)) {
             return EMPTY;
         }
@@ -81,10 +96,11 @@ public class Importer implements Importable {
         if (shortName != null) {
             return shortName;
         }
-        if ("...".equals(classname)) {
-            return classname;
-        }
         shortName = Element2.getSimpleName(classname);
+        if (classname.equals(packageName + "." + shortName)) {
+            shortNameCached.put(shortName, classname);
+            return shortName;
+        }
         if (importCached.containsKey(shortName)) {
             return classname;
         } else if (Test2.isPrimitive(classname) || "void".equals(classname)) {

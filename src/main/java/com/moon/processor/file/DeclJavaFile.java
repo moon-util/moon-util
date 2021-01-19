@@ -103,7 +103,7 @@ public class DeclJavaFile extends DeclInterFile implements Importable, JavaFileW
         return privateConstField(name, typePattern, values).withPublic();
     }
 
-    public DeclConstruct publicConstruct(DeclParams params) {
+    public DeclConstruct construct(DeclParams params) {
         DeclConstruct construct = new DeclConstruct(getConstManager(), Modifier.PUBLIC, getSimpleName(), params);
         constructMap.put(construct.getUniqueDeclaredKey(), construct);
         return construct;

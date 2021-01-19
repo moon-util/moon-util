@@ -68,7 +68,7 @@ public class DeclConstruct implements ScriptsProvider {
             return methodScripts;
         }
         methodScripts.add(declared);
-        scripts.forEach(it -> methodScripts.add("    " + it));
+        scripts.forEach(it -> methodScripts.add("    " + onlyColonTail(it)));
         methodScripts.add("}");
         return methodScripts;
     }

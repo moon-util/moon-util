@@ -20,13 +20,12 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
     private final static String[] STRINGS = {};
     private final List<DeclMarked> annotations = new ArrayList<>();
     private DeclMethod getter, setter;
-    private final String name, type, typeClassname;
+    private final String name, typeClassname;
     private String value;
 
     DeclField(ConstManager importer, String name, String typePattern, Object... types) {
         super(importer);
         String classname = Formatter2.toFormatted(typePattern, types);
-        this.type = importer.onImported(classname);
         this.typeClassname = classname;
         this.name = name;
         this.withPrivate();
@@ -101,7 +100,7 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
     }
 
     private String getDeclareField() {
-        return String2.format("{}{} {}", getModifiersDeclared(), onImported(type), name);
+        return String2.format("{}{} {}", getModifiersDeclared(), onImported(typeClassname), name);
     }
 
     private String[] toScriptsOfBlock() {

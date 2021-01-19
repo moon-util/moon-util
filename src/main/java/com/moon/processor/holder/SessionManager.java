@@ -4,7 +4,7 @@ import com.moon.accessor.Session;
 import com.moon.accessor.Supported;
 import com.moon.accessor.config.DSLConfiguration;
 import com.moon.accessor.dml.InsertInto;
-import com.moon.accessor.dml.InsertIntoColImpl;
+import com.moon.accessor.dml.InsertIntoColsImpl;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 import com.moon.processor.JavaFileWriteable;
@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.moon.processor.holder.Select2.*;
 
 /**
  * @author benshaoye
@@ -36,7 +38,7 @@ public class SessionManager implements JavaFileWriteable {
 
     static {
         INSERT_INTO = String2.format("{}<R, TB>", InsertInto.class.getCanonicalName());
-        INSERT_INTO_IMPL_PKG = Element2.getPackageName(InsertIntoColImpl.class);
+        INSERT_INTO_IMPL_PKG = Element2.getPackageName(InsertIntoColsImpl.class);
         INSERT_INTO_PKG = Element2.getPackageName(InsertInto.class);
 
         Supported supported = SESSION_CLASS.getAnnotation(Supported.class);
@@ -72,28 +74,31 @@ public class SessionManager implements JavaFileWriteable {
 
     private List<DeclInterFile> getInsertionDeclJavaFile(int startingAt, int nextEnding) {
         List<DeclInterFile> selects = new ArrayList<>();
-        Map<String, DeclInterFile> javaFileMap = new LinkedHashMap<>();
+        Map<String, DeclInterFile> insertColsMap = new LinkedHashMap<>();
+        Map<String, DeclInterFile> insertValsMap = new LinkedHashMap<>();
         DeclParams interValuesParams = toInitInsertIntoValuesParams(startingAt);
         for (int i = startingAt; i < nextEnding; i++) {
             // T1, T2, T3, T4
-            final String joined = toJoinedValuesGenericDeclared(i);
+            final String joined = Holder2.toTypesJoined(i);
             // <T1, T2, R, TB extends {Table}<R, TB>>
             String genericDeclPlaced = '<' + joined + ", R, TB extends {}<R, TB>>";
             // <T1, T2, R, TB>
             String genericUsingPlaced = "{}<" + joined + ", R, TB>";
             DeclParams thisInterValuesArgs = toDeclParamsWith(interValuesParams, i);
 
-            DeclInterFile limit = Select2.getForLimit(genericDeclPlaced, i, genericUsingPlaced);
-            DeclInterFile orderBy = Select2.getForOrderBy(genericDeclPlaced, i, genericUsingPlaced, limit);
-            DeclInterFile having = Select2.getForHaving(genericDeclPlaced, i, genericUsingPlaced, orderBy);
-            DeclInterFile groupBy = Select2.getForGroupBy(genericDeclPlaced, i, genericUsingPlaced, orderBy, having);
-            DeclInterFile where = Select2.getForWhere(genericDeclPlaced, i, genericUsingPlaced, groupBy);
-            DeclInterFile from = Select2.getForFrom(genericDeclPlaced, i, genericUsingPlaced, where);
-            DeclInterFile selectCols = Select2.getForSelectCols(joined, i, genericUsingPlaced, from);
-            DeclInterFile insert = Select2.getForInsert(genericDeclPlaced, i, genericUsingPlaced, thisInterValuesArgs);
+            DeclInterFile limit = getForLimit(genericDeclPlaced, i, genericUsingPlaced);
+            DeclInterFile orderBy = getForOrderBy(genericDeclPlaced, i, genericUsingPlaced, limit);
+            DeclInterFile having = getForHaving(genericDeclPlaced, i, genericUsingPlaced, orderBy);
+            DeclInterFile groupBy = getForGroupBy(genericDeclPlaced, i, genericUsingPlaced, orderBy, having);
+            DeclInterFile where = getForWhere(genericDeclPlaced, i, genericUsingPlaced, groupBy);
+            DeclInterFile from = getForFrom(genericDeclPlaced, i, genericUsingPlaced, where);
+            DeclInterFile selectCols = getForSelectCols(joined, i, genericUsingPlaced, from);
+            DeclInterFile insertCols = forInsertCols(genericDeclPlaced, i, genericUsingPlaced, thisInterValuesArgs);
+            DeclInterFile insertVals = forInsertVals(genericDeclPlaced, i, genericUsingPlaced);
 
             interValuesParams = thisInterValuesArgs;
-            javaFileMap.put(joined, insert);
+            insertColsMap.put(joined, insertCols);
+            insertValsMap.put(joined, insertVals);
 
             selects.add(limit);
             selects.add(orderBy);
@@ -102,22 +107,28 @@ public class SessionManager implements JavaFileWriteable {
             selects.add(where);
             selects.add(from);
             selects.add(selectCols);
-            selects.add(insert);
+            selects.add(insertCols);
+            selects.add(insertVals);
         }
 
-        DeclJavaFile insertImpl = getInsertIntoColsImpl(javaFileMap, nextEnding - 1);
-        selects.add(insertImpl);
-        selects.add(getSessionDeclJavaFile(javaFileMap, insertImpl.getCanonicalName()));
+        // DeclJavaFile insertImpl = getInsertIntoColsImpl(insertColsMap, nextEnding - 1);
+        // selects.add(insertImpl);
+        DeclJavaFile colImpl = InsertImpl2.forColImpl(nextEnding - 1, insertColsMap);
+        DeclJavaFile valImpl = InsertImpl2.forValImpl(nextEnding - 1, insertValsMap);
+        selects.add(colImpl);
+        selects.add(valImpl);
+        selects.add(getSessionDeclJavaFile(insertColsMap, colImpl.getCanonicalName()));
         return selects;
     }
 
     private DeclInterFile getSessionDeclJavaFile(Map<String, DeclInterFile> javaFileMap, String insertImpl) {
         String simpleSessionClass = String2.format("Dml{}Session", generateLevel());
         DeclJavaFile session = DeclJavaFile.classOf(PKG, simpleSessionClass);
-        String importedImpl = session.extend(SESSION_CLASS).onImported(insertImpl);
+        // String importedImpl = session.extend(SESSION_CLASS).onImported(insertImpl);
+        session.extend(SESSION_CLASS);
 
         // 构造器
-        session.publicConstruct(DeclParams.of("config", DSLConfiguration.class)).scriptOf("super(config)");
+        session.construct(DeclParams.of("config", DSLConfiguration.class)).scriptOf("super(config)");
 
         String bound = Table.class.getCanonicalName();
         String tableField = TableField.class.getCanonicalName();
@@ -132,7 +143,8 @@ public class SessionManager implements JavaFileWriteable {
             DeclMethod insertInto = session.publicMethod("insertInto", params);
             insertInto.genericOf("<{}, R, TB extends {}<R, TB>>", joined, Table.class);
             insertInto.returnTypeof("{}<{}, R, TB>", interFile.getCanonicalName(), joined);
-            insertInto.returning("new {}<>(getConfig(), table, toArr({}))", importedImpl, names);
+            insertInto.returning("null");
+            // insertInto.returning("new {}<>(getConfig(), table, toArr({}))", importedImpl, names);
         }
 
         return session;
@@ -153,13 +165,15 @@ public class SessionManager implements JavaFileWriteable {
         return String.join(", ", fieldsNameList);
     }
 
+
+
     private DeclJavaFile getInsertIntoColsImpl(Map<String, DeclInterFile> javaFileMap, int endingAt) {
-        String simpleImplName = "InsertIntoCol" + endingAt + "Impl";
+        String simpleImplName = "InsertIntoVal" + endingAt + "Impl";
         String joined = toJoinedValuesGenericDeclared(endingAt);
         DeclJavaFile insertImpl = DeclJavaFile.classOf(INSERT_INTO_IMPL_PKG, simpleImplName);
         String importedTable = insertImpl.onImported(Table.class);
         insertImpl.genericOf("<{}, R, TB extends {}<R, TB>>", joined, importedTable);
-        insertImpl.extend("{}<T1, T2, T3, T4, R, TB>", InsertIntoColImpl.class);
+        insertImpl.extend("{}<T1, T2, T3, T4, R, TB>", InsertIntoColsImpl.class);
 
         List<String> interfacesList = new ArrayList<>();
         String valuesReturnType = String.format("%s<%s, R, TB>", simpleImplName, joined);
@@ -173,9 +187,14 @@ public class SessionManager implements JavaFileWriteable {
                 if ("values".equals(methodName)) {
                     DeclParams params = method.getClonedParams();
                     DeclMethod override = insertImpl.publicMethod(method.getName(), params);
-                    override.override().returnTypeof(valuesReturnType).returning("this");
+                    override.override().returnTypeof(valuesReturnType);
+                    String returning = "insertValuesOf(valuesOf({}))";
+                    override.returning(returning, String.join(", ", params.keySet()));
                 }
             });
+            String insertValuesArg = String2.format("{}<{}[]>", List.class, Object.class);
+            DeclParams insertValuesOf = DeclParams.of("list", insertValuesArg);
+            insertImpl.publicMethod("insertValuesOf", insertValuesOf);
         }
 
         insertImpl.implement(interfacesList.toArray(Const2.EMPTY));
@@ -185,7 +204,7 @@ public class SessionManager implements JavaFileWriteable {
         String fieldsType = String2.format("{}<?, R, TB>...", TableField.class.getCanonicalName());
         DeclParams params = DeclParams.of("config", DSLConfiguration.class);
         params.addGeneralization("table", "TB", bound).addActual("fields", fieldsType);
-        DeclConstruct construct = insertImpl.publicConstruct(params);
+        DeclConstruct construct = insertImpl.construct(params);
         construct.scriptOf("super(config, table, fields)").markedOf(DeclMarked::ofSafeVarargs);
 
         return insertImpl;
