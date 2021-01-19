@@ -63,6 +63,7 @@ enum InsertImpl2 {
 
     public static DeclJavaFile forColImpl(int endVal, Map<String, DeclInterFile> insertCols) {
         String simpleName = getColImplSimpleName(endVal);
+        String valImplClass = getValImplCanonicalName(endVal);
         MaxLengthVal maxLengthVal = new MaxLengthVal();
         TreeSet<String> typesJoined = new TreeSet<>(Comparator.comparingInt(String2::length));
 
@@ -82,7 +83,7 @@ enum InsertImpl2 {
         // private InsertIntoVal2Impl<T1, T2, R, TB> insertValuesOf(List<Object[]> values) { /* ... */ }
         String insertValuesImpl = getValImplCanonicalName(endVal);
         String importedValImpl = colImpl.onImported(insertValuesImpl);
-        String insertValuesJoined = toUsingByJoined(getValImplCanonicalName(endVal), usingJoined);
+        String insertValuesJoined = toUsingByJoined(valImplClass, usingJoined);
         DeclParams params = DeclParams.of("values", "java.lang.Object...");
         DeclMethod insertValuesOf = colImpl.publicMethod("insertValuesOf", params).withPrivate();
         insertValuesOf.returnTypeof(insertValuesJoined);
@@ -98,6 +99,24 @@ enum InsertImpl2 {
             valuesMethod.returning("insertValuesOf({})", argsJoined);
         }
 
+        // public InsertIntoVal2Impl<T1, T2, R, TB> valuesRecord(R record) { /* ... */ }
+        DeclParams recordParams1 = DeclParams.of().addGeneralization("record", "R", Object.class);
+        DeclMethod recordMethod1 = colImpl.publicMethod("valuesRecord", recordParams1).override();
+        recordMethod1.returning("new {}<>(getConfig(), getTable(), getFields(), record)", valImplClass);
+        recordMethod1.returnTypeof(insertValuesJoined);
+
+        DeclParams recordParamsL = DeclParams.of().addActual("records", "java.util.List<R>");
+        DeclMethod recordMethodL = colImpl.publicMethod("valuesRecord", recordParamsL).override();
+        recordMethodL.returning("new {}<>(getConfig(), getTable(), getFields(), records)", valImplClass);
+        recordMethodL.returnTypeof(insertValuesJoined);
+
+        DeclParams recordParamsN = DeclParams.of();
+        recordParamsN.addGeneralization("record1", "R", Object.class);
+        recordParamsN.addGeneralization("record2", "R", Object.class);
+        recordParamsN.addGeneralization("records", "R...", Object.class);
+        DeclMethod recordMethodN = colImpl.publicMethod("valuesRecord", recordParamsN).override();
+        recordMethodN.returning("new {}<>(getConfig(), getTable(), getFields(), record1, record2, records)", valImplClass);
+        recordMethodN.returnTypeof(insertValuesJoined);
         return colImpl;
     }
 
@@ -127,8 +146,9 @@ enum InsertImpl2 {
         // constructor
         publicConstruct(valImpl, true);
 
+        String valImplClass = valImpl.getCanonicalName();
         // public InsertIntoVal2Impl<T1, T2, R, TB> values(T1 t1, T2 t2) { /* ... */ }
-        String thisUsingJoined = toUsingByJoined(valImpl.getCanonicalName(), usingJoined);
+        String thisUsingJoined = toUsingByJoined(valImplClass, usingJoined);
         for (String joined : typesJoined) {
             List<String> typesAll = String2.split(joined, ',');
             DeclParams valuesParams = declParamsBy(typesAll);
@@ -142,6 +162,24 @@ enum InsertImpl2 {
         // public int done() { return 0; }
         valImpl.publicMethod("done", DeclParams.of()).returnTypeof("int").returning("0").override();
 
+        // public InsertIntoVal2Impl<T1, T2, R, TB> valuesRecord(R record) { /* ... */ }
+        DeclParams recordParams1 = DeclParams.of().addGeneralization("record", "R", Object.class);
+        DeclMethod recordMethod1 = valImpl.publicMethod("valuesRecord", recordParams1).override();
+        recordMethod1.scriptOf("requireAddRecord(this.getValues(), record)");
+        recordMethod1.returnTypeof(thisUsingJoined).returning("this");
+
+        DeclParams recordParamsL = DeclParams.of().addActual("records", "java.util.List<R>");
+        DeclMethod recordMethodL = valImpl.publicMethod("valuesRecord", recordParamsL).override();
+        recordMethod1.scriptOf("requireAddRecord(this.getValues(), records)");
+        recordMethodL.returnTypeof(thisUsingJoined).returning("this");
+
+        DeclParams recordParamsN = DeclParams.of();
+        recordParamsN.addGeneralization("record1", "R", Object.class);
+        recordParamsN.addGeneralization("record2", "R", Object.class);
+        recordParamsN.addGeneralization("records", "R...", Object.class);
+        DeclMethod recordMethodN = valImpl.publicMethod("valuesRecord", recordParamsN).override();
+        recordMethod1.scriptOf("requireAddRecord(this.getValues(), record1, record2, records)");
+        recordMethodN.returnTypeof(thisUsingJoined).returning("this");
         return valImpl;
     }
 

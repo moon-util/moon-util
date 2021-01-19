@@ -4,6 +4,8 @@ import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,8 +23,20 @@ abstract class TableFieldsHolder<R, TB extends Table<R, TB>> {
         this.fields = fields == null ? FIELDS : fields;
     }
 
-    protected final List<Object[]> asList(Object... values) {
-        return requireAddAll(new ArrayList<>(2), values);
+    @SafeVarargs
+    protected static <R> List<R> asList(R... values) {
+        return Arrays.asList(values);
+    }
+
+    @SafeVarargs
+    protected static <R> List<R> asList(R record1, R record2, R... values) {
+        List<R> list = new ArrayList<>();
+        list.add(record1);
+        list.add(record2);
+        for (R value : values) {
+            list.add(value);
+        }
+        return list;
     }
 
     protected static int length(Object[] values) { return values == null ? 0 : values.length; }
@@ -39,13 +53,33 @@ abstract class TableFieldsHolder<R, TB extends Table<R, TB>> {
         return list;
     }
 
-    protected final Object[] getRecordValues(R record) {
+    protected final List<Object[]> requireAddRecord(List<Object[]> list, Collection<? extends R> records) {
+        for (R record : records) {
+            requireAddRecord(list, record);
+        }
+        return list;
+    }
+
+    @SafeVarargs
+    protected final List<Object[]> requireAddRecord(List<Object[]> list, R record1, R record2, R... records) {
+        requireAddRecord(list, record1);
+        requireAddRecord(list, record2);
+        if (records != null) {
+            for (R record : records) {
+                requireAddRecord(list, record);
+            }
+        }
+        return list;
+    }
+
+    protected final List<Object[]> requireAddRecord(List<Object[]> list, R record) {
         TableField<?, R, TB>[] fields = this.getFields();
         Object[] values = new Object[fields.length];
         for (int i = 0, l = fields.length; i < l; i++) {
             values[i] = fields[i].getPropertyValue(record);
         }
-        return values;
+        list.add(values);
+        return list;
     }
 
     public TableField<?, R, TB>[] getFields() { return fields; }
