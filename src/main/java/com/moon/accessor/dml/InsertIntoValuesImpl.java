@@ -12,7 +12,7 @@ import java.util.List;
  * @author benshaoye
  */
 public class InsertIntoValuesImpl<T1, T2, R, TB extends Table<R, TB>> extends InsertIntoBase<R, TB>
-    implements InsertInto<R, TB>, InsertIntoVal1<T1, R, TB>, InsertIntoVal2<T1, T2, R, TB> {
+    implements InsertIntoValues<R, TB>, InsertIntoVal1<T1, R, TB>, InsertIntoVal2<T1, T2, R, TB> {
 
     private final List<Object[]> values = new ArrayList<>(4);
 

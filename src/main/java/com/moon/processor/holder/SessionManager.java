@@ -32,15 +32,7 @@ public class SessionManager implements JavaFileWriteable {
 
     private static final int SUPPORTED_LEVEL, MAX_LEVEL;
 
-    private static final String INSERT_INTO_IMPL_PKG;
-    private static final String INSERT_INTO_PKG;
-    private static final String INSERT_INTO;
-
     static {
-        INSERT_INTO = String2.format("{}<R, TB>", InsertInto.class.getCanonicalName());
-        INSERT_INTO_IMPL_PKG = Element2.getPackageName(InsertIntoColsImpl.class);
-        INSERT_INTO_PKG = Element2.getPackageName(InsertInto.class);
-
         Supported supported = SESSION_CLASS.getAnnotation(Supported.class);
         SUPPORTED_LEVEL = supported.value();
         MAX_LEVEL = supported.max();
@@ -111,8 +103,6 @@ public class SessionManager implements JavaFileWriteable {
             selects.add(insertVals);
         }
 
-        // DeclJavaFile insertImpl = getInsertIntoColsImpl(insertColsMap, nextEnding - 1);
-        // selects.add(insertImpl);
         DeclJavaFile colImpl = InsertImpl2.forColImpl(nextEnding - 1, insertColsMap);
         DeclJavaFile valImpl = InsertImpl2.forValImpl(nextEnding - 1, insertValsMap);
         selects.add(colImpl);
@@ -123,9 +113,8 @@ public class SessionManager implements JavaFileWriteable {
 
     private DeclInterFile getSessionDeclJavaFile(Map<String, DeclInterFile> javaFileMap, String insertImpl) {
         String simpleSessionClass = String2.format("Dml{}Session", generateLevel());
-        DeclJavaFile session = DeclJavaFile.classOf(PKG, simpleSessionClass);
-        // String importedImpl = session.extend(SESSION_CLASS).onImported(insertImpl);
-        session.extend(SESSION_CLASS);
+        DeclJavaFile session = DeclJavaFile.classOf(PKG, simpleSessionClass).extend(SESSION_CLASS);
+        String importedImpl = session.onImported(insertImpl);
 
         // 构造器
         session.construct(DeclParams.of("config", DSLConfiguration.class)).scriptOf("super(config)");
@@ -143,8 +132,7 @@ public class SessionManager implements JavaFileWriteable {
             DeclMethod insertInto = session.publicMethod("insertInto", params);
             insertInto.genericOf("<{}, R, TB extends {}<R, TB>>", joined, Table.class);
             insertInto.returnTypeof("{}<{}, R, TB>", interFile.getCanonicalName(), joined);
-            insertInto.returning("null");
-            // insertInto.returning("new {}<>(getConfig(), table, toArr({}))", importedImpl, names);
+            insertInto.returning("new {}<>(getConfig(), table, toArr({}))", importedImpl, names);
         }
 
         return session;
@@ -165,51 +153,6 @@ public class SessionManager implements JavaFileWriteable {
         return String.join(", ", fieldsNameList);
     }
 
-
-
-    private DeclJavaFile getInsertIntoColsImpl(Map<String, DeclInterFile> javaFileMap, int endingAt) {
-        String simpleImplName = "InsertIntoVal" + endingAt + "Impl";
-        String joined = toJoinedValuesGenericDeclared(endingAt);
-        DeclJavaFile insertImpl = DeclJavaFile.classOf(INSERT_INTO_IMPL_PKG, simpleImplName);
-        String importedTable = insertImpl.onImported(Table.class);
-        insertImpl.genericOf("<{}, R, TB extends {}<R, TB>>", joined, importedTable);
-        insertImpl.extend("{}<T1, T2, T3, T4, R, TB>", InsertIntoColsImpl.class);
-
-        List<String> interfacesList = new ArrayList<>();
-        String valuesReturnType = String.format("%s<%s, R, TB>", simpleImplName, joined);
-
-        for (Map.Entry<String, DeclInterFile> fileEntry : javaFileMap.entrySet()) {
-            String interGenericDecl = String.format("<%s, R, TB>", fileEntry.getKey());
-            DeclInterFile interFile = fileEntry.getValue();
-            interfacesList.add(interFile.getCanonicalName() + interGenericDecl);
-            interFile.forEachMethods(method -> {
-                String methodName = method.getName();
-                if ("values".equals(methodName)) {
-                    DeclParams params = method.getClonedParams();
-                    DeclMethod override = insertImpl.publicMethod(method.getName(), params);
-                    override.override().returnTypeof(valuesReturnType);
-                    String returning = "insertValuesOf(valuesOf({}))";
-                    override.returning(returning, String.join(", ", params.keySet()));
-                }
-            });
-            String insertValuesArg = String2.format("{}<{}[]>", List.class, Object.class);
-            DeclParams insertValuesOf = DeclParams.of("list", insertValuesArg);
-            insertImpl.publicMethod("insertValuesOf", insertValuesOf);
-        }
-
-        insertImpl.implement(interfacesList.toArray(Const2.EMPTY));
-
-        // construct
-        String bound = Table.class.getCanonicalName();
-        String fieldsType = String2.format("{}<?, R, TB>...", TableField.class.getCanonicalName());
-        DeclParams params = DeclParams.of("config", DSLConfiguration.class);
-        params.addGeneralization("table", "TB", bound).addActual("fields", fieldsType);
-        DeclConstruct construct = insertImpl.construct(params);
-        construct.scriptOf("super(config, table, fields)").markedOf(DeclMarked::ofSafeVarargs);
-
-        return insertImpl;
-    }
-
     private static DeclParams toDeclParamsWith(DeclParams prevParams, int index) {
         return prevParams.clone().addGeneralization("v" + index, "T" + index, Object.class);
     }
@@ -220,21 +163,5 @@ public class SessionManager implements JavaFileWriteable {
             params.addGeneralization("v" + i, "T" + i, Object.class);
         }
         return params;
-    }
-
-    /**
-     * startingAt = 4;
-     * return T1, T2, T3, T4
-     *
-     * @param n n
-     *
-     * @return t
-     */
-    private static String toJoinedValuesGenericDeclared(int n) {
-        String[] generics = new String[n];
-        for (int i = 0; i < n; i++) {
-            generics[i] = "T" + (i + 1);
-        }
-        return String.join(", ", generics);
     }
 }

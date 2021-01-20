@@ -45,11 +45,7 @@ public class Session {
         TableField<T1, ?, ? extends Table<?, ?>> f1, TableField<T2, ?, ? extends Table<?, ?>> f2
     ) { return new SelectCol2Impl<>(f1, f2); }
 
-    public <R, T extends Table<R, T>> Updater<R, T> update(T table) {
-        return new Updater<>(table);
-    }
+    public <R, TB extends Table<R, TB>> TableUpdater<R, TB> update(TB table) { return new TableUpdaterImpl<>(table); }
 
-    public <R, T extends Table<R, T>> Deleter<R, T> delete(T table) {
-        return new Deleter<>(table);
-    }
+    public <R, TB extends Table<R, TB>> TableDeleter<R, TB> delete(TB table) { return new TableDeleterImpl<>(table); }
 }

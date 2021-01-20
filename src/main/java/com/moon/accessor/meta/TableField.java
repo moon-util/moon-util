@@ -31,9 +31,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 实体对应字段的属性
      */
-    default T getPropertyValue(R record) {
-        return getPropertyGetter().get(record);
-    }
+    default T getPropertyValue(R record) { return getPropertyGetter().get(record); }
 
     /**
      * 获取属性值
@@ -43,27 +41,21 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 实体对应字段的属性
      */
-    default void setPropertyValue(R record, T value) {
-        getPropertySetter().set(record, value);
-    }
+    default void setPropertyValue(R record, T value) { getPropertySetter().set(record, value); }
 
     /**
      * 是否可获取属性值，即实体类里是否存在相应 getter
      *
      * @return true/false
      */
-    default boolean isGetterAvailable() {
-        return getPropertyGetter() != null;
-    }
+    default boolean isGetterAvailable() { return getPropertyGetter() != null; }
 
     /**
      * 是否可设置属性值，即实体类里是否存在相应 setter
      *
      * @return true/false
      */
-    default boolean isSetterAvailable() {
-        return getPropertySetter() != null;
-    }
+    default boolean isSetterAvailable() { return getPropertySetter() != null; }
 
     /**
      * 获取属性获取器
@@ -78,8 +70,6 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      * @return 属性设置器
      */
     PropertySetter<R, T> getPropertySetter();
-
-    // void transfer(R record, PreparedStatement statement, int columnIndex);
 
     /**
      * 实体字段名
@@ -111,9 +101,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @see #as(String) 指定别名
      */
-    default String getAliasName() {
-        return getColumnName();
-    }
+    default String getAliasName() { return getColumnName(); }
 
     /**
      * 返回所属数据表

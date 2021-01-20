@@ -33,9 +33,8 @@ public class InsertIntoColsImpl<T1, T2, R, TB extends Table<R, TB>>//
         return new InsertIntoValuesImpl<>(getConfig(), getTable(), getFields(), asList(record));
     }
 
-    @SafeVarargs
     @Override
-    public final InsertIntoValuesImpl<T1, T2, R, TB> valuesRecord(R record1, R record2, R... records) {
+    public InsertIntoValuesImpl<T1, T2, R, TB> valuesRecord(R record1, R record2, R... records) {
         return new InsertIntoValuesImpl<>(getConfig(), getTable(), getFields(), asList(record1, record2, records));
     }
 

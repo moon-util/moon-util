@@ -42,6 +42,7 @@ public class Importer implements Importable {
         StringBuilder result = new StringBuilder();
         StringBuilder cache = new StringBuilder();
 
+        boolean prevCharIdBlank = false;
         for (int i = 0; i < length; i++) {
             char ch = classname.charAt(i);
             switch (ch) {
@@ -56,14 +57,21 @@ public class Importer implements Importable {
                     if (ch == ',') {
                         result.append(' ');
                     }
+                    prevCharIdBlank = false;
                     break;
                 case '?':
                 case '&':
                     result.append(ch);
+                    prevCharIdBlank = false;
                     break;
                 case ' ':
+                    if (!prevCharIdBlank) {
+                        prevCharIdBlank = true;
+                        cache.append(ch);
+                    }
                     break;
                 default:
+                    prevCharIdBlank = false;
                     cache.append(ch);
             }
         }
@@ -88,10 +96,13 @@ public class Importer implements Importable {
     }
 
     private String withImported(String fullName) {
-        if (StringUtil.isBlank(fullName)) {
+        if (StringUtil.isEmpty(fullName)) {
             return EMPTY;
         }
-        String classname = fullName.trim();
+        if (StringUtil.isBlank(fullName)) {
+            return " ";
+        }
+        String classname = fullName;
         String shortName = shortNameCached.get(classname);
         if (shortName != null) {
             return shortName;

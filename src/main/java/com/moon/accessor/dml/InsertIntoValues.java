@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * @author benshaoye
  */
-public interface InsertInto<R, TB extends Table<R, TB>> {
+public interface InsertIntoValues<R, TB extends Table<R, TB>> extends InsertInto<R, TB>, Done {
 
     /**
      * 按实体数据插入
@@ -16,6 +16,7 @@ public interface InsertInto<R, TB extends Table<R, TB>> {
      *
      * @return 当前对象
      */
+    @Override
     InsertIntoValues<R, TB> valuesRecord(R record);
 
     /**
@@ -27,6 +28,7 @@ public interface InsertInto<R, TB extends Table<R, TB>> {
      *
      * @return this object
      */
+    @Override
     InsertIntoValues<R, TB> valuesRecord(R record1, R record2, R... records);
 
     /**
@@ -36,5 +38,6 @@ public interface InsertInto<R, TB extends Table<R, TB>> {
      *
      * @return this object
      */
+    @Override
     InsertIntoValues<R, TB> valuesRecord(Collection<? extends R> record);
 }

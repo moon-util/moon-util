@@ -2,6 +2,7 @@ package com.moon.processor.holder;
 
 import com.moon.accessor.dml.Done;
 import com.moon.accessor.dml.InsertInto;
+import com.moon.accessor.dml.InsertIntoValues;
 import com.moon.accessor.meta.Table;
 import com.moon.processor.file.DeclInterFile;
 import com.moon.processor.file.DeclMethod;
@@ -134,6 +135,13 @@ enum Select2 {
         DeclMethod values = inter.publicMethod("values", thisInterValuesArgs);
         values.returnTypeof(genericUsingPlaced, simpleName);
 
+        DeclMethod record1 = inter.publicMethod("valuesRecord", Params2.declParamsForValuesRecord1());
+        record1.returnTypeof(genericUsingPlaced, simpleName).override();
+        DeclMethod recordC = inter.publicMethod("valuesRecord", Params2.declParamsForValuesRecordC());
+        recordC.returnTypeof(genericUsingPlaced, simpleName).override();
+        DeclMethod recordN = inter.publicMethod("valuesRecord", Params2.declParamsForValuesRecordN());
+        recordN.returnTypeof(genericUsingPlaced, simpleName).override();
+
         return inter;
     }
 
@@ -142,7 +150,8 @@ enum Select2 {
     ) {
         DeclInterFile inter = interfaceForN(INSERT_INTO_VAL_N_PLACED, genericDeclPlaced, i);
         String colsClassName = String2.format(genericUsingPlaced, getInsertIntoColsClassname(i));
-        return inter.implement(colsClassName, DONE_CLASS);
+        String insertIntoValues = String2.format("{}<R, TB>", InsertIntoValues.class.getCanonicalName());
+        return inter.implement(insertIntoValues, colsClassName, DONE_CLASS);
     }
 
     private static String getInsertIntoColsClassname(int i) {

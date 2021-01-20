@@ -7,7 +7,7 @@ import com.moon.accessor.meta.Table;
  */
 public interface SelectCol2GroupBy<T1, T2, R, TB extends Table<R, TB>> extends SelectCol2OrderBy<T1, T2, R, TB> {
 
-    SelectCol2OrderBy<T1, T2, R, TB> orderBy(int count);
+    SelectCol2OrderBy<T1, T2, R, TB> orderBy();
 
     SelectCol2Having<T1, T2, R, TB> having();
 }

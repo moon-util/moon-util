@@ -1,7 +1,5 @@
 package com.moon.accessor.meta;
 
-import com.moon.accessor.Conditional;
-
 /**
  * @author benshaoye
  */
@@ -41,15 +39,4 @@ public interface Table<R, TB extends Table<R, TB>> {
      * @return 数据表所有字段
      */
     TableField<?, R, TB>[] getTableFields();
-
-    /**
-     * 连接条件
-     *
-     * @param condition 连接条件
-     *
-     * @return 查询表
-     */
-    default Table<R, TB> on(Conditional condition) {
-        return this;
-    }
 }

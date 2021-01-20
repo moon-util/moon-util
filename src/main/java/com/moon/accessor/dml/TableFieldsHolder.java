@@ -19,14 +19,10 @@ abstract class TableFieldsHolder<R, TB extends Table<R, TB>> {
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    protected TableFieldsHolder(TableField<?, R, TB>... fields) {
-        this.fields = fields == null ? FIELDS : fields;
-    }
+    protected TableFieldsHolder(TableField<?, R, TB>... fields) { this.fields = fields == null ? FIELDS : fields; }
 
     @SafeVarargs
-    protected static <R> List<R> asList(R... values) {
-        return Arrays.asList(values);
-    }
+    protected static <R> List<R> asList(R... values) { return Arrays.asList(values); }
 
     @SafeVarargs
     protected static <R> List<R> asList(R record1, R record2, R... values) {

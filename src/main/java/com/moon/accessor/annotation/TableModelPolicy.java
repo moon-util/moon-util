@@ -50,7 +50,7 @@ public @interface TableModelPolicy {
      * <strong>如：</strong>
      * <pre>
      * &#064;TableModelPolicy(
-     *     pattern = "t_{}",
+     *     pattern = "T_{}",
      *     trimEntityPrefix = "Ch",
      *     trimEntitySuffix = "Entity",
      *     caseMode = CaseMode.UNDERSCORE_LOWERCASE
@@ -64,7 +64,7 @@ public @interface TableModelPolicy {
      * 此示例中的处理就是:
      * 1. 去掉实体名前后缀后得到: UserInfo
      * 2. 按模式下划线分割的小写字母处理 UserInfo 得到: user_info
-     * 3. 替换表名占位符得到表名: t_user_info
+     * 3. 替换表名占位符得到表名: T_user_info (注: 设置的 caseMode 大小写不能影响到这里，这里为了演示故意写成了大小写不统一，实际中请注意)
      * </pre>
      *
      * @return 表名格式

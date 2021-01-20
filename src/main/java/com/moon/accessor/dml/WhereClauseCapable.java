@@ -5,16 +5,9 @@ import com.moon.accessor.Conditional;
 /**
  * @author benshaoye
  */
-public class WhereClauseCapable {
+public interface WhereClauseCapable {
 
-    public WhereClauseCapable() {
-    }
+    WhereClauseCapable and(Conditional condition);
 
-    public WhereClauseCapable and(Conditional condition) {
-        return this;
-    }
-
-    public WhereClauseCapable or(Conditional condition) {
-        return this;
-    }
+    WhereClauseCapable or(Conditional condition);
 }

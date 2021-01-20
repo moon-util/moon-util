@@ -5,7 +5,14 @@ package com.moon.accessor.parser;
  */
 public class QueryParserImpl {
 
-    public void parse(String qlString) {
+    private final char[] chars;
+
+
+    public QueryParserImpl(CharSequence chars) {
+        this.chars = chars.toString().trim().toCharArray();
+    }
+
+    public void parse() {
 
     }
 }
