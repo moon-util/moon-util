@@ -39,11 +39,11 @@ public class Session {
 
     public final <T1> SelectCol1<T1> select(
         TableField<T1, ?, ? extends Table<?, ?>> f1
-    ) { return new SelectCol1Impl<>(f1); }
+    ) { return null; }
 
     public <T1, T2> SelectCol2<T1, T2> select(
         TableField<T1, ?, ? extends Table<?, ?>> f1, TableField<T2, ?, ? extends Table<?, ?>> f2
-    ) { return new SelectCol2Impl<>(f1, f2); }
+    ) { return null; }
 
     public <R, TB extends Table<R, TB>> TableUpdater<R, TB> update(TB table) { return new TableUpdaterImpl<>(table); }
 

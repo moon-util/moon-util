@@ -1,5 +1,6 @@
 package com.moon.processor.holder;
 
+import com.moon.accessor.Conditional;
 import com.moon.accessor.dml.Done;
 import com.moon.accessor.dml.InsertInto;
 import com.moon.accessor.dml.InsertIntoValues;
@@ -46,7 +47,7 @@ enum Select2 {
         String implemented = String2.format(genericUsingPlaced, where.getCanonicalName());
 
         // orderBy
-        DeclParams params = DeclParams.of();
+        DeclParams params = DeclParams.of("conditional", Conditional.class);
         from.publicMethod("where", params).returnTypeof(implemented);
 
         from.implement(implemented);
@@ -59,7 +60,11 @@ enum Select2 {
         DeclInterFile where = interfaceForN("SelectCol{}Where", genericDeclPlaced, i);
         String implemented = String2.format(genericUsingPlaced, groupBy.getCanonicalName());
 
-        // orderBy
+        DeclParams conditionalParams = DeclParams.of("conditional", Conditional.class);
+        where.publicMethod("and", conditionalParams).returnTypeof(genericUsingPlaced, where.getCanonicalName());
+        where.publicMethod("or", conditionalParams).returnTypeof(genericUsingPlaced, where.getCanonicalName());
+
+        // groupBy
         DeclParams params = DeclParams.of();
         where.publicMethod("groupBy", params).returnTypeof(implemented);
 

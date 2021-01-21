@@ -1,5 +1,6 @@
 package com.moon.accessor.dml;
 
+import com.moon.accessor.Conditional;
 import com.moon.accessor.meta.Table;
 
 /**
@@ -7,5 +8,5 @@ import com.moon.accessor.meta.Table;
  */
 public interface TableUpdateSetter<R, TB extends Table<R, TB>> extends TableUpdater<R, TB>, Done {
 
-    TableUpdateWhere<R, TB> where();
+    TableUpdateWhere<R, TB> where(Conditional conditional);
 }

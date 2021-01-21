@@ -1,5 +1,6 @@
 package com.moon.accessor.dml;
 
+import com.moon.accessor.Conditional;
 import com.moon.accessor.meta.Table;
 
 /**
@@ -7,5 +8,5 @@ import com.moon.accessor.meta.Table;
  */
 public interface SelectCol1Join<T1, R, TB extends Table<R, TB>> {
 
-    SelectCol1From<T1, R, TB> on();
+    SelectCol1From<T1, R, TB> on(Conditional conditional);
 }

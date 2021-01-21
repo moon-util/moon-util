@@ -46,10 +46,10 @@ public class InsertIntoColsImpl<T1, T2, R, TB extends Table<R, TB>>//
     @Override
     public SelectCol1<T1> select(
         TableField<T1, ?, ? extends Table<?, ?>> f1
-    ) { return new SelectCol1Impl<>(f1); }
+    ) { return null; }
 
     @Override
     public SelectCol2<T1, T2> select(
         TableField<T1, ?, ? extends Table<?, ?>> f1, TableField<T2, ?, ? extends Table<?, ?>> f2
-    ) { return new SelectCol2Impl<>(f1, f2); }
+    ) { return null; }
 }

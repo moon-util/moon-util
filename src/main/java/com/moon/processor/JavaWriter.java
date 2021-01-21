@@ -18,9 +18,7 @@ public class JavaWriter {
     private final Map<String, Object> written = new ConcurrentHashMap<>();
     private final Filer filer;
 
-    public JavaWriter(Filer filer) {
-        this.filer = filer;
-    }
+    public JavaWriter(Filer filer) { this.filer = filer; }
 
     private Filer getFiler() { return filer; }
 

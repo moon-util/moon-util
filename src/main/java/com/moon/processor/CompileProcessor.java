@@ -19,6 +19,8 @@ import javax.lang.model.element.TypeElement;
 import java.util.HashSet;
 import java.util.Set;
 
+import static javax.lang.model.SourceVersion.latestSupported;
+
 /**
  * @author benshaoye
  */
@@ -34,9 +36,7 @@ public class CompileProcessor extends AbstractProcessor {
     }
 
     @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
-    }
+    public SourceVersion getSupportedSourceVersion() { return latestSupported(); }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {

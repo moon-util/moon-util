@@ -1,5 +1,6 @@
 package com.moon.accessor.dml;
 
+import com.moon.accessor.Conditional;
 import com.moon.accessor.meta.Table;
 
 /**
@@ -7,5 +8,5 @@ import com.moon.accessor.meta.Table;
  */
 public interface SelectCol2From<T1, T2, R, TB extends Table<R, TB>> extends SelectCol2Where<T1, T2, R, TB> {
 
-    SelectCol2Where<T1, T2, R, TB> where();
+    SelectCol2Where<T1, T2, R, TB> where(Conditional conditional);
 }

@@ -30,4 +30,8 @@ abstract class InsertIntoBase<R, TB extends Table<R, TB>> extends TableFieldsHol
     protected final DSLConfiguration getConfig() { return config; }
 
     public TB getTable() { return table; }
+
+    private void doInsert(){
+        DSLConfiguration configuration = getConfig();
+    }
 }
