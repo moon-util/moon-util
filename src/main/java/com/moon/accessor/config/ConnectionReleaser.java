@@ -1,8 +1,9 @@
 package com.moon.accessor.config;
 
+import com.moon.accessor.exception.SqlException;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * @author benshaoye
@@ -15,7 +16,7 @@ public interface ConnectionReleaser {
      * @param connection 数据库连接
      * @param dataSource 数据源
      *
-     * @throws SQLException 释放数据库连接
+     * @throws SqlException 释放数据库连接
      */
-    void release(Connection connection, DataSource dataSource) throws SQLException;
+    void release(Connection connection, DataSource dataSource) throws SqlException;
 }

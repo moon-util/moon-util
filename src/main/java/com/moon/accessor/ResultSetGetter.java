@@ -1,5 +1,7 @@
 package com.moon.accessor;
 
+import com.moon.accessor.exception.SqlException;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;

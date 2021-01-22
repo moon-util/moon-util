@@ -4,12 +4,7 @@ import com.moon.accessor.config.DSLConfiguration;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author benshaoye
@@ -31,7 +26,10 @@ abstract class InsertIntoBase<R, TB extends Table<R, TB>> extends TableFieldsHol
 
     public TB getTable() { return table; }
 
-    private void doInsert(){
+    private void doInsert(List<Object[]> values) {
         DSLConfiguration configuration = getConfig();
+        configuration.runWithAutoRelease(connection -> {
+            new Inserter<>(getTable(), getFields(), values).doInsert(connection);
+        });
     }
 }

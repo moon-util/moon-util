@@ -1,4 +1,4 @@
-package com.moon.accessor;
+package com.moon.accessor.exception;
 
 /**
  * @author benshaoye

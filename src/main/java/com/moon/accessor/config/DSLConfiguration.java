@@ -1,5 +1,6 @@
 package com.moon.accessor.config;
 
+import com.moon.accessor.exception.SqlException;
 import com.moon.accessor.dialect.SQLDialect;
 
 import javax.sql.DataSource;
@@ -25,7 +26,13 @@ public class DSLConfiguration {
     public DataSource getDataSource() { return dataSource; }
 
     private ConnectionGetter getConnectionGetter() {
-        return connectionGetter == null ? DataSource::getConnection : connectionGetter;
+        return connectionGetter == null ? ds -> {
+            try {
+                return ds.getConnection();
+            } catch (SQLException e) {
+                throw new SqlException(e);
+            }
+        } : connectionGetter;
     }
 
     public void setConnectionGetter(ConnectionGetter connectionGetter) {
@@ -33,14 +40,19 @@ public class DSLConfiguration {
     }
 
     public ConnectionReleaser getConnectionReleaser() {
-        return connectionReleaser == null ? (conn, ds) -> conn.close() : connectionReleaser;
+        return connectionReleaser == null ? (conn, ds) -> {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+            }
+        } : connectionReleaser;
     }
 
     private void setConnectionReleaser(ConnectionReleaser connectionReleaser) {
         this.connectionReleaser = connectionReleaser;
     }
 
-    public void runWithAutoRelease(Consumer<Connection> consumer) throws SQLException {
+    public void runWithAutoRelease(Consumer<Connection> consumer) throws SqlException {
         Connection connection = getConnectionGetter().getConnection(getDataSource());
         try {
             consumer.accept(connection);

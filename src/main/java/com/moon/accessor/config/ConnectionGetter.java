@@ -1,5 +1,7 @@
 package com.moon.accessor.config;
 
+import com.moon.accessor.exception.SqlException;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -18,5 +20,5 @@ public interface ConnectionGetter {
      *
      * @throws SQLException 数据库连接或执行错误
      */
-    Connection getConnection(DataSource dataSource) throws SQLException;
+    Connection getConnection(DataSource dataSource) throws SqlException;
 }

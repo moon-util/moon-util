@@ -1,5 +1,6 @@
 package com.moon.accessor.meta;
 
+import com.moon.accessor.Conditional;
 import com.moon.accessor.MatchingType;
 import com.moon.accessor.PropertyGetter;
 import com.moon.accessor.PropertySetter;
@@ -135,7 +136,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return where 条件
      */
-    default Condition startsWith(Object value) {
+    default Conditional startsWith(Object value) {
         return new Condition(this, MatchingType.starts_with, value);
     }
 
@@ -150,7 +151,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return where 条件
      */
-    default Condition endsWith(Object value) {
+    default Conditional endsWith(Object value) {
         return null;
     }
 
@@ -165,7 +166,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return where 条件
      */
-    default Condition contains(Object value) {
+    default Conditional contains(Object value) {
         return null;
     }
 
@@ -185,7 +186,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return where 条件
      */
-    default Condition like(Object value) {
+    default Conditional like(Object value) {
         return null;
     }
 
@@ -196,7 +197,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件子句
      */
-    default Condition lt(T value) {
+    default Conditional lt(T value) {
         return null;
     }
 
@@ -207,7 +208,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件子句
      */
-    default Condition gt(T value) {
+    default Conditional gt(T value) {
         return null;
     }
 
@@ -218,7 +219,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件子句
      */
-    default Condition le(T value) {
+    default Conditional le(T value) {
         return null;
     }
 
@@ -229,7 +230,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件子句
      */
-    default Condition ge(T value) {
+    default Conditional ge(T value) {
         return null;
     }
 
@@ -242,7 +243,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @see #is(Object) 等价
      */
-    default Condition eq(T value) {
+    default Conditional eq(T value) {
         return null;
     }
 
@@ -255,7 +256,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @see #eq(Object) 等价
      */
-    default Condition is(T value) {
+    default Conditional is(T value) {
         return null;
     }
 
@@ -266,7 +267,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件子句
      */
-    default Condition ne(T value) {
+    default Conditional ne(T value) {
         return null;
     }
 
@@ -280,7 +281,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      * @see #in(Iterable) 等价
      * @see #nonOf(Object[])
      */
-    default Condition oneOf(T... values) {
+    default Conditional oneOf(T... values) {
         return null;
     }
 
@@ -294,7 +295,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      * @see #notIn(Iterable) 等价
      * @see #oneOf(Object[])
      */
-    default Condition nonOf(T... values) {
+    default Conditional nonOf(T... values) {
         return null;
     }
 
@@ -305,7 +306,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件子句
      */
-    default Condition in(Iterable<T> values) {
+    default Conditional in(Iterable<T> values) {
         return null;
     }
 
@@ -316,7 +317,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件子句
      */
-    default Condition notIn(Iterable<T> values) {
+    default Conditional notIn(Iterable<T> values) {
         return null;
     }
 
@@ -325,7 +326,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件
      */
-    default Condition isNull() {
+    default Conditional isNull() {
         return null;
     }
 
@@ -334,7 +335,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件
      */
-    default Condition notNull() {
+    default Conditional notNull() {
         return null;
     }
 
@@ -343,7 +344,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件
      */
-    default Condition isNotNull() { return notNull(); }
+    default Conditional isNotNull() { return notNull(); }
 
     /**
      * 与另一个字段相等
@@ -352,7 +353,7 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      *
      * @return 条件
      */
-    default Condition equalsTo(TableField<?, ?, ? extends Table<?, ?>> field) {
+    default Conditional equalsTo(TableField<?, ?, ? extends Table<?, ?>> field) {
         return null;
     }
 }
