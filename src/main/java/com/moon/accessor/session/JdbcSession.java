@@ -20,9 +20,15 @@ public interface JdbcSession extends Closeable {
 
     int delete(String sql, Object[] parameters);
 
-    <T> T select(String sql, Object[] parameters, ResultExtractor<T> extractor);
+    <T> T selectOne(String sql, RowMapper<T> mapper);
+
+    <T> List<T> selectAll(String sql, RowMapper<T> mapper);
+
+    <T> T select(String sql, ResultExtractor<T> extractor);
+
+    <T> T selectOne(String sql, Object[] parameters, RowMapper<T> mapper);
 
     <T> List<T> selectAll(String sql, Object[] parameters, RowMapper<T> mapper);
 
-    <T> T selectOne(String sql, Object[] parameters, RowMapper<T> mapper);
+    <T> T select(String sql, Object[] parameters, ResultExtractor<T> extractor);
 }

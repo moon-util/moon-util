@@ -1,6 +1,6 @@
 package com.moon.accessor.dml;
 
-import com.moon.accessor.config.DSLConfiguration;
+import com.moon.accessor.config.Configuration;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 
@@ -14,7 +14,7 @@ public class InsertIntoColsImpl<T1, T2, R, TB extends Table<R, TB>>//
     implements InsertInto<R, TB>, InsertIntoCol1<T1, R, TB>, InsertIntoCol2<T1, T2, R, TB> {
 
     @SafeVarargs
-    public InsertIntoColsImpl(DSLConfiguration config, TB table, TableField<?, R, TB>... fields) {
+    public InsertIntoColsImpl(Configuration config, TB table, TableField<?, R, TB>... fields) {
         super(config, table, fields);
     }
 

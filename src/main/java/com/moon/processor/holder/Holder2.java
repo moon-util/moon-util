@@ -1,6 +1,6 @@
 package com.moon.processor.holder;
 
-import com.moon.accessor.Session;
+import com.moon.accessor.session.DSLSession;
 import com.moon.accessor.Supported;
 import com.moon.accessor.meta.Table;
 import com.moon.processor.utils.String2;
@@ -10,7 +10,7 @@ import com.moon.processor.utils.String2;
  */
 enum Holder2 {
     ;
-    public static final Class<Session> SESSION_CLASS = Session.class;
+    public static final Class<DSLSession> SESSION_CLASS = DSLSession.class;
     public static final int SUPPORTED_LEVEL, MAX_LEVEL;
     public static final String TYPES_JOINED;
 

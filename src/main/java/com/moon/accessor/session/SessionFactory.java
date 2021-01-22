@@ -6,4 +6,6 @@ package com.moon.accessor.session;
 public interface SessionFactory {
 
     JdbcSession openJdbcSession();
+
+    <T extends DSLSession> T openDSLSession();
 }

@@ -1,16 +1,13 @@
 package com.moon.processor.holder;
 
-import com.moon.accessor.Session;
+import com.moon.accessor.session.DSLSession;
 import com.moon.accessor.Supported;
-import com.moon.accessor.config.DSLConfiguration;
-import com.moon.accessor.dml.InsertInto;
-import com.moon.accessor.dml.InsertIntoColsImpl;
+import com.moon.accessor.config.Configuration;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.file.*;
-import com.moon.processor.utils.Const2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
 
@@ -26,7 +23,7 @@ import static com.moon.processor.holder.Select2.*;
  */
 public class SessionManager implements JavaFileWriteable {
 
-    private static final Class<Session> SESSION_CLASS = Session.class;
+    private static final Class<DSLSession> SESSION_CLASS = DSLSession.class;
 
     private static final String PKG = Element2.getPackageName(SESSION_CLASS);
 
@@ -112,12 +109,12 @@ public class SessionManager implements JavaFileWriteable {
     }
 
     private DeclInterFile getSessionDeclJavaFile(Map<String, DeclInterFile> javaFileMap, String insertImpl) {
-        String simpleSessionClass = String2.format("Dml{}Session", generateLevel());
+        String simpleSessionClass = String2.format("DSL{}Session", generateLevel());
         DeclJavaFile session = DeclJavaFile.classOf(PKG, simpleSessionClass).extend(SESSION_CLASS);
         String importedImpl = session.onImported(insertImpl);
 
         // 构造器
-        session.construct(DeclParams.of("config", DSLConfiguration.class)).scriptOf("super(config)");
+        session.construct(DeclParams.of("config", Configuration.class)).scriptOf("super(config)");
 
         String bound = Table.class.getCanonicalName();
         String tableField = TableField.class.getCanonicalName();

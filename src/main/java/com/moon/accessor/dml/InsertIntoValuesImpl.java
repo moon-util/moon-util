@@ -1,6 +1,6 @@
 package com.moon.accessor.dml;
 
-import com.moon.accessor.config.DSLConfiguration;
+import com.moon.accessor.config.Configuration;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 
@@ -16,12 +16,12 @@ public class InsertIntoValuesImpl<T1, T2, R, TB extends Table<R, TB>> extends In
 
     private final List<Object[]> values = new ArrayList<>(4);
 
-    InsertIntoValuesImpl(DSLConfiguration config, TB table, TableField<?, R, TB>[] fields, Object... values) {
+    InsertIntoValuesImpl(Configuration config, TB table, TableField<?, R, TB>[] fields, Object... values) {
         super(config, table, fields);
         requireAddAll(this.getValues(), values);
     }
 
-    InsertIntoValuesImpl(DSLConfiguration config, TB table, TableField<?, R, TB>[] fields, Collection<R> records) {
+    InsertIntoValuesImpl(Configuration config, TB table, TableField<?, R, TB>[] fields, Collection<R> records) {
         super(config, table, fields);
         requireAddRecord(this.getValues(), records);
     }

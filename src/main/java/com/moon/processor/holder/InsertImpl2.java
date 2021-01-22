@@ -1,6 +1,6 @@
 package com.moon.processor.holder;
 
-import com.moon.accessor.config.DSLConfiguration;
+import com.moon.accessor.config.Configuration;
 import com.moon.accessor.dml.InsertIntoColsImpl;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
@@ -197,7 +197,7 @@ enum InsertImpl2 {
 
     private static DeclParams declParamsForConfigTableFields() {
         String fieldsType = String2.format("{}<?, R, TB>[]", TableField.class.getCanonicalName());
-        DeclParams constructParams = DeclParams.of("config", DSLConfiguration.class);
+        DeclParams constructParams = DeclParams.of("config", Configuration.class);
         constructParams.addGeneralization("table", "TB", Table.class);
         return constructParams.addActual("fields", fieldsType);
     }

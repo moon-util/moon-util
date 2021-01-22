@@ -1,5 +1,6 @@
 package com.moon.accessor.config;
 
+import com.moon.accessor.exception.Exception2;
 import com.moon.accessor.exception.SqlException;
 import com.moon.accessor.dialect.SQLDialect;
 
@@ -11,14 +12,14 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class DSLConfiguration {
+public class Configuration {
 
     private final SQLDialect dialect;
     private final DataSource dataSource;
     private ConnectionGetter connectionGetter;
     private ConnectionReleaser connectionReleaser;
 
-    public DSLConfiguration(DataSource dataSource, SQLDialect dialect) {
+    public Configuration(DataSource dataSource, SQLDialect dialect) {
         this.dataSource = dataSource;
         this.dialect = dialect;
     }
@@ -30,7 +31,7 @@ public class DSLConfiguration {
             try {
                 return ds.getConnection();
             } catch (SQLException e) {
-                throw new SqlException(e);
+                throw Exception2.with(e);
             }
         } : connectionGetter;
     }
