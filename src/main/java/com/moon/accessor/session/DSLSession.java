@@ -1,62 +1,109 @@
 package com.moon.accessor.session;
 
-import com.moon.accessor.Supported;
-import com.moon.accessor.config.Configuration;
 import com.moon.accessor.dml.*;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 
-import java.util.function.Function;
-
 /**
+ * DSL 语法
+ *
  * @author benshaoye
  */
-@Supported(value = 2, max = 16)
-public class DSLSession {
+@SuppressWarnings("unused")
+public interface DSLSession {
 
-    private static Function<Configuration, ? extends DSLSession> creator;
+    /**
+     * 向指定表所有列插入数据
+     *
+     * @param table 指定表
+     * @param <R>   与表关联的实体数据类型
+     * @param <TB>  表
+     *
+     * @return Insert 语句执行器
+     */
+    <R, TB extends Table<R, TB>> InsertInto<R, TB> insertInto(TB table);
 
-    static { creator = DSLSession::new; }
-
-    private final Configuration config;
-
-    public DSLSession(Configuration config) { this.config = config; }
-
-    public static <T extends DSLSession> T newDSLSession(Configuration config) {
-        return (T) creator.apply(config);
-    }
-
-    public final Configuration getConfig() { return config; }
-
-    @SafeVarargs
-    protected static <T> T[] toArr(T... ts) { return ts; }
-
-    public final <R, TB extends Table<R, TB>> InsertInto<R, TB> insertInto(TB table) {
-        return new InsertIntoColsImpl<>(getConfig(), table, table.getTableFields());
-    }
-
-    public final <T1, R, TB extends Table<R, TB>> InsertIntoCol1<T1, R, TB> insertInto(
+    /**
+     * 向指定表指定一列插入数据
+     *
+     * @param table 指定表
+     * @param f1    指定列
+     * @param <R>   与表关联的实体数据类型
+     * @param <TB>  表
+     *
+     * @return Insert 语句执行器
+     */
+    <T1, R, TB extends Table<R, TB>> InsertIntoCol1<T1, R, TB> insertInto(
         TB table, TableField<T1, R, TB> f1
-    ) { return new InsertIntoColsImpl<>(getConfig(), table, f1); }
+    );
 
-    public final <T1, T2, R, TB extends Table<R, TB>> InsertIntoCol2<T1, T2, R, TB> insertInto(
+    /**
+     * 向指定表指定两列插入数据
+     *
+     * @param table 指定表
+     * @param f1    指定列1
+     * @param f2    指定列2
+     * @param <R>   与表关联的实体数据类型
+     * @param <TB>  表
+     *
+     * @return Insert 语句执行器
+     */
+    <T1, T2, R, TB extends Table<R, TB>> InsertIntoCol2<T1, T2, R, TB> insertInto(
         TB table, TableField<T1, R, TB> f1, TableField<T2, R, TB> f2
-    ) { return new InsertIntoColsImpl<>(getConfig(), table, f1, f2); }
+    );
 
-    @SafeVarargs
-    public final SelectCols select(TableField<?, ?, ? extends Table<?, ?>>... fields) {
-        return new SelectColsImpl(fields);
-    }
+    /**
+     * 查询字段
+     *
+     * @param fields 字段列表
+     *
+     * @return 查询
+     */
+    SelectCols select(TableField<?, ?, ? extends Table<?, ?>>... fields);
 
-    public final <T1> SelectCol1<T1> select(
-        TableField<T1, ?, ? extends Table<?, ?>> f1
-    ) { return null; }
+    /**
+     * 查询单个字段值
+     *
+     * @param f1   指定字段
+     * @param <T1> 字段值的数据类型
+     *
+     * @return 单列查询
+     */
+    <T1> SelectCol1<T1> select(TableField<T1, ?, ? extends Table<?, ?>> f1);
 
-    public <T1, T2> SelectCol2<T1, T2> select(
+    /**
+     * 查询多个字段值
+     *
+     * @param f1   指定字段1
+     * @param f2   指定字段2
+     * @param <T1> 字段 1 值的数据类型
+     * @param <T2> 字段 2 值的数据类型
+     *
+     * @return 两列查询
+     */
+    <T1, T2> SelectCol2<T1, T2> select(
         TableField<T1, ?, ? extends Table<?, ?>> f1, TableField<T2, ?, ? extends Table<?, ?>> f2
-    ) { return null; }
+    );
 
-    public <R, TB extends Table<R, TB>> TableUpdater<R, TB> update(TB table) { return new TableUpdaterImpl<>(table); }
+    /**
+     * 更新单表数据
+     *
+     * @param table 表
+     * @param <R>   与表关联的实体数据类型
+     * @param <TB>  表
+     *
+     * @return update
+     */
+    <R, TB extends Table<R, TB>> TableUpdater<R, TB> update(TB table);
 
-    public <R, TB extends Table<R, TB>> TableDeleter<R, TB> delete(TB table) { return new TableDeleterImpl<>(table); }
+    /**
+     * 删除单表数据
+     *
+     * @param table 表
+     * @param <R>   与表关联的实体数据类型
+     * @param <TB>  表
+     *
+     * @return delete
+     */
+    <R, TB extends Table<R, TB>> TableDeleter<R, TB> delete(TB table);
 }

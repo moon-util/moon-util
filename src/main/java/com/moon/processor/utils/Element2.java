@@ -22,6 +22,8 @@ public enum Element2 {
         return getQualifiedName(Environment2.getUtils().getPackageOf(elem));
     }
 
+    public static String getQualifiedName(Class<?> elem) { return elem.getCanonicalName(); }
+
     public static String getQualifiedName(QualifiedNameable elem) { return elem.getQualifiedName().toString(); }
 
     public static String getSimpleName(Element elem) { return elem.getSimpleName().toString(); }

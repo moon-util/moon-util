@@ -73,7 +73,5 @@ public class InsertIntoValuesImpl<T1, T2, R, TB extends Table<R, TB>> extends In
     }
 
     @Override
-    public int done() {
-        return 0;
-    }
+    public int done() { return doInsert(getValues()); }
 }

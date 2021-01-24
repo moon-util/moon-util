@@ -11,6 +11,7 @@ import com.moon.processor.utils.String2;
 import java.util.*;
 
 import static com.moon.processor.utils.String2.format;
+import static java.util.Comparator.comparingInt;
 
 /**
  * @author benshaoye
@@ -18,6 +19,7 @@ import static com.moon.processor.utils.String2.format;
 enum InsertImpl2 {
     ;
 
+    private final static String CALL_SUPER = "super(config, table, fields)";
     private final static String PACKAGE = Element2.getPackageName(InsertIntoColsImpl.class);
     private final static String COL_SIMPLE_NAME_PLACED = "InsertIntoCol{}Impl";
     private final static String VAL_SIMPLE_NAME_PLACED = "InsertIntoVal{}Impl";
@@ -50,14 +52,14 @@ enum InsertImpl2 {
         }
     }
 
-    private final static String INSERT_INTO_BASE_CLASSNAME = InsertIntoColsImpl.class.getSuperclass()
-        .getCanonicalName();
+    private final static String INSERT_INTO_BASE_CLASSNAME//
+        = InsertIntoColsImpl.class.getSuperclass().getCanonicalName();
 
     public static DeclJavaFile forColImpl(int endVal, Map<String, DeclInterFile> insertCols) {
         String simpleName = getColImplSimpleName(endVal);
         String valImplClass = getValImplCanonicalName(endVal);
         MaxLengthVal maxLengthVal = new MaxLengthVal();
-        TreeSet<String> typesJoined = new TreeSet<>(Comparator.comparingInt(String2::length));
+        TreeSet<String> typesJoined = new TreeSet<>(comparingInt(String2::length));
 
         // declare class and implements interfaces
         DeclJavaFile colImpl = newAndImplInterfaces(simpleName, maxLengthVal, typesJoined, insertCols);
@@ -70,7 +72,7 @@ enum InsertImpl2 {
         colImpl.genericOf(Holder2.toGenericDeclWithJoined(usingJoined), Table.class);
 
         // public InsertIntoCol2Impl(DSLConfiguration config, TB table, TableTable<?, R, TB>... fields) { super(config, table, fields); }
-        colImpl.construct(declParamsForConfigTableFields()).scriptOf("super(config, table, fields)");
+        colImpl.construct(declParamsForConfigTableFields()).scriptOf(CALL_SUPER);
 
         // private InsertIntoVal2Impl<T1, T2, R, TB> insertValuesOf(List<Object[]> values) { /* ... */ }
         String insertValuesImpl = getValImplCanonicalName(endVal);
@@ -117,7 +119,7 @@ enum InsertImpl2 {
     public static DeclJavaFile forValImpl(int endVal, Map<String, DeclInterFile> insertVals) {
         String simpleName = getValImplSimpleName(endVal);
         MaxLengthVal maxLengthVal = new MaxLengthVal();
-        TreeSet<String> typesJoined = new TreeSet<>(Comparator.comparingInt(String2::length));
+        TreeSet<String> typesJoined = new TreeSet<>(comparingInt(String2::length));
 
         // declare class and implements interfaces
         DeclJavaFile valImpl = newAndImplInterfaces(simpleName, maxLengthVal, typesJoined, insertVals);
@@ -128,24 +130,21 @@ enum InsertImpl2 {
         valImpl.genericOf(Holder2.toGenericDeclWithJoined(usingJoined), Table.class);
 
         // extends superclass of: InsertIntoCol2Impl<T1, T2>
-        // valImpl.extend(toUsingByJoined(superclass, usingJoined));
         valImpl.extend(toUsingByJoined(INSERT_INTO_BASE_CLASSNAME, null));
 
         // private final List<Object[]> values = new ArrayList<>(4);
-        valImpl.privateField("values", "{}<{}[]>", List.class, Object.class)
-            .withFinal()
-            .withGetterMethod(m -> {})
-            .valueOf("new {}<>({})", valImpl.onImported(ArrayList.class), 4);
+        String importedArrayList = valImpl.onImported(ArrayList.class);
+        valImpl.privateField("values", "{}<{}[]>", List.class, Object.class)//
+            .withFinal().withGetterMethod(m -> {})//
+            .valueOf("new {}<>({})", importedArrayList, 4);
 
         // constructor
         DeclParams paramsL = declParamsForConfigTableFields().addActual("records", "java.util.Collection<? extends R>");
-        DeclConstruct constructL = valImpl.construct(paramsL);
-        constructL.scriptOf("super(config, table, fields)");
+        DeclConstruct constructL = valImpl.construct(paramsL).scriptOf(CALL_SUPER);
         constructL.scriptOf("requireAddRecord(this.getValues(), records)");
 
         DeclParams paramsN = declParamsForConfigTableFields().addActual("values", "java.lang.Object...");
-        DeclConstruct constructN = valImpl.construct(paramsN);
-        constructN.scriptOf("super(config, table, fields)");
+        DeclConstruct constructN = valImpl.construct(paramsN).scriptOf(CALL_SUPER);
         constructN.scriptOf("requireAddAll(this.getValues(), values)");
 
         String valImplClass = valImpl.getCanonicalName();
@@ -169,7 +168,8 @@ enum InsertImpl2 {
         valuesRecord(valImpl, recordParamsN).returnTypeof(thisUsingJoined);
 
         // public int done() { return 0; }
-        valImpl.publicMethod("done", DeclParams.of()).returnTypeof("int").returning("0").override();
+        DeclMethod done = valImpl.publicMethod("done", DeclParams.of()).override();
+        done.returnTypeof("int").returning("doInsert(getValues())");
 
         return valImpl;
     }

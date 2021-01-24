@@ -21,7 +21,7 @@ import static java.nio.file.spi.FileSystemProvider.installedProviders;
 public class PackageScanner extends HashSet<String> {
 
     private final static String DOT_CLASS = ".class";
-    private final static Class TYPE = PackageScanner.class;
+    private final static Class<PackageScanner> TYPE = PackageScanner.class;
 
     PackageScanner() { }
 
@@ -75,7 +75,7 @@ public class PackageScanner extends HashSet<String> {
                 ThrowUtil.runtime(e);
             }
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     private static Path targetUrlToPath(URL url) {

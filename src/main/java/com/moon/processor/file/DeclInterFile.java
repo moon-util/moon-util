@@ -97,11 +97,6 @@ public class DeclInterFile implements Importable, JavaFileWriteable {
         return method.withPublic();
     }
 
-    public DeclInterFile forEachMethods(Consumer<DeclMethod> consumer) {
-        methodsMap.values().forEach(consumer);
-        return this;
-    }
-
     protected StringAddr.Mark predefineAntGetImportMark(StringAddr addr) {
         addr.addPackage(getPackageName()).next(2);
         StringAddr.Mark importMark = addr.mark();

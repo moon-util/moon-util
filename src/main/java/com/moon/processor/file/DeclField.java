@@ -25,8 +25,7 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
 
     DeclField(ConstManager importer, String name, String typePattern, Object... types) {
         super(importer);
-        String classname = Formatter2.toFormatted(typePattern, types);
-        this.typeClassname = classname;
+        this.typeClassname = Formatter2.toFormatted(typePattern, types);
         this.name = name;
         this.withPrivate();
     }

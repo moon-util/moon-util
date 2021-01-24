@@ -28,6 +28,30 @@ import static javax.lang.model.SourceVersion.latestSupported;
 @AutoService(Processor.class)
 public class CompileProcessor extends AbstractProcessor {
 
+    private final NameHolder nameHolder;
+    private final SessionManager sessionManager;
+    private final PojoHolder pojoHolder;
+    private final PolicyHolder policyHolder;
+    private final AccessorHolder accessorHolder;
+    private final AliasesHolder aliasesHolder;
+    private final TablesHolder tablesHolder;
+    private final ModelHolder modelHolder;
+    private final CopierHolder copierHolder;
+    private final MapperHolder mapperHolder;
+
+    public CompileProcessor() {
+        nameHolder = new NameHolder();
+        sessionManager = new SessionManager();
+        pojoHolder = new PojoHolder(nameHolder, sessionManager);
+        policyHolder = new PolicyHolder();
+        aliasesHolder = new AliasesHolder();
+        tablesHolder = new TablesHolder(policyHolder);
+        modelHolder = new ModelHolder(pojoHolder, tablesHolder, aliasesHolder, policyHolder);
+        copierHolder = new CopierHolder(pojoHolder, nameHolder);
+        mapperHolder = new MapperHolder(copierHolder, pojoHolder, nameHolder);
+        accessorHolder = new AccessorHolder(copierHolder, pojoHolder, modelHolder, nameHolder);
+    }
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
@@ -52,31 +76,23 @@ public class CompileProcessor extends AbstractProcessor {
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        NameHolder nameHolder = new NameHolder();
-        SessionManager sessionManager = new SessionManager();
-        PojoHolder pojoHolder = new PojoHolder(nameHolder, sessionManager);
-        PolicyHolder policyHolder = new PolicyHolder();
-        AliasesHolder aliasesHolder = new AliasesHolder();
-        TablesHolder tablesHolder = new TablesHolder(policyHolder);
-        ModelHolder modelHolder = new ModelHolder(pojoHolder, tablesHolder, aliasesHolder, policyHolder);
-        CopierHolder copierHolder = new CopierHolder(pojoHolder, nameHolder);
-        MapperHolder mapperHolder = new MapperHolder(copierHolder, pojoHolder, nameHolder);
-
-        AccessorHolder accessorHolder = new AccessorHolder(copierHolder, pojoHolder, modelHolder, nameHolder);
-        processMapperFor(roundEnv, mapperHolder);
-        processTableModel(roundEnv, modelHolder);
-        processAccessor(roundEnv, accessorHolder);
-        processMapper();
-        processSubQuery(roundEnv);
-        JavaWriter writer = new JavaWriter(Environment2.getFiler());
-        pojoHolder.writeJavaFile(writer);
-        copierHolder.writeJavaFile(writer);
-        mapperHolder.writeJavaFile(writer);
-        modelHolder.writeJavaFile(writer);
-        tablesHolder.writeJavaFile(writer);
-        aliasesHolder.writeJavaFile(writer);
-        sessionManager.writeJavaFile(writer);
-        accessorHolder.writeJavaFile(writer);
+        if (roundEnv.processingOver()) {
+            JavaWriter writer = new JavaWriter(Environment2.getFiler());
+            pojoHolder.writeJavaFile(writer);
+            copierHolder.writeJavaFile(writer);
+            mapperHolder.writeJavaFile(writer);
+            modelHolder.writeJavaFile(writer);
+            tablesHolder.writeJavaFile(writer);
+            aliasesHolder.writeJavaFile(writer);
+            sessionManager.writeJavaFile(writer);
+            accessorHolder.writeJavaFile(writer);
+        } else {
+            processMapperFor(roundEnv, mapperHolder);
+            processTableModel(roundEnv, modelHolder);
+            processAccessor(roundEnv, accessorHolder);
+            processMapper();
+            processSubQuery(roundEnv);
+        }
         return true;
     }
 

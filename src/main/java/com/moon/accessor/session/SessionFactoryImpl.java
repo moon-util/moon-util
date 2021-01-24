@@ -1,20 +1,24 @@
 package com.moon.accessor.session;
 
+import com.moon.accessor.config.ConfigurationContext;
+import com.moon.accessor.config.Configuration;
+
 /**
  * @author benshaoye
  */
-public class SessionFactoryImpl implements SessionFactory {
+@SuppressWarnings("unused")
+public class SessionFactoryImpl extends ConfigurationContext implements SessionFactory {
 
-    public SessionFactoryImpl() {
-    }
+    public SessionFactoryImpl(Configuration config) { super(config); }
 
     @Override
     public JdbcSession openJdbcSession() {
-        return new JdbcSessionImpl();
+        return new JdbcSessionImpl(getConfiguration());
     }
 
+    @SuppressWarnings("all")
     @Override
     public <T extends DSLSession> T openDSLSession() {
-        return null;
+        return DSLSession2.newDSLSession(getConfiguration());
     }
 }

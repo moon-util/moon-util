@@ -50,7 +50,7 @@ public enum Chars {
         char[] value = CHARS;
         int index = 0, pr = -1, es = '\\', i = indexer.get();
         for (char ch; (ch = chars[i++]) != endChar || pr == es; pr = ch) {
-            if (ch == endChar && pr == es) {
+            if (ch == endChar) {
                 value[index - 1] = ch;
             } else {
                 value = setChar(value, index++, ch);

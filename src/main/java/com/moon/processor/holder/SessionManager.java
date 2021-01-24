@@ -1,20 +1,22 @@
 package com.moon.processor.holder;
 
-import com.moon.accessor.session.DSLSession;
 import com.moon.accessor.Supported;
 import com.moon.accessor.config.Configuration;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
+import com.moon.accessor.session.DSLSession;
+import com.moon.accessor.session.DSLSessionBuilder;
+import com.moon.accessor.session.DSLSessionImpl;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
-import com.moon.processor.file.*;
+import com.moon.processor.file.DeclInterFile;
+import com.moon.processor.file.DeclJavaFile;
+import com.moon.processor.file.DeclMethod;
+import com.moon.processor.file.DeclParams;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.moon.processor.holder.Select2.*;
 
@@ -23,14 +25,17 @@ import static com.moon.processor.holder.Select2.*;
  */
 public class SessionManager implements JavaFileWriteable {
 
-    private static final Class<DSLSession> SESSION_CLASS = DSLSession.class;
+    private static final String SESSION_CLASS = DSLSession.class.getCanonicalName();
+    private static final String SESSION_BUILDER_PKG = Element2.getPackageName(DSLSessionBuilder.class);
+    private static final String SESSION_BUILDER_CLASS = Element2.getQualifiedName(DSLSessionBuilder.class);
+    private static final Class<DSLSessionImpl> SESSION_IMPL_CLASS = DSLSessionImpl.class;
 
-    private static final String PKG = Element2.getPackageName(SESSION_CLASS);
+    private static final String PKG = Element2.getPackageName(SESSION_IMPL_CLASS);
 
     private static final int SUPPORTED_LEVEL, MAX_LEVEL;
 
     static {
-        Supported supported = SESSION_CLASS.getAnnotation(Supported.class);
+        Supported supported = SESSION_IMPL_CLASS.getAnnotation(Supported.class);
         SUPPORTED_LEVEL = supported.value();
         MAX_LEVEL = supported.max();
     }
@@ -53,6 +58,10 @@ public class SessionManager implements JavaFileWriteable {
     public void writeJavaFile(JavaWriter writer) {
         if (canGenerate()) {
             getDeclJavaFileList().forEach(java -> java.writeJavaFile(writer));
+
+            Set<String> sessionBuilderImpls = new LinkedHashSet<>();
+            sessionBuilderImpls.add(getSessionImplCanonicalName());
+            writer.writeResourceFile(SESSION_BUILDER_CLASS, sessionBuilderImpls);
         }
     }
 
@@ -62,7 +71,7 @@ public class SessionManager implements JavaFileWriteable {
     }
 
     private List<DeclInterFile> getInsertionDeclJavaFile(int startingAt, int nextEnding) {
-        List<DeclInterFile> selects = new ArrayList<>();
+        List<DeclInterFile> files = new ArrayList<>();
         Map<String, DeclInterFile> insertColsMap = new LinkedHashMap<>();
         Map<String, DeclInterFile> insertValsMap = new LinkedHashMap<>();
         DeclParams interValuesParams = toInitInsertIntoValuesParams(startingAt);
@@ -89,32 +98,46 @@ public class SessionManager implements JavaFileWriteable {
             insertColsMap.put(joined, insertCols);
             insertValsMap.put(joined, insertVals);
 
-            selects.add(limit);
-            selects.add(orderBy);
-            selects.add(having);
-            selects.add(groupBy);
-            selects.add(where);
-            selects.add(from);
-            selects.add(selectCols);
-            selects.add(insertCols);
-            selects.add(insertVals);
+            files.add(limit);
+            files.add(orderBy);
+            files.add(having);
+            files.add(groupBy);
+            files.add(where);
+            files.add(from);
+            files.add(selectCols);
+            files.add(insertCols);
+            files.add(insertVals);
         }
 
         DeclJavaFile colImpl = InsertImpl2.forColImpl(nextEnding - 1, insertColsMap);
         DeclJavaFile valImpl = InsertImpl2.forValImpl(nextEnding - 1, insertValsMap);
-        selects.add(colImpl);
-        selects.add(valImpl);
-        selects.add(getSessionDeclJavaFile(insertColsMap, colImpl.getCanonicalName()));
-        return selects;
+        files.add(colImpl);
+        files.add(valImpl);
+        forDSLSession(files, insertColsMap, colImpl.getCanonicalName());
+        return files;
     }
 
-    private DeclInterFile getSessionDeclJavaFile(Map<String, DeclInterFile> javaFileMap, String insertImpl) {
-        String simpleSessionClass = String2.format("DSL{}Session", generateLevel());
-        DeclJavaFile session = DeclJavaFile.classOf(PKG, simpleSessionClass).extend(SESSION_CLASS);
-        String importedImpl = session.onImported(insertImpl);
+    private String getSessionImplCanonicalName() {
+        return String.join(".", SESSION_BUILDER_PKG, getSessionBuilderImplSimpleName());
+    }
+
+    private String getSessionBuilderImplSimpleName() {
+        return String2.format("DSL{}SessionBuilderImpl", generateLevel());
+    }
+
+    private void forDSLSession(
+        List<DeclInterFile> files, Map<String, DeclInterFile> javaFileMap, String insertImpl
+    ) {
+        String sessionName = String2.format("DSL{}Session", generateLevel());
+        String sessionImplName = String2.format("DSL{}SessionImpl", generateLevel());
+        DeclInterFile session = DeclInterFile.interfaceOf(PKG, sessionName).implement(SESSION_CLASS);
+        DeclJavaFile sessionImpl = DeclJavaFile.classOf(PKG, sessionImplName).extend(SESSION_IMPL_CLASS);
+        sessionImpl.implement(session.getCanonicalName(), SESSION_CLASS);
+        String importedImpl = sessionImpl.onImported(insertImpl);
 
         // 构造器
-        session.construct(DeclParams.of("config", Configuration.class)).scriptOf("super(config)");
+        DeclParams constructParams = DeclParams.of("config", Configuration.class);
+        sessionImpl.construct(constructParams).scriptOf("super(config)");
 
         String bound = Table.class.getCanonicalName();
         String tableField = TableField.class.getCanonicalName();
@@ -126,13 +149,30 @@ public class SessionManager implements JavaFileWriteable {
             DeclParams params = DeclParams.of().addGeneralization("table", "TB", bound);
             String names = extractParams(generics, params, tableField);
 
-            DeclMethod insertInto = session.publicMethod("insertInto", params);
+            // 接口方法
+            DeclMethod insert = session.publicMethod("insertInto", params);
+            insert.genericOf("<{}, R, TB extends {}<R, TB>>", joined, Table.class);
+            insert.returnTypeof("{}<{}, R, TB>", interFile.getCanonicalName(), joined);
+
+            // 实现
+            DeclMethod insertInto = sessionImpl.publicMethod("insertInto", params).override();
             insertInto.genericOf("<{}, R, TB extends {}<R, TB>>", joined, Table.class);
             insertInto.returnTypeof("{}<{}, R, TB>", interFile.getCanonicalName(), joined);
             insertInto.returning("new {}<>(getConfig(), table, toArr({}))", importedImpl, names);
         }
 
-        return session;
+        // DSLSessionBuilder
+        String builderSimpleName = getSessionBuilderImplSimpleName();
+        DeclJavaFile builderImpl = DeclJavaFile.classOf(SESSION_BUILDER_PKG, builderSimpleName);
+        builderImpl.implement(SESSION_BUILDER_CLASS);
+        DeclMethod buildMethod = builderImpl.publicMethod("build", constructParams);
+        buildMethod.override().returnTypeof(session.getCanonicalName());
+        String importedSessionImpl = builderImpl.onImported(sessionImpl.getCanonicalName());
+        buildMethod.returning("new {}(config)", importedSessionImpl);
+
+        files.add(session);
+        files.add(sessionImpl);
+        files.add(builderImpl);
     }
 
     private static String extractParams(List<String> generics, DeclParams params, String tableField) {

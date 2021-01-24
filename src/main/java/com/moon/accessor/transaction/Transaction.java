@@ -1,5 +1,7 @@
 package com.moon.accessor.transaction;
 
+import com.moon.accessor.exception.TransactionException;
+
 /**
  * @author benshaoye
  */

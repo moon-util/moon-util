@@ -26,10 +26,11 @@ abstract class InsertIntoBase<R, TB extends Table<R, TB>> extends TableFieldsHol
 
     public TB getTable() { return table; }
 
-    private void doInsert(List<Object[]> values) {
-        Configuration configuration = getConfig();
-        configuration.runWithAutoRelease(connection -> {
-            new Inserter<>(getTable(), getFields(), values).doInsert(connection);
+    protected final int doInsert(List<Object[]> values) {
+        return getConfig().getConnectionFactory().use(connection -> {
+            TableField<?, R, TB>[] fields = getFields();
+            Inserter<R, TB> inserter = new Inserter<>(getTable(), fields, values);
+            return inserter.doInsert(connection);
         });
     }
 }
