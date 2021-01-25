@@ -76,24 +76,34 @@ public class CompileProcessor extends AbstractProcessor {
     public boolean process(
         Set<? extends TypeElement> annotations, RoundEnvironment roundEnv
     ) {
-        if (roundEnv.processingOver()) {
-            JavaWriter writer = new JavaWriter(Environment2.getFiler());
-            pojoHolder.writeJavaFile(writer);
-            copierHolder.writeJavaFile(writer);
-            mapperHolder.writeJavaFile(writer);
-            modelHolder.writeJavaFile(writer);
-            tablesHolder.writeJavaFile(writer);
-            aliasesHolder.writeJavaFile(writer);
-            sessionManager.writeJavaFile(writer);
-            accessorHolder.writeJavaFile(writer);
-        } else {
-            processMapperFor(roundEnv, mapperHolder);
-            processTableModel(roundEnv, modelHolder);
-            processAccessor(roundEnv, accessorHolder);
-            processMapper();
-            processSubQuery(roundEnv);
-        }
+        // if (roundEnv.processingOver()) {
+        //     doWriteJavaFile();
+        // } else {
+        //     doProcess(roundEnv);
+        // }
+        doProcess(roundEnv);
+        doWriteJavaFile();
         return true;
+    }
+
+    private void doProcess(RoundEnvironment roundEnv){
+        processMapperFor(roundEnv, mapperHolder);
+        processTableModel(roundEnv, modelHolder);
+        processAccessor(roundEnv, accessorHolder);
+        processMapper();
+        processSubQuery(roundEnv);
+    }
+
+    private void doWriteJavaFile(){
+        JavaWriter writer = new JavaWriter(Environment2.getFiler());
+        pojoHolder.writeJavaFile(writer);
+        copierHolder.writeJavaFile(writer);
+        mapperHolder.writeJavaFile(writer);
+        modelHolder.writeJavaFile(writer);
+        tablesHolder.writeJavaFile(writer);
+        aliasesHolder.writeJavaFile(writer);
+        sessionManager.writeJavaFile(writer);
+        accessorHolder.writeJavaFile(writer);
     }
 
     private void processSubQuery(RoundEnvironment roundEnv) {

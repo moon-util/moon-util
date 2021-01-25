@@ -2,10 +2,15 @@ package com.moon.processor;
 
 import com.moon.processor.holder.Closer;
 import com.moon.processor.model.ThrowingConsumer;
+import com.moon.processor.utils.Environment2;
+import com.moon.processor.utils.Log2;
 
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
 import javax.tools.FileObject;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +41,11 @@ public class JavaWriter {
         if (written.containsKey(fullClassname)) {
             return;
         }
+        TypeElement elem = Environment2.getUtils().getTypeElement(fullClassname);
+        if (elem != null) {
+            written.put(fullClassname, BYTES);
+            return;
+        }
         written.put(fullClassname, BYTES);
         try (Writer jw = getFiler().createSourceFile(fullClassname).openWriter();
              PrintWriter writer = new PrintWriter(jw)) {
@@ -61,9 +71,10 @@ public class JavaWriter {
 
         FileObject fileObject;
         try {
-            fileObject = filer.createResource(CLASS_OUTPUT, "", resourceFile);
+            fileObject = filer.createResource(CLASS_OUTPUT, "", resourceFile, new Element[0]);
         } catch (/* IOException */Throwable e) {
-            throw new IllegalStateException(e);
+            Log2.warn("创建 {} 错误: {}", resourceFile, e);
+            return;
         }
 
         try (OutputStream out = fileObject.openOutputStream();

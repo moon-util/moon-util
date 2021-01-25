@@ -19,4 +19,6 @@ public enum Exception2 {
     public static SqlException with(Throwable t, String message, Object... values) {
         return with(t, String2.format(message, values));
     }
+
+    public static SqlException tx(String message) { return new TransactionException(message); }
 }
