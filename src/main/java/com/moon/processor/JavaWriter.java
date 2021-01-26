@@ -1,5 +1,6 @@
 package com.moon.processor;
 
+import com.moon.accessor.function.ThrowingApplier;
 import com.moon.processor.holder.Closer;
 import com.moon.processor.model.ThrowingConsumer;
 import com.moon.processor.utils.Environment2;
@@ -93,7 +94,7 @@ public class JavaWriter {
     private static Set<String> getPresentSessionImpls(FileObject fileObject) {
         try {
             return readAll(fileObject, JavaWriter::getPresentSessionImpls);
-        } catch (IOException ignored) {
+        } catch (Throwable ignored) {
             return Collections.emptySet();
         }
     }
@@ -123,14 +124,9 @@ public class JavaWriter {
     }
 
     private static <T> T readAll(FileObject existingFile, ThrowingApplier<InputStream, T> inputConsumer)
-        throws IOException {
+        throws Throwable {
         try (InputStream is = existingFile.openInputStream()) {
             return inputConsumer.apply(is);
         }
-    }
-
-    private interface ThrowingApplier<P, R> {
-
-        R apply(P p) throws IOException;
     }
 }

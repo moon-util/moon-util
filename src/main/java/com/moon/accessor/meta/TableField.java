@@ -4,6 +4,8 @@ import com.moon.accessor.Conditional;
 import com.moon.accessor.MatchingType;
 import com.moon.accessor.PropertyGetter;
 import com.moon.accessor.PropertySetter;
+import com.moon.accessor.dialect.KeywordPolicy;
+import com.moon.accessor.dialect.SQLDialect;
 import com.moon.accessor.dml.AliasCapable;
 
 /**
@@ -92,6 +94,28 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      * @return 列名
      */
     String getColumnName();
+
+    /**
+     * 指定方言的数据库列名，不同方言数据库列名可能不同，
+     * <p>
+     * 如: {@code MySQL}列名会用反引号包裹 {@code `column_name`}，
+     * <p>
+     * 当没有指定方言时，这里直接返回列名，因为大多数情况下是允许直接使用列名的
+     *
+     * @return 符合数据库方言规则的列名
+     */
+    default String getAvailableColumnName() { return getColumnName(); }
+
+    /**
+     * 获取符合数据库方言的列名，这主要是为了能在运行时根据自定义数据库方言返回对应信息
+     *
+     * @param dialect 方言
+     *
+     * @return 符合数据库方言规则的列名
+     */
+    default String getAvailableColumnName(SQLDialect dialect) {
+        return dialect.asAvailableName(getColumnName(), KeywordPolicy.AUTO);
+    }
 
     /**
      * 获取列别名，当设置了别名是返回别名

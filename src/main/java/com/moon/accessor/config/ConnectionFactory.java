@@ -1,10 +1,10 @@
 package com.moon.accessor.config;
 
 import com.moon.accessor.exception.Exception2;
+import com.moon.accessor.function.ThrowingApplier;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Function;
 
 /**
  * @author benshaoye
@@ -41,7 +41,7 @@ public interface ConnectionFactory {
      *
      * @return data
      */
-    default <T> T use(Function<Connection, T> consumer) {
+    default <T> T use(ThrowingApplier<Connection, T> consumer) {
         Connection connection;
         try {
             connection = getConnection();
@@ -50,6 +50,8 @@ public interface ConnectionFactory {
         }
         try {
             return consumer.apply(connection);
+        } catch (Throwable t) {
+            throw Exception2.with(t);
         } finally {
             try {
                 release(connection);
