@@ -12,6 +12,8 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
     private final Class<T> propertyType;
     private final String propertyName;
     private final String columnName;
+    private final String firstComment;
+    private final String comment;
     private final String alias;
     private final TB table;
     private final PropertyGetter<R, T> getter;
@@ -24,8 +26,10 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         PropertyGetter<R, T> getter,
         PropertySetter<R, T> setter,
         String propertyName,
-        String columnName
-    ) { this(table, domainClass, propertyType, getter, setter, propertyName, columnName, null); }
+        String columnName,
+        String firstComment,
+        String comment
+    ) { this(table, domainClass, propertyType, getter, setter, propertyName, columnName, firstComment,comment, null); }
 
     public TableFieldDetail(
         TB table,
@@ -35,12 +39,16 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         PropertySetter<R, T> setter,
         String propertyName,
         String columnName,
+        String firstComment,
+        String comment,
         String alias
     ) {
         this.domainClass = domainClass;
         this.propertyType = propertyType;
         this.propertyName = propertyName;
         this.columnName = columnName;
+        this.firstComment = firstComment;
+        this.comment = comment;
         this.alias = alias;
         this.table = table;
         this.getter = getter;
@@ -55,6 +63,8 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
             detail.setter,
             detail.propertyName,
             detail.columnName,
+            detail.firstComment,
+            detail.comment,
             alias);
     }
 
@@ -81,6 +91,10 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
 
     @Override
     public TB getTable() { return table; }
+
+    public String getFirstComment() { return firstComment == null ? getComment() : firstComment; }
+
+    public String getComment() { return comment; }
 
     @Override
     public TableField<T, R, TB> as(String alias) { return new TableFieldDetail<>(this, alias); }

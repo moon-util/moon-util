@@ -4,15 +4,12 @@ import com.moon.accessor.function.ThrowingApplier;
 import com.moon.processor.holder.Closer;
 import com.moon.processor.model.ThrowingConsumer;
 import com.moon.processor.utils.Environment2;
-import com.moon.processor.utils.Log2;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.FileObject;
 import java.io.*;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,7 +46,7 @@ public class JavaWriter {
         }
         written.put(fullClassname, BYTES);
         try (Writer jw = getFiler().createSourceFile(fullClassname).openWriter();
-             PrintWriter writer = new PrintWriter(jw)) {
+            PrintWriter writer = new PrintWriter(jw)) {
             consumer.accept(writer);
         } catch (/* IOException */Throwable e) {
             throw new IllegalStateException(e);
@@ -74,13 +71,13 @@ public class JavaWriter {
         try {
             fileObject = filer.createResource(CLASS_OUTPUT, "", resourceFile, new Element[0]);
         } catch (/* IOException */Throwable e) {
-            Log2.warn("创建 {} 错误: {}", resourceFile, e);
+            // 注意: {Log2.warn("创建 {} 错误: {}", resourceFile, e)};
             return;
         }
 
         try (OutputStream out = fileObject.openOutputStream();
-             OutputStreamWriter outWriter = new OutputStreamWriter(out, UTF_8);
-             BufferedWriter writer = new BufferedWriter(outWriter)) {
+            OutputStreamWriter outWriter = new OutputStreamWriter(out, UTF_8);
+            BufferedWriter writer = new BufferedWriter(outWriter)) {
             for (String service : valuesOfAll) {
                 writer.write(service);
                 writer.newLine();

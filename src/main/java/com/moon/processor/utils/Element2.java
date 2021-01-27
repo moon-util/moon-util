@@ -3,6 +3,8 @@ package com.moon.processor.utils;
 import javax.lang.model.element.*;
 import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -75,6 +77,20 @@ public enum Element2 {
         } catch (MirroredTypeException mirrored) {
             return mirrored.getTypeMirror().toString();
         }
+    }
+
+    public static List<Element> getEnums(Element elem) {
+        if (!Test2.isEnum(elem)) {
+            return new ArrayList<>();
+        }
+        List<Element> enums = new ArrayList<>();
+        List<? extends Element> elements = elem.getEnclosedElements();
+        for (Element element : elements) {
+            if (element.getKind() == ElementKind.ENUM_CONSTANT) {
+                enums.add(element);
+            }
+        }
+        return enums;
     }
 
     public static Element findEnumAt(String classname, int index) {

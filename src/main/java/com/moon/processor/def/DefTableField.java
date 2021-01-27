@@ -4,8 +4,9 @@ import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.processor.file.DeclField;
 import com.moon.processor.file.DeclJavaFile;
-import com.moon.processor.holder.Importable;
 import com.moon.processor.utils.String2;
+
+import java.util.Objects;
 
 import static com.moon.processor.utils.String2.format;
 
@@ -22,6 +23,8 @@ public class DefTableField {
     private final String constValue;
     private final String getterName;
     private final String setterName;
+    private final String firstComment;
+    private final String comment;
     private final String stringifyPropName;
     private final String stringifyFieldName;
 
@@ -33,7 +36,9 @@ public class DefTableField {
         String propType,
         String constValue,
         String getterName,
-        String setterName
+        String setterName,
+        String firstComment,
+        String comment
     ) {
         this.pojoClass = pojoClass;
         this.propName = propName;
@@ -43,6 +48,8 @@ public class DefTableField {
         this.constValue = constValue;
         this.getterName = getterName;
         this.setterName = setterName;
+        this.firstComment = firstComment;
+        this.comment = comment;
         this.stringifyPropName = String2.strWrapped(propName);
         this.stringifyFieldName = String2.strWrapped(fieldName);
     }
@@ -73,14 +80,35 @@ public class DefTableField {
 
     private String getFieldValue(DeclJavaFile table) {
         String importedPojo = table.onImported(pojoClass);
-        return format("new {}<>(this, {}, {}, {}, {}, {}, {});",
+        String firstComment = getFirstComment(), comment = getDeclareComment();
+        return format("new {}<>(this, {}, {}, {}, {}, {}, {}, {}, {});",
             table.onImported(TableFieldDetail.class),
             String2.dotClass(importedPojo),
             String2.dotClass(table.onImported(propType)),
             getGetterRef(importedPojo),
             getSetterRef(importedPojo),
             getStringifyPropName(),
-            getStringifyFieldName());
+            getStringifyFieldName(),
+            Objects.equals(firstComment, comment) ? null : firstComment,
+            getDeclareComment());
+    }
+
+    private String getFirstComment() {
+        return toComment(this.firstComment);
+    }
+
+    private String getDeclareComment() {
+        return toComment(this.comment);
+    }
+
+    private static String toComment(String comment) {
+        if (comment == null) {
+            return null;
+        }
+        if (comment.charAt(0) == '"' && comment.charAt(comment.length() - 1) == '"') {
+            return comment;
+        }
+        return String2.strWrapped(comment);
     }
 
     private String getGetterRef(String importedPojo) {

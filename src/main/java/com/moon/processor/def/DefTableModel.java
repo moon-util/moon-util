@@ -14,12 +14,12 @@ import com.moon.processor.file.DeclParams;
 import com.moon.processor.model.DeclareProperty;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.model.ValueRef;
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
+import com.moon.processor.utils.*;
 import com.sun.istack.Nullable;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +31,8 @@ import static com.moon.processor.utils.String2.format;
  * @author benshaoye
  */
 public class DefTableModel implements JavaFileWriteable {
+
+    private final Elements utils = Environment2.getUtils();
 
     private final Map<String, DefTableField> defFields;
 
@@ -131,20 +133,23 @@ public class DefTableModel implements JavaFileWriteable {
         DeclaredPojo declaredPojo, DeclJavaFile tableJava
     ) {
         final int size = declaredPojo.size();
+        List<String> commentForAliases = new ArrayList<>(size);
         List<String> commentForFields = new ArrayList<>(size);
         List<String> commentForConsts = new ArrayList<>(size);
         Map<String, DeclareProperty> copiedPojoFields = new LinkedHashMap<>(declaredPojo);
         Map<String, DefTableField> definedTableFields = new LinkedHashMap<>();
+        // 第一个字段
         final ValueRef<DeclField> refer = new ValueRef<>();
+
+        // 优先字段
         for (String sort : SORTS) {
             DeclareProperty property = copiedPojoFields.remove(sort);
             if (property != null) {
                 DefTableField defField = toDefTableField(sort, property);
                 if (defField != null) {
                     refer.setIfAbsent(defField.declareTableField(tableJava, getCanonicalName()));
+                    asColumnRef(defField, commentForAliases, commentForFields, commentForConsts);
                     definedTableFields.put(sort, defField);
-                    commentForFields.add(toColumnRef(defField.getFieldName()));
-                    commentForConsts.add(toConstRef(defField.getConstName()));
                 }
             }
         }
@@ -152,9 +157,8 @@ public class DefTableModel implements JavaFileWriteable {
             DefTableField defField = toDefTableField(prop.getKey(), prop.getValue());
             if (defField != null) {
                 refer.setIfAbsent(defField.declareTableField(tableJava, getCanonicalName()));
+                asColumnRef(defField, commentForAliases, commentForFields, commentForConsts);
                 definedTableFields.put(prop.getKey(), defField);
-                commentForFields.add(toColumnRef(defField.getFieldName()));
-                commentForConsts.add(toConstRef(defField.getConstName()));
             }
         }
         refer.useIfPresent(first -> {
@@ -163,9 +167,30 @@ public class DefTableModel implements JavaFileWriteable {
             comments.addAll(commentForFields);
             comments.add("");
             comments.addAll(commentForConsts);
+            if (!commentForAliases.isEmpty()) {
+                comments.add("");
+                comments.addAll(commentForAliases);
+            }
             first.commentOf(comments);
         });
         return definedTableFields;
+    }
+
+    private void asColumnRef(DefTableField field, List<String> aliases, List<String> fields, List<String> constants){
+        fields.add(toColumnRef(field.getFieldName()));
+        constants.add(toConstRef(field.getConstName()));
+        String aliasRef = toAliasRef(field.getFieldName());
+        if (aliasRef != null) {
+            aliases.add(aliasRef);
+        }
+    }
+
+    private String toAliasRef(String columnName) {
+        String group = getAliasGroup(), alias = getAlias();
+        if (String2.isNotBlank(group) && String2.isNotBlank(alias)) {
+            return format("{}.{}.{},", group, alias, columnName);
+        }
+        return null;
     }
 
     private String toColumnRef(String columnName) {
@@ -200,7 +225,9 @@ public class DefTableModel implements JavaFileWriteable {
             propType,
             constValue,
             getterName,
-            setterName);
+            setterName,
+            Doc2.resolveFirstComment(element),
+            Doc2.resolveComment(element));
     }
 
     public String getPkg() { return pkg; }
