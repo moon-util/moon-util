@@ -1,17 +1,19 @@
 package com.moon.accessor.session;
 
-import com.moon.accessor.config.ConfigurationContext;
 import com.moon.accessor.config.Configuration;
+import com.moon.accessor.config.ConfigurationContext;
 import com.moon.accessor.config.ConnectionFactory;
 import com.moon.accessor.exception.Exception2;
 import com.moon.accessor.result.Result2;
 import com.moon.accessor.result.ResultExtractor;
 import com.moon.accessor.result.RowMapper;
+import com.moon.accessor.util.Collect2;
 
 import java.io.IOException;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * @author benshaoye
@@ -45,12 +47,6 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     }
 
     @Override
-    public int insert(String sql) { return update(sql); }
-
-    @Override
-    public int insert(String sql, Object[] parameters) { return update(sql, parameters); }
-
-    @Override
     public int update(String sql) {
         Connection connection = openConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -69,17 +65,37 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
             setObjectParameters(stmt, parameters);
             return stmt.executeUpdate();
         } catch (SQLException e) {
-            throw Exception2.with(e, "SQL DML error: {}, parameters: {}.", sql, toArr(parameters));
+            throw Exception2.with(e, "SQL DML error: {}, parameters: {}.", sql, stringify(parameters));
         } finally {
             releaseConnection(connection);
         }
     }
 
     @Override
-    public int delete(String sql) { return update(sql); }
-
-    @Override
-    public int delete(String sql, Object[] parameters) { return update(sql, parameters); }
+    public int[] updateBatch(String sql, List<Object[]> parameters) {
+        if (Collect2.isEmpty(parameters)) {
+            return new int[0];
+        }
+        if (parameters.size() == 1) {
+            return new int[]{update(sql, parameters.get(0))};
+        }
+        Connection connection = openConnection();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            for (Object[] params : parameters) {
+                setObjectParameters(stmt, params);
+                stmt.addBatch();
+            }
+            return stmt.executeBatch();
+        } catch (SQLException e) {
+            StringJoiner joiner = new StringJoiner(", ", "[", "]");
+            for (Object[] parameter : parameters) {
+                joiner.add(stringify(parameter));
+            }
+            throw Exception2.with(e, "SQL DML error: {}, parameters: {}.", sql, joiner.toString());
+        } finally {
+            releaseConnection(connection);
+        }
+    }
 
     @Override
     public <T> T selectOne(String sql, RowMapper<T> mapper) {
@@ -124,7 +140,7 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
                 return extractor.apply(resultSet, extra);
             }
         } catch (SQLException e) {
-            throw Exception2.with(e, errorMessage, sql, toArr(parameters));
+            throw Exception2.with(e, errorMessage, sql, stringify(parameters));
         } finally {
             releaseConnection(connection);
         }
@@ -135,7 +151,7 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     ) {
         Connection connection = openConnection();
         try (@SuppressWarnings("all") Statement stmt = connection.createStatement();
-             ResultSet resultSet = stmt.executeQuery(sql)) {
+            ResultSet resultSet = stmt.executeQuery(sql)) {
             return extractor.apply(resultSet, extra);
         } catch (SQLException e) {
             throw Exception2.with(e, errorMessage, sql, "[]");
@@ -155,7 +171,7 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
         }
     }
 
-    private static String toArr(Object[] parameters) {
+    private static String stringify(Object[] parameters) {
         return Arrays.toString(parameters);
     }
 

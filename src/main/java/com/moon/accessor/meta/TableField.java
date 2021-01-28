@@ -11,7 +11,7 @@ import com.moon.accessor.dml.AliasCapable;
 /**
  * @author benshaoye
  */
-public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<TableField<T, R, TB>> {
+public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<TableField<T, R, TB>>, Commentable {
 
     /**
      * 领域模型类
@@ -127,6 +127,26 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      * @see #as(String) 指定别名
      */
     default String getAliasName() { return getColumnName(); }
+
+    /**
+     * 参考：{@inheritDoc}
+     *
+     * @return 该字段下的第一行注释
+     *
+     * @see #getComment() 该字段的所有注释
+     */
+    @Override
+    String getFirstComment();
+
+    /**
+     * 参考：{@inheritDoc}
+     *
+     * @return 该字段的文档注释
+     *
+     * @see #getFirstComment() 该字段的第一行注释
+     */
+    @Override
+    String getComment();
 
     /**
      * 返回所属数据表

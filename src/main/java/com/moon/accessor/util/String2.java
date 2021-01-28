@@ -1,10 +1,13 @@
 package com.moon.accessor.util;
 
+import java.util.Arrays;
+
 /**
  * @author benshaoye
  */
 public enum String2 {
     ;
+    private final static char BACKSLASH = '\\';
 
     public static String format(String template, Object... values) {
         if (values != null && values.length > 0) {
@@ -22,5 +25,69 @@ public enum String2 {
             return builder.toString();
         }
         return template;
+    }
+
+    public static String joinQuestionMark(int count, String open, String close) {
+        if (count > 0) {
+            int iMax = count - 1;
+            StringBuilder b = new StringBuilder();
+            if (open != null) {
+                b.append(open);
+            }
+            for (int i = 0; ; i++) {
+                b.append('?');
+                if (i == iMax) {
+                    if (close != null) {
+                        b.append(close);
+                    }
+                    return b.toString();
+                }
+                b.append(", ");
+            }
+        }
+        if (open != null) {
+            return close == null ? open : open + close;
+        }
+        return close == null ? null : close;
+    }
+
+    public static String firstWord(CharSequence sequence) {
+        if (sequence == null) {
+            return null;
+        }
+        char thisChar;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0, length = sequence.length(); i < length; i++) {
+            if (!Character.isWhitespace(thisChar = sequence.charAt(i))) {
+                builder.append(thisChar);
+            } else if (builder.length() == 0) {
+                continue;
+            } else {
+                break;
+            }
+        }
+        return builder.toString();
+    }
+
+    public static String doEscape(String content, char targetChar) {
+        if (content == null) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        int backslashCnt = 0;
+        char[] chars = content.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            if (ch == BACKSLASH) {
+                backslashCnt++;
+            } else {
+                if ((ch == targetChar) && backslashCnt % 2 == 0) {
+                    builder.append(BACKSLASH).append(BACKSLASH);
+                }
+                backslashCnt = 0;
+            }
+            builder.append(ch);
+        }
+        return builder.toString();
     }
 }

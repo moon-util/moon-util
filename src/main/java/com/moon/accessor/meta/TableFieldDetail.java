@@ -29,7 +29,7 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         String columnName,
         String firstComment,
         String comment
-    ) { this(table, domainClass, propertyType, getter, setter, propertyName, columnName, firstComment,comment, null); }
+    ) { this(table, domainClass, propertyType, getter, setter, propertyName, columnName, firstComment, comment, null); }
 
     public TableFieldDetail(
         TB table,
@@ -92,8 +92,24 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
     @Override
     public TB getTable() { return table; }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return 该字段下的第一行注释
+     *
+     * @see #getComment() 该字段所有文档注释
+     */
+    @Override
     public String getFirstComment() { return firstComment == null ? getComment() : firstComment; }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return 该字段的文档注释
+     *
+     * @see #getFirstComment() 该字段的第一行注释
+     */
+    @Override
     public String getComment() { return comment; }
 
     @Override

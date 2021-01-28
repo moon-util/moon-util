@@ -3,7 +3,7 @@ package com.moon.accessor.meta;
 /**
  * @author benshaoye
  */
-public interface Table<R, TB extends Table<R, TB>> {
+public interface Table<R, TB extends Table<R, TB>> extends Commentable{
 
     /**
      * 返回实体数据类型
@@ -39,4 +39,24 @@ public interface Table<R, TB extends Table<R, TB>> {
      * @return 数据表所有字段
      */
     TableField<?, R, TB>[] getTableFields();
+
+    /**
+     * 参考：{@inheritDoc}
+     *
+     * @return 该字段下的第一行注释
+     *
+     * @see #getComment() 该字段的所有注释
+     */
+    @Override
+    String getFirstComment();
+
+    /**
+     * 参考：{@inheritDoc}
+     *
+     * @return 该字段的文档注释
+     *
+     * @see #getFirstComment() 该字段的第一行注释
+     */
+    @Override
+    String getComment();
 }

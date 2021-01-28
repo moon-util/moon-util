@@ -17,7 +17,7 @@ public interface ResultExtractor<T> {
      *
      * @return 自定义返回
      *
-     * @throws SQLException SQLException
+     * @throws SQLException 通常是{@link SQLException}或其子类
      */
     T extract(ResultSet resultSet) throws SQLException;
 }

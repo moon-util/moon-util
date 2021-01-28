@@ -11,51 +11,33 @@ import java.util.List;
 /**
  * @author benshaoye
  */
-public enum Doc2 {
+public enum Comment2 {
     ;
 
-    private final static char DB_QUOTE = '"', BACKSLASH = '\\';
     private final static String AT_COMMENT = "@comment ";
 
     public static String resolveFirstComment(Element elem) {
-        String comment = asAvailable(getComment(getFirstComment(elem), elem, true));
+        String comment = getComment(getFirstComment(elem), elem, true);
         return String2.isBlank(comment) ? null : comment;
     }
 
     public static String resolveComment(Element elem) {
-        String comment = asAvailable(getComment(getSimpleComment(elem), elem, false));
+        String comment = getComment(getSimpleComment(elem), elem, false);
         return String2.isBlank(comment) ? null : comment;
     }
 
     private static String getComment(String comment, Element elem, boolean first) {
         switch (elem.getKind()) {
             case FIELD:
-                return resolveEnum(comment, elem.asType(), first);
+                comment = resolveEnum(comment, elem.asType(), first);
+                break;
             case METHOD:
                 ExecutableElement method = (ExecutableElement) elem;
-                return resolveEnum(comment, method.getReturnType(), first);
+                comment = resolveEnum(comment, method.getReturnType(), first);
+                break;
             default:
         }
-        return comment;
-    }
-
-    private static String asAvailable(String comment) {
-        StringBuilder builder = new StringBuilder();
-        int backslashCnt = 0;
-        char[] chars = comment.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            char ch = chars[i];
-            if (ch == BACKSLASH) {
-                backslashCnt++;
-            } else {
-                if ((ch == DB_QUOTE) && backslashCnt % 2 == 0) {
-                    builder.append(BACKSLASH).append(BACKSLASH);
-                }
-                backslashCnt = 0;
-            }
-            builder.append(ch);
-        }
-        return builder.toString();
+        return com.moon.accessor.util.String2.doEscape(comment, '"');
     }
 
     private static String resolveEnum(String baseComment, TypeMirror elemTyped, boolean first) {
@@ -76,7 +58,7 @@ public enum Doc2 {
         String[] comments = docComment.split("\n");
         for (int i = 0; i < comments.length; i++) {
             String line = comments[i].trim();
-            if (String2.isNotBlank(line) && defaultComment == null) {
+            if (String2.isNotBlank(line) && defaultComment == null && !isTagComment(line)) {
                 defaultComment = line;
             }
             if (line.startsWith(AT_COMMENT)) {

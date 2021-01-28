@@ -40,6 +40,19 @@ public interface JdbcSession extends Closeable {
     }
 
     /**
+     * 用相同结构的参数批量执行 insert 语句
+     *
+     * @param sql        sql 预编译语句
+     * @param parameters 参数
+     *
+     * @return 每组参数是否插入成功对应的数目
+     */
+    default int[] insertBatch(String sql, List<Object[]> parameters) {
+        // Example:
+        return updateBatch(sql, parameters);
+    }
+
+    /**
      * update 语句
      *
      * @param sql sql 语句
@@ -57,6 +70,16 @@ public interface JdbcSession extends Closeable {
      * @return 执行结果
      */
     int update(String sql, Object[] parameters);
+
+    /**
+     * 用相同结构的参数批量执行 update 语句
+     *
+     * @param sql        sql 预编译语句
+     * @param parameters 参数
+     *
+     * @return 执行结果影响的数据数目
+     */
+    int[] updateBatch(String sql, List<Object[]> parameters);
 
     /**
      * delete 语句
@@ -81,6 +104,19 @@ public interface JdbcSession extends Closeable {
     default int delete(String sql, Object[] parameters) {
         // Example:
         return update(sql, parameters);
+    }
+
+    /**
+     * 用相同结构的参数批量执行 delete 语句
+     *
+     * @param sql        sql 预编译语句
+     * @param parameters 参数
+     *
+     * @return 执行结果影响的数据数目
+     */
+    default int[] deleteBatch(String sql, List<Object[]> parameters) {
+        // Example:
+        return updateBatch(sql, parameters);
     }
 
     /**

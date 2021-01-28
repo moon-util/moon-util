@@ -4,6 +4,7 @@ import com.moon.accessor.config.Configuration;
 import com.moon.accessor.config.ConnectionFactory;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
+import com.moon.accessor.session.JdbcSessionImpl;
 import com.moon.accessor.util.Math2;
 
 import java.sql.PreparedStatement;
@@ -35,41 +36,16 @@ abstract class InsertIntoBase<R, TB extends Table<R, TB>> extends TableFieldsHol
     public TB getTable() { return table; }
 
     protected final int doInsert(List<Object[]> values) {
-        ConnectionFactory factory = getConfig().getConnectionFactory();
-        return doInsert(factory, getTable(), getFields(), values);
+        return doInsert(getConfig(), getTable(), getFields(), values);
     }
 
     private static <R, TB extends Table<R, TB>> int doInsert(
-        ConnectionFactory factory, TB table, TableField<?, R, TB>[] fields, List<Object[]> valuesAll
+        Configuration config, TB table, TableField<?, R, TB>[] fields, List<Object[]> valuesAll
     ) {
         String placeholders = Placeholders.find(fields.length);
         String fieldsSerial = joinMapped(fields, TableField::getColumnName);
         String insert = toInsertSQL(table.getTableName(), fieldsSerial, placeholders);
-        return factory.use(connection -> {
-            try (PreparedStatement statement = connection.prepareStatement(insert)) {
-                if (valuesAll.size() == 1) {
-                    return executeInsert(statement, valuesAll.get(0));
-                }
-                return executeInsert(statement, valuesAll);
-            }
-        });
-    }
-
-    private static int executeInsert(PreparedStatement statement, Object[] values) throws SQLException {
-        for (int i = 0; i < values.length; i++) {
-            statement.setObject(i + 1, values[i]);
-        }
-        return statement.executeUpdate();
-    }
-
-    private static int executeInsert(PreparedStatement statement, List<Object[]> valuesAll) throws SQLException {
-        for (Object[] values : valuesAll) {
-            for (int i = 0; i < values.length; i++) {
-                statement.setObject(i + 1, values[i]);
-            }
-            statement.addBatch();
-        }
-        return Math2.sum(statement.executeBatch());
+        return Math2.sum(new JdbcSessionImpl(config).insertBatch(insert, valuesAll));
     }
 
     private static String toInsertSQL(String tableName, String fieldsSerial, String placeholders) {

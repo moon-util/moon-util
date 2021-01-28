@@ -14,16 +14,16 @@ import com.moon.processor.file.DeclParams;
 import com.moon.processor.model.DeclareProperty;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.model.ValueRef;
-import com.moon.processor.utils.*;
+import com.moon.processor.utils.Comment2;
+import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.Environment2;
+import com.moon.processor.utils.String2;
 import com.sun.istack.Nullable;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.moon.processor.utils.String2.format;
 
@@ -67,6 +67,7 @@ public class DefTableModel implements JavaFileWriteable {
         this.simpleClassName = simpleClassName;
         this.tableEnumFieldVal = tableEnumFieldVal;
         this.tableName = tableName;
+
         this.pojoClassname = declaredPojo.getThisClassname();
         this.fullClassname = pkg + '.' + simpleClassName;
 
@@ -83,7 +84,9 @@ public class DefTableModel implements JavaFileWriteable {
         this.defFields = defineTableModel(declaredPojo, table);
         this.tableJava = table;
 
+        TypeElement elem = declaredPojo.getDeclareElement();
         declare(table, pojoClassname, simpleClassName);
+        declareComment(table, elem);
     }
 
     private static String getTableFields(
@@ -95,6 +98,15 @@ public class DefTableModel implements JavaFileWriteable {
             fields[index++] = entry.getValue().getFieldName();
         }
         return String.join(", ", fields);
+    }
+
+    private void declareComment(DeclJavaFile table, TypeElement elem) {
+        DeclParams params = DeclParams.of();
+        String comment = String2.strWrappedIfNonNull(Comment2.resolveComment(elem));
+        String firstComment = String2.strWrappedIfNonNull(Comment2.resolveFirstComment(elem));
+        String firstReturning = Objects.equals(comment, firstComment) ? "getComment()" : firstComment;
+        table.publicMethod("getComment", params).override().returnTypeof(String.class).returning(comment);
+        table.publicMethod("getFirstComment", params).override().returnTypeof(String.class).returning(firstReturning);
     }
 
     private void declare(DeclJavaFile table, String pojoClass, String simpleName) {
@@ -176,7 +188,7 @@ public class DefTableModel implements JavaFileWriteable {
         return definedTableFields;
     }
 
-    private void asColumnRef(DefTableField field, List<String> aliases, List<String> fields, List<String> constants){
+    private void asColumnRef(DefTableField field, List<String> aliases, List<String> fields, List<String> constants) {
         fields.add(toColumnRef(field.getFieldName()));
         constants.add(toConstRef(field.getConstName()));
         String aliasRef = toAliasRef(field.getFieldName());
@@ -226,8 +238,8 @@ public class DefTableModel implements JavaFileWriteable {
             constValue,
             getterName,
             setterName,
-            Doc2.resolveFirstComment(element),
-            Doc2.resolveComment(element));
+            Comment2.resolveFirstComment(element),
+            Comment2.resolveComment(element));
     }
 
     public String getPkg() { return pkg; }

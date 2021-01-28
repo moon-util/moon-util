@@ -270,6 +270,8 @@ public enum String2 {
 
     public static String strWrapped(String value) { return '"' + value + '"'; }
 
+    public static String strWrappedIfNonNull(String value) { return value == null ? null : '"' + value + '"'; }
+
     public static String onInlineDocCommentOf(String comment) {
         return format("/** {} */", comment);
     }

@@ -6,24 +6,18 @@ import com.moon.accessor.meta.TableField;
 /**
  * @author benshaoye
  */
-public class TableUpdaterImpl<R, TB extends Table<R, TB>> implements TableUpdater<R, TB> {
+public class TableUpdaterImpl<R, TB extends Table<R, TB>> extends TableUpdateBase<R, TB>
+    implements TableUpdater<R, TB> {
 
-    private final TB table;
-
-    public TableUpdaterImpl(TB table) { this.table = table; }
+    public TableUpdaterImpl(TB table) { super(table); }
 
     @Override
-    public <T> TableUpdateSetter<R, TB> setNull(TableField<T, R, TB> field) {
-        return null;
+    public <T> TableUpdateSetter<R, TB> setIf(TableField<T, R, TB> field, T value, boolean doUpdate) {
+        return new TableUpdateSetterImpl<>(getTable(), field, value, doUpdate);
     }
 
     @Override
-    public <T> TableUpdateSetter<R, TB> set(TableField<T, R, TB> field, T value) {
-        return null;
-    }
-
-    @Override
-    public <T> TableUpdateSetter<R, TB> set(TableField<T, R, TB> field, TableField<T, R, TB> sourceField) {
-        return null;
-    }
+    public <T> TableUpdateSetter<R, TB> setIf(
+        TableField<T, R, TB> field, TableField<T, R, TB> sourceField, boolean doUpdate
+    ) { return new TableUpdateSetterImpl<>(getTable(), field, sourceField, doUpdate); }
 }
