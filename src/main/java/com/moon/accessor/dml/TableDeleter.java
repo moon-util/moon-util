@@ -5,4 +5,4 @@ import com.moon.accessor.meta.Table;
 /**
  * @author benshaoye
  */
-public interface TableDeleter<R, TB extends Table<R, TB>> extends Done {}
+public interface TableDeleter<R, TB extends Table<R, TB>> extends WhereClauseCapable<TableDeleteWhere<R, TB>>, Done {}

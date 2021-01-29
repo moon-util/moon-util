@@ -4,6 +4,9 @@ import com.moon.accessor.config.Configuration;
 import com.moon.accessor.config.ConfigurationContext;
 import com.moon.accessor.config.ConnectionFactory;
 import com.moon.accessor.exception.Exception2;
+import com.moon.accessor.function.ThrowingBiConsumer;
+import com.moon.accessor.param.Param2;
+import com.moon.accessor.param.ParamSetter;
 import com.moon.accessor.result.Result2;
 import com.moon.accessor.result.ResultExtractor;
 import com.moon.accessor.result.RowMapper;
@@ -14,6 +17,8 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
+
+import static com.moon.accessor.param.Param2.setObjectParameters;
 
 /**
  * @author benshaoye
@@ -47,7 +52,19 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     }
 
     @Override
-    public int update(String sql) {
+    public int update(String sql) { return doUpdateSQL(sql); }
+
+    @Override
+    public int update(String sql, Object[] parameters) {
+        return doUpdateSQL(sql, parameters, Param2::setObjectParameters);
+    }
+
+    @Override
+    public int update(String sql, ParamSetter[] parameters) {
+        return doUpdateSQL(sql, parameters, Param2::setObjectParameters);
+    }
+
+    private int doUpdateSQL(String sql) {
         Connection connection = openConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             return stmt.executeUpdate();
@@ -58,11 +75,15 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
         }
     }
 
-    @Override
-    public int update(String sql, Object[] parameters) {
+    private <T> int doUpdateSQL(
+        String sql, T[] parameters, ThrowingBiConsumer<PreparedStatement, T[]> parameterSetter
+    ) {
+        if (parameters == null || parameters.length == 0) {
+            return doUpdateSQL(sql);
+        }
         Connection connection = openConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            setObjectParameters(stmt, parameters);
+            parameterSetter.accept(stmt, parameters);
             return stmt.executeUpdate();
         } catch (SQLException e) {
             throw Exception2.with(e, "SQL DML error: {}, parameters: {}.", sql, stringify(parameters));
@@ -163,12 +184,6 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     @Override
     public void close() throws IOException {
         //
-    }
-
-    private static void setObjectParameters(PreparedStatement stmt, Object[] parameters) throws SQLException {
-        for (int i = 0; i < parameters.length; i++) {
-            stmt.setObject(i + 1, parameters[i]);
-        }
     }
 
     private static String stringify(Object[] parameters) {

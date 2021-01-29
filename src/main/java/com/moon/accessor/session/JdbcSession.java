@@ -1,5 +1,6 @@
 package com.moon.accessor.session;
 
+import com.moon.accessor.param.ParamSetter;
 import com.moon.accessor.result.ResultExtractor;
 import com.moon.accessor.result.RowMapper;
 
@@ -70,6 +71,8 @@ public interface JdbcSession extends Closeable {
      * @return 执行结果
      */
     int update(String sql, Object[] parameters);
+
+    int update(String sql, ParamSetter[] parameters);
 
     /**
      * 用相同结构的参数批量执行 update 语句

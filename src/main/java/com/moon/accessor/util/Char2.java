@@ -1,11 +1,9 @@
 package com.moon.accessor.util;
 
-import com.moon.accessor.util.Indexer;
-
 /**
  * @author benshaoye
  */
-public enum Chars {
+public enum Char2 {
     ;
 
     private final static int NOT_FOUND = -1;

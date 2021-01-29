@@ -1,6 +1,6 @@
 package com.moon.accessor;
 
-import com.moon.accessor.dml.WhereClauseCapable;
+import com.moon.accessor.dml.WhereClause;
 
 /**
  * WHERE 条件
@@ -10,7 +10,7 @@ import com.moon.accessor.dml.WhereClauseCapable;
 public interface Conditional {
 
     /**
-     * 两个条件之间的关系，注意与{@link WhereClauseCapable#and(Conditional)}的区别
+     * 两个条件之间的关系，注意与{@link WhereClause#and(Conditional)}的区别
      * <p>
      * 这里的{@code and}最终会加括号，逻辑意义也会不一样，如：
      *
@@ -28,13 +28,13 @@ public interface Conditional {
      *
      * @return 合成条件
      *
-     * @see WhereClauseCapable#and(Conditional)
-     * @see WhereClauseCapable#or(Conditional)
+     * @see WhereClause#and(Conditional)
+     * @see WhereClause#or(Conditional)
      */
     Conditional and(Conditional condition);
 
     /**
-     * 两个条件之间的关系，注意与{@link WhereClauseCapable#or(Conditional)}的区别
+     * 两个条件之间的关系，注意与{@link WhereClause#or(Conditional)}的区别
      * <p>
      * 这里的{@code and}最终会加括号，逻辑意义也会不一样，如：
      *
@@ -52,8 +52,8 @@ public interface Conditional {
      *
      * @return 合成条件
      *
-     * @see WhereClauseCapable#and(Conditional)
-     * @see WhereClauseCapable#or(Conditional)
+     * @see WhereClause#and(Conditional)
+     * @see WhereClause#or(Conditional)
      */
     Conditional or(Conditional condition);
 

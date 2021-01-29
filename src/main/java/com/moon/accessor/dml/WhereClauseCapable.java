@@ -5,9 +5,14 @@ import com.moon.accessor.Conditional;
 /**
  * @author benshaoye
  */
-public interface WhereClauseCapable {
+public interface WhereClauseCapable<T> extends Done {
 
-    WhereClauseCapable and(Conditional condition);
-
-    WhereClauseCapable or(Conditional condition);
+    /**
+     * where 子句
+     *
+     * @param condition where 条件
+     *
+     * @return where 子句
+     */
+    T where(Conditional condition);
 }
