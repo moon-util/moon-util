@@ -3,13 +3,11 @@ package com.moon.accessor.param;
 /**
  * @author benshaoye
  */
-abstract class BaseParamSetter {
+public abstract class BaseParameterSetter implements ParameterSetter {
 
     private final int parameterIndex;
 
-    public BaseParamSetter(int parameterIndex) {
-        this.parameterIndex = parameterIndex;
-    }
+    public BaseParameterSetter(int parameterIndex) { this.parameterIndex = parameterIndex; }
 
     public int getParameterIndex() { return parameterIndex; }
 }

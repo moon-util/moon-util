@@ -1,14 +1,16 @@
 package com.moon.accessor.session;
 
-import com.moon.accessor.param.ParamSetter;
+import com.moon.accessor.param.ParameterSetter;
+import com.moon.accessor.param.Parameters;
 import com.moon.accessor.result.ResultExtractor;
 import com.moon.accessor.result.RowMapper;
 
 import java.io.Closeable;
+import java.util.Collection;
 import java.util.List;
 
-import static com.moon.accessor.result.Result2.extractList;
-import static com.moon.accessor.result.Result2.extractOne;
+import static com.moon.accessor.result.Result2.atMost1;
+import static com.moon.accessor.result.Result2.listAll;
 
 /**
  * @author benshaoye
@@ -72,7 +74,37 @@ public interface JdbcSession extends Closeable {
      */
     int update(String sql, Object[] parameters);
 
-    int update(String sql, ParamSetter[] parameters);
+    /**
+     * update 语句
+     *
+     * <pre>
+     * Parameters.of().with(1).with("name")
+     * </pre>
+     *
+     * @param sql        sql 预编译语句
+     * @param parameters 参数
+     *
+     * @return 执行结果
+     *
+     * @see Parameters
+     */
+    int update(String sql, ParameterSetter[] parameters);
+
+    /**
+     * update 语句
+     *
+     * <pre>
+     * Parameters.of().with(1).with("name")
+     * </pre>
+     *
+     * @param sql        sql 预编译语句
+     * @param parameters 参数
+     *
+     * @return 执行结果
+     *
+     * @see Parameters
+     */
+    int update(String sql, Collection<ParameterSetter> parameters);
 
     /**
      * 用相同结构的参数批量执行 update 语句
@@ -133,7 +165,7 @@ public interface JdbcSession extends Closeable {
      */
     default <T> T selectOne(String sql, RowMapper<T> mapper) {
         // Example:
-        return select(sql, set -> extractOne(set, mapper));
+        return select(sql, set -> atMost1(set, mapper));
     }
 
     /**
@@ -149,7 +181,7 @@ public interface JdbcSession extends Closeable {
      */
     default <T> List<T> selectAll(String sql, RowMapper<T> mapper) {
         // Example:
-        return select(sql, set -> extractList(set, mapper));
+        return select(sql, set -> listAll(set, mapper));
     }
 
     /**
@@ -175,7 +207,7 @@ public interface JdbcSession extends Closeable {
      */
     default <T> T selectOne(String sql, Object[] parameters, RowMapper<T> mapper) {
         // Example:
-        return select(sql, parameters, set -> extractOne(set, mapper));
+        return select(sql, parameters, set -> atMost1(set, mapper));
     }
 
     /**
@@ -192,7 +224,7 @@ public interface JdbcSession extends Closeable {
      */
     default <T> List<T> selectAll(String sql, Object[] parameters, RowMapper<T> mapper) {
         // Example:
-        return select(sql, parameters, set -> extractList(set, mapper));
+        return select(sql, parameters, set -> listAll(set, mapper));
     }
 
     /**

@@ -6,17 +6,17 @@ import java.sql.SQLException;
 /**
  * @author benshaoye
  */
-public class ParamLongSetter extends BaseParamSetter implements ParamSetter {
+public class ShortParameterSetter extends BaseParameterSetter implements ParameterSetter {
 
-    private final long value;
+    private final short value;
 
-    public ParamLongSetter(int parameterIndex, long value) {
+    public ShortParameterSetter(int parameterIndex, short value) {
         super(parameterIndex);
         this.value = value;
     }
 
     @Override
     public void setParameter(PreparedStatement stmt) throws SQLException {
-        stmt.setLong(getParameterIndex(), value);
+        stmt.setShort(getParameterIndex(), value);
     }
 }

@@ -5,8 +5,8 @@ import com.moon.accessor.config.ConfigurationContext;
 import com.moon.accessor.config.ConnectionFactory;
 import com.moon.accessor.exception.Exception2;
 import com.moon.accessor.function.ThrowingBiConsumer;
-import com.moon.accessor.param.Param2;
-import com.moon.accessor.param.ParamSetter;
+import com.moon.accessor.param.Parameter2;
+import com.moon.accessor.param.ParameterSetter;
 import com.moon.accessor.result.Result2;
 import com.moon.accessor.result.ResultExtractor;
 import com.moon.accessor.result.RowMapper;
@@ -15,10 +15,11 @@ import com.moon.accessor.util.Collect2;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static com.moon.accessor.param.Param2.setObjectParameters;
+import static com.moon.accessor.param.Parameter2.setAll;
 
 /**
  * @author benshaoye
@@ -56,12 +57,17 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
 
     @Override
     public int update(String sql, Object[] parameters) {
-        return doUpdateSQL(sql, parameters, Param2::setObjectParameters);
+        return doUpdateSQL(sql, parameters, Parameter2::setAll);
     }
 
     @Override
-    public int update(String sql, ParamSetter[] parameters) {
-        return doUpdateSQL(sql, parameters, Param2::setObjectParameters);
+    public int update(String sql, ParameterSetter[] parameters) {
+        return doUpdateSQL(sql, parameters, Parameter2::setAll);
+    }
+
+    @Override
+    public int update(String sql, Collection<ParameterSetter> parameters) {
+        return doUpdateSQL(sql, parameters, Parameter2::setAll);
     }
 
     private int doUpdateSQL(String sql) {
@@ -92,6 +98,25 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
         }
     }
 
+    private int doUpdateSQL(
+        String sql,
+        Collection<ParameterSetter> parameters,
+        ThrowingBiConsumer<PreparedStatement, Collection<ParameterSetter>> parameterSetter
+    ) {
+        if (parameters == null || parameters.isEmpty()) {
+            return doUpdateSQL(sql);
+        }
+        Connection connection = openConnection();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            parameterSetter.accept(stmt, parameters);
+            return stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw Exception2.with(e, "SQL DML error: {}, parameters: {}.", sql, parameters.toString());
+        } finally {
+            releaseConnection(connection);
+        }
+    }
+
     @Override
     public int[] updateBatch(String sql, List<Object[]> parameters) {
         if (Collect2.isEmpty(parameters)) {
@@ -103,7 +128,7 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
         Connection connection = openConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             for (Object[] params : parameters) {
-                setObjectParameters(stmt, params);
+                Parameter2.setAll(stmt, params);
                 stmt.addBatch();
             }
             return stmt.executeBatch();
@@ -120,12 +145,12 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
 
     @Override
     public <T> T selectOne(String sql, RowMapper<T> mapper) {
-        return doExecuteQuery(sql, mapper, Result2::extractOne, ERROR_FOR_ONE);
+        return doExecuteQuery(sql, mapper, Result2::atMost1, ERROR_FOR_ONE);
     }
 
     @Override
     public <T> List<T> selectAll(String sql, RowMapper<T> mapper) {
-        return doExecuteQuery(sql, mapper, Result2::extractList, ERROR_FOR_LIST);
+        return doExecuteQuery(sql, mapper, Result2::listAll, ERROR_FOR_LIST);
     }
 
     @Override
@@ -135,12 +160,12 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
 
     @Override
     public <T> T selectOne(String sql, Object[] parameters, RowMapper<T> mapper) {
-        return doExecuteQuery(sql, parameters, mapper, Result2::extractOne, ERROR_FOR_ONE);
+        return doExecuteQuery(sql, parameters, mapper, Result2::atMost1, ERROR_FOR_ONE);
     }
 
     @Override
     public <T> List<T> selectAll(String sql, Object[] parameters, RowMapper<T> mapper) {
-        return doExecuteQuery(sql, parameters, mapper, Result2::extractList, ERROR_FOR_LIST);
+        return doExecuteQuery(sql, parameters, mapper, Result2::listAll, ERROR_FOR_LIST);
     }
 
     @Override
@@ -156,7 +181,7 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
         }
         Connection connection = openConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            setObjectParameters(stmt, parameters);
+            Parameter2.setAll(stmt, parameters);
             try (ResultSet resultSet = stmt.executeQuery()) {
                 return extractor.apply(resultSet, extra);
             }

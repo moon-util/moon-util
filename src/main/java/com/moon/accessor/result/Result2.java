@@ -2,6 +2,7 @@ package com.moon.accessor.result;
 
 import com.moon.accessor.exception.Exception2;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -16,15 +17,44 @@ import java.util.Map;
 public enum Result2 {
     ;
 
-    public static String[] extractColumnsLabel(ResultSet resultSet) {
+    public static String[] labels(ResultSetMetaData meta) {
         try {
-            ResultSetMetaData meta = resultSet.getMetaData();
             final int count = meta.getColumnCount();
             String[] labels = new String[count];
             for (int i = 0; i < count; i++) {
                 labels[i] = meta.getColumnName(i + 1);
             }
             return labels;
+        } catch (SQLException e) {
+            throw Exception2.with(e);
+        }
+    }
+
+    /**
+     * 提取列名
+     *
+     * @param stmt Statement
+     *
+     * @return 列名
+     */
+    public static String[] labels(PreparedStatement stmt) {
+        try {
+            return labels(stmt.getMetaData());
+        } catch (SQLException e) {
+            throw Exception2.with(e);
+        }
+    }
+
+    /**
+     * 提取列名
+     *
+     * @param resultSet SQL 结果集
+     *
+     * @return 列名
+     */
+    public static String[] labels(ResultSet resultSet) {
+        try {
+            return labels(resultSet.getMetaData());
         } catch (SQLException e) {
             throw Exception2.with(e);
         }
@@ -59,7 +89,7 @@ public enum Result2 {
      */
     public static List<Map<String, Object>> mapList(ResultSet resultSet) {
         try {
-            String[] labels = extractColumnsLabel(resultSet);
+            String[] labels = labels(resultSet);
             int columnsCount = labels.length;
             List<Map<String, Object>> resultList = new ArrayList<>();
             while (resultSet.next()) {
@@ -84,7 +114,7 @@ public enum Result2 {
      *
      * @return 单行数据或 null
      */
-    public static <T> T extractOne(ResultSet resultSet, RowMapper<T> mapper) {
+    public static <T> T atMost1(ResultSet resultSet, RowMapper<T> mapper) {
         try {
             if (!resultSet.next()) {
                 return null;
@@ -110,7 +140,7 @@ public enum Result2 {
      *
      * @return 结果集所对应的所有行数据
      */
-    public static <T> List<T> extractList(ResultSet resultSet, RowMapper<T> mapper) {
+    public static <T> List<T> listAll(ResultSet resultSet, RowMapper<T> mapper) {
         try {
             List<T> resultList = new ArrayList<>();
             while (resultSet.next()) {
