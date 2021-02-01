@@ -2,6 +2,7 @@ package com.moon.accessor.param;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * @author benshaoye
@@ -11,7 +12,11 @@ public class ByteParameterSetter extends BaseParameterSetter implements Paramete
     private final byte value;
 
     public ByteParameterSetter(int parameterIndex, byte value) {
-        super(parameterIndex);
+        this(parameterIndex, Types.TINYINT, value);
+    }
+
+    public ByteParameterSetter(int parameterIndex, int sqlType, byte value) {
+        super(parameterIndex, sqlType);
         this.value = value;
     }
 
@@ -19,4 +24,7 @@ public class ByteParameterSetter extends BaseParameterSetter implements Paramete
     public void setParameter(PreparedStatement stmt) throws SQLException {
         stmt.setByte(getParameterIndex(), value);
     }
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

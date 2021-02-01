@@ -8,15 +8,13 @@ import java.sql.SQLException;
  */
 public class NullParameterSetter extends BaseParameterSetter {
 
-    private final int sqlType;
-
     public NullParameterSetter(int parameterIndex, int sqlType) {
-        super(parameterIndex);
-        this.sqlType = sqlType;
+        super(parameterIndex, sqlType);
     }
 
     @Override
-    public void setParameter(PreparedStatement stmt) throws SQLException {
-        stmt.setNull(getParameterIndex(), sqlType);
-    }
+    public void setParameter(PreparedStatement stmt) throws SQLException { setNull(stmt); }
+
+    @Override
+    public String toString() { return "null"; }
 }

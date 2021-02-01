@@ -13,7 +13,11 @@ public class OffsetTimestampParameterSetter extends BaseParameterSetter implemen
     private final OffsetDateTime value;
 
     public OffsetTimestampParameterSetter(int parameterIndex, OffsetDateTime value) {
-        super(parameterIndex);
+        this(parameterIndex, Types.TIMESTAMP_WITH_TIMEZONE, value);
+    }
+
+    public OffsetTimestampParameterSetter(int parameterIndex, int sqlType, OffsetDateTime value) {
+        super(parameterIndex, sqlType);
         this.value = value;
     }
 
@@ -21,4 +25,7 @@ public class OffsetTimestampParameterSetter extends BaseParameterSetter implemen
     public void setParameter(PreparedStatement stmt) throws SQLException {
         stmt.setObject(getParameterIndex(), value, Types.TIMESTAMP_WITH_TIMEZONE);
     }
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

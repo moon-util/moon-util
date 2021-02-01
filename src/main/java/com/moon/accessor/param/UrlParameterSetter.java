@@ -13,7 +13,11 @@ public class UrlParameterSetter extends BaseParameterSetter implements Parameter
     private final URL value;
 
     public UrlParameterSetter(int parameterIndex, URL value) {
-        super(parameterIndex);
+        this(parameterIndex, Types.DATALINK, value);
+    }
+
+    public UrlParameterSetter(int parameterIndex, int sqlType, URL value) {
+        super(parameterIndex, sqlType);
         this.value = value;
     }
 
@@ -21,4 +25,7 @@ public class UrlParameterSetter extends BaseParameterSetter implements Parameter
     public void setParameter(PreparedStatement stmt) throws SQLException {
         stmt.setObject(getParameterIndex(), value, Types.DATALINK);
     }
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

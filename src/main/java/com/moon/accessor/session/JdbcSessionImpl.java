@@ -4,6 +4,7 @@ import com.moon.accessor.config.Configuration;
 import com.moon.accessor.config.ConfigurationContext;
 import com.moon.accessor.config.ConnectionFactory;
 import com.moon.accessor.exception.Exception2;
+import com.moon.accessor.function.ThrowingBiApplier;
 import com.moon.accessor.function.ThrowingBiConsumer;
 import com.moon.accessor.param.Parameter2;
 import com.moon.accessor.param.ParameterSetter;
@@ -18,8 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
-
-import static com.moon.accessor.param.Parameter2.setAll;
 
 /**
  * @author benshaoye
@@ -118,13 +117,31 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     }
 
     @Override
-    public int[] updateBatch(String sql, List<Object[]> parameters) {
+    public int[] updateBatch(String sql, Iterable<Object[]> parameters) {
+        if (parameters instanceof Collection) {
+            return updateBatchCollect(sql, (Collection<Object[]>) parameters);
+        }
+        return updateBatchIterable(sql, parameters);
+    }
+
+    private int[] updateBatchCollect(String sql, Collection<Object[]> parameters) {
         if (Collect2.isEmpty(parameters)) {
             return new int[0];
         }
+        if (parameters instanceof List) {
+            return updateBatchList(sql, (List<Object[]>) parameters);
+        }
+        return updateBatchIterable(sql, parameters);
+    }
+
+    private int[] updateBatchList(String sql, List<Object[]> parameters) {
         if (parameters.size() == 1) {
             return new int[]{update(sql, parameters.get(0))};
         }
+        return updateBatchIterable(sql, parameters);
+    }
+
+    private int[] updateBatchIterable(String sql, Iterable<Object[]> parameters) {
         Connection connection = openConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             for (Object[] params : parameters) {
@@ -174,7 +191,7 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     }
 
     private <T, V> T doExecuteQuery(
-        String sql, Object[] parameters, V extra, ThrowingBiFunction<ResultSet, V, T> extractor, String errorMessage
+        String sql, Object[] parameters, V extra, ThrowingBiApplier<ResultSet, V, T> extractor, String errorMessage
     ) {
         if (parameters == null || parameters.length == 0) {
             return doExecuteQuery(sql, extra, extractor, errorMessage);
@@ -193,7 +210,7 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     }
 
     private <T, V> T doExecuteQuery(
-        String sql, V extra, ThrowingBiFunction<ResultSet, V, T> extractor, String errorMessage
+        String sql, V extra, ThrowingBiApplier<ResultSet, V, T> extractor, String errorMessage
     ) {
         Connection connection = openConnection();
         try (@SuppressWarnings("all") Statement stmt = connection.createStatement();
@@ -211,29 +228,5 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
         //
     }
 
-    private static String stringify(Object[] parameters) {
-        return Arrays.toString(parameters);
-    }
-
-    /**
-     * 两参数函数
-     *
-     * @param <T> 参数 1
-     * @param <V> 参数 2
-     * @param <R> 返回类型
-     */
-    private interface ThrowingBiFunction<T, V, R> {
-
-        /**
-         * 执行函数
-         *
-         * @param t 参数 1
-         * @param v 参数 2
-         *
-         * @return 返回
-         *
-         * @throws SQLException SQLException
-         */
-        R apply(T t, V v) throws SQLException;
-    }
+    private static String stringify(Object[] parameters) { return Arrays.toString(parameters); }
 }

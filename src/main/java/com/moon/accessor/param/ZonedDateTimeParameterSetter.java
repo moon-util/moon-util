@@ -10,4 +10,8 @@ public class ZonedDateTimeParameterSetter extends ObjectParameterSetter implemen
     public ZonedDateTimeParameterSetter(int parameterIndex, ZonedDateTime value) {
         super(parameterIndex, value);
     }
+
+    public ZonedDateTimeParameterSetter(int parameterIndex, int sqlType, ZonedDateTime value) {
+        super(parameterIndex, sqlType, value);
+    }
 }

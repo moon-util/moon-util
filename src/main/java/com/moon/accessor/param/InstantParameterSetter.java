@@ -3,6 +3,7 @@ package com.moon.accessor.param;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 
 /**
@@ -13,7 +14,11 @@ public class InstantParameterSetter extends BaseParameterSetter implements Param
     private final Instant value;
 
     public InstantParameterSetter(int parameterIndex, Instant value) {
-        super(parameterIndex);
+        this(parameterIndex, Types.TIMESTAMP, value);
+    }
+
+    public InstantParameterSetter(int parameterIndex, int sqlType, Instant value) {
+        super(parameterIndex, sqlType);
         this.value = value;
     }
 
@@ -21,4 +26,7 @@ public class InstantParameterSetter extends BaseParameterSetter implements Param
     public void setParameter(PreparedStatement stmt) throws SQLException {
         stmt.setTimestamp(getParameterIndex(), Timestamp.from(value));
     }
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }

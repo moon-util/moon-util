@@ -6,6 +6,7 @@ import com.moon.accessor.result.ResultExtractor;
 import com.moon.accessor.result.RowMapper;
 
 import java.io.Closeable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import static com.moon.accessor.result.Result2.listAll;
  * @author benshaoye
  */
 public interface JdbcSession extends Closeable {
+
+    Object[] EMPTY_PARAMETERS = {};
 
     /**
      * insert 语句
@@ -50,7 +53,7 @@ public interface JdbcSession extends Closeable {
      *
      * @return 每组参数是否插入成功对应的数目
      */
-    default int[] insertBatch(String sql, List<Object[]> parameters) {
+    default int[] insertBatch(String sql, Iterable<Object[]> parameters) {
         // Example:
         return updateBatch(sql, parameters);
     }
@@ -62,7 +65,10 @@ public interface JdbcSession extends Closeable {
      *
      * @return 执行结果
      */
-    int update(String sql);
+    default int update(String sql) {
+        // Example:
+        return update(sql, EMPTY_PARAMETERS);
+    }
 
     /**
      * update 语句
@@ -88,7 +94,10 @@ public interface JdbcSession extends Closeable {
      *
      * @see Parameters
      */
-    int update(String sql, ParameterSetter[] parameters);
+    default int update(String sql, ParameterSetter[] parameters) {
+        // Example:
+        return update(sql, Arrays.asList(parameters));
+    }
 
     /**
      * update 语句
@@ -114,7 +123,7 @@ public interface JdbcSession extends Closeable {
      *
      * @return 执行结果影响的数据数目
      */
-    int[] updateBatch(String sql, List<Object[]> parameters);
+    int[] updateBatch(String sql, Iterable<Object[]> parameters);
 
     /**
      * delete 语句
@@ -149,7 +158,7 @@ public interface JdbcSession extends Closeable {
      *
      * @return 执行结果影响的数据数目
      */
-    default int[] deleteBatch(String sql, List<Object[]> parameters) {
+    default int[] deleteBatch(String sql, Iterable<Object[]> parameters) {
         // Example:
         return updateBatch(sql, parameters);
     }
@@ -191,9 +200,12 @@ public interface JdbcSession extends Closeable {
      * @param extractor 结果集数据提取器
      * @param <T>       返回数据类型
      *
-     * @return 返回结果集数据提取器的返回值
+     * @return extractor 原样返回{@code extractor}的返回值
      */
-    <T> T select(String sql, ResultExtractor<T> extractor);
+    default <T> T select(String sql, ResultExtractor<T> extractor) {
+        // Example:
+        return select(sql, EMPTY_PARAMETERS, extractor);
+    }
 
     /**
      * select 语句，最多只返回一行数据，超过一行将抛出异常
@@ -235,7 +247,7 @@ public interface JdbcSession extends Closeable {
      * @param extractor  结果集数据提取器
      * @param <T>        返回数据类型
      *
-     * @return 返回结果集数据提取器的返回值
+     * @return extractor 原样返回{@code extractor}的返回值
      */
     <T> T select(String sql, Object[] parameters, ResultExtractor<T> extractor);
 }

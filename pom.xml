@@ -245,6 +245,12 @@
       <version>8.0.19</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.14</version>
+      <scope>test</scope>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
     <dependency>
       <groupId>org.ow2.asm</groupId>

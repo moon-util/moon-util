@@ -3,6 +3,7 @@ package com.moon.accessor.param;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.sql.Types;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -14,12 +15,20 @@ public class SqlTimeParameterSetter extends BaseParameterSetter implements Param
     private final Time value;
 
     public SqlTimeParameterSetter(int parameterIndex, Date value) {
-        super(parameterIndex);
-        this.value = new Time(value.getTime());
+        this(parameterIndex, Types.TIME, value);
     }
 
     public SqlTimeParameterSetter(int parameterIndex, LocalTime value) {
-        super(parameterIndex);
+        this(parameterIndex, Types.TIME, value);
+    }
+
+    public SqlTimeParameterSetter(int parameterIndex, int sqlType, Date value) {
+        super(parameterIndex, sqlType);
+        this.value = new Time(value.getTime());
+    }
+
+    public SqlTimeParameterSetter(int parameterIndex, int sqlType, LocalTime value) {
+        super(parameterIndex, sqlType);
         this.value = Time.valueOf(value);
     }
 
@@ -27,4 +36,7 @@ public class SqlTimeParameterSetter extends BaseParameterSetter implements Param
     public void setParameter(PreparedStatement stmt) throws SQLException {
         stmt.setTime(getParameterIndex(), value);
     }
+
+    @Override
+    public String toString() { return String.valueOf(value); }
 }
