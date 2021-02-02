@@ -6,13 +6,19 @@ import org.joda.time.*;
 
 import java.sql.*;
 
+import static com.moon.accessor.type.TypeUsing2.useIfNonNull;
+import static org.joda.time.Instant.ofEpochMilli;
+
 /**
  * @author benshaoye
  */
-enum JodaTypeHandlersEnum implements TypeHandler {
+enum JodaTypeHandlersEnum implements TypeHandler<Object> {
+    /**
+     * types
+     */
     forJodaLocalDate(Types.DATE,
-        (set, idx) -> TypeUsing2.useIfNonNull(set.getDate(idx), LocalDate::fromDateFields),
-        (set, name) -> TypeUsing2.useIfNonNull(set.getDate(name), LocalDate::fromDateFields),
+        (set, idx) -> useIfNonNull(set.getDate(idx), LocalDate::fromDateFields),
+        (set, name) -> useIfNonNull(set.getDate(name), LocalDate::fromDateFields),
         LocalDate.class) {
         @Override
         @SuppressWarnings("deprecation")
@@ -22,8 +28,8 @@ enum JodaTypeHandlersEnum implements TypeHandler {
         }
     },
     forJodaLocalTime(Types.TIME,
-        (set, idx) -> TypeUsing2.useIfNonNull(set.getTime(idx), LocalTime::fromDateFields),
-        (set, name) -> TypeUsing2.useIfNonNull(set.getTime(name), LocalTime::fromDateFields),
+        (set, idx) -> useIfNonNull(set.getTime(idx), LocalTime::fromDateFields),
+        (set, name) -> useIfNonNull(set.getTime(name), LocalTime::fromDateFields),
         LocalTime.class) {
         @Override
         @SuppressWarnings("deprecation")
@@ -33,8 +39,8 @@ enum JodaTypeHandlersEnum implements TypeHandler {
         }
     },
     forJodaLocalDateTime(Types.TIMESTAMP,
-        (set, idx) -> TypeUsing2.useIfNonNull(set.getTimestamp(idx), LocalDateTime::fromDateFields),
-        (set, name) -> TypeUsing2.useIfNonNull(set.getTimestamp(name), LocalDateTime::fromDateFields),
+        (set, idx) -> useIfNonNull(set.getTimestamp(idx), LocalDateTime::fromDateFields),
+        (set, name) -> useIfNonNull(set.getTimestamp(name), LocalDateTime::fromDateFields),
         LocalDateTime.class) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
@@ -42,8 +48,8 @@ enum JodaTypeHandlersEnum implements TypeHandler {
         }
     },
     forDateTime(Types.TIMESTAMP,
-        (set, idx) -> TypeUsing2.useIfNonNull(set.getTimestamp(idx), LocalDateTime::fromDateFields),
-        (set, name) -> TypeUsing2.useIfNonNull(set.getTimestamp(name), LocalDateTime::fromDateFields),
+        (set, idx) -> useIfNonNull(set.getTimestamp(idx), LocalDateTime::fromDateFields),
+        (set, name) -> useIfNonNull(set.getTimestamp(name), LocalDateTime::fromDateFields),
         DateTime.class) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
@@ -51,12 +57,40 @@ enum JodaTypeHandlersEnum implements TypeHandler {
         }
     },
     forInstant(Types.TIMESTAMP,
-        (set, idx) -> TypeUsing2.useIfNonNull(set.getTimestamp(idx), t -> Instant.ofEpochMilli(t.getTime())),
-        (set, name) -> TypeUsing2.useIfNonNull(set.getTimestamp(name), t -> Instant.ofEpochMilli(t.getTime())),
+        (set, idx) -> useIfNonNull(set.getTimestamp(idx), t -> ofEpochMilli(t.getTime())),
+        (set, name) -> useIfNonNull(set.getTimestamp(name), t -> ofEpochMilli(t.getTime())),
         Instant.class) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, new Timestamp(((Instant) value).getMillis()));
+        }
+    },
+    forMutableDateTime(Types.TIMESTAMP,
+        (set, idx) -> useIfNonNull(set.getTimestamp(idx), dt -> new MutableDateTime(dt.getTime())),
+        (set, name) -> useIfNonNull(set.getTimestamp(name), dt -> new MutableDateTime(dt.getTime())),
+        MutableDateTime.class) {
+        @Override
+        public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
+            MutableDateTime datetime = (MutableDateTime) value;
+            stmt.setTimestamp(index, new Timestamp(datetime.getMillis()));
+        }
+    },
+    forYearMonth(Types.VARCHAR,
+        (set, idx) -> set.wasNull() ? null : YearMonth.parse(set.getString(idx)),
+        (set, name) -> set.wasNull() ? null : YearMonth.parse(set.getString(name)),
+        YearMonth.class) {
+        @Override
+        public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
+            stmt.setString(index, String.valueOf(value));
+        }
+    },
+    forMonthDay(Types.VARCHAR,
+        (set, idx) -> set.wasNull() ? null : MonthDay.parse(set.getString(idx)),
+        (set, name) -> set.wasNull() ? null : MonthDay.parse(set.getString(name)),
+        MonthDay.class) {
+        @Override
+        public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
+            stmt.setString(index, String.valueOf(value));
         }
     },
     ;
