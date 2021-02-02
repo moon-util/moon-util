@@ -8,7 +8,5 @@ import java.sql.SQLException;
  */
 public interface ParameterSetter {
 
-    void setNull(PreparedStatement stmt) throws SQLException;
-
-    void setParameter(PreparedStatement stmt) throws SQLException;
+    void setParameter(PreparedStatement stmt, int index) throws SQLException;
 }

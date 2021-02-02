@@ -5,7 +5,6 @@ import com.moon.accessor.function.ThrowingIntBiApplier;
 import org.joda.time.*;
 
 import java.sql.*;
-import java.util.Arrays;
 
 import static com.moon.accessor.type.TypeUsing2.*;
 import static org.joda.time.Instant.ofEpochMilli;
@@ -13,7 +12,7 @@ import static org.joda.time.Instant.ofEpochMilli;
 /**
  * @author benshaoye
  */
-enum JodaTypeHandlersEnum implements TypeHandler<Object> {
+enum JodaTypeHandlersEnum implements TypeJdbcHandler<Object> {
     /**
      * types
      */
@@ -93,8 +92,7 @@ enum JodaTypeHandlersEnum implements TypeHandler<Object> {
 
     private final ThrowingIntBiApplier<ResultSet, Object> indexedGetter;
     private final ThrowingBiApplier<ResultSet, String, Object> namedGetter;
-    private final int[] compatibleTypes;
-    public final int primaryJdbcType;
+    private final int[] supportJdbcTypes;
     public final Class<?> supportClass;
 
     JodaTypeHandlersEnum(
@@ -106,19 +104,15 @@ enum JodaTypeHandlersEnum implements TypeHandler<Object> {
         this.supportClass = supportClass;
         this.indexedGetter = indexedGetter;
         this.namedGetter = namedGetter;
-        // types
-        this.primaryJdbcType = jdbcTypes[0];
-        int typesLength = jdbcTypes.length;
-        if (typesLength == 1) {
-            this.compatibleTypes = EMPTY_TYPES;
-        } else {
-            int[] types = new int[typesLength - 1];
-            System.arraycopy(jdbcTypes, 1, types, 0, typesLength - 1);
-            this.compatibleTypes = types;
-        }
+        this.supportJdbcTypes = jdbcTypes;
     }
 
-    public int[] getCompatibleTypes() { return Arrays.copyOf(compatibleTypes, compatibleTypes.length); }
+    @Override
+    public int[] supportJdbcTypes() { return supportJdbcTypes; }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public Class supportClass() { return supportClass; }
 
     public abstract void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException;
 

@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import static com.moon.accessor.type.TypeUsing2.toKey;
 
@@ -29,8 +30,20 @@ public class TypeHandlerRegistry {
         JODA_IMPORTED = jodaImported;
     }
 
-    private final static Map<Class<?>, TypeHandler<?>> DEFAULT_HANDLERS_MAP;
+    private final static Map<Class<?>, TypeHandler<?>> HANDLERS_MAP;
     private final static Map<Object, TypeHandler<?>> TYPED_HANDLERS_MAP;
+    private final static Map<Class<?>, TypeHandler<?>> DEF_HANDLERS_MAP;
+    private final static Map<Object, TypeHandler<?>> DEF_TYPED_HANDLERS_MAP;
+
+    static {
+        Map<Class<?>, TypeHandler<?>> handlerMap = new HashMap<>();
+        Map<Object, TypeHandler<?>> typedHandlersMap = new HashMap<>();
+        ServiceLoader<TypeHandler> loader = ServiceLoader.load(TypeHandler.class);
+        for (TypeHandler<?> handler : loader) {
+        }
+        DEF_TYPED_HANDLERS_MAP = Collections.unmodifiableMap(typedHandlersMap);
+        DEF_HANDLERS_MAP = Collections.unmodifiableMap(handlerMap);
+    }
 
     static {
         Map<Class<?>, TypeHandler<?>> handlerMap = new HashMap<>();
@@ -38,28 +51,22 @@ public class TypeHandlerRegistry {
 
         for (JavaTypeHandlersEnum value : JavaTypeHandlersEnum.values()) {
             handlerMap.putIfAbsent(value.supportClass, value);
-            String typedKey = toKey(value.primaryJdbcType, value.supportClass);
-            typedHandlersMap.put(typedKey, value);
-            for (int compatibleType : value.getCompatibleTypes()) {
-                typedKey = toKey(compatibleType, value.supportClass);
-                typedHandlersMap.put(typedKey, value);
+            for (int type : value.supportJdbcTypes()) {
+                typedHandlersMap.put(toKey(type, value.supportClass), value);
             }
         }
 
         if (JODA_IMPORTED) {
             for (JodaTypeHandlersEnum value : JodaTypeHandlersEnum.values()) {
                 handlerMap.putIfAbsent(value.supportClass, value);
-                String typedKey = toKey(value.primaryJdbcType, value.supportClass);
-                typedHandlersMap.put(typedKey, value);
-                for (int compatibleType : value.getCompatibleTypes()) {
-                    typedKey = toKey(compatibleType, value.supportClass);
-                    typedHandlersMap.put(typedKey, value);
+                for (int type : value.supportJdbcTypes()) {
+                    typedHandlersMap.put(toKey(type, value.supportClass), value);
                 }
             }
         }
 
         TYPED_HANDLERS_MAP = Collections.unmodifiableMap(typedHandlersMap);
-        DEFAULT_HANDLERS_MAP = Collections.unmodifiableMap(handlerMap);
+        HANDLERS_MAP = Collections.unmodifiableMap(handlerMap);
     }
 
     @SuppressWarnings({"rawtypes"})
@@ -68,17 +75,8 @@ public class TypeHandlerRegistry {
             return jdbcType;
         }
         TypeHandler handler = findBuiltInHandler(propertyType, jdbcType);
-        if (handler instanceof JavaTypeHandlersEnum) {
-            return JdbcType.valueOf(((JavaTypeHandlersEnum) handler).primaryJdbcType);
-        }
-        if (JODA_IMPORTED && handler instanceof JodaTypeHandlersEnum) {
-            return JdbcType.valueOf(((JodaTypeHandlersEnum) handler).primaryJdbcType);
-        }
-        if (handler instanceof JavaEnumOrdinalHandler) {
-            return JdbcType.INTEGER;
-        }
-        if (handler instanceof JavaEnumStringHandler) {
-            return JdbcType.VARCHAR;
+        if (handler instanceof TypeJdbcHandler) {
+            return JdbcType.valueOf(((TypeJdbcHandler<?>) handler).supportJdbcTypes()[0]);
         }
         return JdbcType.JAVA_OBJECT;
     }
@@ -98,7 +96,7 @@ public class TypeHandlerRegistry {
     private static <T> TypeHandler findBuiltInHandler(Class<T> propertyType, JdbcType jdbcType) {
         TypeHandler handler;
         if (jdbcType == JdbcType.AUTO) {
-            handler = DEFAULT_HANDLERS_MAP.get(propertyType);
+            handler = HANDLERS_MAP.get(propertyType);
             if (handler == null && propertyType.isEnum()) {
                 handler = new JavaEnumOrdinalHandler(propertyType);
             }

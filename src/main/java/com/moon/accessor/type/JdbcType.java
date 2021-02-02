@@ -126,7 +126,7 @@ public enum JdbcType {
      */
     TIMESTAMP_WITH_TIMEZONE(Types.TIMESTAMP_WITH_TIMEZONE),
     /**
-     * 根据字段类型自动推断
+     * 根据字段类型自动推断，不能出现在实际运行过程中
      */
     AUTO(null),
     ;

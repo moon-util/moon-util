@@ -9,14 +9,13 @@ import java.net.URL;
 import java.sql.*;
 import java.time.*;
 import java.time.chrono.JapaneseDate;
-import java.util.Arrays;
 
 import static com.moon.accessor.type.TypeUsing2.*;
 
 /**
  * @author benshaoye
  */
-enum JavaTypeHandlersEnum implements TypeHandler<Object> {
+enum JavaTypeHandlersEnum implements TypeJdbcHandler<Object> {
     /**
      * types
      */
@@ -390,8 +389,7 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
 
     private final ThrowingIntBiApplier<ResultSet, Object> indexedGetter;
     private final ThrowingBiApplier<ResultSet, String, Object> namedGetter;
-    private final int[] compatibleTypes;
-    public final int primaryJdbcType;
+    private final int[] supportJdbcTypes;
     public final Class<?> supportClass;
 
     JavaTypeHandlersEnum(
@@ -403,21 +401,17 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
         this.supportClass = supportClass;
         this.indexedGetter = indexedGetter;
         this.namedGetter = namedGetter;
-        // types
-        this.primaryJdbcType = jdbcTypes[0];
-        int typesLength = jdbcTypes.length;
-        if (typesLength == 1) {
-            this.compatibleTypes = EMPTY_TYPES;
-        } else {
-            int[] types = new int[typesLength - 1];
-            System.arraycopy(jdbcTypes, 1, types, 0, typesLength - 1);
-            this.compatibleTypes = types;
-        }
+        this.supportJdbcTypes = jdbcTypes;
     }
 
-    public abstract void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException;
+    @Override
+    public int[] supportJdbcTypes() { return supportJdbcTypes; }
 
-    public int[] getCompatibleTypes() { return Arrays.copyOf(compatibleTypes, compatibleTypes.length); }
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public Class supportClass() { return supportClass; }
+
+    public abstract void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException;
 
     @Override
     public void setParameter(PreparedStatement stmt, int index, Object value, int jdbcType) throws SQLException {

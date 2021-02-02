@@ -3,17 +3,20 @@ package com.moon.accessor.type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * @author benshaoye
  */
-public class JavaEnumOrdinalHandler<T extends Enum<T>> implements TypeHandler<T> {
+public class JavaEnumOrdinalHandler<T extends Enum<T>> implements TypeJdbcHandler<T> {
 
     private final T[] values;
+    private final Class<T> enumClass;
 
     public JavaEnumOrdinalHandler(Class<T> enumClass) {
         assert enumClass.isEnum() : "Must be an enum.";
         values = enumClass.getEnumConstants();
+        this.enumClass = enumClass;
     }
 
     @Override
@@ -32,4 +35,10 @@ public class JavaEnumOrdinalHandler<T extends Enum<T>> implements TypeHandler<T>
         int ordinal = resultSet.getInt(columnName);
         return ordinal == 0 && resultSet.wasNull() ? null : values[ordinal];
     }
+
+    @Override
+    public Class<T> supportClass() { return enumClass; }
+
+    @Override
+    public int[] supportJdbcTypes() { return TypeUsing2.asInts(Types.INTEGER); }
 }

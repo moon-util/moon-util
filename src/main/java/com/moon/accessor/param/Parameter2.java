@@ -18,14 +18,14 @@ public enum Parameter2 {
 
     public static void setAll(PreparedStatement stmt, ParameterSetter[] setters) throws SQLException {
         for (int i = 0, l = setters.length; i < l; i++) {
-            setters[i].setParameter(stmt);
+            setters[i].setParameter(stmt, i);
         }
     }
 
-    public static void setAll(PreparedStatement stmt, Collection<ParameterSetter> setters)
-        throws SQLException {
+    public static void setAll(PreparedStatement stmt, Collection<ParameterSetter> setters) throws SQLException {
+        int index = 0;
         for (ParameterSetter setter : setters) {
-            setter.setParameter(stmt);
+            setter.setParameter(stmt, index++);
         }
     }
 }

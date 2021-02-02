@@ -3,11 +3,12 @@ package com.moon.accessor.type;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * @author benshaoye
  */
-public class JavaEnumStringHandler<T extends Enum<T>> implements TypeHandler<T> {
+public class JavaEnumStringHandler<T extends Enum<T>> implements TypeJdbcHandler<T> {
 
     private final Class<T> enumClass;
 
@@ -35,4 +36,10 @@ public class JavaEnumStringHandler<T extends Enum<T>> implements TypeHandler<T> 
         String value = resultSet.getString(columnName);
         return isEmpty(value) ? null : Enum.valueOf(enumClass, value);
     }
+
+    @Override
+    public Class<T> supportClass() { return enumClass; }
+
+    @Override
+    public int[] supportJdbcTypes() { return TypeUsing2.asInts(Types.VARCHAR); }
 }
