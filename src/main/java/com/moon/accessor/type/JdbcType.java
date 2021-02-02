@@ -9,6 +9,9 @@ import java.util.Map;
  * @author benshaoye
  */
 public enum JdbcType {
+    /**
+     * bit
+     */
     BIT(Types.BIT),
     /**
      * byte

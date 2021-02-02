@@ -3,7 +3,7 @@ package com.moon.processor.holder;
 import com.moon.accessor.annotation.TableFieldPolicy;
 import com.moon.accessor.annotation.TableModel;
 import com.moon.accessor.annotation.TableModelPolicy;
-import com.moon.processor.model.DefaultTableColumnPolicy;
+import com.moon.processor.model.DefaultTableFieldPolicy;
 import com.moon.processor.model.DefaultTableModel;
 import com.moon.processor.model.DefaultTablePolicy;
 import com.moon.processor.utils.Element2;
@@ -62,7 +62,7 @@ public class PolicyHolder {
     }
 
     public TableFieldPolicy withColumnPolicy(TypeElement element) {
-        return find(element, columnPolicyMap, TableFieldPolicy.class, DefaultTableColumnPolicy.INSTANCE);
+        return find(element, columnPolicyMap, TableFieldPolicy.class, DefaultTableFieldPolicy.INSTANCE);
     }
 
     public TableModelPolicy with(TypeElement element) {

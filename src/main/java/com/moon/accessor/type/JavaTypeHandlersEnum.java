@@ -20,9 +20,10 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
     /**
      * types
      */
-    forBigDecimal(BigDecimal.class, asInts(Types.NUMERIC, Types.DECIMAL),
-
-        ResultSet::getBigDecimal, ResultSet::getBigDecimal) {
+    forBigDecimal(BigDecimal.class,
+        asInts(Types.NUMERIC, Types.DECIMAL),
+        ResultSet::getBigDecimal,
+        ResultSet::getBigDecimal) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setBigDecimal(index, (BigDecimal) value);
@@ -289,8 +290,8 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
     },
     forMonthDay(MonthDay.class,
         asInts(Types.VARCHAR),
-        (set, idx) -> set.wasNull() ? null : MonthDay.parse(set.getString(idx)),
-        (set, name) -> set.wasNull() ? null : MonthDay.parse(set.getString(name))) {
+        (set, idx) -> useIfNonNull(set.getString(idx), MonthDay::parse),
+        (set, name) -> useIfNonNull(set.getString(name), MonthDay::parse)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
@@ -298,8 +299,8 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
     },
     forYearMonth(YearMonth.class,
         asInts(Types.VARCHAR),
-        (set, idx) -> set.wasNull() ? null : YearMonth.parse(set.getString(idx)),
-        (set, name) -> set.wasNull() ? null : YearMonth.parse(set.getString(name))) {
+        (set, idx) -> useIfNonNull(set.getString(idx), YearMonth::parse),
+        (set, name) -> useIfNonNull(set.getString(name), YearMonth::parse)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
@@ -380,7 +381,12 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    ;
+    forObject(Object.class, asInts(Types.JAVA_OBJECT), ResultSet::getObject, ResultSet::getObject) {
+        @Override
+        public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
+            stmt.setObject(index, value);
+        }
+    };
 
     private final ThrowingIntBiApplier<ResultSet, Object> indexedGetter;
     private final ThrowingBiApplier<ResultSet, String, Object> namedGetter;
@@ -411,7 +417,7 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
 
     public abstract void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException;
 
-    public int[] getCompatibleTypes() { return Arrays.copyOf(compatibleTypes,compatibleTypes.length); }
+    public int[] getCompatibleTypes() { return Arrays.copyOf(compatibleTypes, compatibleTypes.length); }
 
     @Override
     public void setParameter(PreparedStatement stmt, int index, Object value, int jdbcType) throws SQLException {

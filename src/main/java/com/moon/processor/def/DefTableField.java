@@ -2,6 +2,7 @@ package com.moon.processor.def;
 
 import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.TableFieldDetail;
+import com.moon.accessor.type.JdbcType;
 import com.moon.processor.file.DeclField;
 import com.moon.processor.file.DeclJavaFile;
 import com.moon.processor.utils.String2;
@@ -28,6 +29,7 @@ public class DefTableField {
     private final String comment;
     private final String stringifyPropName;
     private final String stringifyFieldName;
+    private final com.moon.accessor.annotation.TableField field;
 
     public DefTableField(
         String pojoClass,
@@ -40,7 +42,8 @@ public class DefTableField {
         String getterName,
         String setterName,
         String firstComment,
-        String comment
+        String comment,
+        com.moon.accessor.annotation.TableField field
     ) {
         this.pojoClass = pojoClass;
         this.propName = propName;
@@ -55,6 +58,7 @@ public class DefTableField {
         this.comment = comment;
         this.stringifyPropName = String2.strWrapped(propName);
         this.stringifyFieldName = String2.strWrapped(fieldName);
+        this.field = field;
     }
 
     public String getPropName() { return propName; }
@@ -84,7 +88,7 @@ public class DefTableField {
     private String getFieldValue(DeclJavaFile table) {
         String importedPojo = table.onImported(pojoClass);
         String firstComment = getFirstComment(), comment = getDeclareComment();
-        return format("new {}<>(this, {}, {}, {}, {}, {}, {}, {}, {}, {});",
+        return format("new {}<>(this, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});",
             table.onImported(TableFieldDetail.class),
             String2.dotClass(importedPojo),
             String2.dotClass(table.onImported(propType)),
@@ -94,7 +98,10 @@ public class DefTableField {
             getStringifyPropName(),
             getStringifyFieldName(),
             Objects.equals(firstComment, comment) ? null : firstComment,
-            getDeclareComment());
+            getDeclareComment(),
+            format("{}.{}", table.onImported(JdbcType.class), field.jdbcType()),
+            field.length(),
+            field.precision());
     }
 
     private String getUsableHandlerType(DeclJavaFile table, String handlerType) {

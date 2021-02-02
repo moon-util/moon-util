@@ -217,7 +217,7 @@ public class DefTableModel implements JavaFileWriteable {
             return null;
         }
         com.moon.accessor.annotation.TableField fieldAnnotated//
-            = element.getAnnotation(com.moon.accessor.annotation.TableField.class);
+            = Table2.getTableFieldAnnotation(element);
 
         // 列名
         String fieldName = Table2.toColumnName(fieldAnnotated, propName, columnPolicy);
@@ -245,7 +245,8 @@ public class DefTableModel implements JavaFileWriteable {
             getterName,
             setterName,
             Comment2.resolveFirstComment(element),
-            Comment2.resolveComment(element));
+            Comment2.resolveComment(element),
+            fieldAnnotated);
     }
 
     public String getPkg() { return pkg; }

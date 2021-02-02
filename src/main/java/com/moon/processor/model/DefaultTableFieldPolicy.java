@@ -6,7 +6,7 @@ import com.moon.accessor.annotation.TableFieldPolicy;
 /**
  * @author benshaoye
  */
-public enum DefaultTableColumnPolicy implements TableFieldPolicy {
+public enum DefaultTableFieldPolicy implements TableFieldPolicy {
     /** default instance */
     INSTANCE;
 

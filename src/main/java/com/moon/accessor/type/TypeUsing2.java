@@ -16,8 +16,6 @@ enum TypeUsing2 {
 
     static int[] asInts(int... types) { return types; }
 
-    static <T> T[] asArray(T... types) { return types; }
-
     static <T> Object useIfNonNull(T value, Function<T, Object> converter) {
         return value == null ? null : converter.apply(value);
     }

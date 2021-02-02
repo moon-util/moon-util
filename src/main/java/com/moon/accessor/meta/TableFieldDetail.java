@@ -2,12 +2,11 @@ package com.moon.accessor.meta;
 
 import com.moon.accessor.PropertyGetter;
 import com.moon.accessor.PropertySetter;
-import com.moon.accessor.exception.Exception2;
+import com.moon.accessor.type.JdbcType;
 import com.moon.accessor.type.TypeHandler;
 
-import java.lang.reflect.Modifier;
-
-import static com.moon.accessor.type.TypeHandlerRegistry.DEFAULT;
+import static com.moon.accessor.type.TypeHandlerRegistry.findEffectiveJdbcType;
+import static com.moon.accessor.type.TypeHandlerRegistry.findEffectiveHandler;
 
 /**
  * @author benshaoye
@@ -25,19 +24,9 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
     private final PropertyGetter<R, T> getter;
     private final PropertySetter<R, T> setter;
     private final TypeHandler<T> typeHandler;
-
-    private static <T> TypeHandler<T> usingHandler(Class<T> propertyType, Class<TypeHandler<T>> handlerClass) {
-        if (handlerClass != null && !Modifier.isAbstract(handlerClass.getModifiers()) && !handlerClass.isInterface()) {
-            try {
-                return handlerClass.newInstance();
-            } catch (InstantiationException e) {
-                throw Exception2.with(e, "实例化错误: " + handlerClass.getCanonicalName());
-            } catch (IllegalAccessException e) {
-                throw Exception2.with(e, "不可访问: " + handlerClass.getCanonicalName());
-            }
-        }
-        return DEFAULT.findFor(propertyType);
-    }
+    private final JdbcType columnJdbcType;
+    private final int columnLength;
+    private final int columnPrecision;
 
     public TableFieldDetail(
         TB table,
@@ -49,18 +38,24 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         String propertyName,
         String columnName,
         String firstComment,
-        String comment
+        String comment,
+        JdbcType columnJdbcType,
+        int columnLength,
+        int columnPrecision
     ) {
         this(table,
             domainClass,
             propertyType,
-            usingHandler(propertyType, handlerClass),
+            findEffectiveHandler(handlerClass, propertyType, columnJdbcType),
             getter,
             setter,
             propertyName,
             columnName,
             firstComment,
             comment,
+            findEffectiveJdbcType(propertyType, columnJdbcType),
+            columnLength,
+            columnPrecision,
             null);
     }
 
@@ -75,8 +70,12 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         String columnName,
         String firstComment,
         String comment,
+        JdbcType columnJdbcType,
+        int columnLength,
+        int columnPrecision,
         String alias
     ) {
+        assert columnJdbcType != JdbcType.AUTO : "不准确的 Jdbc 类型:" + columnJdbcType;
         this.domainClass = domainClass;
         this.propertyType = propertyType;
         this.propertyName = propertyName;
@@ -88,6 +87,9 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         this.getter = getter;
         this.setter = setter;
         this.typeHandler = typeHandler;
+        this.columnJdbcType = columnJdbcType;
+        this.columnLength = columnLength;
+        this.columnPrecision = columnPrecision;
     }
 
     public TableFieldDetail(TableFieldDetail<T, R, TB> detail, String alias) {
@@ -101,6 +103,9 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
             detail.columnName,
             detail.firstComment,
             detail.comment,
+            detail.columnJdbcType,
+            detail.columnLength,
+            detail.columnPrecision,
             alias);
     }
 

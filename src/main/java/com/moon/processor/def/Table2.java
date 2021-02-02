@@ -3,6 +3,7 @@ package com.moon.processor.def;
 import com.moon.accessor.annotation.*;
 import com.moon.accessor.type.TypeHandler;
 import com.moon.processor.model.DeclaredPojo;
+import com.moon.processor.model.DefaultTableField;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;
@@ -116,6 +117,12 @@ enum Table2 {
             throw new IllegalStateException("JDBC type handler must be modified by public: " + name);
         }
         return name;
+    }
+
+    static TableField getTableFieldAnnotation(VariableElement element) {
+        com.moon.accessor.annotation.TableField fieldAnnotated//
+            = element.getAnnotation(TABLE_FIELD_CLASS);
+        return fieldAnnotated == null ? DefaultTableField.INSTANCE : fieldAnnotated;
     }
 
     static String toColumnName(
