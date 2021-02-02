@@ -9,8 +9,9 @@ import java.net.URL;
 import java.sql.*;
 import java.time.*;
 import java.time.chrono.JapaneseDate;
+import java.util.Arrays;
 
-import static com.moon.accessor.type.TypeUsing2.useIfNonNull;
+import static com.moon.accessor.type.TypeUsing2.*;
 
 /**
  * @author benshaoye
@@ -19,375 +20,361 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
     /**
      * types
      */
-    forBigDecimal_AS_NUMERIC(Types.NUMERIC, ResultSet::getBigDecimal, ResultSet::getBigDecimal, BigDecimal.class) {
+    forBigDecimal(BigDecimal.class, asInts(Types.NUMERIC, Types.DECIMAL),
+
+        ResultSet::getBigDecimal, ResultSet::getBigDecimal) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setBigDecimal(index, (BigDecimal) value);
         }
     },
-    forBigDecimal_AS_DECIMAL(Types.DECIMAL, ResultSet::getBigDecimal, ResultSet::getBigDecimal, BigDecimal.class) {
-        @Override
-        public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
-            stmt.setBigDecimal(index, (BigDecimal) value);
-        }
-    },
-    forBigInteger(Types.BIGINT, (set, idx) -> {
-        BigDecimal decimal = set.getBigDecimal(idx);
-        return decimal == null ? null : decimal.toBigInteger();
-    }, (set, name) -> {
-        BigDecimal decimal = set.getBigDecimal(name);
-        return decimal == null ? null : decimal.toBigInteger();
-    }, BigInteger.class) {
+    forBigInteger(BigInteger.class,
+        asInts(Types.BIGINT),
+        (set, idx) -> useIfNonNull(set.getBigDecimal(idx), BigDecimal::toBigInteger),
+        (set, name) -> useIfNonNull(set.getBigDecimal(name), BigDecimal::toBigInteger)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setBigDecimal(index, new BigDecimal((BigInteger) value));
         }
     },
-    forBoolean(Types.BOOLEAN, (set, idx) -> {
+    forBoolean(Boolean.class, asInts(Types.BOOLEAN), (set, idx) -> {
         boolean value = set.getBoolean(idx);
         return !value && set.wasNull() ? null : value;
     }, (set, name) -> {
         boolean value = set.getBoolean(name);
         return !value && set.wasNull() ? null : value;
-    }, Boolean.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setBoolean(index, (Boolean) value);
         }
     },
-    forBooleanValue(Types.BOOLEAN, ResultSet::getBoolean, ResultSet::getBoolean, boolean.class) {
+    forBooleanValue(boolean.class, asInts(Types.BOOLEAN), ResultSet::getBoolean, ResultSet::getBoolean) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setBoolean(index, (Boolean) value);
         }
     },
-    forDouble(Types.DOUBLE, (set, idx) -> {
+    forDouble(Double.class, asInts(Types.DOUBLE), (set, idx) -> {
         double value = set.getDouble(idx);
         return value == 0 && set.wasNull() ? null : value;
     }, (set, name) -> {
         double value = set.getDouble(name);
         return value == 0 && set.wasNull() ? null : value;
-    }, Double.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setDouble(index, (Double) value);
         }
     },
-    forDoubleValue(Types.DOUBLE, ResultSet::getDouble, ResultSet::getDouble, double.class) {
+    forDoubleValue(double.class, asInts(Types.DOUBLE), ResultSet::getDouble, ResultSet::getDouble) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setDouble(index, (Double) value);
         }
     },
-    forFloat(Types.REAL, (set, idx) -> {
+    forFloat(Float.class, asInts(Types.REAL), (set, idx) -> {
         float value = set.getFloat(idx);
         return value == 0 && set.wasNull() ? null : value;
     }, (set, name) -> {
         float value = set.getFloat(name);
         return value == 0 && set.wasNull() ? null : value;
-    }, Float.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setFloat(index, (Float) value);
         }
     },
-    forFloatValue(Types.REAL, ResultSet::getFloat, ResultSet::getFloat, float.class) {
+    forFloatValue(float.class, asInts(Types.REAL), ResultSet::getFloat, ResultSet::getFloat) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setFloat(index, (Float) value);
         }
     },
-    forLong(Types.BIGINT, (set, idx) -> {
+    forLong(Long.class, asInts(Types.BIGINT), (set, idx) -> {
         long value = set.getLong(idx);
         return value == 0 && set.wasNull() ? null : value;
     }, (set, name) -> {
         long value = set.getLong(name);
         return value == 0 && set.wasNull() ? null : value;
-    }, Long.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setLong(index, (Long) value);
         }
     },
-    forLongValue(Types.BIGINT, ResultSet::getLong, ResultSet::getLong, long.class) {
+    forLongValue(long.class, asInts(Types.BIGINT), ResultSet::getLong, ResultSet::getLong) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setLong(index, (Long) value);
         }
     },
-    forInteger(Types.INTEGER, (set, idx) -> {
+    forInteger(Integer.class, asInts(Types.INTEGER), (set, idx) -> {
         int value = set.getInt(idx);
         return value == 0 && set.wasNull() ? null : value;
     }, (set, name) -> {
         int value = set.getInt(name);
         return value == 0 && set.wasNull() ? null : value;
-    }, Integer.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setInt(index, (Integer) value);
         }
     },
-    forInt(Types.INTEGER, ResultSet::getInt, ResultSet::getInt, int.class) {
+    forInt(int.class, asInts(Types.INTEGER), ResultSet::getInt, ResultSet::getInt) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setInt(index, (Integer) value);
         }
     },
-    forShort(Types.SMALLINT, (set, idx) -> {
+    forShort(Short.class, asInts(Types.SMALLINT), (set, idx) -> {
         short value = set.getShort(idx);
         return value == 0 && set.wasNull() ? null : value;
     }, (set, name) -> {
         short value = set.getShort(name);
         return value == 0 && set.wasNull() ? null : value;
-    }, Short.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setShort(index, (Short) value);
         }
     },
-    forShortValue(Types.SMALLINT, ResultSet::getShort, ResultSet::getShort, short.class) {
+    forShortValue(short.class, asInts(Types.SMALLINT), ResultSet::getShort, ResultSet::getShort) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setShort(index, (Short) value);
         }
     },
-    forByte(Types.TINYINT, (set, idx) -> {
+    forByte(Byte.class, asInts(Types.TINYINT), (set, idx) -> {
         byte value = set.getByte(idx);
         return value == 0 && set.wasNull() ? null : value;
     }, (set, name) -> {
         byte value = set.getByte(name);
         return value == 0 && set.wasNull() ? null : value;
-    }, Byte.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setLong(index, (Long) value);
         }
     },
-    forByteValue(Types.TINYINT, ResultSet::getByte, ResultSet::getByte, byte.class) {
+    forByteValue(byte.class, asInts(Types.TINYINT), ResultSet::getByte, ResultSet::getByte) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setByte(index, (Byte) value);
         }
     },
-    forCharacter(Types.CHAR,
+    forCharacter(Character.class,
+        asInts(Types.CHAR, Types.VARCHAR),
+
         (set, idx) -> set.wasNull() ? null : set.getString(idx).charAt(0),
-        (set, name) -> set.wasNull() ? null : set.getString(name).charAt(0),
-        Character.class) {
+        (set, name) -> set.wasNull() ? null : set.getString(name).charAt(0)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forChar(Types.CHAR, ResultSet::getByte, ResultSet::getByte, char.class) {
+    forChar(char.class, asInts(Types.CHAR, Types.VARCHAR), ResultSet::getByte, ResultSet::getByte) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forBlob(Types.BLOB, ResultSet::getBlob, ResultSet::getBlob, Blob.class) {
+    forBlob(Blob.class, asInts(Types.BLOB), ResultSet::getBlob, ResultSet::getBlob) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setBlob(index, (Blob) value);
         }
     },
-    forClob(Types.BLOB, ResultSet::getClob, ResultSet::getClob, Clob.class) {
+    forClob(Clob.class, asInts(Types.CLOB), ResultSet::getClob, ResultSet::getClob) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setClob(index, (Clob) value);
         }
     },
-    forSqlDate(Types.DATE, ResultSet::getDate, ResultSet::getDate, Date.class) {
+    forSqlDate(Date.class, asInts(Types.DATE), ResultSet::getDate, ResultSet::getDate) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setDate(index, (Date) value);
         }
     },
-    forSqlTime(Types.TIME, ResultSet::getTime, ResultSet::getTime, Time.class) {
+    forSqlTime(Time.class, asInts(Types.TIME), ResultSet::getTime, ResultSet::getTime) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTime(index, (Time) value);
         }
     },
-    forSqlTimestamp(Types.TIMESTAMP, ResultSet::getTimestamp, ResultSet::getTimestamp, Timestamp.class) {
+    forSqlTimestamp(Timestamp.class, asInts(Types.TIMESTAMP), ResultSet::getTimestamp, ResultSet::getTimestamp) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, (Timestamp) value);
         }
     },
-    forUtilDate(Types.TIMESTAMP, ResultSet::getTimestamp, ResultSet::getTimestamp, java.util.Date.class) {
+    forUtilDate(java.util.Date.class, asInts(Types.TIMESTAMP), ResultSet::getTimestamp, ResultSet::getTimestamp) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, new Timestamp(((java.util.Date) value).getTime()));
         }
     },
-    forLocalDate(Types.DATE,
+    forLocalDate(LocalDate.class,
+        asInts(Types.DATE),
         (set, idx) -> useIfNonNull(set.getDate(idx), Date::toLocalDate),
-        (set, name) -> useIfNonNull(set.getDate(name), Date::toLocalDate),
-        LocalDate.class) {
+        (set, name) -> useIfNonNull(set.getDate(name), Date::toLocalDate)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setDate(index, Date.valueOf((LocalDate) value));
         }
     },
-    forLocalTime(Types.TIME,
+    forLocalTime(LocalTime.class,
+        asInts(Types.TIME),
         (set, idx) -> useIfNonNull(set.getTime(idx), Time::toLocalTime),
-        (set, name) -> useIfNonNull(set.getTime(name), Time::toLocalTime),
-        LocalTime.class) {
+        (set, name) -> useIfNonNull(set.getTime(name), Time::toLocalTime)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTime(index, Time.valueOf((LocalTime) value));
         }
     },
-    forLocalDateTime(Types.TIMESTAMP,
+    forLocalDateTime(LocalDateTime.class,
+        asInts(Types.TIMESTAMP),
         (set, idx) -> useIfNonNull(set.getTimestamp(idx), Timestamp::toLocalDateTime),
-        (set, name) -> useIfNonNull(set.getTimestamp(name), Timestamp::toLocalDateTime),
-        LocalDateTime.class) {
+        (set, name) -> useIfNonNull(set.getTimestamp(name), Timestamp::toLocalDateTime)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, Timestamp.valueOf((LocalDateTime) value));
         }
     },
-    forInstant(Types.TIMESTAMP,
+    forInstant(Instant.class,
+        asInts(Types.TIMESTAMP),
         (set, idx) -> useIfNonNull(set.getTimestamp(idx), Timestamp::toInstant),
-        (set, name) -> useIfNonNull(set.getTimestamp(name), Timestamp::toInstant),
-        Instant.class) {
+        (set, name) -> useIfNonNull(set.getTimestamp(name), Timestamp::toInstant)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, Timestamp.from((Instant) value));
         }
     },
-    forJapaneseDate(Types.DATE,
+    forJapaneseDate(JapaneseDate.class,
+        asInts(Types.DATE),
         (set, idx) -> useIfNonNull(set.getDate(idx), date -> JapaneseDate.from(date.toLocalDate())),
-        (set, name) -> useIfNonNull(set.getDate(name), date -> JapaneseDate.from(date.toLocalDate())),
-        Instant.class) {
+        (set, name) -> useIfNonNull(set.getDate(name), date -> JapaneseDate.from(date.toLocalDate()))) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setDate(index, java.sql.Date.valueOf(LocalDate.ofEpochDay(((JapaneseDate) value).toEpochDay())));
         }
     },
-    forOffsetTime(Types.TIME_WITH_TIMEZONE,
+    forOffsetTime(OffsetTime.class,
+        asInts(Types.TIME_WITH_TIMEZONE),
         (set, idx) -> set.getObject(idx, OffsetTime.class),
-        (set, name) -> set.getObject(name, OffsetTime.class),
-        OffsetTime.class) {
+        (set, name) -> set.getObject(name, OffsetTime.class)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setObject(index, value);
         }
     },
-    forOffsetDateTime(Types.TIMESTAMP_WITH_TIMEZONE,
+    forOffsetDateTime(OffsetTime.class,
+        asInts(Types.TIMESTAMP_WITH_TIMEZONE),
         (set, idx) -> set.getObject(idx, OffsetDateTime.class),
-        (set, name) -> set.getObject(name, OffsetDateTime.class),
-        OffsetTime.class) {
+        (set, name) -> set.getObject(name, OffsetDateTime.class)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setObject(index, value);
         }
     },
-    forZonedDateTime(Types.TIMESTAMP_WITH_TIMEZONE,
+    forZonedDateTime(ZonedDateTime.class,
+        asInts(Types.TIMESTAMP_WITH_TIMEZONE),
         (set, idx) -> set.getObject(idx, ZonedDateTime.class),
-        (set, name) -> set.getObject(name, ZonedDateTime.class),
-        ZonedDateTime.class) {
+        (set, name) -> set.getObject(name, ZonedDateTime.class)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setObject(index, value);
         }
     },
-    forMonthDay(Types.VARCHAR,
+    forMonthDay(MonthDay.class,
+        asInts(Types.VARCHAR),
         (set, idx) -> set.wasNull() ? null : MonthDay.parse(set.getString(idx)),
-        (set, name) -> set.wasNull() ? null : MonthDay.parse(set.getString(name)),
-        MonthDay.class) {
+        (set, name) -> set.wasNull() ? null : MonthDay.parse(set.getString(name))) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forYearMonth(Types.VARCHAR,
+    forYearMonth(YearMonth.class,
+        asInts(Types.VARCHAR),
         (set, idx) -> set.wasNull() ? null : YearMonth.parse(set.getString(idx)),
-        (set, name) -> set.wasNull() ? null : YearMonth.parse(set.getString(name)),
-        YearMonth.class) {
+        (set, name) -> set.wasNull() ? null : YearMonth.parse(set.getString(name))) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forMonth(Types.INTEGER, (set, idx) -> {
+    forMonth(Month.class, asInts(Types.INTEGER), (set, idx) -> {
         int month = set.getInt(idx);
         return month > 0 && month < 13 ? Month.of(month) : null;
     }, (set, name) -> {
         int month = set.getInt(name);
         return month > 0 && month < 13 ? Month.of(month) : null;
-    }, Month.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setInt(index, ((Month) value).getValue());
         }
     },
-    forYear(Types.INTEGER, (set, idx) -> {
+    forMonth_String(Month.class,
+        asInts(Types.VARCHAR),
+        (set, idx) -> useIfNonNull(set.getString(idx), Month::valueOf),
+        (set, name) -> useIfNonNull(set.getString(name), Month::valueOf)) {
+        @Override
+        public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
+            stmt.setString(index, ((Month) value).name());
+        }
+    },
+    forYear(Year.class, asInts(Types.INTEGER), (set, idx) -> {
         int year = set.getInt(idx);
         return year == 0 && set.wasNull() ? null : Year.of(year);
     }, (set, name) -> {
         int year = set.getInt(name);
         return year == 0 && set.wasNull() ? null : Year.of(year);
-    }, Year.class) {
+    }) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setInt(index, ((Year) value).getValue());
         }
     },
-    forURL(Types.DATALINK, ResultSet::getURL, ResultSet::getURL, URL.class) {
+    forURL(URL.class, asInts(Types.DATALINK), ResultSet::getURL, ResultSet::getURL) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setURL(index, (URL) value);
         }
     },
-    forURLString(Types.VARCHAR,
+    forURL_String(URL.class,
+        asInts(Types.VARCHAR, Types.CHAR, Types.LONGVARCHAR),
         (set, idx) -> useIfNonNull(set.getString(idx), TypeUsing2::toURL),
-        (set, name) -> useIfNonNull(set.getString(name), TypeUsing2::toURL),
-        URL.class) {
-        @Override
-        public int[] getCompatibleTypes() {
-            return TypeUsing2.as(Types.CHAR, Types.LONGVARCHAR);
-        }
-
+        (set, name) -> useIfNonNull(set.getString(name), TypeUsing2::toURL)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forString(Types.VARCHAR, ResultSet::getString, ResultSet::getString, String.class) {
-        @Override
-        public int[] getCompatibleTypes() {
-            return TypeUsing2.as(Types.CHAR, Types.LONGVARCHAR);
-        }
-
+    forString(String.class,
+        asInts(Types.VARCHAR, Types.CHAR, Types.LONGVARCHAR),
+        ResultSet::getString,
+        ResultSet::getString) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forStringBuilder(Types.VARCHAR,
+    forStringBuilder(StringBuilder.class,
+        asInts(Types.VARCHAR, Types.CHAR, Types.LONGVARCHAR),
         (set, idx) -> useIfNonNull(set.getString(idx), StringBuilder::new),
-        (set, name) -> useIfNonNull(set.getString(name), StringBuilder::new),
-        String.class) {
-        @Override
-        public int[] getCompatibleTypes() {
-            return TypeUsing2.as(Types.CHAR, Types.LONGVARCHAR);
-        }
-
+        (set, name) -> useIfNonNull(set.getString(name), StringBuilder::new)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forStringBuffer(Types.VARCHAR,
+    forStringBuffer(StringBuffer.class,
+        asInts(Types.VARCHAR, Types.CHAR, Types.LONGVARCHAR),
         (set, idx) -> useIfNonNull(set.getString(idx), StringBuffer::new),
-        (set, name) -> useIfNonNull(set.getString(name), StringBuffer::new),
-        String.class) {
-        @Override
-        public int[] getCompatibleTypes() {
-            return TypeUsing2.as(Types.CHAR, Types.LONGVARCHAR);
-        }
-
+        (set, name) -> useIfNonNull(set.getString(name), StringBuffer::new)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
@@ -397,24 +384,34 @@ enum JavaTypeHandlersEnum implements TypeHandler<Object> {
 
     private final ThrowingIntBiApplier<ResultSet, Object> indexedGetter;
     private final ThrowingBiApplier<ResultSet, String, Object> namedGetter;
-    public final Class<?> supportClasses;
-    public final int jdbcType;
+    private final int[] compatibleTypes;
+    public final int primaryJdbcType;
+    public final Class<?> supportClass;
 
     JavaTypeHandlersEnum(
-        int jdbcType,
+        Class<?> supportClass,
+        int[] jdbcTypes,
         ThrowingIntBiApplier<ResultSet, Object> indexedGetter,
-        ThrowingBiApplier<ResultSet, String, Object> namedGetter,
-        Class<?> supportClasses
+        ThrowingBiApplier<ResultSet, String, Object> namedGetter
     ) {
-        this.supportClasses = supportClasses;
+        this.supportClass = supportClass;
         this.indexedGetter = indexedGetter;
         this.namedGetter = namedGetter;
-        this.jdbcType = jdbcType;
+        // types
+        this.primaryJdbcType = jdbcTypes[0];
+        int typesLength = jdbcTypes.length;
+        if (typesLength == 1) {
+            this.compatibleTypes = EMPTY_TYPES;
+        } else {
+            int[] types = new int[typesLength - 1];
+            System.arraycopy(jdbcTypes, 1, types, 0, typesLength - 1);
+            this.compatibleTypes = types;
+        }
     }
 
     public abstract void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException;
 
-    public int[] getCompatibleTypes() { return TypeUsing2.EMPTY_TYPES; }
+    public int[] getCompatibleTypes() { return Arrays.copyOf(compatibleTypes,compatibleTypes.length); }
 
     @Override
     public void setParameter(PreparedStatement stmt, int index, Object value, int jdbcType) throws SQLException {

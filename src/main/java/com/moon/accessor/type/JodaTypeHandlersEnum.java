@@ -5,8 +5,9 @@ import com.moon.accessor.function.ThrowingIntBiApplier;
 import org.joda.time.*;
 
 import java.sql.*;
+import java.util.Arrays;
 
-import static com.moon.accessor.type.TypeUsing2.useIfNonNull;
+import static com.moon.accessor.type.TypeUsing2.*;
 import static org.joda.time.Instant.ofEpochMilli;
 
 /**
@@ -16,101 +17,108 @@ enum JodaTypeHandlersEnum implements TypeHandler<Object> {
     /**
      * types
      */
-    forJodaLocalDate(Types.DATE,
+    forJodaLocalDate(LocalDate.class,
+        asInts(Types.DATE),
         (set, idx) -> useIfNonNull(set.getDate(idx), LocalDate::fromDateFields),
-        (set, name) -> useIfNonNull(set.getDate(name), LocalDate::fromDateFields),
-        LocalDate.class) {
+        (set, name) -> useIfNonNull(set.getDate(name), LocalDate::fromDateFields)) {
         @Override
-        @SuppressWarnings("deprecation")
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
-            LocalDate date = (LocalDate) value;
-            stmt.setDate(index, new Date(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
+            stmt.setDate(index, new Date(((LocalDate) value).toDate().getTime()));
         }
     },
-    forJodaLocalTime(Types.TIME,
+    forJodaLocalTime(LocalTime.class,
+        asInts(Types.TIME),
         (set, idx) -> useIfNonNull(set.getTime(idx), LocalTime::fromDateFields),
-        (set, name) -> useIfNonNull(set.getTime(name), LocalTime::fromDateFields),
-        LocalTime.class) {
+        (set, name) -> useIfNonNull(set.getTime(name), LocalTime::fromDateFields)) {
         @Override
-        @SuppressWarnings("deprecation")
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
-            LocalTime time = (LocalTime) value;
-            stmt.setDate(index, new Date(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute()));
+            stmt.setTime(index, new Time(((LocalTime) value).toDateTimeToday().getMillis()));
         }
     },
-    forJodaLocalDateTime(Types.TIMESTAMP,
+    forJodaLocalDateTime(LocalDateTime.class,
+        asInts(Types.TIMESTAMP),
         (set, idx) -> useIfNonNull(set.getTimestamp(idx), LocalDateTime::fromDateFields),
-        (set, name) -> useIfNonNull(set.getTimestamp(name), LocalDateTime::fromDateFields),
-        LocalDateTime.class) {
+        (set, name) -> useIfNonNull(set.getTimestamp(name), LocalDateTime::fromDateFields)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, new Timestamp(((LocalDateTime) value).toDate().getTime()));
         }
     },
-    forDateTime(Types.TIMESTAMP,
-        (set, idx) -> useIfNonNull(set.getTimestamp(idx), LocalDateTime::fromDateFields),
-        (set, name) -> useIfNonNull(set.getTimestamp(name), LocalDateTime::fromDateFields),
-        DateTime.class) {
+    forJodaDateTime(DateTime.class,
+        asInts(Types.TIMESTAMP),
+        (set, idx) -> useIfNonNull(set.getTimestamp(idx), t -> new DateTime(t.getTime())),
+        (set, name) -> useIfNonNull(set.getTimestamp(name), t -> new DateTime(t.getTime()))) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, new Timestamp(((DateTime) value).getMillis()));
         }
     },
-    forInstant(Types.TIMESTAMP,
+    forJodaInstant(Instant.class,
+        asInts(Types.TIMESTAMP),
         (set, idx) -> useIfNonNull(set.getTimestamp(idx), t -> ofEpochMilli(t.getTime())),
-        (set, name) -> useIfNonNull(set.getTimestamp(name), t -> ofEpochMilli(t.getTime())),
-        Instant.class) {
+        (set, name) -> useIfNonNull(set.getTimestamp(name), t -> ofEpochMilli(t.getTime()))) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setTimestamp(index, new Timestamp(((Instant) value).getMillis()));
         }
     },
-    forMutableDateTime(Types.TIMESTAMP,
+    forJodaMutableDateTime(MutableDateTime.class,
+        asInts(Types.TIMESTAMP),
         (set, idx) -> useIfNonNull(set.getTimestamp(idx), dt -> new MutableDateTime(dt.getTime())),
-        (set, name) -> useIfNonNull(set.getTimestamp(name), dt -> new MutableDateTime(dt.getTime())),
-        MutableDateTime.class) {
+        (set, name) -> useIfNonNull(set.getTimestamp(name), dt -> new MutableDateTime(dt.getTime()))) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             MutableDateTime datetime = (MutableDateTime) value;
             stmt.setTimestamp(index, new Timestamp(datetime.getMillis()));
         }
     },
-    forYearMonth(Types.VARCHAR,
-        (set, idx) -> set.wasNull() ? null : YearMonth.parse(set.getString(idx)),
-        (set, name) -> set.wasNull() ? null : YearMonth.parse(set.getString(name)),
-        YearMonth.class) {
+    forJodaYearMonth(YearMonth.class,
+        asInts(Types.VARCHAR),
+        (set, idx) -> useIfNonNull(set.getString(idx), YearMonth::parse),
+        (set, name) -> useIfNonNull(set.getString(name), YearMonth::parse)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
     },
-    forMonthDay(Types.VARCHAR,
-        (set, idx) -> set.wasNull() ? null : MonthDay.parse(set.getString(idx)),
-        (set, name) -> set.wasNull() ? null : MonthDay.parse(set.getString(name)),
-        MonthDay.class) {
+    forJodaMonthDay(MonthDay.class,
+        asInts(Types.VARCHAR),
+        (set, idx) -> useIfNonNull(set.getString(idx), MonthDay::parse),
+        (set, name) -> useIfNonNull(set.getString(name), MonthDay::parse)) {
         @Override
         public void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException {
             stmt.setString(index, String.valueOf(value));
         }
-    },
-    ;
+    };
 
     private final ThrowingIntBiApplier<ResultSet, Object> indexedGetter;
     private final ThrowingBiApplier<ResultSet, String, Object> namedGetter;
-    public final Class<?> supportClasses;
-    public final int jdbcType;
+    private final int[] compatibleTypes;
+    public final int primaryJdbcType;
+    public final Class<?> supportClass;
 
     JodaTypeHandlersEnum(
-        int jdbcType,
+        Class<?> supportClass,
+        int[] jdbcTypes,
         ThrowingIntBiApplier<ResultSet, Object> indexedGetter,
-        ThrowingBiApplier<ResultSet, String, Object> namedGetter,
-        Class<?> supportClasses
+        ThrowingBiApplier<ResultSet, String, Object> namedGetter
     ) {
-        this.supportClasses = supportClasses;
-        this.jdbcType = jdbcType;
+        this.supportClass = supportClass;
         this.indexedGetter = indexedGetter;
         this.namedGetter = namedGetter;
+        // types
+        this.primaryJdbcType = jdbcTypes[0];
+        int typesLength = jdbcTypes.length;
+        if (typesLength == 1) {
+            this.compatibleTypes = EMPTY_TYPES;
+        } else {
+            int[] types = new int[typesLength - 1];
+            System.arraycopy(jdbcTypes, 1, types, 0, typesLength - 1);
+            this.compatibleTypes = types;
+        }
     }
+
+    public int[] getCompatibleTypes() { return Arrays.copyOf(compatibleTypes, compatibleTypes.length); }
 
     public abstract void setParameterForNonNull(PreparedStatement stmt, int index, Object value) throws SQLException;
 

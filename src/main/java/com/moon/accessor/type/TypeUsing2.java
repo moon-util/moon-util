@@ -14,7 +14,9 @@ enum TypeUsing2 {
 
     static final int[] EMPTY_TYPES = {};
 
-    static int[] as(int... types) { return types; }
+    static int[] asInts(int... types) { return types; }
+
+    static <T> T[] asArray(T... types) { return types; }
 
     static <T> Object useIfNonNull(T value, Function<T, Object> converter) {
         return value == null ? null : converter.apply(value);
@@ -29,6 +31,6 @@ enum TypeUsing2 {
     }
 
     static String toKey(Object jdbcType, Class<?> supportClass) {
-        return jdbcType + ":" + supportClass;
+        return jdbcType + ":" + supportClass.getCanonicalName();
     }
 }

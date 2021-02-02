@@ -1,7 +1,5 @@
 package com.moon.accessor.type;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.JDBCType;
 import java.sql.Types;
 import java.util.HashMap;
@@ -12,20 +10,62 @@ import java.util.Map;
  */
 public enum JdbcType {
     BIT(Types.BIT),
+    /**
+     * byte
+     */
     TINYINT(Types.TINYINT),
+    /**
+     * short
+     */
     SMALLINT(Types.SMALLINT),
+    /**
+     * int
+     */
     INTEGER(Types.INTEGER),
+    /**
+     * long, BigInteger
+     */
     BIGINT(Types.BIGINT),
     FLOAT(Types.FLOAT),
+    /**
+     * float
+     */
     REAL(Types.REAL),
+    /**
+     * double
+     */
     DOUBLE(Types.DOUBLE),
+    /**
+     * BigDecimal
+     */
     NUMERIC(Types.NUMERIC),
+    /**
+     * BigDecimal
+     */
     DECIMAL(Types.DECIMAL),
+    /**
+     * String, char
+     */
     CHAR(Types.CHAR),
+    /**
+     * String
+     */
     VARCHAR(Types.VARCHAR),
+    /**
+     * String
+     */
     LONGVARCHAR(Types.LONGVARCHAR),
+    /**
+     * java.sql.Date, java.time.LocalDate
+     */
     DATE(Types.DATE),
+    /**
+     * java.sql.Time, java.time.LocalTime
+     */
     TIME(Types.TIME),
+    /**
+     * java.sql.Timestamp, java.time.LocalDateTime
+     */
     TIMESTAMP(Types.TIMESTAMP),
     BINARY(Types.BINARY),
     VARBINARY(Types.VARBINARY),
@@ -46,10 +86,22 @@ public enum JdbcType {
     DISTINCT(Types.DISTINCT),
     STRUCT(Types.STRUCT),
     ARRAY(Types.ARRAY),
+    /**
+     * java.sql.Blob
+     */
     BLOB(Types.BLOB),
+    /**
+     * java.sql.Clob
+     */
     CLOB(Types.CLOB),
     REF(Types.REF),
+    /**
+     * java.net.URL
+     */
     DATALINK(Types.DATALINK),
+    /**
+     * boolean
+     */
     BOOLEAN(Types.BOOLEAN),
 
     /* JDBC 4.0 Types */
@@ -62,59 +114,37 @@ public enum JdbcType {
 
     /* JDBC 4.2 Types */
     REF_CURSOR(Types.REF_CURSOR),
+    /**
+     * java.time.OffsetTime
+     */
     TIME_WITH_TIMEZONE(Types.TIME_WITH_TIMEZONE),
+    /**
+     * java.time.OffsetDateTime
+     */
     TIMESTAMP_WITH_TIMEZONE(Types.TIMESTAMP_WITH_TIMEZONE),
     /**
      * 根据字段类型自动推断
      */
-    AUTO(null);
+    AUTO(null),
+    ;
 
-    private final static Map<Class<?>, JDBCType> JAVA_TYPE_MAP_JDBC_TYPE = new HashMap<>();
-    private final static Map<JDBCType, Class<?>> JDBC_TYPE_MAP_JAVA_TYPE = new HashMap<>();
-    // private final static Map<Class<?>, JDBCType> classForJdbcType = new HashMap<>();
-
-    private final static Map<Integer, JDBCType> CACHED = new HashMap<>();
+    private final static Map<Integer, JdbcType> CACHED = new HashMap<>();
 
     static {
-        for (JDBCType value : JDBCType.values()) {
-            CACHED.put(value.getVendorTypeNumber(), value);
+        for (JdbcType value : JdbcType.values()) {
+            CACHED.put(value.typeCode, value);
         }
-        final Map<Class<?>, JDBCType> forward = JAVA_TYPE_MAP_JDBC_TYPE;
-        forward.put(Byte.class, JDBCType.TINYINT);
-        forward.put(byte.class, JDBCType.TINYINT);
-        forward.put(Short.class, JDBCType.SMALLINT);
-        forward.put(short.class, JDBCType.SMALLINT);
-        forward.put(int.class, JDBCType.INTEGER);
-        forward.put(Integer.class, JDBCType.INTEGER);
-        forward.put(int.class, JDBCType.INTEGER);
-        forward.put(Long.class, JDBCType.BIGINT);
-        forward.put(long.class, JDBCType.BIGINT);
-        forward.put(Float.class, JDBCType.REAL);
-        forward.put(float.class, JDBCType.REAL);
-        forward.put(Double.class, JDBCType.DOUBLE);
-        forward.put(double.class, JDBCType.DOUBLE);
-        forward.put(BigInteger.class, JDBCType.BIGINT);
-        forward.put(BigDecimal.class, JDBCType.NUMERIC);
-        forward.put(String.class, JDBCType.VARCHAR);
-
-        final Map<JDBCType, Class<?>> backward = JDBC_TYPE_MAP_JAVA_TYPE;
-        backward.put(JDBCType.LONGVARCHAR, String.class);
-        backward.put(JDBCType.VARCHAR, String.class);
-        backward.put(JDBCType.CHAR, String.class);
     }
 
     private final Integer typeCode;
     public final JDBCType jdbcType;
 
     JdbcType(Integer typeCode) {
-        // Class<?> defaultMapped, Class<?>... supportsMapped
         this.typeCode = typeCode;
         this.jdbcType = typeCode == null ? null : JDBCType.valueOf(typeCode);
     }
 
     public Integer getTypeCode() { return typeCode; }
 
-    public static JDBCType getJDBCType(int codeType) { return CACHED.get(codeType); }
-
-    public static int getTypeCode(JDBCType type) { return type.getVendorTypeNumber(); }
+    public static JdbcType valueOf(int code) { return CACHED.get(code); }
 }

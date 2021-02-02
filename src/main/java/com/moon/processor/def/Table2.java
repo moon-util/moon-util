@@ -1,13 +1,16 @@
 package com.moon.processor.def;
 
-import com.moon.accessor.annotation.CasePolicy;
-import com.moon.accessor.annotation.TableModel;
-import com.moon.accessor.annotation.TableModelPolicy;
-import com.moon.accessor.annotation.TableFieldPolicy;
+import com.moon.accessor.annotation.*;
+import com.moon.accessor.type.TypeHandler;
 import com.moon.processor.model.DeclaredPojo;
+import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +26,8 @@ enum Table2 {
     @SuppressWarnings("all")
     private final static Class<com.moon.accessor.annotation.TableField> TABLE_FIELD_CLASS//
         = com.moon.accessor.annotation.TableField.class;
-    private final static String TABLE_FIELD_NAME = "TABLE";
+    private final static String TABLE_FIELD_NAME = "TABLE", RECORD = "RECORD";
+    final static String TYPE_HANDLER_NAME = TypeHandler.class.getCanonicalName();
 
     static String toRefColumnName(String column) {
         return String2.isAny(column, Character::isLowerCase) ? column.toUpperCase() : column.toLowerCase();
@@ -78,8 +82,45 @@ enum Table2 {
         return String2.replaceAll(effectPattern, "{}", resultName);
     }
 
-    static String toColumnName(VariableElement fieldDecl, String propertyName, TableFieldPolicy columnPolicy) {
-        com.moon.accessor.annotation.TableField field = fieldDecl.getAnnotation(TABLE_FIELD_CLASS);
+    static String getNullableTypeHandler(com.moon.accessor.annotation.TableField field) {
+        if (field == null) {
+            return null;
+        }
+        String name = Element2.getClassname(field, TableField::typeHandler);
+        TypeElement element = Environment2.getUtils().getTypeElement(name);
+        if (element == null) {
+            return null;
+        }
+        if (TYPE_HANDLER_NAME.equals(name)) {
+            return null;
+        }
+        ElementKind kind = element.getKind();
+        if (kind == ElementKind.INTERFACE) {
+            throw new IllegalStateException("JDBC type handler can not be an interface: " + name);
+        }
+        if (kind == ElementKind.ANNOTATION_TYPE) {
+            throw new IllegalStateException("JDBC type handler can not be an annotation: " + name);
+        }
+        if (kind == ElementKind.ENUM) {
+            throw new IllegalStateException("JDBC type handler can not be an enum: " + name);
+        }
+        // future: record class
+        if (RECORD.equals(kind.name())) {
+            throw new IllegalStateException("JDBC type handler can not be a record: " + name);
+        }
+        Set<Modifier> modifiers = element.getModifiers();
+        if (modifiers.contains(Modifier.ABSTRACT)) {
+            throw new IllegalStateException("JDBC type handler can not be an abstract class: " + name);
+        }
+        if (!modifiers.contains(Modifier.PUBLIC)) {
+            throw new IllegalStateException("JDBC type handler must be modified by public: " + name);
+        }
+        return name;
+    }
+
+    static String toColumnName(
+        com.moon.accessor.annotation.TableField field, String propertyName, TableFieldPolicy columnPolicy
+    ) {
         if (field != null) {
             String name = field.name().trim();
             if (String2.isNotBlank(name)) {

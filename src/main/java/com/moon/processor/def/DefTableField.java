@@ -20,6 +20,7 @@ public class DefTableField {
     private final String fieldName;
     private final String constName;
     private final String propType;
+    private final String handlerType;
     private final String constValue;
     private final String getterName;
     private final String setterName;
@@ -34,6 +35,7 @@ public class DefTableField {
         String fieldName,
         String constName,
         String propType,
+        String handlerType,
         String constValue,
         String getterName,
         String setterName,
@@ -45,6 +47,7 @@ public class DefTableField {
         this.fieldName = fieldName;
         this.constName = constName;
         this.propType = propType;
+        this.handlerType = handlerType;
         this.constValue = constValue;
         this.getterName = getterName;
         this.setterName = setterName;
@@ -81,10 +84,11 @@ public class DefTableField {
     private String getFieldValue(DeclJavaFile table) {
         String importedPojo = table.onImported(pojoClass);
         String firstComment = getFirstComment(), comment = getDeclareComment();
-        return format("new {}<>(this, {}, {}, {}, {}, {}, {}, {}, {});",
+        return format("new {}<>(this, {}, {}, {}, {}, {}, {}, {}, {}, {});",
             table.onImported(TableFieldDetail.class),
             String2.dotClass(importedPojo),
             String2.dotClass(table.onImported(propType)),
+            getUsableHandlerType(table, handlerType),
             getGetterRef(importedPojo),
             getSetterRef(importedPojo),
             getStringifyPropName(),
@@ -93,13 +97,13 @@ public class DefTableField {
             getDeclareComment());
     }
 
-    private String getFirstComment() {
-        return toComment(this.firstComment);
+    private String getUsableHandlerType(DeclJavaFile table, String handlerType) {
+        return String2.isBlank(handlerType) ? null : String2.dotClass(table.onImported(handlerType));
     }
 
-    private String getDeclareComment() {
-        return toComment(this.comment);
-    }
+    private String getFirstComment() { return toComment(this.firstComment); }
+
+    private String getDeclareComment() { return toComment(this.comment); }
 
     private static String toComment(String comment) {
         if (comment == null) {

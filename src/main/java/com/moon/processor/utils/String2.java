@@ -241,9 +241,9 @@ public enum String2 {
         }
     }
 
-    public static String dotClass(Class<?> cls) { return dotClass(cls.getCanonicalName()); }
+    public static String dotClass(Class<?> cls) { return cls == null ? null : dotClass(cls.getCanonicalName()); }
 
-    public static String dotClass(String classname) { return classname + ".class"; }
+    public static String dotClass(String classname) { return classname == null ? null : (classname + ".class"); }
 
     public static String toGeneralizableType(String type) {
         switch (type) {

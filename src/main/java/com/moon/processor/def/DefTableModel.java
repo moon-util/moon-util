@@ -216,10 +216,15 @@ public class DefTableModel implements JavaFileWriteable {
         if (element == null) {
             return null;
         }
+        com.moon.accessor.annotation.TableField fieldAnnotated//
+            = element.getAnnotation(com.moon.accessor.annotation.TableField.class);
+
         // 列名
-        String fieldName = Table2.toColumnName(element, propName, columnPolicy);
+        String fieldName = Table2.toColumnName(fieldAnnotated, propName, columnPolicy);
         // 字段类型
         String propType = String2.toGeneralizableType(property.getActualType());
+
+        String handlerType = Table2.getNullableTypeHandler(fieldAnnotated);
 
         String getterName = null, setterName = null;
         if (property.getGetter() != null) {
@@ -235,6 +240,7 @@ public class DefTableModel implements JavaFileWriteable {
             fieldName,
             constName,
             propType,
+            handlerType,
             constValue,
             getterName,
             setterName,

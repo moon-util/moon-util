@@ -2,6 +2,12 @@ package com.moon.accessor.meta;
 
 import com.moon.accessor.PropertyGetter;
 import com.moon.accessor.PropertySetter;
+import com.moon.accessor.exception.Exception2;
+import com.moon.accessor.type.TypeHandler;
+
+import java.lang.reflect.Modifier;
+
+import static com.moon.accessor.type.TypeHandlerRegistry.DEFAULT;
 
 /**
  * @author benshaoye
@@ -18,23 +24,51 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
     private final TB table;
     private final PropertyGetter<R, T> getter;
     private final PropertySetter<R, T> setter;
+    private final TypeHandler<T> typeHandler;
+
+    private static <T> TypeHandler<T> usingHandler(Class<T> propertyType, Class<TypeHandler<T>> handlerClass) {
+        if (handlerClass != null && !Modifier.isAbstract(handlerClass.getModifiers()) && !handlerClass.isInterface()) {
+            try {
+                return handlerClass.newInstance();
+            } catch (InstantiationException e) {
+                throw Exception2.with(e, "实例化错误: " + handlerClass.getCanonicalName());
+            } catch (IllegalAccessException e) {
+                throw Exception2.with(e, "不可访问: " + handlerClass.getCanonicalName());
+            }
+        }
+        return DEFAULT.findFor(propertyType);
+    }
 
     public TableFieldDetail(
         TB table,
         Class<R> domainClass,
         Class<T> propertyType,
+        Class<TypeHandler<T>> handlerClass,
         PropertyGetter<R, T> getter,
         PropertySetter<R, T> setter,
         String propertyName,
         String columnName,
         String firstComment,
         String comment
-    ) { this(table, domainClass, propertyType, getter, setter, propertyName, columnName, firstComment, comment, null); }
+    ) {
+        this(table,
+            domainClass,
+            propertyType,
+            usingHandler(propertyType, handlerClass),
+            getter,
+            setter,
+            propertyName,
+            columnName,
+            firstComment,
+            comment,
+            null);
+    }
 
     public TableFieldDetail(
         TB table,
         Class<R> domainClass,
         Class<T> propertyType,
+        TypeHandler<T> typeHandler,
         PropertyGetter<R, T> getter,
         PropertySetter<R, T> setter,
         String propertyName,
@@ -53,12 +87,14 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         this.table = table;
         this.getter = getter;
         this.setter = setter;
+        this.typeHandler = typeHandler;
     }
 
     public TableFieldDetail(TableFieldDetail<T, R, TB> detail, String alias) {
         this(detail.table,
             detail.domainClass,
             detail.propertyType,
+            detail.typeHandler,
             detail.getter,
             detail.setter,
             detail.propertyName,
@@ -73,6 +109,9 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
 
     @Override
     public Class<T> getPropertyType() { return propertyType; }
+
+    @Override
+    public TypeHandler<T> getTypeHandler() { return typeHandler; }
 
     @Override
     public PropertyGetter<R, T> getPropertyGetter() { return getter; }

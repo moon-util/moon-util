@@ -7,6 +7,7 @@ import com.moon.accessor.PropertySetter;
 import com.moon.accessor.dialect.KeywordPolicy;
 import com.moon.accessor.dialect.SQLDialect;
 import com.moon.accessor.dml.AliasCapable;
+import com.moon.accessor.type.TypeHandler;
 
 /**
  * @author benshaoye
@@ -59,6 +60,13 @@ public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<
      * @return true/false
      */
     default boolean isSetterAvailable() { return getPropertySetter() != null; }
+
+    /**
+     * 字段类型处理器
+     *
+     * @return 字段类型处理器
+     */
+    TypeHandler<T> getTypeHandler();
 
     /**
      * 获取属性获取器
