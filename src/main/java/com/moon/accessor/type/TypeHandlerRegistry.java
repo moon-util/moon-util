@@ -38,6 +38,7 @@ public class TypeHandlerRegistry {
     static {
         Map<Class<?>, TypeHandler<?>> handlerMap = new HashMap<>();
         Map<Object, TypeHandler<?>> typedHandlersMap = new HashMap<>();
+        @SuppressWarnings("rawtypes")
         ServiceLoader<TypeHandler> loader = ServiceLoader.load(TypeHandler.class);
         for (TypeHandler<?> handler : loader) {
         }

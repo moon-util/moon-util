@@ -253,7 +253,7 @@ public final class EnumUtil {
         return throwEnumConst(enumType, value);
     }
 
-    private static <T> T throwEnumConst(Class type, Object value) {
+    private static <T> T throwEnumConst(Class<T> type, Object value) {
         throw new IllegalArgumentException("No enum constant " + type.getCanonicalName() + "[" + value + "]");
     }
 }

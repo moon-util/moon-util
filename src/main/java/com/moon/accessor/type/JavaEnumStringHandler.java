@@ -12,9 +12,7 @@ public class JavaEnumStringHandler<T extends Enum<T>> implements TypeJdbcHandler
 
     private final Class<T> enumClass;
 
-    public JavaEnumStringHandler(Class<T> enumClass) {
-        this.enumClass = enumClass;
-    }
+    public JavaEnumStringHandler(Class<T> enumClass) { this.enumClass = enumClass; }
 
     @Override
     public void setParameter(PreparedStatement stmt, int index, T value, int jdbcType) throws SQLException {

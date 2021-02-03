@@ -37,11 +37,11 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         PropertySetter<R, T> setter,
         String propertyName,
         String columnName,
-        String firstComment,
-        String comment,
         JdbcType columnJdbcType,
         int columnLength,
-        int columnPrecision
+        int columnPrecision,
+        String firstComment,
+        String comment
     ) {
         this(table,
             domainClass,
@@ -51,11 +51,11 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
             setter,
             propertyName,
             columnName,
-            firstComment,
-            comment,
             findEffectiveJdbcType(propertyType, columnJdbcType),
             columnLength,
             columnPrecision,
+            firstComment,
+            comment,
             null);
     }
 
@@ -68,11 +68,11 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         PropertySetter<R, T> setter,
         String propertyName,
         String columnName,
-        String firstComment,
-        String comment,
         JdbcType columnJdbcType,
         int columnLength,
         int columnPrecision,
+        String firstComment,
+        String comment,
         String alias
     ) {
         assert columnJdbcType != JdbcType.AUTO : "不准确的 Jdbc 类型:" + columnJdbcType;
@@ -101,11 +101,11 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
             detail.setter,
             detail.propertyName,
             detail.columnName,
-            detail.firstComment,
-            detail.comment,
             detail.columnJdbcType,
             detail.columnLength,
             detail.columnPrecision,
+            detail.firstComment,
+            detail.comment,
             alias);
     }
 

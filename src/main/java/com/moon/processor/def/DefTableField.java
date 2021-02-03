@@ -97,11 +97,11 @@ public class DefTableField {
             getSetterRef(importedPojo),
             getStringifyPropName(),
             getStringifyFieldName(),
-            Objects.equals(firstComment, comment) ? null : firstComment,
-            getDeclareComment(),
             format("{}.{}", table.onImported(JdbcType.class), field.jdbcType()),
             field.length(),
-            field.precision());
+            field.precision(),
+            Objects.equals(firstComment, comment) ? null : firstComment,
+            getDeclareComment());
     }
 
     private String getUsableHandlerType(DeclJavaFile table, String handlerType) {
