@@ -31,13 +31,15 @@ public class AccessorHolder implements JavaFileWriteable {
     }
 
     public void with(TypeElement accessorElem, TypeElement modelElem) {
+        Access2.assertAccessorDecl(accessorElem);
         String classname = Element2.getQualifiedName(accessorElem);
         modelHolder.with(modelElem, classname);
-        accessorHashMap.computeIfAbsent(classname, k -> new DefAccessor(accessorElem));
+        accessorHashMap.computeIfAbsent(classname,
+            k -> new DefAccessor(copierHolder, modelHolder, pojoHolder, nameHolder, accessorElem));
     }
 
     @Override
     public void writeJavaFile(JavaWriter writer) {
-
+        accessorHashMap.forEach((k, accessor) -> accessor.writeJavaFile(writer));
     }
 }

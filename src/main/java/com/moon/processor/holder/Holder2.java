@@ -32,8 +32,4 @@ enum Holder2 {
     public static String toGenericDeclWithJoined(String joined) {
         return String2.format("<{}, R, TB extends {}<R, TB>>", joined);
     }
-
-    public static String toGenericUsingWithJoined(String joined) {
-        return String2.format("<{}, R, TB>", joined, Table.class.getCanonicalName());
-    }
 }
