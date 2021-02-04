@@ -102,8 +102,8 @@ enum Table2 {
         if (kind == ElementKind.ANNOTATION_TYPE) {
             throw new IllegalStateException("JDBC type handler can not be an annotation: " + name);
         }
-        if (kind == ElementKind.ENUM) {
-            throw new IllegalStateException("JDBC type handler can not be an enum: " + name);
+        if (kind == ElementKind.CLASS) {
+            throw new IllegalStateException("JDBC type handler must be a class: " + name);
         }
         // future: record class
         if (RECORD.equals(kind.name())) {
