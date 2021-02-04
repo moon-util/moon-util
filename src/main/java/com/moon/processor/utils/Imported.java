@@ -9,8 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Generated;
+import javax.lang.model.element.TypeElement;
 import java.util.function.Supplier;
 
 /**
@@ -28,6 +30,7 @@ public enum Imported {
     public final static boolean QUALIFIER;
     public final static boolean GENERATED;
     public final static boolean JODA_TIME;
+    public final static boolean SERVICE;
     public final static boolean COMPONENT;
     public final static boolean REPOSITORY;
     public final static boolean SAFEVARARGS;
@@ -43,9 +46,27 @@ public enum Imported {
         JODA_TIME = isNoException(() -> ReadablePeriod.class.toString());
         AUTOWIRED = isNoException(() -> Autowired.class.toString());
         QUALIFIER = isNoException(() -> Qualifier.class.toString());
+        SERVICE = isNoException(() -> Service.class.toString());
         COMPONENT = isNoException(() -> Component.class.toString());
         REPOSITORY = isNoException(() -> Repository.class.toString());
         SAFEVARARGS = isNoException(() -> SafeVarargs.class.toString());
+    }
+
+    public static boolean isImportedComponent() {
+        return COMPONENT || REPOSITORY || SERVICE;
+    }
+
+    public static boolean isComponent(TypeElement element) {
+        if (COMPONENT && element.getAnnotation(Component.class) != null) {
+            return true;
+        }
+        if (REPOSITORY && element.getAnnotation(Repository.class) != null) {
+            return true;
+        }
+        if (SERVICE && element.getAnnotation(Service.class) != null) {
+            return true;
+        }
+        return false;
     }
 
     private static boolean isNoException(Supplier<String> runner) {
