@@ -12,9 +12,9 @@ import java.lang.annotation.Target;
 /**
  * 注解在 getter 方法上，在 spring 环境中提供对应对象，如：
  * <p>
- * {@link com.moon.data.jdbc.annotation.Provided}是为接口默认方法(@code default)从 spring 容器中获取 bean 的途径
+ * {@link Provided}是为接口默认方法{@code default}从 spring 容器中获取 bean 的途径
  * <p>
- * 如果不是在接口中获取的话，也就没必要使用{@link com.moon.data.jdbc.annotation.Provided}了，因为类中有多种方法可以获取 bean
+ * 如果不是在接口中获取的话，也就没必要使用{@link Provided}了，因为类中有多种方法可以获取 bean
  *
  * <pre>
  * &#64;Accessor

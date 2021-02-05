@@ -75,7 +75,9 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
         String comment,
         String alias
     ) {
-        assert columnJdbcType != JdbcType.AUTO : "不准确的 Jdbc 类型:" + columnJdbcType;
+        if (columnJdbcType == JdbcType.AUTO) {
+            throw new IllegalStateException("不准确的 Jdbc 类型:" + columnJdbcType);
+        }
         this.domainClass = domainClass;
         this.propertyType = propertyType;
         this.propertyName = propertyName;

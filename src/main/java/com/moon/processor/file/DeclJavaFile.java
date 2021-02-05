@@ -66,6 +66,8 @@ public class DeclJavaFile extends DeclInterFile implements Importable, JavaFileW
         return this;
     }
 
+    public boolean hasField(String name) { return fieldMap.containsKey(name); }
+
     public DeclField declareField(String name, String typePattern, Object... values) {
         DeclField field = new DeclField(getConstManager(), name, typePattern, values);
         fieldMap.put(name, field);
@@ -138,9 +140,6 @@ public class DeclJavaFile extends DeclInterFile implements Importable, JavaFileW
             getMethodsMap().forEach((d, method) -> addr.next().newTab(method.getScripts()));
         }
 
-        // imports
-        importMark.with(getImporter().toString("\n"));
-
         defaultsMark.with(toDefaultFields());
 
         // fields
@@ -148,6 +147,9 @@ public class DeclJavaFile extends DeclInterFile implements Importable, JavaFileW
         blockMark.with(toBlockDeclared());
         // getters & setters
         addr.add(toGetterSetterMethodsDeclared());
+
+        // imports
+        importMark.with(getImporter().toString("\n"));
         return addr.next().add('}').toString();
     }
 

@@ -147,12 +147,6 @@ public enum String2 {
         return GROUP.on(template, type, name, value);
     }
 
-    public static String privateConstField(String type, String name, String value) {
-        // 这里实际应该是 {value}，为了重用 GROUP，就写成了 {field}
-        String template = "private final static {type} {name} = {field};";
-        return GROUP.on(template, type, name, value);
-    }
-
     public static String toPrivateField(String field, String type) {
         String template = "private {type} {field};";
         return GROUP.on(template, type, "", field);
@@ -186,6 +180,10 @@ public enum String2 {
 
     public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {
         return camelcaseToHyphen(str, hyphen, continuousSplit, true);
+    }
+
+    public static String firstWord(String string) {
+        return com.moon.accessor.util.String2.firstWord(string);
     }
 
     public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit, boolean lowerCaseAtPos) {

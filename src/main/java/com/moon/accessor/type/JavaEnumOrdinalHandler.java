@@ -14,7 +14,9 @@ public class JavaEnumOrdinalHandler<T extends Enum<T>> implements TypeJdbcHandle
     private final Class<T> enumClass;
 
     public JavaEnumOrdinalHandler(Class<T> enumClass) {
-        assert enumClass.isEnum() : "Must be an enum.";
+        if (!enumClass.isEnum()) {
+            throw new IllegalStateException("Must be an enum: " + enumClass);
+        }
         values = enumClass.getEnumConstants();
         this.enumClass = enumClass;
     }

@@ -1,10 +1,12 @@
 package com.moon.processor.utils;
 
+import com.moon.accessor.annotation.Provided;
 import com.moon.processor.model.DeclareMethod;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,19 @@ import java.util.stream.Collectors;
  */
 public enum Assert2 {
     ;
+
+    static final String SIMPLE_NAME = Provided.class.getSimpleName();
+
+    public static void assertProvidedMethodParameters(ExecutableElement method) {
+        if (!method.getParameters().isEmpty()) {
+            String value = String2.format("被（{}）注解的方法返回值不能有参数.", SIMPLE_NAME);
+            throw new IllegalStateException(value);
+        }
+        if (method.getReturnType().getKind() == TypeKind.VOID) {
+            String value = String2.format("被（{}）注解的方法返回值不能是 'void'.", SIMPLE_NAME);
+            throw new IllegalStateException(value);
+        }
+    }
 
     public static boolean assertEffectMethod(DeclareMethod getter, DeclareMethod setter) {
         if (getter.isDefaultMethod()) {

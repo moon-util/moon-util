@@ -56,6 +56,13 @@ public enum Generic2 {
      * static methods
      */
 
+    /**
+     * 解析泛型
+     *
+     * @param element
+     *
+     * @return declaredClass#
+     */
     public static Map<String, DeclareGeneric> from(TypeElement element) {
         return parse(element, new LinkedHashMap<>());
     }

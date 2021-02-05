@@ -21,7 +21,7 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
     private final List<DeclMarked> annotations = new ArrayList<>();
     private DeclMethod getter, setter;
     private final String name, typeClassname;
-    private String value;
+    private String value, setterParameterName;
 
     DeclField(ConstManager importer, String name, String typePattern, Object... types) {
         super(importer);
@@ -58,7 +58,7 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
         if (setter == null || isFinal()) {
             return DeclMethod.EMPTY;
         }
-        return setter.scriptOf("this.{} = {}", name, name).withPublic().with(Modifier.STATIC, isStatic());
+        return setter.scriptOf("this.{} = {}", name, setterParameterName).withPublic().with(Modifier.STATIC, isStatic());
     }
 
     /**
@@ -85,8 +85,17 @@ public class DeclField extends DeclModifier<DeclField> implements Importable {
      * @return
      */
     public DeclField withSetterMethod(Consumer<DeclMethod> setterBuilder) {
+        return withSetterMethod(name, setterBuilder);
+    }
+
+    public DeclField withSetterMethod(String setterParamName, Consumer<DeclMethod> setterBuilder) {
         if (setterBuilder != null) {
-            DeclMethod setter = DeclMethod.ofSetter(getImportable(), name, typeClassname);
+            String parameterName = setterParamName == null ? name : setterParamName;
+            this.setterParameterName = parameterName;
+            DeclMethod setter = DeclMethod.ofSetter(getImportable(),
+                String2.toSetterName(name),
+                parameterName,
+                typeClassname);
             setterBuilder.accept(setter);
             this.setter = setter;
         }

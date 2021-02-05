@@ -49,9 +49,11 @@ public class DeclaredPojo extends LinkedHashMap<String, DeclareProperty> impleme
     private final boolean abstracted;
     private final boolean interfaced;
 
+    private boolean canGenerate;
+
     private Map<String, MappingMerged> pushMappings;
 
-    public DeclaredPojo(TypeElement declareElement, NameHolder registry) {
+    public DeclaredPojo(TypeElement declareElement, NameHolder registry, boolean canGenerate) {
         this.declareElement = declareElement;
         // 这里的 thisClassname 没考虑泛型
         this.thisClassname = Element2.getQualifiedName(declareElement);
@@ -61,6 +63,7 @@ public class DeclaredPojo extends LinkedHashMap<String, DeclareProperty> impleme
         if (abstracted) {
             name = registry.getImplClassname(declareElement);
         }
+        this.canGenerate = canGenerate;
         this.implClassname = name;
     }
 
@@ -98,6 +101,10 @@ public class DeclaredPojo extends LinkedHashMap<String, DeclareProperty> impleme
         this.pushMappings = pushMappingAssigned(this);
     }
 
+    public void withCanGenerate() { this.canGenerate = true; }
+
+    public boolean canGenerate() { return canGenerate; }
+
     private static Map<String, MappingMerged> pushMappingAssigned(DeclaredPojo thisPojo) {
         Map<String, MappingMerged> mappingDeclared = new HashMap<>(4);
         thisPojo.forEach((name, propDecl) -> {
@@ -116,7 +123,7 @@ public class DeclaredPojo extends LinkedHashMap<String, DeclareProperty> impleme
     }
 
     public DeclJavaFile getDeclJavaFile() {
-        if (isAbstracted()) {
+        if (canGenerate() && isAbstracted()) {
             String implName = getImplClassname();
             String simpleName, pkg;
             int lastIdx = implName.lastIndexOf('.');

@@ -12,4 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.SOURCE)
-public @interface IfLt {}
+public @interface IfLt {
+
+    double value();
+}

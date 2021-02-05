@@ -51,9 +51,9 @@ public class PojoParser {
     private final Types types = Environment2.getTypes();
 
 
-    private PojoParser(TypeElement thisElement, NameHolder nameHolder) {
+    private PojoParser(TypeElement thisElement, NameHolder nameHolder, boolean canGenerate) {
         this.thisClassname = Element2.getQualifiedName(thisElement);
-        this.declaredPojo = new DeclaredPojo(thisElement, nameHolder);
+        this.declaredPojo = new DeclaredPojo(thisElement, nameHolder, canGenerate);
         this.thisGenericMap = Generic2.from(thisElement);
         this.ignoringMap = parseMappingIgnoring(thisElement);
         this.thisElement = thisElement;
@@ -205,8 +205,8 @@ public class PojoParser {
         return declaredPojo;
     }
 
-    public static DeclaredPojo parse(TypeElement thisElement, NameHolder nameHolder) {
-        return new PojoParser(thisElement, nameHolder).doParse();
+    public static DeclaredPojo parse(TypeElement thisElement, NameHolder nameHolder, boolean canGenerate) {
+        return new PojoParser(thisElement, nameHolder, canGenerate).doParse();
     }
 
 

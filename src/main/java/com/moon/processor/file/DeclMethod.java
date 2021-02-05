@@ -44,7 +44,11 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
     }
 
     public static DeclMethod ofSetter(ConstManager importer, String name, String type) {
-        return new DeclMethod(importer, String2.toSetterName(name), DeclParams.of(name, type)).withPublic();
+        return ofSetter(importer, String2.toSetterName(name), name, type);
+    }
+
+    public static DeclMethod ofSetter(ConstManager importer, String setterName, String name, String type) {
+        return new DeclMethod(importer, setterName, DeclParams.of(name, type)).withPublic();
     }
 
     public DeclMethod markedOf(Function<? super ConstManager, ? extends DeclMarked> consumer) {
@@ -58,7 +62,9 @@ public class DeclMethod extends DeclModifier<DeclMethod> implements ScriptsProvi
     }
 
     public DeclMethod markedOf(DeclMarked annotation) {
-        this.annotations.add(annotation);
+        if (annotation != null) {
+            this.annotations.add(annotation);
+        }
         return this;
     }
 

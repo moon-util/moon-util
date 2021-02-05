@@ -137,4 +137,18 @@ public class DefTableField {
         }
         return String2.format("{}::{}", importedPojo, setterName);
     }
+
+    public String getPojoClass() { return pojoClass; }
+
+    public String getHandlerType() { return handlerType; }
+
+    public String getConstValue() { return constValue; }
+
+    public String getGetterName() { return getterName; }
+
+    public String getSetterName() { return setterName; }
+
+    public String getComment() { return comment; }
+
+    public com.moon.accessor.annotation.TableField getField() { return field; }
 }

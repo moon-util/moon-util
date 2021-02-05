@@ -3,7 +3,6 @@ package com.moon.processor.holder;
 import com.moon.core.lang.StringUtil;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
-import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.TypeElement;

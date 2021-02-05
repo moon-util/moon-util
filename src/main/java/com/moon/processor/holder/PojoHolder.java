@@ -39,17 +39,23 @@ public class PojoHolder implements JavaFileWriteable {
     }
 
     public DeclaredPojo with(TypeElement typeElement) {
+        return with(typeElement, true);
+    }
+
+    public DeclaredPojo with(TypeElement typeElement, boolean canGenerate) {
         String classname = Element2.getQualifiedName(typeElement);
         DeclaredPojo declared = classMap.get(classname);
         if (declared == null) {
             synchronized (classMap) {
                 declared = classMap.get(classname);
                 if (declared == null) {
-                    declared = PojoParser.parse(typeElement, nameHolder);
+                    declared = PojoParser.parse(typeElement, nameHolder, canGenerate);
                     sessionManager.setMaxLevelIfLessThan(computeFieldsCount(declared));
                     classMap.put(classname, declared);
                 }
             }
+        } else if (canGenerate) {
+            declared.withCanGenerate();
         }
         return declared;
     }

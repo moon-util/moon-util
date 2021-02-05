@@ -12,4 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.SOURCE)
-public @interface IfNe {}
+public @interface IfNe {
+
+    double value();
+}

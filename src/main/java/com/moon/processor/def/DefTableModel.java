@@ -16,13 +16,11 @@ import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.model.ValueRef;
 import com.moon.processor.utils.Comment2;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;
 import com.sun.istack.Nullable;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.Elements;
 import java.util.*;
 
 import static com.moon.processor.utils.String2.format;
@@ -31,8 +29,6 @@ import static com.moon.processor.utils.String2.format;
  * @author benshaoye
  */
 public class DefTableModel implements JavaFileWriteable {
-
-    private final Elements utils = Environment2.getUtils();
 
     private final Map<String, DefTableField> defFields;
 
@@ -248,6 +244,10 @@ public class DefTableModel implements JavaFileWriteable {
             Comment2.resolveComment(element),
             fieldAnnotated);
     }
+
+    public DefTableField getTableFieldInfo(String propertyName) { return defFields.get(propertyName); }
+
+    public boolean hasProperty(String name) { return defFields.containsKey(name); }
 
     public String getPkg() { return pkg; }
 

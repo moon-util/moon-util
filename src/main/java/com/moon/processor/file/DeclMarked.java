@@ -2,11 +2,12 @@ package com.moon.processor.file;
 
 import com.moon.processor.holder.Importable;
 import com.moon.processor.utils.Imported;
-import com.moon.processor.utils.Log2;
 import com.moon.processor.utils.String2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.annotation.Generated;
 import java.time.LocalDateTime;
@@ -56,6 +57,14 @@ public class DeclMarked implements ImporterAware, ScriptsProvider {
 
     public static DeclMarked ofComponent(Importable importable) {
         return COMPONENT ? new DeclMarked(importable, Component.class) : EMPTY;
+    }
+
+    public static DeclMarked ofRepository(Importable importable) {
+        return REPOSITORY ? new DeclMarked(importable, Repository.class) : EMPTY;
+    }
+
+    public static DeclMarked ofQualifier(Importable importable) {
+        return QUALIFIER ? new DeclMarked(importable, Qualifier.class) : EMPTY;
     }
 
     public static DeclMarked ofAutowired(Importable importable) {
@@ -127,6 +136,18 @@ public class DeclMarked implements ImporterAware, ScriptsProvider {
 
     public DeclMarked numberOf(String method, double value) {
         return add(method, String.valueOf(value));
+    }
+
+    public DeclMarked trueOf(String method) {
+        return add(method, String.valueOf(true));
+    }
+
+    public DeclMarked falseOf(String method) {
+        return add(method, String.valueOf(false));
+    }
+
+    public DeclMarked booleanOf(String method, boolean value) {
+        return value ? trueOf(method) : falseOf(method);
     }
 
     public DeclMarked classOf(String method, Class<?> valueClass) {

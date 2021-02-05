@@ -3,8 +3,12 @@ package com.moon.processor.holder;
 import com.moon.processor.JavaFileWriteable;
 import com.moon.processor.JavaWriter;
 import com.moon.processor.def.DefAccessor;
+import com.moon.processor.def.DefTableModel;
 import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.Test2;
 
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,11 +35,33 @@ public class AccessorHolder implements JavaFileWriteable {
     }
 
     public void with(TypeElement accessorElem, TypeElement modelElem) {
-        Access2.assertAccessorDecl(accessorElem);
+        assertAccessorDecl(accessorElem);
         String classname = Element2.getQualifiedName(accessorElem);
-        modelHolder.with(modelElem, classname);
+        DefTableModel model = modelHolder.with(modelElem, classname);
         accessorHashMap.computeIfAbsent(classname,
-            k -> new DefAccessor(copierHolder, modelHolder, pojoHolder, nameHolder, accessorElem));
+            k -> new DefAccessor(copierHolder, modelHolder, pojoHolder, nameHolder, accessorElem, model));
+    }
+
+    private static void throwException(String message, TypeElement element) {
+        String classname = Element2.getQualifiedName(element);
+        throw new IllegalStateException(message + classname);
+    }
+
+    private static void assertAccessorDecl(TypeElement element) {
+        if (Test2.isAny(element, Modifier.FINAL)) {
+            throwException("Accessor cannot be modified by 'final': ", element);
+        }
+        ElementKind kind = element.getKind();
+        if (kind == ElementKind.ENUM) {
+            throwException("Accessor cannot be an 'enum': ", element);
+        }
+        if (kind == ElementKind.ANNOTATION_TYPE) {
+            throwException("Accessor cannot be an 'annotation': ", element);
+        }
+        // for future: record
+        if ("record".equals(kind.name())) {
+            throwException("Accessor cannot be a 'record': ", element);
+        }
     }
 
     @Override
