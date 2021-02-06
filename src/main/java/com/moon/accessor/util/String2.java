@@ -48,25 +48,7 @@ public enum String2 {
         if (open != null) {
             return close == null ? open : open + close;
         }
-        return close == null ? null : close;
-    }
-
-    public static String firstWord(CharSequence sequence) {
-        if (sequence == null) {
-            return null;
-        }
-        char thisChar;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0, length = sequence.length(); i < length; i++) {
-            if (!Character.isWhitespace(thisChar = sequence.charAt(i))) {
-                builder.append(thisChar);
-            } else if (builder.length() == 0) {
-                continue;
-            } else {
-                break;
-            }
-        }
-        return builder.toString();
+        return close;
     }
 
     public static String doEscape(String content, char targetChar) {
@@ -76,8 +58,7 @@ public enum String2 {
         StringBuilder builder = new StringBuilder();
         int backslashCnt = 0;
         char[] chars = content.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            char ch = chars[i];
+        for (char ch : chars) {
             if (ch == BACKSLASH) {
                 backslashCnt++;
             } else {

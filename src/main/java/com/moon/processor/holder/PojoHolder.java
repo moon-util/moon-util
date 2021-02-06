@@ -38,9 +38,7 @@ public class PojoHolder implements JavaFileWriteable {
         return count;
     }
 
-    public DeclaredPojo with(TypeElement typeElement) {
-        return with(typeElement, true);
-    }
+    public DeclaredPojo with(TypeElement typeElement) { return with(typeElement, true); }
 
     public DeclaredPojo with(TypeElement typeElement, boolean canGenerate) {
         String classname = Element2.getQualifiedName(typeElement);

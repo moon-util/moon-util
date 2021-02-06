@@ -8,6 +8,7 @@ import com.moon.processor.file.DeclJavaFile;
 import com.moon.processor.file.DeclMarked;
 import com.moon.processor.file.DeclMethod;
 import com.moon.processor.file.DeclParams;
+import com.moon.processor.holder.ModelHolder;
 import com.moon.processor.model.DeclareGeneric;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.*;
@@ -15,12 +16,8 @@ import com.moon.processor.utils.*;
 import javax.lang.model.element.*;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.moon.processor.parser.Access2.onPropertyProvided;
 import static javax.lang.model.element.Modifier.*;
@@ -92,7 +89,7 @@ public class AccessorParser {
     }
 
     private void implMethod(String methodName, DeclJavaFile impl, ExecutableElement method) {
-        switch (String2.firstWord(methodName)) {
+        switch (String2.firstWord(methodName).toLowerCase()) {
             case "insert":
                 implMethodForInsert(impl, method);
                 break;
@@ -132,51 +129,86 @@ public class AccessorParser {
         final String methodName = Element2.getSimpleName(method);
         final String actualReturnType = getActualType(thisElement, method.getReturnType());
         if (parameterCount == 0) {
-            DeclMethod methodImpl = impl.publicMethod(methodName, DeclParams.of())
-                .returnTypeof(actualReturnType)
+            DeclMethod methodImpl = impl.publicMethod(methodName, DeclParams.of()).returnTypeof(actualReturnType)
                 .override();
             defaultReturning(methodImpl, method, actualReturnType);
         } else if (parameters.size() == 1) {
             VariableElement parameter = parameters.get(0);
-            String actualType = getActualType(thisElement, parameter.asType());
             String parameterName = Element2.getSimpleName(parameter);
+            String paramActualType = getActualType(thisElement, parameter.asType());
             DefTableModel tableModel = accessor.getTableModel();
-            DefTableField field = tableModel.getTableFieldInfo(parameterName);
-            DeclMethod methodImpl = impl.publicMethod(methodName, DeclParams.of(parameterName, actualType))
-                .returnTypeof(actualReturnType)
-                .override();
-            // 只有一个参数
-            if (field == null) {
-                TypeElement insertPojo = Environment2.getUtils().getTypeElement(actualType);
-                if (insertPojo == null) {
-                    throw new IllegalStateException("无法确定 POJO 类型: " + actualType);
+            DefTableField tableField = tableModel.getTableFieldInfo(parameterName);
+            DeclParams methodImplParams = DeclParams.of(parameterName, paramActualType);
+            @SuppressWarnings("all")
+            DeclMethod methodImpl = impl.publicMethod(methodName, methodImplParams)//
+                .returnTypeof(actualReturnType).override();
+            if (tableField == null) {
+                ModelHolder modelHolder = accessor.getModelHolder();
+                // 可以直接插入一个其他类型实体
+                DefTableModel otherModel = modelHolder.get(paramActualType);
+                if (otherModel != null) {
+                    doImplMethodFoInsertEntity(methodImpl, otherModel, method, actualReturnType);
+                    return;
                 }
+                TypeElement insertPojo = Environment2.getUtils().getTypeElement(paramActualType);
+                if (insertPojo == null) {
+                    throw new IllegalStateException("无法确定 POJO 类型: " + paramActualType);
+                }
+                // 基于当前实体实体字段映射的其他类
                 DeclaredPojo pojo = accessor.getPojoHolder().with(insertPojo, false);
                 if (pojo.isEmpty()) {
                     defaultReturning(methodImpl, method, actualReturnType);
                     return;
-                } else {
-                    List<String> insertionProps = pojo.keySet()
-                        .stream()
-                        .filter(tableModel::hasProperty)
-                        .collect(Collectors.toList());
-                    if (insertionProps.isEmpty()) {
-                        defaultReturning(methodImpl, method, actualReturnType);
-                        return;
-                    }
                 }
-                // 参数是对应表的 0 至多个字段
-            } else if (Objects.equals(actualType, field.getPropType())) {
-                // 参数是对应表的个字段，这种情况比较特殊，但也允许
+                Set<String> properties = filterUsableTableFields(pojo, tableModel);
+                if (properties.isEmpty()) {
+                    defaultReturning(methodImpl, method, actualReturnType);
+                    return;
+                }
+                doImplMethodFoInsertFields(methodImpl, tableModel, properties);
+            } else if (Objects.equals(paramActualType, tableField.getPropType())) {
+                // 参数是对应表的单个字段，这种情况比较特殊，但也允许
+                doImplMethodFoInsertFields(methodImpl, tableModel, Collect2.set(parameterName));
             } else {
-
+                // 如果单个参数既非某个实体、又非当前实体的某个类型匹配的字段就抛异常
+                throw new IllegalStateException("未知字段（字段名以及字段类型应与数据表对应）: " + parameter);
             }
-
-            // TODO
-            defaultReturning(methodImpl, method, actualReturnType);
         } else {
-
+            // 参数对应表的多个字段，要求参数名、参数类型与实体中的都要一致
+            Access2.assertParametersSameWithTableModel(tableModel, parameters);
+            for (VariableElement parameter : parameters) {
+                String parameterName = Element2.getSimpleName(parameter);
+            }
         }
+    }
+
+    private void doImplMethodFoInsertEntity(
+        DeclMethod method, DefTableModel tableModel, ExecutableElement methodElem, String actualReturnType
+    ) {
+        StringBuilder insert = new StringBuilder().append("INSERT INTO ");
+        StringBuilder values = new StringBuilder().append(" VALUES (");
+
+        Indexer indexer = new Indexer();
+        insert.append(tableModel.getTableName()).append(" (");
+        tableModel.forEachFields((name, field) -> {
+            if (indexer.gt(0)) {
+                insert.append(", ");
+                values.append(", ");
+            }
+            insert.append(field.getFieldName());
+            values.append("?");
+            indexer.getAndIncrement();
+        });
+        insert.append(")");
+        values.append(")");
+        insert.append(values);
+        String wrapped = String2.strWrapped(insert.toString());
+        method.scriptOf("{} sql = {}", method.onImported(String.class), wrapped);
+        defaultReturning(method, methodElem, actualReturnType);
+    }
+
+    private void doImplMethodFoInsertFields(DeclMethod method, DefTableModel tableModel, Set<String> fields) {
+
     }
 
     private void implMethodForDelete(DeclJavaFile impl, ExecutableElement method) {}
@@ -208,13 +240,33 @@ public class AccessorParser {
     private Map<TypeElement, String> enclosedClassnameMap;
 
     private String getActualType(TypeElement declaredClass, TypeMirror type) {
-        Map<TypeElement, String> classnameMap = enclosedClassnameMap == null ? (enclosedClassnameMap = new HashMap<>()) : enclosedClassnameMap;
+        @SuppressWarnings("all")
+        Map<TypeElement, String> classnameMap = enclosedClassnameMap == null //
+            ? (enclosedClassnameMap = new HashMap<>()) : enclosedClassnameMap;
         String classname = classnameMap.get(declaredClass);
         if (classname == null) {
             classname = Element2.getQualifiedName(declaredClass);
             classnameMap.put(declaredClass, classname);
         }
         return Generic2.mappingToActual(genericMap, classname, type.toString());
+    }
+
+    /**
+     * 筛选出实体与数据表相对应的字段
+     *
+     * @param pojo
+     * @param tableModel
+     *
+     * @return
+     */
+    private static Set<String> filterUsableTableFields(DeclaredPojo pojo, DefTableModel tableModel) {
+        Set<String> correctFields = new LinkedHashSet<>();
+        for (String prop : pojo.keySet()) {
+            if (tableModel.hasProperty(prop)) {
+                correctFields.add(prop);
+            }
+        }
+        return correctFields;
     }
 
     private static boolean isImplCapable(Element enclosedElement) {

@@ -22,6 +22,7 @@ import com.sun.istack.Nullable;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.*;
+import java.util.function.BiConsumer;
 
 import static com.moon.processor.utils.String2.format;
 
@@ -266,6 +267,10 @@ public class DefTableModel implements JavaFileWriteable {
     public String getTableName() { return tableName; }
 
     public String getCanonicalName() { return fullClassname; }
+
+    public void forEachFields(BiConsumer<String, DefTableField> action) {
+        defFields.forEach(action);
+    }
 
     @Override
     public void writeJavaFile(JavaWriter writer) {

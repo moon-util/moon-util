@@ -69,6 +69,14 @@ public class ModelHolder implements JavaFileWriteable {
         return entityModel;
     }
 
+    public DefTableModel get(String modelClassname) {
+        return modelMap.get(modelClassname);
+    }
+
+    public boolean contains(String modelClassname) {
+        return modelMap.containsKey(modelClassname);
+    }
+
     @Override
     public void writeJavaFile(JavaWriter writer) {
         modelMap.forEach((n, model) -> model.writeJavaFile(writer));

@@ -183,7 +183,27 @@ public enum String2 {
     }
 
     public static String firstWord(String string) {
-        return com.moon.accessor.util.String2.firstWord(string);
+        char[] chars = string.trim().toCharArray();
+        StringBuilder builder = new StringBuilder(8);
+        boolean firstUpper = false, thisUpper;
+        for (int i = 0; i < chars.length; i++) {
+            char currChar = chars[i];
+            if (i == 0) {
+                firstUpper = Character.isUpperCase(currChar);
+                builder.append(currChar);
+            } else if (Character.isWhitespace(currChar)) {
+                break;
+            } else {
+                thisUpper = Character.isUpperCase(currChar);
+                if (firstUpper == thisUpper) {
+                    builder.append(currChar);
+                    firstUpper = thisUpper;
+                } else {
+                    break;
+                }
+            }
+        }
+        return builder.toString();
     }
 
     public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit, boolean lowerCaseAtPos) {
@@ -266,9 +286,11 @@ public enum String2 {
         }
     }
 
-    public static String strWrapped(String value) { return '"' + value + '"'; }
+    public static String strWrapped(CharSequence value) { return "\"" + value + '"'; }
 
-    public static String strWrappedIfNonNull(String value) { return value == null ? null : '"' + value + '"'; }
+    public static String strWrappedIfNonNull(CharSequence value) {
+        return value == null ? null : strWrapped(value);
+    }
 
     public static String onInlineDocCommentOf(String comment) {
         return format("/** {} */", comment);

@@ -1,9 +1,6 @@
 package com.moon.processor.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author benshaoye
@@ -21,14 +18,23 @@ public enum Collect2 {
 
     public static boolean isNotEmpty(Collection<?> collection) { return !isEmpty(collection); }
 
-    public static <T> List<T> list(T... values) {
-        List<T> list = new ArrayList<>();
-        if (list == null) {
+    @SafeVarargs
+    public static <T> Set<T> set(T... values) {
+        Set<T> list = new LinkedHashSet<>();
+        if (values == null) {
             return list;
         }
-        for (T value : values) {
-            list.add(value);
+        list.addAll(Arrays.asList(values));
+        return list;
+    }
+
+    @SafeVarargs
+    public static <T> List<T> list(T... values) {
+        List<T> list = new ArrayList<>();
+        if (values == null) {
+            return list;
         }
+        list.addAll(Arrays.asList(values));
         return list;
     }
 }

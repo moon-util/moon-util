@@ -1,11 +1,14 @@
 package com.moon.processor.parser;
 
 import com.moon.accessor.annotation.Provided;
+import com.moon.processor.def.DefTableModel;
 import com.moon.processor.file.*;
 import com.moon.processor.model.DeclareGeneric;
 import com.moon.processor.utils.*;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,6 +17,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 enum Access2 {
     ;
+
+    static void assertParametersSameWithTableModel(DefTableModel tableModel, List<? extends VariableElement> elements) {
+
+    }
 
     static void onPropertyProvided(
         DeclJavaFile impl,
