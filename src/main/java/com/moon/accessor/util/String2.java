@@ -1,7 +1,5 @@
 package com.moon.accessor.util;
 
-import java.util.Arrays;
-
 /**
  * @author benshaoye
  */

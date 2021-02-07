@@ -10,6 +10,7 @@ import com.moon.processor.file.DeclMethod;
 import com.moon.processor.file.DeclParams;
 import com.moon.processor.holder.ModelHolder;
 import com.moon.processor.model.DeclareGeneric;
+import com.moon.processor.model.DeclareProperty;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.*;
 
@@ -129,7 +130,8 @@ public class AccessorParser {
         final String methodName = Element2.getSimpleName(method);
         final String actualReturnType = getActualType(thisElement, method.getReturnType());
         if (parameterCount == 0) {
-            DeclMethod methodImpl = impl.publicMethod(methodName, DeclParams.of()).returnTypeof(actualReturnType)
+            DeclMethod methodImpl = impl.publicMethod(methodName, DeclParams.of())
+                .returnTypeof(actualReturnType)
                 .override();
             defaultReturning(methodImpl, method, actualReturnType);
         } else if (parameters.size() == 1) {
@@ -139,15 +141,14 @@ public class AccessorParser {
             DefTableModel tableModel = accessor.getTableModel();
             DefTableField tableField = tableModel.getTableFieldInfo(parameterName);
             DeclParams methodImplParams = DeclParams.of(parameterName, paramActualType);
-            @SuppressWarnings("all")
-            DeclMethod methodImpl = impl.publicMethod(methodName, methodImplParams)//
+            @SuppressWarnings("all") DeclMethod methodImpl = impl.publicMethod(methodName, methodImplParams)//
                 .returnTypeof(actualReturnType).override();
-            if (tableField == null) {
+            if (tableField == null || !Objects.equals(tableField.getPropType(), paramActualType)) {
                 ModelHolder modelHolder = accessor.getModelHolder();
                 // 可以直接插入一个其他类型实体
                 DefTableModel otherModel = modelHolder.get(paramActualType);
                 if (otherModel != null) {
-                    doImplMethodFoInsertEntity(methodImpl, otherModel, method, actualReturnType);
+                    doImplMethodForInsertEntity(methodImpl, otherModel, method, actualReturnType);
                     return;
                 }
                 TypeElement insertPojo = Environment2.getUtils().getTypeElement(paramActualType);
@@ -160,15 +161,15 @@ public class AccessorParser {
                     defaultReturning(methodImpl, method, actualReturnType);
                     return;
                 }
-                Set<String> properties = filterUsableTableFields(pojo, tableModel);
+                Map<String, DeclareProperty> properties = filterUsableTableFields(pojo, tableModel);
                 if (properties.isEmpty()) {
                     defaultReturning(methodImpl, method, actualReturnType);
                     return;
                 }
-                doImplMethodFoInsertFields(methodImpl, tableModel, properties);
+                doImplMethodFoInsertFields(methodImpl, tableModel, method, actualReturnType, properties);
             } else if (Objects.equals(paramActualType, tableField.getPropType())) {
                 // 参数是对应表的单个字段，这种情况比较特殊，但也允许
-                doImplMethodFoInsertFields(methodImpl, tableModel, Collect2.set(parameterName));
+                doImplMethodFoInsertFields(methodImpl, tableModel, method, actualReturnType, Collect2.set(parameter));
             } else {
                 // 如果单个参数既非某个实体、又非当前实体的某个类型匹配的字段就抛异常
                 throw new IllegalStateException("未知字段（字段名以及字段类型应与数据表对应）: " + parameter);
@@ -176,13 +177,72 @@ public class AccessorParser {
         } else {
             // 参数对应表的多个字段，要求参数名、参数类型与实体中的都要一致
             Access2.assertParametersSameWithTableModel(tableModel, parameters);
-            for (VariableElement parameter : parameters) {
-                String parameterName = Element2.getSimpleName(parameter);
-            }
+            // doImplMethodFoInsertFields(methodImpl, tableModel, method, actualReturnType, new LinkedHashSet<>(parameters));
         }
     }
 
-    private void doImplMethodFoInsertEntity(
+    private void doImplMethodFoInsertFields(
+        DeclMethod method,
+        DefTableModel tableModel,
+        ExecutableElement methodElem,
+        String actualReturnType,
+        Set<VariableElement> fields
+    ) {
+        StringBuilder insert = new StringBuilder().append("INSERT INTO ");
+        StringBuilder values = new StringBuilder().append(" VALUES (");
+
+        Indexer indexer = new Indexer();
+        insert.append(tableModel.getTableName()).append(" (");
+        for (VariableElement field : fields) {
+            String simpleName = Element2.getSimpleName(field);
+            DefTableField tableField = tableModel.getTableFieldInfo(simpleName);
+            if (indexer.gt(0)) {
+                insert.append(", ");
+                values.append(", ");
+            }
+            insert.append(tableField.getFieldName());
+            values.append("?");
+            indexer.getAndIncrement();
+        }
+        insert.append(")");
+        values.append(")");
+        insert.append(values);
+        String wrapped = String2.strWrapped(insert.toString());
+        method.scriptOf("{} sql = {}", method.onImported(String.class), wrapped);
+        defaultReturning(method, methodElem, actualReturnType);
+    }
+
+    private void doImplMethodFoInsertFields(
+        DeclMethod method,
+        DefTableModel tableModel,
+        ExecutableElement methodElem,
+        String actualReturnType,
+        Map<String, DeclareProperty> fields
+    ) {
+        StringBuilder insert = new StringBuilder().append("INSERT INTO ");
+        StringBuilder values = new StringBuilder().append(" VALUES (");
+
+        Indexer indexer = new Indexer();
+        insert.append(tableModel.getTableName()).append(" (");
+        for (Map.Entry<String, DeclareProperty> fieldEntry : fields.entrySet()) {
+            DefTableField tableField = tableModel.getTableFieldInfo(fieldEntry.getKey());
+            if (indexer.gt(0)) {
+                insert.append(", ");
+                values.append(", ");
+            }
+            insert.append(tableField.getFieldName());
+            values.append("?");
+            indexer.getAndIncrement();
+        }
+        insert.append(")");
+        values.append(")");
+        insert.append(values);
+        String wrapped = String2.strWrapped(insert.toString());
+        method.scriptOf("{} sql = {}", method.onImported(String.class), wrapped);
+        defaultReturning(method, methodElem, actualReturnType);
+    }
+
+    private void doImplMethodForInsertEntity(
         DeclMethod method, DefTableModel tableModel, ExecutableElement methodElem, String actualReturnType
     ) {
         StringBuilder insert = new StringBuilder().append("INSERT INTO ");
@@ -205,10 +265,6 @@ public class AccessorParser {
         String wrapped = String2.strWrapped(insert.toString());
         method.scriptOf("{} sql = {}", method.onImported(String.class), wrapped);
         defaultReturning(method, methodElem, actualReturnType);
-    }
-
-    private void doImplMethodFoInsertFields(DeclMethod method, DefTableModel tableModel, Set<String> fields) {
-
     }
 
     private void implMethodForDelete(DeclJavaFile impl, ExecutableElement method) {}
@@ -240,9 +296,8 @@ public class AccessorParser {
     private Map<TypeElement, String> enclosedClassnameMap;
 
     private String getActualType(TypeElement declaredClass, TypeMirror type) {
-        @SuppressWarnings("all")
-        Map<TypeElement, String> classnameMap = enclosedClassnameMap == null //
-            ? (enclosedClassnameMap = new HashMap<>()) : enclosedClassnameMap;
+        @SuppressWarnings("all") Map<TypeElement, String> classnameMap = enclosedClassnameMap == null //
+                                                                         ? (enclosedClassnameMap = new HashMap<>()) : enclosedClassnameMap;
         String classname = classnameMap.get(declaredClass);
         if (classname == null) {
             classname = Element2.getQualifiedName(declaredClass);
@@ -259,11 +314,11 @@ public class AccessorParser {
      *
      * @return
      */
-    private static Set<String> filterUsableTableFields(DeclaredPojo pojo, DefTableModel tableModel) {
-        Set<String> correctFields = new LinkedHashSet<>();
-        for (String prop : pojo.keySet()) {
-            if (tableModel.hasProperty(prop)) {
-                correctFields.add(prop);
+    private static Map<String, DeclareProperty> filterUsableTableFields(DeclaredPojo pojo, DefTableModel tableModel) {
+        Map<String, DeclareProperty> correctFields = new LinkedHashMap<>();
+        for (Map.Entry<String, DeclareProperty> propertyEntry : pojo.entrySet()) {
+            if (tableModel.hasProperty(propertyEntry.getKey())) {
+                correctFields.put(propertyEntry.getKey(), propertyEntry.getValue());
             }
         }
         return correctFields;
