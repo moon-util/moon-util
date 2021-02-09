@@ -6,7 +6,7 @@ import com.moon.accessor.annotation.TableModelPolicy;
 /**
  * @author benshaoye
  */
-public enum DefaultTablePolicy implements TableModelPolicy {
+public enum DefaultTableModelPolicy implements TableModelPolicy {
     /** default instance */
     INSTANCE;
 

@@ -77,38 +77,6 @@ public class PojoParser {
 
     public String getThisClassname() { return thisClassname; }
 
-    private final static String TEMPLATE = "{} {} {}({})";
-
-    /**
-     * 处理扩展方法：
-     * <p>
-     * 1. 抽象方法要求之类必须实现；
-     * 2. 非抽象方法没特殊要求
-     *
-     * @param method
-     * @param parsingElem
-     */
-    private void handleExpandMethod(ExecutableElement method, String parsingElem) {
-        if (Test2.isAny(method, Modifier.ABSTRACT)) {
-
-        } else {
-            String simpleName = Element2.getSimpleName(method);
-            String returnType = Generic2.mappingToActual(thisGenericMap,
-                parsingElem,
-                method.getReturnType().toString());
-            String parameters = method.getParameters()
-                .stream()
-                .map(p -> Generic2.mappingToActual(thisGenericMap, parsingElem, p.asType().toString()))
-                .collect(Collectors.joining(","));
-            if (Test2.isAny(method, Modifier.PUBLIC)) {
-                String.format(TEMPLATE, Const2.PUBLIC, returnType, simpleName, parameters);
-            } else if (Test2.isAny(method, Modifier.PROTECTED)) {
-                String.format(TEMPLATE, Const2.PROTECTED, returnType, simpleName, parameters);
-                String.format(TEMPLATE, Const2.PUBLIC, returnType, simpleName, parameters);
-            }
-        }
-    }
-
     private String findActualType(String parsingClass, String declaredType) {
         return Generic2.mappingToActual(thisGenericMap, parsingClass, declaredType);
     }

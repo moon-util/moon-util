@@ -5,7 +5,7 @@ import com.moon.accessor.annotation.TableModel;
 import com.moon.accessor.annotation.TableModelPolicy;
 import com.moon.processor.model.DefaultTableFieldPolicy;
 import com.moon.processor.model.DefaultTableModel;
-import com.moon.processor.model.DefaultTablePolicy;
+import com.moon.processor.model.DefaultTableModelPolicy;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Test2;
@@ -66,6 +66,6 @@ public class PolicyHolder {
     }
 
     public TableModelPolicy with(TypeElement element) {
-        return find(element, policyMap, TableModelPolicy.class, DefaultTablePolicy.INSTANCE);
+        return find(element, policyMap, TableModelPolicy.class, DefaultTableModelPolicy.INSTANCE);
     }
 }

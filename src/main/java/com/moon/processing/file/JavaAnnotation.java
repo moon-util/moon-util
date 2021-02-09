@@ -1,4 +1,4 @@
-package com.moon.processor.create;
+package com.moon.processing.file;
 
 import com.moon.processor.holder.Importer;
 
@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * @author benshaoye
  */
-public class DeclAnnotation {
+public class JavaAnnotation {
 
     private final static String[] EMPTY_STRINGS = {};
 
@@ -20,26 +20,26 @@ public class DeclAnnotation {
 
     private final Map<String, AnnotationValue> valuesMap = new HashMap<>();
 
-    public DeclAnnotation(Importer importer, String annotationName) {
+    public JavaAnnotation(Importer importer, String annotationName) {
         this.annotationName = annotationName;
         this.importer = importer;
     }
 
-    public DeclAnnotation classOf(String method, Class<?> classValue, Class<?>... classValues) {
+    public JavaAnnotation classOf(String method, Class<?> classValue, Class<?>... classValues) {
         return classOf(method, classValue.getCanonicalName(), mapClassName(classValues));
     }
 
-    public DeclAnnotation classOf(String method, String classname, String... classnames) {
+    public JavaAnnotation classOf(String method, String classname, String... classnames) {
         putVal(method, ValueType.CLASS, classname, classnames);
         return this;
     }
 
-    public DeclAnnotation stringOf(String method, String value, String... values) {
+    public JavaAnnotation stringOf(String method, String value, String... values) {
         putVal(method, ValueType.STRING, value, values);
         return this;
     }
 
-    public DeclAnnotation longOf(String method, long value, long... values) {
+    public JavaAnnotation longOf(String method, long value, long... values) {
         String[] valuesStringify;
         if (values == null) {
             valuesStringify = EMPTY_STRINGS;
@@ -53,7 +53,7 @@ public class DeclAnnotation {
         return this;
     }
 
-    public DeclAnnotation doubleOf(String method, double value, double... values) {
+    public JavaAnnotation doubleOf(String method, double value, double... values) {
         String[] valuesStringify;
         if (values == null) {
             valuesStringify = EMPTY_STRINGS;
@@ -67,14 +67,14 @@ public class DeclAnnotation {
         return this;
     }
 
-    public DeclAnnotation booleanOf(String method, boolean value) {
+    public JavaAnnotation booleanOf(String method, boolean value) {
         putVal(method, ValueType.PRIMITIVE, String.valueOf(value));
         return this;
     }
 
-    public DeclAnnotation trueOf(String method) { return booleanOf(method, true); }
+    public JavaAnnotation trueOf(String method) { return booleanOf(method, true); }
 
-    public DeclAnnotation falseOf(String method) { return booleanOf(method, false); }
+    public JavaAnnotation falseOf(String method) { return booleanOf(method, false); }
 
     private void putVal(String method, ValueType type, String value, String... values) {
         valuesMap.put(method, new AnnotationValue(importer, type, value, values));

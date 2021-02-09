@@ -1,4 +1,4 @@
-package com.moon.processor.create;
+package com.moon.processing.file;
 
 import com.moon.processor.holder.Importer;
 
@@ -7,25 +7,25 @@ import java.util.Objects;
 /**
  * @author benshaoye
  */
-public class DeclGeneric {
+public class JavaGeneric {
 
     private final Importer importer;
     private final String name;
     private GenericType type;
     private String bound;
 
-    public DeclGeneric(Importer importer, String name) {
+    public JavaGeneric(Importer importer, String name) {
         this.importer = importer;
         this.name = name;
     }
 
-    public DeclGeneric superOf(String bound) {
+    public JavaGeneric superOf(String bound) {
         this.type = GenericType.SUPER;
         this.bound = bound;
         return this;
     }
 
-    public DeclGeneric extendsOf(String bound) {
+    public JavaGeneric extendsOf(String bound) {
         this.type = GenericType.EXTENDS;
         this.bound = bound;
         return this;
@@ -35,13 +35,18 @@ public class DeclGeneric {
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        DeclGeneric that = (DeclGeneric) o;
+        JavaGeneric that = (JavaGeneric) o;
         return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() { return Objects.hash(name); }
 
+    /**
+     * 返回单个的泛型声明，如果包含边界，返回的结果也包含边界
+     *
+     * @return
+     */
     @Override
     public String toString() {
         return bound == null ? name : String.join(" ", name, type.name(), importer.onImported(bound));

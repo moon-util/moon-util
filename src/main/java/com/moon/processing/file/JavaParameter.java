@@ -1,9 +1,9 @@
-package com.moon.processor.create;
+package com.moon.processing.file;
 
 /**
  * @author benshaoye
  */
-public class DeclParam {
+public class JavaParameter {
 
     /**
      * 参数类型，类全名/泛型全名
@@ -13,7 +13,7 @@ public class DeclParam {
     private final String paramType;
     private final String name;
 
-    public DeclParam(String paramType, String name) {
+    public JavaParameter(String paramType, String name) {
         this.paramType = paramType;
         this.name = name;
     }
