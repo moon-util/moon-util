@@ -39,7 +39,7 @@ public class GenericDeclared {
         this.bound = bound;
         boolean isBound = actual == null || Objects.equals(actual, declare);
         this.effectType = isBound ? bound : actual;
-        this.simpleType = toSimpleGenericTypename(this.effectType);
+        this.simpleType = Generic2.typeSimplify(this.effectType);
     }
 
     public String getDeclare() { return declare; }
@@ -51,14 +51,6 @@ public class GenericDeclared {
     public String getEffectType() { return effectType; }
 
     public String getSimpleType() { return simpleType; }
-
-    private static String toSimpleGenericTypename(String value) {
-        if (value == null) {
-            return null;
-        }
-        int index = value.indexOf('<');
-        return index < 0 ? value : value.substring(0, index);
-    }
 
     @Override
     public String toString() {

@@ -1,10 +1,26 @@
 package com.moon.processing.file;
 
+import com.moon.processor.holder.Importer;
+
+import javax.lang.model.element.Modifier;
+import java.util.Set;
+
 /**
  * @author benshaoye
  */
-public class JavaMethod {
+public class JavaMethod extends JavaAnnotable {
 
-    public JavaMethod() {
+    private final JavaParameters parameters;
+
+    public JavaMethod(Importer importer) {
+        super(importer);
+        this.parameters = new JavaParameters(importer);
+    }
+
+
+
+    @Override
+    public Set<Modifier> getAllowedModifiers() {
+        return Modifier2.FOR_METHOD;
     }
 }

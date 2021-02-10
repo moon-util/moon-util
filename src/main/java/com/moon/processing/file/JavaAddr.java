@@ -54,18 +54,11 @@ public class JavaAddr {
 
     public JavaAddr blankAdd(Object value) { return next(2).add(value); }
 
-    public JavaAddr script(CharSequence script) {
-        return add(onlyColonTail(script.toString()));
-    }
+    public JavaAddr script(CharSequence script) { return add(onlyColonTail(script.toString())); }
 
-    public JavaAddr newScript(CharSequence script) {
-        return next().script(script);
-    }
+    public JavaAddr newScript(CharSequence script) { return next().script(script); }
 
-
-    public JavaAddr blankScript(CharSequence script) {
-        return next(2).script(script);
-    }
+    public JavaAddr blankScript(CharSequence script) { return next(2).script(script); }
 
     public JavaAddr newEnd() { return next().end(); }
 
@@ -144,6 +137,13 @@ public class JavaAddr {
         }
     }
 
+    /**
+     * 确保语句末尾有且只有一个分号
+     *
+     * @param script
+     *
+     * @return
+     */
     private static String onlyColonTail(String script) {
         final int initLastIndex = script.length() - 1;
         int lastIndex = initLastIndex;

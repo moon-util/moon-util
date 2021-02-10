@@ -93,6 +93,14 @@ public enum Generic2 {
         return declaredGenericMap;
     }
 
+    public static String typeSimplify(String classname) {
+        if (classname == null) {
+            return null;
+        }
+        int index = classname.indexOf('<');
+        return index < 0 ? classname : classname.substring(0, index);
+    }
+
     /**
      * 解析类/接口上的泛型
      * <p>
