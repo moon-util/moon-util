@@ -3,15 +3,14 @@ package com.moon.processing.file;
 import com.moon.processor.holder.Importer;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author benshaoye
  */
-public class JavaAnnotation {
+public class JavaAnnotation extends BaseImportable implements Appender {
 
     private final static String[] EMPTY_STRINGS = {};
-
-    private final Importer importer;
 
     /**
      * 注解完整名：java.lang.Override
@@ -21,8 +20,8 @@ public class JavaAnnotation {
     private final Map<String, AnnotationValue> valuesMap = new HashMap<>();
 
     public JavaAnnotation(Importer importer, String annotationName) {
+        super(importer);
         this.annotationName = annotationName;
-        this.importer = importer;
     }
 
     public JavaAnnotation classOf(String method, Class<?> classValue, Class<?>... classValues) {
@@ -77,7 +76,34 @@ public class JavaAnnotation {
     public JavaAnnotation falseOf(String method) { return booleanOf(method, false); }
 
     private void putVal(String method, ValueType type, String value, String... values) {
-        valuesMap.put(method, new AnnotationValue(importer, type, value, values));
+        valuesMap.put(method, new AnnotationValue(getImporter(), type, value, values));
+    }
+
+    @Override
+    public void appendTo(JavaAddr addr) {
+        addr.newAdd('@').add(onImported(annotationName));
+        if (valuesMap.isEmpty()) {
+            return;
+        }
+        List<String> values = valuesMap.values().stream().map(Object::toString).collect(Collectors.toList());
+        if (values.size() == 1) {
+            addr.add("(").add(values.get(0)).add(")");
+        } else {
+            String valuesJoined = String.join(", ", values);
+            if (addr.willOverLength(valuesJoined)) {
+                addr.add("(").start();
+                int lastIndex = values.size() - 1, index = 0;
+                for (String value : values) {
+                    addr.newAdd(value);
+                    if (index < lastIndex) {
+                        addr.add(",");
+                    }
+                }
+                addr.newEnd(")");
+            } else {
+                addr.add("(").add(values.get(0)).add(")");
+            }
+        }
     }
 
     private static class AnnotationValue {
@@ -136,7 +162,7 @@ public class JavaAnnotation {
         return names;
     }
 
-
+    @SuppressWarnings("all")
     private enum ValueType {
         CLASS,
         ENUM,

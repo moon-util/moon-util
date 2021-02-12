@@ -3,7 +3,8 @@ package com.moon.validator.annotation;
 /**
  * @author benshaoye
  */
-final class Message {
+enum Message {
+    ;
 
     final static String AT_ALL = "所有项都必须是数值 [{values}] 之一";
 

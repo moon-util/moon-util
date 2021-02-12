@@ -47,7 +47,7 @@ enum Modifier2 {
         // 互斥修饰符，只列举了这里可能会用到的一些
         mutuallyExclusive(Modifier.PUBLIC, Modifier.PROTECTED, Modifier.PRIVATE);
         mutuallyExclusive(Modifier.FINAL, Modifier.TRANSIENT, Modifier.ABSTRACT);
-        mutuallyExclusive(Modifier.STATIC, Modifier.DEFAULT);
+        mutuallyExclusive(Modifier.STATIC, Modifier.DEFAULT, Modifier.ABSTRACT);
     }
 
     public static void useModifier(Set<Modifier> modifierSet, Modifier usingModifier) {

@@ -9,23 +9,21 @@ import java.util.TreeSet;
 /**
  * @author benshaoye
  */
-abstract class BaseDeclared {
-
-    private final Importer importer;
+abstract class BaseDeclared extends BaseImportable {
 
     private final Set<Modifier> modifiers = new TreeSet<>();
 
-    public BaseDeclared(Importer importer) { this.importer = importer; }
+    public BaseDeclared(Importer importer) { super(importer); }
 
-    public Importer getImporter() { return importer; }
-
+    @Override
     public BaseDeclared onImported(Class<?> importClass) {
-        importer.onImported(importClass);
+        super.onImported(importClass);
         return this;
     }
 
+    @Override
     public BaseDeclared onImported(String classname) {
-        importer.onImported(classname);
+        super.onImported(classname);
         return this;
     }
 

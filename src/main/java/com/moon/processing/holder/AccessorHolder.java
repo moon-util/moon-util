@@ -1,7 +1,7 @@
 package com.moon.processing.holder;
 
 import com.moon.accessor.annotation.Accessor;
-import com.moon.processing.decl.DataAccessorDeclared;
+import com.moon.processing.decl.AccessorDeclared;
 import com.moon.processing.decl.TableDeclared;
 import com.moon.processing.decl.TypeDeclared;
 import com.moon.processor.utils.Element2;
@@ -16,22 +16,22 @@ import java.util.Map;
  *
  * @author benshaoye
  */
-public class DataHolder {
+public class AccessorHolder {
 
     private final TypeHolder typeHolder;
 
     private final TableHolder tableHolder;
 
-    private final Map<String, DataAccessorDeclared> dataDeclaredMap = new LinkedHashMap<>();
+    private final Map<String, AccessorDeclared> accessorDeclaredMap = new LinkedHashMap<>();
 
-    public DataHolder(TypeHolder typeHolder, TableHolder tableHolder) {
+    public AccessorHolder(TypeHolder typeHolder, TableHolder tableHolder) {
         this.typeHolder = typeHolder;
         this.tableHolder = tableHolder;
     }
 
-    public DataAccessorDeclared with(TypeElement element, Accessor accessor) {
+    public AccessorDeclared with(TypeElement element, Accessor accessor) {
         String classname = Element2.getQualifiedName(element);
-        DataAccessorDeclared accessorDeclared = dataDeclaredMap.get(classname);
+        AccessorDeclared accessorDeclared = accessorDeclaredMap.get(classname);
         if (accessorDeclared != null) {
             return accessorDeclared;
         }
@@ -43,8 +43,8 @@ public class DataHolder {
         TableDeclared tableDeclared = tableHolder.with(pojoElement);
         // 实体定义
         TypeDeclared pojoDeclared = typeHolder.with(pojoElement);
-        accessorDeclared = new DataAccessorDeclared(typeDeclared, tableDeclared, pojoDeclared);
-        dataDeclaredMap.put(classname, accessorDeclared);
+        accessorDeclared = new AccessorDeclared(typeDeclared, tableDeclared, pojoDeclared);
+        accessorDeclaredMap.put(classname, accessorDeclared);
         return accessorDeclared;
     }
 }

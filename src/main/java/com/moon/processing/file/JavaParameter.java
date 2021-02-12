@@ -2,6 +2,7 @@ package com.moon.processing.file;
 
 import com.moon.processing.decl.Generic2;
 import com.moon.processor.holder.Importer;
+import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.Modifier;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class JavaParameter extends JavaAnnotable {
 
     public JavaParameter(Importer importer, String name, String typeTemplate, Object... types) {
         super(importer);
-        this.type = Type2.format(typeTemplate, types);
+        this.type = String2.formatTypes(typeTemplate, types);
         this.name = name;
         this.typeSimplify = Generic2.typeSimplify(type);
     }

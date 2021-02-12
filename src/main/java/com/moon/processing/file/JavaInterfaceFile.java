@@ -18,6 +18,7 @@ public class JavaInterfaceFile extends JavaAnnotable {
     private final Set<String> interfacesSet = new LinkedHashSet<>();
     private final Set<JavaGeneric> generics = new LinkedHashSet<>();
     private final Map<String, JavaField> fieldsMap = new LinkedHashMap<>();
+    private final Map<String, JavaMethod> methodsMap = new LinkedHashMap<>();
 
     public JavaInterfaceFile(String packageName, String simpleName) {
         super(new Importer(packageName));
@@ -27,9 +28,26 @@ public class JavaInterfaceFile extends JavaAnnotable {
 
     public String getClassname() { return String.join(".", packageName, simpleName); }
 
+    @Override
+    public JavaInterfaceFile addModifierWith(Modifier modifier) {
+        super.addModifierWith(modifier);
+        return this;
+    }
+
     public JavaInterfaceFile publicConstField(String name, String typeTemplate, Object... types) {
         JavaField field = new JavaField(getImporter(), name, typeTemplate, types);
         return this;
+    }
+
+    public JavaMethod declareMethod(String name, Consumer<JavaParameters> parametersBuilder) {
+        JavaParameters parameters = new JavaParameters(getImporter());
+        JavaMethod method = new JavaMethod(getImporter(),name, parameters);
+        methodsMap.put(method.getUniqueKey(), method);
+        return method;
+    }
+
+    public JavaMethod publicAbstractMethod(String name, Consumer<JavaParameters> parametersBuilder) {
+        return declareMethod(name, parametersBuilder).addModifierWith(Modifier.ABSTRACT);
     }
 
     /**
@@ -98,14 +116,12 @@ public class JavaInterfaceFile extends JavaAnnotable {
 
         JavaAddr.Mark importMark = addr.mark();
 
-        addr.newAdd("public interface ")
-            .add(simpleName)
-            .add(getGenericDeclared())
-            .add(getInterfacesWillImplemented())
-            .add(" {")
-            .start();
+        addr.newAdd("public interface ").add(simpleName).add(getGenericDeclared()).add(getInterfacesWillImplemented())
+            .add(" {").start();
 
+        fieldsMap.forEach((key, field) -> field.appendTo(addr));
 
+        methodsMap.forEach((key,method) -> method.appendTo(addr));
 
         addr.newEnd().add("}");
         importMark.with(getImporter().toString("\n"));

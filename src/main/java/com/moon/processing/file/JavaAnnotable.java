@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public abstract class JavaAnnotable extends BaseDeclared {
+public abstract class JavaAnnotable extends BaseDeclared implements Appender{
 
     private final List<JavaAnnotation> annotations = new ArrayList<>();
 
@@ -25,5 +25,12 @@ public abstract class JavaAnnotable extends BaseDeclared {
         annotationUsing.accept(annotation);
         annotations.add(annotation);
         return this;
+    }
+
+    @Override
+    public void appendTo(JavaAddr addr) {
+        for (JavaAnnotation annotation : annotations) {
+            annotation.appendTo(addr);
+        }
     }
 }

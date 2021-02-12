@@ -5,7 +5,7 @@ package com.moon.processing.decl;
  *
  * @author benshaoye
  */
-public class DataAccessorDeclared {
+public class AccessorDeclared {
 
     /** 数据库访问对象 */
     private final TypeDeclared typeDeclared;
@@ -14,7 +14,7 @@ public class DataAccessorDeclared {
     /** 数据表 */
     private final TableDeclared tableDeclared;
 
-    public DataAccessorDeclared(TypeDeclared typeDeclared, TableDeclared tableDeclared, TypeDeclared pojoDeclared) {
+    public AccessorDeclared(TypeDeclared typeDeclared, TableDeclared tableDeclared, TypeDeclared pojoDeclared) {
         this.tableDeclared = tableDeclared;
         this.typeDeclared = typeDeclared;
         this.pojoDeclared = pojoDeclared;

@@ -40,6 +40,22 @@ public enum String2 {
         return String.join(":", keys);
     }
 
+    public static String formatTypes(String typeTemplate, Object... types) {
+        if (types == null) {
+            return typeTemplate;
+        }
+        Object[] typesStringify = new String[types.length];
+        for (int i = 0; i < types.length; i++) {
+            Object type = types[i];
+            if (type instanceof Class<?>) {
+                typesStringify[i] = ((Class<?>) type).getCanonicalName();
+            } else {
+                typesStringify[i] = String.valueOf(type);
+            }
+        }
+        return String2.format(typeTemplate, typesStringify);
+    }
+
     public static String format(String template, Object... values) {
         if (values != null) {
             List<String> rest = null;

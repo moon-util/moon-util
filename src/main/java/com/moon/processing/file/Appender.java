@@ -5,5 +5,5 @@ package com.moon.processing.file;
  */
 public interface Appender {
 
-    void append(JavaAddr addr);
+    void appendTo(JavaAddr addr);
 }

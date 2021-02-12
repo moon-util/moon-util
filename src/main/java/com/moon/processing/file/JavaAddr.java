@@ -8,6 +8,11 @@ import java.util.function.Consumer;
  */
 public class JavaAddr {
 
+    private final static char NEXT = '\n';
+    private final static String NEXT_STR = "\n";
+    private final static int TAB_SPACES = 4;
+    private final static int MAX_LINE_LENGTH = 120;
+
     private final static Map<Integer, String> INDENT_MAP = new HashMap<>();
 
     private final List<Mark> marks = new ArrayList<>();
@@ -23,7 +28,7 @@ public class JavaAddr {
         this.indentUnit = indentUnit;
         String indentSpaces = INDENT_MAP.get(indentUnit);
         if (indentSpaces == null) {
-            char[] chars = new char[indentUnit * 4];
+            char[] chars = new char[indentUnit * TAB_SPACES];
             Arrays.fill(chars, ' ');
             indentSpaces = new String(chars);
             INDENT_MAP.put(indentUnit, indentSpaces);
@@ -32,13 +37,13 @@ public class JavaAddr {
     }
 
     public JavaAddr next() {
-        content.append('\n');
+        content.append(NEXT);
         return this;
     }
 
     public JavaAddr next(int line) {
         char[] chars = new char[line];
-        Arrays.fill(chars, '\n');
+        Arrays.fill(chars, NEXT);
         content.append(chars);
         return this;
     }
@@ -62,7 +67,19 @@ public class JavaAddr {
 
     public JavaAddr newEnd() { return next().end(); }
 
+    public JavaAddr newEnd(String close) { return next().end().add(close); }
+
     public JavaAddr end() { return indentStart(-1); }
+
+    public int lineLength() {
+        int afterIndex = content.lastIndexOf(NEXT_STR) + 1;
+        return afterIndex > 0 ? content.length() - afterIndex : content.length();
+    }
+
+    public boolean willOverLength(Object script) {
+        String scriptStringify = String.valueOf(script);
+        return lineLength() + scriptStringify.length() > MAX_LINE_LENGTH;
+    }
 
     private JavaAddr indentStart(int count) {
         setIndentUnit(indentUnit + count);

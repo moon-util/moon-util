@@ -10,14 +10,33 @@ import java.util.Set;
  */
 public class JavaMethod extends JavaAnnotable {
 
+    private final String name;
     private final JavaParameters parameters;
 
-    public JavaMethod(Importer importer) {
+    public JavaMethod(Importer importer,String name, JavaParameters parameters) {
         super(importer);
-        this.parameters = new JavaParameters(importer);
+        this.name = name;
+        this.parameters = parameters;
     }
 
+    @Override
+    public JavaMethod addModifierWith(Modifier modifier) {
+        super.addModifierWith(modifier);
+        return this;
+    }
 
+    public String getUniqueKey() {
+        return null;
+    }
+
+    @Override
+    public void appendTo(JavaAddr addr) {
+        addr.next();
+        super.appendTo(addr);
+        for (Modifier modifier : getModifiers()) {
+            addr.newAdd(modifier.name().toLowerCase()).add(' ');
+        }
+    }
 
     @Override
     public Set<Modifier> getAllowedModifiers() {
