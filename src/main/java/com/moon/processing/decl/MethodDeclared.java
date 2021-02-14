@@ -7,15 +7,13 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class MethodDeclared {
+public class MethodDeclared extends BaseExecutableDeclared {
 
-    private final TypeElement thisElement;
+    private final String methodName;
 
-    private final TypeElement enclosingElement;
+    private final String returnDeclaredType;
 
-    private final ExecutableElement method;
-
-    private final Map<String, GenericDeclared> thisGenericMap;
+    private final String returnActualType;
 
     public MethodDeclared(
         TypeElement thisElement,
@@ -23,9 +21,20 @@ public class MethodDeclared {
         ExecutableElement method,
         Map<String, GenericDeclared> thisGenericMap
     ) {
-        this.thisElement = thisElement;
-        this.enclosingElement = enclosingElement;
-        this.method = method;
-        this.thisGenericMap = Generic2.from(method, thisGenericMap);
+        super(thisElement, enclosingElement, method, Generic2.from(method, thisGenericMap));
+        this.methodName = method.getSimpleName().toString();
+
+        String declaredType = method.getReturnType().toString();
+        String actualType = Generic2.mapToActual(getThisGenericMap(), getEnclosingClassname(), declaredType);
+        this.returnDeclaredType = declaredType;
+        this.returnActualType = actualType;
     }
+
+    public ExecutableElement getMethod() { return super.getExecutable(); }
+
+    public String getMethodName() { return methodName; }
+
+    public String getReturnDeclaredType() { return returnDeclaredType; }
+
+    public String getReturnActualType() { return returnActualType; }
 }

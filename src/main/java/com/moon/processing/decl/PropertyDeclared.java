@@ -3,6 +3,7 @@ package com.moon.processing.decl;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ public class PropertyDeclared {
      * <p>
      * 所以如果实际应用中即使真的出现 getXxx(int) 的 getter，请考虑修改成其他方案
      */
-    private MethodDeclared getter;
+    private PropertyMethodDeclared getter;
     /**
      * 从{@link #typedSetterMap}最终选用的 setter 方法
      *
@@ -34,7 +35,7 @@ public class PropertyDeclared {
      * 3. 若没有与字段类型一致的 setter 方法就按照一定规则取一个默认的 setter 方法
      * </pre>
      */
-    private MethodDeclared setter;
+    private PropertyMethodDeclared setter;
     /**
      * setter 方法，要求 setter 方法参数类型和 getter 方法返回值类型一致
      * <p>
@@ -42,7 +43,7 @@ public class PropertyDeclared {
      * 1. 与字段声明类型一致
      * 2. 按特定顺序排序后的第一个方法（这种排序规则受 jdk 版本可能受 jvm 版本的影响，所以这里自定义顺序）
      */
-    private Map<String, MethodDeclared> typedSetterMap;
+    private Map<String, PropertyMethodDeclared> typedSetterMap = new LinkedHashMap<>();
 
     public PropertyDeclared(TypeElement thisElement, String name, Map<String, GenericDeclared> thisGenericMap) {
         this.thisGenericMap = thisGenericMap;
@@ -52,26 +53,35 @@ public class PropertyDeclared {
 
     public void withFieldDeclared(VariableElement fieldElement) {
         TypeElement enclosingElement = ((TypeElement) fieldElement.getEnclosingElement());
-        withFieldDeclared(new FieldDeclared(thisElement, enclosingElement, fieldElement, thisGenericMap));
+        setFieldDeclaredIfAbsent(new FieldDeclared(thisElement, enclosingElement, fieldElement, thisGenericMap));
     }
 
-    public PropertyDeclared withFieldDeclared(FieldDeclared fieldDeclared) {
-        this.fieldDeclared = fieldDeclared;
-        return this;
+    public void setFieldDeclaredIfAbsent(FieldDeclared fieldDeclared) {
+        if (this.fieldDeclared == null) {
+            this.fieldDeclared = fieldDeclared;
+        }
     }
 
-    public PropertyDeclared withGetterMethodDeclared(ExecutableElement getterElement) {
+    public void withGetterMethodDeclared(ExecutableElement getterElement) {
+        if (this.getter != null) {
+            return;
+        }
         TypeElement enclosingElement = ((TypeElement) getterElement.getEnclosingElement());
-        new MethodDeclared(thisElement, enclosingElement, getterElement, thisGenericMap);
-        return this;
+        new PropertyMethodDeclared(thisElement, enclosingElement, getterElement, thisGenericMap);
     }
 
-    public PropertyDeclared withSetterMethodDeclared(
-        ExecutableElement setterElement, String declaredType, String actualType
+    public void withSetterMethodDeclared(
+        ExecutableElement setterElement, String actualType
     ) {
-        TypeElement enclosingElement = ((TypeElement) setterElement.getEnclosingElement());
-        new MethodDeclared(thisElement, enclosingElement, setterElement, thisGenericMap);
-        return this;
+        String simplifySetterType = Generic2.typeSimplify(actualType);
+        if (typedSetterMap.containsKey(simplifySetterType)) {
+            return;
+        }
+        typedSetterMap.put(simplifySetterType,
+            new PropertyMethodDeclared(thisElement,
+                (TypeElement) setterElement.getEnclosingElement(),
+                setterElement,
+                thisGenericMap));
     }
 
     public boolean isWriteable(String setterActualClass) {

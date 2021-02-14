@@ -37,7 +37,7 @@ public class TypeDeclared {
     /**
      * 所有构造器
      */
-    private final List<ConstructorDeclared> constructors = new ArrayList<>();
+    private final Map<String, ConstructorDeclared> constructorsMap = new LinkedHashMap<>();
     /**
      * 除了 properties 中所有方法外的其他所有方法(自身声明+继承的+接口包含的)
      */
@@ -66,7 +66,7 @@ public class TypeDeclared {
     void setProperties(Map<String, PropertyDeclared> properties) {
         if (properties == null) {
             return;
-    }
+        }
         this.properties.clear();
         this.properties.putAll(properties);
     }

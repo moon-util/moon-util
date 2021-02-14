@@ -83,16 +83,14 @@ final class TypeParser {
             if (isParsedSetter(name, actualType)) {
                 return;
             }
-            withPropertyDeclared(name);
+            withPropertyDeclared(name).withSetterMethodDeclared(elem, actualType);
         } else if (Test2.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
-            declaredType = Element2.getGetterDeclareType(elem);
-            actualType = getActualType(parsingClass, declaredType);
             String name = Element2.toPropertyName(elem);
             if (isParsedGetter(name)) {
                 return;
             }
-            withPropertyDeclared(name);
+            withPropertyDeclared(name).withGetterMethodDeclared(elem);
         } else if (Test2.isConstructor(element)) {
             // definition.addConstructor((ExecutableElement) element);
         } else if (Test2.isMethod(element)) {
@@ -100,6 +98,8 @@ final class TypeParser {
             // 但由于这里可能是父接口或父类，子类可能已实现相应方法，故这里虽然是抽象的
             // 但不能报错
             // 实际子类没有实现的，这里就应该报错
+        } else if (Test2.isField(element)) {
+
         }
     }
 
