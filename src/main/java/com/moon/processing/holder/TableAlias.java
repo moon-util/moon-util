@@ -3,7 +3,7 @@ package com.moon.processing.holder;
 /**
  * @author benshaoye
  */
-public class TableAlias {
+public abstract class TableAlias {
 
     private final String group;
     private final String name;

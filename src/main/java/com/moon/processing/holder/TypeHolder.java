@@ -25,7 +25,7 @@ public class TypeHolder {
         if (declared != null) {
             return declared;
         }
-        declared = new TypeDeclared(element);
+        declared = TypeDeclared.from(element);
         typeDeclaredMap.put(classname, declared);
         return declared;
     }

@@ -1,4 +1,4 @@
-package com.moon.processor.model;
+package com.moon.processing.defaults;
 
 import com.moon.accessor.annotation.TableField;
 import com.moon.accessor.type.JdbcType;
@@ -9,10 +9,10 @@ import java.lang.annotation.Annotation;
 /**
  * @author benshaoye
  */
-public class DefaultTableField implements TableField {
+public class TableFieldEnum implements TableField {
 
     /** INSTANCE */
-    public static final DefaultTableField INSTANCE = new DefaultTableField();
+    public static final TableFieldEnum INSTANCE = new TableFieldEnum();
 
     @Override
     public String name() { return ""; }

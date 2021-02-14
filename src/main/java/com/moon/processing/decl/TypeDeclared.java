@@ -12,6 +12,17 @@ public class TypeDeclared {
 
     private final TypeElement typeElement;
 
+    private final String typeClassname;
+    /**
+     * 所有泛型声明，如声明在 java.util.List&lt;T> 上的 T 在实际应用中如果是：
+     * <p>
+     * List&lt;String> 那么会这样包含:
+     * <p>
+     * java.util.List#T  ==  java.lang.String
+     * java.util.Collection#T  ==  java.lang.String
+     * java.util.Iterable#T  ==  java.lang.String
+     * ...(所有父类、继承的接口都有其对应的声明和使用时的实际类)
+     */
     private final Map<String, GenericDeclared> genericDeclaredMap;
     /**
      * 所有 properties
@@ -32,11 +43,33 @@ public class TypeDeclared {
      */
     private final List<MethodDeclared> methods = new ArrayList<>();
 
-    public TypeDeclared(TypeElement typeElement) {
+    private TypeDeclared(TypeElement typeElement, Map<String, GenericDeclared> genericDeclaredMap) {
         this.typeElement = typeElement;
-        Map<String, GenericDeclared> thisGenericMap = Generic2.from(typeElement);
-        this.genericDeclaredMap = Collections.unmodifiableMap(thisGenericMap);
+        this.typeClassname = typeElement.getQualifiedName().toString();
+        this.genericDeclaredMap = Collections.unmodifiableMap(genericDeclaredMap);
     }
 
+    public static TypeDeclared from(TypeElement typeElement) {
+        Map<String, GenericDeclared> thisGenericMap = Generic2.from(typeElement);
+        TypeParser parser = new TypeParser(new TypeDeclared(typeElement, thisGenericMap));
+        return parser.doParseTypeDeclared();
+    }
+
+    public String getTypeClassname() { return typeClassname; }
+
+    public TypeElement getTypeElement() { return typeElement; }
+
+    public Map<String, GenericDeclared> getGenericDeclaredMap() { return genericDeclaredMap; }
+
     public Map<String, PropertyDeclared> getCopiedProperties() { return new LinkedHashMap<>(properties); }
+
+    void setProperties(Map<String, PropertyDeclared> properties) {
+        if (properties == null) {
+            return;
+    }
+        this.properties.clear();
+        this.properties.putAll(properties);
+    }
+
+    public Set<String> getAllPropertiesName() { return new LinkedHashSet<>(properties.keySet()); }
 }

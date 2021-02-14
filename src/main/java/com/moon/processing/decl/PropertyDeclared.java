@@ -1,5 +1,8 @@
 package com.moon.processing.decl;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import java.util.Map;
 
 /**
@@ -7,7 +10,11 @@ import java.util.Map;
  */
 public class PropertyDeclared {
 
+    private final TypeElement thisElement;
+
     private final String name;
+
+    private final Map<String, GenericDeclared> thisGenericMap;
 
     private FieldDeclared fieldDeclared;
     /**
@@ -37,11 +44,38 @@ public class PropertyDeclared {
      */
     private Map<String, MethodDeclared> typedSetterMap;
 
-    public PropertyDeclared(String name) { this.name = name; }
+    public PropertyDeclared(TypeElement thisElement, String name, Map<String, GenericDeclared> thisGenericMap) {
+        this.thisGenericMap = thisGenericMap;
+        this.thisElement = thisElement;
+        this.name = name;
+    }
+
+    public void withFieldDeclared(VariableElement fieldElement) {
+        TypeElement enclosingElement = ((TypeElement) fieldElement.getEnclosingElement());
+        withFieldDeclared(new FieldDeclared(thisElement, enclosingElement, fieldElement, thisGenericMap));
+    }
 
     public PropertyDeclared withFieldDeclared(FieldDeclared fieldDeclared) {
         this.fieldDeclared = fieldDeclared;
         return this;
+    }
+
+    public PropertyDeclared withGetterMethodDeclared(ExecutableElement getterElement) {
+        TypeElement enclosingElement = ((TypeElement) getterElement.getEnclosingElement());
+        new MethodDeclared(thisElement, enclosingElement, getterElement, thisGenericMap);
+        return this;
+    }
+
+    public PropertyDeclared withSetterMethodDeclared(
+        ExecutableElement setterElement, String declaredType, String actualType
+    ) {
+        TypeElement enclosingElement = ((TypeElement) setterElement.getEnclosingElement());
+        new MethodDeclared(thisElement, enclosingElement, setterElement, thisGenericMap);
+        return this;
+    }
+
+    public boolean isWriteable(String setterActualClass) {
+        return typedSetterMap.containsKey(setterActualClass);
     }
 
     public boolean isWriteable() { return setter != null; }

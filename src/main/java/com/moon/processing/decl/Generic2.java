@@ -29,7 +29,7 @@ public enum Generic2 {
      * @return
      */
     public static String mapToActual(
-        Map<String, DeclareGeneric> generics, String enclosingClassname, String declareType
+        Map<String, GenericDeclared> generics, String enclosingClassname, String declareType
     ) {
         StringBuilder actual = new StringBuilder();
         StringBuilder tempBuilder = new StringBuilder();
@@ -54,11 +54,11 @@ public enum Generic2 {
     }
 
     private static String toActual(
-        Map<String, DeclareGeneric> generics, String enclosingClassname, StringBuilder declareBuilder
+        Map<String, GenericDeclared> generics, String enclosingClassname, StringBuilder declareBuilder
     ) {
         String declared = declareBuilder.toString().trim();
         String key = toFullKey(enclosingClassname, declared);
-        DeclareGeneric generic = generics.get(key);
+        GenericDeclared generic = generics.get(key);
         return generic == null ? declared : generic.getEffectType();
     }
 

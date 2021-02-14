@@ -3,7 +3,7 @@ package com.moon.processor.def;
 import com.moon.accessor.annotation.*;
 import com.moon.accessor.type.TypeHandler;
 import com.moon.processor.model.DeclaredPojo;
-import com.moon.processor.model.DefaultTableField;
+import com.moon.processor.defaults.DefaultTableField;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;

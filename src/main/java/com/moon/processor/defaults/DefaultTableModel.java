@@ -1,4 +1,4 @@
-package com.moon.processor.model;
+package com.moon.processor.defaults;
 
 import com.moon.accessor.annotation.TableModel;
 

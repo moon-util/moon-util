@@ -1,5 +1,6 @@
 package com.moon.processing.decl;
 
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 
 /**
@@ -7,6 +8,8 @@ import javax.lang.model.element.VariableElement;
  */
 public class FieldDeclared {
 
+    private final TypeElement thisElement;
+    private final TypeElement declareEnclosingElement;
     /**
      * 字段声明
      */
@@ -22,7 +25,11 @@ public class FieldDeclared {
      */
     private final String type;
 
-    public FieldDeclared(VariableElement fieldElement, String name, String type) {
+    public FieldDeclared(
+        TypeElement thisElement, TypeElement declareEnclosingElement, VariableElement fieldElement, String name, String type
+    ) {
+        this.thisElement = thisElement;
+        this.declareEnclosingElement = declareEnclosingElement;
         this.fieldElement = fieldElement;
         this.name = name;
         this.type = type;

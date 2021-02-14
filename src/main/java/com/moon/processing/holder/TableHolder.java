@@ -35,10 +35,7 @@ public class TableHolder {
 
         // 处理表公共引用
         String tables = tableDeclared.getTablesFor();
-        Set<String> registeredTables = tablesMap.get(tables);
-        if (registeredTables == null) {
-            tablesMap.put(tables, registeredTables = new LinkedHashSet<>());
-        }
+        Set<String> registeredTables = tablesMap.computeIfAbsent(tables, k -> new LinkedHashSet<>());
         registeredTables.add(tableDeclared.getTableName());
 
         // 处理表别名
@@ -46,11 +43,8 @@ public class TableHolder {
         if (String2.isNotBlank(name)) {
             // 并非所有表都需要别名，但有别名的一定存在别名组
             String aliasGroup = tableDeclared.getAliasGroup();
-            Map<String, TableDeclared> aliasDeclaredMap = aliasesMap.get(aliasGroup);
-            if (aliasDeclaredMap == null) {
-                aliasDeclaredMap = new LinkedHashMap<>();
-                aliasesMap.put(aliasGroup, aliasDeclaredMap);
-            }
+            Map<String, TableDeclared> aliasDeclaredMap = aliasesMap.computeIfAbsent(aliasGroup,
+                k -> new LinkedHashMap<>());
             aliasDeclaredMap.put(name, tableDeclared);
         }
 
