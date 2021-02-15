@@ -4,7 +4,6 @@ import com.moon.accessor.annotation.Accessor;
 import com.moon.accessor.annotation.TableModel;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processing.holder.*;
-import com.moon.processing.util.Extract2;
 import com.moon.processing.util.Processing2;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -15,6 +14,8 @@ import javax.lang.model.element.TypeElement;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.moon.processing.util.Extract2.getMapperForValues;
 
 /**
  * @author benshaoye
@@ -27,16 +28,24 @@ public class ProcessingProcessor extends AbstractProcessor {
     private final CopierHolder copierHolder;
     private final MapperHolder mapperHolder;
     private final TableHolder tableHolder;
+    private final PolicyHelper policyHelper;
+    private final TablesHolder tablesHolder;
+    private final AliasesHolder aliasesHolder;
     private final AccessorHolder accessorHolder;
+    private final DslHelper dslHelper;
 
     public ProcessingProcessor() {
+        this.dslHelper = new DslHelper();
         this.nameHolder = new NameHolder();
+        this.policyHelper = new PolicyHelper();
+        this.tablesHolder = new TablesHolder();
+        this.aliasesHolder = new AliasesHolder();
         this.typeHolder = new TypeHolder(nameHolder);
         this.recordHolder = new RecordHolder(typeHolder);
-        this.tableHolder = new TableHolder(typeHolder);
+        this.tableHolder = new TableHolder(typeHolder, policyHelper, tablesHolder, aliasesHolder);
         this.copierHolder = new CopierHolder(recordHolder);
         this.mapperHolder = new MapperHolder(copierHolder);
-        this.accessorHolder = new AccessorHolder(typeHolder, tableHolder);
+        this.accessorHolder = new AccessorHolder(nameHolder, typeHolder, tableHolder);
     }
 
     @Override
@@ -63,7 +72,7 @@ public class ProcessingProcessor extends AbstractProcessor {
         roundEnv.getElementsAnnotatedWith(MapperFor.class).forEach(annotated -> {
             TypeElement mapperForAnnotated = (TypeElement) annotated;
             MapperFor mapperFor = annotated.getAnnotation(MapperFor.class);
-            Collection<TypeElement> forValues = Extract2.getMapperForValues(mapperForAnnotated);
+            Collection<TypeElement> forValues = getMapperForValues(mapperForAnnotated);
             for (TypeElement forElement : forValues) {
                 mapperHolder.with(mapperFor, mapperForAnnotated, forElement);
             }
@@ -80,7 +89,19 @@ public class ProcessingProcessor extends AbstractProcessor {
         accessors.forEach(element -> accessorHolder.with((TypeElement) element));
     }
 
-    private void doWriteJavaFiles() {}
+    private void doWriteJavaFiles() {
+        JavaFiler filer = new JavaFiler();
+        recordHolder.write(filer);
+        copierHolder.write(filer);
+        mapperHolder.write(filer);
+
+        tableHolder.write(filer);
+        tablesHolder.write(filer);
+        aliasesHolder.write(filer);
+        accessorHolder.write(filer);
+
+        dslHelper.write(filer);
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {

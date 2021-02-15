@@ -8,7 +8,8 @@ import java.lang.annotation.Annotation;
  * @author benshaoye
  */
 public enum TablesEnum implements Tables {
-    ;
+    /** default instance */
+    INSTANCE;
 
     @Override
     public String value() { return "Tables"; }

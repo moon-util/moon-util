@@ -1,5 +1,7 @@
 package com.moon.processing.holder;
 
+import com.moon.processing.JavaFiler;
+import com.moon.processing.JavaWritable;
 import com.moon.processing.decl.CopierDeclared;
 import com.moon.processing.decl.RecordDeclared;
 import com.moon.processor.utils.Element2;
@@ -11,7 +13,7 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class CopierHolder {
+public class CopierHolder implements JavaWritable {
 
     private final RecordHolder recordHolder;
 
@@ -36,5 +38,10 @@ public class CopierHolder {
 
     private String toCopierKey(String thisClass, String thatClass) {
         return String.format("%s>%s", thisClass, thatClass);
+    }
+
+    @Override
+    public void write(JavaFiler writer) {
+
     }
 }

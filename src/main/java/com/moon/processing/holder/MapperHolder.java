@@ -1,6 +1,8 @@
 package com.moon.processing.holder;
 
 import com.moon.mapper.annotation.MapperFor;
+import com.moon.processing.JavaFiler;
+import com.moon.processing.JavaWritable;
 import com.moon.processing.decl.CopierDeclared;
 import com.moon.processing.decl.MapperDeclared;
 import com.moon.processor.utils.Element2;
@@ -12,7 +14,7 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class MapperHolder {
+public class MapperHolder implements JavaWritable {
 
     private final CopierHolder copierHolder;
 
@@ -39,5 +41,10 @@ public class MapperHolder {
 
     private String toMapperKey(String thisClass, String thatClass) {
         return String.format("%s>%s", thisClass, thatClass);
+    }
+
+    @Override
+    public void write(JavaFiler writer) {
+
     }
 }

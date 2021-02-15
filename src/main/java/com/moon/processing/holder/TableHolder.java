@@ -1,25 +1,32 @@
 package com.moon.processing.holder;
 
+import com.moon.processing.JavaFiler;
+import com.moon.processing.JavaWritable;
 import com.moon.processing.decl.TableDeclared;
 import com.moon.processing.decl.TypeDeclared;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.TypeElement;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author benshaoye
  */
-public class TableHolder {
+public class TableHolder implements JavaWritable {
 
     private final TypeHolder typeHolder;
-
-    private final Map<String, Set<String>> tablesMap = new HashMap<>();
-    private final Map<String, Map<String, TableDeclared>> aliasesMap = new HashMap<>();
+    private final PolicyHelper policyHelper;
+    private final TablesHolder tablesHolder;
+    private final AliasesHolder aliasesHolder;
     private final Map<String, TableDeclared> tableDeclaredMap = new HashMap<>();
 
-    public TableHolder(TypeHolder typeHolder) {
+    public TableHolder(
+        TypeHolder typeHolder, PolicyHelper policyHelper, TablesHolder tablesHolder, AliasesHolder aliasesHolder
+    ) {
+        this.policyHelper = policyHelper;
+        this.tablesHolder = tablesHolder;
+        this.aliasesHolder = aliasesHolder;
         this.typeHolder = typeHolder;
     }
 
@@ -31,23 +38,17 @@ public class TableHolder {
 
     private TableDeclared newTableDeclared(TypeElement tableElement) {
         TypeDeclared typeDeclared = typeHolder.with(tableElement);
-        TableDeclared tableDeclared = TableDeclared.of(typeDeclared);
-
+        TableDeclared tableDeclared = TableDeclared.of(policyHelper, typeDeclared);
+        tableDeclaredMap.put(typeDeclared.getTypeClassname(), tableDeclared);
         // 处理表公共引用
-        String tables = tableDeclared.getTablesFor();
-        Set<String> registeredTables = tablesMap.computeIfAbsent(tables, k -> new LinkedHashSet<>());
-        registeredTables.add(tableDeclared.getTableName());
-
+        tablesHolder.with(tableDeclared);
         // 处理表别名
-        String name = tableDeclared.getAliasName();
-        if (String2.isNotBlank(name)) {
-            // 并非所有表都需要别名，但有别名的一定存在别名组
-            String aliasGroup = tableDeclared.getAliasGroup();
-            Map<String, TableDeclared> aliasDeclaredMap = aliasesMap.computeIfAbsent(aliasGroup,
-                k -> new LinkedHashMap<>());
-            aliasDeclaredMap.put(name, tableDeclared);
-        }
-
+        aliasesHolder.with(tableDeclared);
         return tableDeclared;
+    }
+
+    @Override
+    public void write(JavaFiler writer) {
+        writer.write(tableDeclaredMap);
     }
 }

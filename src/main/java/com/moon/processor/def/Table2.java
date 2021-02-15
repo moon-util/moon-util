@@ -2,8 +2,8 @@ package com.moon.processor.def;
 
 import com.moon.accessor.annotation.*;
 import com.moon.accessor.type.TypeHandler;
-import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.defaults.DefaultTableField;
+import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.String2;
@@ -22,7 +22,7 @@ import static com.moon.processor.utils.String2.camelcaseToHyphen;
 /**
  * @author benshaoye
  */
-enum Table2 {
+public enum Table2 {
     ;
     @SuppressWarnings("all")
     private final static Class<com.moon.accessor.annotation.TableField> TABLE_FIELD_CLASS//
@@ -34,25 +34,25 @@ enum Table2 {
         return String2.isAny(column, Character::isLowerCase) ? column.toUpperCase() : column.toLowerCase();
     }
 
-    static String toDeclaredTableName(String entityName, TableModelPolicy policy, TableModel model) {
+    public static String toDeclaredTableName(String entitySimpleName, TableModelPolicy policy, TableModel model) {
         if (String2.isNotBlank(model.name())) {
             return model.name().trim();
         }
         String[] prefixes = policy.trimEntityPrefix();
         String[] suffixes = policy.trimEntitySuffix();
         for (String prefix : prefixes) {
-            if (entityName.startsWith(prefix)) {
-                entityName = entityName.substring(prefix.length());
+            if (entitySimpleName.startsWith(prefix)) {
+                entitySimpleName = entitySimpleName.substring(prefix.length());
                 break;
             }
         }
         for (String suffix : suffixes) {
-            if (entityName.endsWith(suffix)) {
-                entityName = entityName.substring(0, entityName.lastIndexOf(suffix));
+            if (entitySimpleName.endsWith(suffix)) {
+                entitySimpleName = entitySimpleName.substring(0, entitySimpleName.lastIndexOf(suffix));
                 break;
             }
         }
-        return deducePlacedName(policy.casePolicy(), entityName, policy.pattern());
+        return deducePlacedName(policy.casePolicy(), entitySimpleName, policy.pattern());
     }
 
     static String deducePlacedName(CasePolicy policy, String inputName, String pattern) {
@@ -138,7 +138,11 @@ enum Table2 {
     }
 
     static String deduceTableField(DeclaredPojo pojo) {
-        Set<String> fields = new HashSet<>(pojo.keySet());
+        return deduceTableField(pojo.keySet());
+    }
+
+    public static String deduceTableField(Set<String> columnsName) {
+        Set<String> fields = new HashSet<>(columnsName);
         Set<String> upperFields = fields.stream().map(String::toUpperCase).collect(Collectors.toSet());
         if (upperFields.contains(TABLE_FIELD_NAME)) {
             final String name = "DATA_" + TABLE_FIELD_NAME;

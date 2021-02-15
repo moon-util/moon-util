@@ -86,7 +86,7 @@ public class CompileProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void doProcess(RoundEnvironment roundEnv){
+    private void doProcess(RoundEnvironment roundEnv) {
         processMapperFor(roundEnv, mapperHolder);
         processTableModel(roundEnv, modelHolder);
         processAccessor(roundEnv, accessorHolder);
@@ -94,7 +94,7 @@ public class CompileProcessor extends AbstractProcessor {
         processSubQuery(roundEnv);
     }
 
-    private void doWriteJavaFile(){
+    private void doWriteJavaFile() {
         JavaWriter writer = new JavaWriter(Environment2.getFiler());
         pojoHolder.writeJavaFile(writer);
         copierHolder.writeJavaFile(writer);

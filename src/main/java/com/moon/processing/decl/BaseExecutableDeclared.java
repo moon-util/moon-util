@@ -21,7 +21,9 @@ public class BaseExecutableDeclared {
     private final Map<String, GenericDeclared> thisGenericMap;
 
     private final String thisClassname;
-
+    /**
+     * 参数或构造器所声明的类名
+     */
     private final String enclosingClassname;
     /**
      * 所有参数，按顺序
@@ -31,7 +33,13 @@ public class BaseExecutableDeclared {
      * 所有参数，按名称索引
      */
     private final Map<String, ParameterDeclared> parametersMap;
-
+    /**
+     * 参数签名，如:
+     * <p>
+     * java.util.String,java.util.List,int
+     * <p>
+     * 不会出现带有泛型的类型，如: java.util.List&lt;java.lang.String>
+     */
     protected final String parametersTypesSignature;
 
     public BaseExecutableDeclared(
