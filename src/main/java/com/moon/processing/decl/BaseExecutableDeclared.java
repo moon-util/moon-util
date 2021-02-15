@@ -2,6 +2,7 @@ package com.moon.processing.decl;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +21,8 @@ import java.util.Map;
     private final String thisClassname;
 
     private final String enclosingClassname;
+
+    private final List<ParameterDeclared> parametersDeclared;
 
     public BaseExecutableDeclared(
         TypeElement thisElement,

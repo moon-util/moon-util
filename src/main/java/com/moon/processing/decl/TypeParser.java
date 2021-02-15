@@ -31,6 +31,8 @@ final class TypeParser {
     private final TypeDeclared typeDeclared;
     private final Map<String, GenericDeclared> thisGenericMap;
     private final Map<String, PropertyDeclared> properties = new LinkedHashMap<>();
+    private final Map<String, FieldDeclared> staticFieldsMap = new LinkedHashMap<>();
+    private final List<MethodDeclared> methods = new ArrayList<>();
     private final Set<String> parsedKeys;
 
     private final Types types = Processing2.getTypes();
@@ -99,7 +101,11 @@ final class TypeParser {
             // 但不能报错
             // 实际子类没有实现的，这里就应该报错
         } else if (Test2.isField(element)) {
-
+            FieldDeclared fieldDeclared = new FieldDeclared(typeElement,
+                parsingElem,
+                (VariableElement) element,
+                thisGenericMap);
+            staticFieldsMap.put(fieldDeclared.getName(), fieldDeclared);
         }
     }
 
@@ -148,6 +154,8 @@ final class TypeParser {
         parseRootElements();
         parseSuperElements(typeElement);
         typeDeclared.setProperties(properties);
+        typeDeclared.setStaticFieldsMap(this.staticFieldsMap);
+
         return this.typeDeclared;
     }
 

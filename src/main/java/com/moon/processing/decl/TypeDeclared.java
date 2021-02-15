@@ -63,12 +63,21 @@ public class TypeDeclared {
 
     public Map<String, PropertyDeclared> getCopiedProperties() { return new LinkedHashMap<>(properties); }
 
+    public Map<String, FieldDeclared> getStaticFieldsMap() {
+        return new LinkedHashMap<>(staticFieldsMap);
+    }
+
     void setProperties(Map<String, PropertyDeclared> properties) {
         if (properties == null) {
             return;
         }
         this.properties.clear();
         this.properties.putAll(properties);
+    }
+
+    public void setStaticFieldsMap(Map<String, FieldDeclared> staticFieldsMap) {
+        this.staticFieldsMap.clear();
+        this.staticFieldsMap.putAll(staticFieldsMap);
     }
 
     public Set<String> getAllPropertiesName() { return new LinkedHashSet<>(properties.keySet()); }
