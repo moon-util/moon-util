@@ -62,26 +62,33 @@ public class PropertyDeclared {
         }
     }
 
-    public void withGetterMethodDeclared(ExecutableElement getterElement) {
+    public PropertyMethodDeclared withGetterMethodDeclared(ExecutableElement getterElement) {
         if (this.getter != null) {
-            return;
+            return getter;
         }
         TypeElement enclosingElement = ((TypeElement) getterElement.getEnclosingElement());
-        new PropertyMethodDeclared(thisElement, enclosingElement, getterElement, thisGenericMap);
+        PropertyMethodDeclared getter = new PropertyMethodDeclared(thisElement,
+            enclosingElement,
+            getterElement,
+            thisGenericMap);
+        this.getter = getter;
+        return getter;
     }
 
-    public void withSetterMethodDeclared(
+    public PropertyMethodDeclared withSetterMethodDeclared(
         ExecutableElement setterElement, String actualType
     ) {
         String simplifySetterType = Generic2.typeSimplify(actualType);
-        if (typedSetterMap.containsKey(simplifySetterType)) {
-            return;
+        PropertyMethodDeclared setter = typedSetterMap.get(simplifySetterType);
+        if (setter != null) {
+            return setter;
         }
-        typedSetterMap.put(simplifySetterType,
-            new PropertyMethodDeclared(thisElement,
-                (TypeElement) setterElement.getEnclosingElement(),
-                setterElement,
-                thisGenericMap));
+        setter = new PropertyMethodDeclared(thisElement,
+            (TypeElement) setterElement.getEnclosingElement(),
+            setterElement,
+            thisGenericMap);
+        typedSetterMap.put(simplifySetterType, setter);
+        return setter;
     }
 
     public boolean isWriteable(String setterActualClass) {

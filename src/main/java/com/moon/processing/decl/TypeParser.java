@@ -10,7 +10,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.*;
 import java.util.function.Function;
@@ -21,26 +20,20 @@ import java.util.function.Function;
 final class TypeParser {
 
     private final static String TOP_CLASS = Object.class.getName();
-    /**
-     * typeElement.getQualifiedName().toString()
-     *
-     * @see TypeElement#getQualifiedName()
-     */
-    private final String typeClassname;
+
     private final TypeElement typeElement;
     private final TypeDeclared typeDeclared;
     private final Map<String, GenericDeclared> thisGenericMap;
     private final Map<String, PropertyDeclared> properties = new LinkedHashMap<>();
     private final Map<String, FieldDeclared> staticFieldsMap = new LinkedHashMap<>();
-    private final List<MethodDeclared> methods = new ArrayList<>();
+    private final Map<String, MethodDeclared> methodsMap = new LinkedHashMap<>();
+    private final Map<String, ConstructorDeclared> constructorsMap = new LinkedHashMap<>();
     private final Set<String> parsedKeys;
 
     private final Types types = Processing2.getTypes();
-    private final Elements elements = Processing2.getUtils();
 
     TypeParser(TypeDeclared typeDeclared) {
         this.typeElement = typeDeclared.getTypeElement();
-        this.typeClassname = typeDeclared.getTypeClassname();
         this.thisGenericMap = typeDeclared.getGenericDeclaredMap();
         this.typeDeclared = typeDeclared;
         this.parsedKeys = new HashSet<>();
@@ -85,21 +78,28 @@ final class TypeParser {
             if (isParsedSetter(name, actualType)) {
                 return;
             }
-            withPropertyDeclared(name).withSetterMethodDeclared(elem, actualType);
+            PropertyMethodDeclared setter = withPropertyDeclared(name).withSetterMethodDeclared(elem, actualType);
         } else if (Test2.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             String name = Element2.toPropertyName(elem);
             if (isParsedGetter(name)) {
                 return;
             }
-            withPropertyDeclared(name).withGetterMethodDeclared(elem);
+            PropertyMethodDeclared getter = withPropertyDeclared(name).withGetterMethodDeclared(elem);
         } else if (Test2.isConstructor(element)) {
-            // definition.addConstructor((ExecutableElement) element);
+            if (parsingElem == typeElement) {
+                ConstructorDeclared constructorDeclared = new ConstructorDeclared(typeElement,
+                    parsingElem,
+                    (ExecutableElement) element,
+                    thisGenericMap);
+                constructorsMap.put(constructorDeclared.getConstructorSignature(), constructorDeclared);
+            }
         } else if (Test2.isMethod(element)) {
-            // 如果根类是接口或抽象类，那么这里的方法不能是抽象方法
-            // 但由于这里可能是父接口或父类，子类可能已实现相应方法，故这里虽然是抽象的
-            // 但不能报错
-            // 实际子类没有实现的，这里就应该报错
+            MethodDeclared methodDeclared = new MethodDeclared(typeElement,
+                parsingElem,
+                (ExecutableElement) element,
+                thisGenericMap);
+            methodsMap.putIfAbsent(methodDeclared.getMethodSignature(), methodDeclared);
         } else if (Test2.isField(element)) {
             FieldDeclared fieldDeclared = new FieldDeclared(typeElement,
                 parsingElem,
@@ -155,9 +155,11 @@ final class TypeParser {
         parseSuperElements(typeElement);
         typeDeclared.setProperties(properties);
         typeDeclared.setStaticFieldsMap(this.staticFieldsMap);
-
+        typeDeclared.setMethodsMap(this.methodsMap);
+        typeDeclared.setConstructorsMap(constructorsMap);
         return this.typeDeclared;
     }
+
 
     private static boolean isTopElement(Element element, TypeMirror superclass) {
         return element == null || superclass.toString().equals(TOP_CLASS);

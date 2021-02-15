@@ -1,5 +1,6 @@
 package com.moon.processing.file;
 
+import com.moon.processing.JavaDeclarable;
 import com.moon.processor.holder.Importer;
 import com.moon.processor.utils.String2;
 
@@ -10,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class JavaInterfaceFile extends JavaAnnotable {
+public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
 
     private final String packageName;
     private final String simpleName;
@@ -26,6 +27,7 @@ public class JavaInterfaceFile extends JavaAnnotable {
         this.simpleName = simpleName;
     }
 
+    @Override
     public String getClassname() { return String.join(".", packageName, simpleName); }
 
     @Override
@@ -41,7 +43,7 @@ public class JavaInterfaceFile extends JavaAnnotable {
 
     public JavaMethod declareMethod(String name, Consumer<JavaParameters> parametersBuilder) {
         JavaParameters parameters = new JavaParameters(getImporter());
-        JavaMethod method = new JavaMethod(getImporter(),name, parameters);
+        JavaMethod method = new JavaMethod(getImporter(), name, parameters);
         methodsMap.put(method.getUniqueKey(), method);
         return method;
     }
@@ -121,7 +123,7 @@ public class JavaInterfaceFile extends JavaAnnotable {
 
         fieldsMap.forEach((key, field) -> field.appendTo(addr));
 
-        methodsMap.forEach((key,method) -> method.appendTo(addr));
+        methodsMap.forEach((key, method) -> method.appendTo(addr));
 
         addr.newEnd().add("}");
         importMark.with(getImporter().toString("\n"));

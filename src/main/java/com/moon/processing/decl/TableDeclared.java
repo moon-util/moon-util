@@ -33,7 +33,6 @@ public class TableDeclared extends TableAlias {
     private TableDeclared(TypeDeclared typeDeclared, String group, String name) {
         super(group, name);
         this.typeDeclared = typeDeclared;
-
         Map<String, ColumnDeclared> columnsMap = new LinkedHashMap<>();
         Map<String, PropertyDeclared> properties = typeDeclared.getCopiedProperties();
         for (Map.Entry<String, PropertyDeclared> propertyEntry : properties.entrySet()) {

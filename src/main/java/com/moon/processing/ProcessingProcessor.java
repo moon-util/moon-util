@@ -4,6 +4,7 @@ import com.moon.accessor.annotation.Accessor;
 import com.moon.accessor.annotation.TableModel;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processing.holder.*;
+import com.moon.processing.util.Extract2;
 import com.moon.processing.util.Processing2;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -11,6 +12,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +23,7 @@ public class ProcessingProcessor extends AbstractProcessor {
 
     private final NameHolder nameHolder;
     private final TypeHolder typeHolder;
+    private final RecordHolder recordHolder;
     private final CopierHolder copierHolder;
     private final MapperHolder mapperHolder;
     private final TableHolder tableHolder;
@@ -29,9 +32,10 @@ public class ProcessingProcessor extends AbstractProcessor {
     public ProcessingProcessor() {
         this.nameHolder = new NameHolder();
         this.typeHolder = new TypeHolder(nameHolder);
+        this.recordHolder = new RecordHolder(typeHolder);
         this.tableHolder = new TableHolder(typeHolder);
-        this.copierHolder = new CopierHolder(typeHolder);
-        this.mapperHolder = new MapperHolder(typeHolder);
+        this.copierHolder = new CopierHolder(recordHolder);
+        this.mapperHolder = new MapperHolder(copierHolder);
         this.accessorHolder = new AccessorHolder(typeHolder, tableHolder);
     }
 
@@ -56,7 +60,14 @@ public class ProcessingProcessor extends AbstractProcessor {
     }
 
     private void doProcessingMapper(RoundEnvironment roundEnv) {
-
+        roundEnv.getElementsAnnotatedWith(MapperFor.class).forEach(annotated -> {
+            TypeElement mapperForAnnotated = (TypeElement) annotated;
+            MapperFor mapperFor = annotated.getAnnotation(MapperFor.class);
+            Collection<TypeElement> forValues = Extract2.getMapperForValues(mapperForAnnotated);
+            for (TypeElement forElement : forValues) {
+                mapperHolder.with(mapperFor, mapperForAnnotated, forElement);
+            }
+        });
     }
 
     private void doProcessingTableModel(RoundEnvironment roundEnv) {
@@ -75,7 +86,6 @@ public class ProcessingProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         Processing2.initialize(processingEnv);
-        // Logger2.initialize(processingEnv);
     }
 
     @Override

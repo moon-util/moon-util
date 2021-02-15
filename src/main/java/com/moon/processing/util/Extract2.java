@@ -57,12 +57,15 @@ public enum Extract2 {
             if (!types.isSameType(declaredType, supportedAnnotationTypeMirror)) {
                 continue;
             }
-            Map<? extends ExecutableElement, ? extends AnnotationValue> annotationValuesMap = annotationMirror.getElementValues();
-            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationValuesMap.entrySet()) {
+            Map<? extends ExecutableElement, ? extends AnnotationValue> annotationValuesMap//
+                = annotationMirror.getElementValues();
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : annotationValuesMap
+                .entrySet()) {
                 if (!supportedMethods.contains(Element2.getSimpleName(entry.getKey()))) {
                     continue;
                 }
-                for (String stringify : String2.split(entry.getValue().getValue().toString(), COMMA)) {
+                String values = entry.getValue().getValue().toString();
+                for (String stringify : String2.split(values, COMMA)) {
                     String classname = stringify.trim();
                     if (classname.endsWith(CLASS_SUFFIX)) {
                         classname = classname.substring(0, classname.length() - 6);

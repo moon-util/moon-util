@@ -1,11 +1,13 @@
 package com.moon.processing.decl;
 
+import com.moon.processing.JavaDeclarable;
+
 /**
  * 数据库访问对象
  *
  * @author benshaoye
  */
-public class AccessorDeclared {
+public class AccessorDeclared implements JavaDeclarable {
 
     /** 数据库访问对象 */
     private final TypeDeclared typeDeclared;
@@ -18,5 +20,10 @@ public class AccessorDeclared {
         this.tableDeclared = tableDeclared;
         this.typeDeclared = typeDeclared;
         this.pojoDeclared = pojoDeclared;
+    }
+
+    @Override
+    public String getClassname() {
+        return null;
     }
 }

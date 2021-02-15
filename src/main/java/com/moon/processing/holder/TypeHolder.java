@@ -15,9 +15,7 @@ public class TypeHolder {
     private final NameHolder nameHolder;
     private final Map<String, TypeDeclared> typeDeclaredMap = new HashMap<>();
 
-    public TypeHolder(NameHolder nameHolder) {
-        this.nameHolder = nameHolder;
-    }
+    public TypeHolder(NameHolder nameHolder) { this.nameHolder = nameHolder; }
 
     public TypeDeclared with(TypeElement element) {
         String classname = Element2.getQualifiedName(element);
@@ -25,7 +23,7 @@ public class TypeHolder {
         if (declared != null) {
             return declared;
         }
-        declared = TypeDeclared.from(element);
+        declared = TypeDeclared.from(element, nameHolder);
         typeDeclaredMap.put(classname, declared);
         return declared;
     }
