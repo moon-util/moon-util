@@ -1,8 +1,7 @@
 package com.moon.processing.decl;
 
-import com.moon.processor.model.DeclareGeneric;
+import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
@@ -123,7 +122,7 @@ public enum Generic2 {
             return thisGenericMap;
         }
         parse(thisGenericMap, element.asType(), element, null);
-        Types types = Environment2.getTypes();
+        Types types = Processing2.getTypes();
         do {
             parseInterfaces(thisGenericMap, element.getInterfaces(), element);
             TypeMirror superclass = element.getSuperclass();
@@ -145,7 +144,7 @@ public enum Generic2 {
         if (elements == null || elements.isEmpty()) {
             return;
         }
-        Types types = Environment2.getTypes();
+        Types types = Processing2.getTypes();
         for (TypeMirror mirror : elements) {
             TypeElement element = (TypeElement) types.asElement(mirror);
             parse(genericMap, mirror, element, implElement);
@@ -171,7 +170,7 @@ public enum Generic2 {
         List<String> actualAll = splitSuperclass(elementTyped.toString());
         String declareClassname = Element2.getQualifiedName(element);
         String subClassname = subClass == null ? "" : Element2.getQualifiedName(subClass);
-        Elements utils = Environment2.getUtils();
+        Elements utils = Processing2.getUtils();
         int index = 0;
         for (TypeParameterElement param : element.getTypeParameters()) {
             String actual = index < actualAll.size() ? actualAll.get(index++) : null;

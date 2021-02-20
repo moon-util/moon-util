@@ -38,6 +38,10 @@ public class Importer implements Importable {
 
     @Override
     public String onImported(String classname) {
+        String shortName = shortNameCached.get(classname);
+        if (shortName != null) {
+            return shortName;
+        }
         int length = classname.length();
         StringBuilder result = new StringBuilder();
         StringBuilder cache = new StringBuilder();
@@ -102,35 +106,34 @@ public class Importer implements Importable {
         if (StringUtil.isBlank(fullName)) {
             return " ";
         }
-        String classname = fullName;
-        String shortName = shortNameCached.get(classname);
+        String shortName = shortNameCached.get(fullName);
         if (shortName != null) {
             return shortName;
         }
-        shortName = Element2.getSimpleName(classname);
-        if (classname.equals(packageName + "." + shortName)) {
-            shortNameCached.put(shortName, classname);
+        shortName = Element2.getSimpleName(fullName);
+        if (fullName.equals(packageName + "." + shortName)) {
+            shortNameCached.put(shortName, fullName);
             return shortName;
         }
         if (importCached.containsKey(shortName)) {
-            return classname;
-        } else if (Test2.isPrimitive(classname) || "void".equals(classname)) {
-            shortNameCached.put(classname, classname);
-            return classname;
+            return fullName;
+        } else if (Test2.isPrimitive(fullName) || "void".equals(fullName)) {
+            shortNameCached.put(fullName, fullName);
+            return fullName;
         } else {
-            if (classname.indexOf('.') < 0) {
-                if (GENERICS_MAP.containsKey(classname)) {
+            if (fullName.indexOf('.') < 0) {
+                if (GENERICS_MAP.containsKey(fullName)) {
                     return shortName;
                 }
-                if (Environment2.getUtils().getTypeElement(classname) == null) {
-                    GENERICS_MAP.put(classname, shortName);
+                if (Environment2.getUtils().getTypeElement(fullName) == null) {
+                    GENERICS_MAP.put(fullName, shortName);
                     return shortName;
                 }
-                importCached.put(shortName, "import " + classname + ";");
-            } else if (!(classname.startsWith("java.lang.") && classname.split("\\.").length == 3)) {
-                importCached.put(shortName, "import " + classname + ";");
+                importCached.put(shortName, "import " + fullName + ";");
+            } else if (!(fullName.startsWith("java.lang.") && fullName.split("\\.").length == 3)) {
+                importCached.put(shortName, "import " + fullName + ";");
             }
-            shortNameCached.put(classname, shortName);
+            shortNameCached.put(fullName, shortName);
             return shortName;
         }
     }

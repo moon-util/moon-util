@@ -1,5 +1,6 @@
 package com.moon.processing;
 
+import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
 import com.moon.accessor.annotation.TableModel;
 import com.moon.mapper.annotation.MapperFor;
@@ -8,7 +9,9 @@ import com.moon.processing.util.Processing2;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.util.Collection;
@@ -20,32 +23,30 @@ import static com.moon.processing.util.Extract2.getMapperForValues;
 /**
  * @author benshaoye
  */
+@AutoService(Processor.class)
 public class ProcessingProcessor extends AbstractProcessor {
 
-    private final NameHolder nameHolder;
     private final TypeHolder typeHolder;
-    private final RecordHolder recordHolder;
     private final CopierHolder copierHolder;
     private final MapperHolder mapperHolder;
     private final TableHolder tableHolder;
-    private final PolicyHelper policyHelper;
+    private final RecordHolder recordHolder;
     private final TablesHolder tablesHolder;
     private final AliasesHolder aliasesHolder;
     private final AccessorHolder accessorHolder;
     private final DslHelper dslHelper;
 
     public ProcessingProcessor() {
+        NameHolder nameHelper = new NameHolder();
         this.dslHelper = new DslHelper();
-        this.nameHolder = new NameHolder();
-        this.policyHelper = new PolicyHelper();
         this.tablesHolder = new TablesHolder();
         this.aliasesHolder = new AliasesHolder();
-        this.typeHolder = new TypeHolder(nameHolder);
+        this.typeHolder = new TypeHolder(nameHelper);
         this.recordHolder = new RecordHolder(typeHolder);
-        this.tableHolder = new TableHolder(typeHolder, policyHelper, tablesHolder, aliasesHolder);
+        this.tableHolder = new TableHolder(typeHolder, tablesHolder, aliasesHolder);
         this.copierHolder = new CopierHolder(recordHolder);
         this.mapperHolder = new MapperHolder(copierHolder);
-        this.accessorHolder = new AccessorHolder(nameHolder, typeHolder, tableHolder);
+        this.accessorHolder = new AccessorHolder(nameHelper, typeHolder, tableHolder);
     }
 
     @Override
@@ -107,6 +108,11 @@ public class ProcessingProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         Processing2.initialize(processingEnv);
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
     }
 
     @Override

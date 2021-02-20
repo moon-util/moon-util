@@ -25,7 +25,7 @@ import static javax.lang.model.SourceVersion.latestSupported;
  * @author benshaoye
  */
 @SuppressWarnings("all")
-@AutoService(Processor.class)
+// @AutoService(Processor.class)
 public class CompileProcessor extends AbstractProcessor {
 
     private final NameHolder nameHolder;

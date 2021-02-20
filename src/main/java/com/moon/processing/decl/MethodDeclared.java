@@ -6,6 +6,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import java.util.Map;
 
+import static com.moon.processing.decl.Generic2.mapToActual;
+
 /**
  * @author benshaoye
  */
@@ -30,9 +32,34 @@ public class MethodDeclared extends BaseExecutableDeclared {
         this.methodName = methodName;
 
         String declaredType = method.getReturnType().toString();
-        String actualType = Generic2.mapToActual(getThisGenericMap(), getEnclosingClassname(), declaredType);
+        String actualType = mapToActual(getThisGenericMap(), getEnclosingClassname(), declaredType);
         this.returnDeclaredType = declaredType;
         this.returnActualType = actualType;
+        this.methodSignature = String2.format("{}({})", methodName, parametersTypesSignature);
+    }
+
+    /**
+     * 主要用于 lombok 自动生成的 getter/setter
+     *
+     * @param thisElement
+     * @param enclosingElement
+     * @param methodName
+     * @param returnDeclaredType
+     * @param thisGenericMap
+     * @param parametersMap
+     */
+    protected MethodDeclared(
+        TypeElement thisElement,
+        TypeElement enclosingElement,
+        String methodName,
+        String returnDeclaredType,
+        Map<String, GenericDeclared> thisGenericMap,
+        Map<String, String> parametersMap
+    ) {
+        super(thisElement, enclosingElement, thisGenericMap, parametersMap);
+        this.methodName = methodName;
+        this.returnDeclaredType = returnDeclaredType;
+        this.returnActualType = mapToActual(getThisGenericMap(), getEnclosingClassname(), returnDeclaredType);
         this.methodSignature = String2.format("{}({})", methodName, parametersTypesSignature);
     }
 

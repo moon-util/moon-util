@@ -30,7 +30,7 @@ public enum Table2 {
     private final static String TABLE_FIELD_NAME = "TABLE", RECORD = "RECORD";
     final static String TYPE_HANDLER_NAME = TypeHandler.class.getCanonicalName();
 
-    static String toRefColumnName(String column) {
+    public static String toConstColumnName(String column) {
         return String2.isAny(column, Character::isLowerCase) ? column.toUpperCase() : column.toLowerCase();
     }
 
@@ -83,7 +83,7 @@ public enum Table2 {
         return String2.replaceAll(effectPattern, "{}", resultName);
     }
 
-    static String getNullableTypeHandler(com.moon.accessor.annotation.TableField field) {
+    public static String getNullableTypeHandler(com.moon.accessor.annotation.TableField field) {
         if (field == null) {
             return null;
         }
@@ -119,13 +119,13 @@ public enum Table2 {
         return name;
     }
 
-    static TableField getTableFieldAnnotation(VariableElement element) {
+    public static TableField getTableFieldAnnotation(VariableElement element) {
         com.moon.accessor.annotation.TableField fieldAnnotated//
             = element.getAnnotation(TABLE_FIELD_CLASS);
         return fieldAnnotated == null ? DefaultTableField.INSTANCE : fieldAnnotated;
     }
 
-    static String toColumnName(
+    public static String toColumnName(
         com.moon.accessor.annotation.TableField field, String propertyName, TableFieldPolicy columnPolicy
     ) {
         if (field != null) {

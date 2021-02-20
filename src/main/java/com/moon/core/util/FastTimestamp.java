@@ -1,5 +1,6 @@
 package com.moon.core.util;
 
+import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -11,11 +12,9 @@ import java.util.function.LongSupplier;
  *
  * @author moonsky
  */
-public final class FastTimestamp implements LongSupplier {
-
-    public final static FastTimestamp INSTANCE = new FastTimestamp();
-
-    private FastTimestamp() { }
+public enum FastTimestamp implements LongSupplier {
+    /** unique instance */
+    INSTANCE;
 
     public static FastTimestamp getInstance() { return INSTANCE; }
 
@@ -24,23 +23,25 @@ public final class FastTimestamp implements LongSupplier {
     /**
      * 可用来调整精度
      *
-     * @param microseconds
+     * @param microseconds 毫秒数
      */
     public static void setPeriod(long microseconds) {
-        FastTimestampRunner.TIMER.setPeriod(microseconds, TimeUnit.MICROSECONDS);
+        setPeriod(microseconds, TimeUnit.MICROSECONDS);
+    }
+
+    public static void setPeriod(long microseconds, TimeUnit unit) {
+        FastTimestampRunner.TIMER.setPeriod(microseconds, unit);
     }
 
     @Override
     public long getAsLong() { return currentTimeMillis(); }
 
     private enum FastTimestampRunner {
-        /**
-         * 单例计数器
-         */
+        /** 单例计数器 */
         TIMER;
 
         private final ScheduledExecutorService scheduler;
-        private volatile ScheduledFuture scheduledFuture;
+        private volatile ScheduledFuture<?> scheduledFuture;
         private volatile long value = System.currentTimeMillis();
 
         @SuppressWarnings("all")
@@ -54,7 +55,7 @@ public final class FastTimestamp implements LongSupplier {
         }
 
         private void setPeriod(long period, TimeUnit unit) {
-            ScheduledFuture future = this.scheduledFuture;
+            final ScheduledFuture<?> future = this.scheduledFuture;
 
             this.scheduledFuture = scheduler.scheduleAtFixedRate(() -> {
                 this.value = System.currentTimeMillis();
@@ -64,9 +65,7 @@ public final class FastTimestamp implements LongSupplier {
                 if (future != null && !future.isCancelled()) {
                     future.cancel(false);
                 }
-            } catch (Exception e) {
-                // ignore
-            }
+            } catch (Exception ignored) { }
         }
     }
 }

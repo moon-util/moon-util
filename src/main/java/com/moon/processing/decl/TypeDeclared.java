@@ -78,6 +78,15 @@ public class TypeDeclared {
 
     public Map<String, MethodDeclared> getMethodsMap() { return methodsMap; }
 
+    public Collection<MethodDeclared> getAllMethodsDeclared() {
+        List<MethodDeclared> methods = new ArrayList<>(getMethodsMap().values());
+        for (PropertyDeclared propDeclared : properties.values()) {
+            methods.addAll(propDeclared.getTypedSetterMap().values());
+            methods.add(propDeclared.getGetterMethod());
+        }
+        return methods;
+    }
+
     void setProperties(Map<String, PropertyDeclared> properties) {
         withAll(this.properties, properties);
     }

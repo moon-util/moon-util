@@ -5,6 +5,8 @@ package com.moon.processing;
  */
 public interface JavaDeclarable {
 
+    JavaDeclarable NULL = JavaDeclaredNull.NULL;
+
     /**
      * 返回将要生成类的类全名
      *
@@ -13,10 +15,9 @@ public interface JavaDeclarable {
     String getClassname();
 
     /**
-     * 类文件内容
+     * 返回 java 文件内容
      *
-     * @return 类文件内容
+     * @return java 文件内容
      */
-    @Override
-    String toString();
+    String getJavaContent();
 }

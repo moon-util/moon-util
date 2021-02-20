@@ -57,6 +57,7 @@ final class TypeParser {
         PropertyDeclared declared = properties.get(name);
         if (declared == null) {
             declared = new PropertyDeclared(typeElement, name, thisGenericMap);
+            properties.put(name, declared);
         }
         return declared;
     }
@@ -78,14 +79,14 @@ final class TypeParser {
             if (isParsedSetter(name, actualType)) {
                 return;
             }
-            PropertyMethodDeclared setter = withPropertyDeclared(name).withSetterMethodDeclared(elem, actualType);
+            withPropertyDeclared(name).withSetterMethodDeclared(elem, actualType);
         } else if (Test2.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             String name = Element2.toPropertyName(elem);
             if (isParsedGetter(name)) {
                 return;
             }
-            PropertyMethodDeclared getter = withPropertyDeclared(name).withGetterMethodDeclared(elem);
+            withPropertyDeclared(name).withGetterMethodDeclared(elem);
         } else if (Test2.isConstructor(element)) {
             if (parsingElem == typeElement) {
                 ConstructorDeclared constructorDeclared = new ConstructorDeclared(typeElement,
@@ -153,13 +154,13 @@ final class TypeParser {
     public TypeDeclared doParseTypeDeclared() {
         parseRootElements();
         parseSuperElements(typeElement);
+        properties.forEach((name, prop) -> prop.onCompleted());
         typeDeclared.setProperties(properties);
         typeDeclared.setStaticFieldsMap(this.staticFieldsMap);
         typeDeclared.setMethodsMap(this.methodsMap);
         typeDeclared.setConstructorsMap(constructorsMap);
         return this.typeDeclared;
     }
-
 
     private static boolean isTopElement(Element element, TypeMirror superclass) {
         return element == null || superclass.toString().equals(TOP_CLASS);

@@ -48,7 +48,7 @@ public interface Table<R, TB extends Table<R, TB>> extends Commentable{
      * @see #getComment() 该字段的所有注释
      */
     @Override
-    String getFirstComment();
+    default String getFirstComment() { return getComment(); }
 
     /**
      * 参考：{@inheritDoc}

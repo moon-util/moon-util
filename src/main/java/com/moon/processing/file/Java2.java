@@ -3,7 +3,7 @@ package com.moon.processing.file;
 /**
  * @author benshaoye
  */
-public enum JavaFile2 {
+public enum Java2 {
     ;
 
     public static JavaClassFile classOf(String packageName, String simpleName) {
@@ -38,7 +38,7 @@ public enum JavaFile2 {
         if (index < 0) {
             return new String[]{"", classname};
         }
-        String pkg = classname.substring(index);
+        String pkg = classname.substring(0, index);
         String name = classname.substring(index + 1);
         return new String[]{pkg, name};
     }

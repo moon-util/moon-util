@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * @author benshaoye
  */
-public class JavaParameter extends JavaAnnotable {
+public class JavaParameter extends JavaLineCommentable {
 
     /**
      * 参数类型，类全名/泛型全名
@@ -46,4 +46,10 @@ public class JavaParameter extends JavaAnnotable {
 
     @Override
     public Set<Modifier> getAllowedModifiers() { return Modifier2.FOR_PARAMETER; }
+
+    @Override
+    public void appendTo(JavaAddr addr) {
+        appendAnnotations(addr);
+        addr.newAdd(onImported(getType())).add(" ").add(getName());
+    }
 }

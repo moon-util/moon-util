@@ -2,19 +2,25 @@ package com.moon.processing.file;
 
 import com.moon.processing.JavaDeclarable;
 import com.moon.processor.holder.Importer;
+import com.moon.processor.utils.Collect2;
 import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static java.util.Collections.unmodifiableSet;
+
 /**
+ * 用于生成接口类
+ *
  * @author benshaoye
  */
-public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
+public class JavaInterfaceFile extends JavaBlockCommentable implements JavaDeclarable {
 
     private final String packageName;
     private final String simpleName;
+    private final String classname;
 
     private final Set<String> interfacesSet = new LinkedHashSet<>();
     private final Set<JavaGeneric> generics = new LinkedHashSet<>();
@@ -25,10 +31,13 @@ public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
         super(new Importer(packageName));
         this.packageName = packageName;
         this.simpleName = simpleName;
+        this.classname = String.join(".", packageName, simpleName);
+        annotationGenerated();
+        docCommentOf(getClassname(), "", String2.format("@author {}", getClass().getCanonicalName()));
     }
 
     @Override
-    public String getClassname() { return String.join(".", packageName, simpleName); }
+    public String getClassname() { return classname; }
 
     @Override
     public JavaInterfaceFile addModifierWith(Modifier modifier) {
@@ -36,20 +45,64 @@ public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
         return this;
     }
 
-    public JavaInterfaceFile publicConstField(String name, String typeTemplate, Object... types) {
-        JavaField field = new JavaField(getImporter(), name, typeTemplate, types);
-        return this;
+    public Set<String> getDeclaredFieldsName() {
+        return unmodifiableSet(getFieldsMap().keySet());
     }
 
-    public JavaMethod declareMethod(String name, Consumer<JavaParameters> parametersBuilder) {
+    protected boolean inInterface() { return true; }
+
+    protected final Map<String, JavaMethod> getMethodsMap() { return methodsMap; }
+
+    protected final Map<String, JavaField> getFieldsMap() { return fieldsMap; }
+
+    protected Map<FieldScope, Map<String, JavaField>> getGroupedFieldsMap() {
+        Map<FieldScope, Map<String, JavaField>> groupedFieldsMap = new HashMap<>();
+        Map<String, JavaField> fieldsMap = getFieldsMap();
+        for (JavaField field : fieldsMap.values()) {
+            Map<String, JavaField> scopedFieldsMap = FieldScope.getScopedFieldsMap(field, groupedFieldsMap);
+            scopedFieldsMap.put(field.getFieldName(), field);
+        }
+        return groupedFieldsMap;
+    }
+
+    protected enum FieldScope {
+        /** 字段范围: 静态、实例字段 */
+        STATIC,
+        MEMBER;
+
+        public static Map<String, JavaField> getScopedFieldsMap(
+            JavaField field, Map<FieldScope, Map<String, JavaField>> allFieldsMap
+        ) { return (field.isStatic() ? STATIC : MEMBER).getScopedMap(allFieldsMap); }
+
+        public Map<String, JavaField> getScopedMap(Map<FieldScope, Map<String, JavaField>> allFieldsMap) {
+            return allFieldsMap.computeIfAbsent(this, k -> new LinkedHashMap<>());
+        }
+    }
+
+    protected void afterMethodCreated(JavaMethod method) { }
+
+    protected void afterFieldCreated(JavaField field) { field.withStatic(); }
+
+    public JavaField publicField(String name, Class<?> fieldClass) {
+        return publicField(name, fieldClass.getCanonicalName());
+    }
+
+    public JavaField publicField(String name, String typeTemplate, Object... types) {
+        JavaField field = new JavaField(getImporter(), inInterface(), getClassname(), name, typeTemplate, types);
+        afterFieldCreated(field);
+        getFieldsMap().put(field.getFieldName(), field);
+        return field;
+    }
+
+    public JavaMethod publicMethod(String name) { return publicMethod(name, p -> {}); }
+
+    public JavaMethod publicMethod(String name, Consumer<JavaParameters> parametersBuilder) {
         JavaParameters parameters = new JavaParameters(getImporter());
-        JavaMethod method = new JavaMethod(getImporter(), name, parameters);
-        methodsMap.put(method.getUniqueKey(), method);
+        parametersBuilder.accept(parameters);
+        JavaMethod method = new JavaMethod(getImporter(), name, parameters, inInterface());
+        afterMethodCreated(method);
+        getMethodsMap().put(method.getUniqueKey(), method);
         return method;
-    }
-
-    public JavaMethod publicAbstractMethod(String name, Consumer<JavaParameters> parametersBuilder) {
-        return declareMethod(name, parametersBuilder).addModifierWith(Modifier.ABSTRACT);
     }
 
     /**
@@ -60,9 +113,12 @@ public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
      * @return
      */
     public JavaInterfaceFile implement(Class<?>... interfaces) {
-        for (Class<?> aClass : interfaces) {
-            this.interfacesSet.add(aClass.getCanonicalName());
-        }
+        Collect2.addAll(Class::getCanonicalName, interfacesSet, interfaces);
+        return this;
+    }
+
+    public JavaInterfaceFile implementOf(String interfaceTemplate, Object... types) {
+        interfacesSet.add(Formatter.with(interfaceTemplate, types));
         return this;
     }
 
@@ -74,9 +130,7 @@ public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
      * @return
      */
     public JavaInterfaceFile implement(String... interfaces) {
-        for (String aClass : interfaces) {
-            this.interfacesSet.add(aClass);
-        }
+        Collect2.addAll(this.interfacesSet, interfaces);
         return this;
     }
 
@@ -107,35 +161,51 @@ public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
         return this;
     }
 
+    public final String getSimpleName() { return simpleName; }
+
     @Override
-    public String toString() {
+    public String getJavaContent() {
+        final JavaAddr addr = newPackagedJavaAddr();
+        JavaAddr.Mark importMark = addr.mark();
+
+        super.appendTo(addr.next());
+        addr.newAdd("public interface ").add(getSimpleName()).add(getGenericDeclared())
+            .add(getInterfacesWillImplemented("extends")).add(" {").start();
+
+        getFieldsMap().forEach((key, field) -> field.appendTo(addr));
+
+        appendMethods(addr);
+
+        return returning(addr, importMark);
+    }
+
+    protected final void appendMethods(JavaAddr addr) {
+        getMethodsMap().forEach((key, method) -> method.appendTo(addr));
+    }
+
+    protected final JavaAddr newPackagedJavaAddr() {
         JavaAddr addr = new JavaAddr();
 
         String pkg = this.packageName;
         if (!String2.isBlank(pkg)) {
-            addr.add("package ").script(pkg).next(2);
+            addr.padAdd("package ").padScript(pkg).next(2);
         }
+        return addr;
+    }
 
-        JavaAddr.Mark importMark = addr.mark();
-
-        addr.newAdd("public interface ").add(simpleName).add(getGenericDeclared()).add(getInterfacesWillImplemented())
-            .add(" {").start();
-
-        fieldsMap.forEach((key, field) -> field.appendTo(addr));
-
-        methodsMap.forEach((key, method) -> method.appendTo(addr));
-
-        addr.newEnd().add("}");
+    protected final String returning(JavaAddr addr, JavaAddr.Mark importMark) {
+        addr.newEnd().padAdd("}");
         importMark.with(getImporter().toString("\n"));
         return addr.toString();
     }
 
-    private String getInterfacesWillImplemented() {
+    protected String getInterfacesWillImplemented(String keyword) {
         Set<String> interfaces = this.interfacesSet;
         if (interfaces.isEmpty()) {
             return "";
         }
-        StringBuilder builder = new StringBuilder().append(" extends ");
+        StringBuilder builder = new StringBuilder();
+        builder.append(" ").append(keyword.trim()).append(" ");
         for (String anInterface : interfaces) {
             builder.append(onImported(anInterface));
         }
@@ -145,9 +215,9 @@ public class JavaInterfaceFile extends JavaAnnotable implements JavaDeclarable {
     /**
      * 接口的泛型声明
      *
-     * @return
+     * @return 泛型声明
      */
-    private String getGenericDeclared() {
+    protected String getGenericDeclared() {
         Set<JavaGeneric> generics = this.generics;
         if (generics.isEmpty()) {
             return "";

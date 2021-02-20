@@ -5,7 +5,7 @@ import com.moon.processor.holder.Importer;
 /**
  * @author benshaoye
  */
-abstract class BaseImportable {
+public abstract class BaseImportable {
 
     private final Importer importer;
 
@@ -13,13 +13,11 @@ abstract class BaseImportable {
 
     public Importer getImporter() { return importer; }
 
-    public BaseImportable onImported(Class<?> importClass) {
-        importer.onImported(importClass);
-        return this;
+    public final String onImported(Class<?> importClass) {
+        return importer.onImported(importClass);
     }
 
-    public BaseImportable onImported(String classname) {
-        importer.onImported(classname);
-        return this;
+    public final String onImported(String classname) {
+        return importer.onImported(classname);
     }
 }

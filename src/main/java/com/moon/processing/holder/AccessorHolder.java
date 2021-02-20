@@ -76,6 +76,6 @@ public class AccessorHolder implements JavaWritable {
 
     @Override
     public void write(JavaFiler writer) {
-        writer.write(accessorDeclaredMap);
+        writer.write(accessorDeclaredMap.values());
     }
 }

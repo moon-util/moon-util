@@ -5,6 +5,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.util.*;
 
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -42,6 +43,49 @@ public class BaseExecutableDeclared {
      */
     protected final String parametersTypesSignature;
 
+    /**
+     * 主要用于 lombok 自动生成的 getter/setter
+     *
+     * @param thisElement
+     * @param enclosingElement
+     * @param thisGenericMap
+     * @param parametersMap
+     */
+    protected BaseExecutableDeclared(
+        TypeElement thisElement,
+        TypeElement enclosingElement,
+        Map<String, GenericDeclared> thisGenericMap,
+        Map<String, String> parametersMap
+    ) {
+        this.thisElement = thisElement;
+        this.enclosingElement = enclosingElement;
+        this.executable = null;
+        this.thisGenericMap = thisGenericMap;
+
+        this.thisClassname = thisElement.getQualifiedName().toString();
+        this.enclosingClassname = enclosingElement.getQualifiedName().toString();
+
+        Map<String, String> typesMap = parametersMap == null ? emptyMap() : parametersMap;
+        int index = 0, size = typesMap.size();
+        List<ParameterDeclared> parametersDeclared = new ArrayList<>(size);
+        Map<String, ParameterDeclared> parametersIndexedMap = new HashMap<>(size);
+        for (Map.Entry<String, String> stringEntry : typesMap.entrySet()) {
+            String name = stringEntry.getKey(), type = stringEntry.getValue();
+            ParameterDeclared parameterDeclared = new ParameterDeclared(thisElement,
+                enclosingElement,
+                type,
+                name,
+                index++,
+                thisGenericMap);
+            parametersDeclared.add(parameterDeclared);
+            parametersIndexedMap.put(parameterDeclared.getParameterName(), parameterDeclared);
+        }
+        this.parametersDeclared = parametersDeclared;
+        this.parametersMap = parametersIndexedMap;
+        this.parametersTypesSignature = parametersDeclared.stream().map(ParameterDeclared::getSimplifyActualType)
+            .collect(joining(","));
+    }
+
     public BaseExecutableDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
@@ -75,6 +119,10 @@ public class BaseExecutableDeclared {
         this.parametersTypesSignature = parametersDeclared.stream().map(ParameterDeclared::getSimplifyActualType)
             .collect(joining(","));
     }
+
+    public ParameterDeclared getParameterAt(int index) { return parametersDeclared.get(index); }
+
+    public ParameterDeclared getParameterOf(String parameterName) { return parametersMap.get(parameterName); }
 
     public TypeElement getThisElement() { return thisElement; }
 

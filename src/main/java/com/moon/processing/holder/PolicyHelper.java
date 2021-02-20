@@ -8,8 +8,8 @@ import com.moon.processing.defaults.TableFieldPolicyEnum;
 import com.moon.processing.defaults.TableModelEnum;
 import com.moon.processing.defaults.TableModelPolicyEnum;
 import com.moon.processing.defaults.TablesEnum;
+import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Environment2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.Element;
@@ -56,7 +56,7 @@ public class PolicyHelper {
         if (policy != null) {
             return policy;
         }
-        Types types = Environment2.getTypes();
+        Types types = Processing2.getTypes();
         do {
             policy = element.getAnnotation(annotationClass);
             if (policy != null) {

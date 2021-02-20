@@ -57,6 +57,35 @@ public enum String2 {
     }
 
     public static String format(String template, Object... values) {
+        if (template == null) {
+            return null;
+        }
+        if (values == null || values.length == 0) {
+            return template;
+        }
+        int startIdx = 0, idx = 0;
+        final int valueLen = values.length, tempLen = template.length();
+        StringBuilder builder = new StringBuilder(tempLen);
+        for (int at, nextStartAt; ; ) {
+            at = template.indexOf("{}", startIdx);
+            if (at >= 0) {
+                nextStartAt = at + 2;
+                builder.append(template, startIdx, at);
+                builder.append(values[idx++]);
+                if (idx >= valueLen) {
+                    return builder.append(template, nextStartAt, tempLen).toString();
+                }
+                startIdx = nextStartAt;
+            } else {
+                for (int i = idx; i < valueLen; i++) {
+                    builder.append(values[i]);
+                }
+                return builder.toString();
+            }
+        }
+    }
+
+    public static String format0(String template, Object... values) {
         if (values != null) {
             List<String> rest = null;
             int index = 0;
@@ -163,35 +192,12 @@ public enum String2 {
         return GROUP.on(template, type, name, value);
     }
 
-    public static String toPrivateField(String field, String type) {
-        String template = "private {type} {field};";
-        return GROUP.on(template, type, "", field);
-    }
-
     public static String toGetterName(String field, String type) {
         return ("boolean".equals(type) ? Const2.IS : Const2.GET) + capitalize(field);
     }
 
-    public static String toGetterMethod(String field, String type) {
-        return toGetterMethod(toGetterName(field, type), field, type);
-    }
-
-    public static String toGetterMethod(String getterName, String field, String type) {
-        String template = "public {type} {name}() { return this.{field}; }";
-        return GROUP.on(template, type, getterName, field);
-    }
-
     public static String toSetterName(String field) {
         return Const2.SET + capitalize(field);
-    }
-
-    public static String toSetterMethod(String field, String type) {
-        return toSetterMethod(toSetterName(field), field, type);
-    }
-
-    public static String toSetterMethod(String setterName, String field, String type) {
-        String template = "public void {name}({type} {field}) { this.{field} = {field}; }";
-        return GROUP.on(template, type, setterName, field);
     }
 
     public static String camelcaseToHyphen(String str, char hyphen, boolean continuousSplit) {

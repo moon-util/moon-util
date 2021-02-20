@@ -1,5 +1,7 @@
 package com.moon.processing.util;
 
+import com.moon.processor.utils.Environment2;
+
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -18,7 +20,10 @@ public enum Processing2 {
 
     static Messager getMessager() { return get().getMessager(); }
 
-    public static void initialize(ProcessingEnvironment env) { ENVIRONMENT_THREAD_LOCAL.set(env); }
+    public static void initialize(ProcessingEnvironment env) {
+        ENVIRONMENT_THREAD_LOCAL.set(env);
+        Environment2.initialize(env);
+    }
 
     public static Elements getUtils() { return get().getElementUtils(); }
 

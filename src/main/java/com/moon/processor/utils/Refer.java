@@ -1,17 +1,21 @@
-package com.moon.processor.model;
+package com.moon.processor.utils;
 
 import java.util.function.Consumer;
 
 /**
  * @author benshaoye
  */
-public final class ValueRef<V> {
+public final class Refer<V> {
 
     private V value;
 
-    public ValueRef() { }
+    public Refer() { }
+
+    public static <V> Refer<V> of() { return new Refer<>(); }
 
     public void set(V value) { this.value = value; }
+
+    public V getValue() { return value; }
 
     public void setIfAbsent(V value) {
         if (this.value == null) {

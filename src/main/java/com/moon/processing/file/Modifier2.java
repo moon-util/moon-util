@@ -28,6 +28,7 @@ enum Modifier2 {
         EnumSet<Modifier> forMethod = EnumSet.of(Modifier.PUBLIC,
             Modifier.PROTECTED,
             Modifier.PRIVATE,
+            Modifier.DEFAULT,
             Modifier.STATIC,
             Modifier.FINAL,
             Modifier.SYNCHRONIZED);

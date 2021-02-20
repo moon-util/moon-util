@@ -22,9 +22,9 @@ public class TableHolder implements JavaWritable {
     private final Map<String, TableDeclared> tableDeclaredMap = new HashMap<>();
 
     public TableHolder(
-        TypeHolder typeHolder, PolicyHelper policyHelper, TablesHolder tablesHolder, AliasesHolder aliasesHolder
+        TypeHolder typeHolder, TablesHolder tablesHolder, AliasesHolder aliasesHolder
     ) {
-        this.policyHelper = policyHelper;
+        this.policyHelper = new PolicyHelper();
         this.tablesHolder = tablesHolder;
         this.aliasesHolder = aliasesHolder;
         this.typeHolder = typeHolder;
@@ -49,6 +49,6 @@ public class TableHolder implements JavaWritable {
 
     @Override
     public void write(JavaFiler writer) {
-        writer.write(tableDeclaredMap);
+        writer.write(tableDeclaredMap.values());
     }
 }

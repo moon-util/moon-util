@@ -17,6 +17,7 @@ public class JavaAddr {
 
     private final List<Mark> marks = new ArrayList<>();
     private final StringBuilder content = new StringBuilder();
+    private int lineNumber = 1;
     private String indentSpaces;
     private int indentUnit;
 
@@ -36,8 +37,11 @@ public class JavaAddr {
         this.indentSpaces = indentSpaces;
     }
 
+    public int lineNumber() { return lineNumber; }
+
     public JavaAddr next() {
         content.append(NEXT);
+        lineNumber++;
         return this;
     }
 
@@ -45,29 +49,52 @@ public class JavaAddr {
         char[] chars = new char[line];
         Arrays.fill(chars, NEXT);
         content.append(chars);
+        lineNumber += line;
         return this;
     }
 
     public JavaAddr start() { return indentStart(1); }
 
     public JavaAddr add(Object value) {
-        content.append(indentSpaces).append(value);
+        content.append(value);
         return this;
     }
 
-    public JavaAddr newAdd(Object value) { return next().add(value); }
+    public JavaAddr padAdd(Object value) {
+        content.append(indentSpaces);
+        return add(value);
+    }
 
-    public JavaAddr blankAdd(Object value) { return next(2).add(value); }
+    public JavaAddr addScript(CharSequence script) { return add(onlyColonTail(script.toString())); }
 
-    public JavaAddr script(CharSequence script) { return add(onlyColonTail(script.toString())); }
+    public JavaAddr newAdd(Object value) { return next().padAdd(value); }
 
-    public JavaAddr newScript(CharSequence script) { return next().script(script); }
+    public JavaAddr blankAdd(Object value) { return next(2).padAdd(value); }
 
-    public JavaAddr blankScript(CharSequence script) { return next(2).script(script); }
+    public JavaAddr padScript(CharSequence script) { return padAdd(onlyColonTail(script.toString())); }
+
+    public JavaAddr newScript(CharSequence script) { return next().padScript(script); }
+
+    public JavaAddr blankScript(CharSequence script) { return next(2).padScript(script); }
+
+    public JavaAddr scriptEnd() {
+        final StringBuilder builder = this.content;
+        for (int i = builder.length() - 1; i > 0; i--) {
+            char ch = builder.charAt(i);
+            if (Character.isWhitespace(ch)) {
+                continue;
+            }
+            if (ch != ';') {
+                builder.append(';');
+            }
+            break;
+        }
+        return this;
+    }
 
     public JavaAddr newEnd() { return next().end(); }
 
-    public JavaAddr newEnd(String close) { return next().end().add(close); }
+    public JavaAddr newEnd(String close) { return next().end().padAdd(close); }
 
     public JavaAddr end() { return indentStart(-1); }
 

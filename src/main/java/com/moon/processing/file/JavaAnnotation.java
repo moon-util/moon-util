@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
  */
 public class JavaAnnotation extends BaseImportable implements Appender {
 
+    public final static JavaAnnotation NONE = new None();
+
     private final static String[] EMPTY_STRINGS = {};
 
     /**
@@ -17,7 +19,7 @@ public class JavaAnnotation extends BaseImportable implements Appender {
      */
     private final String annotationName;
 
-    private final Map<String, AnnotationValue> valuesMap = new HashMap<>();
+    private final Map<String, AnnotationValue> valuesMap = new LinkedHashMap<>();
 
     public JavaAnnotation(Importer importer, String annotationName) {
         super(importer);
@@ -76,16 +78,21 @@ public class JavaAnnotation extends BaseImportable implements Appender {
     public JavaAnnotation falseOf(String method) { return booleanOf(method, false); }
 
     private void putVal(String method, ValueType type, String value, String... values) {
-        valuesMap.put(method, new AnnotationValue(getImporter(), type, value, values));
+        valuesMap.put(method, new AnnotationValue(getImporter(), method, type, value, values));
     }
 
+    /**
+     * 格式说明: 每个注解一定单起一行
+     *
+     * @param addr
+     */
     @Override
     public void appendTo(JavaAddr addr) {
         addr.newAdd('@').add(onImported(annotationName));
         if (valuesMap.isEmpty()) {
             return;
         }
-        List<String> values = valuesMap.values().stream().map(Object::toString).collect(Collectors.toList());
+        List<String> values = valuesMap.values().stream().map(AnnotationValue::toString).collect(Collectors.toList());
         if (values.size() == 1) {
             addr.add("(").add(values.get(0)).add(")");
         } else {
@@ -95,32 +102,39 @@ public class JavaAnnotation extends BaseImportable implements Appender {
                 int lastIndex = values.size() - 1, index = 0;
                 for (String value : values) {
                     addr.newAdd(value);
-                    if (index < lastIndex) {
+                    if ((index++) < lastIndex) {
                         addr.add(",");
                     }
                 }
                 addr.newEnd(")");
             } else {
-                addr.add("(").add(values.get(0)).add(")");
+                addr.add("(").add(valuesJoined).add(")");
             }
         }
     }
 
-    private static class AnnotationValue {
+    private final static class None extends JavaAnnotation {
 
-        private final Importer importer;
+        public None() { super(new Importer(), null); }
+
+        @Override
+        public void appendTo(JavaAddr addr) { }
+    }
+
+    private static class AnnotationValue extends BaseImportable {
+
         private final ValueType type;
+        private final String method;
         private final List<String> values;
 
-        private AnnotationValue(Importer importer, ValueType type, String value, String... values) {
-            this.importer = importer;
+        private AnnotationValue(Importer importer, String method, ValueType type, String value, String... values) {
+            super(importer);
             this.type = type;
+            this.method = method;
             this.values = new ArrayList<>();
             this.values.add(value);
             values = values == null ? EMPTY_STRINGS : values;
-            for (String val : values) {
-                this.values.add(val);
-            }
+            this.values.addAll(Arrays.asList(values));
         }
 
         @Override
@@ -139,15 +153,23 @@ public class JavaAnnotation extends BaseImportable implements Appender {
         private String toValue(ValueType type, String value) {
             switch (type) {
                 case STRING:
-                    return "\"" + value + '"';
+                    return with(method, " = \"", value, "\"");
                 case ENUM:
                 case PRIMITIVE:
-                    return value;
+                    return with(method, " = ", value);
                 case CLASS:
-                    return importer.onImported(value) + ".class";
+                    return with(method, " = ", onImported(value), ".class");
                 default:
                     throw new IllegalStateException();
             }
+        }
+
+        private static String with(String... values) {
+            StringBuilder builder = new StringBuilder();
+            for (String value : values) {
+                builder.append(value);
+            }
+            return builder.toString();
         }
     }
 

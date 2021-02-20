@@ -13,7 +13,7 @@ import com.moon.processor.file.DeclMethod;
 import com.moon.processor.file.DeclParams;
 import com.moon.processor.model.DeclareProperty;
 import com.moon.processor.model.DeclaredPojo;
-import com.moon.processor.model.ValueRef;
+import com.moon.processor.utils.Refer;
 import com.moon.processor.utils.Comment2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
@@ -148,7 +148,7 @@ public class DefTableModel implements JavaFileWriteable {
         Map<String, DeclareProperty> copiedPojoFields = new LinkedHashMap<>(declaredPojo);
         Map<String, DefTableField> definedTableFields = new LinkedHashMap<>();
         // 第一个字段
-        final ValueRef<DeclField> refer = new ValueRef<>();
+        final Refer<DeclField> refer = new Refer<>();
 
         // 优先字段
         for (String sort : SORTS) {
@@ -230,7 +230,7 @@ public class DefTableModel implements JavaFileWriteable {
         if (property.getSetter() != null) {
             setterName = property.getSetter().getName();
         }
-        String constName = Table2.toRefColumnName(fieldName);
+        String constName = Table2.toConstColumnName(fieldName);
         String constValue = format("{}.{}", getTableEnumFieldVal(), fieldName);
         return new DefTableField(getPojoClassname(),
             propName,

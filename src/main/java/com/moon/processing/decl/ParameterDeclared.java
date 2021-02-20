@@ -50,6 +50,40 @@ public class ParameterDeclared {
         this.simplifyActualType = Generic2.typeSimplify(actualType);
     }
 
+    /**
+     * 主要用于 lombok 自动生成的 getter/setter
+     *
+     * @param thisElement
+     * @param declaredElement
+     * @param declaredType
+     * @param declaredName
+     * @param parameterIndex
+     * @param thisGenericMap
+     */
+    public ParameterDeclared(
+        TypeElement thisElement,
+        TypeElement declaredElement,
+        String declaredType,
+        String declaredName,
+        int parameterIndex,
+        Map<String, GenericDeclared> thisGenericMap
+    ) {
+        this.thisElement = thisElement;
+        this.declaredElement = declaredElement;
+        this.thisExecutable = null;
+        this.thisGenericMap = thisGenericMap;
+        this.parameter = null;
+        this.parameterIndex = parameterIndex;
+        this.thisClassname = Element2.getQualifiedName(thisElement);
+        String declaredClassname = Element2.getQualifiedName(declaredElement);
+        String actualType = Generic2.mapToActual(thisGenericMap, declaredClassname, declaredType);
+        this.parameterName = declaredName;
+        this.declaredClassname = declaredClassname;
+        this.declaredType = declaredType;
+        this.actualType = actualType;
+        this.simplifyActualType = Generic2.typeSimplify(actualType);
+    }
+
     public TypeElement getThisElement() { return thisElement; }
 
     public TypeElement getDeclaredElement() { return declaredElement; }

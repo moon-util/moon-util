@@ -61,7 +61,8 @@ public enum String2 {
                 backslashCnt++;
             } else {
                 if ((ch == targetChar) && backslashCnt % 2 == 0) {
-                    builder.append(BACKSLASH).append(BACKSLASH);
+                    // 暂时 builder.append(BACKSLASH).append(BACKSLASH); 处理
+                    builder.append(BACKSLASH);
                 }
                 backslashCnt = 0;
             }

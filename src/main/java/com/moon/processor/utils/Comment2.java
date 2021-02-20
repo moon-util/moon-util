@@ -28,13 +28,15 @@ public enum Comment2 {
 
     private static String getComment(String comment, Element elem, boolean first) {
         switch (elem.getKind()) {
-            case FIELD:
+            case FIELD: {
                 comment = resolveEnum(comment, elem.asType(), first);
                 break;
-            case METHOD:
+            }
+            case METHOD: {
                 ExecutableElement method = (ExecutableElement) elem;
                 comment = resolveEnum(comment, method.getReturnType(), first);
                 break;
+            }
             default:
         }
         return com.moon.accessor.util.String2.doEscape(comment, '"');
@@ -56,9 +58,9 @@ public enum Comment2 {
         }
         String defaultComment = null;
         String[] comments = docComment.split("\n");
-        for (int i = 0; i < comments.length; i++) {
-            String line = comments[i].trim();
-            if (String2.isNotBlank(line) && defaultComment == null && !isTagComment(line)) {
+        for (String comment : comments) {
+            String line = comment.trim();
+            if (String2.isNotBlank(line) && defaultComment == null && isNotTagComment(line)) {
                 defaultComment = line;
             }
             if (line.startsWith(AT_COMMENT)) {
@@ -82,13 +84,13 @@ public enum Comment2 {
         for (int i = 0; i < comments.length; i++) {
             String line = comments[i].trim();
             if (i == defaultCmtNextIdx) {
-                if (!isTagComment(line)) {
+                if (isNotTagComment(line)) {
                     defaultBuilder.append(line);
                     defaultCmtNextIdx++;
                 }
             }
             if (i == commentNextIdx) {
-                if (!isTagComment(line)) {
+                if (isNotTagComment(line)) {
                     commentBuilder.append(line);
                     commentNextIdx++;
                 }
@@ -128,14 +130,14 @@ public enum Comment2 {
         return builder.append(String.join(", ", comments)).append('}').toString();
     }
 
-    private static boolean isTagComment(String line) {
+    private static boolean isNotTagComment(String line) {
         for (int i = 0; i < line.length(); i++) {
             char character = line.charAt(i);
             if (Character.isWhitespace(character)) {
                 continue;
             }
-            return character == '@';
+            return character != '@';
         }
-        return false;
+        return true;
     }
 }

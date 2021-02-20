@@ -44,5 +44,5 @@ public interface Commentable {
      *
      * @see #getComment() 该字段所有文档注释
      */
-    String getFirstComment();
+    default String getFirstComment() { return getComment(); }
 }

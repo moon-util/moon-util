@@ -15,18 +15,6 @@ abstract class BaseDeclared extends BaseImportable {
 
     public BaseDeclared(Importer importer) { super(importer); }
 
-    @Override
-    public BaseDeclared onImported(Class<?> importClass) {
-        super.onImported(importClass);
-        return this;
-    }
-
-    @Override
-    public BaseDeclared onImported(String classname) {
-        super.onImported(classname);
-        return this;
-    }
-
     /**
      * 应用修饰符
      *
@@ -57,6 +45,8 @@ abstract class BaseDeclared extends BaseImportable {
     public BaseDeclared withStatic() { return addModifierWith(Modifier.STATIC); }
 
     public BaseDeclared withConst() { return withFinal().withStatic(); }
+
+    public boolean isStatic() { return modifiers.contains(Modifier.STATIC); }
 
     /**
      * 获取最终的所有修饰符

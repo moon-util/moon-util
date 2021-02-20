@@ -1,10 +1,15 @@
 package com.moon.processing.decl;
 
+import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.Test2;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author benshaoye
@@ -12,6 +17,8 @@ import java.util.Map;
 public class PropertyDeclared {
 
     private final TypeElement thisElement;
+
+    private final String thisClassname;
 
     private final String name;
 
@@ -49,6 +56,7 @@ public class PropertyDeclared {
         this.thisGenericMap = thisGenericMap;
         this.thisElement = thisElement;
         this.name = name;
+        this.thisClassname = Element2.getQualifiedName(thisElement);
     }
 
     public void withFieldDeclared(VariableElement fieldElement) {
@@ -62,40 +70,134 @@ public class PropertyDeclared {
         }
     }
 
-    public PropertyMethodDeclared withGetterMethodDeclared(ExecutableElement getterElement) {
+    public void withGetterMethodDeclared(ExecutableElement getterElement) {
         if (this.getter != null) {
-            return getter;
+            return;
         }
-        TypeElement enclosingElement = ((TypeElement) getterElement.getEnclosingElement());
-        PropertyMethodDeclared getter = new PropertyMethodDeclared(thisElement,
-            enclosingElement,
-            getterElement,
-            thisGenericMap);
-        this.getter = getter;
-        return getter;
+        TypeElement enclosingElement = (TypeElement) getterElement.getEnclosingElement();
+        this.getter = new PropertyMethodDeclared(thisElement, enclosingElement, getterElement, thisGenericMap);
     }
 
-    public PropertyMethodDeclared withSetterMethodDeclared(
+    public void withSetterMethodDeclared(
         ExecutableElement setterElement, String actualType
     ) {
         String simplifySetterType = Generic2.typeSimplify(actualType);
         PropertyMethodDeclared setter = typedSetterMap.get(simplifySetterType);
         if (setter != null) {
-            return setter;
+            return;
         }
-        setter = new PropertyMethodDeclared(thisElement,
-            (TypeElement) setterElement.getEnclosingElement(),
-            setterElement,
-            thisGenericMap);
-        typedSetterMap.put(simplifySetterType, setter);
-        return setter;
+        typedSetterMap.put(simplifySetterType,
+            new PropertyMethodDeclared(thisElement,
+                (TypeElement) setterElement.getEnclosingElement(),
+                setterElement,
+                thisGenericMap));
     }
 
-    public boolean isWriteable(String setterActualClass) {
-        return typedSetterMap.containsKey(setterActualClass);
-    }
+    public String getName() { return name; }
+
+    public boolean isWriteable(String setterActualClass) { return typedSetterMap.containsKey(setterActualClass); }
 
     public boolean isWriteable() { return setter != null; }
 
     public boolean isReadable() { return getter != null; }
+
+    public TypeElement getThisElement() { return thisElement; }
+
+    public String getThisClassname() { return thisClassname; }
+
+    public Map<String, GenericDeclared> getThisGenericMap() { return thisGenericMap; }
+
+    public FieldDeclared getFieldDeclared() { return fieldDeclared; }
+
+    public PropertyMethodDeclared getGetterMethod() { return getter; }
+
+    public PropertyMethodDeclared getSetterMethod() { return setter; }
+
+    public Map<String, PropertyMethodDeclared> getTypedSetterMap() { return typedSetterMap; }
+
+    @Override
+    public boolean equals(Object o) { return o == this; }
+
+    @Override
+    public int hashCode() { return System.identityHashCode(this); }
+
+    public void onCompleted() {
+        computeGetterMethod();
+        computeSetterMethod();
+    }
+
+    private void computeSetterMethod() {
+        FieldDeclared field = this.fieldDeclared;
+        if (getter == null) {
+            if (field != null && Test2.hasLombokSetter(field.getFieldElement())) {
+                PropertyMethodDeclared setter = PropertyMethodDeclared
+                    .ofLombokSetterGenerated(thisElement, field.getFieldElement(), thisGenericMap);
+                ParameterDeclared parameter = setter.getParameterAt(0);
+                typedSetterMap.put(parameter.getSimplifyActualType(), setter);
+                this.setter = setter;
+            } else {
+                this.setter = filterSetterMethod(typedSetterMap);
+            }
+        } else {
+            PropertyMethodDeclared setter = typedSetterMap.get(getter.getReturnActualType());
+            if (setter == null && field != null && Test2.hasLombokSetter(field.getFieldElement())) {
+                setter = PropertyMethodDeclared
+                    .ofLombokSetterGenerated(thisElement, field.getFieldElement(), thisGenericMap);
+                ParameterDeclared parameter = setter.getParameterAt(0);
+                typedSetterMap.put(parameter.getSimplifyActualType(), setter);
+            }
+            this.setter = setter;
+        }
+    }
+
+    private void computeGetterMethod() {
+        if (getter == null) {
+            FieldDeclared field = this.fieldDeclared;
+            if (field != null && Test2.hasLombokGetter(field.getFieldElement())) {
+                this.getter = PropertyMethodDeclared
+                    .ofLombokGetterGenerated(thisElement, field.getFieldElement(), thisGenericMap);
+            }
+        }
+    }
+
+    private static PropertyMethodDeclared filterSetterMethod(Map<String, PropertyMethodDeclared> settersMap) {
+        if (settersMap.isEmpty()) {
+            return null;
+        }
+        PropertyMethodDeclared setter = findMethod(settersMap, "boolean,byte,short,char,int,long,float,double", false);
+        if (setter != null) {
+            return setter;
+        }
+        setter = findMethod(settersMap, "Boolean,Byte,Short,Character,Integer,Long,Float,Double", true);
+        if (setter != null) {
+            return setter;
+        }
+        return new TreeMap<>(settersMap).firstEntry().getValue();
+    }
+
+    private static PropertyMethodDeclared findMethod(
+        Map<String, PropertyMethodDeclared> settersMap, String classes, boolean langPackage
+    ) {
+        String[] types = classes.split(",");
+        if (langPackage) {
+            types = Arrays.stream(types).map(type -> "java.lang." + type).toArray(String[]::new);
+        }
+        for (String type : types) {
+            PropertyMethodDeclared setter = settersMap.get(type);
+            if (type != null) {
+                return setter;
+            }
+        }
+        return null;
+    }
+
+    public String getActualType() {
+        if (getter != null) {
+            return getter.getReturnActualType();
+        }
+        if (setter != null) {
+            return setter.getReturnActualType();
+        }
+        return null;
+    }
 }
