@@ -7,18 +7,18 @@ import com.moon.processor.utils.String2;
  *
  * @author benshaoye
  */
-public class JavaClassFile extends BaseImplFile {
+public class FileClassImpl extends BaseImplementation {
 
     private String superclass;
 
-    public JavaClassFile(String packageName, String simpleName) {
+    public FileClassImpl(String packageName, String simpleName) {
         super(packageName, simpleName);
     }
 
     @Override
     protected boolean inInterface() { return false; }
 
-    public JavaClassFile extend(String superclass, Object... types) {
+    public FileClassImpl extend(String superclass, Object... types) {
         this.superclass = String2.format(superclass, types);
         return this;
     }
@@ -33,7 +33,6 @@ public class JavaClassFile extends BaseImplFile {
 
         appendFieldsAndBlock(addr);
         appendMethods(addr);
-        appendGetterSetterMethods(addr);
         return returning(addr, importMark);
     }
 

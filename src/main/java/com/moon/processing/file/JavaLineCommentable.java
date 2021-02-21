@@ -7,7 +7,7 @@ import com.moon.processor.holder.Importer;
  *
  * @author benshaoye
  */
-public abstract class JavaLineCommentable extends JavaAnnotable {
+public abstract class JavaLineCommentable extends BaseAnnotatedElement {
 
     private String comment;
 

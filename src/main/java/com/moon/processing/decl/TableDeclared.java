@@ -6,11 +6,9 @@ import com.moon.accessor.annotation.TableModelPolicy;
 import com.moon.accessor.annotation.Tables;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
-import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.processing.JavaDeclarable;
 import com.moon.processing.JavaProvider;
-import com.moon.processing.file.BaseImportable;
-import com.moon.processing.file.JavaEnumFile;
+import com.moon.processing.file.FileEnumImpl;
 import com.moon.processing.file.JavaField;
 import com.moon.processing.holder.PolicyHelper;
 import com.moon.processing.holder.TableAlias;
@@ -158,7 +156,7 @@ public class TableDeclared implements JavaProvider {
 
     @Override
     public JavaDeclarable getJavaDeclare() {
-        JavaEnumFile enumFile = new JavaEnumFile(packageName, simpleClassName);
+        FileEnumImpl enumFile = new FileEnumImpl(packageName, simpleClassName);
         enumFile.enumOf(tableEnumVal);
 
         enumFile.implementOf("{}<{}, {}>", Table.class, typeDeclared.getTypeClassname(), enumFile.getClassname());
@@ -168,7 +166,7 @@ public class TableDeclared implements JavaProvider {
         return enumFile;
     }
 
-    private void declareTableColumns(JavaEnumFile enumFile) {
+    private void declareTableColumns(FileEnumImpl enumFile) {
         final String entityName = typeDeclared.getTypeClassname();
         final String entityVar = varHelper.next(allColumnsName);
 
@@ -179,7 +177,7 @@ public class TableDeclared implements JavaProvider {
         }
 
         enumFile.privateFinalField(entityVar, "{}<{}>", Class.class, entityName)
-            .valueOf(value -> value.valueOf(value.onImported(entityName) + ".class"));
+            .valueOf(value -> value.classOf(entityName)).withForceInline();
 
         firstRefer.useIfPresent(field -> {
             List<String> comments = new ArrayList<>();
@@ -230,7 +228,7 @@ public class TableDeclared implements JavaProvider {
         return alias == null ? null : alias.toAliasRef(name);
     }
 
-    private void overrideTableMethods(JavaEnumFile enumFile) {
+    private void overrideTableMethods(FileEnumImpl enumFile) {
         TypeElement typeElement = typeDeclared.getTypeElement();
         String entityName = typeDeclared.getTypeClassname();
 

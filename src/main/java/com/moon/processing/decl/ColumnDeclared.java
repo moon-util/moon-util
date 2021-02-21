@@ -5,7 +5,7 @@ import com.moon.accessor.annotation.TableFieldPolicy;
 import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.accessor.type.JdbcType;
 import com.moon.processing.file.BaseImportable;
-import com.moon.processing.file.JavaEnumFile;
+import com.moon.processing.file.FileEnumImpl;
 import com.moon.processing.file.JavaField;
 import com.moon.processor.def.Table2;
 import com.moon.processor.utils.Comment2;
@@ -145,13 +145,13 @@ public class ColumnDeclared extends BaseColumnDeclared {
 
     public String getFieldPrecision() { return String.valueOf(tableField.precision()); }
 
-    public void declareFinalField(JavaEnumFile enumFile, String entityVar) {
+    public void declareFinalField(FileEnumImpl enumFile, String entityVar) {
         enumFile.privateFinalField(columnName,
             "{}<{}, {}, {}>",
             TABLE_FIELD_CLASS,
             getFieldClass(),
             getThisClassname(),
-            enumFile.getClassname()).valueOf(value -> value.ofFormatted(NEW_TABLE_FIELD,
+            enumFile.getClassname()).valueOf(value -> value.formattedOf(NEW_TABLE_FIELD,
             value.onImported(TableFieldDetail.class),
             entityVar,
             classRef(value, getFieldClass()),
@@ -167,7 +167,7 @@ public class ColumnDeclared extends BaseColumnDeclared {
             stringOf(getComment()))).withPublic();
     }
 
-    public JavaField declareConstField(JavaEnumFile enumFile) {
+    public JavaField declareConstField(FileEnumImpl enumFile) {
         JavaField constField = enumFile.privateConstField(getConstColumnName(),
             "{}<{}, {}, {}>",
             TABLE_FIELD_CLASS,

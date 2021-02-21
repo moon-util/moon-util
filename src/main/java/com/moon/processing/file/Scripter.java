@@ -7,12 +7,13 @@ package com.moon.processing.file;
  *
  * @author benshaoye
  */
-public interface Scripter {
+public interface Scripter extends Appender {
 
     /**
      * 添加 java 脚本内容
      *
      * @param addr JavaAddr
      */
-    void addJavaScript(JavaAddr addr);
+    @Override
+    void appendTo(JavaAddr addr);
 }

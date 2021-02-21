@@ -5,19 +5,19 @@ import java.util.*;
 /**
  * @author benshaoye
  */
-abstract class BaseImplFile extends JavaInterfaceFile {
+abstract class BaseImplementation extends FileInterfaceImpl {
 
     private final List<Scripter> instanceBlock = new ArrayList<>();
     private final List<Scripter> staticBlock = new ArrayList<>();
 
-    public BaseImplFile(String packageName, String simpleName) { super(packageName, simpleName); }
+    public BaseImplementation(String packageName, String simpleName) { super(packageName, simpleName); }
 
-    public BaseImplFile addInstanceScript(CharSequence script) {
+    public BaseImplementation addInstanceScript(CharSequence script) {
         instanceBlock.add(addr -> addr.newScript(script));
         return this;
     }
 
-    public BaseImplFile addStaticScript(CharSequence script) {
+    public BaseImplementation addStaticScript(CharSequence script) {
         staticBlock.add(addr -> addr.newScript(script));
         return this;
     }
@@ -82,12 +82,6 @@ abstract class BaseImplFile extends JavaInterfaceFile {
         appendBlock(addr, this.instanceBlock, false);
     }
 
-    protected final void appendGetterSetterMethods(JavaAddr addr) {
-        getGroupedFieldsMap().forEach((scope, grouped) -> grouped.forEach((fieldName, field) -> {
-            field.appendGetterSetterMethods(addr);
-        }));
-    }
-
     private static void appendFields(JavaAddr addr, Map<String, JavaField> fieldsMap, boolean wasStatic) {
         if (fieldsMap.isEmpty()) {
             return;
@@ -112,7 +106,7 @@ abstract class BaseImplFile extends JavaInterfaceFile {
         }
         addr.blankAdd(wasStatic ? "static {" : "{").start();
         for (Scripter scripter : scripterList) {
-            scripter.addJavaScript(addr);
+            scripter.appendTo(addr);
         }
         addr.newEnd("}");
     }

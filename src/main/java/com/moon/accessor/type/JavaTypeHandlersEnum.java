@@ -269,7 +269,7 @@ enum JavaTypeHandlersEnum implements TypeJdbcHandler<Object> {
             stmt.setObject(index, value);
         }
     },
-    forOffsetDateTime(OffsetTime.class,
+    forOffsetDateTime(OffsetDateTime.class,
         asInts(Types.TIMESTAMP_WITH_TIMEZONE),
         (set, idx) -> set.getObject(idx, OffsetDateTime.class),
         (set, name) -> set.getObject(name, OffsetDateTime.class)) {

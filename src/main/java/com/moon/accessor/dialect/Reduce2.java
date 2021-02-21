@@ -21,9 +21,7 @@ enum Reduce2 {
         return Collections.unmodifiableSet(cached);
     }
 
-    static String wrapKeyword(String name, char open, char close) {
-        return new StringBuilder().append(name).append(open).append(close).toString();
-    }
+    static String wrapKeyword(String name, char open, char close) { return name + open + close; }
 
     public static boolean anyHas(String value, Set<String> set1, Set<String> set2) {
         return set1.contains(value) || set2.contains(value);

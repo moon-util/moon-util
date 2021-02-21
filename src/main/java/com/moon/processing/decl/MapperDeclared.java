@@ -3,7 +3,6 @@ package com.moon.processing.decl;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processing.JavaDeclarable;
 import com.moon.processing.JavaProvider;
-import com.moon.processing.file.JavaEnumFile;
 
 /**
  * @author benshaoye

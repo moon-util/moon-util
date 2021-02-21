@@ -55,6 +55,11 @@ public class JavaAddr {
 
     public JavaAddr start() { return indentStart(1); }
 
+    public JavaAddr add(char value) {
+        content.append(value);
+        return this;
+    }
+
     public JavaAddr add(Object value) {
         content.append(value);
         return this;

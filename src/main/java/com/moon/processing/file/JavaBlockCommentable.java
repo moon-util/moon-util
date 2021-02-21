@@ -48,15 +48,29 @@ public abstract class JavaBlockCommentable extends JavaLineCommentable {
         return this;
     }
 
+    public JavaBlockCommentable addBlockCommentOf(Object comment) {
+        addCommentToList(getBlockComments(), comment);
+        return this;
+    }
+
+    public JavaBlockCommentable addDocCommentOf(Object comment) {
+        addCommentToList(getDocComments(), comment);
+        return this;
+    }
+
     private static void addCommentsToList(List<String> list, Object[] comments) {
         for (Object comment : comments) {
-            if (comment == null) {
-                list.add("");
-            } else if (comment instanceof Class<?>) {
-                list.add(((Class<?>) comment).getCanonicalName());
-            } else {
-                list.add(comment.toString());
-            }
+            addCommentToList(list, comment);
+        }
+    }
+
+    private static void addCommentToList(List<String> list, Object comment) {
+        if (comment == null) {
+            list.add("");
+        } else if (comment instanceof Class<?>) {
+            list.add(((Class<?>) comment).getCanonicalName());
+        } else {
+            list.add(comment.toString());
         }
     }
 

@@ -2,7 +2,9 @@ package com.moon.processing.file;
 
 import com.moon.processor.holder.Importer;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -19,7 +21,7 @@ public class JavaAnnotation extends BaseImportable implements Appender {
      */
     private final String annotationName;
 
-    private final Map<String, AnnotationValue> valuesMap = new LinkedHashMap<>();
+    private final Map<String, JavaAnnotationValue> valuesMap = new LinkedHashMap<>();
 
     public JavaAnnotation(Importer importer, String annotationName) {
         super(importer);
@@ -31,12 +33,12 @@ public class JavaAnnotation extends BaseImportable implements Appender {
     }
 
     public JavaAnnotation classOf(String method, String classname, String... classnames) {
-        putVal(method, ValueType.CLASS, classname, classnames);
+        putVal(method, JavaAnnotationValueType.CLASS, classname, classnames);
         return this;
     }
 
     public JavaAnnotation stringOf(String method, String value, String... values) {
-        putVal(method, ValueType.STRING, value, values);
+        putVal(method, JavaAnnotationValueType.STRING, value, values);
         return this;
     }
 
@@ -50,7 +52,7 @@ public class JavaAnnotation extends BaseImportable implements Appender {
                 valuesStringify[i] = String.valueOf(values[i]);
             }
         }
-        putVal(method, ValueType.PRIMITIVE, String.valueOf(value), valuesStringify);
+        putVal(method, JavaAnnotationValueType.PRIMITIVE, String.valueOf(value), valuesStringify);
         return this;
     }
 
@@ -64,12 +66,12 @@ public class JavaAnnotation extends BaseImportable implements Appender {
                 valuesStringify[i] = String.valueOf(values[i]);
             }
         }
-        putVal(method, ValueType.PRIMITIVE, String.valueOf(value), valuesStringify);
+        putVal(method, JavaAnnotationValueType.PRIMITIVE, String.valueOf(value), valuesStringify);
         return this;
     }
 
     public JavaAnnotation booleanOf(String method, boolean value) {
-        putVal(method, ValueType.PRIMITIVE, String.valueOf(value));
+        putVal(method, JavaAnnotationValueType.PRIMITIVE, String.valueOf(value));
         return this;
     }
 
@@ -77,8 +79,15 @@ public class JavaAnnotation extends BaseImportable implements Appender {
 
     public JavaAnnotation falseOf(String method) { return booleanOf(method, false); }
 
-    private void putVal(String method, ValueType type, String value, String... values) {
-        valuesMap.put(method, new AnnotationValue(getImporter(), method, type, value, values));
+    public JavaAnnotationValue with(String method) {
+        JavaAnnotationValue value = valuesMap.get(method);
+        return value == null ? putVal(method, null, null) : value;
+    }
+
+    private JavaAnnotationValue putVal(String method, JavaAnnotationValueType type, String value, String... values) {
+        JavaAnnotationValue val = new JavaAnnotationValue(getImporter(), method, type, value, values);
+        valuesMap.put(method, val);
+        return val;
     }
 
     /**
@@ -92,7 +101,11 @@ public class JavaAnnotation extends BaseImportable implements Appender {
         if (valuesMap.isEmpty()) {
             return;
         }
-        List<String> values = valuesMap.values().stream().map(AnnotationValue::toString).collect(Collectors.toList());
+        @SuppressWarnings("all")
+        List<String> values = valuesMap.values().stream()//
+            .filter(JavaAnnotationValue::isAvailable)//
+            .map(Object::toString)//
+            .collect(Collectors.toList());
         if (values.size() == 1) {
             addr.add("(").add(values.get(0)).add(")");
         } else {
@@ -121,58 +134,6 @@ public class JavaAnnotation extends BaseImportable implements Appender {
         public void appendTo(JavaAddr addr) { }
     }
 
-    private static class AnnotationValue extends BaseImportable {
-
-        private final ValueType type;
-        private final String method;
-        private final List<String> values;
-
-        private AnnotationValue(Importer importer, String method, ValueType type, String value, String... values) {
-            super(importer);
-            this.type = type;
-            this.method = method;
-            this.values = new ArrayList<>();
-            this.values.add(value);
-            values = values == null ? EMPTY_STRINGS : values;
-            this.values.addAll(Arrays.asList(values));
-        }
-
-        @Override
-        public String toString() {
-            List<String> values = this.values;
-            if (values.size() == 1) {
-                return toValue(type, values.get(0));
-            }
-            StringJoiner joiner = new StringJoiner(", ", "{", "}");
-            for (String value : values) {
-                joiner.add(toValue(type, value));
-            }
-            return joiner.toString();
-        }
-
-        private String toValue(ValueType type, String value) {
-            switch (type) {
-                case STRING:
-                    return with(method, " = \"", value, "\"");
-                case ENUM:
-                case PRIMITIVE:
-                    return with(method, " = ", value);
-                case CLASS:
-                    return with(method, " = ", onImported(value), ".class");
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-
-        private static String with(String... values) {
-            StringBuilder builder = new StringBuilder();
-            for (String value : values) {
-                builder.append(value);
-            }
-            return builder.toString();
-        }
-    }
-
     private static String[] mapClassName(Class<?>... classes) {
         if (classes == null) {
             return new String[0];
@@ -182,13 +143,5 @@ public class JavaAnnotation extends BaseImportable implements Appender {
             names[i] = classes[i].getCanonicalName();
         }
         return names;
-    }
-
-    @SuppressWarnings("all")
-    private enum ValueType {
-        CLASS,
-        ENUM,
-        STRING,
-        PRIMITIVE
     }
 }

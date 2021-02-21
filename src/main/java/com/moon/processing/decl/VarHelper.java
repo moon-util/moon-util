@@ -30,15 +30,15 @@ public class VarHelper {
         return computeInCached(this, key, excludesVars, false);
     }
 
-    public String nextStatic() { return nextStatic(emptySet()); }
+    public String nextConst() { return nextConst(emptySet()); }
 
-    public String nextStatic(Object key) { return nextStatic(key, emptySet()); }
+    public String nextConst(Object key) { return nextConst(key, emptySet()); }
 
-    public String nextStatic(Set<String> excludesVars) {
+    public String nextConst(Set<String> excludesVars) {
         return toNext(this, excludesVars, true);
     }
 
-    public String nextStatic(Object key, Set<String> excludesVars) {
+    public String nextConst(Object key, Set<String> excludesVars) {
         return computeInCached(this, key, excludesVars, true);
     }
 
@@ -48,7 +48,7 @@ public class VarHelper {
         Map<Object, String> caches = wasStatic ? helper.staticCached : helper.memberCached;
         String var = caches.get(key);
         if (var == null) {
-            var = wasStatic ? helper.nextStatic(excludesVars) : helper.next(excludesVars);
+            var = wasStatic ? helper.nextConst(excludesVars) : helper.next(excludesVars);
             caches.put(key, var);
         }
         return var;

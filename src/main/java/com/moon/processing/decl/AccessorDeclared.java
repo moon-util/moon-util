@@ -4,8 +4,9 @@ import com.moon.accessor.annotation.Accessor;
 import com.moon.processing.JavaDeclarable;
 import com.moon.processing.JavaProvider;
 import com.moon.processing.file.Java2;
-import com.moon.processing.file.JavaClassFile;
+import com.moon.processing.file.FileClassImpl;
 import com.moon.processing.holder.NameHolder;
+import com.moon.processing.holder.TableHolder;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Imported;
 import com.moon.processor.utils.Test2;
@@ -27,6 +28,7 @@ import static javax.lang.model.element.Modifier.FINAL;
 public class AccessorDeclared implements JavaProvider {
 
     private final NameHolder nameHolder;
+    private final TableHolder tableHolder;
     private final Accessor accessor;
     private final TypeElement accessorElement;
     private final String accessorClassname;
@@ -39,19 +41,20 @@ public class AccessorDeclared implements JavaProvider {
 
     private final String classname;
 
-    private final VarHelper varHelper = new VarHelper();
     private final Elements utils;
     private final Types types;
 
     public AccessorDeclared(
         Accessor accessor,
         NameHolder nameHolder,
+        TableHolder tableHolder,
         TypeDeclared typeDeclared,
         TableDeclared tableDeclared,
         TypeDeclared pojoDeclared
     ) {
         this.accessor = accessor;
         this.nameHolder = nameHolder;
+        this.tableHolder = tableHolder;
         this.typeDeclared = typeDeclared;
         this.pojoDeclared = pojoDeclared;
         this.tableDeclared = tableDeclared;
@@ -66,6 +69,8 @@ public class AccessorDeclared implements JavaProvider {
 
     public NameHolder getNameHolder() { return nameHolder; }
 
+    public TableHolder getTableHolder() { return tableHolder; }
+
     public Accessor getAccessor() { return accessor; }
 
     public TypeElement getAccessorElement() { return accessorElement; }
@@ -79,8 +84,6 @@ public class AccessorDeclared implements JavaProvider {
     public TableDeclared getTableDeclared() { return tableDeclared; }
 
     public String getClassname() { return classname; }
-
-    public VarHelper getVarHelper() { return varHelper; }
 
     public Elements getUtils() { return utils; }
 
@@ -116,7 +119,7 @@ public class AccessorDeclared implements JavaProvider {
     }
 
     private JavaDeclarable doGetForInterface() {
-        JavaClassFile classFile = newAccessorImpl();
+        FileClassImpl classFile = newAccessorImpl();
         classFile.implement(typeDeclared.getTypeClassname());
 
         new AccessorGeneratorForInterface(classFile, this).doGenerate();
@@ -125,21 +128,21 @@ public class AccessorDeclared implements JavaProvider {
     }
 
     private JavaDeclarable doGetForAbstractClass() {
-        JavaClassFile classFile = newAccessorImpl();
+        FileClassImpl classFile = newAccessorImpl();
         classFile.extend(typeDeclared.getTypeClassname());
 
         return classFile;
     }
 
     private JavaDeclarable doGetForNormalClass() {
-        JavaClassFile classFile = newAccessorImpl();
+        FileClassImpl classFile = newAccessorImpl();
         classFile.extend(typeDeclared.getTypeClassname());
 
         return classFile;
     }
 
-    private JavaClassFile newAccessorImpl() {
-        JavaClassFile classFile = Java2.classOf(classname);
+    private FileClassImpl newAccessorImpl() {
+        FileClassImpl classFile = Java2.classOf(classname);
         classFile.annotationForRepository();
         return classFile;
     }

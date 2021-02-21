@@ -3,24 +3,23 @@ package com.moon.processing.file;
 import com.moon.processor.utils.Collect2;
 
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * @author benshaoye
  */
-public class JavaEnumFile extends BaseImplFile {
+public class FileEnumImpl extends BaseImplementation {
 
     private final Set<String> enums = new LinkedHashSet<>();
 
-    public JavaEnumFile(String packageName, String simpleName) {
+    public FileEnumImpl(String packageName, String simpleName) {
         super(packageName, simpleName);
     }
 
     @Override
     protected boolean inInterface() { return false; }
 
-    public JavaEnumFile enumOf(String... enums) {
+    public FileEnumImpl enumOf(String... enums) {
         Collect2.addAll(this.enums, enums);
         return this;
     }
@@ -36,7 +35,6 @@ public class JavaEnumFile extends BaseImplFile {
 
         appendFieldsAndBlock(addr);
         appendMethods(addr);
-        appendGetterSetterMethods(addr);
         return returning(addr, importMark);
     }
 

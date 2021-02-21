@@ -30,9 +30,12 @@ public class TableHolder implements JavaWritable {
         this.typeHolder = typeHolder;
     }
 
+    public TableDeclared get(String classname) { return tableDeclaredMap.get(classname); }
+
+    public TableDeclared get(TypeElement tableElement) { return get(Element2.getQualifiedName(tableElement)); }
+
     public TableDeclared with(TypeElement tableElement) {
-        String classname = Element2.getQualifiedName(tableElement);
-        TableDeclared tableDeclared = tableDeclaredMap.get(classname);
+        TableDeclared tableDeclared = get(tableElement);
         return tableDeclared == null ? newTableDeclared(tableElement) : tableDeclared;
     }
 

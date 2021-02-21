@@ -9,11 +9,11 @@ import java.util.TreeSet;
 /**
  * @author benshaoye
  */
-abstract class BaseDeclared extends BaseImportable {
+abstract class BaseModifiable extends BaseImportable {
 
     private final Set<Modifier> modifiers = new TreeSet<>();
 
-    public BaseDeclared(Importer importer) { super(importer); }
+    public BaseModifiable(Importer importer) { super(importer); }
 
     /**
      * 应用修饰符
@@ -22,29 +22,29 @@ abstract class BaseDeclared extends BaseImportable {
      *
      * @return
      */
-    public BaseDeclared addModifierWith(Modifier modifier) {
+    public BaseModifiable addModifierWith(Modifier modifier) {
         if (getAllowedModifiers().contains(modifier)) {
             Modifier2.useModifier(modifiers, modifier);
         }
         return this;
     }
 
-    public BaseDeclared remove(Modifier modifier) {
+    public BaseModifiable remove(Modifier modifier) {
         modifiers.remove(modifier);
         return this;
     }
 
-    public BaseDeclared withPrivate() { return addModifierWith(Modifier.PRIVATE); }
+    public BaseModifiable withPrivate() { return addModifierWith(Modifier.PRIVATE); }
 
-    public BaseDeclared withProtected() { return addModifierWith(Modifier.PROTECTED); }
+    public BaseModifiable withProtected() { return addModifierWith(Modifier.PROTECTED); }
 
-    public BaseDeclared withPublic() { return addModifierWith(Modifier.PUBLIC); }
+    public BaseModifiable withPublic() { return addModifierWith(Modifier.PUBLIC); }
 
-    public BaseDeclared withFinal() { return addModifierWith(Modifier.FINAL); }
+    public BaseModifiable withFinal() { return addModifierWith(Modifier.FINAL); }
 
-    public BaseDeclared withStatic() { return addModifierWith(Modifier.STATIC); }
+    public BaseModifiable withStatic() { return addModifierWith(Modifier.STATIC); }
 
-    public BaseDeclared withConst() { return withFinal().withStatic(); }
+    public BaseModifiable withConst() { return withFinal().withStatic(); }
 
     public boolean isStatic() { return modifiers.contains(Modifier.STATIC); }
 

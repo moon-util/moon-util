@@ -1,5 +1,7 @@
 package com.moon.processor.utils;
 
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.TypeKind;
 import java.beans.Introspector;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -204,22 +206,40 @@ public enum String2 {
         return camelcaseToHyphen(str, hyphen, continuousSplit, true);
     }
 
+    public static boolean isUpper(int ch) { return ch > 64 && ch < 91; }
+
+    public static boolean isLower(int ch) { return ch > 96 && ch < 123; }
+
+    public static boolean isLetter(int ch) { return isUpper(ch) || isLower(ch); }
+
+    /**
+     * 截取第一个单词
+     *
+     * @param string
+     *
+     * @return
+     */
     public static String firstWord(String string) {
         char[] chars = string.trim().toCharArray();
         StringBuilder builder = new StringBuilder(8);
-        boolean firstUpper = false, thisUpper;
-        for (int i = 0; i < chars.length; i++) {
-            char currChar = chars[i];
-            if (i == 0) {
-                firstUpper = Character.isUpperCase(currChar);
+        Boolean firstUpper = null;
+        for (char currChar : chars) {
+            if (firstUpper == null) {
+                if (isUpper(currChar)) {
+                    firstUpper = Boolean.TRUE;
+                } else if (isLower(currChar)) {
+                    firstUpper = Boolean.FALSE;
+                } else {
+                    continue;
+                }
                 builder.append(currChar);
-            } else if (Character.isWhitespace(currChar)) {
+            } else if (!isLetter(currChar)) {
                 break;
             } else {
-                thisUpper = Character.isUpperCase(currChar);
-                if (firstUpper == thisUpper) {
+                if (firstUpper && isUpper(currChar)) {
                     builder.append(currChar);
-                    firstUpper = thisUpper;
+                } else if (!firstUpper && isLower(currChar)) {
+                    builder.append(currChar);
                 } else {
                     break;
                 }
@@ -306,6 +326,19 @@ public enum String2 {
             default:
                 return type;
         }
+    }
+
+    public static String defaultReturningVal(ExecutableElement method, String actualReturnType) {
+        if (Test2.isPrimitiveNumber(actualReturnType)) {
+            return "0";
+        } else if (Test2.isPrimitiveBool(actualReturnType)) {
+            return "false";
+        } else if (Test2.isPrimitiveChar(actualReturnType)) {
+            return "' '";
+        } else if (method.getReturnType().getKind() != TypeKind.VOID) {
+            return "null";
+        }
+        return null;
     }
 
     public static String strWrapped(CharSequence value) { return "\"" + value + '"'; }

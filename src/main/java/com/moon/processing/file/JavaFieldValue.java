@@ -11,7 +11,6 @@ import java.util.Objects;
 public class JavaFieldValue extends BaseImportable {
 
     private final String classname;
-
     private String value;
 
     public JavaFieldValue(Importer importer, String classname) {
@@ -19,16 +18,24 @@ public class JavaFieldValue extends BaseImportable {
         this.classname = classname;
     }
 
+    public void classOf(Class<?> klass) { valueOf(onImported(klass) + ".class"); }
+
+    public void classOf(String classname) { valueOf(onImported(classname) + ".class"); }
+
     public void valueOf(Object value) { this.value = String.valueOf(value); }
 
     public void stringOf(String value) { valueOf('"' + value + '"'); }
 
-    public void ofFormatted(String template, Object... values) {
+    public void formattedOf(String template, Object... values) {
         valueOf(String2.format(template, values));
     }
 
+    public void typedFormattedOf(String template, Object... values) {
+        valueOf(Formatter.with(template, values));
+    }
+
     public void staticRef(String classname, String staticRef) {
-        this.value = String2.format("{}.{}", onImported(classname), staticRef);
+        valueOf(String2.format("{}.{}", onImported(classname), staticRef));
     }
 
     public void enumMemberRef(String enumClass, String enumValue, String memberRef) {

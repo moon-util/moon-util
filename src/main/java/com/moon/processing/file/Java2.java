@@ -6,29 +6,29 @@ package com.moon.processing.file;
 public enum Java2 {
     ;
 
-    public static JavaClassFile classOf(String packageName, String simpleName) {
-        return new JavaClassFile(packageName, simpleName);
+    public static FileClassImpl classOf(String packageName, String simpleName) {
+        return new FileClassImpl(packageName, simpleName);
     }
 
-    public static JavaEnumFile enumOf(String packageName, String simpleName) {
-        return new JavaEnumFile(packageName, simpleName);
+    public static FileEnumImpl enumOf(String packageName, String simpleName) {
+        return new FileEnumImpl(packageName, simpleName);
     }
 
-    public static JavaInterfaceFile interfaceOf(String packageName, String simpleName) {
-        return new JavaInterfaceFile(packageName, simpleName);
+    public static FileInterfaceImpl interfaceOf(String packageName, String simpleName) {
+        return new FileInterfaceImpl(packageName, simpleName);
     }
 
-    public static JavaClassFile classOf(String classname) {
+    public static FileClassImpl classOf(String classname) {
         String[] spliced = spliced(classname);
         return classOf(spliced[0], spliced[1]);
     }
 
-    public static JavaEnumFile enumOf(String classname) {
+    public static FileEnumImpl enumOf(String classname) {
         String[] spliced = spliced(classname);
         return enumOf(spliced[0], spliced[1]);
     }
 
-    public static JavaInterfaceFile interfaceOf(String classname) {
+    public static FileInterfaceImpl interfaceOf(String classname) {
         String[] spliced = spliced(classname);
         return interfaceOf(spliced[0], spliced[1]);
     }
