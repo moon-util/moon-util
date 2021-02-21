@@ -87,28 +87,6 @@ public enum String2 {
         }
     }
 
-    public static String format0(String template, Object... values) {
-        if (values != null) {
-            List<String> rest = null;
-            int index = 0;
-            for (Object value : values) {
-                if (template.contains("{}")) {
-                    template = template.replaceFirst("\\{\\}", value == null ? "null" : value.toString());
-                } else {
-                    if (rest == null) {
-                        rest = new ArrayList<>();
-                    }
-                    rest.add(index + ": " + value);
-                }
-                index++;
-            }
-            if (rest != null) {
-                template += rest.toString();
-            }
-        }
-        return template;
-    }
-
     public static StringBuilder newLine(StringBuilder builder) {
         return builder.append('\n');
     }

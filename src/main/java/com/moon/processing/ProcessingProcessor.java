@@ -5,6 +5,7 @@ import com.moon.accessor.annotation.Accessor;
 import com.moon.accessor.annotation.TableModel;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processing.holder.*;
+import com.moon.processing.util.Logger2;
 import com.moon.processing.util.Processing2;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -58,6 +59,7 @@ public class ProcessingProcessor extends AbstractProcessor {
         // } else {
         //     doProcessing(roundEnv);
         // }
+        Logger2.warn("================================>>>>>>>>");
         doProcessing(roundEnv);
         doWriteJavaFiles();
         return true;

@@ -109,4 +109,15 @@ public class TypeDeclared {
     }
 
     public Set<String> getAllPropertiesName() { return new LinkedHashSet<>(properties.keySet()); }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        TypeDeclared that = (TypeDeclared) o;
+        return Objects.equals(getTypeClassname(), that.getTypeClassname());
+    }
+
+    @Override
+    public int hashCode() { return getTypeClassname().hashCode(); }
 }

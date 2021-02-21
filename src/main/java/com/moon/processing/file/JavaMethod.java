@@ -1,11 +1,10 @@
 package com.moon.processing.file;
 
-import com.moon.accessor.util.String2;
 import com.moon.processor.holder.Importer;
+import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -41,6 +40,8 @@ public class JavaMethod extends JavaBlockCommentable {
         return this;
     }
 
+    public String getName() { return name; }
+
     public boolean isPropertyMethod() { return propertyMethod; }
 
     public JavaMethod typeOf(Class<?> returnType) {
@@ -52,6 +53,13 @@ public class JavaMethod extends JavaBlockCommentable {
         return this;
     }
 
+    /**
+     * 这里获取的{@link JavaParameters}不可增减参数、修改参数类型、名称
+     * <p>
+     * 只可以添加注解、注释以及获取参数信息等
+     *
+     * @return
+     */
     public JavaParameters getParameters() { return parameters; }
 
     public String getUniqueKey() { return signature; }
@@ -109,11 +117,15 @@ public class JavaMethod extends JavaBlockCommentable {
         return nextFormatted(using, template, arr(v1, v2, v3));
     }
 
-    public JavaMethod nextFormatted(String template, Object v1, Object v2, Object v3, Object v4, Consumer<LineScripter> using) {
+    public JavaMethod nextFormatted(
+        String template, Object v1, Object v2, Object v3, Object v4, Consumer<LineScripter> using
+    ) {
         return nextFormatted(using, template, arr(v1, v2, v3, v4));
     }
 
-    public JavaMethod nextFormatted(String template, Object v1, Object v2, Object v3, Object v4, Object v5, Consumer<LineScripter> using) {
+    public JavaMethod nextFormatted(
+        String template, Object v1, Object v2, Object v3, Object v4, Object v5, Consumer<LineScripter> using
+    ) {
         return nextFormatted(using, template, arr(v1, v2, v3, v4, v5));
     }
 
@@ -139,7 +151,7 @@ public class JavaMethod extends JavaBlockCommentable {
 
         if (scripters.isEmpty()) {
             appendOnly(addr, returning);
-        } else if (scripters.size() == 1) {
+        } else if (scripters.size() == 1 && returning == null) {
             appendOnly(addr, scripters.get(0));
         } else {
             // body
@@ -153,16 +165,12 @@ public class JavaMethod extends JavaBlockCommentable {
                     unsorted.add(scripter);
                 }
             }
-            if (returning != null) {
-                if (returning.isSorted()) {
-                    returning.appendTo(addr);
-                } else {
-                    unsorted.add(returning);
-                }
-            }
             unsorted.sort((o1, o2) -> o2.length() - o1.length());
             for (LineScripter scripter : unsorted) {
                 scripter.appendTo(addr);
+            }
+            if (returning != null) {
+                returning.appendTo(addr);
             }
             // close
             addr.newEnd("}");

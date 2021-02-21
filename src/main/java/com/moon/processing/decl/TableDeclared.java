@@ -21,6 +21,7 @@ import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -153,6 +154,19 @@ public class TableDeclared implements JavaProvider {
     public String getTableName() { return tableName; }
 
     public String getTablesFor() { return tables; }
+
+    public TypeDeclared getTypeDeclared() { return typeDeclared; }
+
+    public ColumnDeclared getColumnDeclared(String propertyName) {
+        return columnDeclaredMap.get(propertyName);
+    }
+
+    public <T> T reduce(BiConsumer<ColumnDeclared, T> consumer, T totalValue) {
+        for (ColumnDeclared value : columnDeclaredMap.values()) {
+            consumer.accept(value, totalValue);
+        }
+        return totalValue;
+    }
 
     @Override
     public JavaDeclarable getJavaDeclare() {

@@ -7,6 +7,7 @@ import com.moon.processing.file.Java2;
 import com.moon.processing.file.FileClassImpl;
 import com.moon.processing.holder.NameHolder;
 import com.moon.processing.holder.TableHolder;
+import com.moon.processing.holder.TypeHolder;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Imported;
 import com.moon.processor.utils.Test2;
@@ -28,6 +29,7 @@ import static javax.lang.model.element.Modifier.FINAL;
 public class AccessorDeclared implements JavaProvider {
 
     private final NameHolder nameHolder;
+    private final TypeHolder typeHolder;
     private final TableHolder tableHolder;
     private final Accessor accessor;
     private final TypeElement accessorElement;
@@ -47,6 +49,7 @@ public class AccessorDeclared implements JavaProvider {
     public AccessorDeclared(
         Accessor accessor,
         NameHolder nameHolder,
+        TypeHolder typeHolder,
         TableHolder tableHolder,
         TypeDeclared typeDeclared,
         TableDeclared tableDeclared,
@@ -54,6 +57,7 @@ public class AccessorDeclared implements JavaProvider {
     ) {
         this.accessor = accessor;
         this.nameHolder = nameHolder;
+        this.typeHolder = typeHolder;
         this.tableHolder = tableHolder;
         this.typeDeclared = typeDeclared;
         this.pojoDeclared = pojoDeclared;
@@ -68,6 +72,8 @@ public class AccessorDeclared implements JavaProvider {
     }
 
     public NameHolder getNameHolder() { return nameHolder; }
+
+    public TypeHolder getTypeHolder() { return typeHolder; }
 
     public TableHolder getTableHolder() { return tableHolder; }
 

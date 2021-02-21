@@ -72,4 +72,8 @@ public class MethodDeclared extends BaseExecutableDeclared {
     public String getReturnActualType() { return returnActualType; }
 
     public String getMethodSignature() { return methodSignature; }
+
+    public String getActualTypeFor(String declareType) {
+        return Generic2.mapToActual(getThisGenericMap(), getEnclosingClassname(), declareType);
+    }
 }

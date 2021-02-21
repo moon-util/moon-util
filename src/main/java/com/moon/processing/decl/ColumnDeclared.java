@@ -12,6 +12,7 @@ import com.moon.processor.utils.Comment2;
 import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.VariableElement;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import static com.moon.processor.utils.String2.format;
@@ -182,5 +183,19 @@ public class ColumnDeclared extends BaseColumnDeclared {
 
     private static String classRef(BaseImportable importable, String classname) {
         return classname == null ? null : (importable.onImported(classname) + ".class");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        ColumnDeclared that = (ColumnDeclared) o;
+        return Objects.equals(getThisClassname(), that.getThisClassname()) &&
+            Objects.equals(getFieldName(), that.getFieldName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getThisClassname(), getFieldName());
     }
 }

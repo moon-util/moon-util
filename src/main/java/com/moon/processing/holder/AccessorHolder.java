@@ -67,6 +67,7 @@ public class AccessorHolder implements JavaWritable {
         TypeDeclared pojoDeclared = typeHolder.with(modelElement);
         AccessorDeclared accessorDeclared = new AccessorDeclared(accessor,
             nameHolder,
+            typeHolder,
             tableHolder,
             typeDeclared,
             tableDeclared,
