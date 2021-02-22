@@ -246,7 +246,7 @@ public class AccessorGeneratorForInterface {
         ExecutableElement method = methodDeclared.getMethod();
         // Logger2.warn(method);
         // Logger2.warn(method.getTypeParameters());
-        // Logger2.warn(Generic2.from(methodDeclared.getMethod(), methodDeclared.getThisGenericMap()));
+        Logger2.warn(Generic2.from(methodDeclared.getMethod(), methodDeclared.getThisGenericMap()));
         TypeDeclared paramModel = typeHolder.with(parameterElem);
         if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
             doImplInsertFields(methodDeclared, implMethod, tableDeclared.reduce((col, cols) -> {

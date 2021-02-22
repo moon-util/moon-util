@@ -104,7 +104,7 @@ public enum Generic2 {
             TypeElement element = (TypeElement) method.getEnclosingElement();
             Logger2.warn("------->> {}", method.getSimpleName());
             Logger2.warn(usingGenericMap);
-            List<Runnable> runners = new ArrayList<>();
+            Queue<Runnable> taskQueue = new LinkedList<>();
 
             final Elements utils = Processing2.getUtils();
             final String classname = Element2.getQualifiedName(element);
@@ -115,6 +115,9 @@ public enum Generic2 {
                 if (utils.getTypeElement(bound) == null) {
                     GenericDeclared subGenericModel = usingGenericMap.get(fullKey);
                     if (subGenericModel == null) {
+                        taskQueue.add(() -> {
+
+                        });
                         runners.add(() -> {
                             GenericDeclared decl = usingGenericMap.get(fullKey);
                             if (decl == null) {
@@ -136,16 +139,9 @@ public enum Generic2 {
         return usingGenericMap;
     }
 
-    private static Runnable toRunner(Map<String, GenericDeclared> usingGenericMap, String fullKey, String declare) {
-        return () -> {
-            GenericDeclared decl = usingGenericMap.get(fullKey);
-            if (decl == null) {
-
-            } else {
-                String thsBound = decl.getEffectType();
-                putGenericDecl(fullKey, usingGenericMap, declare, thsBound);
-            }
-        };
+    private static class GenericTask {
+        private final String declare;
+        private
     }
 
     public static String typeSimplify(String classname) {
