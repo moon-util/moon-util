@@ -23,42 +23,55 @@ public class PropertyMethodDeclared extends MethodDeclared {
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
+        TypeDeclared thisTypeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
-        this(thisElement, enclosingElement, method, thisGenericMap, false);
+        this(thisElement, enclosingElement, method, thisTypeDeclared, thisGenericMap, false);
     }
 
     public PropertyMethodDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
+        TypeDeclared thisTypeDeclared,
         Map<String, GenericDeclared> thisGenericMap,
         boolean lombokGenerated
     ) {
-        super(thisElement, enclosingElement, method, thisGenericMap);
+        super(thisElement, enclosingElement, method, thisTypeDeclared, thisGenericMap);
         this.lombokGenerated = lombokGenerated;
     }
 
     protected PropertyMethodDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
+        TypeDeclared thisTypeDeclared,
         String methodName,
         String returnDeclaredType,
         Map<String, GenericDeclared> thisGenericMap,
         Map<String, String> parametersMap,
         boolean lombokGenerated
     ) {
-        super(thisElement, enclosingElement, methodName, returnDeclaredType, thisGenericMap, parametersMap);
+        super(thisElement,
+            enclosingElement,
+            thisTypeDeclared,
+            methodName,
+            returnDeclaredType,
+            thisGenericMap,
+            parametersMap);
         this.lombokGenerated = lombokGenerated;
     }
 
     public static PropertyMethodDeclared ofLombokGetterGenerated(
-        TypeElement thisElement, VariableElement field, Map<String, GenericDeclared> thisGenericMap
+        TypeElement thisElement,
+        VariableElement field,
+        TypeDeclared thisTypeDeclared,
+        Map<String, GenericDeclared> thisGenericMap
     ) {
         String type = field.asType().toString();
         String getterName = String2.toGetterName(Element2.getSimpleName(field), type);
         return new PropertyMethodDeclared(thisElement,
             (TypeElement) field.getEnclosingElement(),
+            thisTypeDeclared,
             getterName,
             type,
             thisGenericMap,
@@ -67,7 +80,10 @@ public class PropertyMethodDeclared extends MethodDeclared {
     }
 
     public static PropertyMethodDeclared ofLombokSetterGenerated(
-        TypeElement thisElement, VariableElement field, Map<String, GenericDeclared> thisGenericMap
+        TypeElement thisElement,
+        VariableElement field,
+        TypeDeclared thisTypeDeclared,
+        Map<String, GenericDeclared> thisGenericMap
     ) {
         String type = field.asType().toString();
         String name = Element2.getSimpleName(field);
@@ -76,6 +92,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
         String getterName = String2.toSetterName(Element2.getSimpleName(field));
         return new PropertyMethodDeclared(thisElement,
             (TypeElement) field.getEnclosingElement(),
+            thisTypeDeclared,
             getterName,
             "void",
             thisGenericMap,

@@ -19,6 +19,8 @@ public class BaseExecutableDeclared {
 
     private final ExecutableElement executable;
 
+    private final TypeDeclared typeDeclared;
+
     private final Map<String, GenericDeclared> thisGenericMap;
 
     private final String thisClassname;
@@ -54,11 +56,13 @@ public class BaseExecutableDeclared {
     protected BaseExecutableDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
+        TypeDeclared typeDeclared,
         Map<String, GenericDeclared> thisGenericMap,
         Map<String, String> parametersMap
     ) {
         this.thisElement = thisElement;
         this.enclosingElement = enclosingElement;
+        this.typeDeclared = typeDeclared;
         this.executable = null;
         this.thisGenericMap = thisGenericMap;
 
@@ -73,6 +77,7 @@ public class BaseExecutableDeclared {
             String name = stringEntry.getKey(), type = stringEntry.getValue();
             ParameterDeclared parameterDeclared = new ParameterDeclared(thisElement,
                 enclosingElement,
+                typeDeclared,
                 type,
                 name,
                 index++,
@@ -82,7 +87,8 @@ public class BaseExecutableDeclared {
         }
         this.parametersDeclared = parametersDeclared;
         this.parametersMap = parametersIndexedMap;
-        this.parametersTypesSignature = parametersDeclared.stream().map(ParameterDeclared::getSimplifyActualType)
+        this.parametersTypesSignature = parametersDeclared.stream()
+            .map(ParameterDeclared::getSimplifyActualType)
             .collect(joining(","));
     }
 
@@ -90,10 +96,12 @@ public class BaseExecutableDeclared {
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement executable,
+        TypeDeclared typeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
         this.thisElement = thisElement;
         this.enclosingElement = enclosingElement;
+        this.typeDeclared = typeDeclared;
         this.executable = executable;
         this.thisGenericMap = thisGenericMap;
 
@@ -109,6 +117,7 @@ public class BaseExecutableDeclared {
                 enclosingElement,
                 executable,
                 parameter,
+                typeDeclared,
                 index++,
                 thisGenericMap);
             parametersDeclared.add(parameterDeclared);
@@ -116,7 +125,8 @@ public class BaseExecutableDeclared {
         }
         this.parametersDeclared = Collections.unmodifiableList(parametersDeclared);
         this.parametersMap = Collections.unmodifiableMap(parametersMap);
-        this.parametersTypesSignature = parametersDeclared.stream().map(ParameterDeclared::getSimplifyActualType)
+        this.parametersTypesSignature = parametersDeclared.stream()
+            .map(ParameterDeclared::getSimplifyActualType)
             .collect(joining(","));
     }
 
@@ -130,11 +140,15 @@ public class BaseExecutableDeclared {
 
     public ExecutableElement getExecutable() { return executable; }
 
+    public TypeDeclared getTypeDeclared() { return typeDeclared; }
+
     public Map<String, GenericDeclared> getThisGenericMap() { return thisGenericMap; }
 
     public String getThisClassname() { return thisClassname; }
 
     public String getEnclosingClassname() { return enclosingClassname; }
+
+    public int getParametersCount() { return parametersDeclared.size(); }
 
     public List<ParameterDeclared> getParametersDeclared() { return parametersDeclared; }
 

@@ -1,10 +1,12 @@
 package com.moon.processing.decl;
 
+import com.moon.processing.util.Logger2;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
@@ -89,7 +91,61 @@ public enum Generic2 {
     public static Map<String, GenericDeclared> from(
         ExecutableElement method, Map<String, GenericDeclared> declaredGenericMap
     ) {
-        return declaredGenericMap;
+        Map<String, GenericDeclared> usingGenericMap;
+        if (method.getModifiers().contains(Modifier.STATIC)) {
+            usingGenericMap = new LinkedHashMap<>();
+        } else {
+            usingGenericMap = new LinkedHashMap<>(declaredGenericMap);
+        }
+        List<? extends TypeParameterElement> typeParameters = method.getTypeParameters();
+        if (typeParameters == null || typeParameters.isEmpty()) {
+            return usingGenericMap;
+        } else {
+            TypeElement element = (TypeElement) method.getEnclosingElement();
+            Logger2.warn("------->> {}", method.getSimpleName());
+            Logger2.warn(usingGenericMap);
+            List<Runnable> runners = new ArrayList<>();
+
+            final Elements utils = Processing2.getUtils();
+            final String classname = Element2.getQualifiedName(element);
+            for (TypeParameterElement param : typeParameters) {
+                String declare = getDeclareType(param);
+                String bound = param.getBounds().get(0).toString();
+                String fullKey = toFullKey(classname, bound);
+                if (utils.getTypeElement(bound) == null) {
+                    GenericDeclared subGenericModel = usingGenericMap.get(fullKey);
+                    if (subGenericModel == null) {
+                        runners.add(() -> {
+                            GenericDeclared decl = usingGenericMap.get(fullKey);
+                            if (decl == null) {
+
+                            } else {
+                                String thsBound = decl.getEffectType();
+                                putGenericDecl(fullKey, usingGenericMap, declare, thsBound);
+                            }
+                        });
+                    } else {
+                        bound = subGenericModel.getEffectType();
+                        putGenericDecl(fullKey, usingGenericMap, declare, bound);
+                    }
+                } else {
+                    putGenericDecl(fullKey, usingGenericMap, declare, bound);
+                }
+            }
+        }
+        return usingGenericMap;
+    }
+
+    private static Runnable toRunner(Map<String, GenericDeclared> usingGenericMap, String fullKey, String declare) {
+        return () -> {
+            GenericDeclared decl = usingGenericMap.get(fullKey);
+            if (decl == null) {
+
+            } else {
+                String thsBound = decl.getEffectType();
+                putGenericDecl(fullKey, usingGenericMap, declare, thsBound);
+            }
+        };
     }
 
     public static String typeSimplify(String classname) {
@@ -115,13 +171,21 @@ public enum Generic2 {
         return parse(element, new LinkedHashMap<>());
     }
 
+    public static Map<String, GenericDeclared> from(TypeMirror usingType) {
+        return parse((TypeElement) Processing2.getTypes().asElement(usingType), usingType, new LinkedHashMap<>());
+    }
+
+    private static Map<String, GenericDeclared> parse(TypeElement element, Map<String, GenericDeclared> genericMap) {
+        return element == null ? genericMap : parse(element, element.asType(), genericMap);
+    }
+
     private static Map<String, GenericDeclared> parse(
-        TypeElement element, Map<String, GenericDeclared> thisGenericMap
+        TypeElement element, TypeMirror usingType, Map<String, GenericDeclared> thisGenericMap
     ) {
-        if (element == null) {
+        if (element == null || usingType == null) {
             return thisGenericMap;
         }
-        parse(thisGenericMap, element.asType(), element, null);
+        parse(thisGenericMap, usingType, element, null);
         Types types = Processing2.getTypes();
         do {
             parseInterfaces(thisGenericMap, element.getInterfaces(), element);
@@ -187,6 +251,17 @@ public enum Generic2 {
             String key = toFullKey(declareClassname, model.getDeclare());
             genericMap.putIfAbsent(key, model);
         }
+    }
+
+    private static void putGenericDecl(
+        String fullKey, Map<String, GenericDeclared> genericMap, String declare, String bound
+    ) { putGenericDecl(fullKey, genericMap, declare, null, bound); }
+
+    private static void putGenericDecl(
+        String fullKey, Map<String, GenericDeclared> genericMap, String declare, String actual, String bound
+    ) {
+        GenericDeclared model = new GenericDeclared(declare, actual, bound);
+        genericMap.put(fullKey, model);
     }
 
     private static String toFullKey(String declareClassname, String declareType) {

@@ -59,7 +59,7 @@ public class GenericDeclared {
         sb.append(", actual='").append(actual).append('\'');
         sb.append(", bound='").append(bound).append('\'');
         sb.append(", effectType='").append(effectType).append('\'');
-        sb.append(", simpleEffectType='").append(simpleType).append('\'');
+        sb.append(", simpleType='").append(simpleType).append('\'');
         sb.append('}');
         return sb.toString();
     }

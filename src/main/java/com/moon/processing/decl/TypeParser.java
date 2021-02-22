@@ -56,7 +56,7 @@ final class TypeParser {
     private PropertyDeclared withPropertyDeclared(String name) {
         PropertyDeclared declared = properties.get(name);
         if (declared == null) {
-            declared = new PropertyDeclared(typeElement, name, thisGenericMap);
+            declared = new PropertyDeclared(typeElement, typeDeclared, name, thisGenericMap);
             properties.put(name, declared);
         }
         return declared;
@@ -92,6 +92,7 @@ final class TypeParser {
                 ConstructorDeclared constructorDeclared = new ConstructorDeclared(typeElement,
                     parsingElem,
                     (ExecutableElement) element,
+                    typeDeclared,
                     thisGenericMap);
                 constructorsMap.put(constructorDeclared.getConstructorSignature(), constructorDeclared);
             }
@@ -99,6 +100,7 @@ final class TypeParser {
             MethodDeclared methodDeclared = new MethodDeclared(typeElement,
                 parsingElem,
                 (ExecutableElement) element,
+                typeDeclared,
                 thisGenericMap);
             methodsMap.putIfAbsent(methodDeclared.getMethodSignature(), methodDeclared);
         } else if (Test2.isField(element)) {

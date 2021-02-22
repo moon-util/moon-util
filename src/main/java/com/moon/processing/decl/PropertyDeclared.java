@@ -18,6 +18,8 @@ public class PropertyDeclared {
 
     private final TypeElement thisElement;
 
+    private final TypeDeclared typeDeclared;
+
     private final String thisClassname;
 
     private final String name;
@@ -52,8 +54,11 @@ public class PropertyDeclared {
      */
     private Map<String, PropertyMethodDeclared> typedSetterMap = new LinkedHashMap<>();
 
-    public PropertyDeclared(TypeElement thisElement, String name, Map<String, GenericDeclared> thisGenericMap) {
+    public PropertyDeclared(
+        TypeElement thisElement, TypeDeclared typeDeclared, String name, Map<String, GenericDeclared> thisGenericMap
+    ) {
         this.thisGenericMap = thisGenericMap;
+        this.typeDeclared = typeDeclared;
         this.thisElement = thisElement;
         this.name = name;
         this.thisClassname = Element2.getQualifiedName(thisElement);
@@ -75,7 +80,11 @@ public class PropertyDeclared {
             return;
         }
         TypeElement enclosingElement = (TypeElement) getterElement.getEnclosingElement();
-        this.getter = new PropertyMethodDeclared(thisElement, enclosingElement, getterElement, thisGenericMap);
+        this.getter = new PropertyMethodDeclared(thisElement,
+            enclosingElement,
+            getterElement,
+            typeDeclared,
+            thisGenericMap);
     }
 
     public void withSetterMethodDeclared(
@@ -90,6 +99,7 @@ public class PropertyDeclared {
             new PropertyMethodDeclared(thisElement,
                 (TypeElement) setterElement.getEnclosingElement(),
                 setterElement,
+                typeDeclared,
                 thisGenericMap));
     }
 
@@ -130,8 +140,10 @@ public class PropertyDeclared {
         FieldDeclared field = this.fieldDeclared;
         if (getter == null) {
             if (field != null && Test2.hasLombokSetter(field.getFieldElement())) {
-                PropertyMethodDeclared setter = PropertyMethodDeclared
-                    .ofLombokSetterGenerated(thisElement, field.getFieldElement(), thisGenericMap);
+                PropertyMethodDeclared setter = PropertyMethodDeclared.ofLombokSetterGenerated(thisElement,
+                    field.getFieldElement(),
+                    typeDeclared,
+                    thisGenericMap);
                 ParameterDeclared parameter = setter.getParameterAt(0);
                 typedSetterMap.put(parameter.getSimplifyActualType(), setter);
                 this.setter = setter;
@@ -141,8 +153,10 @@ public class PropertyDeclared {
         } else {
             PropertyMethodDeclared setter = typedSetterMap.get(getter.getReturnActualType());
             if (setter == null && field != null && Test2.hasLombokSetter(field.getFieldElement())) {
-                setter = PropertyMethodDeclared
-                    .ofLombokSetterGenerated(thisElement, field.getFieldElement(), thisGenericMap);
+                setter = PropertyMethodDeclared.ofLombokSetterGenerated(thisElement,
+                    field.getFieldElement(),
+                    typeDeclared,
+                    thisGenericMap);
                 ParameterDeclared parameter = setter.getParameterAt(0);
                 typedSetterMap.put(parameter.getSimplifyActualType(), setter);
             }
@@ -154,8 +168,10 @@ public class PropertyDeclared {
         if (getter == null) {
             FieldDeclared field = this.fieldDeclared;
             if (field != null && Test2.hasLombokGetter(field.getFieldElement())) {
-                this.getter = PropertyMethodDeclared
-                    .ofLombokGetterGenerated(thisElement, field.getFieldElement(), thisGenericMap);
+                this.getter = PropertyMethodDeclared.ofLombokGetterGenerated(thisElement,
+                    field.getFieldElement(),
+                    typeDeclared,
+                    thisGenericMap);
             }
         }
     }

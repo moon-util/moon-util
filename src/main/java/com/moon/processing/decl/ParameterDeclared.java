@@ -16,6 +16,7 @@ public class ParameterDeclared {
     private final TypeElement declaredElement;
     private final ExecutableElement thisExecutable;
     private final VariableElement parameter;
+    private final TypeDeclared thisTypeDeclared;
     private final Map<String, GenericDeclared> thisGenericMap;
     private final String thisClassname;
     private final String declaredClassname;
@@ -30,6 +31,7 @@ public class ParameterDeclared {
         TypeElement declaredElement,
         ExecutableElement thisExecutable,
         VariableElement parameter,
+        TypeDeclared thisTypeDeclared,
         int parameterIndex,
         Map<String, GenericDeclared> thisGenericMap
     ) {
@@ -39,6 +41,7 @@ public class ParameterDeclared {
         this.thisGenericMap = thisGenericMap;
         this.parameter = parameter;
         this.parameterIndex = parameterIndex;
+        this.thisTypeDeclared = thisTypeDeclared;
         this.thisClassname = Element2.getQualifiedName(thisElement);
         String declaredClassname = Element2.getQualifiedName(declaredElement);
         String declaredType = parameter.asType().toString();
@@ -63,6 +66,7 @@ public class ParameterDeclared {
     public ParameterDeclared(
         TypeElement thisElement,
         TypeElement declaredElement,
+        TypeDeclared thisTypeDeclared,
         String declaredType,
         String declaredName,
         int parameterIndex,
@@ -73,6 +77,7 @@ public class ParameterDeclared {
         this.thisExecutable = null;
         this.thisGenericMap = thisGenericMap;
         this.parameter = null;
+        this.thisTypeDeclared = thisTypeDeclared;
         this.parameterIndex = parameterIndex;
         this.thisClassname = Element2.getQualifiedName(thisElement);
         String declaredClassname = Element2.getQualifiedName(declaredElement);
@@ -91,6 +96,8 @@ public class ParameterDeclared {
     public ExecutableElement getThisExecutable() { return thisExecutable; }
 
     public VariableElement getParameter() { return parameter; }
+
+    public TypeDeclared getThisTypeDeclared() { return thisTypeDeclared; }
 
     public Map<String, GenericDeclared> getThisGenericMap() { return thisGenericMap; }
 

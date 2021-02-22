@@ -255,20 +255,20 @@ public class TableDeclared implements JavaProvider {
 
         // getTableFields()
         enumFile.publicMethod("getTableFields").override()
-            .typeOf("{}<?, {}, {}>[]", TableField.class, entityName, enumFile.getClassname()).returnFormatted(
+            .typeOf("{}<?, {}, {}>[]", TableField.class, entityName, enumFile.getClassname()).returnTypeFormatted(
             "new {}[]{{}}",
             enumFile.onImported(TableField.class),
             columnDeclaredMap.values().stream().map(ColumnDeclared::getColumnName).collect(Collectors.joining(", ")));
 
         // getTableName()
-        enumFile.publicMethod("getTableName").typeOf(String.class).override().returnFormatted("\"{}\"", getTableName());
+        enumFile.publicMethod("getTableName").typeOf(String.class).override().returnTypeFormatted("\"{}\"", getTableName());
 
         // getComment() & getFirstComment()
         String comment = Comment2.resolveComment(typeElement);
         String firstComment = Comment2.resolveFirstComment(typeElement);
-        enumFile.publicMethod("getComment").override().typeOf(String.class).returnString(comment);
+        enumFile.publicMethod("getComment").override().typeOf(String.class).returnStringify(comment);
         if (!Objects.equals(firstComment, comment)) {
-            enumFile.publicMethod("getFirstComment").override().typeOf(String.class).returnString(firstComment);
+            enumFile.publicMethod("getFirstComment").override().typeOf(String.class).returnStringify(firstComment);
         }
     }
 }

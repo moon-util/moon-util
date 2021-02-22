@@ -4,6 +4,7 @@ import com.moon.accessor.annotation.Provided;
 import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;
+import com.moon.processing.util.Logger2;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Assert2;
 import com.moon.processor.utils.Element2;
@@ -12,13 +13,13 @@ import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author benshaoye
@@ -61,7 +62,7 @@ public class AccessorGeneratorForInterface {
             Provided provided = element.getAnnotation(Provided.class);
             if (provided != null) {
                 // Provided 有优先权，但要后处理
-                runners.add(() -> onProvidedAnnotated(element, provided));
+                runners.add(() -> onProvidedAnnotated(declared, provided));
                 return;
             }
             String methodName = Element2.getSimpleName(element);
@@ -70,7 +71,7 @@ public class AccessorGeneratorForInterface {
                 return;
             }
             // TODO 方法名解析
-            doParsingWithDeclared(methodName, element);
+            doParsingWithDeclared(declared);
         });
         runners.forEach(Runnable::run);
     }
@@ -79,10 +80,10 @@ public class AccessorGeneratorForInterface {
         return false;
     }
 
-    private void doParsingWithDeclared(String methodName, ExecutableElement element) {
-        switch (String2.firstWord(methodName).toLowerCase()) {
+    private void doParsingWithDeclared(MethodDeclared methodDeclared) {
+        switch (String2.firstWord(methodDeclared.getMethodName()).toLowerCase()) {
             case "insert": {
-                implMethodForInsert(methodName, element);
+                implMethodForInsert(methodDeclared);
                 break;
             }
             case "update": {
@@ -126,105 +127,95 @@ public class AccessorGeneratorForInterface {
         }
     }
 
-    private void implMethodForInsert(String methodName, ExecutableElement element) {
-        List<? extends VariableElement> parameters = element.getParameters();
-        switch (parameters.size()) {
-            case 0:
-                doImplEmptyMethod(methodName, element);
+    private void implMethodForInsert(MethodDeclared methodDeclared) {
+        switch (methodDeclared.getParametersCount()) {
+            case 0: {
+                doImplEmptyMethod(methodDeclared);
                 break;
-            case 1:
-                doImplInsertForOnlyParameter(methodName, parameters.get(0));
+            }
+            case 1: {
+                doImplInsertForOnlyParameter(methodDeclared, methodDeclared.getParameterAt(0));
                 break;
-            default:
-                doImplInsertForMultiParameters(methodName, parameters);
+            }
+            default: {
+                doImplInsertForMultiParameters(methodDeclared);
                 break;
+            }
         }
     }
 
-    private void doImplInsertForMultiParameters(String methodName, List<? extends VariableElement> parameters) {
+    private void doImplInsertForMultiParameters(MethodDeclared methodDeclared) {
         List<Consumer<JavaParameters>> runners = new ArrayList<>();
-        Map<ColumnDeclared, String> columnsMap = new LinkedHashMap<>();
-        for (VariableElement parameter : parameters) {
-            String declareType = parameter.asType().toString();
-            String actualType = parsingDeclared.getActualTypeFor(declareType);
-            String parameterName = parameter.getSimpleName().toString();
+        Map<ColumnDeclared, ParameterDeclared> columnsMap = new LinkedHashMap<>();
+        for (ParameterDeclared parameter : methodDeclared.getParametersDeclared()) {
+            String actualType = parameter.getActualType();
+            String parameterName = parameter.getParameterName();
             ColumnDeclared column = tableDeclared.getColumnDeclared(parameterName);
             if (isSamePropertyType(actualType, column.getFieldClass())) {
-                columnsMap.put(column, parameterName);
+                columnsMap.put(column, parameter);
                 runners.add(params -> params.add(parameterName, actualType));
             }
         }
-        doImplInsertParameters(impl.publicMethod(methodName, params -> {
+        doImplInsertParameters(methodDeclared, publicMethod(methodDeclared, params -> {
             for (Consumer<JavaParameters> runner : runners) {
                 runner.accept(params);
             }
-        }).typeOf(parsingDeclared.getReturnActualType()).override(), columnsMap);
+        }).override().typeOf(methodDeclared.getReturnActualType()), columnsMap);
     }
 
-    private void doImplInsertForOnlyParameter(String methodName, VariableElement parameter) {
-        TypeMirror parameterType = parameter.asType();
-        String parameterActualType = parsingDeclared.getActualTypeFor(parameterType.toString());
-        String parameterName = Element2.getSimpleName(parameter);
+    private void doImplInsertForOnlyParameter(MethodDeclared methodDeclared, ParameterDeclared parameter) {
+        String parameterActualType = parameter.getActualType();
+        String parameterName = parameter.getParameterName();
         ColumnDeclared columnDeclared = tableDeclared.getColumnDeclared(parameterName);
-        final JavaMethod implMethod = impl.publicMethod(methodName, parameters -> {
+
+        final JavaMethod implMethod = publicMethod(methodDeclared, parameters -> {
             parameters.add(parameterName, parameterActualType);
-        }).typeOf(parsingDeclared.getReturnActualType());
+        }).typeOf(methodDeclared.getReturnActualType()).override();
+
         if (columnDeclared == null) {
-            // 自定义属性隔离容器
-            TypeElement parameterElem = (TypeElement) types.asElement(parameterType);
-            TypeDeclared paramModel = typeHolder.with(parameterElem);
-            if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
-                doImplInsertEntity(implMethod);
-            } else {
-                doImplInsertModel(implMethod, paramModel);
-            }
+            doImplInsertMethodForModel(methodDeclared, parameter, implMethod);
         } else {
             String columnFieldClass = columnDeclared.getFieldClass();
             String generalizableType = String2.toGeneralizableType(parameterActualType);
             if (Objects.equals(generalizableType, columnFieldClass)) {
-                // 属性类型
-                doImplInsertParameter(implMethod, columnDeclared, parameterName);
+                doImplInsertParameter(methodDeclared, implMethod, columnDeclared, parameter);
             } else if (Test2.isSubtypeOf(generalizableType, columnFieldClass)) {
-                // 属性子类型
-                doImplInsertParameter(implMethod, columnDeclared, parameterName);
+                doImplInsertParameter(methodDeclared, implMethod, columnDeclared, parameter);
             } else {
-                // 自定义属性隔离容器
-                TypeElement parameterElem = (TypeElement) types.asElement(parameterType);
-                TypeDeclared paramModel = typeHolder.with(parameterElem);
-                if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
-                    doImplInsertEntity(implMethod);
-                } else {
-                    doImplInsertModel(implMethod, paramModel);
-                }
+                doImplInsertMethodForModel(methodDeclared, parameter, implMethod);
             }
         }
     }
 
-    private void doImplInsertParameters(JavaMethod implMethod, Map<ColumnDeclared, String> parameters) {
+    private void doImplInsertParameters(
+        MethodDeclared methodDeclared, JavaMethod implMethod, Map<ColumnDeclared, ParameterDeclared> parameters
+    ) {
         if (parameters.isEmpty()) {
-            defaultReturning(implMethod, parsingDeclared.getMethod());
+            defaultReturning(methodDeclared, implMethod);
             return;
         }
         writeInsertSQL(implMethod, toColumnsJoined(parameters), parameters.size());
         // TODO execute SQL
-        defaultReturning(implMethod, parsingDeclared.getMethod());
+        defaultReturning(methodDeclared, implMethod);
     }
 
     private void doImplInsertFields(
-        JavaMethod implMethod, Map<ColumnDeclared, PropertyDeclared> columnsMap
+        MethodDeclared methodDeclared, JavaMethod implMethod, Map<ColumnDeclared, PropertyDeclared> columnsMap
     ) {
         writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
         // TODO execute SQL
-        defaultReturning(implMethod, parsingDeclared.getMethod());
+        defaultReturning(methodDeclared, implMethod);
     }
 
-    private void doImplInsertParameter(JavaMethod implMethod, ColumnDeclared column, String parameterName) {
-        Map<ColumnDeclared, String> parameters = new LinkedHashMap<>();
+    private void doImplInsertParameter(
+        MethodDeclared methodDeclared, JavaMethod implMethod, ColumnDeclared column, ParameterDeclared parameterName
+    ) {
+        Map<ColumnDeclared, ParameterDeclared> parameters = new LinkedHashMap<>();
         parameters.put(column, parameterName);
-        doImplInsertParameters(implMethod, parameters);
+        doImplInsertParameters(methodDeclared, implMethod, parameters);
     }
 
-    private void doImplInsertModel(JavaMethod implMethod, TypeDeclared paramModel) {
+    private void doImplInsertModel(MethodDeclared methodDeclared, JavaMethod implMethod, TypeDeclared paramModel) {
         Map<ColumnDeclared, PropertyDeclared> columns = new LinkedHashMap<>();
         Map<String, PropertyDeclared> properties = paramModel.getCopiedProperties();
         for (PropertyDeclared property : properties.values()) {
@@ -232,38 +223,57 @@ public class AccessorGeneratorForInterface {
                 continue;
             }
             ColumnDeclared column = tableDeclared.getColumnDeclared(property.getName());
+            if (column == null) {
+                continue;
+            }
             if (isSamePropertyType(property.getActualType(), column.getFieldClass())) {
                 columns.put(column, property);
             }
         }
         if (columns.isEmpty()) {
-            defaultReturning(implMethod, parsingDeclared.getMethod());
+            defaultReturning(methodDeclared, implMethod);
         } else {
-            doImplInsertFields(implMethod, columns);
+            doImplInsertFields(methodDeclared, implMethod, columns);
         }
     }
 
-    private void doImplInsertEntity(JavaMethod implMethod) {
-        doImplInsertFields(implMethod, tableDeclared.reduce((col, cols) -> {
-            cols.put(col, col.getProperty());
-        }, new LinkedHashMap<>()));
+    private void doImplInsertMethodForModel(
+        MethodDeclared methodDeclared, ParameterDeclared parameter, JavaMethod implMethod
+    ) {
+        TypeMirror parameterType = parameter.getParameter().asType();
+        TypeElement parameterElem = (TypeElement) types.asElement(parameterType);
+        // Logger2.warn("-----------------------------------------------------");
+        ExecutableElement method = methodDeclared.getMethod();
+        // Logger2.warn(method);
+        // Logger2.warn(method.getTypeParameters());
+        // Logger2.warn(Generic2.from(methodDeclared.getMethod(), methodDeclared.getThisGenericMap()));
+        TypeDeclared paramModel = typeHolder.with(parameterElem);
+        if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
+            doImplInsertFields(methodDeclared, implMethod, tableDeclared.reduce((col, cols) -> {
+                cols.put(col, col.getProperty());
+            }, new LinkedHashMap<>()));
+        } else {
+            doImplInsertModel(methodDeclared, implMethod, paramModel);
+        }
     }
 
     private void writeInsertSQL(JavaMethod implMethod, String columnsJoined, int count) {
-        String sql = "INSERT INTO " + '`' + tableDeclared.getTableName() + "` " +
+        String sql = "INSERT INTO " + toDatabaseSymbol(tableDeclared.getTableName()) +
 
-            '(' + columnsJoined + ") VALUES " +
-
-            '(' + toPlaceholders(count) + ')';
+            " (" + columnsJoined + ") VALUES (" + toPlaceholders(count) + ')';
         implMethod.nextFormatted("{} sql = \"{}\"", implMethod.onImported(String.class), sql);
     }
 
     private static String toColumnsJoined(Map<ColumnDeclared, ?> columnsMap) {
-        return columnsMap.keySet().stream().map(col -> toTableColumn(col.getColumnName()))
-            .collect(Collectors.joining(", "));
+        int index = 0, length = columnsMap.size();
+        String[] columns = new String[length];
+        for (ColumnDeclared declared : columnsMap.keySet()) {
+            columns[index++] = toDatabaseSymbol(declared.getColumnName());
+        }
+        return String.join(", ", columns);
     }
 
-    private static String toTableColumn(String columnName) { return '`' + columnName + '`'; }
+    private static String toDatabaseSymbol(String columnName) { return '`' + columnName + '`'; }
 
     private static String toPlaceholders(int count) {
         String[] holders = new String[count];
@@ -279,22 +289,21 @@ public class AccessorGeneratorForInterface {
         return Test2.isSubtypeOf(generalizableType, fieldClass);
     }
 
-    private void onProvidedAnnotated(ExecutableElement element, Provided provided) {
+    private void onProvidedAnnotated(MethodDeclared method, Provided provided) {
         final JavaMethod setter;
+        ExecutableElement element = method.getMethod();
         Assert2.assertProvidedMethodParameters(element);
-        String fieldName, fieldType, actualType, paramName;
+        String fieldName, actualType, paramName;
         if (Test2.isGetterMethod(element)) {
             fieldName = Element2.toPropertyName(element);
-            fieldType = Element2.getGetterDeclareType(element);
-            actualType = Generic2.mapToActual(thisGenericMap, accessorClassname, fieldType);
+            actualType = method.getReturnActualType();
             JavaField field = impl.privateField(fieldName, actualType);
             field.withGetterMethod().returning(fieldName).override();
             setter = field.useSetterMethod();
         } else {
-            String parameterName = Element2.getSimpleName(element);
-            fieldType = element.getReturnType().toString();
-            actualType = Generic2.mapToActual(thisGenericMap, accessorClassname, fieldType);
             fieldName = impl.nextVar();
+            actualType = method.getReturnActualType();
+            String parameterName = Element2.getSimpleName(element);
             JavaField field = impl.privateField(fieldName, actualType);
             field.publicMethod(parameterName).override().typeOf(actualType).returning(fieldName);
             setter = field.useMethod(String2.toSetterName(parameterName), params -> {
@@ -308,26 +317,81 @@ public class AccessorGeneratorForInterface {
         setter.nextFormatted("this.{} = {}", fieldName, paramName, LineScripter::withUnsorted);
     }
 
-    private void doImplEmptyMethod(String methodName, ExecutableElement element) {
-        doImplEmptyMethod(methodName, element, ps -> {});
+    private void doImplEmptyMethod(MethodDeclared methodDeclared) {
+        doImplEmptyMethod(methodDeclared, ps -> {});
     }
 
     private void doImplEmptyMethod(
-        String methodName, ExecutableElement element, Consumer<JavaParameters> usingParameters
+        MethodDeclared methodDeclared, Consumer<JavaParameters> usingParameters
     ) {
-        final String returnType = parsingDeclared.getReturnActualType();
-        JavaMethod method = impl.publicMethod(methodName, usingParameters).typeOf(returnType);
-        defaultReturning(method, element);
+        JavaMethod implMethod = publicMethod(methodDeclared, usingParameters).override()
+            .typeOf(methodDeclared.getReturnActualType());
+        defaultReturning(methodDeclared, implMethod);
     }
 
-    private void defaultReturning(JavaMethod method, ExecutableElement element) {
-        final String returnType = parsingDeclared.getReturnActualType();
-        defaultReturning(method.override(), String2.defaultReturningVal(element, returnType));
+    private JavaMethod publicMethod(MethodDeclared methodDeclared, Consumer<JavaParameters> usingParameters) {
+        return impl.publicMethod(methodDeclared.getMethodName(), usingParameters);
     }
 
-    private static void defaultReturning(JavaMethod method, String returning) {
-        if (returning != null) {
+    private void defaultReturning(MethodDeclared methodDeclared, JavaMethod method) {
+        final String returnActualType = methodDeclared.getReturnActualType();
+        String returning = defaultReturningVal(returnActualType);
+        if (returning == null) {
+            ExecutableElement element = methodDeclared.getMethod();
+            TypeMirror returnType = element.getReturnType();
+            if (returnType.getKind() == TypeKind.VOID) {
+                return;
+            }
+            TypeElement returnElem = (TypeElement) types.asElement(returnType);
+            String stringify = Element2.getQualifiedName(returnElem);
+            String collectionType = COLLECTION_TYPES.get(stringify);
+            if (collectionType != null) {
+                if (Objects.equals(returnElem.toString(), returnType.toString())) {
+                    method.returnFormatted("new {}();", method.onImported(collectionType));
+                } else {
+                    method.returnFormatted("new {}<>();", method.onImported(collectionType));
+                }
+            } else {
+                method.returning("null");
+            }
+        } else {
             method.returning(returning);
         }
+    }
+
+    private final static Map<String, String> COLLECTION_TYPES = new HashMap<>();
+
+    static {
+        BiConsumer<Class<?>, Class<?>> consumer = (cls1, cls2) -> COLLECTION_TYPES.put(cls1.getCanonicalName(),
+            cls2.getCanonicalName());
+        consumer.accept(Map.class, HashMap.class);
+        consumer.accept(HashMap.class, HashMap.class);
+        consumer.accept(TreeMap.class, TreeMap.class);
+        consumer.accept(LinkedHashMap.class, LinkedHashMap.class);
+
+        consumer.accept(Set.class, HashSet.class);
+        consumer.accept(HashMap.class, HashMap.class);
+        consumer.accept(TreeSet.class, TreeSet.class);
+        consumer.accept(LinkedHashSet.class, LinkedHashSet.class);
+
+        consumer.accept(List.class, ArrayList.class);
+        consumer.accept(ArrayList.class, ArrayList.class);
+        consumer.accept(LinkedList.class, LinkedList.class);
+
+        consumer.accept(Collection.class, ArrayList.class);
+        consumer.accept(Iterable.class, ArrayList.class);
+        consumer.accept(Queue.class, LinkedList.class);
+        consumer.accept(Deque.class, LinkedList.class);
+    }
+
+    private static String defaultReturningVal(String actualReturnType) {
+        if (Test2.isPrimitiveNumber(actualReturnType)) {
+            return "0";
+        } else if (Test2.isPrimitiveBool(actualReturnType)) {
+            return "false";
+        } else if (Test2.isPrimitiveChar(actualReturnType)) {
+            return "' '";
+        }
+        return null;
     }
 }

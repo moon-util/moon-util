@@ -2,10 +2,9 @@ package com.moon.processor.utils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import java.beans.Introspector;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.IntPredicate;
 
 /**
@@ -304,19 +303,6 @@ public enum String2 {
             default:
                 return type;
         }
-    }
-
-    public static String defaultReturningVal(ExecutableElement method, String actualReturnType) {
-        if (Test2.isPrimitiveNumber(actualReturnType)) {
-            return "0";
-        } else if (Test2.isPrimitiveBool(actualReturnType)) {
-            return "false";
-        } else if (Test2.isPrimitiveChar(actualReturnType)) {
-            return "' '";
-        } else if (method.getReturnType().getKind() != TypeKind.VOID) {
-            return "null";
-        }
-        return null;
     }
 
     public static String strWrapped(CharSequence value) { return "\"" + value + '"'; }

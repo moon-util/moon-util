@@ -229,6 +229,21 @@ public enum Test2 {
         return isSubtypeOf(actualType, superclass.getCanonicalName());
     }
 
+    public static boolean isSubtypeOf(TypeMirror theType, Class<?> supertype) {
+        return isSubtypeOf(theType, supertype.getCanonicalName());
+    }
+
+    public static boolean isSubtypeOf(TypeMirror theType, String supertype) {
+        if (theType == null || supertype == null) {
+            return false;
+        }
+        TypeElement type = Environment2.getUtils().getTypeElement(supertype);
+        if (type == null) {
+            return false;
+        }
+        return theType != null && supertype != null && isSubtypeOf(theType, type.asType());
+    }
+
     public static boolean isSubtypeOf(String actualType, String superClass) {
         if (actualType == null || superClass == null) {
             return false;
@@ -238,10 +253,15 @@ public enum Test2 {
     }
 
     public static boolean isSubtypeOf(TypeElement elem1, TypeElement elem2) {
-        return elem1 != null && elem2 != null && getTypes().isSubtype(elem1.asType(), elem2.asType());
+        return elem1 != null && elem2 != null && isSubtypeOf(elem1.asType(), elem2.asType());
     }
 
-    final static Args<Collection<String>, Class<?>> WITHER = (c, cs) -> Arrays.stream(cs).map(Class::getCanonicalName)
+    public static boolean isSubtypeOf(TypeMirror type1, TypeMirror type2) {
+        return type1 != null && type2 != null && getTypes().isSubtype(type1, type2);
+    }
+
+    final static Args<Collection<String>, Class<?>> WITHER = (c, cs) -> Arrays.stream(cs)
+        .map(Class::getCanonicalName)
         .forEach(c::add);
     private final static Set<String> PRIMITIVE_NUMS = new HashSet<>();
     private final static Set<String> BASIC_TYPES = new HashSet<>();

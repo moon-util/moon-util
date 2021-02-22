@@ -69,11 +69,18 @@ public class JavaMethod extends JavaBlockCommentable {
         return this;
     }
 
-    public JavaMethod returnFormatted(String template, Object... values) {
+    public JavaMethod returnTypeFormatted(String template, Object... values) {
         return template == null ? returnNull() : returning(Formatter.with(template, values));
     }
 
-    public JavaMethod returnString(String template, Object... values) {
+    public JavaMethod returnFormatted(String template, Object... values){
+        if (template == null) {
+            return returnNull();
+        }
+        return returning(String2.format(template, values));
+    }
+
+    public JavaMethod returnStringify(String template, Object... values) {
         if (template == null) {
             return returnNull();
         }

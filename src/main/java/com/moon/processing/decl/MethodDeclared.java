@@ -25,9 +25,10 @@ public class MethodDeclared extends BaseExecutableDeclared {
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
+        TypeDeclared typeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
-        super(thisElement, enclosingElement, method, Generic2.from(method, thisGenericMap));
+        super(thisElement, enclosingElement, method, typeDeclared, Generic2.from(method, thisGenericMap));
         String methodName = method.getSimpleName().toString();
         this.methodName = methodName;
 
@@ -51,12 +52,13 @@ public class MethodDeclared extends BaseExecutableDeclared {
     protected MethodDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
+        TypeDeclared typeDeclared,
         String methodName,
         String returnDeclaredType,
         Map<String, GenericDeclared> thisGenericMap,
         Map<String, String> parametersMap
     ) {
-        super(thisElement, enclosingElement, thisGenericMap, parametersMap);
+        super(thisElement, enclosingElement, typeDeclared, thisGenericMap, parametersMap);
         this.methodName = methodName;
         this.returnDeclaredType = returnDeclaredType;
         this.returnActualType = mapToActual(getThisGenericMap(), getEnclosingClassname(), returnDeclaredType);

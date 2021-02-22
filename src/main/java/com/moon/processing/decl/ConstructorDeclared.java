@@ -15,9 +15,10 @@ public class ConstructorDeclared extends BaseExecutableDeclared {
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement executable,
+        TypeDeclared typeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
-        super(thisElement, enclosingElement, executable, thisGenericMap);
+        super(thisElement, enclosingElement, executable, typeDeclared, thisGenericMap);
         this.constructorSignature = String.format("%s", parametersTypesSignature);
     }
 
