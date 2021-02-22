@@ -114,4 +114,24 @@ public class ParameterDeclared {
     public String getActualType() { return actualType; }
 
     public String getSimplifyActualType() { return simplifyActualType; }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ParameterDeclared{");
+        sb.append("thisElement=").append(thisElement);
+        sb.append(", declaredElement=").append(declaredElement);
+        sb.append(", thisExecutable=").append(thisExecutable);
+        sb.append(", parameter=").append(parameter);
+        sb.append(", thisTypeDeclared=").append(thisTypeDeclared);
+        sb.append(", thisGenericMap=").append(thisGenericMap);
+        sb.append(", thisClassname='").append(thisClassname).append('\'');
+        sb.append(", declaredClassname='").append(declaredClassname).append('\'');
+        sb.append(", parameterIndex=").append(parameterIndex);
+        sb.append(", parameterName='").append(parameterName).append('\'');
+        sb.append(", declaredType='").append(declaredType).append('\'');
+        sb.append(", actualType='").append(actualType).append('\'');
+        sb.append(", simplifyActualType='").append(simplifyActualType).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

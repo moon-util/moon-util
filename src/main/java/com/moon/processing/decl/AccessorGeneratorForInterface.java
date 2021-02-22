@@ -4,13 +4,13 @@ import com.moon.accessor.annotation.Provided;
 import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;
-import com.moon.processing.util.Logger2;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Assert2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
@@ -241,19 +241,19 @@ public class AccessorGeneratorForInterface {
         MethodDeclared methodDeclared, ParameterDeclared parameter, JavaMethod implMethod
     ) {
         TypeMirror parameterType = parameter.getParameter().asType();
-        TypeElement parameterElem = (TypeElement) types.asElement(parameterType);
-        // Logger2.warn("-----------------------------------------------------");
-        ExecutableElement method = methodDeclared.getMethod();
-        // Logger2.warn(method);
-        // Logger2.warn(method.getTypeParameters());
-        Logger2.warn(Generic2.from(methodDeclared.getMethod(), methodDeclared.getThisGenericMap()));
-        TypeDeclared paramModel = typeHolder.with(parameterElem);
-        if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
-            doImplInsertFields(methodDeclared, implMethod, tableDeclared.reduce((col, cols) -> {
-                cols.put(col, col.getProperty());
-            }, new LinkedHashMap<>()));
+        Element parameterElem = types.asElement(parameterType);
+        if (parameterElem instanceof TypeElement) {
+            TypeElement parameterTypeElem = (TypeElement) types.asElement(parameterType);
+            TypeDeclared paramModel = typeHolder.with(parameterTypeElem);
+            if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
+                doImplInsertFields(methodDeclared, implMethod, tableDeclared.reduce((col, cols) -> {
+                    cols.put(col, col.getProperty());
+                }, new LinkedHashMap<>()));
+            } else {
+                doImplInsertModel(methodDeclared, implMethod, paramModel);
+            }
         } else {
-            doImplInsertModel(methodDeclared, implMethod, paramModel);
+            defaultReturning(methodDeclared, implMethod);
         }
     }
 

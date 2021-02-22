@@ -1,8 +1,8 @@
 package com.moon.processing.decl;
 
-import com.moon.processing.util.Logger2;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Element2;
+import com.moon.processor.utils.String2;
 import com.moon.processor.utils.Test2;
 
 import javax.lang.model.element.ExecutableElement;
@@ -13,6 +13,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.*;
+import java.util.function.BiConsumer;
 
 /**
  * @author benshaoye
@@ -102,46 +103,74 @@ public enum Generic2 {
             return usingGenericMap;
         } else {
             TypeElement element = (TypeElement) method.getEnclosingElement();
-            Logger2.warn("------->> {}", method.getSimpleName());
-            Logger2.warn(usingGenericMap);
-            Queue<Runnable> taskQueue = new LinkedList<>();
-
+            Queue<GenericTask> taskQueue = new LinkedList<>();
             final Elements utils = Processing2.getUtils();
             final String classname = Element2.getQualifiedName(element);
             for (TypeParameterElement param : typeParameters) {
                 String declare = getDeclareType(param);
                 String bound = param.getBounds().get(0).toString();
-                String fullKey = toFullKey(classname, bound);
                 if (utils.getTypeElement(bound) == null) {
-                    GenericDeclared subGenericModel = usingGenericMap.get(fullKey);
-                    if (subGenericModel == null) {
-                        taskQueue.add(() -> {
-
-                        });
-                        runners.add(() -> {
-                            GenericDeclared decl = usingGenericMap.get(fullKey);
-                            if (decl == null) {
-
-                            } else {
-                                String thsBound = decl.getEffectType();
-                                putGenericDecl(fullKey, usingGenericMap, declare, thsBound);
-                            }
-                        });
-                    } else {
-                        bound = subGenericModel.getEffectType();
-                        putGenericDecl(fullKey, usingGenericMap, declare, bound);
-                    }
+                    taskQueue.offer(new MethodGenericTask(classname, declare, bound));
                 } else {
-                    putGenericDecl(fullKey, usingGenericMap, declare, bound);
+                    GenericDeclared model = new GenericDeclared(declare, null, bound);
+                    usingGenericMap.put(toFullKey(classname, declare), model);
                 }
             }
+            handleGenericTasks(usingGenericMap, taskQueue);
         }
         return usingGenericMap;
     }
 
-    private static class GenericTask {
+    private static void handleGenericTasks(
+        Map<String, GenericDeclared> genericMap, Queue<GenericTask> taskQueue
+    ) {
+        int index = 0;
+        for (GenericTask task = taskQueue.poll(); task != null; task = taskQueue.poll()) {
+            task.accept(genericMap, taskQueue);
+            if ((index++) > 20) {
+                break;
+            }
+        }
+    }
+
+    private interface GenericTask extends BiConsumer<Map<String, GenericDeclared>, Queue<GenericTask>> {
+
+        /**
+         * handle generic map
+         *
+         * @param genericMap   泛型定义
+         * @param genericTasks 队列
+         */
+        @Override
+        void accept(
+            Map<String, GenericDeclared> genericMap, Queue<GenericTask> genericTasks
+        );
+    }
+
+    private static class MethodGenericTask implements GenericTask {
+
+        private final String classname;
         private final String declare;
-        private
+        private final String bound;
+
+        private MethodGenericTask(String classname, String declare, String bound) {
+            this.classname = classname;
+            this.declare = declare;
+            this.bound = bound;
+        }
+
+        @Override
+        public void accept(
+            Map<String, GenericDeclared> genericMap, Queue<GenericTask> genericTasks
+        ) {
+            GenericDeclared genDecl = genericMap.get(toFullKey(classname, bound));
+            if (genDecl == null) {
+                genericTasks.offer(this);
+            } else {
+                GenericDeclared model = new GenericDeclared(declare, null, genDecl.getEffectType());
+                genericMap.put(toFullKey(classname, declare), model);
+            }
+        }
     }
 
     public static String typeSimplify(String classname) {
@@ -232,32 +261,72 @@ public enum Generic2 {
         String subClassname = subClass == null ? "" : Element2.getQualifiedName(subClass);
         Elements utils = Processing2.getUtils();
         int index = 0;
+        Queue<GenericTask> taskQueue = new LinkedList<>();
         for (TypeParameterElement param : element.getTypeParameters()) {
-            String actual = index < actualAll.size() ? actualAll.get(index++) : null;
-            // 存在多级继承时追溯实际类
-            String fullKey = toFullKey(subClassname, actual);
-            GenericDeclared subGenericModel = genericMap.get(fullKey);
-            if (subGenericModel != null && utils.getTypeElement(actual) == null) {
-                actual = subGenericModel.getActual();
-            }
+            String declare = getDeclareType(param);
             // 泛型边界只取第一个，多边界的情况不考虑
             String bound = param.getBounds().get(0).toString();
-            String declare = getDeclareType(param);
-            GenericDeclared model = new GenericDeclared(declare, actual, bound);
-            String key = toFullKey(declareClassname, model.getDeclare());
-            genericMap.putIfAbsent(key, model);
+            String actual = index < actualAll.size() ? actualAll.get(index++) : null;
+            handleGenericDecl(utils, taskQueue, declareClassname, subClassname, genericMap, declare, actual, bound);
+            // 存在多级继承时追溯实际类
+            // String fullKey = toFullKey(subClassname, actual);
+            // GenericDeclared subGenericModel = genericMap.get(fullKey);
+            // if (subGenericModel != null && utils.getTypeElement(actual) == null) {
+            //     actual = subGenericModel.getActual();
+            // }
+            // 泛型边界只取第一个，多边界的情况不考虑
+            // GenericDeclared model = new GenericDeclared(declare, actual, bound);
+            // String key = toFullKey(declareClassname, model.getDeclare());
+            // genericMap.putIfAbsent(key, model);
+        }
+        handleGenericTasks(genericMap, taskQueue);
+    }
+
+    private static void handleGenericDecl(
+        Elements utils, Queue<GenericTask> taskQueue, String declareClassname, String subClassname,
+
+        Map<String, GenericDeclared> genericMap, String declare, String actual, String bound
+    ) {
+        boolean unavailable = utils.getTypeElement(actual) == null;
+        if (unavailable && String2.isNotBlank(subClassname)) {
+            // 存在多级继承时追溯实际类
+            taskQueue.offer(new ClassGenericTask(declareClassname, subClassname, declare, actual, bound));
+        } else {
+            final String usingActual = unavailable ? null : actual;
+            GenericDeclared model = new GenericDeclared(declare, usingActual, bound);
+            genericMap.putIfAbsent(toFullKey(declareClassname, declare), model);
         }
     }
 
-    private static void putGenericDecl(
-        String fullKey, Map<String, GenericDeclared> genericMap, String declare, String bound
-    ) { putGenericDecl(fullKey, genericMap, declare, null, bound); }
+    private static class ClassGenericTask implements GenericTask {
 
-    private static void putGenericDecl(
-        String fullKey, Map<String, GenericDeclared> genericMap, String declare, String actual, String bound
-    ) {
-        GenericDeclared model = new GenericDeclared(declare, actual, bound);
-        genericMap.put(fullKey, model);
+        private final String declareClassname, subClassname;
+        private final String declare, firstActual, bound;
+
+        private ClassGenericTask(
+            String declareClassname, String subClassname, String declare, String firstActual, String bound
+        ) {
+            this.declareClassname = declareClassname;
+            this.subClassname = subClassname;
+            this.firstActual = firstActual;
+            this.declare = declare;
+            this.bound = bound;
+        }
+
+        @Override
+        public void accept(
+            Map<String, GenericDeclared> genericMap, Queue<GenericTask> genericTasks
+        ) {
+            GenericDeclared genDecl = genericMap.get(toFullKey(subClassname, firstActual));
+            if (genDecl == null) {
+                genericTasks.offer(this);
+            } else {
+                String usingBound = genDecl.getBound();
+                String usingActual = genDecl.getActual();
+                GenericDeclared model = new GenericDeclared(declare, usingActual, usingBound);
+                genericMap.putIfAbsent(toFullKey(declareClassname, declare), model);
+            }
+        }
     }
 
     private static String toFullKey(String declareClassname, String declareType) {
