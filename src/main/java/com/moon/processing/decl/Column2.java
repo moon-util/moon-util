@@ -23,7 +23,7 @@ public enum Column2 {
         if (name != null) {
             return name;
         }
-        FieldDeclared fieldDeclared = property.getFieldDeclared();
+        PropertyFieldDeclared fieldDeclared = property.getFieldDeclared();
         if (fieldDeclared == null) {
             return null;
         }

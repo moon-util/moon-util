@@ -78,6 +78,12 @@ public class FileInterfaceImpl extends JavaBlockCommentable implements JavaDecla
         return field;
     }
 
+    public JavaField useConstField(Consumer<JavaFieldValue> valueBuilder, String typeTemplate, Object... types) {
+        JavaField field = fieldsScoped.useConstField(valueBuilder, typeTemplate, types);
+        afterFieldCreated(field);
+        return field;
+    }
+
     public JavaMethod publicMethod(String name) { return publicMethod(name, p -> {}); }
 
     public JavaMethod publicMethod(String name, Consumer<JavaParameters> parametersBuilder) {

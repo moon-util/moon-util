@@ -44,7 +44,7 @@ public class ColumnDeclared extends BaseColumnDeclared {
         this.fieldPolicy = fieldPolicy;
         this.property = property;
 
-        FieldDeclared fieldDeclared = property.getFieldDeclared();
+        PropertyFieldDeclared fieldDeclared = property.getFieldDeclared();
         VariableElement element = fieldDeclared.getFieldElement();
         TableField tableField = Table2.getTableFieldAnnotation(element);
 
@@ -72,7 +72,7 @@ public class ColumnDeclared extends BaseColumnDeclared {
     public static ColumnDeclared nullableOf(
         final Supplier<String> tableEnumRef, TableFieldPolicy fieldPolicy, PropertyDeclared property
     ) {
-        FieldDeclared fieldDeclared = property.getFieldDeclared();
+        PropertyFieldDeclared fieldDeclared = property.getFieldDeclared();
         if (fieldDeclared == null) {
             return null;
         }

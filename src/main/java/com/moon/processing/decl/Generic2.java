@@ -268,16 +268,6 @@ public enum Generic2 {
             String bound = param.getBounds().get(0).toString();
             String actual = index < actualAll.size() ? actualAll.get(index++) : null;
             handleGenericDecl(utils, taskQueue, declareClassname, subClassname, genericMap, declare, actual, bound);
-            // 存在多级继承时追溯实际类
-            // String fullKey = toFullKey(subClassname, actual);
-            // GenericDeclared subGenericModel = genericMap.get(fullKey);
-            // if (subGenericModel != null && utils.getTypeElement(actual) == null) {
-            //     actual = subGenericModel.getActual();
-            // }
-            // 泛型边界只取第一个，多边界的情况不考虑
-            // GenericDeclared model = new GenericDeclared(declare, actual, bound);
-            // String key = toFullKey(declareClassname, model.getDeclare());
-            // genericMap.putIfAbsent(key, model);
         }
         handleGenericTasks(genericMap, taskQueue);
     }
@@ -289,7 +279,7 @@ public enum Generic2 {
     ) {
         boolean unavailable = utils.getTypeElement(actual) == null;
         if (unavailable && String2.isNotBlank(subClassname)) {
-            // 存在多级继承时追溯实际类
+            // 存在多级继承或声明顺序不确定时追溯实际类
             taskQueue.offer(new ClassGenericTask(declareClassname, subClassname, declare, actual, bound));
         } else {
             final String usingActual = unavailable ? null : actual;

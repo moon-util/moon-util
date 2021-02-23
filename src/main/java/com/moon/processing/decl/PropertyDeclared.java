@@ -26,7 +26,7 @@ public class PropertyDeclared {
 
     private final Map<String, GenericDeclared> thisGenericMap;
 
-    private FieldDeclared fieldDeclared;
+    private PropertyFieldDeclared fieldDeclared;
     /**
      * 由于 java 方法重载规则， getter 方法只有一个，所以不考虑重载的情况
      * <p>
@@ -66,10 +66,10 @@ public class PropertyDeclared {
 
     public void withFieldDeclared(VariableElement fieldElement) {
         TypeElement enclosingElement = ((TypeElement) fieldElement.getEnclosingElement());
-        setFieldDeclaredIfAbsent(new FieldDeclared(thisElement, enclosingElement, fieldElement, thisGenericMap));
+        setFieldDeclaredIfAbsent(new PropertyFieldDeclared(thisElement, enclosingElement, fieldElement, thisGenericMap));
     }
 
-    public void setFieldDeclaredIfAbsent(FieldDeclared fieldDeclared) {
+    public void setFieldDeclaredIfAbsent(PropertyFieldDeclared fieldDeclared) {
         if (this.fieldDeclared == null) {
             this.fieldDeclared = fieldDeclared;
         }
@@ -83,6 +83,7 @@ public class PropertyDeclared {
         this.getter = new PropertyMethodDeclared(thisElement,
             enclosingElement,
             getterElement,
+            getName(),
             typeDeclared,
             thisGenericMap);
     }
@@ -99,6 +100,7 @@ public class PropertyDeclared {
             new PropertyMethodDeclared(thisElement,
                 (TypeElement) setterElement.getEnclosingElement(),
                 setterElement,
+                getName(),
                 typeDeclared,
                 thisGenericMap));
     }
@@ -117,7 +119,7 @@ public class PropertyDeclared {
 
     public Map<String, GenericDeclared> getThisGenericMap() { return thisGenericMap; }
 
-    public FieldDeclared getFieldDeclared() { return fieldDeclared; }
+    public PropertyFieldDeclared getFieldDeclared() { return fieldDeclared; }
 
     public PropertyMethodDeclared getGetterMethod() { return getter; }
 

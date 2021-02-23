@@ -1,9 +1,12 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.Provided;
+import com.moon.accessor.annotation.condition.If;
+import com.moon.accessor.util.Annotation2;
 import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;
+import com.moon.processing.util.Logger2;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Assert2;
 import com.moon.processor.utils.Element2;
@@ -188,13 +191,14 @@ public class AccessorGeneratorForInterface {
     }
 
     private void doImplInsertParameters(
-        MethodDeclared methodDeclared, JavaMethod implMethod, Map<ColumnDeclared, ParameterDeclared> parameters
+        MethodDeclared methodDeclared, JavaMethod implMethod, Map<ColumnDeclared, ParameterDeclared> columnsMap
     ) {
-        if (parameters.isEmpty()) {
+        if (columnsMap.isEmpty()) {
             defaultReturning(methodDeclared, implMethod);
             return;
         }
-        writeInsertSQL(implMethod, toColumnsJoined(parameters), parameters.size());
+        writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
+        writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
     }
@@ -202,7 +206,17 @@ public class AccessorGeneratorForInterface {
     private void doImplInsertFields(
         MethodDeclared methodDeclared, JavaMethod implMethod, Map<ColumnDeclared, PropertyDeclared> columnsMap
     ) {
+        // JavaField field = impl.useConstField(value -> {
+        //     value.formattedOf("{}.{}({}, {}, \"{}\")",
+        //         value.onImported(Annotation2.class),
+        //         "getFieldAnnotationFor",
+        //         dotClass(value.onImported(If.class)),
+        //         dotClass(value.onImported(getClass())),
+        //         "value");
+        // }, If.class.getCanonicalName());
+        // Logger2.warn(">>>>>> {}", field.getFieldName());
         writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
+        writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
     }
@@ -262,6 +276,14 @@ public class AccessorGeneratorForInterface {
 
             " (" + columnsJoined + ") VALUES (" + toPlaceholders(count) + ')';
         implMethod.nextFormatted("{} sql = \"{}\"", implMethod.onImported(String.class), sql);
+    }
+
+    private void writeInsertColumnsHandlerStatement(JavaMethod implMethod, int count) {
+        implMethod.nextFormatted("{}<{}> columnsHandler = new {}<>({})",
+            implMethod.onImported(List.class),
+            implMethod.onImported(String.class),
+            implMethod.onImported(ArrayList.class),
+            count);
     }
 
     private static String toColumnsJoined(Map<ColumnDeclared, ?> columnsMap) {
@@ -393,5 +415,9 @@ public class AccessorGeneratorForInterface {
             return "' '";
         }
         return null;
+    }
+
+    private static String dotClass(String classname) {
+        return classname + ".class";
     }
 }

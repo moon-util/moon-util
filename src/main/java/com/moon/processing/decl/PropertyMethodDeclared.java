@@ -1,5 +1,9 @@
 package com.moon.processing.decl;
 
+import com.moon.accessor.annotation.AutoInsertable;
+import com.moon.accessor.annotation.AutoUpdatable;
+import com.moon.accessor.annotation.TableId;
+import com.moon.processing.util.Logger2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
 
@@ -17,33 +21,44 @@ import java.util.Map;
  */
 public class PropertyMethodDeclared extends MethodDeclared {
 
+    private final String propertyName;
     private final boolean lombokGenerated;
+    private final TableId tableId;
+    private final AutoInsertable autoInsert;
+    private final AutoUpdatable autoUpdate;
 
     public PropertyMethodDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
+        String propertyName,
         TypeDeclared thisTypeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
-        this(thisElement, enclosingElement, method, thisTypeDeclared, thisGenericMap, false);
+        this(thisElement, enclosingElement, method,propertyName, thisTypeDeclared, thisGenericMap, false);
     }
 
     public PropertyMethodDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
+        String propertyName,
         TypeDeclared thisTypeDeclared,
         Map<String, GenericDeclared> thisGenericMap,
         boolean lombokGenerated
     ) {
         super(thisElement, enclosingElement, method, thisTypeDeclared, thisGenericMap);
+        this.autoInsert = method.getAnnotation(AutoInsertable.class);
+        this.autoUpdate = method.getAnnotation(AutoUpdatable.class);
+        this.tableId = method.getAnnotation(TableId.class);
         this.lombokGenerated = lombokGenerated;
+        this.propertyName = propertyName;
     }
 
     protected PropertyMethodDeclared(
         TypeElement thisElement,
         TypeElement enclosingElement,
+        VariableElement field,
         TypeDeclared thisTypeDeclared,
         String methodName,
         String returnDeclaredType,
@@ -59,7 +74,19 @@ public class PropertyMethodDeclared extends MethodDeclared {
             thisGenericMap,
             parametersMap);
         this.lombokGenerated = lombokGenerated;
+        this.propertyName = Element2.getSimpleName(field);
+        this.autoInsert = null;
+        this.autoUpdate = null;
+        this.tableId = null;
     }
+
+    public boolean isLombokGenerated() { return lombokGenerated; }
+
+    public String getPropertyName() { return propertyName; }
+
+    public TableId getTableId() { return tableId; }
+
+    public boolean isTableId() { return getTableId() != null; }
 
     public static PropertyMethodDeclared ofLombokGetterGenerated(
         TypeElement thisElement,
@@ -71,6 +98,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
         String getterName = String2.toGetterName(Element2.getSimpleName(field), type);
         return new PropertyMethodDeclared(thisElement,
             (TypeElement) field.getEnclosingElement(),
+            field,
             thisTypeDeclared,
             getterName,
             type,
@@ -92,6 +120,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
         String getterName = String2.toSetterName(Element2.getSimpleName(field));
         return new PropertyMethodDeclared(thisElement,
             (TypeElement) field.getEnclosingElement(),
+            field,
             thisTypeDeclared,
             getterName,
             "void",

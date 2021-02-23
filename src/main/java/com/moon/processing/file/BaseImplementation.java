@@ -26,7 +26,7 @@ abstract class BaseImplementation extends FileInterfaceImpl {
     protected void afterMethodCreated(JavaMethod method) { method.withPublic(); }
 
     @Override
-    protected void afterFieldCreated(JavaField field) { field.withPublic(); }
+    protected void afterFieldCreated(JavaField field) { field.withPrivate(); }
 
     public JavaField privateField(String name, Class<?> fieldClass) {
         return privateField(name, fieldClass.getCanonicalName());

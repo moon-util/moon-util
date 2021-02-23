@@ -4,6 +4,7 @@ import com.moon.processor.holder.Importer;
 import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.Modifier;
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -16,6 +17,7 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     private final MethodsScoped methodsScoped;
     private final String fieldType;
     private final String fieldName;
+    private final boolean inInterface;
     private JavaFieldValue value;
     private LineScripter scripter;
     private boolean forceInline;
@@ -30,13 +32,16 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     ) {
         super(importer);
         this.fieldType = Formatter.with(fieldTypeTemplate, types);
+        this.inInterface = methodsScoped.inInterface();
         this.methodsScoped = methodsScoped;
         this.classname = classname;
         this.fieldName = fieldName;
     }
 
     @Override
-    public Set<Modifier> getAllowedModifiers() { return Modifier2.FOR_FIELD; }
+    public Set<Modifier> getAllowedModifiers() {
+        return inInterface ? Collections.emptySet() : Modifier2.FOR_FIELD;
+    }
 
     public LineScripter getLineScripter() { return scripter; }
 
@@ -45,6 +50,13 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     public void withForceInline() { this.forceInline = true; }
 
     public boolean isForceInline() { return forceInline; }
+
+    /**
+     * 内容签名，返回字段类型和字段值组成的内容，可用于反向获取字段名
+     *
+     * @return
+     */
+    public String getContentSymbol() { return fieldType + ">>" + value; }
 
     public JavaField valueOf(Consumer<JavaFieldValue> valueBuilder) {
         JavaFieldValue value = new JavaFieldValue(getImporter(), classname);

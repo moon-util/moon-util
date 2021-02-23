@@ -21,5 +21,5 @@ public @interface TableId {
      *
      * @return
      */
-    int value() default 0;
+    int value() default -1;
 }
