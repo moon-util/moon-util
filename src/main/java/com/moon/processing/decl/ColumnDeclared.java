@@ -88,7 +88,11 @@ public class ColumnDeclared extends BaseColumnDeclared {
         return new ColumnDeclared(tableEnumRef, fieldClass, fieldPolicy, property);
     }
 
-    public String getConstColumnRef() { return format("{}.{}", getTableEnumVal(), columnName); }
+    public String getColumnRef() { return format("{}.{}", getTableEnumVal(), columnName); }
+
+    public String getConstColumnRef(String tableImported) {
+        return tableImported + "." + getConstColumnName();
+    }
 
     public String getColumnName() { return columnName; }
 

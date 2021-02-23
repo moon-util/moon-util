@@ -147,6 +147,8 @@ public class TableDeclared implements JavaProvider {
         return new TableDeclared(policyHelper, typeDeclared);
     }
 
+    public String getTableClassname() { return packageName + "." + simpleClassName; }
+
     public String getTableEnumVal() { return tableEnumVal; }
 
     public TableAlias getTableAlias() { return tableAlias; }

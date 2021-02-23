@@ -12,6 +12,11 @@ import java.util.Date;
 public enum Fields {
     ;
 
+    @SafeVarargs
+    public static <R, TB extends Table<R, TB>> TableField<?, R, TB>[] of(TableField<?, R, TB>... fields) {
+        return fields;
+    }
+
     public static TableField<String, ?, ?> ofString() {
         return of(String.class);
     }

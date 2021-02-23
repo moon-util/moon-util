@@ -1,12 +1,12 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.Provided;
-import com.moon.accessor.annotation.condition.If;
-import com.moon.accessor.util.Annotation2;
+import com.moon.accessor.meta.Fields;
+import com.moon.accessor.meta.TableField;
+import com.moon.accessor.meta.TableFields;
 import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;
-import com.moon.processing.util.Logger2;
 import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Assert2;
 import com.moon.processor.utils.Element2;
@@ -198,24 +198,42 @@ public class AccessorGeneratorForInterface {
             return;
         }
         writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
+        // writeInsertTableFields(implMethod, columnsMap);
         writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
     }
 
     private void doImplInsertFields(
-        MethodDeclared methodDeclared, JavaMethod implMethod, Map<ColumnDeclared, PropertyDeclared> columnsMap
+        MethodDeclared methodDeclared,
+        ParameterDeclared parameter,
+        JavaMethod implMethod,
+        Map<ColumnDeclared, PropertyDeclared> columnsMap
     ) {
-        // JavaField field = impl.useConstField(value -> {
-        //     value.formattedOf("{}.{}({}, {}, \"{}\")",
-        //         value.onImported(Annotation2.class),
-        //         "getFieldAnnotationFor",
-        //         dotClass(value.onImported(If.class)),
-        //         dotClass(value.onImported(getClass())),
-        //         "value");
-        // }, If.class.getCanonicalName());
-        // Logger2.warn(">>>>>> {}", field.getFieldName());
         writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
+
+        String fieldsImported = implMethod.onImported(TableFields.class);
+        String modelImported = implMethod.onImported(tableDeclared.getTypeDeclared().getTypeClassname());
+        String tableImported = implMethod.onImported(tableDeclared.getTableClassname());
+        implMethod.nextFormatted("{}<{}, {}> fields = new {}<>({}.{}, {})",
+            fieldsImported,
+            modelImported,
+            tableImported,
+            fieldsImported,
+            tableImported,
+            tableDeclared.getTableEnumVal(),
+            columnsMap.size());
+        for (Map.Entry<ColumnDeclared, PropertyDeclared> columnMap : columnsMap.entrySet()) {
+            PropertyDeclared prop = columnMap.getValue();
+            ColumnDeclared column = columnMap.getKey();
+            implMethod.nextFormatted("fields.add({}.{}, {}.{}())",
+                tableImported,
+                column.getConstColumnName(),
+                parameter.getParameterName(),
+                prop.getGetterMethod().getMethodName());
+        }
+
+        // writeInsertTableFields(implMethod, columnsMap);
         writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
@@ -229,7 +247,9 @@ public class AccessorGeneratorForInterface {
         doImplInsertParameters(methodDeclared, implMethod, parameters);
     }
 
-    private void doImplInsertModel(MethodDeclared methodDeclared, JavaMethod implMethod, TypeDeclared paramModel) {
+    private void doImplInsertModel(
+        MethodDeclared methodDeclared, ParameterDeclared parameter, JavaMethod implMethod, TypeDeclared paramModel
+    ) {
         Map<ColumnDeclared, PropertyDeclared> columns = new LinkedHashMap<>();
         Map<String, PropertyDeclared> properties = paramModel.getCopiedProperties();
         for (PropertyDeclared property : properties.values()) {
@@ -247,7 +267,7 @@ public class AccessorGeneratorForInterface {
         if (columns.isEmpty()) {
             defaultReturning(methodDeclared, implMethod);
         } else {
-            doImplInsertFields(methodDeclared, implMethod, columns);
+            doImplInsertFields(methodDeclared, parameter, implMethod, columns);
         }
     }
 
@@ -260,11 +280,11 @@ public class AccessorGeneratorForInterface {
             TypeElement parameterTypeElem = (TypeElement) types.asElement(parameterType);
             TypeDeclared paramModel = typeHolder.with(parameterTypeElem);
             if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
-                doImplInsertFields(methodDeclared, implMethod, tableDeclared.reduce((col, cols) -> {
+                doImplInsertFields(methodDeclared, parameter, implMethod, tableDeclared.reduce((col, cols) -> {
                     cols.put(col, col.getProperty());
                 }, new LinkedHashMap<>()));
             } else {
-                doImplInsertModel(methodDeclared, implMethod, paramModel);
+                doImplInsertModel(methodDeclared, parameter, implMethod, paramModel);
             }
         } else {
             defaultReturning(methodDeclared, implMethod);
@@ -276,6 +296,21 @@ public class AccessorGeneratorForInterface {
 
             " (" + columnsJoined + ") VALUES (" + toPlaceholders(count) + ')';
         implMethod.nextFormatted("{} sql = \"{}\"", implMethod.onImported(String.class), sql);
+    }
+
+    private void writeInsertTableFields(JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap) {
+        int index = 0;
+        String[] fields = new String[columnsMap.size()];
+        String tableImported = implMethod.onImported(tableDeclared.getTableClassname());
+        for (Map.Entry<ColumnDeclared, ?> declaredEntry : columnsMap.entrySet()) {
+            fields[index++] = declaredEntry.getKey().getConstColumnRef(tableImported);
+        }
+        implMethod.nextFormatted("{}<?, {}, {}>[] fields = {}.of({})",
+            implMethod.onImported(TableField.class),
+            implMethod.onImported(tableDeclared.getTypeDeclared().getTypeClassname()),
+            tableImported,
+            implMethod.onImported(Fields.class),
+            String.join(", ", fields));
     }
 
     private void writeInsertColumnsHandlerStatement(JavaMethod implMethod, int count) {
@@ -384,8 +419,8 @@ public class AccessorGeneratorForInterface {
     private final static Map<String, String> COLLECTION_TYPES = new HashMap<>();
 
     static {
-        BiConsumer<Class<?>, Class<?>> consumer = (cls1, cls2) -> COLLECTION_TYPES.put(cls1.getCanonicalName(),
-            cls2.getCanonicalName());
+        BiConsumer<Class<?>, Class<?>> consumer = (cls1, cls2) -> COLLECTION_TYPES
+            .put(cls1.getCanonicalName(), cls2.getCanonicalName());
         consumer.accept(Map.class, HashMap.class);
         consumer.accept(HashMap.class, HashMap.class);
         consumer.accept(TreeMap.class, TreeMap.class);
