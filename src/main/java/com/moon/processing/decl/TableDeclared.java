@@ -151,11 +151,19 @@ public class TableDeclared implements JavaProvider {
 
     public String getTableEnumVal() { return tableEnumVal; }
 
+    public String getTableEnumRef(String tableImported) {
+        return tableImported + "." + getTableEnumVal();
+    }
+
     public TableAlias getTableAlias() { return tableAlias; }
 
     public String getTableName() { return tableName; }
 
     public String getTablesFor() { return tables; }
+
+    public String getModelClassname() {
+        return getTypeDeclared().getTypeClassname();
+    }
 
     public TypeDeclared getTypeDeclared() { return typeDeclared; }
 
@@ -193,7 +201,8 @@ public class TableDeclared implements JavaProvider {
         }
 
         enumFile.privateFinalField(entityVar, "{}<{}>", Class.class, entityName)
-            .valueOf(value -> value.classOf(entityName)).withForceInline();
+            .valueOf(value -> value.classOf(entityName))
+            .withForceInline();
 
         firstRefer.useIfPresent(field -> {
             List<String> comments = new ArrayList<>();
@@ -249,21 +258,30 @@ public class TableDeclared implements JavaProvider {
         String entityName = typeDeclared.getTypeClassname();
 
         // getEntityClass()
-        enumFile.publicMethod("getEntityClass").typeOf("{}<{}>", Class.class, entityName).override()
+        enumFile.publicMethod("getEntityClass")
+            .typeOf("{}<{}>", Class.class, entityName)
+            .override()
             .returning(enumFile.onImported(entityName) + ".class");
 
         // getTableFieldsCount()
         enumFile.publicMethod("getTableFieldsCount").typeOf("int").override().returning(columnDeclaredMap.size());
 
         // getTableFields()
-        enumFile.publicMethod("getTableFields").override()
-            .typeOf("{}<?, {}, {}>[]", TableField.class, entityName, enumFile.getClassname()).returnTypeFormatted(
-            "new {}[]{{}}",
-            enumFile.onImported(TableField.class),
-            columnDeclaredMap.values().stream().map(ColumnDeclared::getColumnName).collect(Collectors.joining(", ")));
+        enumFile.publicMethod("getTableFields")
+            .override()
+            .typeOf("{}<?, {}, {}>[]", TableField.class, entityName, enumFile.getClassname())
+            .returnTypeFormatted("new {}[]{{}}",
+                enumFile.onImported(TableField.class),
+                columnDeclaredMap.values()
+                    .stream()
+                    .map(ColumnDeclared::getColumnName)
+                    .collect(Collectors.joining(", ")));
 
         // getTableName()
-        enumFile.publicMethod("getTableName").typeOf(String.class).override().returnTypeFormatted("\"{}\"", getTableName());
+        enumFile.publicMethod("getTableName")
+            .typeOf(String.class)
+            .override()
+            .returnTypeFormatted("\"{}\"", getTableName());
 
         // getComment() & getFirstComment()
         String comment = Comment2.resolveComment(typeElement);

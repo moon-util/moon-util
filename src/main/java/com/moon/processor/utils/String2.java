@@ -58,32 +58,7 @@ public enum String2 {
     }
 
     public static String format(String template, Object... values) {
-        if (template == null) {
-            return null;
-        }
-        if (values == null || values.length == 0) {
-            return template;
-        }
-        int startIdx = 0, idx = 0;
-        final int valueLen = values.length, tempLen = template.length();
-        StringBuilder builder = new StringBuilder(tempLen);
-        for (int at, nextStartAt; ; ) {
-            at = template.indexOf("{}", startIdx);
-            if (at >= 0) {
-                nextStartAt = at + 2;
-                builder.append(template, startIdx, at);
-                builder.append(values[idx++]);
-                if (idx >= valueLen) {
-                    return builder.append(template, nextStartAt, tempLen).toString();
-                }
-                startIdx = nextStartAt;
-            } else {
-                for (int i = idx; i < valueLen; i++) {
-                    builder.append(values[i]);
-                }
-                return builder.toString();
-            }
-        }
+        return com.moon.accessor.util.String2.format(template, values);
     }
 
     public static StringBuilder newLine(StringBuilder builder) {

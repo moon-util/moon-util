@@ -715,6 +715,80 @@ public abstract class ValidateUtil extends TestUtil {
     }
 
     /**
+     * 要求包含中文汉字
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireAnyChineseWord(C str) {
+        if (isAnyChiniseWord(str)) {
+            return str;
+        }
+        throw new RequireValidateException("Require contains Chinese word: " + str);
+    }
+
+    /**
+     * 要求包含中文汉字
+     *
+     * @param str     待测字符串
+     * @param message 自定义消息模板
+     * @param <C>     字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireAnyChineseWord(C str, String message) {
+        if (isAnyChiniseWord(str)) {
+            return str;
+        }
+        throw new RequireValidateException(message, str);
+    }
+
+    /**
+     * 要求包含中文汉字
+     *
+     * @param str 待测字符串
+     * @param <C> 字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常
+     */
+    public final static <C extends CharSequence> C requireNonChineseWord(C str) {
+        if (isAnyChiniseWord(str)) {
+            throw new RequireValidateException("Require not contains Chinese word: " + str);
+        }
+        return str;
+    }
+
+    /**
+     * 要求包含中文汉字
+     *
+     * @param str     待测字符串
+     * @param message 自定义消息模板
+     * @param <C>     字符串泛型类型
+     *
+     * @return 如果检测通过，返回原字符串
+     *
+     * @throws RequireValidateException 当检测不通过时抛出异常，
+     *                                  异常消息由调用方自定义，
+     *                                  可用“{}”占位符接收入参字符串
+     */
+    public final static <C extends CharSequence> C requireNonChineseWord(C str, String message) {
+        if (isAnyChiniseWord(str)) {
+            throw new RequireValidateException(message, str);
+        }
+        return str;
+    }
+
+    /**
      * 要求中国 11 位手机号
      *
      * @param str 待测字符串
@@ -728,7 +802,7 @@ public abstract class ValidateUtil extends TestUtil {
         if (isChineseMobile(str)) {
             return str;
         }
-        throw new RequireValidateException("Invalid resident ID: " + str);
+        throw new RequireValidateException("Invalid Chinese mobile: " + str);
     }
 
     /**
@@ -765,7 +839,7 @@ public abstract class ValidateUtil extends TestUtil {
         if (isChineseZipCode(str)) {
             return str;
         }
-        throw new RequireValidateException("Invalid chinese zip code: " + str);
+        throw new RequireValidateException("Invalid Chinese zip code: " + str);
     }
 
     /**

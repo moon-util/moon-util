@@ -320,6 +320,13 @@ public abstract class TestUtil {
     public final static boolean isChineseWords(CharSequence str) { return CHINESE_WORDS.test(str); }
 
     /**
+     *
+     * @param str
+     * @return
+     */
+    public final static boolean isAnyChiniseWord(CharSequence str) { return HAS_CHINESE_WORD.test(str); }
+
+    /**
      * 验证 11 位手机号
      *
      * @param str 待测字符串

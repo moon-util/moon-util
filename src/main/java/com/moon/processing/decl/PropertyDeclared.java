@@ -66,7 +66,10 @@ public class PropertyDeclared {
 
     public void withFieldDeclared(VariableElement fieldElement) {
         TypeElement enclosingElement = ((TypeElement) fieldElement.getEnclosingElement());
-        setFieldDeclaredIfAbsent(new PropertyFieldDeclared(thisElement, enclosingElement, fieldElement, thisGenericMap));
+        setFieldDeclaredIfAbsent(new PropertyFieldDeclared(thisElement,
+            enclosingElement,
+            fieldElement,
+            thisGenericMap));
     }
 
     public void setFieldDeclaredIfAbsent(PropertyFieldDeclared fieldDeclared) {
@@ -123,7 +126,15 @@ public class PropertyDeclared {
 
     public PropertyMethodDeclared getGetterMethod() { return getter; }
 
+    public String getReffedGetterScript(String instanceName) {
+        return instanceName + "." + getGetterMethod().getMethodName() + "()";
+    }
+
     public PropertyMethodDeclared getSetterMethod() { return setter; }
+
+    public String getRefferedSetterScript(String instanceName, String parameterName) {
+        return instanceName + "." + getSetterMethod().getMethodName() + "(" + parameterName + ")";
+    }
 
     public Map<String, PropertyMethodDeclared> getTypedSetterMap() { return typedSetterMap; }
 

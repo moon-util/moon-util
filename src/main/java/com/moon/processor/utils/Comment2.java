@@ -39,7 +39,7 @@ public enum Comment2 {
             }
             default:
         }
-        return com.moon.accessor.util.String2.doEscape(comment, '"');
+        return com.moon.accessor.util.String2.withEscaped(comment, '"');
     }
 
     private static String resolveEnum(String baseComment, TypeMirror elemTyped, boolean first) {

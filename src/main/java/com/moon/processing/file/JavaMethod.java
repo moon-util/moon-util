@@ -18,9 +18,9 @@ public class JavaMethod extends JavaBlockCommentable {
     private final JavaParameters parameters;
     private final String signature;
     private final boolean inInterface;
-    private final List<LineScripter> scripters = new ArrayList<>();
+    private final List<Scripter> scripters = new ArrayList<>();
     private boolean propertyMethod;
-    private LineScripter returning;
+    private Scripter returning;
     private String returnType;
 
     public JavaMethod(
@@ -33,6 +33,10 @@ public class JavaMethod extends JavaBlockCommentable {
         this.signature = String.format("%s(%s)", name, parameters.getSignature());
     }
 
+    /**
+     * 描述这个方法是否是 getter/setter 等描述属性的方法，这种方法放在文件最后
+     * @return
+     */
     public JavaMethod withPropertyMethod() { return withPropertyMethod(true); }
 
     public JavaMethod withPropertyMethod(boolean propertyMethod) {
@@ -69,11 +73,15 @@ public class JavaMethod extends JavaBlockCommentable {
         return this;
     }
 
+    /*
+    returning
+     */
+
     public JavaMethod returnTypeFormatted(String template, Object... values) {
         return template == null ? returnNull() : returning(Formatter.with(template, values));
     }
 
-    public JavaMethod returnFormatted(String template, Object... values){
+    public JavaMethod returnFormatted(String template, Object... values) {
         if (template == null) {
             return returnNull();
         }
@@ -96,6 +104,10 @@ public class JavaMethod extends JavaBlockCommentable {
         return this;
     }
 
+    /*
+    next
+     */
+
     public JavaMethod nextFormatted(String template, Object... values) {
         return nextScript(String2.format(template, values));
     }
@@ -111,6 +123,10 @@ public class JavaMethod extends JavaBlockCommentable {
         scripters.add(scripter);
         return this;
     }
+
+    /*
+    支持后置调用 LineScripter#withUnsorted() 方法
+     */
 
     public JavaMethod nextFormatted(String template, Object v1, Consumer<LineScripter> using) {
         return nextFormatted(using, template, arr(v1));
@@ -136,6 +152,17 @@ public class JavaMethod extends JavaBlockCommentable {
         return nextFormatted(using, template, arr(v1, v2, v3, v4, v5));
     }
 
+    /**
+     * 区别{@link #nextFormatted(String, Object...)}
+     * <p>
+     * 主要用于设置脚本以后调用{@link LineScripter#withUnsorted()}
+     *
+     * @param using
+     * @param template
+     * @param values
+     *
+     * @return
+     */
     public JavaMethod nextFormatted(Consumer<LineScripter> using, String template, Object... values) {
         return nextScript(String2.format(template, values), using);
     }
@@ -157,19 +184,33 @@ public class JavaMethod extends JavaBlockCommentable {
         addr.add(")").add(" {");
 
         if (scripters.isEmpty()) {
-            appendOnly(addr, returning);
+            if (returning instanceof LineScripter) {
+                appendOnly(addr, (LineScripter) returning);
+            } else if (returning != null) {
+                returning.appendTo(addr);
+            }
         } else if (scripters.size() == 1 && returning == null) {
-            appendOnly(addr, scripters.get(0));
+            Scripter scripter = scripters.get(0);
+            if (scripter instanceof LineScripter) {
+                appendOnly(addr, (LineScripter) scripter);
+            } else if (scripter != null) {
+                scripter.appendTo(addr);
+            }
         } else {
             // body
             addr.start();
             // 收集无序脚本
             List<LineScripter> unsorted = new ArrayList<>();
-            for (LineScripter scripter : scripters) {
-                if (scripter.isSorted()) {
-                    scripter.appendTo(addr);
+            for (Scripter scripter : scripters) {
+                if (scripter instanceof LineScripter) {
+                    LineScripter lineScripter = (LineScripter) scripter;
+                    if (lineScripter.isSorted()) {
+                        scripter.appendTo(addr);
+                    } else {
+                        unsorted.add(lineScripter);
+                    }
                 } else {
-                    unsorted.add(scripter);
+                    scripter.appendTo(addr);
                 }
             }
             unsorted.sort((o1, o2) -> o2.length() - o1.length());

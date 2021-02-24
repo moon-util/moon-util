@@ -3,7 +3,7 @@ package com.moon.processing.decl;
 import com.moon.accessor.annotation.Provided;
 import com.moon.accessor.meta.Fields;
 import com.moon.accessor.meta.TableField;
-import com.moon.accessor.meta.TableFields;
+import com.moon.accessor.meta.JdbcParameters;
 import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;
@@ -212,25 +212,22 @@ public class AccessorGeneratorForInterface {
     ) {
         writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
 
-        String fieldsImported = implMethod.onImported(TableFields.class);
-        String modelImported = implMethod.onImported(tableDeclared.getTypeDeclared().getTypeClassname());
+        String paramsImported = implMethod.onImported(JdbcParameters.class);
+        String modelImported = implMethod.onImported(tableDeclared.getModelClassname());
         String tableImported = implMethod.onImported(tableDeclared.getTableClassname());
-        implMethod.nextFormatted("{}<{}, {}> fields = new {}<>({}.{}, {})",
-            fieldsImported,
+        implMethod.nextFormatted("{}<{}, {}> fields = new {}<>({}, {})",
+            paramsImported,
             modelImported,
             tableImported,
-            fieldsImported,
-            tableImported,
-            tableDeclared.getTableEnumVal(),
+            paramsImported,
+            tableDeclared.getTableEnumRef(tableImported),
             columnsMap.size());
         for (Map.Entry<ColumnDeclared, PropertyDeclared> columnMap : columnsMap.entrySet()) {
             PropertyDeclared prop = columnMap.getValue();
             ColumnDeclared column = columnMap.getKey();
-            implMethod.nextFormatted("fields.add({}.{}, {}.{}())",
-                tableImported,
-                column.getConstColumnName(),
-                parameter.getParameterName(),
-                prop.getGetterMethod().getMethodName());
+            implMethod.nextFormatted("fields.add({}, {})",
+                column.getConstColumnRef(tableImported),
+                prop.getReffedGetterScript(parameter.getParameterName()));
         }
 
         // writeInsertTableFields(implMethod, columnsMap);

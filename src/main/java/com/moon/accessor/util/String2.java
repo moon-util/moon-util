@@ -3,53 +3,73 @@ package com.moon.accessor.util;
 /**
  * @author benshaoye
  */
-public enum String2 {
-    ;
+public class String2 {
+
     private final static char BACKSLASH = '\\';
 
+    protected String2() { throw new AssertionError("No com.moon.accessor.util.String2 instances for you!"); }
+
+    public static boolean isBlank(CharSequence string) {
+        if (string != null) {
+            for (int i = 0, len = string.length(); i < len; i++) {
+                if (!Character.isWhitespace(string.charAt(i))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean isNotBlank(CharSequence string) { return !isBlank(string); }
+
+    /**
+     * 格式化字符串，将模板中的占位符（{}）按顺序替换为指定值的字符串形式，剩余的值
+     * <p>
+     * 直接追加到最终字符串末尾
+     *
+     * @param template 字符串模板
+     * @param values   有序的待替换值
+     *
+     * @return 替换完成后的字符串
+     */
     public static String format(String template, Object... values) {
-        if (values != null && values.length > 0) {
-            StringBuilder builder = new StringBuilder(template.length() + values.length * 16);
-            int holderPreviousIndex = 0, thisIndex;
-            for (Object value : values) {
-                thisIndex = template.indexOf("{}", holderPreviousIndex);
-                if (thisIndex < 0) {
-                    return builder.toString();
-                }
-                builder.append(template, holderPreviousIndex, thisIndex);
-                builder.append(value);
-                holderPreviousIndex = thisIndex + 2;
-            }
-            return builder.toString();
+        if (template == null) {
+            return null;
         }
-        return template;
+        if (values == null || values.length == 0) {
+            return template;
+        }
+        int startIdx = 0, idx = 0;
+        final int valueLen = values.length, tempLen = template.length();
+        StringBuilder builder = new StringBuilder(tempLen);
+        for (int at, nextStartAt; ; ) {
+            at = template.indexOf("{}", startIdx);
+            if (at >= 0) {
+                nextStartAt = at + 2;
+                builder.append(template, startIdx, at);
+                builder.append(values[idx++]);
+                if (idx >= valueLen) {
+                    return builder.append(template, nextStartAt, tempLen).toString();
+                }
+                startIdx = nextStartAt;
+            } else {
+                for (int i = idx; i < valueLen; i++) {
+                    builder.append(values[i]);
+                }
+                return builder.toString();
+            }
+        }
     }
 
-    public static String joinQuestionMark(int count, String open, String close) {
-        if (count > 0) {
-            int iMax = count - 1;
-            StringBuilder b = new StringBuilder();
-            if (open != null) {
-                b.append(open);
-            }
-            for (int i = 0; ; i++) {
-                b.append('?');
-                if (i == iMax) {
-                    if (close != null) {
-                        b.append(close);
-                    }
-                    return b.toString();
-                }
-                b.append(", ");
-            }
-        }
-        if (open != null) {
-            return close == null ? open : open + close;
-        }
-        return close;
-    }
-
-    public static String doEscape(String content, char targetChar) {
+    /**
+     * 将字符串中的某些字符转义，如在 java 字符串中的双引号‘"’前加反斜线成‘\"’
+     *
+     * @param content    待转义字符串
+     * @param targetChar 将要转义的字符
+     *
+     * @return 转义完成的字符串
+     */
+    public static String withEscaped(String content, char targetChar) {
         if (content == null) {
             return null;
         }

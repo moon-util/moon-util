@@ -11,18 +11,31 @@ import java.util.Objects;
 public class JavaFieldValue extends BaseImportable {
 
     private final String classname;
+    private boolean valueAvailable;
     private String value;
 
     public JavaFieldValue(Importer importer, String classname) {
         super(importer);
         this.classname = classname;
+        clear();
     }
+
+    private void withValue(String value) {
+        this.valueAvailable = true;
+        this.value = value;
+    }
+
+    public void clear() {
+        this.valueAvailable = false;
+    }
+
+    public boolean isValueAvailable() { return valueAvailable; }
 
     public void classOf(Class<?> klass) { valueOf(onImported(klass) + ".class"); }
 
     public void classOf(String classname) { valueOf(onImported(classname) + ".class"); }
 
-    public void valueOf(Object value) { this.value = String.valueOf(value); }
+    public void valueOf(Object value) { withValue(String.valueOf(value)); }
 
     public void stringOf(String value) { valueOf('"' + value + '"'); }
 
@@ -42,12 +55,12 @@ public class JavaFieldValue extends BaseImportable {
         if (Objects.equals(classname, enumClass)) {
             thisEnumRef(enumValue, memberRef);
         } else {
-            this.value = String2.format("{}.{}.{}", onImported(classname), enumValue, memberRef);
+            withValue(String2.format("{}.{}.{}", onImported(classname), enumValue, memberRef));
         }
     }
 
     public void thisEnumRef(String enumValue, String memberRef) {
-        this.value = String2.format("{}.{}", enumValue, memberRef);
+        withValue(String2.format("{}.{}", enumValue, memberRef));
     }
 
     @Override

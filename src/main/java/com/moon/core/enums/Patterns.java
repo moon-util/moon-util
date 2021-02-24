@@ -51,9 +51,27 @@ public enum Patterns implements Predicate<CharSequence> {
      */
     RESIDENT_ID_18(Pattern.compile("[1-9]\\d{5}[1-2]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}(\\d|X|x)")),
     /**
-     * 汉字
+     * 是否全部是汉字
      */
     CHINESE_WORDS(Pattern.compile("[\u4E00-\u9FAF]+")),
+    /**
+     * 是否包含汉字
+     */
+    HAS_CHINESE_WORD(Pattern.compile(".*[\u4E00-\u9FAF].*")) {
+        @Override
+        public boolean test(CharSequence str) {
+            if (str == null) {
+                return false;
+            }
+            int length = str.length();
+            for (int i = 0, ch; i < length; i++) {
+                if ((ch = str.charAt(i)) >= '\u4E00' || ch <= '\u9FAF') {
+                    return true;
+                }
+            }
+            return false;
+        }
+    },
     /**
      * 中国大陆手机号
      * <p>
