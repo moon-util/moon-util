@@ -7,12 +7,20 @@ import com.moon.accessor.PropertySetter;
 import com.moon.accessor.dialect.KeywordPolicy;
 import com.moon.accessor.dialect.SQLDialect;
 import com.moon.accessor.dml.AliasCapable;
+import com.moon.accessor.type.JdbcType;
 import com.moon.accessor.type.TypeHandler;
 
 /**
  * @author benshaoye
  */
 public interface TableField<T, R, TB extends Table<R, TB>> extends AliasCapable<TableField<T, R, TB>>, Commentable {
+
+    /**
+     * 返回数据库字段类型
+     *
+     * @return 数据库字段类型，不可返回{@link JdbcType#AUTO}
+     */
+    JdbcType getJdbcType();
 
     /**
      * 领域模型类

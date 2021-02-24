@@ -188,6 +188,8 @@ public class JavaMethod extends JavaBlockCommentable {
                 appendOnly(addr, (LineScripter) returning);
             } else if (returning != null) {
                 returning.appendTo(addr);
+            } else {
+                addr.add(" }");
             }
         } else if (scripters.size() == 1 && returning == null) {
             Scripter scripter = scripters.get(0);
@@ -195,6 +197,8 @@ public class JavaMethod extends JavaBlockCommentable {
                 appendOnly(addr, (LineScripter) scripter);
             } else if (scripter != null) {
                 scripter.appendTo(addr);
+            } else {
+                addr.add(" }");
             }
         } else {
             // body

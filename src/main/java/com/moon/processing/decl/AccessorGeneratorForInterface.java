@@ -1,8 +1,6 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.Provided;
-import com.moon.accessor.meta.Fields;
-import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.JdbcParameters;
 import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
@@ -27,34 +25,12 @@ import java.util.function.Consumer;
 /**
  * @author benshaoye
  */
-public class AccessorGeneratorForInterface {
+public class AccessorGeneratorForInterface extends TypeImported {
 
-    private final TypeHolder typeHolder;
-    private final TableHolder tableHolder;
-    private final TypeElement accessorElement;
-    private final String accessorClassname;
-    private final AccessorDeclared accessorDeclared;
-    private final TypeDeclared accessorTypeDeclared;
-    private final TableDeclared tableDeclared;
-    private final FileClassImpl impl;
-    private final Map<String, GenericDeclared> thisGenericMap;
-    private final Elements utils;
-    private final Types types;
     private MethodDeclared parsingDeclared;
 
     public AccessorGeneratorForInterface(FileClassImpl impl, AccessorDeclared declared) {
-        TypeDeclared accessorTypeDeclared = declared.getTypeDeclared();
-        this.thisGenericMap = accessorTypeDeclared.getGenericDeclaredMap();
-        this.accessorClassname = declared.getAccessorClassname();
-        this.accessorElement = declared.getAccessorElement();
-        this.accessorTypeDeclared = accessorTypeDeclared;
-        this.tableHolder = declared.getTableHolder();
-        this.typeHolder = declared.getTypeHolder();
-        this.tableDeclared = declared.getTableDeclared();
-        this.impl = impl;
-        this.accessorDeclared = declared;
-        this.utils = Processing2.getUtils();
-        this.types = Processing2.getTypes();
+        super(impl, declared);
     }
 
     public void doGenerate() {
@@ -198,8 +174,14 @@ public class AccessorGeneratorForInterface {
             return;
         }
         writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
-        // writeInsertTableFields(implMethod, columnsMap);
-        writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
+        writeDeclareParameters(implMethod, columnsMap.size());
+        for (Map.Entry<ColumnDeclared, ParameterDeclared> columnMap : columnsMap.entrySet()) {
+            ParameterDeclared param = columnMap.getValue();
+            ColumnDeclared column = columnMap.getKey();
+            implMethod.nextFormatted("parameters.add({}, {})",
+                column.getConstColumnRef(getTableImported()),
+                param.getParameterName());
+        }
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
     }
@@ -211,29 +193,53 @@ public class AccessorGeneratorForInterface {
         Map<ColumnDeclared, PropertyDeclared> columnsMap
     ) {
         writeInsertSQL(implMethod, toColumnsJoined(columnsMap), columnsMap.size());
-
-        String paramsImported = implMethod.onImported(JdbcParameters.class);
-        String modelImported = implMethod.onImported(tableDeclared.getModelClassname());
-        String tableImported = implMethod.onImported(tableDeclared.getTableClassname());
-        implMethod.nextFormatted("{}<{}, {}> fields = new {}<>({}, {})",
-            paramsImported,
-            modelImported,
-            tableImported,
-            paramsImported,
-            tableDeclared.getTableEnumRef(tableImported),
-            columnsMap.size());
+        writeDeclareParameters(implMethod, columnsMap.size());
         for (Map.Entry<ColumnDeclared, PropertyDeclared> columnMap : columnsMap.entrySet()) {
             PropertyDeclared prop = columnMap.getValue();
             ColumnDeclared column = columnMap.getKey();
-            implMethod.nextFormatted("fields.add({}, {})",
-                column.getConstColumnRef(tableImported),
+            implMethod.nextFormatted("parameters.add({}, {})",
+                column.getConstColumnRef(getTableImported()),
                 prop.getReffedGetterScript(parameter.getParameterName()));
         }
 
         // writeInsertTableFields(implMethod, columnsMap);
-        writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
+        // writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
+    }
+
+    private void writeDeclareParameters(JavaMethod implMethod, int capacity) {
+        implMethod.nextFormatted("{}<{}, {}> parameters = new {}<>({}, {})",
+            getParamsTypeImported(),
+            getModelImported(),
+            getTableImported(),
+            getParamsTypeImported(),
+            tableDeclared.getTableEnumRef(getTableImported()),
+            capacity);
+    }
+
+    private void writeInsertSQL(JavaMethod implMethod, String columnsJoined, int count) {
+        String sql = "INSERT INTO " + toDatabaseSymbol(tableDeclared.getTableName()) +
+
+            " (" + columnsJoined + ") VALUES (" + toPlaceholders(count) + ')';
+        implMethod.nextFormatted("{} sql = \"{}\"", implMethod.onImported(String.class), sql);
+    }
+
+    private static String toColumnsJoined(Map<ColumnDeclared, ?> columnsMap) {
+        int index = 0, length = columnsMap.size();
+        String[] columns = new String[length];
+        for (ColumnDeclared declared : columnsMap.keySet()) {
+            columns[index++] = toDatabaseSymbol(declared.getColumnName());
+        }
+        return String.join(", ", columns);
+    }
+
+    private static String toDatabaseSymbol(String columnName) { return '`' + columnName + '`'; }
+
+    private static String toPlaceholders(int count) {
+        String[] holders = new String[count];
+        Arrays.fill(holders, "?");
+        return String.join(", ", holders);
     }
 
     private void doImplInsertParameter(
@@ -286,53 +292,6 @@ public class AccessorGeneratorForInterface {
         } else {
             defaultReturning(methodDeclared, implMethod);
         }
-    }
-
-    private void writeInsertSQL(JavaMethod implMethod, String columnsJoined, int count) {
-        String sql = "INSERT INTO " + toDatabaseSymbol(tableDeclared.getTableName()) +
-
-            " (" + columnsJoined + ") VALUES (" + toPlaceholders(count) + ')';
-        implMethod.nextFormatted("{} sql = \"{}\"", implMethod.onImported(String.class), sql);
-    }
-
-    private void writeInsertTableFields(JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap) {
-        int index = 0;
-        String[] fields = new String[columnsMap.size()];
-        String tableImported = implMethod.onImported(tableDeclared.getTableClassname());
-        for (Map.Entry<ColumnDeclared, ?> declaredEntry : columnsMap.entrySet()) {
-            fields[index++] = declaredEntry.getKey().getConstColumnRef(tableImported);
-        }
-        implMethod.nextFormatted("{}<?, {}, {}>[] fields = {}.of({})",
-            implMethod.onImported(TableField.class),
-            implMethod.onImported(tableDeclared.getTypeDeclared().getTypeClassname()),
-            tableImported,
-            implMethod.onImported(Fields.class),
-            String.join(", ", fields));
-    }
-
-    private void writeInsertColumnsHandlerStatement(JavaMethod implMethod, int count) {
-        implMethod.nextFormatted("{}<{}> columnsHandler = new {}<>({})",
-            implMethod.onImported(List.class),
-            implMethod.onImported(String.class),
-            implMethod.onImported(ArrayList.class),
-            count);
-    }
-
-    private static String toColumnsJoined(Map<ColumnDeclared, ?> columnsMap) {
-        int index = 0, length = columnsMap.size();
-        String[] columns = new String[length];
-        for (ColumnDeclared declared : columnsMap.keySet()) {
-            columns[index++] = toDatabaseSymbol(declared.getColumnName());
-        }
-        return String.join(", ", columns);
-    }
-
-    private static String toDatabaseSymbol(String columnName) { return '`' + columnName + '`'; }
-
-    private static String toPlaceholders(int count) {
-        String[] holders = new String[count];
-        Arrays.fill(holders, "?");
-        return String.join(", ", holders);
     }
 
     private static boolean isSamePropertyType(String actualType, String fieldClass) {

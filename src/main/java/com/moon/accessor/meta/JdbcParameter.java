@@ -1,7 +1,10 @@
 package com.moon.accessor.meta;
 
+import com.moon.accessor.type.JdbcType;
 import com.moon.accessor.type.TypeHandler;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Objects;
 
 /**
@@ -10,10 +13,16 @@ import java.util.Objects;
 public final class JdbcParameter<T, R, TB extends Table<R, TB>> {
 
     private final TypeHandler<T> handler;
+    private final JdbcType jdbcType;
     private final T value;
     private final int index;
 
-    JdbcParameter(TypeHandler<T> handler, T value, int index) {
+    JdbcParameter(TableField<T, R, TB> field, T value, int index) {
+        this(field.getTypeHandler(), field.getJdbcType(), value, index);
+    }
+
+    JdbcParameter(TypeHandler<T> handler, JdbcType jdbcType, T value, int index) {
+        this.jdbcType = jdbcType;
         this.handler = handler;
         this.value = value;
         this.index = index;
@@ -24,6 +33,10 @@ public final class JdbcParameter<T, R, TB extends Table<R, TB>> {
     public T getValue() { return value; }
 
     public int getIndex() { return index; }
+
+    public void setParameter(PreparedStatement stmt) throws SQLException {
+        handler.setParameter(stmt, index, value, jdbcType.getTypeCode());
+    }
 
     @Override
     public boolean equals(Object o) {

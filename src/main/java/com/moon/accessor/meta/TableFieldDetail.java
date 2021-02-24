@@ -112,6 +112,9 @@ public class TableFieldDetail<T, R, TB extends Table<R, TB>> implements TableFie
     }
 
     @Override
+    public JdbcType getJdbcType() { return columnJdbcType; }
+
+    @Override
     public Class<R> getDomainClass() { return domainClass; }
 
     @Override
