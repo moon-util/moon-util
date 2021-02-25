@@ -12,7 +12,7 @@ public class JavaFieldValue extends BaseImportable {
 
     private final String classname;
     private boolean valueAvailable;
-    private String value;
+    private String fieldValue;
 
     public JavaFieldValue(Importer importer, String classname) {
         super(importer);
@@ -22,10 +22,11 @@ public class JavaFieldValue extends BaseImportable {
 
     private void withValue(String value) {
         this.valueAvailable = true;
-        this.value = value;
+        this.fieldValue = value;
     }
 
     public void clear() {
+        this.fieldValue = null;
         this.valueAvailable = false;
     }
 
@@ -64,5 +65,5 @@ public class JavaFieldValue extends BaseImportable {
     }
 
     @Override
-    public String toString() { return value == null ? "null" : value; }
+    public String toString() { return fieldValue == null ? "null" : fieldValue; }
 }

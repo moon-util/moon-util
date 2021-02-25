@@ -14,6 +14,8 @@ import java.util.function.Consumer;
  */
 public class JavaMethod extends JavaBlockCommentable {
 
+    private final static Scripter BLANK = JavaAddr::next;
+
     private final String name;
     private final JavaParameters parameters;
     private final String signature;
@@ -35,6 +37,7 @@ public class JavaMethod extends JavaBlockCommentable {
 
     /**
      * 描述这个方法是否是 getter/setter 等描述属性的方法，这种方法放在文件最后
+     *
      * @return
      */
     public JavaMethod withPropertyMethod() { return withPropertyMethod(true); }
@@ -108,12 +111,18 @@ public class JavaMethod extends JavaBlockCommentable {
     next
      */
 
+    public JavaMethod nextBlank() { return nextScript(BLANK); }
+
     public JavaMethod nextFormatted(String template, Object... values) {
         return nextScript(String2.format(template, values));
     }
 
     public JavaMethod nextScript(String script) {
-        scripters.add(new LineScripterImpl(script));
+        return nextScript(new LineScripterImpl(script));
+    }
+
+    public JavaMethod nextScript(Scripter scripter) {
+        scripters.add(scripter);
         return this;
     }
 

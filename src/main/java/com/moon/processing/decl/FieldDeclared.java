@@ -1,8 +1,11 @@
 package com.moon.processing.decl;
 
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author benshaoye
@@ -32,6 +35,8 @@ public class FieldDeclared {
      */
     private final String declaredType;
 
+    private final Set<Modifier> modifiers;
+
     public FieldDeclared(
         TypeElement thisElement,
         TypeElement declareEnclosingElement,
@@ -49,7 +54,18 @@ public class FieldDeclared {
         String actualType = Generic2.mapToActual(thisGenericMap, enclosingClass, declaredType);
         this.declaredType = declaredType;
         this.type = actualType;
+        this.modifiers = fieldElement.getModifiers();
     }
+
+    public <A extends Annotation> A getFieldAnnotation(Class<A> annotationClass) {
+        return fieldElement.getAnnotation(annotationClass);
+    }
+
+    public boolean isStatic() { return isModifierOf(Modifier.STATIC); }
+
+    public boolean isTransient() { return isModifierOf(Modifier.TRANSIENT); }
+
+    public boolean isModifierOf(Modifier modifier) { return modifiers.contains(modifier); }
 
     public VariableElement getFieldElement() { return fieldElement; }
 

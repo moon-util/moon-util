@@ -7,7 +7,7 @@ package com.moon.poi.excel.table;
 
 import com.moon.core.lang.NumberUtil;
 import com.moon.core.time.DateUtil;
-import com.moon.poi.excel.annotation.TableColumn;
+import com.moon.poi.excel.annotation.SheetColumn;
 
 /**
  * @author moonsky
@@ -50,10 +50,10 @@ final class Assert {
     // }
 
     final static void notDuplicated(Marked onMethod, Marked onField) {
-        TableColumn mCol = onMethod == null ? null : onMethod.getTableColumn();
-        TableColumn fCol = onField == null ? null : onField.getTableColumn();
+        SheetColumn mCol = onMethod == null ? null : onMethod.getTableColumn();
+        SheetColumn fCol = onField == null ? null : onField.getTableColumn();
         if (mCol != null && fCol != null) {
-            throw new IllegalStateException("@" + TableColumn.class.getSimpleName() + " 不能同时注解在 getter/setter 方法和字段上");
+            throw new IllegalStateException("@" + SheetColumn.class.getSimpleName() + " 不能同时注解在 getter/setter 方法和字段上");
         }
     }
 

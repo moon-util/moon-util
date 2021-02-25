@@ -8,7 +8,7 @@ import com.moon.core.util.ListUtil;
 import com.moon.core.util.MapUtil;
 import com.moon.core.util.SetUtil;
 import com.moon.core.util.function.ShortFunction;
-import com.moon.poi.excel.annotation.TableRecord;
+import com.moon.poi.excel.annotation.RowRecord;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import com.moon.poi.excel.annotation.style.StyleBuilder;
 import org.apache.poi.ss.usermodel.*;
@@ -122,20 +122,20 @@ final class StyleUtil {
     }
 
     private static void collectImports(
-        Set<Class<?>> rang, final Map<String, StyleBuilder> builderMap, final String prefix, final TableRecord record
+        Set<Class<?>> rang, final Map<String, StyleBuilder> builderMap, final String prefix, final RowRecord record
     ) {
         if (record == null) {
             return;
         }
         Class<?>[] imports = record.importStyles();
         for (final Class<?> importClass : imports) {
-            TableRecord importRecord = null;
+            RowRecord importRecord = null;
             // 递归深层引入样式
             if (rang.contains(importClass)) {
                 continue;
             } else {
                 rang.add(importClass);
-                importRecord = importClass.getAnnotation(TableRecord.class);
+                importRecord = importClass.getAnnotation(RowRecord.class);
                 collectImports(rang, builderMap, prefix, importRecord);
             }
             // 定义在类上的所有样式
@@ -174,7 +174,7 @@ final class StyleUtil {
     }
 
     private static void parseStyleOnClass(
-        Map<String, StyleBuilder> builderMap, Class<?> type, String prefix, TableRecord record
+        Map<String, StyleBuilder> builderMap, Class<?> type, String prefix, RowRecord record
     ) {
         List<DefinitionStyle> classStyles = ListUtil.newList(type.getAnnotationsByType(DefinitionStyle.class));
         parseStyles(builderMap, prefix, EMPTY, classStyles);
@@ -184,10 +184,10 @@ final class StyleUtil {
         Map<String, StyleBuilder> builderMap = MapUtil.newMap();
         final String prefix = scoped(type);
         // 首先引入外部定义样式
-        final TableRecord tableRecord = type.getAnnotation(TableRecord.class);
-        collectImports(SetUtil.newSet(type), builderMap, prefix, tableRecord);
+        final RowRecord rowRecord = type.getAnnotation(RowRecord.class);
+        collectImports(SetUtil.newSet(type), builderMap, prefix, rowRecord);
         // 解析类定义样式
-        parseStyleOnClass(builderMap, type, prefix, tableRecord);
+        parseStyleOnClass(builderMap, type, prefix, rowRecord);
         for (Attribute attr : attrs) {
             // getter 方法上的默认样式覆盖字段上的默认样式
             List<DefinitionStyle> stylesOnMethod = attr.getDefinitionStylesOnMethod();

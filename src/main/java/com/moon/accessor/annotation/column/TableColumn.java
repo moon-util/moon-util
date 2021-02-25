@@ -1,4 +1,4 @@
-package com.moon.accessor.annotation;
+package com.moon.accessor.annotation.column;
 
 import com.moon.accessor.type.JdbcType;
 import com.moon.accessor.type.TypeHandler;
@@ -15,7 +15,7 @@ import java.sql.Types;
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableField {
+public @interface TableColumn {
 
     /**
      * 指定列名，指定的列名会覆盖公共列名策略
@@ -46,4 +46,11 @@ public @interface TableField {
      * @return 精度位数（小数位数），不同浮点数类型有默认值，如果没有主动设置有效值，将自动设置默认精度
      */
     int precision() default -1;
+
+    /**
+     * 是否忽略这个字段作为表字段
+     *
+     * @return 默认不忽略
+     */
+    boolean ignored() default false;
 }

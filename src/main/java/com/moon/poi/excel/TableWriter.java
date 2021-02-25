@@ -2,9 +2,9 @@ package com.moon.poi.excel;
 
 import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.IteratorUtil;
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
-import com.moon.poi.excel.annotation.TableRecord;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
+import com.moon.poi.excel.annotation.RowRecord;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Iterator;
@@ -16,9 +16,9 @@ import java.util.stream.Stream;
  * 针对注解的渲染工厂
  *
  * @author moonsky
- * @see TableColumn 标记一个字段
- * @see TableColumnGroup 标记一个实体字段
- * @see TableRecord 标记一个实体
+ * @see SheetColumn 标记一个字段
+ * @see SheetColumnGroup 标记一个实体字段
+ * @see RowRecord 标记一个实体
  * * @see TableListable 标记一个列表字段，一个实体里最多只能有一列可迭代
  // * @see TableIndexer 标记一列索引
  */

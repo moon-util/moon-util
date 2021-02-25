@@ -1,8 +1,9 @@
 package com.moon.processor.def;
 
 import com.moon.accessor.annotation.*;
+import com.moon.accessor.annotation.column.TableColumn;
 import com.moon.accessor.type.TypeHandler;
-import com.moon.processor.defaults.DefaultTableField;
+import com.moon.processor.defaults.DefaultTableColumn;
 import com.moon.processor.model.DeclaredPojo;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.Environment2;
@@ -25,8 +26,8 @@ import static com.moon.processor.utils.String2.camelcaseToHyphen;
 public enum Table2 {
     ;
     @SuppressWarnings("all")
-    private final static Class<com.moon.accessor.annotation.TableField> TABLE_FIELD_CLASS//
-        = com.moon.accessor.annotation.TableField.class;
+    private final static Class<TableColumn> TABLE_FIELD_CLASS//
+        = TableColumn.class;
     private final static String TABLE_FIELD_NAME = "TABLE", RECORD = "RECORD";
     final static String TYPE_HANDLER_NAME = TypeHandler.class.getCanonicalName();
 
@@ -83,11 +84,11 @@ public enum Table2 {
         return String2.replaceAll(effectPattern, "{}", resultName);
     }
 
-    public static String getNullableTypeHandler(com.moon.accessor.annotation.TableField field) {
+    public static String getNullableTypeHandler(TableColumn field) {
         if (field == null) {
             return null;
         }
-        String name = Element2.getClassname(field, TableField::typeHandler);
+        String name = Element2.getClassname(field, TableColumn::typeHandler);
         TypeElement element = Environment2.getUtils().getTypeElement(name);
         if (element == null) {
             return null;
@@ -119,14 +120,14 @@ public enum Table2 {
         return name;
     }
 
-    public static TableField getTableFieldAnnotation(VariableElement element) {
-        com.moon.accessor.annotation.TableField fieldAnnotated//
+    public static TableColumn getTableFieldAnnotation(VariableElement element) {
+        TableColumn fieldAnnotated//
             = element.getAnnotation(TABLE_FIELD_CLASS);
-        return fieldAnnotated == null ? DefaultTableField.INSTANCE : fieldAnnotated;
+        return fieldAnnotated == null ? DefaultTableColumn.INSTANCE : fieldAnnotated;
     }
 
     public static String toColumnName(
-        com.moon.accessor.annotation.TableField field, String propertyName, TableFieldPolicy columnPolicy
+        TableColumn field, String propertyName, TableFieldPolicy columnPolicy
     ) {
         if (field != null) {
             String name = field.name().trim();

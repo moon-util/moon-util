@@ -1,11 +1,8 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.Provided;
-import com.moon.accessor.meta.JdbcParameters;
+import com.moon.accessor.session.JdbcSession;
 import com.moon.processing.file.*;
-import com.moon.processing.holder.TableHolder;
-import com.moon.processing.holder.TypeHolder;
-import com.moon.processing.util.Processing2;
 import com.moon.processor.utils.Assert2;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
@@ -16,8 +13,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -182,6 +177,7 @@ public class AccessorGeneratorForInterface extends TypeImported {
                 column.getConstColumnRef(getTableImported()),
                 param.getParameterName());
         }
+        implMethod.nextBlank().nextFormatted("{}.insert(sql, parameters)", getJdbcSessionName());
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
     }
@@ -201,20 +197,15 @@ public class AccessorGeneratorForInterface extends TypeImported {
                 column.getConstColumnRef(getTableImported()),
                 prop.getReffedGetterScript(parameter.getParameterName()));
         }
-
-        // writeInsertTableFields(implMethod, columnsMap);
-        // writeInsertColumnsHandlerStatement(implMethod, columnsMap.size());
+        implMethod.nextBlank().nextFormatted("{}.insert(sql, parameters)", getJdbcSessionName());
         // TODO execute SQL
         defaultReturning(methodDeclared, implMethod);
     }
 
     private void writeDeclareParameters(JavaMethod implMethod, int capacity) {
-        implMethod.nextFormatted("{}<{}, {}> parameters = new {}<>({}, {})",
+        implMethod.nextFormatted("{} parameters = new {}({})",
             getParamsTypeImported(),
-            getModelImported(),
-            getTableImported(),
             getParamsTypeImported(),
-            tableDeclared.getTableEnumRef(getTableImported()),
             capacity);
     }
 
@@ -375,8 +366,8 @@ public class AccessorGeneratorForInterface extends TypeImported {
     private final static Map<String, String> COLLECTION_TYPES = new HashMap<>();
 
     static {
-        BiConsumer<Class<?>, Class<?>> consumer = (cls1, cls2) -> COLLECTION_TYPES
-            .put(cls1.getCanonicalName(), cls2.getCanonicalName());
+        BiConsumer<Class<?>, Class<?>> consumer = (cls1, cls2) -> COLLECTION_TYPES.put(cls1.getCanonicalName(),
+            cls2.getCanonicalName());
         consumer.accept(Map.class, HashMap.class);
         consumer.accept(HashMap.class, HashMap.class);
         consumer.accept(TreeMap.class, TreeMap.class);

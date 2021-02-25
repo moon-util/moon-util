@@ -3,6 +3,7 @@ package com.moon.processor.def;
 import com.moon.accessor.annotation.TableFieldPolicy;
 import com.moon.accessor.annotation.TableModel;
 import com.moon.accessor.annotation.TableModelPolicy;
+import com.moon.accessor.annotation.column.TableColumn;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 import com.moon.processor.JavaFileWriteable;
@@ -213,7 +214,7 @@ public class DefTableModel implements JavaFileWriteable {
         if (element == null) {
             return null;
         }
-        com.moon.accessor.annotation.TableField fieldAnnotated//
+        TableColumn fieldAnnotated//
             = Table2.getTableFieldAnnotation(element);
 
         // 列名

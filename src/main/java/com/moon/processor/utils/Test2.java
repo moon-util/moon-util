@@ -179,7 +179,7 @@ public enum Test2 {
             String name = exe.getSimpleName().toString();
             boolean maybeSet = name.length() > 3 && name.startsWith(SET);
             maybeSet = maybeSet && exe.getParameters().size() == 1;
-            maybeSet = maybeSet && isTypeKind(exe.getReturnType(), TypeKind.VOID);
+            // maybeSet = maybeSet && isTypeKind(exe.getReturnType(), TypeKind.VOID);
             return maybeSet;
         }
         return false;

@@ -1,5 +1,6 @@
 package com.moon.accessor.session;
 
+import com.moon.accessor.meta.JdbcParameters;
 import com.moon.accessor.param.ParameterSetter;
 import com.moon.accessor.param.Parameters;
 import com.moon.accessor.result.ResultExtractor;
@@ -41,6 +42,19 @@ public interface JdbcSession extends Closeable {
      * @return 执行结果
      */
     default int insert(String sql, Object[] parameters) {
+        // Example:
+        return update(sql, parameters);
+    }
+
+    /**
+     * 执行 insert 语句
+     *
+     * @param sql        SQL 预编译语句
+     * @param parameters 预定义参数
+     *
+     * @return 执行结果
+     */
+    default int insert(String sql, JdbcParameters parameters) {
         // Example:
         return update(sql, parameters);
     }
@@ -98,6 +112,18 @@ public interface JdbcSession extends Closeable {
         // Example:
         return update(sql, Arrays.asList(parameters));
     }
+
+    /**
+     * 执行 update 语句
+     *
+     * @param sql        SQL 预编译语句
+     * @param parameters 预定义参数
+     *
+     * @return 执行结果
+     *
+     * @see JdbcParameters
+     */
+    int update(String sql, JdbcParameters parameters);
 
     /**
      * update 语句

@@ -6,6 +6,7 @@ import com.moon.accessor.config.ConnectionFactory;
 import com.moon.accessor.exception.Exception2;
 import com.moon.accessor.function.ThrowingBiApplier;
 import com.moon.accessor.function.ThrowingBiConsumer;
+import com.moon.accessor.meta.JdbcParameters;
 import com.moon.accessor.param.Parameter2;
 import com.moon.accessor.param.ParameterSetter;
 import com.moon.accessor.result.Result2;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
 
 /**
  * @author benshaoye
@@ -56,17 +58,22 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
 
     @Override
     public int update(String sql, Object[] parameters) {
-        return doUpdateSQL(sql, parameters, Parameter2::setAll);
+        return doUpdateSQL(sql, parameters, ps -> isEmptyArray(ps), Parameter2::setAll);
     }
 
     @Override
     public int update(String sql, ParameterSetter[] parameters) {
-        return doUpdateSQL(sql, parameters, Parameter2::setAll);
+        return doUpdateSQL(sql, parameters, ps -> isEmptyArray(ps), Parameter2::setAll);
+    }
+
+    @Override
+    public int update(String sql, JdbcParameters parameters) {
+        return doUpdateSQL(sql, parameters, JdbcParameters::isEmpty, (stmt, ps) -> ps.setParameters(stmt));
     }
 
     @Override
     public int update(String sql, Collection<ParameterSetter> parameters) {
-        return doUpdateSQL(sql, parameters, Parameter2::setAll);
+        return doUpdateSQL(sql, parameters, Collect2::isEmpty, Parameter2::setAll);
     }
 
     private int doUpdateSQL(String sql) {
@@ -81,28 +88,12 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
     }
 
     private <T> int doUpdateSQL(
-        String sql, T[] parameters, ThrowingBiConsumer<PreparedStatement, T[]> parameterSetter
-    ) {
-        if (parameters == null || parameters.length == 0) {
-            return doUpdateSQL(sql);
-        }
-        Connection connection = openConnection();
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            parameterSetter.accept(stmt, parameters);
-            return stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw Exception2.with(e, "SQL DML error: {}, parameters: {}.", sql, stringify(parameters));
-        } finally {
-            releaseConnection(connection);
-        }
-    }
-
-    private int doUpdateSQL(
         String sql,
-        Collection<ParameterSetter> parameters,
-        ThrowingBiConsumer<PreparedStatement, Collection<ParameterSetter>> parameterSetter
+        T parameters,
+        Predicate<T> paramsUnavailableTester,
+        ThrowingBiConsumer<PreparedStatement, T> parameterSetter
     ) {
-        if (parameters == null || parameters.isEmpty()) {
+        if (paramsUnavailableTester.test(parameters)) {
             return doUpdateSQL(sql);
         }
         Connection connection = openConnection();
@@ -228,5 +219,43 @@ public class JdbcSessionImpl extends ConfigurationContext implements JdbcSession
         //
     }
 
-    private static String stringify(Object[] parameters) { return Arrays.toString(parameters); }
+    private static boolean isEmptyArray(Object[] array) {
+        return array == null || array.length == 0;
+    }
+
+    private static String stringify(Object parameters) {
+        if (parameters == null) {
+            return "null";
+        }
+        if (parameters.getClass().isArray()) {
+            if (parameters instanceof Object[]) {
+                return Arrays.toString((Object[]) parameters);
+            }
+            if (parameters instanceof boolean[]) {
+                return Arrays.toString((boolean[]) parameters);
+            }
+            if (parameters instanceof double[]) {
+                return Arrays.toString((double[]) parameters);
+            }
+            if (parameters instanceof float[]) {
+                return Arrays.toString((float[]) parameters);
+            }
+            if (parameters instanceof long[]) {
+                return Arrays.toString((long[]) parameters);
+            }
+            if (parameters instanceof int[]) {
+                return Arrays.toString((int[]) parameters);
+            }
+            if (parameters instanceof short[]) {
+                return Arrays.toString((short[]) parameters);
+            }
+            if (parameters instanceof byte[]) {
+                return Arrays.toString((byte[]) parameters);
+            }
+            if (parameters instanceof char[]) {
+                return Arrays.toString((char[]) parameters);
+            }
+        }
+        return parameters.toString();
+    }
 }

@@ -3,9 +3,9 @@ package com.moon.poi.excel.table;
 import com.moon.core.lang.IntUtil;
 import com.moon.core.lang.reflect.FieldUtil;
 import com.moon.poi.excel.Renderer;
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
-import com.moon.poi.excel.annotation.TableRecord;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
+import com.moon.poi.excel.annotation.RowRecord;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import org.junit.jupiter.api.Test;
 
@@ -29,45 +29,45 @@ public class StyleUtilTest extends TableParser {
     void testGetTableColClassname() throws Exception {
     }
 
-    @TableRecord(importStyles = {StyleUtilTest.class})
+    @RowRecord(importStyles = {StyleUtilTest.class})
     @DefinitionStyle(classname = "defaultStyleOnDeptNo1")
     @DefinitionStyle(classname = "defaultStyleOnDeptNo2")
     public static class Department {
 
-        @TableColumn
+        @SheetColumn
         @DefinitionStyle
         private String name;
 
-        @TableColumn
+        @SheetColumn
         @DefinitionStyle
         private String address;
 
-        @TableColumn
+        @SheetColumn
         private int age;
 
-        @TableColumn
+        @SheetColumn
         private boolean male;
 
-        @TableColumn
-        @TableColumnGroup
+        @SheetColumn
+        @SheetColumnGroup
         private Detail detail;
     }
 
     @DefinitionStyle(classname = "defaultName")
     public static class Detail {
 
-        @TableColumn
+        @SheetColumn
         @DefinitionStyle
         private String name;
 
-        @TableColumn
+        @SheetColumn
         @DefinitionStyle
         private String address;
 
-        @TableColumn
+        @SheetColumn
         private int age;
 
-        @TableColumn
+        @SheetColumn
         private boolean male;
     }
 

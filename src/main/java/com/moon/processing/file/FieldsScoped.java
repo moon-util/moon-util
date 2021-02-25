@@ -40,9 +40,11 @@ public class FieldsScoped extends BaseScoped<JavaField> {
         return field;
     }
 
-    public JavaField useField(String fieldName, String typeTemplate, Object... types) {
-        JavaField field = getMemberMap().get(fieldName);
-        return field == null ? declareField(fieldName, typeTemplate, types) : field;
+    public JavaField useField(
+        String fieldName, Consumer<JavaFieldValue> valueBuilder, String typeTemplate, Object... types
+    ) {
+        JavaField field = newUsingField(fieldName, typeTemplate, types).valueOf(valueBuilder);
+        return usingContentSymbolWith(field, false);
     }
 
     public JavaField useFinalField(Consumer<JavaFieldValue> valueBuilder, String typeTemplate, Object... types) {

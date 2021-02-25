@@ -1,7 +1,7 @@
 package com.moon.poi.excel.annotation.value;
 
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 import java.util.function.Predicate;
 
 /**
- * 字段默认值，只能和{@link TableColumn}搭配使用，对该字段可能存在不符合预期的字段值提供降级方案；
+ * 字段默认值，只能和{@link SheetColumn}搭配使用，对该字段可能存在不符合预期的字段值提供降级方案；
  * <p>
- * 单独注解或者与{@link TableColumnGroup}等搭配使用无效
+ * 单独注解或者与{@link SheetColumnGroup}等搭配使用无效
  *
  * @author moonsky
  */

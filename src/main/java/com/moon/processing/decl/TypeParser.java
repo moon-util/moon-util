@@ -53,10 +53,10 @@ final class TypeParser {
         return Generic2.mapToActual(thisGenericMap, parsingClass, declaredType);
     }
 
-    private PropertyDeclared withPropertyDeclared(String name) {
+    private PropertyDeclared withPropertyDeclared(String name, TypeElement enclosingElement) {
         PropertyDeclared declared = properties.get(name);
         if (declared == null) {
-            declared = new PropertyDeclared(typeElement, typeDeclared, name, thisGenericMap);
+            declared = new PropertyDeclared(typeElement, enclosingElement, typeDeclared, name, thisGenericMap);
             properties.put(name, declared);
         }
         return declared;
@@ -70,7 +70,7 @@ final class TypeParser {
             if (isParsedProperty(name)) {
                 return;
             }
-            withPropertyDeclared(name).withFieldDeclared((VariableElement) element);
+            withPropertyDeclared(name, parsingElem).withFieldDeclared((VariableElement) element);
         } else if (Test2.isSetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             declaredType = Element2.getSetterDeclareType(elem);
@@ -79,14 +79,14 @@ final class TypeParser {
             if (isParsedSetter(name, actualType)) {
                 return;
             }
-            withPropertyDeclared(name).withSetterMethodDeclared(elem, actualType);
+            withPropertyDeclared(name, parsingElem).withSetterMethodDeclared(elem, actualType);
         } else if (Test2.isGetterMethod(element)) {
             ExecutableElement elem = (ExecutableElement) element;
             String name = Element2.toPropertyName(elem);
             if (isParsedGetter(name)) {
                 return;
             }
-            withPropertyDeclared(name).withGetterMethodDeclared(elem);
+            withPropertyDeclared(name, parsingElem).withGetterMethodDeclared(elem);
         } else if (Test2.isConstructor(element)) {
             if (parsingElem == typeElement) {
                 ConstructorDeclared constructorDeclared = new ConstructorDeclared(typeElement,

@@ -1,7 +1,7 @@
 package com.moon.poi.excel.table;
 
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 
 import java.lang.annotation.Annotation;
@@ -78,14 +78,14 @@ interface Descriptor {
      *
      * @return TableColumn
      */
-    TableColumn getTableColumn();
+    SheetColumn getTableColumn();
 
     /**
      * 实体字段注解
      *
      * @return TableColumnGroup
      */
-    TableColumnGroup getTableColumnGroup();
+    SheetColumnGroup getTableColumnGroup();
 
     /**
      * 读取值，不存在的话返回默认值
@@ -97,9 +97,9 @@ interface Descriptor {
      * @return 获取的值
      */
     default <T> T getOrDefault(
-        Function<TableColumn, T> getter, T dft
+        Function<SheetColumn, T> getter, T dft
     ) {
-        TableColumn column = getTableColumn();
+        SheetColumn column = getTableColumn();
         return column == null ? dft : getter.apply(column);
     }
 

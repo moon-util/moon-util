@@ -1,6 +1,6 @@
-package com.moon.processing.defaults;
+package com.moon.processor.defaults;
 
-import com.moon.accessor.annotation.TableField;
+import com.moon.accessor.annotation.column.TableColumn;
 import com.moon.accessor.type.JdbcType;
 import com.moon.accessor.type.TypeHandler;
 
@@ -9,10 +9,10 @@ import java.lang.annotation.Annotation;
 /**
  * @author benshaoye
  */
-public class TableFieldEnum implements TableField {
+public class DefaultTableColumn implements TableColumn {
 
     /** INSTANCE */
-    public static final TableFieldEnum INSTANCE = new TableFieldEnum();
+    public static final DefaultTableColumn INSTANCE = new DefaultTableColumn();
 
     @Override
     public String name() { return ""; }
@@ -30,5 +30,8 @@ public class TableFieldEnum implements TableField {
     public int precision() { return -1; }
 
     @Override
-    public Class<? extends Annotation> annotationType() { return TableField.class; }
+    public boolean ignored() { return false; }
+
+    @Override
+    public Class<? extends Annotation> annotationType() { return TableColumn.class; }
 }

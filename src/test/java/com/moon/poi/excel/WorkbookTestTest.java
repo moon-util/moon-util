@@ -1,14 +1,11 @@
 package com.moon.poi.excel;
 
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.style.DefinitionStyle;
+import com.moon.poi.excel.annotation.SheetColumn;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author moonsky
@@ -18,11 +15,11 @@ class WorkbookTestTest {
     @Data
     public static class EmployeeEntity {
 
-        @TableColumn({"姓名"})
+        @SheetColumn({"姓名"})
         private String name;
-        @TableColumn({"年龄"})
+        @SheetColumn({"年龄"})
         private int age;
-        @TableColumn({"班级"})
+        @SheetColumn({"班级"})
         private String classname;
 
         public EmployeeEntity() {

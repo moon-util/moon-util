@@ -1,8 +1,8 @@
 package com.moon.poi.excel.table;
 
 import com.moon.core.util.ListUtil;
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 
 import java.beans.PropertyDescriptor;
@@ -39,16 +39,16 @@ final class Marked<T extends Member> implements Descriptor {
     private final String name;
     private final Class type;
     private final T member;
-    private final TableColumn annotationColumn;
-    private final TableColumnGroup annotationGroup;
+    private final SheetColumn annotationColumn;
+    private final SheetColumnGroup annotationGroup;
 
     protected Marked(String name, Class type, T member) {
         this.member = Objects.requireNonNull(member);
         this.type = Objects.requireNonNull(type);
         this.name = Objects.requireNonNull(name);
 
-        this.annotationColumn = obtain(member, TableColumn.class);
-        this.annotationGroup = obtain(member, TableColumnGroup.class);
+        this.annotationColumn = obtain(member, SheetColumn.class);
+        this.annotationGroup = obtain(member, SheetColumnGroup.class);
         // Assert.notDuplicated(this);
     }
 
@@ -76,10 +76,10 @@ final class Marked<T extends Member> implements Descriptor {
     }
 
     @Override
-    public TableColumn getTableColumn() { return annotationColumn; }
+    public SheetColumn getTableColumn() { return annotationColumn; }
 
     @Override
-    public TableColumnGroup getTableColumnGroup() { return annotationGroup; }
+    public SheetColumnGroup getTableColumnGroup() { return annotationGroup; }
 
     @Override
     public String[] getTitles() {

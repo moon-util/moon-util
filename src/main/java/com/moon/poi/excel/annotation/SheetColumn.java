@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableColumn {
+public @interface SheetColumn {
 
     /**
      * 列标题，可设置合并标题
@@ -29,7 +29,7 @@ public @interface TableColumn {
      * <p>
      * 数量和位置与表头标题{@link #value()}对应，
      * 不足的自动用<code>-1（不设置）</code>补上，如果不打算设置某行行高也可用 -1 跳过，
-     * 超出部分自动忽略，如果有通过{@link TableColumnGroup}形成多级关系，父级超出部分也不会影响子级行高；
+     * 超出部分自动忽略，如果有通过{@link SheetColumnGroup}形成多级关系，父级超出部分也不会影响子级行高；
      * <p>
      * 只有设置了标题的位置才能设置行高，否则就忽略；
      * <p>
@@ -61,7 +61,7 @@ public @interface TableColumn {
      * 列排序，order 值只用来比较大小，不要求连续
      * <p>
      * 列按 order 大小排序，相同{@code order}列一定相邻，通常按字段声明顺序排序，
-     * 如果 order 相同，但{@link TableColumn}交替出现在{@code getter}或{@code field}上，
+     * 如果 order 相同，但{@link SheetColumn}交替出现在{@code getter}或{@code field}上，
      * 可能会存在例外情况，这种情况可修改 order 大小
      *
      * @return 顺序号

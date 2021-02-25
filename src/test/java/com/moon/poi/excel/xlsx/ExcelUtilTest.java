@@ -4,8 +4,8 @@ import com.moon.core.enums.Systems;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.poi.excel.ExcelUtil;
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
 import com.moon.poi.excel.annotation.value.DefaultNumber;
 import com.moon.poi.excel.annotation.value.DefaultValue;
 import com.moon.poi.excel.annotation.format.DateTimePattern;
@@ -66,25 +66,25 @@ class ExcelUtilTest {
 
         // @TableColumn
         @HeadStyle("name")
-        @TableColumn({"姓名"})
+        @SheetColumn({"姓名"})
         private String name = "张三";
 
         // @TableColumn
-        @TableColumn({"年龄"})
+        @SheetColumn({"年龄"})
         private int age = nextInt(18, 25);
 
         // @TableColumn
-        @TableColumn({"性别"})
+        @SheetColumn({"性别"})
         @DefinitionStyle(classname = "sex", createBy = BackgroundColor.class)
         private String sex = nextBoolean() ? "男" : "女";
 
         // @TableColumn
-        @TableColumn(value = {"居住地址"}, width = 4000)
+        @SheetColumn(value = {"居住地址"}, width = 4000)
         @HeadStyle("sex")
         private String address = ADDRESS.get(nextInt(0, ADDRESS.size()));
 
         // @TableColumn
-        @TableColumn({"邮政编码"})
+        @SheetColumn({"邮政编码"})
         private String zip = RandomStringUtil.nextDigit(6);
     }
 
@@ -92,11 +92,11 @@ class ExcelUtilTest {
 
         // @TableColumn
         @NumberPattern(value = "$##.00", minIntDigit = 4, minFractionDigit = 4)
-        @TableColumn({"上次得分"})
+        @SheetColumn({"上次得分"})
         private int prev = nextInt(59, 95);
 
         // @TableColumn
-        @TableColumn({"此次得分"})
+        @SheetColumn({"此次得分"})
         private int curr = nextInt(59, 95);
 
         public int getPrev() { return prev; }
@@ -106,42 +106,42 @@ class ExcelUtilTest {
 
     public static class Score {
 
-        @TableColumn("语文")
-        @TableColumnGroup
+        @SheetColumn("语文")
+        @SheetColumnGroup
         private ScoreCompare chinese = new ScoreCompare();
 
-        @TableColumn(value = {"数学"})
-        @TableColumnGroup
+        @SheetColumn(value = {"数学"})
+        @SheetColumnGroup
         private ScoreCompare math = new ScoreCompare();
 
-        @TableColumn({"英语"})
-        @TableColumnGroup
+        @SheetColumn({"英语"})
+        @SheetColumnGroup
         private ScoreCompare english = new ScoreCompare();
 
-        @TableColumn(value = {"物理"})
-        @TableColumnGroup
+        @SheetColumn(value = {"物理"})
+        @SheetColumnGroup
         private ScoreCompare score1 = new ScoreCompare();
 
-        @TableColumn({"化学"})
-        @TableColumnGroup
+        @SheetColumn({"化学"})
+        @SheetColumnGroup
         private ScoreCompare score2 = new ScoreCompare();
 
         // @TableColumnOffset(1)
         // @TableColumn
-        @TableColumn(value = {"分数统计", "上次总分"}, offset = 0)
+        @SheetColumn(value = {"分数统计", "上次总分"}, offset = 0)
         public int getPrevTotal() {
             return toTotal(ScoreCompare::getPrev);
         }
 
         // @TableColumn
-        @TableColumn(value = {"分数统计", "此次总分"}, order = 0)
+        @SheetColumn(value = {"分数统计", "此次总分"}, order = 0)
         public int getThisTotal() {
             return toTotal(ScoreCompare::getCurr);
         }
 
         // @TableColumnOffset(1)
         // @TableColumn
-        @TableColumn(value = {"分数统计", "分数变化"}, order = 1, offset = 2, offsetHeadRows = 1)
+        @SheetColumn(value = {"分数统计", "分数变化"}, order = 1, offset = 2, offsetHeadRows = 1)
         public int getDiffTotal() {
             return getThisTotal() - getPrevTotal();
         }
@@ -153,28 +153,28 @@ class ExcelUtilTest {
 
     public static class FeeDetail {
 
-        @TableColumn(value = "基本工资", rowsHeight4Head = 800, width = 0)
+        @SheetColumn(value = "基本工资", rowsHeight4Head = 800, width = 0)
         // @TableColumn({"基本工资"})
         private int basicSalary = nextInt(5000, 10000);
 
         // @TableColumn
-        @TableColumn(value = {"岗位工资"})
+        @SheetColumn(value = {"岗位工资"})
         private int jobSalary = nextInt(500, 1000);
 
         // @TableColumn
-        @TableColumn({"业务补贴"})
+        @SheetColumn({"业务补贴"})
         private int business = nextInt(200, 800);
 
         // @TableColumn
-        @TableColumn({"健康补贴"})
+        @SheetColumn({"健康补贴"})
         private int health = nextInt(200, 800);
 
         // @TableColumn
-        @TableColumn({"交通补贴"})
+        @SheetColumn({"交通补贴"})
         private int traffic = nextInt(200, 800);
 
         @DefaultNumber(value = 0, when = {DefaultNumber.Strategy.NULL, DefaultNumber.Strategy.NEGATIVE})
-        @TableColumn({"应发合计"})
+        @SheetColumn({"应发合计"})
         public Integer getSalary() {
             return null;
         }
@@ -183,7 +183,7 @@ class ExcelUtilTest {
     public static class Member {
 
         // @TableColumn
-        @TableColumn(value = {"部门"})
+        @SheetColumn(value = {"部门"})
         private String department = "市场部";
 
         @DateTimePattern("yyyy-MM-dd")
@@ -192,24 +192,24 @@ class ExcelUtilTest {
         // private Date now = new Date();
         // private LocalDateTime time = LocalDateTime.now();
 
-        @TableColumn({"基本信息"})
-        @TableColumnGroup
+        @SheetColumn({"基本信息"})
+        @SheetColumnGroup
         private BasicInfo info = new BasicInfo();
 
         // @TableColumn
-        @TableColumn({"基本信息", "身体状况"})
+        @SheetColumn({"基本信息", "身体状况"})
         private String status = nextBoolean() ? "健康" : "其他";
 
         @DefaultValue("<空>")
-        @TableColumn(value = {"值", "纸质", "侄子", "侄子的侄子"}, offset = 2)
+        @SheetColumn(value = {"值", "纸质", "侄子", "侄子的侄子"}, offset = 2)
         private String value;
 
-        @TableColumn({"得分情况"})
-        @TableColumnGroup
+        @SheetColumn({"得分情况"})
+        @SheetColumnGroup
         private Score score = new Score();
 
-        @TableColumn(value = {"应发项目"}, rowsHeight4Head = {400, 800})
-        @TableColumnGroup
+        @SheetColumn(value = {"应发项目"}, rowsHeight4Head = {400, 800})
+        @SheetColumnGroup
         private FeeDetail detail;
 
         public Member() { this.detail = nextBoolean() ? new FeeDetail() : null; }

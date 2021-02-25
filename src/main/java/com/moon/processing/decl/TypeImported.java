@@ -1,8 +1,10 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.meta.JdbcParameters;
+import com.moon.accessor.session.JdbcSession;
 import com.moon.processing.file.BaseImportable;
 import com.moon.processing.file.FileClassImpl;
+import com.moon.processing.file.JavaField;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;
 import com.moon.processing.util.Processing2;
@@ -25,10 +27,12 @@ abstract class TypeImported extends BaseImportable {
     protected final TypeDeclared accessorTypeDeclared;
     protected final TableDeclared tableDeclared;
     protected final FileClassImpl impl;
+
     protected final Map<String, GenericDeclared> thisGenericMap;
     protected final Elements utils;
     protected final Types types;
 
+    private JavaField jdbcSession;
     private String tableImported;
     private String modelImported;
     private String paramsTypeImported;
@@ -47,6 +51,15 @@ abstract class TypeImported extends BaseImportable {
         this.accessorDeclared = declared;
         this.utils = Processing2.getUtils();
         this.types = Processing2.getTypes();
+    }
+
+    public String getJdbcSessionName() { return getJdbcSession().getFieldName(); }
+
+    public JavaField getJdbcSession() {
+        if (jdbcSession == null) {
+            this.jdbcSession = impl.useField("jdbcSession", v -> {}, impl.onImported(JdbcSession.class));
+        }
+        return jdbcSession;
     }
 
     public final String getTableImported() {

@@ -1,5 +1,6 @@
 package com.moon.processor.def;
 
+import com.moon.accessor.annotation.column.TableColumn;
 import com.moon.accessor.meta.TableField;
 import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.accessor.type.JdbcType;
@@ -29,7 +30,7 @@ public class DefTableField {
     private final String comment;
     private final String stringifyPropName;
     private final String stringifyFieldName;
-    private final com.moon.accessor.annotation.TableField field;
+    private final TableColumn field;
 
     public DefTableField(
         String pojoClass,
@@ -43,7 +44,7 @@ public class DefTableField {
         String setterName,
         String firstComment,
         String comment,
-        com.moon.accessor.annotation.TableField field
+        TableColumn field
     ) {
         this.pojoClass = pojoClass;
         this.propName = propName;
@@ -150,5 +151,5 @@ public class DefTableField {
 
     public String getComment() { return comment; }
 
-    public com.moon.accessor.annotation.TableField getField() { return field; }
+    public TableColumn getField() { return field; }
 }

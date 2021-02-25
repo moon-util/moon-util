@@ -3,7 +3,7 @@ package com.moon.poi.excel;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.poi.excel.annotation.value.DefaultValue;
-import com.moon.poi.excel.annotation.TableColumn;
+import com.moon.poi.excel.annotation.SheetColumn;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -43,36 +43,36 @@ class TableFactoryTestTest {
 
     public static class User {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name = "张三";
 
         @DefaultValue(value = "100")
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private int age = RandomUtil.nextInt(22, 28);
 
-        @TableColumn({"基本信息", "籍贯"})
+        @SheetColumn({"基本信息", "籍贯"})
         private String address = "杭州西湖";
 
-        @TableColumn({"日期"})
+        @SheetColumn({"日期"})
         private Date date = new Date();
 
-        @TableColumn("毕业院校")
+        @SheetColumn("毕业院校")
         public String getSchoolName() {
             return "北京大学";
         }
 
         @DefaultValue("60")
-        @TableColumn(value = {"成绩"})
+        @SheetColumn(value = {"成绩"})
         public String getDefaultValue() {
             return null;
         }
 
-        @TableColumn(value = {"交通工具"})
+        @SheetColumn(value = {"交通工具"})
         public String getType() {
             return null;
         }
 
-        @TableColumn(value = {"性别"})
+        @SheetColumn(value = {"性别"})
         public String getSex() {
             return null;
         }

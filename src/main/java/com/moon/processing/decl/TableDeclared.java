@@ -4,6 +4,7 @@ import com.moon.accessor.annotation.TableFieldPolicy;
 import com.moon.accessor.annotation.TableModel;
 import com.moon.accessor.annotation.TableModelPolicy;
 import com.moon.accessor.annotation.Tables;
+import com.moon.accessor.annotation.column.TableColumn;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 import com.moon.processing.JavaDeclarable;
@@ -113,6 +114,19 @@ public class TableDeclared implements JavaProvider {
             if (!prop.isReadable() && !prop.isWriteable()) {
                 continue;
             }
+            PropertyFieldDeclared field = prop.getFieldDeclared();
+            if (field == null) {
+                // 字段不存在的情况不考虑
+                continue;
+            } else if (field.isStatic() || field.isTransient()) {
+                // 静态字段 & transient 不是数据库列
+                continue;
+            }
+            TableColumn tableColumn = field.getFieldAnnotation(TableColumn.class);
+            if (tableColumn != null && tableColumn.ignored()) {
+                // 被忽略的字段考虑
+                continue;
+            }
             ColumnDeclared column = ColumnDeclared.nullableOf(tableEnumRef, fieldPolicy, prop);
             if (column != null) {
                 declaredMap.put(propertyEntry.getKey(), column);
@@ -204,6 +218,7 @@ public class TableDeclared implements JavaProvider {
             .valueOf(value -> value.classOf(entityName))
             .withForceInline();
 
+        // 字段快捷引用注释块儿
         firstRefer.useIfPresent(field -> {
             List<String> comments = new ArrayList<>();
             List<String> staticComments = new ArrayList<>();

@@ -18,9 +18,12 @@ public class PropertyDeclared {
 
     private final TypeElement thisElement;
 
+    private final TypeElement enclosingElement;
+
     private final TypeDeclared typeDeclared;
 
     private final String thisClassname;
+    private final String enclosingClassname;
 
     private final String name;
 
@@ -55,13 +58,19 @@ public class PropertyDeclared {
     private Map<String, PropertyMethodDeclared> typedSetterMap = new LinkedHashMap<>();
 
     public PropertyDeclared(
-        TypeElement thisElement, TypeDeclared typeDeclared, String name, Map<String, GenericDeclared> thisGenericMap
+        TypeElement thisElement,
+        TypeElement enclosingElement,
+        TypeDeclared typeDeclared,
+        String name,
+        Map<String, GenericDeclared> thisGenericMap
     ) {
+        this.enclosingElement = enclosingElement;
         this.thisGenericMap = thisGenericMap;
         this.typeDeclared = typeDeclared;
         this.thisElement = thisElement;
         this.name = name;
         this.thisClassname = Element2.getQualifiedName(thisElement);
+        this.enclosingClassname = Element2.getQualifiedName(enclosingElement);
     }
 
     public void withFieldDeclared(VariableElement fieldElement) {
@@ -108,6 +117,10 @@ public class PropertyDeclared {
                 thisGenericMap));
     }
 
+    public TypeElement getEnclosingElement() { return enclosingElement; }
+
+    public String getEnclosingClassname() { return enclosingClassname; }
+
     public String getName() { return name; }
 
     public boolean isWriteable(String setterActualClass) { return typedSetterMap.containsKey(setterActualClass); }
@@ -115,6 +128,8 @@ public class PropertyDeclared {
     public boolean isWriteable() { return setter != null; }
 
     public boolean isReadable() { return getter != null; }
+
+    public boolean hasField() { return fieldDeclared != null; }
 
     public TypeElement getThisElement() { return thisElement; }
 

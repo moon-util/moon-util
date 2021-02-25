@@ -1,8 +1,8 @@
 package com.moon.poi.excel;
 
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
-import com.moon.poi.excel.annotation.TableRecord;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
+import com.moon.poi.excel.annotation.RowRecord;
 import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -374,10 +374,10 @@ public class SheetWriter extends BaseWriter<Sheet, SheetWriter, ExcelWriter> {
      *
      * @return 当前对象 SheetFactory
      *
-     * @see TableColumn at field or method
-     * @see TableColumnGroup at field or method
-     * @see TableIndexer at field or method if present {@link TableColumn} or {@link TableColumnGroup}
-     * @see TableRecord at type
+     * @see SheetColumn at field or method
+     * @see SheetColumnGroup at field or method
+     * @see TableIndexer at field or method if present {@link SheetColumn} or {@link SheetColumnGroup}
+     * @see RowRecord at type
      */
     public SheetWriter table(Consumer<TableWriter> consumer) {
         TableWriter factory = new TableWriter(proxy, this);

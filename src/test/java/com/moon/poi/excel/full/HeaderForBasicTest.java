@@ -2,7 +2,7 @@ package com.moon.poi.excel.full;
 
 import com.moon.core.enums.Systems;
 import com.moon.poi.excel.ExcelUtil;
-import com.moon.poi.excel.annotation.TableColumn;
+import com.moon.poi.excel.annotation.SheetColumn;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -22,26 +22,26 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_0 {
 
-        @TableColumn("姓名")
+        @SheetColumn("姓名")
         private String name;
-        @TableColumn("年龄")
+        @SheetColumn("年龄")
         private String age;
-        @TableColumn("家庭住址")
+        @SheetColumn("家庭住址")
         private String address;
     }
 
     /**
      * 简单表头 + 列排序
      *
-     * @see TableColumn#order() order 按大小排序，相同 order 通常按声明顺序排序
+     * @see SheetColumn#order() order 按大小排序，相同 order 通常按声明顺序排序
      */
     public static class DemoForExcelHead_0_0 {
 
-        @TableColumn(value = "姓名", order = 1)
+        @SheetColumn(value = "姓名", order = 1)
         private String name;
-        @TableColumn(value = "年龄", order = -1)
+        @SheetColumn(value = "年龄", order = -1)
         private String age;
-        @TableColumn("家庭住址")
+        @SheetColumn("家庭住址")
         private String address;
     }
 
@@ -50,11 +50,11 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_0_1 {
 
-        @TableColumn("姓名")
+        @SheetColumn("姓名")
         private String name;
-        @TableColumn("年龄")
+        @SheetColumn("年龄")
         private String age;
-        @TableColumn(value = "家庭住址", offset = 2)
+        @SheetColumn(value = "家庭住址", offset = 2)
         private String address;
     }
 
@@ -63,11 +63,11 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_0_2 {
 
-        @TableColumn(value = "姓名", rowsHeight4Head = 1000)
+        @SheetColumn(value = "姓名", rowsHeight4Head = 1000)
         private String name;
-        @TableColumn("年龄")
+        @SheetColumn("年龄")
         private String age;
-        @TableColumn("家庭住址")
+        @SheetColumn("家庭住址")
         private String address;
     }
 
@@ -76,11 +76,11 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_1 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
     }
 
@@ -89,11 +89,11 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_1_0 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn(value = {"基本信息", "家庭住址"}, order = -1)
+        @SheetColumn(value = {"基本信息", "家庭住址"}, order = -1)
         private String address;
     }
 
@@ -102,18 +102,18 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_2 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn({"成绩", "语文得分"})
+        @SheetColumn({"成绩", "语文得分"})
         private String ChineseScore;
-        @TableColumn({"成绩", "数学得分"})
+        @SheetColumn({"成绩", "数学得分"})
         private String mathScore;
-        @TableColumn({"成绩", "英语得分"})
+        @SheetColumn({"成绩", "英语得分"})
         private String EnglishScore;
     }
 
@@ -122,18 +122,18 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_2_1 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn(value = {"成绩", "语文得分"}, offset = 1)
+        @SheetColumn(value = {"成绩", "语文得分"}, offset = 1)
         private String ChineseScore;
-        @TableColumn({"成绩", "数学得分"})
+        @SheetColumn({"成绩", "数学得分"})
         private String mathScore;
-        @TableColumn({"成绩", "英语得分"})
+        @SheetColumn({"成绩", "英语得分"})
         private String EnglishScore;
     }
 
@@ -142,18 +142,18 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_2_2 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn(value = {"成绩", "语文得分"})
+        @SheetColumn(value = {"成绩", "语文得分"})
         private String ChineseScore;
-        @TableColumn(value = {"成绩", "数学得分"}, offset = 2)
+        @SheetColumn(value = {"成绩", "数学得分"}, offset = 2)
         private String mathScore;
-        @TableColumn({"成绩", "英语得分"})
+        @SheetColumn({"成绩", "英语得分"})
         private String EnglishScore;
     }
 
@@ -162,20 +162,20 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_2_3 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn(value = {"成绩", "语文得分"})
+        @SheetColumn(value = {"成绩", "语文得分"})
         private String ChineseScore;
-        @TableColumn(value = {"成绩", "数学得分"}, offset = 2,
+        @SheetColumn(value = {"成绩", "数学得分"}, offset = 2,
             // 这里表头一共两行，所以只要 offsetHeadRows 大于等于 2，所有表头行都会偏移
             offsetHeadRows = 2)
         private String mathScore;
-        @TableColumn({"成绩", "英语得分"})
+        @SheetColumn({"成绩", "英语得分"})
         private String EnglishScore;
     }
 
@@ -184,20 +184,20 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_2_4 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn(value = {"成绩", "语文得分"})
+        @SheetColumn(value = {"成绩", "语文得分"})
         private String ChineseScore;
-        @TableColumn(value = {"成绩", "数学得分"}, offset = 2,
+        @SheetColumn(value = {"成绩", "数学得分"}, offset = 2,
             // 这里表头一共两行，所以只要 offsetHeadRows 大于等于 2，所有表头行都会偏移
             offsetHeadRows = 0)
         private String mathScore;
-        @TableColumn({"成绩", "英语得分"})
+        @SheetColumn({"成绩", "英语得分"})
         private String EnglishScore;
     }
 
@@ -206,21 +206,21 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_3 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn({"成绩", "语文得分"})
+        @SheetColumn({"成绩", "语文得分"})
         private String ChineseScore;
-        @TableColumn({"成绩", "数学得分"})
+        @SheetColumn({"成绩", "数学得分"})
         private String mathScore;
-        @TableColumn({"成绩", "英语得分"})
+        @SheetColumn({"成绩", "英语得分"})
         private String EnglishScore;
 
-        @TableColumn({"总分"})
+        @SheetColumn({"总分"})
         private int totalScore;
     }
 
@@ -229,21 +229,21 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_3_0 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn({"成绩", "语文得分"})
+        @SheetColumn({"成绩", "语文得分"})
         private String ChineseScore;
-        @TableColumn({"成绩", "数学得分"})
+        @SheetColumn({"成绩", "数学得分"})
         private String mathScore;
-        @TableColumn({"成绩", "英语得分"})
+        @SheetColumn({"成绩", "英语得分"})
         private String EnglishScore;
 
-        @TableColumn(value = {"总分"}, order = -1)
+        @SheetColumn(value = {"总分"}, order = -1)
         private int totalScore;
     }
 
@@ -252,21 +252,21 @@ public class HeaderForBasicTest {
      */
     public static class DemoForExcelHead_3_1 {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private String age;
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address;
 
-        @TableColumn({"成绩", "语文得分"})
+        @SheetColumn({"成绩", "语文得分"})
         private String ChineseScore;
-        @TableColumn({"成绩", "数学得分"})
+        @SheetColumn({"成绩", "数学得分"})
         private String mathScore;
-        @TableColumn(value = {"成绩", "英语得分"}, rowsHeight4Head = {-1, 1000})
+        @SheetColumn(value = {"成绩", "英语得分"}, rowsHeight4Head = {-1, 1000})
         private String EnglishScore;
 
-        @TableColumn(value = {"总分"}, order = -1)
+        @SheetColumn(value = {"总分"}, order = -1)
         private int totalScore;
     }
 

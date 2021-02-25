@@ -1,6 +1,6 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.TableField;
+import com.moon.accessor.annotation.column.TableColumn;
 import com.moon.accessor.annotation.TableFieldPolicy;
 import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.accessor.type.JdbcType;
@@ -32,7 +32,7 @@ public class ColumnDeclared extends BaseColumnDeclared {
     private final String nullableHandlerClass;
     private final String getterName, setterName;
     private final TableFieldPolicy fieldPolicy;
-    private final TableField tableField;
+    private final TableColumn tableColumn;
     private final PropertyDeclared property;
     private final String firstComment, comment;
 
@@ -46,14 +46,14 @@ public class ColumnDeclared extends BaseColumnDeclared {
 
         PropertyFieldDeclared fieldDeclared = property.getFieldDeclared();
         VariableElement element = fieldDeclared.getFieldElement();
-        TableField tableField = Table2.getTableFieldAnnotation(element);
+        TableColumn tableColumn = Table2.getTableFieldAnnotation(element);
 
-        this.tableField = tableField;
+        this.tableColumn = tableColumn;
         this.fieldName = fieldDeclared.getName();
         this.columnName = Column2.deduceTableColumnName(fieldPolicy, fieldName, property);
         this.fieldClass = fieldClass;
         this.constColumnName = Table2.toConstColumnName(columnName);
-        this.nullableHandlerClass = Table2.getNullableTypeHandler(tableField);
+        this.nullableHandlerClass = Table2.getNullableTypeHandler(tableColumn);
 
         String getterName = null, setterName = null;
         if (property.getGetterMethod() != null) {
@@ -143,12 +143,12 @@ public class ColumnDeclared extends BaseColumnDeclared {
     }
 
     public String getJdbcTypeRef(BaseImportable importable) {
-        return format("{}.{}", importable.onImported(JdbcType.class), tableField.jdbcType());
+        return format("{}.{}", importable.onImported(JdbcType.class), tableColumn.jdbcType());
     }
 
-    public String getFieldLength() { return String.valueOf(tableField.length()); }
+    public String getFieldLength() { return String.valueOf(tableColumn.length()); }
 
-    public String getFieldPrecision() { return String.valueOf(tableField.precision()); }
+    public String getFieldPrecision() { return String.valueOf(tableColumn.precision()); }
 
     public void declareFinalField(FileEnumImpl enumFile, String entityVar) {
         enumFile.privateFinalField(columnName,

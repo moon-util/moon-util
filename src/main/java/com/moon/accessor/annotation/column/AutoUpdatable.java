@@ -1,4 +1,4 @@
-package com.moon.accessor.annotation;
+package com.moon.accessor.annotation.column;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
  *
  * @author benshaoye
  */
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AutoUpdatable {}

@@ -5,8 +5,8 @@ import com.moon.core.lang.ArrayUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.poi.excel.ExcelUtil;
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
 import com.moon.poi.excel.annotation.format.DateTimePattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -54,19 +54,19 @@ public class ExcelTest {
 
     public static class MemberInfo {
 
-        @TableColumn({"基本信息", "姓名"})
+        @SheetColumn({"基本信息", "姓名"})
         private final String name;
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private final int age;
-        @TableColumn(value = {"基本信息", "身份证号"},width = 5400)
+        @SheetColumn(value = {"基本信息", "身份证号"},width = 5400)
         private final String certNo;
-        @TableColumn(value = {"基本信息", "手机号码"},width = 3300)
+        @SheetColumn(value = {"基本信息", "手机号码"},width = 3300)
         private final String mobile;
-        @TableColumn(value = {"基本信息", "家庭住址"},width = 3000)
+        @SheetColumn(value = {"基本信息", "家庭住址"},width = 3000)
         private final String address;
-        @TableColumn({"账户信息", "开户行"})
+        @SheetColumn({"账户信息", "开户行"})
         private final String bankName;
-        @TableColumn(value = {"账户信息", "银行卡号"}, width = 8000)
+        @SheetColumn(value = {"账户信息", "银行卡号"}, width = 8000)
         private final String bankAccount;
 
         public MemberInfo() {
@@ -83,12 +83,12 @@ public class ExcelTest {
 
     public static class MemberScore {
 
-        @TableColumn({"考试科目"})
+        @SheetColumn({"考试科目"})
         private final String scoreName;
         @DateTimePattern("yyyy-MM-dd")
-        @TableColumn({"考试时间"})
+        @SheetColumn({"考试时间"})
         private final Date date;
-        @TableColumn({"考试成绩"})
+        @SheetColumn({"考试成绩"})
         private final int value;
 
         public MemberScore(String scoreName) {
@@ -100,21 +100,21 @@ public class ExcelTest {
 
     public static class MemberDetail {
 
-        @TableColumn({"人员基本信息"})
-        @TableColumnGroup
+        @SheetColumn({"人员基本信息"})
+        @SheetColumnGroup
         private MemberInfo info;
 
-        @TableColumn({"成绩详情", "语文成绩"})
-        @TableColumnGroup
+        @SheetColumn({"成绩详情", "语文成绩"})
+        @SheetColumnGroup
         private MemberScore Chinese;
-        @TableColumn(value = {"成绩详情", "数学成绩"}, offset = 3)
-        @TableColumnGroup
+        @SheetColumn(value = {"成绩详情", "数学成绩"}, offset = 3)
+        @SheetColumnGroup
         private MemberScore math;
-        @TableColumn(value = {"成绩详情", "英语成绩"}, offsetHeadRows = Integer.MAX_VALUE - 1)
-        @TableColumnGroup
+        @SheetColumn(value = {"成绩详情", "英语成绩"}, offsetHeadRows = Integer.MAX_VALUE - 1)
+        @SheetColumnGroup
         private MemberScore English;
 
-        @TableColumn(value = {"成绩详情", "总分"}, width = 8000, offset = 3)
+        @SheetColumn(value = {"成绩详情", "总分"}, width = 8000, offset = 3)
         private String scoreTotal;
 
         public MemberDetail() {

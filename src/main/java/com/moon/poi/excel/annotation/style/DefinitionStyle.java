@@ -1,8 +1,8 @@
 package com.moon.poi.excel.annotation.style;
 
 import com.moon.core.lang.Unsupported;
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
 import org.apache.poi.ss.usermodel.*;
 
 import java.lang.annotation.*;
@@ -11,11 +11,11 @@ import java.lang.annotation.*;
  * 定义样式; 注解到类、列字段或 getter 方法上
  * <p>
  * 由于样式采用的是定义 + 使用这种声明式设置，不必要求一定要注解在指定字段上才起效
- * 样式可以定义在任何有效列（被{@link TableColumn}或{@link TableColumnGroup}注解的列）或当前实体的类上
+ * 样式可以定义在任何有效列（被{@link SheetColumn}或{@link SheetColumnGroup}注解的列）或当前实体的类上
  *
  * @author moonsky
  * @see HeadStyle
- * @see TableColumn#style()
+ * @see SheetColumn#style()
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

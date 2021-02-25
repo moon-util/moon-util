@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TableColumnGroup {
+public @interface SheetColumnGroup {
 
     /**
      * 组合列目标类

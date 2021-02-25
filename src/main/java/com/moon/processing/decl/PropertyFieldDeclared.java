@@ -1,8 +1,8 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.AutoInsertable;
-import com.moon.accessor.annotation.AutoUpdatable;
-import com.moon.accessor.annotation.TableId;
+import com.moon.accessor.annotation.column.AutoInsertable;
+import com.moon.accessor.annotation.column.AutoUpdatable;
+import com.moon.accessor.annotation.column.TableId;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;

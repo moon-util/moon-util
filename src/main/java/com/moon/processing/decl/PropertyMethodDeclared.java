@@ -1,9 +1,8 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.AutoInsertable;
-import com.moon.accessor.annotation.AutoUpdatable;
-import com.moon.accessor.annotation.TableId;
-import com.moon.processing.util.Logger2;
+import com.moon.accessor.annotation.column.AutoInsertable;
+import com.moon.accessor.annotation.column.AutoUpdatable;
+import com.moon.accessor.annotation.column.TableId;
 import com.moon.processor.utils.Element2;
 import com.moon.processor.utils.String2;
 

@@ -18,7 +18,7 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     private final String fieldType;
     private final String fieldName;
     private final boolean inInterface;
-    private JavaFieldValue value;
+    private JavaFieldValue fieldValue;
     private LineScripter scripter;
     private boolean forceInline;
 
@@ -56,12 +56,14 @@ public class JavaField extends JavaBlockCommentable implements Appender {
      *
      * @return
      */
-    public String getContentSymbol() { return fieldType + ">>" + value; }
+    public String getContentSymbol() { return fieldType + ">>" + fieldValue; }
 
     public JavaField valueOf(Consumer<JavaFieldValue> valueBuilder) {
         JavaFieldValue value = new JavaFieldValue(getImporter(), classname);
         valueBuilder.accept(value);
-        this.value = value;
+        if (value.isValueAvailable()) {
+            this.fieldValue = value;
+        }
         return this;
     }
 
@@ -118,7 +120,9 @@ public class JavaField extends JavaBlockCommentable implements Appender {
             addr.add(modifier.name().toLowerCase()).add(' ');
         }
         addr.add(onImported(fieldType)).add(" ").add(fieldName);
-        if (value != null) {
+
+        JavaFieldValue value = this.fieldValue;
+        if (value != null && value.isValueAvailable()) {
             String script = value.toString();
             if (!isForceInline() && addr.willOverLength(script)) {
                 if (isStatic()) {

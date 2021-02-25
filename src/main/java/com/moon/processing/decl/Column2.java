@@ -1,6 +1,6 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.TableField;
+import com.moon.accessor.annotation.column.TableColumn;
 import com.moon.accessor.annotation.TableFieldPolicy;
 import com.moon.processor.def.Table2;
 
@@ -31,7 +31,7 @@ public enum Column2 {
         if (element == null) {
             return null;
         }
-        TableField fieldAnnotated = Table2.getTableFieldAnnotation(element);
+        TableColumn fieldAnnotated = Table2.getTableFieldAnnotation(element);
         String columnName = Table2.toColumnName(fieldAnnotated, propName, fieldPolicy);
         COLUMN_NAME_MAP.put(property, columnName);
         return columnName;

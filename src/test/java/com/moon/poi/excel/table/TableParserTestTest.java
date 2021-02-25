@@ -4,8 +4,8 @@ import com.moon.core.lang.IntUtil;
 import com.moon.core.util.ListUtil;
 import com.moon.core.util.RandomUtil;
 import com.moon.poi.excel.ExcelUtil;
-import com.moon.poi.excel.annotation.TableColumn;
-import com.moon.poi.excel.annotation.TableColumnGroup;
+import com.moon.poi.excel.annotation.SheetColumn;
+import com.moon.poi.excel.annotation.SheetColumnGroup;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,17 +55,17 @@ class TableParserTestTest {
     public static class Employee {
 
         // @TableColumnOffset(2)
-        @TableColumn(value = {"部门"}, order = 1, offset = 1)
+        @SheetColumn(value = {"部门"}, order = 1, offset = 1)
         private String department;
 
         private EmpBasicInfo basicInfo;
 
-        @TableColumn({"学生信息"})
-        @TableColumnGroup()
+        @SheetColumn({"学生信息"})
+        @SheetColumnGroup()
         private Student student;
 
-        @TableColumn({"基本信息"})
-        @TableColumnGroup
+        @SheetColumn({"基本信息"})
+        @SheetColumnGroup
         public EmpBasicInfo getBasicInfo() {
             return basicInfo;
         }
@@ -73,35 +73,35 @@ class TableParserTestTest {
 
     public static class Score {
 
-        @TableColumn({"语文"})
+        @SheetColumn({"语文"})
         private String chinese;
 
-        @TableColumn({"数学"})
+        @SheetColumn({"数学"})
         private String math;
 
-        @TableColumn({"英语"})
+        @SheetColumn({"英语"})
         private String english;
     }
 
     public static class EmpBasicInfo {
 
 
-        @TableColumn({"姓名"})
+        @SheetColumn({"姓名"})
         private String name;
 
 
-        @TableColumn({"性别"})
+        @SheetColumn({"性别"})
         private String sex;
 
 
-        @TableColumn(value = {"年龄"}, order = 2)
+        @SheetColumn(value = {"年龄"}, order = 2)
         private int age;
 
 
-        @TableColumn(value = {"地址"}, order = 2)
+        @SheetColumn(value = {"地址"}, order = 2)
         private String address;
 
-        @TableColumnGroup
+        @SheetColumnGroup
         private Score score;
     }
 
@@ -138,36 +138,36 @@ class TableParserTestTest {
 
     public static class Student {
 
-        @TableColumn({"基本信息", "姓名", "名字"})
+        @SheetColumn({"基本信息", "姓名", "名字"})
         private String name = "张三";
 
-        @TableColumn({"基本信息", "性别"})
+        @SheetColumn({"基本信息", "性别"})
         private String sex = RandomUtil.nextBoolean() ? "男" : "女";
 
-        @TableColumn({"基本信息", "年龄"})
+        @SheetColumn({"基本信息", "年龄"})
         private int age = RandomUtil.nextInt(15, 18);
 
-        @TableColumn({"基本信息", "家庭住址"})
+        @SheetColumn({"基本信息", "家庭住址"})
         private String address = "北京市新发地菜市场";
 
-        @TableColumn({"成绩", "语文"})
+        @SheetColumn({"成绩", "语文"})
         private int chineseScore = RandomUtil.nextInt(60, 95);
 
         // @TableColumnOffset(1)
-        @TableColumn(value = {"成绩", "英语"}, offset = 1)
+        @SheetColumn(value = {"成绩", "英语"}, offset = 1)
         private int englishScore = RandomUtil.nextInt(60, 95);
 
-        @TableColumn({"成绩", "数学"})
+        @SheetColumn({"成绩", "数学"})
         private int mathScore = RandomUtil.nextInt(60, 95);
 
-        @TableColumn({"成绩", "物理"})
+        @SheetColumn({"成绩", "物理"})
         private int physicalScore = RandomUtil.nextInt(60, 95);
 
-        @TableColumn({"成绩", "滑雪"})
+        @SheetColumn({"成绩", "滑雪"})
         private int skiScore = RandomUtil.nextInt(60, 95);
 
         // @TableColumnOffset(2)
-        @TableColumn(value = {"总分"}, offset = 2)
+        @SheetColumn(value = {"总分"}, offset = 2)
         public int getTotalScore() {
             return IntUtil.sum(chineseScore, englishScore, mathScore, physicalScore, skiScore);
         }

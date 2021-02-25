@@ -1,13 +1,12 @@
 package com.moon.poi.excel.table;
 
-import com.moon.core.enums.Systems;
 import com.moon.core.lang.SystemUtil;
 import com.moon.core.lang.reflect.FieldUtil;
 import com.moon.core.lang.reflect.MethodUtil;
 import com.moon.core.util.FilterUtil;
 import com.moon.core.util.RandomStringUtil;
 import com.moon.poi.excel.ExcelUtil;
-import com.moon.poi.excel.annotation.TableColumn;
+import com.moon.poi.excel.annotation.SheetColumn;
 import com.moon.poi.excel.annotation.style.DefinitionStyle;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -44,10 +43,10 @@ class StyleUtilTest_1Test extends TableParser {
     @DefinitionStyle(classname = "employeeName", align = HorizontalAlignment.CENTER)
     public static class Employee_1 {
 
-        @TableColumn("姓名")
+        @SheetColumn("姓名")
         private String name;
 
-        @TableColumn("地址")
+        @SheetColumn("地址")
         private String address;
     }
 
@@ -55,10 +54,10 @@ class StyleUtilTest_1Test extends TableParser {
     @DefinitionStyle(align = HorizontalAlignment.CENTER)
     public static class Employee_2 {
 
-        @TableColumn("姓名")
+        @SheetColumn("姓名")
         private String name;
 
-        @TableColumn(value = "地址")
+        @SheetColumn(value = "地址")
         private String address;
     }
 
@@ -66,10 +65,10 @@ class StyleUtilTest_1Test extends TableParser {
     @DefinitionStyle(align = HorizontalAlignment.CENTER)
     public static class Employee_3 {
 
-        @TableColumn("姓名")
+        @SheetColumn("姓名")
         private String name;
 
-        @TableColumn(value = "地址", style = "address")
+        @SheetColumn(value = "地址", style = "address")
         private String address;
     }
 
@@ -126,10 +125,10 @@ class StyleUtilTest_1Test extends TableParser {
         @DefinitionStyle(fillPattern = FillPatternType.SOLID_FOREGROUND,
             foregroundColor = 49,
             border = {BorderStyle.NONE, BorderStyle.NONE, BorderStyle.DOUBLE})
-        @TableColumn("姓名")
+        @SheetColumn("姓名")
         private String name = RandomStringUtil.nextChinese(3);
 
-        @TableColumn(value = "地址", style = "address")
+        @SheetColumn(value = "地址", style = "address")
         private String address = RandomStringUtil.nextChinese(3);
     }
 

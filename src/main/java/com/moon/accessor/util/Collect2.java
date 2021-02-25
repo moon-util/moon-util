@@ -8,6 +8,10 @@ import java.util.Collection;
 public enum Collect2 {
     ;
 
+    public static boolean isEmpty(Object[] array) {
+        return array == null || array.length == 0;
+    }
+
     public static boolean isEmpty(Collection<?> collect) {
         return collect == null || collect.isEmpty();
     }
