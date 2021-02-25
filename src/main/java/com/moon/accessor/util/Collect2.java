@@ -5,8 +5,9 @@ import java.util.Collection;
 /**
  * @author benshaoye
  */
-public enum Collect2 {
-    ;
+public abstract class Collect2 {
+
+    protected Collect2() { throw new AssertionError("No Collect2 instance for you."); }
 
     public static boolean isEmpty(Object[] array) {
         return array == null || array.length == 0;

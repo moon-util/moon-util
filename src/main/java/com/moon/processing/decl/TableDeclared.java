@@ -1,24 +1,20 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.TableFieldPolicy;
-import com.moon.accessor.annotation.TableModel;
-import com.moon.accessor.annotation.TableModelPolicy;
-import com.moon.accessor.annotation.Tables;
 import com.moon.accessor.annotation.column.TableColumn;
+import com.moon.accessor.annotation.table.TableFieldPolicy;
+import com.moon.accessor.annotation.table.TableModel;
+import com.moon.accessor.annotation.table.TableModelPolicy;
+import com.moon.accessor.annotation.table.Tables;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 import com.moon.processing.JavaDeclarable;
 import com.moon.processing.JavaProvider;
 import com.moon.processing.file.FileEnumImpl;
 import com.moon.processing.file.JavaField;
+import com.moon.processing.holder.BaseHolder;
+import com.moon.processing.holder.Holders;
 import com.moon.processing.holder.PolicyHelper;
-import com.moon.processing.holder.TableAlias;
-import com.moon.processing.holder.TableModel2;
-import com.moon.processor.def.Table2;
-import com.moon.processor.utils.Comment2;
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Refer;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.*;
 
 import javax.lang.model.element.TypeElement;
 import java.util.*;
@@ -45,7 +41,7 @@ import java.util.stream.Collectors;
  *
  * @author benshaoye
  */
-public class TableDeclared implements JavaProvider {
+public class TableDeclared extends BaseHolder implements JavaProvider {
 
     private final VarHelper varHelper = new VarHelper();
     private final Set<String> allColumnsName;
@@ -54,20 +50,21 @@ public class TableDeclared implements JavaProvider {
     private final String tables;
     private final String tableName;
     private final String tableEnumVal;
-    private final TableAlias tableAlias;
+    private final AliasDeclared aliasDeclared;
     private final TypeDeclared typeDeclared;
     private final Map<String, ColumnDeclared> columnDeclaredMap;
 
-    private TableDeclared(PolicyHelper policyHelper, TypeDeclared typeDeclared) {
+    private TableDeclared(Holders holders, TypeDeclared typeDeclared) {
+        super(holders);
         final Supplier<String> tableEnumRef = this::getTableEnumVal;
 
         TypeElement thisElement = typeDeclared.getTypeElement();
 
         String simpleName = Element2.getSimpleName(thisElement);
-        Tables tables = policyHelper.withTables(thisElement);
-        TableModel tableModel = policyHelper.withTableModel(thisElement);
-        TableModelPolicy modelPolicy = policyHelper.withModelPolicy(thisElement);
-        TableFieldPolicy fieldPolicy = policyHelper.withFieldPolicy(thisElement);
+        Tables tables = policyHelper().withTables(thisElement);
+        TableModel tableModel = policyHelper().withTableModel(thisElement);
+        TableModelPolicy modelPolicy = policyHelper().withModelPolicy(thisElement);
+        TableFieldPolicy fieldPolicy = policyHelper().withFieldPolicy(thisElement);
 
         final Set<String> allColumnsName = typeDeclared.getAllPropertiesName();
         final List<String> staticCols = new ArrayList<>();
@@ -88,7 +85,7 @@ public class TableDeclared implements JavaProvider {
         this.tables = String2.isBlank(tables.value()) ? null : tables.value().trim();
         this.tableName = Table2.toDeclaredTableName(simpleName, modelPolicy, tableModel);
 
-        this.tableAlias = TableModel2.parseAlias(tableModel);
+        this.aliasDeclared = AliasDeclared.parseAlias(tableModel);
         this.packageName = Element2.getPackageName(thisElement);
         this.simpleClassName = tableName.toUpperCase();
     }
@@ -157,19 +154,17 @@ public class TableDeclared implements JavaProvider {
         return Collections.unmodifiableMap(columnsMap);
     }
 
-    public static TableDeclared of(PolicyHelper policyHelper, TypeDeclared typeDeclared) {
-        return new TableDeclared(policyHelper, typeDeclared);
+    public static TableDeclared of(Holders holders, TypeDeclared typeDeclared) {
+        return new TableDeclared(holders, typeDeclared);
     }
 
     public String getTableClassname() { return packageName + "." + simpleClassName; }
 
     public String getTableEnumVal() { return tableEnumVal; }
 
-    public String getTableEnumRef(String tableImported) {
-        return tableImported + "." + getTableEnumVal();
-    }
+    public String getTableEnumRef(String tableImported) { return tableImported + "." + getTableEnumVal(); }
 
-    public TableAlias getTableAlias() { return tableAlias; }
+    public AliasDeclared getAliasDeclared() { return aliasDeclared; }
 
     public String getTableName() { return tableName; }
 
@@ -181,9 +176,7 @@ public class TableDeclared implements JavaProvider {
 
     public TypeDeclared getTypeDeclared() { return typeDeclared; }
 
-    public ColumnDeclared getColumnDeclared(String propertyName) {
-        return columnDeclaredMap.get(propertyName);
-    }
+    public ColumnDeclared getColumnDeclared(String propertyName) { return columnDeclaredMap.get(propertyName); }
 
     public <T> T reduce(BiConsumer<ColumnDeclared, T> consumer, T totalValue) {
         for (ColumnDeclared value : columnDeclaredMap.values()) {
@@ -264,7 +257,7 @@ public class TableDeclared implements JavaProvider {
     private String toConstRef(String name) { return simpleClassName + '.' + name + ','; }
 
     private String toAliasRef(String name) {
-        TableAlias alias = getTableAlias();
+        AliasDeclared alias = getAliasDeclared();
         return alias == null ? null : alias.toAliasRef(name);
     }
 

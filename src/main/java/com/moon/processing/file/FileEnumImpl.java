@@ -1,6 +1,6 @@
 package com.moon.processing.file;
 
-import com.moon.processor.utils.Collect2;
+import com.moon.processing.util.Collect2;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

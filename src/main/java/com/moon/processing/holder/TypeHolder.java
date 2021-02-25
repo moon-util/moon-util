@@ -1,7 +1,7 @@
 package com.moon.processing.holder;
 
 import com.moon.processing.decl.TypeDeclared;
-import com.moon.processor.utils.Element2;
+import com.moon.processing.util.Element2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
@@ -10,12 +10,11 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class TypeHolder {
+public class TypeHolder extends BaseHolder {
 
-    private final NameHolder nameHolder;
     private final Map<String, TypeDeclared> typeDeclaredMap = new HashMap<>();
 
-    public TypeHolder(NameHolder nameHolder) { this.nameHolder = nameHolder; }
+    public TypeHolder(Holders holders) { super(holders); }
 
     public TypeDeclared with(TypeElement element) {
         String classname = Element2.getQualifiedName(element);
@@ -23,7 +22,7 @@ public class TypeHolder {
         if (declared != null) {
             return declared;
         }
-        declared = TypeDeclared.from(element, nameHolder);
+        declared = TypeDeclared.from(getHolders(), element);
         typeDeclaredMap.put(classname, declared);
         return declared;
     }

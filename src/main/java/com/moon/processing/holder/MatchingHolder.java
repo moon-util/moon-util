@@ -10,11 +10,11 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class MatchingHolder {
+public class MatchingHolder extends BaseHolder {
 
     private final Map<String, MatchingDeclared> matchingDeclaredMap = new LinkedHashMap<>();
 
-    public MatchingHolder() { }
+    public MatchingHolder(Holders holders) { super(holders); }
 
     public MatchingDeclared with(TypeElement matchingAnnotationElem, TypeElement matcherElem, IfMatching matching) {
         MatchingDeclared declared = new MatchingDeclared(matchingAnnotationElem, matcherElem, matching);

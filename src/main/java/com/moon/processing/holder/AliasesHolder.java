@@ -2,8 +2,9 @@ package com.moon.processing.holder;
 
 import com.moon.processing.JavaFiler;
 import com.moon.processing.JavaWritable;
+import com.moon.processing.decl.AliasDeclared;
 import com.moon.processing.decl.TableDeclared;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class AliasesHolder implements JavaWritable {
+public class AliasesHolder extends BaseHolder implements JavaWritable {
 
     /**
      * 表别名
@@ -22,10 +23,10 @@ public class AliasesHolder implements JavaWritable {
      */
     private final Map<String, Map<String, TableDeclared>> aliasesMap = new HashMap<>();
 
-    public AliasesHolder() {}
+    public AliasesHolder(Holders holders) { super(holders); }
 
     public void with(TableDeclared tableDeclared) {
-        TableAlias alias = tableDeclared.getTableAlias();
+        AliasDeclared alias = tableDeclared.getAliasDeclared();
         String name = alias.getAliasName();
         if (String2.isNotBlank(name)) {
             // 并非所有表都需要别名，但有别名的一定存在别名组

@@ -5,12 +5,10 @@ import com.moon.processing.JavaDeclarable;
 import com.moon.processing.JavaProvider;
 import com.moon.processing.file.Java2;
 import com.moon.processing.file.FileClassImpl;
-import com.moon.processing.holder.NameHolder;
-import com.moon.processing.holder.TableHolder;
-import com.moon.processing.holder.TypeHolder;
+import com.moon.processing.holder.*;
 import com.moon.processing.util.Processing2;
-import com.moon.processor.utils.Imported;
-import com.moon.processor.utils.Test2;
+import com.moon.processing.util.Imported;
+import com.moon.processing.util.Test2;
 import org.springframework.data.repository.Repository;
 
 import javax.lang.model.element.ElementKind;
@@ -26,11 +24,8 @@ import static javax.lang.model.element.Modifier.FINAL;
  *
  * @author benshaoye
  */
-public class AccessorDeclared implements JavaProvider {
+public class AccessorDeclared extends BaseHolder implements JavaProvider {
 
-    private final NameHolder nameHolder;
-    private final TypeHolder typeHolder;
-    private final TableHolder tableHolder;
     private final Accessor accessor;
     private final TypeElement accessorElement;
     private final String accessorClassname;
@@ -47,35 +42,25 @@ public class AccessorDeclared implements JavaProvider {
     private final Types types;
 
     public AccessorDeclared(
+        Holders holders,
         Accessor accessor,
-        NameHolder nameHolder,
-        TypeHolder typeHolder,
-        TableHolder tableHolder,
         TypeDeclared typeDeclared,
         TableDeclared tableDeclared,
         TypeDeclared pojoDeclared
     ) {
+        super(holders);
         this.accessor = accessor;
-        this.nameHolder = nameHolder;
-        this.typeHolder = typeHolder;
-        this.tableHolder = tableHolder;
         this.typeDeclared = typeDeclared;
         this.pojoDeclared = pojoDeclared;
         this.tableDeclared = tableDeclared;
 
         TypeElement accessorElem = typeDeclared.getTypeElement();
-        this.classname = nameHolder.getImplClassname(accessorElem);
+        this.classname = nameHelper().getImplClassname(accessorElem);
         this.accessorClassname = typeDeclared.getTypeClassname();
         this.accessorElement = accessorElem;
         this.utils = Processing2.getUtils();
         this.types = Processing2.getTypes();
     }
-
-    public NameHolder getNameHolder() { return nameHolder; }
-
-    public TypeHolder getTypeHolder() { return typeHolder; }
-
-    public TableHolder getTableHolder() { return tableHolder; }
 
     public Accessor getAccessor() { return accessor; }
 

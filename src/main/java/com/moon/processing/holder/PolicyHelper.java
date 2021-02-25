@@ -1,16 +1,16 @@
 package com.moon.processing.holder;
 
-import com.moon.accessor.annotation.TableFieldPolicy;
-import com.moon.accessor.annotation.TableModel;
-import com.moon.accessor.annotation.TableModelPolicy;
-import com.moon.accessor.annotation.Tables;
+import com.moon.accessor.annotation.table.TableFieldPolicy;
+import com.moon.accessor.annotation.table.TableModel;
+import com.moon.accessor.annotation.table.TableModelPolicy;
+import com.moon.accessor.annotation.table.Tables;
 import com.moon.processing.defaults.TableFieldPolicyEnum;
 import com.moon.processing.defaults.TableModelEnum;
 import com.moon.processing.defaults.TableModelPolicyEnum;
 import com.moon.processing.defaults.TablesEnum;
 import com.moon.processing.util.Processing2;
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.Test2;
+import com.moon.processing.util.Element2;
+import com.moon.processing.util.Test2;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -22,14 +22,13 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class PolicyHelper {
+public class PolicyHelper extends BaseHolder {
 
     private final Map<String, Tables> tablesMap = new HashMap<>();
     private final Map<String, TableModelPolicy> modelPolicyMap = new HashMap<>();
     private final Map<String, TableFieldPolicy> fieldPolicyMap = new HashMap<>();
 
-    public PolicyHelper() {}
-
+    public PolicyHelper(Holders holders) { super(holders); }
 
     public TableModel withTableModel(TypeElement element) {
         TableModel model = element.getAnnotation(TableModel.class);

@@ -1,12 +1,11 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.Provided;
-import com.moon.accessor.session.JdbcSession;
 import com.moon.processing.file.*;
-import com.moon.processor.utils.Assert2;
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
-import com.moon.processor.utils.Test2;
+import com.moon.processing.util.Assert2;
+import com.moon.processing.util.Element2;
+import com.moon.processing.util.String2;
+import com.moon.processing.util.Test2;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;

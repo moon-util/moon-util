@@ -44,8 +44,8 @@ abstract class TypeImported extends BaseImportable {
         this.accessorClassname = declared.getAccessorClassname();
         this.accessorElement = declared.getAccessorElement();
         this.accessorTypeDeclared = accessorTypeDeclared;
-        this.tableHolder = declared.getTableHolder();
-        this.typeHolder = declared.getTypeHolder();
+        this.tableHolder = declared.tableHolder();
+        this.typeHolder = declared.typeHolder();
         this.tableDeclared = declared.getTableDeclared();
         this.impl = impl;
         this.accessorDeclared = declared;

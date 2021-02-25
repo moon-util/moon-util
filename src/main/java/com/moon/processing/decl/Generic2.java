@@ -1,9 +1,9 @@
 package com.moon.processing.decl;
 
 import com.moon.processing.util.Processing2;
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
-import com.moon.processor.utils.Test2;
+import com.moon.processing.util.Element2;
+import com.moon.processing.util.String2;
+import com.moon.processing.util.Test2;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;

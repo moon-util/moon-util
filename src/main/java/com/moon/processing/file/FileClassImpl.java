@@ -1,6 +1,6 @@
 package com.moon.processing.file;
 
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 /**
  * 用于生成普通类

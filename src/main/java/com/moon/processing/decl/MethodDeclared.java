@@ -1,6 +1,6 @@
 package com.moon.processing.decl;
 
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;

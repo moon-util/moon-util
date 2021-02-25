@@ -1,7 +1,7 @@
 package com.moon.processing;
 
 import com.moon.processing.util.Processing2;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.TypeElement;

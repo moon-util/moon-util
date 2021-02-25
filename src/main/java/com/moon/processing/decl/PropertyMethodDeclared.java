@@ -3,8 +3,8 @@ package com.moon.processing.decl;
 import com.moon.accessor.annotation.column.AutoInsertable;
 import com.moon.accessor.annotation.column.AutoUpdatable;
 import com.moon.accessor.annotation.column.TableId;
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.Element2;
+import com.moon.processing.util.String2;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;

@@ -1,7 +1,6 @@
 package com.moon.processing.file;
 
-import com.moon.processor.holder.Importer;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class JavaMethod extends JavaBlockCommentable {
     }
 
     public JavaMethod typeOf(String typeTemplate, Object... types) {
-        this.returnType = Formatter.with(typeTemplate, types);
+        this.returnType = Formatter2.with(typeTemplate, types);
         return this;
     }
 
@@ -81,7 +80,7 @@ public class JavaMethod extends JavaBlockCommentable {
      */
 
     public JavaMethod returnTypeFormatted(String template, Object... values) {
-        return template == null ? returnNull() : returning(Formatter.with(template, values));
+        return template == null ? returnNull() : returning(Formatter2.with(template, values));
     }
 
     public JavaMethod returnFormatted(String template, Object... values) {
@@ -95,7 +94,7 @@ public class JavaMethod extends JavaBlockCommentable {
         if (template == null) {
             return returnNull();
         }
-        String formatted = Formatter.with(template, values);
+        String formatted = Formatter2.with(template, values);
         return returning(new StringBuilder().append('"').append(formatted).append('"'));
     }
 

@@ -1,7 +1,7 @@
 package com.moon.processing.defaults;
 
-import com.moon.accessor.annotation.CasePolicy;
-import com.moon.accessor.annotation.TableFieldPolicy;
+import com.moon.accessor.annotation.table.CasePolicy;
+import com.moon.accessor.annotation.table.TableFieldPolicy;
 
 /**
  * @author benshaoye

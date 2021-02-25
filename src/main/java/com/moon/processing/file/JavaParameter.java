@@ -1,8 +1,7 @@
 package com.moon.processing.file;
 
 import com.moon.processing.decl.Generic2;
-import com.moon.processor.holder.Importer;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import javax.lang.model.element.Modifier;
 import java.util.Set;

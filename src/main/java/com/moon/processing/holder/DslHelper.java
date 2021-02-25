@@ -6,9 +6,9 @@ import com.moon.processing.JavaWritable;
 /**
  * @author benshaoye
  */
-public class DslHelper implements JavaWritable {
+public class DslHelper extends BaseHolder implements JavaWritable {
 
-    public DslHelper() {}
+    public DslHelper(Holders holders) { super(holders); }
 
     @Override
     public void write(JavaFiler writer) {

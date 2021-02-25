@@ -1,8 +1,8 @@
 package com.moon.processing.holder;
 
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
-import com.moon.processor.utils.Test2;
+import com.moon.processing.util.Element2;
+import com.moon.processing.util.String2;
+import com.moon.processing.util.Test2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
@@ -11,11 +11,11 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class NameHolder {
+public class NameHolder extends BaseHolder {
 
     private final Map<String, String> registeredClasses = new HashMap<>();
 
-    public NameHolder() { }
+    public NameHolder(Holders holders) { super(holders); }
 
     /**
      * 获取接口/抽象类实现类类名

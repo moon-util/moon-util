@@ -1,7 +1,6 @@
 package com.moon.processing.file;
 
 import com.moon.processing.decl.Generic2;
-import com.moon.processor.holder.Importer;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

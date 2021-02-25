@@ -21,6 +21,9 @@ public interface LineScripter extends Scripter {
      */
     int length();
 
+    /**
+     * 应用为非有序语句
+     */
     void withUnsorted();
 
     /**

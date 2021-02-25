@@ -3,7 +3,7 @@ package com.moon.processing.holder;
 import com.moon.processing.JavaFiler;
 import com.moon.processing.JavaWritable;
 import com.moon.processing.decl.TableDeclared;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * @author benshaoye
  */
-public class TablesHolder implements JavaWritable {
+public class TablesHolder extends BaseHolder implements JavaWritable {
 
     /**
      * Tables 引用
@@ -22,7 +22,7 @@ public class TablesHolder implements JavaWritable {
      */
     private final Map<String, Set<String>> tablesMap = new HashMap<>();
 
-    public TablesHolder() {}
+    public TablesHolder(Holders holders) { super(holders); }
 
     public void with(TableDeclared tableDeclared) {// 处理表公共引用
         String tables = tableDeclared.getTablesFor();

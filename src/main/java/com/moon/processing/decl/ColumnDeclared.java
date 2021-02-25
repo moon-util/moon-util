@@ -1,21 +1,21 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.column.TableColumn;
-import com.moon.accessor.annotation.TableFieldPolicy;
+import com.moon.accessor.annotation.table.TableFieldPolicy;
 import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.accessor.type.JdbcType;
 import com.moon.processing.file.BaseImportable;
 import com.moon.processing.file.FileEnumImpl;
 import com.moon.processing.file.JavaField;
-import com.moon.processor.def.Table2;
-import com.moon.processor.utils.Comment2;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.Table2;
+import com.moon.processing.util.Comment2;
+import com.moon.processing.util.String2;
 
 import javax.lang.model.element.VariableElement;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static com.moon.processor.utils.String2.format;
+import static com.moon.processing.util.String2.format;
 
 /**
  * @author benshaoye

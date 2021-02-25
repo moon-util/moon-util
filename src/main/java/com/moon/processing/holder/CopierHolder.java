@@ -4,7 +4,7 @@ import com.moon.processing.JavaFiler;
 import com.moon.processing.JavaWritable;
 import com.moon.processing.decl.CopierDeclared;
 import com.moon.processing.decl.RecordDeclared;
-import com.moon.processor.utils.Element2;
+import com.moon.processing.util.Element2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.HashMap;
@@ -13,13 +13,11 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class CopierHolder implements JavaWritable {
-
-    private final RecordHolder recordHolder;
+public class CopierHolder extends BaseHolder implements JavaWritable {
 
     private final Map<String, CopierDeclared> copierDeclaredMap = new HashMap<>();
 
-    public CopierHolder(RecordHolder recordHolder) { this.recordHolder = recordHolder; }
+    public CopierHolder(Holders holders) { super(holders); }
 
     public CopierDeclared with(TypeElement thisElement, TypeElement thatElement) {
         String thisClass = Element2.getQualifiedName(thisElement);
@@ -29,8 +27,8 @@ public class CopierHolder implements JavaWritable {
         if (copierDeclared != null) {
             return copierDeclared;
         }
-        RecordDeclared thisDeclared = recordHolder.with(thisElement);
-        RecordDeclared thatDeclared = recordHolder.with(thatElement);
+        RecordDeclared thisDeclared = recordHolder().with(thisElement);
+        RecordDeclared thatDeclared = recordHolder().with(thatElement);
         copierDeclared = new CopierDeclared(thisDeclared, thatDeclared);
         copierDeclaredMap.put(copierKey, copierDeclared);
         return copierDeclared;

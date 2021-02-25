@@ -1,8 +1,8 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.column.TableColumn;
-import com.moon.accessor.annotation.TableFieldPolicy;
-import com.moon.processor.def.Table2;
+import com.moon.accessor.annotation.table.TableFieldPolicy;
+import com.moon.processing.util.Table2;
 
 import javax.lang.model.element.VariableElement;
 import java.util.Map;

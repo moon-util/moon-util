@@ -1,7 +1,5 @@
 package com.moon.processing.file;
 
-import com.moon.processor.holder.Importer;
-
 /**
  * 仅支持单行文本注释
  *

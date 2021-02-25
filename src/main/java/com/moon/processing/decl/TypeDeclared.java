@@ -1,6 +1,7 @@
 package com.moon.processing.decl;
 
-import com.moon.processing.holder.NameHolder;
+import com.moon.processing.holder.BaseHolder;
+import com.moon.processing.holder.Holders;
 
 import javax.lang.model.element.TypeElement;
 import java.util.*;
@@ -10,13 +11,12 @@ import java.util.*;
  *
  * @author benshaoye
  */
-public class TypeDeclared {
+public class TypeDeclared extends BaseHolder {
 
     private final TypeElement typeElement;
 
     private final String typeClassname;
 
-    private final NameHolder nameHolder;
     /**
      * 所有泛型声明，如声明在 java.util.List&lt;T> 上的 T 在实际应用中如果是：
      * <p>
@@ -48,17 +48,17 @@ public class TypeDeclared {
     private final Map<String, MethodDeclared> methodsMap = new LinkedHashMap<>();
 
     private TypeDeclared(
-        TypeElement typeElement, Map<String, GenericDeclared> genericDeclaredMap, NameHolder nameHolder
+        Holders holders, TypeElement typeElement, Map<String, GenericDeclared> genericDeclaredMap
     ) {
-        this.nameHolder = nameHolder;
+        super(holders);
         this.typeElement = typeElement;
         this.typeClassname = typeElement.getQualifiedName().toString();
         this.genericDeclaredMap = Collections.unmodifiableMap(genericDeclaredMap);
     }
 
-    public static TypeDeclared from(TypeElement typeElement, NameHolder nameHolder) {
+    public static TypeDeclared from(Holders holders, TypeElement typeElement) {
         Map<String, GenericDeclared> thisGenericMap = Generic2.from(typeElement);
-        TypeParser parser = new TypeParser(new TypeDeclared(typeElement, thisGenericMap, nameHolder));
+        TypeParser parser = new TypeParser(new TypeDeclared(holders, typeElement, thisGenericMap));
         return parser.doParseTypeDeclared();
     }
 

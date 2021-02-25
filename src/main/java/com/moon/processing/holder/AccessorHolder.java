@@ -7,7 +7,7 @@ import com.moon.processing.decl.AccessorDeclared;
 import com.moon.processing.decl.TableDeclared;
 import com.moon.processing.decl.TypeDeclared;
 import com.moon.processing.util.Processing2;
-import com.moon.processor.utils.Element2;
+import com.moon.processing.util.Element2;
 
 import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashMap;
@@ -18,20 +18,12 @@ import java.util.Map;
  *
  * @author benshaoye
  */
-public class AccessorHolder implements JavaWritable {
-
-    private final NameHolder nameHolder;
-
-    private final TypeHolder typeHolder;
-
-    private final TableHolder tableHolder;
+public class AccessorHolder extends BaseHolder implements JavaWritable {
 
     private final Map<String, AccessorDeclared> accessorDeclaredMap = new LinkedHashMap<>();
 
-    public AccessorHolder(NameHolder nameHolder, TypeHolder typeHolder, TableHolder tableHolder) {
-        this.nameHolder = nameHolder;
-        this.typeHolder = typeHolder;
-        this.tableHolder = tableHolder;
+    public AccessorHolder(Holders holders) {
+        super(holders);
     }
 
     public AccessorDeclared with(TypeElement accessorElement, TypeElement modelElement) {
@@ -60,15 +52,13 @@ public class AccessorHolder implements JavaWritable {
         Accessor accessor, String accessorClassname, TypeElement accessorElement, TypeElement modelElement
     ) {
         // 注解 Accessor 的类
-        TypeDeclared typeDeclared = typeHolder.with(accessorElement);
+        TypeDeclared typeDeclared = typeHolder().with(accessorElement);
         // 数据表定义
-        TableDeclared tableDeclared = tableHolder.with(modelElement);
+        TableDeclared tableDeclared = tableHolder().with(modelElement);
         // 实体定义
-        TypeDeclared pojoDeclared = typeHolder.with(modelElement);
-        AccessorDeclared accessorDeclared = new AccessorDeclared(accessor,
-            nameHolder,
-            typeHolder,
-            tableHolder,
+        TypeDeclared pojoDeclared = typeHolder().with(modelElement);
+        AccessorDeclared accessorDeclared = new AccessorDeclared(getHolders(),
+            accessor,
             typeDeclared,
             tableDeclared,
             pojoDeclared);

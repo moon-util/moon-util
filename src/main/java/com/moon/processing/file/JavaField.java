@@ -1,7 +1,6 @@
 package com.moon.processing.file;
 
-import com.moon.processor.holder.Importer;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import javax.lang.model.element.Modifier;
 import java.util.Collections;
@@ -14,7 +13,7 @@ import java.util.function.Consumer;
 public class JavaField extends JavaBlockCommentable implements Appender {
 
     private final String classname;
-    private final MethodsScoped methodsScoped;
+    private final ScopedMethods scopedMethods;
     private final String fieldType;
     private final String fieldName;
     private final boolean inInterface;
@@ -25,15 +24,15 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     public JavaField(
         Importer importer,
         String classname,
-        MethodsScoped methodsScoped,
+        ScopedMethods scopedMethods,
         String fieldName,
         String fieldTypeTemplate,
         Object... types
     ) {
         super(importer);
-        this.fieldType = Formatter.with(fieldTypeTemplate, types);
-        this.inInterface = methodsScoped.inInterface();
-        this.methodsScoped = methodsScoped;
+        this.fieldType = Formatter2.with(fieldTypeTemplate, types);
+        this.inInterface = scopedMethods.inInterface();
+        this.scopedMethods = scopedMethods;
         this.classname = classname;
         this.fieldName = fieldName;
     }
@@ -70,7 +69,7 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     public JavaMethod useMethod(String name) { return useMethod(name, p -> {}); }
 
     public JavaMethod useMethod(String name, Consumer<JavaParameters> parametersBuilder) {
-        JavaMethod method = methodsScoped.useMethod(name, parametersBuilder);
+        JavaMethod method = scopedMethods.useMethod(name, parametersBuilder);
         method.withPublic();
         return method.withPropertyMethod();
     }
@@ -78,7 +77,7 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     public JavaMethod publicMethod(String name) { return publicMethod(name, p -> {}); }
 
     public JavaMethod publicMethod(String name, Consumer<JavaParameters> parametersBuilder) {
-        JavaMethod method = methodsScoped.declareMethod(name, parametersBuilder);
+        JavaMethod method = scopedMethods.declareMethod(name, parametersBuilder);
         method.withPublic();
         return method.withPropertyMethod();
     }
@@ -86,7 +85,7 @@ public class JavaField extends JavaBlockCommentable implements Appender {
     public JavaMethod withGetterMethod() { return withGetterMethod(fieldType); }
 
     public JavaMethod withGetterMethod(String typeTemplate, Object... types) {
-        String getterType = Formatter.with(typeTemplate, types);
+        String getterType = Formatter2.with(typeTemplate, types);
         String getterName = String2.toGetterName(fieldName, getterType);
         return publicMethod(getterName).typeOf(getterType);
     }

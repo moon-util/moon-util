@@ -1,10 +1,6 @@
 package com.moon.processing.util;
 
-import com.moon.accessor.annotation.Accessor;
 import com.moon.mapper.annotation.MapperFor;
-import com.moon.processor.utils.Collect2;
-import com.moon.processor.utils.Element2;
-import com.moon.processor.utils.String2;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
@@ -28,10 +24,6 @@ public enum Extract2 {
     ;
     private final static char COMMA = ',';
     private final static String CLASS_SUFFIX = ".class";
-
-    public static Collection<TypeElement> getAccessorValues(TypeElement accessorAnnotated) {
-        return getValueClasses(accessorAnnotated, Accessor.class, "value");
-    }
 
     public static Collection<TypeElement> getMapperForValues(TypeElement mapperForAnnotated) {
         return getValueClasses(mapperForAnnotated, MapperFor.class, "value");

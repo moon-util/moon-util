@@ -1,7 +1,6 @@
 package com.moon.processing.file;
 
-import com.moon.processor.holder.Importer;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.String2;
 
 import java.util.Objects;
 
@@ -45,7 +44,7 @@ public class JavaFieldValue extends BaseImportable {
     }
 
     public void typedFormattedOf(String template, Object... values) {
-        valueOf(Formatter.with(template, values));
+        valueOf(Formatter2.with(template, values));
     }
 
     public void staticRef(String classname, String staticRef) {

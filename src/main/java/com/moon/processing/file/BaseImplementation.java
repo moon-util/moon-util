@@ -69,15 +69,15 @@ abstract class BaseImplementation extends FileInterfaceImpl {
     }
 
     protected final void appendFieldsAndBlock(JavaAddr addr) {
-        Map<FieldScope, Map<String, JavaField>> groupedFieldsMap = getGroupedFieldsMap();
+        Map<FieldTypeEnum, Map<String, JavaField>> groupedFieldsMap = getGroupedFieldsMap();
 
         Map<String, JavaField> staticFieldsMap = groupedFieldsMap
-            .getOrDefault(FieldScope.STATIC, Collections.emptyMap());
+            .getOrDefault(FieldTypeEnum.STATIC, Collections.emptyMap());
         appendFields(addr, staticFieldsMap, true);
         appendBlock(addr, this.staticBlock, true);
 
         Map<String, JavaField> memberFieldsMap = groupedFieldsMap
-            .getOrDefault(FieldScope.MEMBER, Collections.emptyMap());
+            .getOrDefault(FieldTypeEnum.MEMBER, Collections.emptyMap());
         appendFields(addr, memberFieldsMap, false);
         appendBlock(addr, this.instanceBlock, false);
     }

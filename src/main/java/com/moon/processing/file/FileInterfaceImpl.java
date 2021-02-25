@@ -1,10 +1,8 @@
 package com.moon.processing.file;
 
 import com.moon.processing.JavaDeclarable;
-import com.moon.processing.decl.VarHelper;
-import com.moon.processor.holder.Importer;
-import com.moon.processor.utils.Collect2;
-import com.moon.processor.utils.String2;
+import com.moon.processing.util.Collect2;
+import com.moon.processing.util.String2;
 
 import javax.lang.model.element.Modifier;
 import java.util.LinkedHashSet;
@@ -26,17 +24,17 @@ public class FileInterfaceImpl extends JavaBlockCommentable implements JavaDecla
 
     private final Set<String> interfacesSet = new LinkedHashSet<>();
     private final Set<JavaGeneric> generics = new LinkedHashSet<>();
-    private final MethodsScoped methodsScoped;
-    private final FieldsScoped fieldsScoped;
+    private final ScopedMethods scopedMethods;
+    private final ScopedFields scopedFields;
 
     public FileInterfaceImpl(String packageName, String simpleName) {
         super(new Importer(packageName));
         this.packageName = packageName;
         this.simpleName = simpleName;
         this.classname = String.join(".", packageName, simpleName);
-        MethodsScoped scoped = new MethodsScoped(getImporter(), inInterface());
-        this.fieldsScoped = new FieldsScoped(classname, scoped, inInterface());
-        this.methodsScoped = scoped;
+        ScopedMethods scoped = new ScopedMethods(getImporter(), inInterface());
+        this.scopedFields = new ScopedFields(classname, scoped, inInterface());
+        this.scopedMethods = scoped;
         annotationGenerated();
         docCommentOf(getClassname(), "", String2.format("@author {}", getClass().getCanonicalName()));
     }
@@ -51,47 +49,47 @@ public class FileInterfaceImpl extends JavaBlockCommentable implements JavaDecla
     }
 
     public Set<String> getDeclaredFieldsName() {
-        return fieldsScoped.getDeclaredFieldsName();
+        return scopedFields.getDeclaredFieldsName();
     }
 
     protected boolean inInterface() { return true; }
 
-    protected Map<FieldScope, Map<String, JavaField>> getGroupedFieldsMap() {
-        return fieldsScoped.getGroupedFieldsMap();
+    protected Map<FieldTypeEnum, Map<String, JavaField>> getGroupedFieldsMap() {
+        return scopedFields.getGroupedFieldsMap();
     }
 
     protected void afterMethodCreated(JavaMethod method) { }
 
     protected void afterFieldCreated(JavaField field) { field.withStatic(); }
 
-    public String nextVar() { return fieldsScoped.nextVar(); }
+    public String nextVar() { return scopedFields.nextVar(); }
 
-    public String nextConstVar() { return fieldsScoped.nextVar(); }
+    public String nextConstVar() { return scopedFields.nextVar(); }
 
     public JavaField publicField(String name, Class<?> fieldClass) {
         return publicField(name, fieldClass.getCanonicalName());
     }
 
     public JavaField publicField(String name, String typeTemplate, Object... types) {
-        JavaField field = fieldsScoped.declareField(name, typeTemplate, types);
+        JavaField field = scopedFields.declareField(name, typeTemplate, types);
         afterFieldCreated(field);
         return field;
     }
 
     public JavaField useField(String fieldPossibleName,Consumer<JavaFieldValue> valueBuilder, String typeTemplate, Object... types) {
-        JavaField field = fieldsScoped.useField(fieldPossibleName, valueBuilder, typeTemplate, types);
+        JavaField field = scopedFields.useField(fieldPossibleName, valueBuilder, typeTemplate, types);
         afterFieldCreated(field);
         return field;
     }
 
     public JavaField useFinalField(Consumer<JavaFieldValue> valueBuilder, String typeTemplate, Object... types) {
-        JavaField field = fieldsScoped.useFinalField(valueBuilder, typeTemplate, types);
+        JavaField field = scopedFields.useFinalField(valueBuilder, typeTemplate, types);
         afterFieldCreated(field);
         return field;
     }
 
     public JavaField useConstField(Consumer<JavaFieldValue> valueBuilder, String typeTemplate, Object... types) {
-        JavaField field = fieldsScoped.useConstField(valueBuilder, typeTemplate, types);
+        JavaField field = scopedFields.useConstField(valueBuilder, typeTemplate, types);
         afterFieldCreated(field);
         return field;
     }
@@ -99,7 +97,7 @@ public class FileInterfaceImpl extends JavaBlockCommentable implements JavaDecla
     public JavaMethod publicMethod(String name) { return publicMethod(name, p -> {}); }
 
     public JavaMethod publicMethod(String name, Consumer<JavaParameters> parametersBuilder) {
-        JavaMethod method = methodsScoped.declareMethod(name, parametersBuilder);
+        JavaMethod method = scopedMethods.declareMethod(name, parametersBuilder);
         afterMethodCreated(method);
         return method;
     }
@@ -117,7 +115,7 @@ public class FileInterfaceImpl extends JavaBlockCommentable implements JavaDecla
     }
 
     public FileInterfaceImpl implementOf(String interfaceTemplate, Object... types) {
-        interfacesSet.add(Formatter.with(interfaceTemplate, types));
+        interfacesSet.add(Formatter2.with(interfaceTemplate, types));
         return this;
     }
 
@@ -169,13 +167,13 @@ public class FileInterfaceImpl extends JavaBlockCommentable implements JavaDecla
         super.appendTo(addr.next());
         addr.newAdd("public interface ").add(getSimpleName()).add(getGenericDeclared())
             .add(getInterfacesWillImplemented("extends")).add(" {").start();
-        fieldsScoped.appendTo(addr);
+        scopedFields.appendTo(addr);
         appendMethods(addr);
         return returning(addr, importMark);
     }
 
     protected final void appendMethods(JavaAddr addr) {
-        methodsScoped.appendTo(addr);
+        scopedMethods.appendTo(addr);
     }
 
     protected final JavaAddr newPackagedJavaAddr() {

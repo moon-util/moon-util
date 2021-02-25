@@ -2,14 +2,13 @@ package com.moon.processing;
 
 import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
-import com.moon.accessor.annotation.TableModel;
+import com.moon.accessor.annotation.table.TableModel;
 import com.moon.accessor.annotation.condition.IfMatching;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processing.holder.Holders;
 import com.moon.processing.holder.MatchingHolder;
-import com.moon.processing.util.Logger2;
-import com.moon.processing.util.Processing2;
-import com.moon.processor.utils.Element2;
+import com.moon.processing.util.Log2;
+import com.moon.processing.util.Element2;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -26,6 +25,81 @@ import java.util.Set;
 import static com.moon.processing.util.Extract2.getMapperForValues;
 
 /**
+ * interface UsernameGetter {
+ * String getUsername();
+ * String getId();
+ * }
+ * <p>
+ * // 返回值可以是 void,boolean,int(等数字类型)
+ * updateById(UsernameGetter getter); // update t_user set username = ? where id = ?
+ * deleteById(UsernameGetter getter); // delete from t_user where id = ?
+ * deleteByIdAndUsername(UsernameGetter getter); // delete from t_user where id = ? and username = ?
+ * deleteByIdOrUsername(UsernameGetter getter); // delete from t_user where id = ? or username = ?
+ * <p>
+ * clearUsername(); // update t_user set username = NULL
+ * clearUsername(String id); // update t_user set username = NULL where id = ?
+ * clearPassword(String username); // update t_user set password = NULL where username = ?
+ * clearPasswordByUsernameLike(String username); // update t_user set password = NULL where username = '%username%'
+ * clearPasswordByUsernameStartsWith(String username); // update t_user set password = NULL where username = 'username%'
+ * clearUsernameById(String id); // update t_user set username = NULL where id = ?
+ * <p>
+ * interface UserInfoGetter extends UsernameGetter {
+ * String getPassword();
+ * }
+ * <p>
+ * // 返回值可以是 void,boolean,int(等数字类型)
+ * updateById(UserInfoGetter getter); // update t_user set username = ?, password = ? where id = ?
+ * updateUsernameById(UserInfoGetter getter); // update t_user set username = ? where id = ?
+ * updateUsernameById(String id, String username); // update t_user set username = ? where id = ?
+ * updateUsernameById(String username, String id); // update t_user set username = ? where id = ?
+ * updateUsernameById(@P("username") String a, String id); // update t_user set username = ? where id = ?
+ * <p>
+ * // 非 ID 字段要保持顺序: update t_user set username = ?, password = ? where id = ?
+ * updateUsernamePasswordById(String string1, String string2, String id);
+ * // 得让知道哪个字段是 id
+ * // 与参数顺序无关，但名称要一致: update t_user set username = ?, password = ? where id = ?
+ * updateUsernamePasswordById(String string1, String id, String string2);
+ * // update t_user set password = ? where username = ? and create_time > ?
+ * updateByUsernameAndCreateTimeAfter(String password, String username, String createTime);
+ * // update t_user set password = ? where username like  and create_time > ?
+ * updateByUsernameLikeAndCreateTimeAfter(String password, String username, String createTime);
+ * updateByUsernameLikeAndCreateTimeAfter(String username, String password, String createTime);
+ * updatePasswordByUsernameLikeAndCreateTimeAfter(String username, String password, String createTime);
+ * updatePasswordByUsernameLikeAndCreateTimeAfter(String username, String string, String createTime);
+ * <p>
+ * // 与参数顺序无关，但名称要一致: update t_user set username = ?, password = ? where id = ?
+ * updateById(String username, String password, String id);
+ * updateUsername(String password); // update t_user set username = ?
+ * updateUsername(String string); // update t_user set username = ?
+ * updatePassword(String password); // update t_user set password = ?
+ * update(String password); // update t_user set password = ?
+ * <p>
+ * // 查询
+ * UserInfoGetter findById(String id); // select username, password, id from t_user where id = ?
+ * UserInfoGetter fetchById(String id); // select username, password, id from t_user where id = ?
+ * UserInfoGetter selectById(String id); // select username, password, id from t_user where id = ?
+ * UserInfoGetter queryById(String id); // select username, password, id from t_user where id = ?
+ * UserInfoGetter readById(String id); // select username, password, id from t_user where id = ?
+ * UserInfoGetter getById(String id); // select username, password, id from t_user where id = ?
+ * <p>
+ * List&lt;UserInfoGetter&gt; findByUsernameLike(String username); // select username, password, id where username like
+ * '%username%'
+ * List&lt;UserInfoGetter&gt; findByUsernameStartsWith(String username); // select username, password, id where username
+ * like 'username%'
+ * List&lt;UserInfoGetter&gt; findByUsernameEndsWith(String username); // select username, password, id where username
+ * like '%username'
+ * List&lt;UserInfoGetter&gt; findByAgeGt(int age); // select username, password, id where age > ?
+ * List&lt;UserInfoGetter&gt; findByAgeGreatThan(int age); // select username, password, id where age > ?
+ * List&lt;UserInfoGetter&gt; findByAgeLt(int age); // select username, password, id where age < ?
+ * List&lt;UserInfoGetter&gt; findByAgeLessThan(int age); // select username, password, id where age < ?
+ * List&lt;UserInfoGetter&gt; findByAgeLessThanAndUsernameIs(int age, String username); // select username, password, id
+ * where age < ? and username = ?
+ * // 此情况所有条件都是 and 和 = : select username, password, id where age =? and username = ? and address = ?
+ * List&lt;UserInfoGetter&gt; findAll(int age, String username, String address);
+ * <p>
+ * insert(UserInfoGetter getter); // insert into t_user (id, username, password) values (?, ?, ?)
+ * insert(String username); // insert into t_user (id, username) values (?, ?)
+ *
  * @author benshaoye
  */
 @AutoService(Processor.class)
@@ -46,7 +120,7 @@ public class ProcessingProcessor extends AbstractProcessor {
         // } else {
         //     doProcessing(roundEnv);
         // }
-        Logger2.warn("================================>>>>>>>>");
+        Log2.warn("================================>>>>>>>>");
         doProcessing(roundEnv);
         doWriteJavaFiles();
         return true;
@@ -65,7 +139,7 @@ public class ProcessingProcessor extends AbstractProcessor {
         MatchingHolder matchingHolder = holders.getMatchingHolder();
         for (Element annotated : matchingSet) {
             TypeElement matchingElem = (TypeElement) annotated;
-            Logger2.warn(matchingElem);
+            Log2.warn(matchingElem);
             IfMatching matching = annotated.getAnnotation(IfMatching.class);
             String matcherClass = Element2.getClassname(matching, IfMatching::value);
             TypeElement matcherElem = elements.getTypeElement(matcherClass);

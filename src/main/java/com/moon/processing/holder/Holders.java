@@ -2,7 +2,6 @@ package com.moon.processing.holder;
 
 import com.moon.processing.JavaFiler;
 import com.moon.processing.util.Processing2;
-import com.moon.processor.utils.Environment2;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
@@ -10,62 +9,66 @@ import javax.annotation.processing.ProcessingEnvironment;
  * @author benshaoye
  */
 public enum Holders {
+    /** holder default instance */
     INSTANCE;
 
     private final static ThreadLocal<ProcessingEnvironment> ENV = new ThreadLocal<>();
+    private final DslHelper dslHelper;
     private final NameHolder nameHelper;
     private final TypeHolder typeHolder;
-    private final MatchingHolder matchingHolder;
+    private final TableHolder tableHolder;
     private final CopierHolder copierHolder;
     private final MapperHolder mapperHolder;
-    private final TableHolder tableHolder;
     private final RecordHolder recordHolder;
     private final TablesHolder tablesHolder;
+    private final PolicyHelper policyHelper;
     private final AliasesHolder aliasesHolder;
     private final AccessorHolder accessorHolder;
-    private final DslHelper dslHelper;
+    private final MatchingHolder matchingHolder;
 
     Holders() {
-        this.nameHelper = new NameHolder();
-        this.dslHelper = new DslHelper();
-        this.tablesHolder = new TablesHolder();
-        this.aliasesHolder = new AliasesHolder();
-        this.matchingHolder = new MatchingHolder();
-        this.typeHolder = new TypeHolder(nameHelper);
-        this.recordHolder = new RecordHolder(typeHolder);
-        this.copierHolder = new CopierHolder(recordHolder);
-        this.mapperHolder = new MapperHolder(copierHolder);
-        this.tableHolder = new TableHolder(typeHolder, tablesHolder, aliasesHolder);
-        this.accessorHolder = new AccessorHolder(nameHelper, typeHolder, tableHolder);
+        this.dslHelper = new DslHelper(this);
+        this.nameHelper = new NameHolder(this);
+        this.typeHolder = new TypeHolder(this);
+        this.tableHolder = new TableHolder(this);
+        this.policyHelper = new PolicyHelper(this);
+        this.tablesHolder = new TablesHolder(this);
+        this.recordHolder = new RecordHolder(this);
+        this.copierHolder = new CopierHolder(this);
+        this.mapperHolder = new MapperHolder(this);
+        this.aliasesHolder = new AliasesHolder(this);
+        this.matchingHolder = new MatchingHolder(this);
+        this.accessorHolder = new AccessorHolder(this);
     }
 
-    public void init(ProcessingEnvironment processingEnv) {
+    public final void init(ProcessingEnvironment processingEnv) {
         ENV.set(processingEnv);
         Processing2.initialize(processingEnv);
-        Environment2.initialize(processingEnv);
     }
 
-    public NameHolder getNameHelper() { return nameHelper; }
+    public final DslHelper getDslHelper() { return dslHelper; }
 
-    public TypeHolder getTypeHolder() { return typeHolder; }
+    public final NameHolder getNameHelper() { return nameHelper; }
 
-    public MatchingHolder getMatchingHolder() { return matchingHolder; }
+    public final TypeHolder getTypeHolder() { return typeHolder; }
 
-    public CopierHolder getCopierHolder() { return copierHolder; }
+    public final TableHolder getTableHolder() { return tableHolder; }
 
-    public MapperHolder getMapperHolder() { return mapperHolder; }
+    public final CopierHolder getCopierHolder() { return copierHolder; }
 
-    public TableHolder getTableHolder() { return tableHolder; }
+    public final MapperHolder getMapperHolder() { return mapperHolder; }
 
-    public RecordHolder getRecordHolder() { return recordHolder; }
+    public final RecordHolder getRecordHolder() { return recordHolder; }
 
-    public TablesHolder getTablesHolder() { return tablesHolder; }
+    public final TablesHolder getTablesHolder() { return tablesHolder; }
 
-    public AliasesHolder getAliasesHolder() { return aliasesHolder; }
+    public final PolicyHelper getPolicyHelper() { return policyHelper; }
 
-    public AccessorHolder getAccessorHolder() { return accessorHolder; }
+    public final AliasesHolder getAliasesHolder() { return aliasesHolder; }
 
-    public DslHelper getDslHelper() { return dslHelper; }
+    public final AccessorHolder getAccessorHolder() { return accessorHolder; }
+
+    public final MatchingHolder getMatchingHolder() { return matchingHolder; }
 
     public void writeJavaFile(JavaFiler filer) {
         recordHolder.write(filer);

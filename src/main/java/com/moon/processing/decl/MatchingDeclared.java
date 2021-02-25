@@ -1,7 +1,7 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.condition.IfMatching;
-import com.moon.processor.utils.Element2;
+import com.moon.processing.util.Element2;
 
 import javax.lang.model.element.TypeElement;
 
