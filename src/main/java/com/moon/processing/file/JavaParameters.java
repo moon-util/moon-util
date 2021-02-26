@@ -2,6 +2,7 @@ package com.moon.processing.file;
 
 import com.moon.processing.decl.Generic2;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -29,10 +30,52 @@ public class JavaParameters extends BaseImportable implements Appender {
         return parameter;
     }
 
-    public JavaParameter get(String parameterName) {
-        return parameters.get(parameterName);
+    public JavaParameter get(String parameterName) { return parameters.get(parameterName); }
+
+    /**
+     * 返回方法/构造器第一个参数
+     *
+     * @return 第一个参数
+     *
+     * @throws IllegalArgumentException 当 index 小于 0 或大于参数总数时抛出异常
+     */
+    public JavaParameter getFirstParameter() { return getParameterAt(0); }
+
+    /**
+     * 返回方法第 index 个参数
+     *
+     * @param index 参数位置
+     *
+     * @return 指定位置参数
+     *
+     * @throws IllegalArgumentException 当 index 小于 0 或大于参数总数时抛出异常
+     */
+    public JavaParameter getParameterAt(final int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("'index' must not less than 0, but got: " + index);
+        }
+        Collection<JavaParameter> values = parameters.values();
+        if (index >= values.size()) {
+            throw new IllegalArgumentException("'index' must not great than " + (values.size() - 1) + ", but got: " + index);
+        }
+        int i = 0;
+        for (JavaParameter value : parameters.values()) {
+            if ((i++) == index) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("'index' must not great than " + (values.size() - 1) + ", but got: " + index);
     }
 
+    /**
+     * 一个方法可能有多个类型相同的参数，这些参数名不同
+     *
+     * @param type 方法参数实际类型，如果是泛型，要是转换过的
+     *
+     * @return 第一个符合条件的参数
+     *
+     * @throws IllegalStateException 如果没有指定类型的参数就抛出异常
+     */
     public JavaParameter getFirstByTypeSimplify(String type) {
         String typeSimplify = Generic2.typeSimplify(type);
         for (JavaParameter value : parameters.values()) {

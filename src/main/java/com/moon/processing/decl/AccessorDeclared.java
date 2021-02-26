@@ -113,7 +113,7 @@ public class AccessorDeclared extends BaseHolder implements JavaProvider {
         FileClassImpl classFile = newAccessorImpl();
         classFile.implement(typeDeclared.getTypeClassname());
 
-        new AccessorGeneratorForInterface(classFile, this).doGenerate();
+        new AccessorOnInterface(classFile, this).doGenerate();
 
         return classFile;
     }

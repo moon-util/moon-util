@@ -2,9 +2,7 @@ package com.moon.processing.decl;
 
 import com.moon.accessor.meta.JdbcParameters;
 import com.moon.accessor.session.JdbcSession;
-import com.moon.processing.file.BaseImportable;
-import com.moon.processing.file.FileClassImpl;
-import com.moon.processing.file.JavaField;
+import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;
 import com.moon.processing.util.Processing2;
@@ -13,11 +11,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author benshaoye
  */
-abstract class TypeImported extends BaseImportable {
+abstract class TypeImported extends BaseGenerator {
 
     protected final TypeHolder typeHolder;
     protected final TableHolder tableHolder;
@@ -53,11 +52,27 @@ abstract class TypeImported extends BaseImportable {
         this.types = Processing2.getTypes();
     }
 
-    public String getJdbcSessionName() { return getJdbcSession().getFieldName(); }
+    protected final JavaMethod publicMethod(MethodDeclared methodDeclared, Consumer<JavaParameters> usingParameters) {
+        return impl.publicMethod(methodDeclared.getMethodName(), usingParameters);
+    }
 
-    public JavaField getJdbcSession() {
+    @Override
+    protected final BaseImplementation getImplementation() { return impl; }
+
+    @Override
+    protected final String getJdbcSessionName() { return getJdbcSession().getFieldName(); }
+
+    public final JavaField getJdbcSession() {
         if (jdbcSession == null) {
-            this.jdbcSession = impl.useField("jdbcSession", v -> {}, impl.onImported(JdbcSession.class));
+            String fieldName = "jdbcSession";
+            String fieldType = JdbcSession.class.getCanonicalName();
+            JavaField session = impl.useField(fieldName, v -> {}, fieldType);
+
+            JavaMethod setter = session.useSetterMethod();
+            String paramName = getFirstParameter(setter).getName();
+            setter.nextFormatted("this.{} = {}", fieldName, paramName, LineScripter::withUnsorted);
+            setter.annotationAutowired(true);
+            this.jdbcSession = session;
         }
         return jdbcSession;
     }

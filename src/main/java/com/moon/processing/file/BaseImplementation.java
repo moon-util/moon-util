@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * @author benshaoye
  */
-abstract class BaseImplementation extends FileInterfaceImpl {
+public abstract class BaseImplementation extends FileInterfaceImpl {
 
     private final List<Scripter> instanceBlock = new ArrayList<>();
     private final List<Scripter> staticBlock = new ArrayList<>();
