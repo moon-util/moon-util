@@ -9,6 +9,12 @@ import java.util.stream.Collectors;
  */
 public class Collect2 extends com.moon.accessor.util.Collect2 {
 
+    public static <K, V> Map<K, V> ofMap(K key, V value) {
+        Map<K, V> params = new LinkedHashMap<>();
+        params.put(key, value);
+        return params;
+    }
+
     public static int size(Collection<?> collect) { return collect == null ? 0 : collect.size(); }
 
     public static <T> List<? extends T> emptyIfNull(List<? extends T> list) {

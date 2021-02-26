@@ -1,6 +1,7 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.Provided;
+import com.moon.accessor.annotation.SafeModifying;
 import com.moon.processing.file.*;
 import com.moon.processing.util.Assert2;
 import com.moon.processing.util.Element2;
@@ -15,6 +16,8 @@ import java.util.function.BiConsumer;
  * @author benshaoye
  */
 public abstract class BaseGenerator extends BaseImportable {
+
+    protected final static String MODIFYING = SafeModifying.class.getCanonicalName();
 
 
     private final static Map<String, String> COLLECTION_TYPES = new HashMap<>();

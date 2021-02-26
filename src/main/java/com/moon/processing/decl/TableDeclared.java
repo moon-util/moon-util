@@ -13,7 +13,6 @@ import com.moon.processing.file.FileEnumImpl;
 import com.moon.processing.file.JavaField;
 import com.moon.processing.holder.BaseHolder;
 import com.moon.processing.holder.Holders;
-import com.moon.processing.holder.PolicyHelper;
 import com.moon.processing.util.*;
 
 import javax.lang.model.element.TypeElement;
@@ -44,15 +43,19 @@ import java.util.stream.Collectors;
 public class TableDeclared extends BaseHolder implements JavaProvider {
 
     private final VarHelper varHelper = new VarHelper();
-    private final Set<String> allColumnsName;
+    /** 所有字段名 + 静态列名 + 成员列名 + 表名的枚举 & 所有字段名 */
+    private final Set<String> allColumnsName, propertiesName;
+    /** 所有列名 & 成员列名 */
     private final Collection<String> staticCols, memberCols;
+    /** 所属{@link Tables} & 实际表名 & 表名枚举值 */
+    private final String tables, tableName, tableEnumVal;
+    /** 生成的表的报名，类名（{@link #tableName}的大写） */
     private final String packageName, simpleClassName;
-    private final String tables;
-    private final String tableName;
-    private final String tableEnumVal;
+    /** 别名: aliasGroup.alias */
     private final AliasDeclared aliasDeclared;
     private final TypeDeclared typeDeclared;
-    private final Map<String, ColumnDeclared> columnDeclaredMap;
+    /** propertyName : columnDeclared */
+    private final Map<String, ColumnDeclared> columnsMap;
 
     private TableDeclared(Holders holders, TypeDeclared typeDeclared) {
         super(holders);
@@ -66,21 +69,23 @@ public class TableDeclared extends BaseHolder implements JavaProvider {
         TableModelPolicy modelPolicy = policyHelper().withModelPolicy(thisElement);
         TableFieldPolicy fieldPolicy = policyHelper().withFieldPolicy(thisElement);
 
-        final Set<String> allColumnsName = typeDeclared.getAllPropertiesName();
-        final List<String> staticCols = new ArrayList<>();
-        final List<String> memberCols = new ArrayList<>();
-        this.columnDeclaredMap = collectColumnMap(tableEnumRef, fieldPolicy, typeDeclared, staticCols, memberCols);
+        final Set<String> propertiesName = typeDeclared.getAllPropertiesName();
+        final Set<String> allColumnsName = new LinkedHashSet<>(propertiesName);
+        final List<String> staticColsName = new ArrayList<>();
+        final List<String> memberColsName = new ArrayList<>();
+        this.columnsMap = collectColsMap(tableEnumRef, fieldPolicy, typeDeclared, staticColsName, memberColsName);
 
-        allColumnsName.addAll(memberCols);
-        allColumnsName.addAll(staticCols);
+        allColumnsName.addAll(memberColsName);
+        allColumnsName.addAll(staticColsName);
         String tableEnumVal = Table2.deduceTableField(allColumnsName);
         allColumnsName.add(tableEnumVal);
 
-        this.typeDeclared = typeDeclared;
         this.allColumnsName = allColumnsName;
+        this.propertiesName = propertiesName;
+        this.staticCols = staticColsName;
+        this.memberCols = memberColsName;
         this.tableEnumVal = tableEnumVal;
-        this.staticCols = staticCols;
-        this.memberCols = memberCols;
+        this.typeDeclared = typeDeclared;
 
         this.tables = String2.isBlank(tables.value()) ? null : tables.value().trim();
         this.tableName = Table2.toDeclaredTableName(simpleName, modelPolicy, tableModel);
@@ -93,10 +98,10 @@ public class TableDeclared extends BaseHolder implements JavaProvider {
     private final static Set<String> SORTS = new LinkedHashSet<>();
 
     static {
-        SORTS.addAll(String2.split("id|name|idCard|idCardNo|username|logName|loginName|mobile|email", '|'));
+        SORTS.addAll(String2.split("id|primaryKey|name|idCard|idCardNo|username|logName|loginName|mobile|email", '|'));
     }
 
-    private static Map<String, ColumnDeclared> collectColumnMap(
+    private static Map<String, ColumnDeclared> collectColsMap(
         final Supplier<String> tableEnumRef,
         TableFieldPolicy fieldPolicy,
         TypeDeclared typeDeclared,
@@ -176,10 +181,10 @@ public class TableDeclared extends BaseHolder implements JavaProvider {
 
     public TypeDeclared getTypeDeclared() { return typeDeclared; }
 
-    public ColumnDeclared getColumnDeclared(String propertyName) { return columnDeclaredMap.get(propertyName); }
+    public ColumnDeclared getColumnDeclared(String propertyName) { return columnsMap.get(propertyName); }
 
     public <T> T reduce(BiConsumer<ColumnDeclared, T> consumer, T totalValue) {
-        for (ColumnDeclared value : columnDeclaredMap.values()) {
+        for (ColumnDeclared value : columnsMap.values()) {
             consumer.accept(value, totalValue);
         }
         return totalValue;
@@ -202,7 +207,7 @@ public class TableDeclared extends BaseHolder implements JavaProvider {
         final String entityVar = varHelper.next(allColumnsName);
 
         Refer<JavaField> firstRefer = Refer.of();
-        for (ColumnDeclared declared : columnDeclaredMap.values()) {
+        for (ColumnDeclared declared : columnsMap.values()) {
             declared.declareFinalField(enumFile, entityVar);
             firstRefer.setIfAbsent(declared.declareConstField(enumFile));
         }
@@ -272,18 +277,15 @@ public class TableDeclared extends BaseHolder implements JavaProvider {
             .returning(enumFile.onImported(entityName) + ".class");
 
         // getTableFieldsCount()
-        enumFile.publicMethod("getTableFieldsCount").typeOf("int").override().returning(columnDeclaredMap.size());
+        enumFile.publicMethod("getTableFieldsCount").typeOf("int").override().returning(columnsMap.size());
 
         // getTableFields()
         enumFile.publicMethod("getTableFields")
             .override()
             .typeOf("{}<?, {}, {}>[]", TableField.class, entityName, enumFile.getClassname())
-            .returnTypeFormatted("new {}[]{{}}",
-                enumFile.onImported(TableField.class),
-                columnDeclaredMap.values()
-                    .stream()
-                    .map(ColumnDeclared::getColumnName)
-                    .collect(Collectors.joining(", ")));
+            .returnTypeFormatted("new {}[]{{}}", enumFile.onImported(TableField.class),
+
+                columnsMap.values().stream().map(ColumnDeclared::getColumnName).collect(Collectors.joining(", ")));
 
         // getTableName()
         enumFile.publicMethod("getTableName")
