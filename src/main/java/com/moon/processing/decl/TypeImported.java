@@ -70,6 +70,10 @@ abstract class TypeImported extends BaseGenerator {
         return method;
     }
 
+    protected final JavaMethod overrideMethod(MethodDeclared methodDeclared){
+        return publicMethod(methodDeclared).override();
+    }
+
     protected final Map<ColumnDeclared,ParameterDeclared> getColsMap(MethodDeclared methodDecl, final int startIdx){
         int index = 0;
         Map<ColumnDeclared, ParameterDeclared> columnsMap = new LinkedHashMap<>();

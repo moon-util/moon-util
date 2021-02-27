@@ -1,9 +1,9 @@
 package com.moon.processing.holder;
 
-import com.moon.accessor.annotation.table.TableFieldPolicy;
-import com.moon.accessor.annotation.table.TableModel;
-import com.moon.accessor.annotation.table.TableModelPolicy;
-import com.moon.accessor.annotation.table.Tables;
+import com.moon.accessor.annotation.domain.TableFieldPolicy;
+import com.moon.accessor.annotation.domain.TableModel;
+import com.moon.accessor.annotation.domain.TableModelPolicy;
+import com.moon.accessor.annotation.domain.Tables;
 import com.moon.processing.defaults.TableFieldPolicyEnum;
 import com.moon.processing.defaults.TableModelEnum;
 import com.moon.processing.defaults.TableModelPolicyEnum;

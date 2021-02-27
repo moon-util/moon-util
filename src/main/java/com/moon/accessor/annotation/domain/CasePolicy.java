@@ -1,4 +1,4 @@
-package com.moon.accessor.annotation.table;
+package com.moon.accessor.annotation.domain;
 
 /**
  * @author benshaoye

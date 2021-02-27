@@ -1,10 +1,10 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.column.TableColumn;
-import com.moon.accessor.annotation.table.TableFieldPolicy;
-import com.moon.accessor.annotation.table.TableModel;
-import com.moon.accessor.annotation.table.TableModelPolicy;
-import com.moon.accessor.annotation.table.Tables;
+import com.moon.accessor.annotation.domain.TableColumn;
+import com.moon.accessor.annotation.domain.TableFieldPolicy;
+import com.moon.accessor.annotation.domain.TableModel;
+import com.moon.accessor.annotation.domain.TableModelPolicy;
+import com.moon.accessor.annotation.domain.Tables;
 import com.moon.accessor.meta.Table;
 import com.moon.accessor.meta.TableField;
 import com.moon.processing.JavaDeclarable;

@@ -1,6 +1,6 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.table.TableModel;
+import com.moon.accessor.annotation.domain.TableModel;
 import com.moon.processing.util.String2;
 import com.moon.processing.util.Test2;
 

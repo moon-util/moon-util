@@ -1,4 +1,4 @@
-package com.moon.accessor.annotation.column;
+package com.moon.accessor.annotation.domain;
 
 import com.moon.accessor.type.JdbcType;
 import com.moon.accessor.type.TypeHandler;

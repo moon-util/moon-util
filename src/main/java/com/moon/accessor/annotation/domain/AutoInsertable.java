@@ -1,4 +1,4 @@
-package com.moon.accessor.annotation.table;
+package com.moon.accessor.annotation.domain;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,9 +8,6 @@ import java.lang.annotation.Target;
 /**
  * @author benshaoye
  */
-@Target({ElementType.TYPE})
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Tables {
-
-    String value() default "Tables";
-}
+public @interface AutoInsertable {}

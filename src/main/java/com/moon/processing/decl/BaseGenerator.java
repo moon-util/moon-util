@@ -49,6 +49,19 @@ public abstract class BaseGenerator extends BaseImportable {
         return COLLECTION_TYPES.get(collectionType);
     }
 
+    protected static void unsafeUpdateModifying(JavaMethod method) {
+        unsafeModifyingWith(method, "update");
+    }
+
+    protected static void unsafeDeleteModifying(JavaMethod method) {
+        unsafeModifyingWith(method, "delete");
+    }
+
+    protected static void unsafeModifyingWith(JavaMethod implMethod, String dml) {
+        implMethod.nextScript("// 不安全的 " + dml + " 语句，请添加 where 子句");
+        implMethod.nextScript("// 或注解 @" + MODIFYING);
+    }
+
     protected static JavaParameter getFirstParameter(JavaMethod method) {
         return method.getParameters().getFirstParameter();
     }

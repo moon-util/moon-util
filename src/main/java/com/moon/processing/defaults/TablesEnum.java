@@ -1,6 +1,6 @@
 package com.moon.processing.defaults;
 
-import com.moon.accessor.annotation.table.Tables;
+import com.moon.accessor.annotation.domain.Tables;
 
 import java.lang.annotation.Annotation;
 

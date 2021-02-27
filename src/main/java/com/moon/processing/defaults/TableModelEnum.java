@@ -1,6 +1,6 @@
 package com.moon.processing.defaults;
 
-import com.moon.accessor.annotation.table.TableModel;
+import com.moon.accessor.annotation.domain.TableModel;
 
 /**
  * @author benshaoye

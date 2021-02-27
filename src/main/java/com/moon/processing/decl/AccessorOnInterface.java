@@ -112,10 +112,7 @@ public class AccessorOnInterface extends TypeImported {
         public void doImplMethod(MethodDeclared declared) {
             final int paramsCount = declared.getParametersCount();
             if (paramsCount == 0) {
-                JavaMethod method = publicMethod(declared);
-                method.nextScript("// 不安全的 delete 语句，请添加 where 子句");
-                method.nextScript("// 或注解 @" + MODIFYING);
-                defaultReturning(declared, method.override());
+                unsafeDeleteModifying(overrideMethod(declared));
             } else if (paramsCount == 1) {
                 doImplUpdateForOnlyParameter(declared);
             } else {
@@ -125,7 +122,7 @@ public class AccessorOnInterface extends TypeImported {
 
         private void doImplDeleteForMultiParameters(MethodDeclared methodDecl) {
             Map<ColumnDeclared, ParameterDeclared> columnsMap = getColsMap(methodDecl, 0);
-            JavaMethod method = publicMethod(methodDecl).override();
+            JavaMethod implMethod = overrideMethod(methodDecl);
             if (columnsMap.isEmpty()) {
 
             } else {
@@ -143,31 +140,40 @@ public class AccessorOnInterface extends TypeImported {
         public void doImplMethod(MethodDeclared methodDecl) {
             switch (methodDecl.getParametersCount()) {
                 case 0: {
-                    publicMethod(methodDecl);
+                    overrideMethod(methodDecl);
                     break;
                 }
                 case 1: {
                     ExecutableElement elem = methodDecl.getMethod();
                     SafeModifying modifying = elem.getAnnotation(SafeModifying.class);
-                    JavaMethod method = publicMethod(methodDecl);
+                    JavaMethod implMethod = overrideMethod(methodDecl);
                     if (modifying == null) {
-                        method.nextScript("// 不安全的 update 语句，请添加 where 子句");
-                        method.nextScript("// 或注解 @" + MODIFYING);
+                        unsafeUpdateModifying(implMethod);
                     }
                     break;
                 }
                 default: {
-                    doImplDeleteForMultiParameters(methodDecl);
+                    doImplUpdateForMultiParameters(methodDecl);
                 }
             }
         }
 
-        private void doImplDeleteForMultiParameters(MethodDeclared methodDecl) {
-            Map<ColumnDeclared, ParameterDeclared> columnsMap = getColsMap(methodDecl, 1);
-            JavaMethod method = publicMethod(methodDecl).override();
-            if (columnsMap.isEmpty()) {
+        private void doImplUpdateForMultiParameters(MethodDeclared methodDecl) {
+            ParameterDeclared firstParameter = methodDecl.getParameterAt(0);
+            String parameterName = firstParameter.getParameterName();
+            String paramActualType = firstParameter.getActualType();
+            ColumnDeclared refColumnDecl = tableDeclared.getColumnDeclared(parameterName);
 
+            Map<ColumnDeclared, ParameterDeclared> columnsMap = getColsMap(methodDecl, 0);
+            JavaMethod implMethod = overrideMethod(methodDecl);
+            if (columnsMap.isEmpty()) {
+                unsafeUpdateModifying(implMethod);
             } else {
+            }
+            if (isSamePropertyType(paramActualType, refColumnDecl.getFieldClass())) {
+                String sql =
+            } else {
+
             }
         }
     }
@@ -181,7 +187,7 @@ public class AccessorOnInterface extends TypeImported {
         public void doImplMethod(MethodDeclared decl) {
             switch (decl.getParametersCount()) {
                 case 0: {
-                    publicMethod(decl);
+                    overrideMethod(decl);
                     break;
                 }
                 case 1: {
@@ -197,7 +203,7 @@ public class AccessorOnInterface extends TypeImported {
 
         private void doImplInsertForMultiParameters(MethodDeclared methodDecl) {
             Map<ColumnDeclared, ParameterDeclared> columnsMap = getColsMap(methodDecl, 0);
-            doImplInsertParameters(methodDecl, publicMethod(methodDecl).override(), columnsMap);
+            doImplInsertParameters(methodDecl, overrideMethod(methodDecl), columnsMap);
         }
 
         private void doImplInsertForOnlyParameter(MethodDeclared methodDecl) {
@@ -205,7 +211,7 @@ public class AccessorOnInterface extends TypeImported {
             String parameterActualType = parameter.getActualType();
             String parameterName = parameter.getParameterName();
             ColumnDeclared columnDecl = tableDeclared.getColumnDeclared(parameterName);
-            JavaMethod implMethod = publicMethod(methodDecl).override();
+            JavaMethod implMethod = overrideMethod(methodDecl);
 
             if (columnDecl == null) {
                 doImplInsertMethodForModel(methodDecl, implMethod, parameter);

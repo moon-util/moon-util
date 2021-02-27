@@ -1,7 +1,7 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.column.TableColumn;
-import com.moon.accessor.annotation.table.TableFieldPolicy;
+import com.moon.accessor.annotation.domain.TableColumn;
+import com.moon.accessor.annotation.domain.TableFieldPolicy;
 import com.moon.accessor.meta.TableFieldDetail;
 import com.moon.accessor.type.JdbcType;
 import com.moon.processing.file.BaseImportable;

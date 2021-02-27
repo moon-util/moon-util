@@ -2,7 +2,7 @@ package com.moon.processing;
 
 import com.google.auto.service.AutoService;
 import com.moon.accessor.annotation.Accessor;
-import com.moon.accessor.annotation.table.TableModel;
+import com.moon.accessor.annotation.domain.TableModel;
 import com.moon.accessor.annotation.condition.IfMatching;
 import com.moon.mapper.annotation.MapperFor;
 import com.moon.processing.holder.Holders;

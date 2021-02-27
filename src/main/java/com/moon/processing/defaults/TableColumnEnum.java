@@ -1,6 +1,6 @@
 package com.moon.processing.defaults;
 
-import com.moon.accessor.annotation.column.TableColumn;
+import com.moon.accessor.annotation.domain.TableColumn;
 import com.moon.accessor.type.JdbcType;
 import com.moon.accessor.type.TypeHandler;
 
