@@ -18,7 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * @author benshaoye
@@ -61,20 +60,60 @@ abstract class TypeImported extends BaseGenerator {
 
     protected final JavaMethod publicMethod(MethodDeclared methodDeclared) {
         List<ParameterDeclared> params = methodDeclared.getParametersDeclared();
-        JavaMethod method= impl.publicMethod(methodDeclared.getMethodName(), parameters -> {
+        JavaMethod method = impl.publicMethod(methodDeclared.getMethodName(), parameters -> {
             for (ParameterDeclared parameter : params) {
-            parameters.add(parameter.getParameterName(), parameter.getActualType());
+                parameters.add(parameter.getParameterName(), parameter.getActualType());
             }
         }).typeOf(methodDeclared.getReturnActualType());
         defaultReturning(methodDeclared, method);
         return method;
     }
 
-    protected final JavaMethod overrideMethod(MethodDeclared methodDeclared){
+    protected final JavaMethod overrideMethod(MethodDeclared methodDeclared) {
         return publicMethod(methodDeclared).override();
     }
 
-    protected final Map<ColumnDeclared,ParameterDeclared> getColsMap(MethodDeclared methodDecl, final int startIdx){
+    protected void writeUpdateSql(
+        JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap, Map<ColumnDeclared, ?> whereColumnsMap
+    ) {
+        if (whereColumnsMap.isEmpty()) {
+            writeUpdateSqlAsNonWhere(implMethod, columnsMap);
+            return;
+        }
+        implMethod.nextFormatted("{} sql = \"UPDATE {} SET {}\" WHERE = {}",
+            implMethod.onImported(String.class),
+            toDatabaseSymbol(tableDeclared.getTableName()),
+            joinedForUpdate(columnsMap),
+            joinedForUpdate(whereColumnsMap));
+        writeDeclareJdbcParameters(implMethod, columnsMap.size() + whereColumnsMap.size());
+    }
+
+    protected void writeUpdateSqlAsNonWhere(JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap) {
+        int count = columnsMap.size();
+        implMethod.nextFormatted("{} sql = \"UPDATE {} SET {}\"",
+            implMethod.onImported(String.class),
+            toDatabaseSymbol(tableDeclared.getTableName()),
+            joinedForUpdate(columnsMap));
+        writeDeclareJdbcParameters(implMethod, count);
+    }
+
+    protected void writeInsertSql(JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap) {
+        int count = columnsMap.size();
+        String sql = "INSERT INTO " + toDatabaseSymbol(tableDeclared.getTableName()) +
+
+            " (" + joinedForInsert(columnsMap) + ") VALUES (" + toPlaceholders(count) + ')';
+
+        implMethod.nextFormatted("{} sql = \"{}\"", implMethod.onImported(String.class), sql);
+        writeDeclareJdbcParameters(implMethod, count);
+    }
+
+    protected final void writeDeclareJdbcParameters(JavaMethod implMethod, int capacity) {
+        implMethod.nextFormatted("{} parameters = new {}({})",
+
+            getParamsTypeImported(), getParamsTypeImported(), capacity);
+    }
+
+    protected final Map<ColumnDeclared, ParameterDeclared> getColsMap(MethodDeclared methodDecl, final int startIdx) {
         int index = 0;
         Map<ColumnDeclared, ParameterDeclared> columnsMap = new LinkedHashMap<>();
         for (ParameterDeclared parameter : methodDecl.getParametersDeclared()) {
@@ -86,6 +125,30 @@ abstract class TypeImported extends BaseGenerator {
             ColumnDeclared column = tableDeclared.getColumnDeclared(parameterName);
             if (isSamePropertyType(actualType, column.getFieldClass())) {
                 columnsMap.put(column, parameter);
+            }
+        }
+        return columnsMap;
+    }
+
+    protected final Map<ColumnDeclared, PropertyDeclared> getColsPropsMap() {
+        return tableDeclared.reduce((col, cols) -> {
+            cols.put(col, col.getProperty());
+        }, new LinkedHashMap<>());
+    }
+
+    protected final Map<ColumnDeclared, PropertyDeclared> getColsPropsMap(TypeDeclared paramModel) {
+        Map<ColumnDeclared, PropertyDeclared> columnsMap = new LinkedHashMap<>();
+        Map<String, PropertyDeclared> properties = paramModel.getCopiedProperties();
+        for (PropertyDeclared property : properties.values()) {
+            if (!property.isReadable()) {
+                continue;
+            }
+            ColumnDeclared column = tableDeclared.getColumnDeclared(property.getName());
+            if (column == null) {
+                continue;
+            }
+            if (isSamePropertyType(property.getActualType(), column.getFieldClass())) {
+                columnsMap.put(column, property);
             }
         }
         return columnsMap;
@@ -114,12 +177,8 @@ abstract class TypeImported extends BaseGenerator {
             }
         } else {
             method.returning(returning);
+        }
     }
-    }
-
-    // protected final JavaMethod publicMethod(MethodDeclared methodDeclared, Consumer<JavaParameters> usingParameters) {
-    //     return impl.publicMethod(methodDeclared.getMethodName(), usingParameters);
-    // }
 
     @Override
     protected final BaseImplementation getImplementation() { return impl; }

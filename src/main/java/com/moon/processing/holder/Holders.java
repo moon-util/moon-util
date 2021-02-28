@@ -4,6 +4,8 @@ import com.moon.processing.JavaFiler;
 import com.moon.processing.util.Processing2;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 /**
  * @author benshaoye
@@ -45,6 +47,12 @@ public enum Holders {
         ENV.set(processingEnv);
         Processing2.initialize(processingEnv);
     }
+
+    public final ProcessingEnvironment getEnvironment() { return ENV.get(); }
+
+    public final Elements getUtils() {return getEnvironment().getElementUtils();}
+
+    public final Types getTypes() {return getEnvironment().getTypeUtils();}
 
     public final DslHelper getDslHelper() { return dslHelper; }
 

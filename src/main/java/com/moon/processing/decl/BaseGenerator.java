@@ -91,7 +91,16 @@ public abstract class BaseGenerator extends BaseImportable {
 
     protected static String dotClass(String classname) { return classname + ".class"; }
 
-    protected static String toColumnsJoined(Map<ColumnDeclared, ?> columnsMap) {
+    protected static String joinedForUpdate(Map<ColumnDeclared, ?> columnsMap) {
+        int index = 0, length = columnsMap.size();
+        String[] columns = new String[length];
+        for (ColumnDeclared declared : columnsMap.keySet()) {
+            columns[index++] = toDatabaseSymbol(declared.getColumnName()) + " = ?";
+        }
+        return String.join(", ", columns);
+    }
+
+    protected static String joinedForInsert(Map<ColumnDeclared, ?> columnsMap) {
         int index = 0, length = columnsMap.size();
         String[] columns = new String[length];
         for (ColumnDeclared declared : columnsMap.keySet()) {
@@ -146,6 +155,10 @@ public abstract class BaseGenerator extends BaseImportable {
     /*
      #################################################################################################
      */
+
+    protected final void writeJdbcSessionUpdate(JavaMethod implMethod) {
+        writeJdbcSessionExecution(implMethod, "Update");
+    }
 
     protected final void writeJdbcSessionInsert(JavaMethod implMethod) {
         writeJdbcSessionExecution(implMethod, "insert");

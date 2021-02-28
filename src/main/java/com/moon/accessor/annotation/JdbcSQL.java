@@ -9,5 +9,8 @@ import java.lang.annotation.Target;
  * @author benshaoye
  */
 @Target(ElementType.METHOD)
-@Retention(RetentionPolicy.SOURCE)
-public @interface JpaQuery {}
+@Retention(RetentionPolicy.RUNTIME)
+public @interface JdbcSQL {
+
+    String value();
+}
