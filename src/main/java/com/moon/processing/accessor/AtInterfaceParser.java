@@ -1,7 +1,8 @@
-package com.moon.processing.decl;
+package com.moon.processing.accessor;
 
 import com.moon.accessor.annotation.ForceModifying;
 import com.moon.accessor.annotation.Provided;
+import com.moon.processing.decl.*;
 import com.moon.processing.file.FileClassImpl;
 import com.moon.processing.file.JavaMethod;
 import com.moon.processing.util.Collect2;
@@ -18,11 +19,11 @@ import java.util.Map;
 /**
  * @author benshaoye
  */
-public class AccessorOnInterface extends TypeImported {
+public class AtInterfaceParser extends TypeImported {
 
     private MethodDeclared parsingDeclared;
 
-    public AccessorOnInterface(FileClassImpl impl, AccessorDeclared declared) { super(impl, declared); }
+    public AtInterfaceParser(FileClassImpl impl, AccessorDeclared declared) { super(impl, declared); }
 
     public void doGenerate() {
         List<Runnable> runners = new ArrayList<>();

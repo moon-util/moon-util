@@ -1,5 +1,8 @@
 package com.moon.processing.holder;
 
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+
 /**
  * @author benshaoye
  */
@@ -10,6 +13,10 @@ public abstract class BaseHolder {
     protected BaseHolder(Holders holders) { this.holders = holders; }
 
     public final Holders getHolders() { return holders; }
+
+    public final Types types() { return getHolders().getTypes(); }
+
+    public final Elements utils() { return getHolders().getUtils(); }
 
     public final DslHelper dslHelper() { return holders.getDslHelper(); }
 

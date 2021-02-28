@@ -1,7 +1,8 @@
-package com.moon.processing.decl;
+package com.moon.processing.accessor;
 
 import com.moon.accessor.meta.JdbcParameters;
 import com.moon.accessor.session.JdbcSession;
+import com.moon.processing.decl.*;
 import com.moon.processing.file.*;
 import com.moon.processing.holder.TableHolder;
 import com.moon.processing.holder.TypeHolder;

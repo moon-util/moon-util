@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  *
  * @author benshaoye
  */
-@Target({ElementType.METHOD, ElementType.PARAMETER})
+@Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Name {
 

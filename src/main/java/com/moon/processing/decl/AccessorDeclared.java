@@ -3,6 +3,7 @@ package com.moon.processing.decl;
 import com.moon.accessor.annotation.Accessor;
 import com.moon.processing.JavaDeclarable;
 import com.moon.processing.JavaProvider;
+import com.moon.processing.accessor.AtInterfaceParser;
 import com.moon.processing.file.Java2;
 import com.moon.processing.file.FileClassImpl;
 import com.moon.processing.holder.*;
@@ -113,7 +114,7 @@ public class AccessorDeclared extends BaseHolder implements JavaProvider {
         FileClassImpl classFile = newAccessorImpl();
         classFile.implement(typeDeclared.getTypeClassname());
 
-        new AccessorOnInterface(classFile, this).doGenerate();
+        new AtInterfaceParser(classFile, this).doGenerate();
 
         return classFile;
     }

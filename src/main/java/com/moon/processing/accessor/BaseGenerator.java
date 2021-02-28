@@ -1,7 +1,9 @@
-package com.moon.processing.decl;
+package com.moon.processing.accessor;
 
 import com.moon.accessor.annotation.Provided;
 import com.moon.accessor.annotation.ForceModifying;
+import com.moon.processing.decl.ColumnDeclared;
+import com.moon.processing.decl.MethodDeclared;
 import com.moon.processing.file.*;
 import com.moon.processing.util.Assert2;
 import com.moon.processing.util.Element2;
@@ -165,7 +167,7 @@ public abstract class BaseGenerator extends BaseImportable {
     }
 
     protected final void writeJdbcSessionExecution(JavaMethod implMethod, String methodName) {
-        implMethod.nextBlank().nextFormatted("final int executed = {}.{}(sql, parameters)", getJdbcSessionName(), methodName);
+        implMethod.nextBlank().nextFormatted("final int affected = {}.{}(sql, parameters)", getJdbcSessionName(), methodName);
     }
 
     /**
