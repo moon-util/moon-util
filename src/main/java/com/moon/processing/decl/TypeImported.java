@@ -8,6 +8,7 @@ import com.moon.processing.holder.TypeHolder;
 import com.moon.processing.util.Element2;
 import com.moon.processing.util.Processing2;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
@@ -74,30 +75,26 @@ abstract class TypeImported extends BaseGenerator {
     }
 
     protected void writeUpdateSql(
-        JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap, Map<ColumnDeclared, ?> whereColumnsMap
+        JavaMethod implMethod,
+        Map<ColumnDeclared, ? extends AnnotatedDeclared> columnsMap,
+        Map<ColumnDeclared, ? extends AnnotatedDeclared> whereColumnsMap
     ) {
         if (whereColumnsMap.isEmpty()) {
-            writeUpdateSqlAsNonWhere(implMethod, columnsMap);
-            return;
+            implMethod.nextFormatted("{} sql = \"UPDATE {} SET {}\"",
+                implMethod.onImported(String.class),
+                toDatabaseSymbol(tableDeclared.getTableName()),
+                joinedForUpdate(columnsMap));
+        } else {
+            implMethod.nextFormatted("{} sql = \"UPDATE {} SET {} WHERE = {}\"",
+                implMethod.onImported(String.class),
+                toDatabaseSymbol(tableDeclared.getTableName()),
+                joinedForUpdate(columnsMap),
+                joinedForUpdate(whereColumnsMap));
         }
-        implMethod.nextFormatted("{} sql = \"UPDATE {} SET {}\" WHERE = {}",
-            implMethod.onImported(String.class),
-            toDatabaseSymbol(tableDeclared.getTableName()),
-            joinedForUpdate(columnsMap),
-            joinedForUpdate(whereColumnsMap));
         writeDeclareJdbcParameters(implMethod, columnsMap.size() + whereColumnsMap.size());
     }
 
-    protected void writeUpdateSqlAsNonWhere(JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap) {
-        int count = columnsMap.size();
-        implMethod.nextFormatted("{} sql = \"UPDATE {} SET {}\"",
-            implMethod.onImported(String.class),
-            toDatabaseSymbol(tableDeclared.getTableName()),
-            joinedForUpdate(columnsMap));
-        writeDeclareJdbcParameters(implMethod, count);
-    }
-
-    protected void writeInsertSql(JavaMethod implMethod, Map<ColumnDeclared, ?> columnsMap) {
+    protected void writeInsertSql(JavaMethod implMethod, Map<ColumnDeclared, ? extends AnnotatedDeclared> columnsMap) {
         int count = columnsMap.size();
         String sql = "INSERT INTO " + toDatabaseSymbol(tableDeclared.getTableName()) +
 
@@ -111,6 +108,20 @@ abstract class TypeImported extends BaseGenerator {
         implMethod.nextFormatted("{} parameters = new {}({})",
 
             getParamsTypeImported(), getParamsTypeImported(), capacity);
+    }
+
+    protected final void writeAddParameters(
+        JavaMethod implMethod, Map<ColumnDeclared, PropertyDeclared> columnsMap, String parameterName
+    ) {
+        columnsMap.forEach((column, prop) -> implMethod.nextFormatted("parameters.add({}, {})",
+            column.getConstColumnRef(getTableImported()),
+            prop.getReffedGetterScript(parameterName)));
+    }
+
+    protected final void writeAddParameters(JavaMethod implMethod, Map<ColumnDeclared, ParameterDeclared> columnsMap) {
+        columnsMap.forEach((column, param) -> implMethod.nextFormatted("parameters.add({}, {})",
+            column.getConstColumnRef(getTableImported()),
+            param.getParameterName()));
     }
 
     protected final Map<ColumnDeclared, ParameterDeclared> getColsMap(MethodDeclared methodDecl, final int startIdx) {
@@ -130,10 +141,23 @@ abstract class TypeImported extends BaseGenerator {
         return columnsMap;
     }
 
+    protected final Map<ColumnDeclared, PropertyDeclared> getColsPropsMap(ParameterDeclared parameter) {
+        Map<ColumnDeclared, PropertyDeclared> columnPropertyMap;
+        Element paramElem = types.asElement(parameter.getParameter().asType());
+        if (paramElem instanceof TypeElement) {
+            TypeDeclared paramModel = typeHolder.withTypeElement(paramElem);
+            if (isSamePropertyType(paramModel.getTypeClassname(), tableDeclared.getModelClassname())) {
+                columnPropertyMap = getColsPropsMap();
+            } else {
+                columnPropertyMap = getColsPropsMap(paramModel);
+            }
+            return columnPropertyMap;
+        }
+        return new LinkedHashMap<>();
+    }
+
     protected final Map<ColumnDeclared, PropertyDeclared> getColsPropsMap() {
-        return tableDeclared.reduce((col, cols) -> {
-            cols.put(col, col.getProperty());
-        }, new LinkedHashMap<>());
+        return tableDeclared.reduce((col, cols) -> cols.put(col, col.getProperty()), new LinkedHashMap<>());
     }
 
     protected final Map<ColumnDeclared, PropertyDeclared> getColsPropsMap(TypeDeclared paramModel) {

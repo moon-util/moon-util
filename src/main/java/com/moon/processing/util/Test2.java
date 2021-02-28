@@ -233,6 +233,12 @@ public enum Test2 {
         return isSubtypeOf(theType, supertype.getCanonicalName());
     }
 
+    /**
+     * 如果 theType 是 superType 或是其子类是返回 true
+     * @param theType
+     * @param supertype
+     * @return
+     */
     public static boolean isSubtypeOf(TypeMirror theType, String supertype) {
         if (theType == null || supertype == null) {
             return false;

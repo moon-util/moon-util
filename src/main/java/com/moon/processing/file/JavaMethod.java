@@ -106,6 +106,16 @@ public class JavaMethod extends JavaBlockCommentable {
         return this;
     }
 
+    public JavaMethod throwFormatted(
+        Class<? extends RuntimeException> exceptionClass, String template, Object... values
+    ) { return throwing(exceptionClass, String2.format(template, values)); }
+
+    public JavaMethod throwing(Class<? extends RuntimeException> exceptionClass, Object script) {
+        String stringify = String2.format("throw new {}({})", onImported(exceptionClass), script);
+        this.returning = new LineScripterImpl(stringify);
+        return this;
+    }
+
     /*
     next
      */

@@ -1,16 +1,20 @@
 package com.moon.processing.decl;
 
+import com.moon.processing.util.Collect2;
 import com.moon.processing.util.Element2;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author benshaoye
  */
-public class ParameterDeclared {
+public class ParameterDeclared extends AnnotatedDeclared {
 
     private final TypeElement thisElement;
     private final TypeElement declaredElement;
@@ -53,6 +57,15 @@ public class ParameterDeclared {
         this.simplifyActualType = Generic2.typeSimplify(actualType);
     }
 
+    private static <T extends Annotation> T conditionalAnnotated(VariableElement parameter, String actualType) {
+        List<? extends AnnotationMirror> annotationMirrors = parameter.getAnnotationMirrors();
+        if (Collect2.isEmpty(annotationMirrors)) {
+            return null;
+        }
+
+        return null;
+    }
+
     /**
      * 主要用于 lombok 自动生成的 getter/setter
      *
@@ -88,6 +101,8 @@ public class ParameterDeclared {
         this.actualType = actualType;
         this.simplifyActualType = Generic2.typeSimplify(actualType);
     }
+
+    public boolean isConditional() { return false; }
 
     public TypeElement getThisElement() { return thisElement; }
 

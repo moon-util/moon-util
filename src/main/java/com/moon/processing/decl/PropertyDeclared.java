@@ -14,7 +14,7 @@ import java.util.TreeMap;
 /**
  * @author benshaoye
  */
-public class PropertyDeclared {
+public class PropertyDeclared extends AnnotatedDeclared {
 
     private final TypeElement thisElement;
 

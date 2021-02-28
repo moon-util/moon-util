@@ -1,9 +1,7 @@
 package com.moon.processing.decl;
 
-import com.moon.accessor.annotation.JdbcDSL;
-import com.moon.accessor.annotation.JdbcSQL;
+import com.moon.accessor.annotation.ForceModifying;
 import com.moon.accessor.annotation.Provided;
-import com.moon.accessor.annotation.SafeModifying;
 import com.moon.processing.file.FileClassImpl;
 import com.moon.processing.file.JavaMethod;
 import com.moon.processing.util.Collect2;
@@ -11,12 +9,11 @@ import com.moon.processing.util.Element2;
 import com.moon.processing.util.String2;
 import com.moon.processing.util.Test2;
 
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author benshaoye
@@ -114,33 +111,18 @@ public class AccessorOnInterface extends TypeImported {
         @Override
         public void doImplMethod(MethodDeclared declared) {
             final int paramsCount = declared.getParametersCount();
-            if (paramsCount == 0) {
-                unsafeDeleteModifying(overrideMethod(declared));
-            } else if (paramsCount == 1) {
-                doImplUpdateForOnlyParameter(declared);
-            } else {
-                doImplDeleteForMultiParameters(declared);
-            }
-        }
-
-        private void doImplDeleteForMultiParameters(MethodDeclared methodDecl) {
-            Map<ColumnDeclared, ParameterDeclared> columnsMap = getColsMap(methodDecl, 0);
-            JavaMethod implMethod = overrideMethod(methodDecl);
-            if (columnsMap.isEmpty()) {
-
-            } else {
-            }
-        }
-
-        private void doImplUpdateForOnlyParameter(MethodDeclared declared) {
-            ParameterDeclared parameter = declared.getParameterAt(0);
+            // if (paramsCount == 0) {
+            //     unsafeDeleteModifying(overrideMethod(declared));
+            // } else if (paramsCount == 1) {
+            //     doImplUpdateForOnlyParameter(declared);
+            // } else {
+            //     doImplDeleteForMultiParameters(declared);
+            // }
         }
     }
 
     private class UpdateByMethodDeclared implements MethodImplementor {
 
-        @JdbcSQL("")
-        @JdbcDSL("")
         @Override
         public void doImplMethod(MethodDeclared methodDecl) {
             switch (methodDecl.getParametersCount()) {
@@ -149,111 +131,130 @@ public class AccessorOnInterface extends TypeImported {
                     break;
                 }
                 case 1: {
-                    ExecutableElement elem = methodDecl.getMethod();
-                    SafeModifying modifying = elem.getAnnotation(SafeModifying.class);
-                    JavaMethod implMethod = overrideMethod(methodDecl);
-                    if (modifying == null) {
-                        unsafeUpdateModifying(implMethod);
-                        break;
-                    }
-                    ParameterDeclared parameter = methodDecl.getParameterAt(0);
-                    String paramActualType = parameter.getActualType();
-                    ColumnDeclared refColumnDecl = tableDeclared.getColumnDeclared(parameter.getParameterName());
-                    if (refColumnDecl != null && isSamePropertyType(paramActualType, refColumnDecl.getFieldClass())) {
-                        doImplUpdateParameters(methodDecl, implMethod, Collect2.ofMap(refColumnDecl, parameter));
-                    } else {
-                        Map<ColumnDeclared, PropertyDeclared> columnsMap;
-                        Element paramElem = types.asElement(parameter.getParameter().asType());
-                        if (paramElem instanceof TypeElement) {
-                            TypeDeclared paramModel = typeHolder.withTypeElement(paramElem);
-                            if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
-                                columnsMap = getColsPropsMap();
-                            } else {
-                                columnsMap = getColsPropsMap(paramModel);
-                            }
-                            doImplUpdateFields(methodDecl, implMethod, columnsMap, parameter);
-                        }
-                    }
+                    doImplUpdateMethod(methodDecl);
                     break;
                 }
                 case 2: {
+                    doImplUpdateMethod(methodDecl.getParameterAt(0), methodDecl.getParameterAt(1));
                     break;
                 }
                 default: {
-                    doImplUpdateForMultiParameters(methodDecl);
+                    doImplUpdateMethod(methodDecl);
                 }
             }
         }
 
-        /**
-         * 无条件的全量更新
-         *
-         * @param methodDecl
-         * @param implMethod
-         * @param columnsMap
-         * @param parameter
-         */
-        private void doImplUpdateFields(
-            MethodDeclared methodDecl,
-            JavaMethod implMethod,
-            Map<ColumnDeclared, PropertyDeclared> columnsMap,
+        private void doImplUpdateMethod(ParameterDeclared first, ParameterDeclared second) {
+            String firstActualType = first.getActualType();
+            String secondActualType = second.getActualType();
+            ColumnDeclared firstColumn = tableDeclared.getColumnDeclared(first.getParameterName());
+            ColumnDeclared secondColumn = tableDeclared.getColumnDeclared(second.getParameterName());
+            if (secondColumn != null && isSamePropertyType(secondActualType, secondColumn.getFieldClass())) {
+                if (firstColumn != null && isSamePropertyType(firstActualType, firstColumn.getFieldClass())) {
+                    doImplUpdateSetParamsOnParams(Collect2.ofMap(firstColumn, first),
+                        Collect2.ofMap(secondColumn, second));
+                } else {
+                    doImplUpdateSetPropsOnParams(getColsPropsMap(first), first, Collect2.ofMap(secondColumn, second));
+                }
+            } else {
+                if (firstColumn != null && isSamePropertyType(firstActualType, firstColumn.getFieldClass())) {
+                    doImplUpdateSetParamsOnProps(Collect2.ofMap(firstColumn, first), getColsPropsMap(second), second);
+                } else {
+                    doImplUpdateSetPropsOnProps(getColsPropsMap(first), first, getColsPropsMap(second), second);
+                }
+            }
+        }
+
+        private void doImplUpdateMethod(MethodDeclared methodDecl) {
+            ParameterDeclared parameter = methodDecl.getParameterAt(0);
+            String parameterName = parameter.getParameterName();
+            String paramActualType = parameter.getActualType();
+            ColumnDeclared refColumnDecl = tableDeclared.getColumnDeclared(parameterName);
+            Map<ColumnDeclared, ParameterDeclared> updateWhereColsMap = getColsMap(methodDecl, 1);
+            if (refColumnDecl != null && isSamePropertyType(paramActualType, refColumnDecl.getFieldClass())) {
+                doImplUpdateSetParamsOnParams(Collect2.ofMap(refColumnDecl, parameter), updateWhereColsMap);
+            } else {
+                doImplUpdateSetPropsOnParams(getColsPropsMap(parameter), parameter, updateWhereColsMap);
+            }
+        }
+
+        private void doImplUpdateSetPropsOnParams(
+            Map<ColumnDeclared, PropertyDeclared> updateSetColsMap,
+            ParameterDeclared parameter,
+            Map<ColumnDeclared, ParameterDeclared> updateWhereColsMap
+        ) {
+            JavaMethod implMethod = allowImplMethod(parsingDeclared, updateSetColsMap, updateWhereColsMap);
+            if (implMethod == null) {
+                return;
+            }
+            writeUpdateSql(implMethod, updateSetColsMap, updateWhereColsMap);
+            writeAddParameters(implMethod, updateSetColsMap, parameter.getParameterName());
+            writeAddParameters(implMethod, updateWhereColsMap);
+            writeJdbcSessionUpdate(implMethod);
+        }
+
+        private void doImplUpdateSetParamsOnProps(
+            Map<ColumnDeclared, ParameterDeclared> updateSetColsMap,
+            Map<ColumnDeclared, PropertyDeclared> updateWhereColsMap,
             ParameterDeclared parameter
         ) {
-            if (columnsMap.isEmpty()) {
+            JavaMethod implMethod = allowImplMethod(parsingDeclared, updateSetColsMap, updateWhereColsMap);
+            if (implMethod == null) {
                 return;
             }
-            writeUpdateSqlAsNonWhere(implMethod, columnsMap);
-            for (Map.Entry<ColumnDeclared, PropertyDeclared> entry : columnsMap.entrySet()) {
-                PropertyDeclared param = entry.getValue();
-                ColumnDeclared column = entry.getKey();
-                implMethod.nextFormatted("parameters.add({}, {})",
-                    column.getConstColumnRef(getTableImported()),
-                    param.getReffedGetterScript(parameter.getParameterName()));
-            }
+            writeUpdateSql(implMethod, updateSetColsMap, updateWhereColsMap);
+            writeAddParameters(implMethod, updateSetColsMap);
+            writeAddParameters(implMethod, updateWhereColsMap, parameter.getParameterName());
             writeJdbcSessionUpdate(implMethod);
         }
 
-        /**
-         * 无条件的全量更新
-         *
-         * @param methodDeclared
-         * @param implMethod
-         * @param columnsMap
-         */
-        private void doImplUpdateParameters(
-            MethodDeclared methodDeclared, JavaMethod implMethod, Map<ColumnDeclared, ParameterDeclared> columnsMap
+        private void doImplUpdateSetPropsOnProps(
+            Map<ColumnDeclared, PropertyDeclared> updateSetColsMap,
+            ParameterDeclared setParam,
+            Map<ColumnDeclared, PropertyDeclared> updateWhereColsMap,
+            ParameterDeclared whereParam
         ) {
-            if (columnsMap.isEmpty()) {
+            JavaMethod implMethod = allowImplMethod(parsingDeclared, updateSetColsMap, updateWhereColsMap);
+            if (implMethod == null) {
                 return;
             }
-            writeUpdateSqlAsNonWhere(implMethod, columnsMap);
-            for (Map.Entry<ColumnDeclared, ParameterDeclared> entry : columnsMap.entrySet()) {
-                ParameterDeclared param = entry.getValue();
-                ColumnDeclared column = entry.getKey();
-                implMethod.nextFormatted("parameters.add({}, {})",
-                    column.getConstColumnRef(getTableImported()),
-                    param.getParameterName());
-            }
+            writeUpdateSql(implMethod, updateSetColsMap, updateWhereColsMap);
+            writeAddParameters(implMethod, updateSetColsMap, setParam.getParameterName());
+            writeAddParameters(implMethod, updateWhereColsMap, whereParam.getParameterName());
             writeJdbcSessionUpdate(implMethod);
         }
 
-        private void doImplUpdateForMultiParameters(MethodDeclared methodDecl) {
-            ParameterDeclared firstParameter = methodDecl.getParameterAt(0);
-            String parameterName = firstParameter.getParameterName();
-            String paramActualType = firstParameter.getActualType();
-            ColumnDeclared refColumnDecl = tableDeclared.getColumnDeclared(parameterName);
-
-            Map<ColumnDeclared, ParameterDeclared> columnsMap = getColsMap(methodDecl, 0);
-            JavaMethod implMethod = overrideMethod(methodDecl);
-            if (columnsMap.isEmpty()) {
-                unsafeUpdateModifying(implMethod);
-            } else {
+        private void doImplUpdateSetParamsOnParams(
+            Map<ColumnDeclared, ParameterDeclared> updateSetColsMap,
+            Map<ColumnDeclared, ParameterDeclared> updateWhereColsMap
+        ) {
+            JavaMethod implMethod = allowImplMethod(parsingDeclared, updateSetColsMap, updateWhereColsMap);
+            if (implMethod == null) {
+                return;
             }
-            if (isSamePropertyType(paramActualType, refColumnDecl.getFieldClass())) {
-                // String sql =
-            } else {
+            writeUpdateSql(implMethod, updateSetColsMap, updateWhereColsMap);
+            writeAddParameters(implMethod, updateSetColsMap);
+            writeAddParameters(implMethod, updateWhereColsMap);
+            writeJdbcSessionUpdate(implMethod);
+        }
 
+        private JavaMethod allowImplMethod(
+            MethodDeclared methodDecl,
+            Map<ColumnDeclared, ?> updateSetColsMap,
+            Map<ColumnDeclared, ?> updateWhereColsMap
+        ) {
+            JavaMethod implMethod = overrideMethod(parsingDeclared);
+            if (updateSetColsMap.isEmpty()) {
+                return null;
             }
+            if (updateWhereColsMap.isEmpty()) {
+                ForceModifying modifying = methodDecl.getAtExecutableAnnotation(ForceModifying.class);
+                if (modifying == null) {
+                    unsafeUpdateModifying(implMethod);
+                    return null;
+                }
+            }
+            return implMethod;
         }
     }
 
@@ -308,13 +309,7 @@ public class AccessorOnInterface extends TypeImported {
                 return;
             }
             writeInsertSql(implMethod, columnsMap);
-            for (Map.Entry<ColumnDeclared, ParameterDeclared> columnMap : columnsMap.entrySet()) {
-                ParameterDeclared param = columnMap.getValue();
-                ColumnDeclared column = columnMap.getKey();
-                implMethod.nextFormatted("parameters.add({}, {})",
-                    column.getConstColumnRef(getTableImported()),
-                    param.getParameterName());
-            }
+            writeAddParameters(implMethod, columnsMap);
             writeJdbcSessionInsert(implMethod);
         }
 
@@ -328,34 +323,15 @@ public class AccessorOnInterface extends TypeImported {
                 return;
             }
             writeInsertSql(implMethod, columnsMap);
-            for (Map.Entry<ColumnDeclared, PropertyDeclared> columnMap : columnsMap.entrySet()) {
-                PropertyDeclared prop = columnMap.getValue();
-                ColumnDeclared column = columnMap.getKey();
-                implMethod.nextFormatted("parameters.add({}, {})",
-                    column.getConstColumnRef(getTableImported()),
-                    prop.getReffedGetterScript(parameter.getParameterName()));
-            }
+            writeAddParameters(implMethod, columnsMap, parameter.getParameterName());
             writeJdbcSessionInsert(implMethod);
         }
 
         private void doImplInsertMethodForModel(
             MethodDeclared methodDeclared, JavaMethod implMethod, ParameterDeclared parameter
         ) {
-            Map<ColumnDeclared, PropertyDeclared> columnsMap;
-            TypeMirror parameterType = parameter.getParameter().asType();
-            Element parameterTypeElem = types.asElement(parameterType);
-            if (parameterTypeElem instanceof TypeElement) {
-                TypeDeclared paramModel = typeHolder.withTypeElement(parameterTypeElem);
-                if (Objects.equals(paramModel, tableDeclared.getTypeDeclared())) {
-                    columnsMap = getColsPropsMap();
-                } else {
-                    columnsMap = getColsPropsMap(paramModel);
-                }
-                if (!columnsMap.isEmpty()) {
-                    return;
-                }
-                doImplInsertFields(methodDeclared, implMethod, columnsMap, parameter);
-            }
+            Map<ColumnDeclared, PropertyDeclared> columnsMap = getColsPropsMap(parameter);
+            doImplInsertFields(methodDeclared, implMethod, columnsMap, parameter);
         }
     }
 }

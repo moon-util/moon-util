@@ -1,7 +1,7 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.Provided;
-import com.moon.accessor.annotation.SafeModifying;
+import com.moon.accessor.annotation.ForceModifying;
 import com.moon.processing.file.*;
 import com.moon.processing.util.Assert2;
 import com.moon.processing.util.Element2;
@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
  */
 public abstract class BaseGenerator extends BaseImportable {
 
-    protected final static String MODIFYING = SafeModifying.class.getCanonicalName();
+    protected final static String MODIFYING = ForceModifying.class.getCanonicalName();
 
 
     private final static Map<String, String> COLLECTION_TYPES = new HashMap<>();
@@ -157,7 +157,7 @@ public abstract class BaseGenerator extends BaseImportable {
      */
 
     protected final void writeJdbcSessionUpdate(JavaMethod implMethod) {
-        writeJdbcSessionExecution(implMethod, "Update");
+        writeJdbcSessionExecution(implMethod, "update");
     }
 
     protected final void writeJdbcSessionInsert(JavaMethod implMethod) {
@@ -165,7 +165,7 @@ public abstract class BaseGenerator extends BaseImportable {
     }
 
     protected final void writeJdbcSessionExecution(JavaMethod implMethod, String methodName) {
-        implMethod.nextBlank().nextFormatted("int inserted = {}.{}(sql, parameters)", getJdbcSessionName(), methodName);
+        implMethod.nextBlank().nextFormatted("final int executed = {}.{}(sql, parameters)", getJdbcSessionName(), methodName);
     }
 
     /**

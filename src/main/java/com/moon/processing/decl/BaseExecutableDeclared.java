@@ -3,6 +3,7 @@ package com.moon.processing.decl;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
@@ -139,6 +140,10 @@ public class BaseExecutableDeclared {
     public TypeElement getEnclosingElement() { return enclosingElement; }
 
     public ExecutableElement getExecutable() { return executable; }
+
+    public <A extends Annotation> A getAtExecutableAnnotation(Class<A> annotationClass) {
+        return getExecutable().getAnnotation(annotationClass);
+    }
 
     public TypeDeclared getTypeDeclared() { return typeDeclared; }
 
