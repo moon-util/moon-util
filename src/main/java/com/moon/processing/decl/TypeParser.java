@@ -1,8 +1,10 @@
 package com.moon.processing.decl;
 
-import com.moon.processing.util.Processing2;
+import com.moon.processing.holder.BaseHolder;
+import com.moon.processing.holder.Holders;
 import com.moon.processing.util.Collect2;
 import com.moon.processing.util.Element2;
+import com.moon.processing.util.Processing2;
 import com.moon.processing.util.Test2;
 
 import javax.lang.model.element.Element;
@@ -17,7 +19,7 @@ import java.util.function.Function;
 /**
  * @author benshaoye
  */
-final class TypeParser {
+final class TypeParser extends BaseHolder {
 
     private final static String TOP_CLASS = Object.class.getName();
 
@@ -32,7 +34,8 @@ final class TypeParser {
 
     private final Types types = Processing2.getTypes();
 
-    TypeParser(TypeDeclared typeDeclared) {
+    TypeParser(Holders holders, TypeDeclared typeDeclared) {
+        super(holders);
         this.typeElement = typeDeclared.getTypeElement();
         this.thisGenericMap = typeDeclared.getGenericDeclaredMap();
         this.typeDeclared = typeDeclared;
@@ -56,7 +59,12 @@ final class TypeParser {
     private PropertyDeclared withPropertyDeclared(String name, TypeElement enclosingElement) {
         PropertyDeclared declared = properties.get(name);
         if (declared == null) {
-            declared = new PropertyDeclared(typeElement, enclosingElement, typeDeclared, name, thisGenericMap);
+            declared = new PropertyDeclared(getHolders(),
+                typeElement,
+                enclosingElement,
+                typeDeclared,
+                name,
+                thisGenericMap);
             properties.put(name, declared);
         }
         return declared;
@@ -89,7 +97,8 @@ final class TypeParser {
             withPropertyDeclared(name, parsingElem).withGetterMethodDeclared(elem);
         } else if (Test2.isConstructor(element)) {
             if (parsingElem == typeElement) {
-                ConstructorDeclared constructorDeclared = new ConstructorDeclared(typeElement,
+                ConstructorDeclared constructorDeclared = new ConstructorDeclared(getHolders(),
+                    typeElement,
                     parsingElem,
                     (ExecutableElement) element,
                     typeDeclared,
@@ -97,7 +106,8 @@ final class TypeParser {
                 constructorsMap.put(constructorDeclared.getConstructorSignature(), constructorDeclared);
             }
         } else if (Test2.isMethod(element)) {
-            MethodDeclared methodDeclared = new MethodDeclared(typeElement,
+            MethodDeclared methodDeclared = new MethodDeclared(getHolders(),
+                typeElement,
                 parsingElem,
                 (ExecutableElement) element,
                 typeDeclared,

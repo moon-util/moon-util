@@ -1,6 +1,8 @@
 package com.moon.processing.decl;
 
 import com.moon.accessor.annotation.condition.IfMatching;
+import com.moon.processing.JavaDeclarable;
+import com.moon.processing.JavaProvider;
 import com.moon.processing.util.Element2;
 
 import javax.lang.model.element.TypeElement;
@@ -8,7 +10,7 @@ import javax.lang.model.element.TypeElement;
 /**
  * @author benshaoye
  */
-public class MatchingDeclared {
+public class MatchingDeclared implements JavaProvider {
 
     private final TypeElement matchingAnnotationElem;
     private final TypeElement matcherElem;
@@ -35,4 +37,9 @@ public class MatchingDeclared {
     public String getMatchingAnnotationName() { return matchingAnnotationName; }
 
     public String getMatcherClassname() { return matcherClassname; }
+
+    @Override
+    public JavaDeclarable getJavaDeclare() {
+        return null;
+    }
 }

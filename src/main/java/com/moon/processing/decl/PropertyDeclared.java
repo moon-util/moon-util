@@ -1,5 +1,6 @@
 package com.moon.processing.decl;
 
+import com.moon.processing.holder.Holders;
 import com.moon.processing.util.Element2;
 import com.moon.processing.util.Test2;
 
@@ -58,12 +59,14 @@ public class PropertyDeclared extends AnnotatedDeclared {
     private Map<String, PropertyMethodDeclared> typedSetterMap = new LinkedHashMap<>();
 
     public PropertyDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         TypeDeclared typeDeclared,
         String name,
         Map<String, GenericDeclared> thisGenericMap
     ) {
+        super(holders);
         this.enclosingElement = enclosingElement;
         this.thisGenericMap = thisGenericMap;
         this.typeDeclared = typeDeclared;
@@ -92,7 +95,8 @@ public class PropertyDeclared extends AnnotatedDeclared {
             return;
         }
         TypeElement enclosingElement = (TypeElement) getterElement.getEnclosingElement();
-        this.getter = new PropertyMethodDeclared(thisElement,
+        this.getter = new PropertyMethodDeclared(getHolders(),
+            thisElement,
             enclosingElement,
             getterElement,
             getName(),
@@ -109,7 +113,8 @@ public class PropertyDeclared extends AnnotatedDeclared {
             return;
         }
         typedSetterMap.put(simplifySetterType,
-            new PropertyMethodDeclared(thisElement,
+            new PropertyMethodDeclared(getHolders(),
+                thisElement,
                 (TypeElement) setterElement.getEnclosingElement(),
                 setterElement,
                 getName(),
@@ -168,7 +173,8 @@ public class PropertyDeclared extends AnnotatedDeclared {
         FieldDeclared field = this.fieldDeclared;
         if (getter == null) {
             if (field != null && Test2.hasLombokSetter(field.getFieldElement())) {
-                PropertyMethodDeclared setter = PropertyMethodDeclared.ofLombokSetterGenerated(thisElement,
+                PropertyMethodDeclared setter = PropertyMethodDeclared.ofLombokSetterGenerated(getHolders(),
+                    thisElement,
                     field.getFieldElement(),
                     typeDeclared,
                     thisGenericMap);
@@ -181,7 +187,8 @@ public class PropertyDeclared extends AnnotatedDeclared {
         } else {
             PropertyMethodDeclared setter = typedSetterMap.get(getter.getReturnActualType());
             if (setter == null && field != null && Test2.hasLombokSetter(field.getFieldElement())) {
-                setter = PropertyMethodDeclared.ofLombokSetterGenerated(thisElement,
+                setter = PropertyMethodDeclared.ofLombokSetterGenerated(getHolders(),
+                    thisElement,
                     field.getFieldElement(),
                     typeDeclared,
                     thisGenericMap);
@@ -196,7 +203,8 @@ public class PropertyDeclared extends AnnotatedDeclared {
         if (getter == null) {
             FieldDeclared field = this.fieldDeclared;
             if (field != null && Test2.hasLombokGetter(field.getFieldElement())) {
-                this.getter = PropertyMethodDeclared.ofLombokGetterGenerated(thisElement,
+                this.getter = PropertyMethodDeclared.ofLombokGetterGenerated(getHolders(),
+                    thisElement,
                     field.getFieldElement(),
                     typeDeclared,
                     thisGenericMap);

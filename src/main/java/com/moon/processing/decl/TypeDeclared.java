@@ -58,7 +58,7 @@ public class TypeDeclared extends BaseHolder {
 
     public static TypeDeclared from(Holders holders, TypeElement typeElement) {
         Map<String, GenericDeclared> thisGenericMap = Generic2.from(typeElement);
-        TypeParser parser = new TypeParser(new TypeDeclared(holders, typeElement, thisGenericMap));
+        TypeParser parser = new TypeParser(holders, new TypeDeclared(holders, typeElement, thisGenericMap));
         return parser.doParseTypeDeclared();
     }
 

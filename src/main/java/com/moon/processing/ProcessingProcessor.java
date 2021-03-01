@@ -128,23 +128,8 @@ public class ProcessingProcessor extends AbstractProcessor {
 
     private void doProcessing(RoundEnvironment roundEnv) {
         doProcessingMapper(roundEnv);
-        doProcessingMatching(roundEnv);
         doProcessingTableModel(roundEnv);
         doProcessingAccessor(roundEnv);
-    }
-
-    private void doProcessingMatching(RoundEnvironment roundEnv) {
-        Elements elements = processingEnv.getElementUtils();
-        Set<? extends Element> matchingSet = roundEnv.getElementsAnnotatedWith(IfMatching.class);
-        MatchingHolder matchingHolder = holders.getMatchingHolder();
-        for (Element annotated : matchingSet) {
-            TypeElement matchingElem = (TypeElement) annotated;
-            Log2.warn(matchingElem);
-            IfMatching matching = annotated.getAnnotation(IfMatching.class);
-            String matcherClass = Element2.getClassname(matching, IfMatching::value);
-            TypeElement matcherElem = elements.getTypeElement(matcherClass);
-            matchingHolder.with(matchingElem, matcherElem, matching);
-        }
     }
 
     private void doProcessingMapper(RoundEnvironment roundEnv) {

@@ -1,5 +1,6 @@
 package com.moon.processing.decl;
 
+import com.moon.processing.holder.Holders;
 import com.moon.processing.util.String2;
 
 import javax.lang.model.element.ExecutableElement;
@@ -22,13 +23,14 @@ public class MethodDeclared extends BaseExecutableDeclared {
     private final String methodSignature;
 
     public MethodDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
         TypeDeclared typeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
-        super(thisElement, enclosingElement, method, typeDeclared, Generic2.from(method, thisGenericMap));
+        super(holders, thisElement, enclosingElement, method, typeDeclared, Generic2.from(method, thisGenericMap));
         String methodName = method.getSimpleName().toString();
         this.methodName = methodName;
 
@@ -50,6 +52,7 @@ public class MethodDeclared extends BaseExecutableDeclared {
      * @param parametersMap
      */
     protected MethodDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         TypeDeclared typeDeclared,
@@ -58,7 +61,7 @@ public class MethodDeclared extends BaseExecutableDeclared {
         Map<String, GenericDeclared> thisGenericMap,
         Map<String, String> parametersMap
     ) {
-        super(thisElement, enclosingElement, typeDeclared, thisGenericMap, parametersMap);
+        super(holders, thisElement, enclosingElement, typeDeclared, thisGenericMap, parametersMap);
         this.methodName = methodName;
         this.returnDeclaredType = returnDeclaredType;
         this.returnActualType = mapToActual(getThisGenericMap(), getEnclosingClassname(), returnDeclaredType);

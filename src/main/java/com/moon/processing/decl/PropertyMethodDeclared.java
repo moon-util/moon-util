@@ -3,6 +3,7 @@ package com.moon.processing.decl;
 import com.moon.accessor.annotation.domain.AutoInsertable;
 import com.moon.accessor.annotation.domain.AutoUpdatable;
 import com.moon.accessor.annotation.domain.TableId;
+import com.moon.processing.holder.Holders;
 import com.moon.processing.util.Element2;
 import com.moon.processing.util.String2;
 
@@ -27,6 +28,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
     private final AutoUpdatable autoUpdate;
 
     public PropertyMethodDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
@@ -34,10 +36,11 @@ public class PropertyMethodDeclared extends MethodDeclared {
         TypeDeclared thisTypeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
-        this(thisElement, enclosingElement, method,propertyName, thisTypeDeclared, thisGenericMap, false);
+        this(holders, thisElement, enclosingElement, method, propertyName, thisTypeDeclared, thisGenericMap, false);
     }
 
     public PropertyMethodDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement method,
@@ -46,7 +49,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
         Map<String, GenericDeclared> thisGenericMap,
         boolean lombokGenerated
     ) {
-        super(thisElement, enclosingElement, method, thisTypeDeclared, thisGenericMap);
+        super(holders, thisElement, enclosingElement, method, thisTypeDeclared, thisGenericMap);
         this.autoInsert = method.getAnnotation(AutoInsertable.class);
         this.autoUpdate = method.getAnnotation(AutoUpdatable.class);
         this.tableId = method.getAnnotation(TableId.class);
@@ -55,6 +58,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
     }
 
     protected PropertyMethodDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         VariableElement field,
@@ -65,7 +69,8 @@ public class PropertyMethodDeclared extends MethodDeclared {
         Map<String, String> parametersMap,
         boolean lombokGenerated
     ) {
-        super(thisElement,
+        super(holders,
+            thisElement,
             enclosingElement,
             thisTypeDeclared,
             methodName,
@@ -88,6 +93,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
     public boolean isTableId() { return getTableId() != null; }
 
     public static PropertyMethodDeclared ofLombokGetterGenerated(
+        Holders holders,
         TypeElement thisElement,
         VariableElement field,
         TypeDeclared thisTypeDeclared,
@@ -95,7 +101,8 @@ public class PropertyMethodDeclared extends MethodDeclared {
     ) {
         String type = field.asType().toString();
         String getterName = String2.toGetterName(Element2.getSimpleName(field), type);
-        return new PropertyMethodDeclared(thisElement,
+        return new PropertyMethodDeclared(holders,
+            thisElement,
             (TypeElement) field.getEnclosingElement(),
             field,
             thisTypeDeclared,
@@ -107,6 +114,7 @@ public class PropertyMethodDeclared extends MethodDeclared {
     }
 
     public static PropertyMethodDeclared ofLombokSetterGenerated(
+        Holders holders,
         TypeElement thisElement,
         VariableElement field,
         TypeDeclared thisTypeDeclared,
@@ -117,7 +125,8 @@ public class PropertyMethodDeclared extends MethodDeclared {
         Map<String, String> parametersMap = new LinkedHashMap<>();
         parametersMap.put(name, type);
         String getterName = String2.toSetterName(Element2.getSimpleName(field));
-        return new PropertyMethodDeclared(thisElement,
+        return new PropertyMethodDeclared(holders,
+            thisElement,
             (TypeElement) field.getEnclosingElement(),
             field,
             thisTypeDeclared,

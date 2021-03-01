@@ -40,7 +40,6 @@ public class DeclaredInsertImplementor extends DeclaredBaseImplementor {
                 return;
             default:
                 doImplInsertParameters(implMethod, getParsingColumnsMap(0));
-                return;
         }
     }
 

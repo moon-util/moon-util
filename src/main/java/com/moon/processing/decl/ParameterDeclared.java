@@ -1,12 +1,18 @@
 package com.moon.processing.decl;
 
+import com.moon.accessor.annotation.condition.IfMatching;
+import com.moon.processing.holder.Holders;
 import com.moon.processing.util.Collect2;
 import com.moon.processing.util.Element2;
+import com.moon.processing.util.Log2;
+import com.moon.processing.util.Test2;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +37,7 @@ public class ParameterDeclared extends AnnotatedDeclared {
     private final String simplifyActualType;
 
     public ParameterDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement declaredElement,
         ExecutableElement thisExecutable,
@@ -39,6 +46,7 @@ public class ParameterDeclared extends AnnotatedDeclared {
         int parameterIndex,
         Map<String, GenericDeclared> thisGenericMap
     ) {
+        super(holders);
         this.thisElement = thisElement;
         this.declaredElement = declaredElement;
         this.thisExecutable = thisExecutable;
@@ -57,12 +65,33 @@ public class ParameterDeclared extends AnnotatedDeclared {
         this.simplifyActualType = Generic2.typeSimplify(actualType);
     }
 
-    private static <T extends Annotation> T conditionalAnnotated(VariableElement parameter, String actualType) {
-        List<? extends AnnotationMirror> annotationMirrors = parameter.getAnnotationMirrors();
-        if (Collect2.isEmpty(annotationMirrors)) {
+
+
+    public final  TypeElement getIfConditionalAnnotated() {
+        List<? extends AnnotationMirror> mirrors = parameter.getAnnotationMirrors();
+        if (Collect2.isEmpty(mirrors)) {
             return null;
         }
+        String typeSimplify = Generic2.typeSimplify(actualType);
 
+        for (AnnotationMirror mirror : mirrors) {
+            DeclaredType annotationType = mirror.getAnnotationType();
+            if (Test2.isTypeKind(annotationType, TypeKind.DECLARED)) {
+                TypeElement annotationElem = (TypeElement) annotationType.asElement();
+                String annotationName = getQualifiedName(annotationElem);
+                if (isIfConditionType(annotationName)) {
+                    continue;
+                }
+                IfMatching matching = annotationElem.getAnnotation(IfMatching.class);
+                if (matching != null) {
+                    return annotationElem;
+                }
+            }
+            Log2.warn("Kind: {}, Type: {}, Elem: {}",
+                annotationType.getKind(),
+                annotationType,
+                annotationType.asElement());
+        }
         return null;
     }
 
@@ -77,6 +106,7 @@ public class ParameterDeclared extends AnnotatedDeclared {
      * @param thisGenericMap
      */
     public ParameterDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement declaredElement,
         TypeDeclared thisTypeDeclared,
@@ -85,6 +115,7 @@ public class ParameterDeclared extends AnnotatedDeclared {
         int parameterIndex,
         Map<String, GenericDeclared> thisGenericMap
     ) {
+        super(holders);
         this.thisElement = thisElement;
         this.declaredElement = declaredElement;
         this.thisExecutable = null;

@@ -1,56 +1,34 @@
 package com.moon.processing.accessor;
 
 import com.moon.accessor.annotation.Provided;
-import com.moon.processing.decl.*;
+import com.moon.processing.decl.AccessorDeclared;
+import com.moon.processing.decl.MethodDeclared;
+import com.moon.processing.decl.TypeDeclared;
 import com.moon.processing.file.BaseImplementation;
 import com.moon.processing.file.FileClassImpl;
-import com.moon.processing.holder.TableHolder;
-import com.moon.processing.holder.TypeHolder;
+import com.moon.processing.holder.Holders;
 import com.moon.processing.util.Element2;
-import com.moon.processing.util.Processing2;
 import com.moon.processing.util.String2;
 import com.moon.processing.util.Test2;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author benshaoye
  */
 public class AtInterfaceParser extends BaseGenerator {
 
-    protected final TypeHolder typeHolder;
-    protected final TableHolder tableHolder;
-    protected final TypeElement accessorElement;
-    protected final String accessorClassname;
     protected final AccessorDeclared accessorDeclared;
     protected final TypeDeclared accessorTypeDeclared;
-    protected final TableDeclared tableDeclared;
     protected final FileClassImpl impl;
-
-    protected final Map<String, GenericDeclared> thisGenericMap;
-    protected final Elements utils;
-    protected final Types types;
 
     public AtInterfaceParser(FileClassImpl impl, AccessorDeclared declared) {
         super(impl.getImporter());
-        TypeDeclared accessorTypeDeclared = declared.getTypeDeclared();
-        this.thisGenericMap = accessorTypeDeclared.getGenericDeclaredMap();
-        this.accessorClassname = declared.getAccessorClassname();
-        this.accessorElement = declared.getAccessorElement();
-        this.accessorTypeDeclared = accessorTypeDeclared;
-        this.tableHolder = declared.tableHolder();
-        this.typeHolder = declared.typeHolder();
-        this.tableDeclared = declared.getTableDeclared();
+        this.accessorTypeDeclared = declared.getTypeDeclared();
         this.accessorDeclared = declared;
-        this.utils = Processing2.getUtils();
-        this.types = Processing2.getTypes();
         this.impl = impl;
     }
 
@@ -82,15 +60,16 @@ public class AtInterfaceParser extends BaseGenerator {
     }
 
     private DeclaredImplementor getDeclaredImplementor(MethodDeclared methodDeclared) {
+        Holders holders = accessorDeclared.getHolders();
         switch (String2.firstWord(methodDeclared.getMethodName()).toLowerCase()) {
             case "insert":
-                return new DeclaredInsertImplementor(accessorDeclared.getHolders(), accessorDeclared, impl);
+                return new DeclaredInsertImplementor(holders, accessorDeclared, impl);
             case "modify":
             case "update":
-                return new DeclaredUpdateImplementor(accessorDeclared.getHolders(), accessorDeclared, impl);
+                return new DeclaredUpdateImplementor(holders, accessorDeclared, impl);
             case "remove":
             case "delete":
-                return new DeclaredDeleteImplementor(accessorDeclared.getHolders(), accessorDeclared, impl);
+                return new DeclaredDeleteImplementor(holders, accessorDeclared, impl);
             case "find":
             case "read":
             case "fetch":

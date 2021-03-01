@@ -1,5 +1,6 @@
 package com.moon.processing.holder;
 
+import javax.lang.model.element.QualifiedNameable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -17,6 +18,10 @@ public abstract class BaseHolder {
     public final Types types() { return getHolders().getTypes(); }
 
     public final Elements utils() { return getHolders().getUtils(); }
+
+    public final String getQualifiedName(QualifiedNameable nameable) {
+        return nameable.getQualifiedName().toString();
+    }
 
     public final DslHelper dslHelper() { return holders.getDslHelper(); }
 

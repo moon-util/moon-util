@@ -1,5 +1,8 @@
 package com.moon.processing.decl;
 
+import com.moon.processing.holder.BaseHolder;
+import com.moon.processing.holder.Holders;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -12,7 +15,7 @@ import static java.util.stream.Collectors.joining;
 /**
  * @author benshaoye
  */
-public class BaseExecutableDeclared {
+public class BaseExecutableDeclared extends BaseHolder {
 
     private final TypeElement thisElement;
 
@@ -55,12 +58,14 @@ public class BaseExecutableDeclared {
      * @param parametersMap
      */
     protected BaseExecutableDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         TypeDeclared typeDeclared,
         Map<String, GenericDeclared> thisGenericMap,
         Map<String, String> parametersMap
     ) {
+        super(holders);
         this.thisElement = thisElement;
         this.enclosingElement = enclosingElement;
         this.typeDeclared = typeDeclared;
@@ -76,7 +81,8 @@ public class BaseExecutableDeclared {
         Map<String, ParameterDeclared> parametersIndexedMap = new HashMap<>(size);
         for (Map.Entry<String, String> stringEntry : typesMap.entrySet()) {
             String name = stringEntry.getKey(), type = stringEntry.getValue();
-            ParameterDeclared parameterDeclared = new ParameterDeclared(thisElement,
+            ParameterDeclared parameterDeclared = new ParameterDeclared(getHolders(),
+                thisElement,
                 enclosingElement,
                 typeDeclared,
                 type,
@@ -88,18 +94,19 @@ public class BaseExecutableDeclared {
         }
         this.parametersDeclared = parametersDeclared;
         this.parametersMap = parametersIndexedMap;
-        this.parametersTypesSignature = parametersDeclared.stream()
-            .map(ParameterDeclared::getSimplifyActualType)
+        this.parametersTypesSignature = parametersDeclared.stream().map(ParameterDeclared::getSimplifyActualType)
             .collect(joining(","));
     }
 
     public BaseExecutableDeclared(
+        Holders holders,
         TypeElement thisElement,
         TypeElement enclosingElement,
         ExecutableElement executable,
         TypeDeclared typeDeclared,
         Map<String, GenericDeclared> thisGenericMap
     ) {
+        super(holders);
         this.thisElement = thisElement;
         this.enclosingElement = enclosingElement;
         this.typeDeclared = typeDeclared;
@@ -114,7 +121,8 @@ public class BaseExecutableDeclared {
         List<ParameterDeclared> parametersDeclared = new ArrayList<>(size);
         Map<String, ParameterDeclared> parametersMap = new HashMap<>(size);
         for (VariableElement parameter : parameters) {
-            ParameterDeclared parameterDeclared = new ParameterDeclared(thisElement,
+            ParameterDeclared parameterDeclared = new ParameterDeclared(getHolders(),
+                thisElement,
                 enclosingElement,
                 executable,
                 parameter,
@@ -126,8 +134,7 @@ public class BaseExecutableDeclared {
         }
         this.parametersDeclared = Collections.unmodifiableList(parametersDeclared);
         this.parametersMap = Collections.unmodifiableMap(parametersMap);
-        this.parametersTypesSignature = parametersDeclared.stream()
-            .map(ParameterDeclared::getSimplifyActualType)
+        this.parametersTypesSignature = parametersDeclared.stream().map(ParameterDeclared::getSimplifyActualType)
             .collect(joining(","));
     }
 

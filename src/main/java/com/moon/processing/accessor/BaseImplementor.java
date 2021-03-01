@@ -108,6 +108,7 @@ public abstract class BaseImplementor extends AbstractImplementor {
         List<ParameterDeclared> params = methodDeclared.getParametersDeclared();
         JavaMethod method = impl.publicMethod(methodDeclared.getMethodName(), parameters -> {
             for (ParameterDeclared parameter : params) {
+                parameter.getIfConditionalAnnotated();
                 parameters.add(parameter.getParameterName(), parameter.getActualType());
             }
         }).typeOf(methodDeclared.getReturnActualType());
