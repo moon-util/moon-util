@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
  * @author benshaoye
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER,ElementType.METHOD,ElementType.FIELD})
 public @interface OnGe {}
