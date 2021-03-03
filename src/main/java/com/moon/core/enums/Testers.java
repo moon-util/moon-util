@@ -98,7 +98,7 @@ public enum Testers implements Predicate, EnumDescriptor {
     },
     isEmptyIterator {
         @Override
-        public boolean test(Object o) { return o == null || ((o instanceof Iterator) && ((Iterator) o).hasNext()); }
+        public boolean test(Object o) { return o == null || ((o instanceof Iterator) && !((Iterator) o).hasNext()); }
     },
     /**
      * 是否为空
@@ -154,35 +154,125 @@ public enum Testers implements Predicate, EnumDescriptor {
      */
     isZeroInt {
         @Override
-        public boolean test(Object o) { return o instanceof Number && ((Number) o).intValue() == 0; }
+        public boolean test(Object o) {
+            if (o instanceof Number) {
+                return ((Number) o).intValue() == 0;
+            }
+            if (o instanceof CharSequence) {
+                try {
+                    return Integer.parseInt(o.toString()) == 0;
+                } catch (Throwable ignored) { }
+            }
+            return false;
+        }
     },
     /**
      * 是 0 值
      */
     isZeroLong {
         @Override
-        public boolean test(Object o) { return o instanceof Number && ((Number) o).longValue() == 0; }
+        public boolean test(Object o) {
+            if (o instanceof Number) {
+                return ((Number) o).longValue() == 0;
+            }
+            if (o instanceof CharSequence) {
+                try {
+                    return Long.parseLong(o.toString()) == 0;
+                } catch (Throwable ignored) { }
+            }
+            return false;
+        }
     },
     /**
      * 是 0 值
      */
     isZeroDouble {
         @Override
-        public boolean test(Object o) { return o instanceof Number && ((Number) o).doubleValue() == 0; }
+        public boolean test(Object o) {
+            if (o instanceof Number) {
+                return ((Number) o).doubleValue() == 0;
+            }
+            if (o instanceof CharSequence) {
+                try {
+                    return Double.parseDouble(o.toString()) == 0;
+                } catch (Throwable ignored) { }
+            }
+            return false;
+        }
     },
     /**
      * 负数
      */
     isNegative {
         @Override
-        public boolean test(Object o) { return o instanceof Number && ((Number) o).doubleValue() < 0; }
+        public boolean test(Object o) {
+            if (o instanceof Number) {
+                return ((Number) o).doubleValue() < 0;
+            }
+            if (o instanceof CharSequence) {
+                try {
+                    return Double.parseDouble(o.toString()) < 0;
+                } catch (Throwable ignored) { }
+            }
+            return false;
+        }
     },
     /**
      * 正数
      */
     isPositive {
         @Override
-        public boolean test(Object o) { return o instanceof Number && ((Number) o).doubleValue() > 0; }
+        public boolean test(Object o) {
+            if (o instanceof Number) {
+                return ((Number) o).doubleValue() > 0;
+            }
+            if (o instanceof CharSequence) {
+                try {
+                    return Double.parseDouble(o.toString()) > 0;
+                } catch (Throwable ignored) { }
+            }
+            return false;
+        }
+    },
+    /**
+     * 奇数
+     */
+    isOdd {
+        @Override
+        public boolean test(Object o) {
+            if (o instanceof Integer || o instanceof Short || o instanceof Byte) {
+                int mod = ((Number) o).intValue() % 2;
+                return mod == 1 || mod == -1;
+            }
+            if (o instanceof Long) {
+                long mod = ((Long) o) % 2;
+                return mod == 1 || mod == -1;
+            }
+            if (o instanceof CharSequence) {
+                try {
+                    long mod = Long.parseLong(o.toString()) % 2;
+                    return mod == 1 || mod == -1;
+                } catch (Throwable ignored) { }
+            }
+            return false;
+        }
+    },
+    isEven {
+        @Override
+        public boolean test(Object o) {
+            if (o instanceof Integer || o instanceof Short || o instanceof Byte) {
+                return ((Number) o).intValue() % 2 == 0;
+            }
+            if (o instanceof Long) {
+                return ((Long) o) % 2 == 0;
+            }
+            if (o instanceof CharSequence) {
+                try {
+                    return Long.parseLong(o.toString()) % 2 == 0;
+                } catch (Throwable ignored) { }
+            }
+            return false;
+        }
     },
     ;
 
