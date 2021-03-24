@@ -31,7 +31,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
         public Object toMessage(Throwable ex) { return forErrorsByBindingResult((BindException) ex); }
     },
     // Hibernate-validator 验证错误
-    onConstraintViolationException(ConstraintViolationException.class) {
+    onConstraintViolationException("javax.validation.ConstraintViolationException") {
         @Override
         public Map<String, String> toMessage(Throwable throwable) {
             ConstraintViolationException ex = (ConstraintViolationException) throwable;
@@ -52,7 +52,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
         }
     },
     // 页面请求时，@RequestBody 参数校验错误，包含所有错误字段
-    onMethodArgumentNotValidException(MethodArgumentNotValidException.class, 400) {
+    onMethodArgumentNotValidException("org.springframework.web.bind.MethodArgumentNotValidException", 400) {
         @Override
         public Object toMessage(Throwable t) {
             MethodArgumentNotValidException e = (MethodArgumentNotValidException) t;
@@ -124,9 +124,9 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     }
 
     public Object toMessage(Throwable throwable) {
-        return StringUtil.concat("[", nextSerialAsString(), "] ",
-
-            StringUtil.format(getConstMessage(), throwable.getMessage()));
+        return String.format("[%s] %s",
+            nextSerialAsString(),
+            StringUtil.defaultIfBlank(throwable.getMessage(), getConstMessage()));
     }
 
     @Override
