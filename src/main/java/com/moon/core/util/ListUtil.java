@@ -134,6 +134,40 @@ public final class ListUtil extends CollectUtil {
         return collect instanceof List ? (List<T>) collect : newList(collect);
     }
 
+    /**
+     * 返回 sublist，包含的元素范围从 fromIndex(含)开始至集合末尾
+     *
+     * @param list      源集合
+     * @param fromIndex 开始索引（含）
+     * @param <E>       元素类型泛型
+     *
+     * @return 子集合，集合类型为{@link ArrayList}
+     *
+     * @throws NullPointerException      当 list 是 null 时抛出异常
+     * @throws IndexOutOfBoundsException 索引范围超过源集合大小
+     */
+    public static <E> ArrayList<E> sublist(List<E> list, int fromIndex) {
+        return new ArrayList<>(list.subList(fromIndex, list.size()));
+    }
+
+    /**
+     * 返回 sublist，包含的元素范围从 fromIndex(含)开始至 toIndex(不含)结束
+     *
+     * @param list      源集合
+     * @param fromIndex 开始索引（含）
+     * @param toIndex   结束索引（不含）
+     * @param <E>       元素类型泛型
+     *
+     * @return 子集合，集合类型为{@link ArrayList}
+     *
+     * @throws NullPointerException      当 list 是 null 时抛出异常
+     * @throws IndexOutOfBoundsException 索引范围超过源集合大小
+     * @throws IllegalArgumentException  索引出现异常情况，如: {@code toIndex < fromIndex}
+     */
+    public static <E> ArrayList<E> sublist(List<E> list, int fromIndex, int toIndex) {
+        return new ArrayList<>(list.subList(fromIndex, toIndex));
+    }
+
     /*
      * ---------------------------------------------------------------------------------
      * keepers

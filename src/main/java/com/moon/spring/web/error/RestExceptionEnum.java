@@ -5,10 +5,10 @@ import com.moon.core.util.MapUtil;
 import com.moon.core.util.SetUtil;
 import com.moon.data.identifier.LongSequenceIdentifier;
 import org.hibernate.TransientObjectException;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +43,42 @@ public enum RestExceptionEnum implements RestExceptionHandler {
             }, MapUtil.newHashMap());
         }
     },
-    // 参数校验错误，缺少 query 参数
+    onMissingPathVariableException("org.springframework.web.bind.MissingPathVariableException") {
+        @Override
+        public Object toMessage(Throwable t) {
+            MissingPathVariableException e = (MissingPathVariableException) t;
+            MethodParameter parameter = e.getParameter();
+            return String.format("缺少路径参数(%s as %s): %s",
+                parameter.getParameterName(),
+                parameter.getParameterType(),
+                e.getVariableName());
+        }
+    },
+    // 请求校验错误，缺少 cookie
+    onMissingRequestCookieException("org.springframework.web.bind.MissingRequestCookieException") {
+        @Override
+        public Object toMessage(Throwable t) {
+            MissingRequestCookieException e = (MissingRequestCookieException) t;
+            MethodParameter parameter = e.getParameter();
+            return String.format("缺少 cookie(%s as %s): %s",
+                parameter.getParameterName(),
+                parameter.getParameterType(),
+                e.getCookieName());
+        }
+    },
+    // 请求校验错误，缺少请求头参数
+    onMissingRequestHeaderException("org.springframework.web.bind.MissingRequestHeaderException") {
+        @Override
+        public Object toMessage(Throwable t) {
+            MissingRequestHeaderException e = (MissingRequestHeaderException) t;
+            MethodParameter parameter = e.getParameter();
+            return String.format("缺少请求头(%s as %s): %s",
+                parameter.getParameterName(),
+                parameter.getParameterType(),
+                e.getHeaderName());
+        }
+    },
+    // 请求参数校验错误，缺少 query 参数
     onMissingServletRequestParameterException("org.springframework.web.bind.MissingServletRequestParameterException") {
         @Override
         public Object toMessage(Throwable t) {
@@ -67,7 +102,7 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     onTemplateInputException("org.thymeleaf.exceptions.TemplateInputException", "页面不存在: {}"),
     // 主要是在ManyToOne级联操作时遇到，
     // 比如new了一个新对象，在未保存之前将它保存进了一个新new的对象（也即不是持久态）
-    onTransientObjectException(TransientObjectException.class, "{}"),
+    onTransientObjectException("org.hibernate.TransientObjectException", "{}"),
     onEntityNotFoundException("javax.persistence.EntityNotFoundException", "数据不存在", 400),
     // sql 语法错误
     onSQLSyntaxErrorException(SQLSyntaxErrorException.class, "数据库语法错误"),
@@ -95,17 +130,13 @@ public enum RestExceptionEnum implements RestExceptionHandler {
     private final String text;
     private final int status;
 
-    RestExceptionEnum(Class type) { this(type, null); }
-
-    RestExceptionEnum(Class type, int status) { this(type, null, status); }
-
     RestExceptionEnum(String classname) { this(classname, null); }
 
     RestExceptionEnum(String classname, int status) { this(classname, null, status); }
 
-    RestExceptionEnum(Class type, String text) { this(type.getName(), text); }
+    RestExceptionEnum(Class type, String text) { this(type.getCanonicalName(), text); }
 
-    RestExceptionEnum(Class type, String text, int status) { this(type.getName(), text, status); }
+    RestExceptionEnum(Class type, String text, int status) { this(type.getCanonicalName(), text, status); }
 
     RestExceptionEnum(String classname, String text) { this(classname, text, 500); }
 

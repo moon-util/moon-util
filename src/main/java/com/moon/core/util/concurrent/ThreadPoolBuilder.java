@@ -24,6 +24,8 @@ public class ThreadPoolBuilder {
 
     public ThreadPoolBuilder() { }
 
+    public static ThreadPoolBuilder of() { return new ThreadPoolBuilder(); }
+
     public ThreadPoolBuilder withCorePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
         return this;

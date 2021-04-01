@@ -34,7 +34,11 @@ public final class MapUtil {
         return put(newMap(key, value), key1, value1);
     }
 
-    public static <K, V, M extends Map<K, V>> M fillAs(M map, V value, Iterable<? extends K> keys) {
+    public static <K, V> Map<K, V> newMap(K key, V value, K key1, V value1, K key2, V value2) {
+        return put(newMap(key, value, key1, value1), key2, value2);
+    }
+
+    public static <K, V, M extends Map<K, V>> M fillWith(M map, V value, Iterable<? extends K> keys) {
         if (keys != null) {
             for (K key : keys) {
                 map.put(key, value);
@@ -43,8 +47,8 @@ public final class MapUtil {
         return map;
     }
 
-    public static <K, V, M extends Map<K, V>> M fillAs(M map, V value, K... keys) {
-        return ArrayUtil.isNotEmpty(keys) ? map : fillAs(map, value, Arrays.asList(keys));
+    public static <K, V, M extends Map<K, V>> M fillWith(M map, V value, K... keys) {
+        return ArrayUtil.isNotEmpty(keys) ? map : fillWith(map, value, Arrays.asList(keys));
     }
 
     /*
