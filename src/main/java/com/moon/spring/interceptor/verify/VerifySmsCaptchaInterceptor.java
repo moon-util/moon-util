@@ -1,6 +1,6 @@
 package com.moon.spring.interceptor.verify;
 
-import com.moon.spring.annotation.verify.VerifyImgCaptcha;
+import com.moon.spring.annotation.verify.VerifySmsCaptcha;
 import com.moon.spring.interceptor.InterceptorUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ public class VerifySmsCaptchaInterceptor extends BaseVerifyInterceptor {
     public boolean preHandle(
         HttpServletRequest request, HttpServletResponse response, Object handler
     ) {
-        VerifyImgCaptcha verify = InterceptorUtil.getAnnotation(handler, VerifyImgCaptcha.class);
+        VerifySmsCaptcha verify = InterceptorUtil.getAnnotation(handler, VerifySmsCaptcha.class);
         return verify == null || getTester().test(request, verify.fromType().apply(request, verify.value()));
     }
 }

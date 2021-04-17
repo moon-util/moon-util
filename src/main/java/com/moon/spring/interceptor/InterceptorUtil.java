@@ -23,13 +23,13 @@ import java.util.function.BiPredicate;
  */
 public final class InterceptorUtil {
 
-    private static final Map<Class, Map<Method, Object>> CACHE = new HashMap<>();
+    private static final Map<Class<?>, Map<Method, Object>> CACHE = new HashMap<>();
 
-    private static Map<Method, Object> ensureGet(Class type) {
+    private static Map<Method, Object> ensureGet(Class<?> type) {
         Map<Method, Object> map = CACHE.get(type);
         if (map == null) {
             Map<Method, Object> nowMap = new HashMap<>(16);
-            // 这里并不会频繁执行，用 synchronized 即可
+            // 这里不会频繁执行
             synchronized (InterceptorUtil.class) {
                 map = CACHE.putIfAbsent(type, nowMap);
                 map = map == null ? nowMap : map;
@@ -60,13 +60,13 @@ public final class InterceptorUtil {
         } else if (cachedVal == null) {
             annotation = method.getAnnotation(annotationType);
             if (annotation == null) {
-                // 这里并不会频繁执行，用 synchronized 即可
+                // 这里不会频繁执行
                 synchronized (cache) {
                     cache.put(method, placeholder);
                 }
                 return null;
             }
-            // 这里并不会频繁执行，用 synchronized 即可
+            // 这里不会频繁执行
             synchronized (cache) {
                 cache.put(method, annotation);
             }
