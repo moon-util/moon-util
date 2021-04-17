@@ -67,7 +67,7 @@ public class ParameterDeclared extends AnnotatedDeclared {
 
 
 
-    public final  TypeElement getIfConditionalAnnotated() {
+    public final  TypeElement getConditionalAnnotated() {
         List<? extends AnnotationMirror> mirrors = parameter.getAnnotationMirrors();
         if (Collect2.isEmpty(mirrors)) {
             return null;

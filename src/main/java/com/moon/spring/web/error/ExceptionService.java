@@ -23,6 +23,12 @@ public class ExceptionService {
         CACHE.put(classname, handler);
     }
 
+    static {
+        try {
+            Class.forName(RestExceptionEnum.class.getCanonicalName());
+        } catch (Throwable ignored) { }
+    }
+
     private final Map<String, RestExceptionHandler> handlerMap;
 
     public ExceptionService() { this((Supplier) Maps.HashMaps); }

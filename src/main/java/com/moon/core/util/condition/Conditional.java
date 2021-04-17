@@ -9,15 +9,19 @@ import java.util.function.BooleanSupplier;
  * 条件执行，实际开发和生产中可能有一些场景需要条件执行，比如：
  *
  * <pre>
- * if (开发环境) {
- *     // do something
- * } else if (生产环境) {
- *     // do something
+ * // 开发环境
+ * private Conditional developmentConditional = Conditional.of(true);
+ *
+ * if (developmentConditional.isTrue()) {
+ *     // do something for development
+ * } else {
+ *     // do something for production
  * }
  * </pre>
  * <p>
- * 虽然{@code Spring}提供了条件加载，但能满足的场景也有些，且
- * 一旦条件多了，多个场景都写多个 bean 也比较麻烦；这提供另一种方式
+ * 虽然{@code Spring}提供了条件加载，但采用的方式策略模式，开发环境加载某类
+ * 生成环境加载的是另一个类，无论什么逻辑都采用这种方式，编程写起来难免麻烦；
+ * 这提供另一种方式，算是一种补充，提供编程式条件执行
  *
  * @author moonsky
  */

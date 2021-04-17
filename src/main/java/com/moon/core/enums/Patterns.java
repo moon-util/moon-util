@@ -47,7 +47,7 @@ public enum Patterns implements Predicate<CharSequence> {
      */
     UNICODE(Pattern.compile("[\u0000-\uFFFF]+")),
     /**
-     * 18位，居民身份证号（这里允许了末尾大写和小写“X”，实际中正确的只有大写）
+     * 18位，居民身份证号（这里允许了末尾大写和小写“X”，规范的写法是只有大写）
      */
     RESIDENT_ID_18(Pattern.compile("[1-9]\\d{5}[1-2]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}(\\d|X|x)")),
     /**
@@ -140,16 +140,27 @@ public enum Patterns implements Predicate<CharSequence> {
     RGB_COLOR3(Pattern.compile("^#[0-9a-fA-F]{3}$")),
     /**
      * 日期校验
+     * yyyy年MM月dd日
+     * yyyy-MM-dd
+     * yyyy/MM/dd
      */
     DATE(Pattern.compile("^(\\d{2,4})([\\-/年]?)(\\d{1,2})([\\-/.月]?)(\\d{1,2})日?$")),
+    /** 日期: yyyy年MM月dd日 */
     DATE_年月日(Pattern.compile("^\\d{4}年\\d{2}月\\d{2}日$")),
+    /** 日期: yyyy-MM-dd */
     DATE_yyyy_MM_dd(Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$")),
+    /** 日期: MM/dd/yyyy */
     DATE_MM$dd$yyyy(Pattern.compile("^\\d{2}/\\d{2}/\\d{4}$")),
+    /** 日期: dd/MM/yyyy */
     DATE_dd$MM$yyyy(Pattern.compile("^\\d{2}/\\d{2}/\\d{4}$")),
+    /** 日期: M/d/yyyy */
     DATE_M$d$yyyy(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}$")),
+    /** 日期: d/M/yyyy */
     DATE_d$M$yyyy(Pattern.compile("^\\d{1,2}/\\d{1,2}/\\d{4}$")),
     /**
      * 时间校验
+     * HH时mm分ss秒
+     * HH:mm:ss
      */
     TIME(Pattern.compile("^(\\d{1,2}:\\d{1,2}(:\\d{1,2})?)|(\\d{1,2}时\\d{1,2}分(\\d{1,2}秒)?)$")),
     /**
@@ -162,7 +173,7 @@ public enum Patterns implements Predicate<CharSequence> {
      */
     HEX(Pattern.compile("^[a-f0-9]+$", Pattern.CASE_INSENSITIVE)),
     /**
-     * 银联卡号
+     * 银联 16 位或 19 位卡号
      */
     UNION_PAY_CARD_NO(Pattern.compile("^62[0-9]{14}(\\d{3})?$")),
     ;

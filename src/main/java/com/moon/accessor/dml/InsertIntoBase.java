@@ -21,22 +21,22 @@ import java.util.function.Function;
 abstract class InsertIntoBase<R, TB extends Table<R, TB>> extends TableFieldsHolder<R, TB>
     implements InsertInto<R, TB> {
 
-    private final Configuration config;
+    // private final Configuration config;
     private final TB table;
 
     @SafeVarargs
-    InsertIntoBase(Configuration config, TB table, TableField<?, R, TB>... fields) {
+    InsertIntoBase(TB table, TableField<?, R, TB>... fields) {
         super(fields);
-        this.config = config;
+        // this.config = config;
         this.table = table;
     }
 
-    protected final Configuration getConfig() { return config; }
+    // protected final Configuration getConfig() { return config; }
 
     public TB getTable() { return table; }
 
     protected final int doInsert(List<Object[]> values) {
-        return doInsert(getConfig(), getTable(), getFields(), values);
+        return doInsert(null, getTable(), getFields(), values);
     }
 
     private static <R, TB extends Table<R, TB>> int doInsert(

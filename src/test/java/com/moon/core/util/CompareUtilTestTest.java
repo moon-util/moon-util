@@ -11,6 +11,5 @@ class CompareUtilTestTest {
 
     @Test
     void testMax() {
-        CompareUtil.max();
     }
 }
